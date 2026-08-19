@@ -1,5 +1,56 @@
-; ModuleID = 'test_full_pipeline_mlib_producer.ms'
-source_filename = "test_full_pipeline_mlib_producer.ms"
+; ModuleID = '..\..\lib\alloc\mod.ms'
+source_filename = "..\\..\\lib\\alloc\\mod.ms"
+
+%GlobalAlloc = type {}
+
+declare void @__mellis_panic()
+
+declare ptr @__mellis_alloc(i64, i64)
+
+declare void @__mellis_dealloc(ptr, i64, i64)
+
+declare ptr @__mellis_realloc(ptr, i64, i64, i64)
+
+declare ptr @__mellis_alloc.1(i64, i64)
+
+declare void @__mellis_dealloc.2(ptr, i64, i64)
+
+declare ptr @__mellis_alloc.3(i64, i64)
+
+declare void @__mellis_dealloc.4(ptr, i64, i64)
+
+declare ptr @__mellis_realloc.5(ptr, i64, i64, i64)
+
+define ptr @alloc_77(%GlobalAlloc %"0", i64 %"1", i64 %"2") {
+entry0:
+  %"3" = alloca %GlobalAlloc, align 8
+  %"4" = alloca i64, align 8
+  %"5" = alloca i64, align 8
+  store %GlobalAlloc %"0", ptr %"3", align 1
+  store i64 %"1", ptr %"4", align 4
+  store i64 %"2", ptr %"5", align 4
+  %"6" = load i64, ptr %"4", align 4
+  %"7" = load i64, ptr %"5", align 4
+  %"8" = call ptr @__mellis_alloc(i64 %"6", i64 %"7")
+  ret ptr %"8"
+}
+
+define void @dealloc_81(%GlobalAlloc %"0", ptr %"1", i64 %"2", i64 %"3") {
+entry0:
+  %"4" = alloca %GlobalAlloc, align 8
+  %"5" = alloca ptr, align 8
+  %"6" = alloca i64, align 8
+  %"7" = alloca i64, align 8
+  store %GlobalAlloc %"0", ptr %"4", align 1
+  store ptr %"1", ptr %"5", align 8
+  store i64 %"2", ptr %"6", align 4
+  store i64 %"3", ptr %"7", align 4
+  %"8" = load ptr, ptr %"5", align 8
+  %"9" = load i64, ptr %"6", align 4
+  %"10" = load i64, ptr %"7", align 4
+  call void @__mellis_dealloc(ptr %"8", i64 %"9", i64 %"10")
+  ret void
+}
 
 define linkonce i1 @mellis_coro_is_done(ptr %0) {
 entry:
