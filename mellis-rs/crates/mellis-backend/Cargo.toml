@@ -1,0 +1,8 @@
+[package]
+name = "mellis-backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+mellis-common = { path = "../mellis-common" }
+mellis-mvir = { path = "../mellis-mvir" }

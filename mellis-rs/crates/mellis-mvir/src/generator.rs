@@ -111,7 +111,7 @@ impl<'a> MvirGenerator<'a> {
         match expr {
             Expr::Literal(_tok) => {
                 // In real compiler, parse token text.
-                Operand::Number("0".to_string())
+                Operand::Number("null".to_string())
             }
             Expr::Call { callee, args, .. } => {
                 let callee_op = self.generate_expr(callee);

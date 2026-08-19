@@ -11,6 +11,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "mellis-backend"
+version = "0.1.0"
+dependencies = [
+ "mellis-common",
+ "mellis-mvir",
+]
+
+[[package]]
 name = "mellis-common"
 version = "0.1.0"
 
@@ -19,6 +27,7 @@ name = "mellis-driver"
 version = "0.1.0"
 dependencies = [
  "mellis-ast",
+ "mellis-backend",
  "mellis-common",
  "mellis-lexer",
  "mellis-mvir",

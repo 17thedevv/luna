@@ -10,3 +10,4 @@ mellis-ast = { path = "../mellis-ast" }
 mellis-parser = { path = "../mellis-parser" }
 mellis-semantic = { path = "../mellis-semantic" }
 mellis-mvir = { path = "../mellis-mvir" }
+mellis-backend = { path = "../mellis-backend" }

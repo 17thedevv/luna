@@ -4,6 +4,7 @@ use mellis_lexer::Lexer;
 use mellis_parser::Parser;
 use mellis_semantic::{SemanticContext, Resolver, TypeChecker};
 use mellis_mvir::{MvirGenerator, print_module};
+use mellis_backend::{generate_llvm_ir, compile_ll_to_exe};
 
 pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
     let mut session = CompilerSession::new();
@@ -47,6 +48,25 @@ pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
             println!("\n--- Generated MVIR ---");
             println!("{}", print_module(&module));
             println!("----------------------\n");
+            
+            // LLVM IR / Backend phase
+            let llvm_ir = generate_llvm_ir(&module);
+            println!("\n--- Generated LLVM IR ---");
+            println!("{}", llvm_ir);
+            println!("-------------------------\n");
+            
+            // Save to file and compile
+            let ll_file = format!("{}.ll", file_name);
+            let obj_file = format!("{}.obj", file_name);
+            let exe_file = format!("{}.exe", file_name.replace(".ms", ""));
+            
+            std::fs::write(&ll_file, &llvm_ir).expect("Failed to write .ll file");
+            
+            println!("Compiling to {}...", exe_file);
+            match compile_ll_to_exe(&ll_file, &obj_file, &exe_file) {
+                Ok(_) => println!("Build successful: {}", exe_file),
+                Err(e) => println!("Build failed: {}", e),
+            }
             
         }
         Err(_) => {
