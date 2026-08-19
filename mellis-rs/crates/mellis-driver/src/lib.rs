@@ -1,4 +1,5 @@
-use mellis_common::{CompilerSession, Diagnostic, Span};
+use mellis_common::{CompilerSession, Diagnostic};
+use mellis_lexer::Lexer;
 
 pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
     let mut session = CompilerSession::new();
@@ -6,22 +7,28 @@ pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
         .source_manager
         .add_file(file_name.to_string(), input.to_string());
 
-    // Test Diagnostic rendering
-    if input.contains("error") {
-        let span = Span {
-            file_id,
-            start: input.find("error").unwrap() as u32,
-            end: input.find("error").unwrap() as u32 + 5,
-        };
-        session
-            .diagnostics
-            .push(Diagnostic::error("Found the word 'error'").with_span(span));
+    // Lexing phase
+    let lexer = Lexer::new(input, file_id);
+    let mut tokens = Vec::new();
+
+    for token in lexer {
+        tokens.push(token);
+        // Ngừng lexing nếu gặp lỗi
+        if token.kind == mellis_lexer::TokenKind::Error {
+            session.diagnostics.push(
+                Diagnostic::error("Lexer encountered an invalid token.").with_span(token.span),
+            );
+            break;
+        }
     }
 
     if session.diagnostics.is_empty() {
+        // Debug print tokens for now
+        for t in &tokens {
+            println!("{:?}", t);
+        }
         Ok(())
     } else {
-        // Trả về kèm theo Diagnostics
         Err(session.diagnostics.clone())
     }
 }
@@ -37,18 +44,4 @@ pub fn render_diagnostics(input: &str, diagnostics: &[Diagnostic]) -> String {
         .map(|d| d.render(&session.source_manager))
         .collect::<Vec<_>>()
         .join("\n")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_dummy_pipeline() {
-        let result = compile("test.ms", "fn main() {}");
-        assert!(result.is_ok());
-
-        let result = compile("test.ms", "fn error() {}");
-        assert!(result.is_err());
-    }
 }

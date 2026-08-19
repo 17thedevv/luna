@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 mellis-common = { path = "../mellis-common" }
+mellis-lexer = { path = "../mellis-lexer" }

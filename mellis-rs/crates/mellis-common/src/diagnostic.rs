@@ -38,7 +38,10 @@ impl Diagnostic {
             DiagnosticLevel::Note => "note",
         };
 
-        if let (Some(span), Some(file)) = (self.span, source_manager.get_file(self.span.unwrap().file_id)) {
+        if let (Some(span), Some(file)) = (
+            self.span,
+            source_manager.get_file(self.span.unwrap().file_id),
+        ) {
             let (line, col) = file.get_line_col(span.start);
             out.push_str(&format!("{}: {}\n", level_str, self.message));
             out.push_str(&format!("  --> {}:{}:{}\n", file.name, line, col));

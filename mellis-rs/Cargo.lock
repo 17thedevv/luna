@@ -11,4 +11,12 @@ name = "mellis-driver"
 version = "0.1.0"
 dependencies = [
  "mellis-common",
+ "mellis-lexer",
+]
+
+[[package]]
+name = "mellis-lexer"
+version = "0.1.0"
+dependencies = [
+ "mellis-common",
 ]
