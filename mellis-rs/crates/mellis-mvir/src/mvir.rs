@@ -1,5 +1,5 @@
 use mellis_common::ids::SymbolId;
-use mellis_semantic::semantic_tables::SemanticTypeId;
+use mellis_semantic::SemanticTypeId;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct LocalId {

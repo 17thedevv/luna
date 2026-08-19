@@ -39,7 +39,14 @@ pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
             typechecker.typecheck_items(&items);
             
             println!("Resolved symbols: {}", semantic_ctx.tables.expr_symbols.len());
-            println!("Typechecked expressions: {}", semantic_ctx.tables.expr_types.len());
+            
+            // Print expression types
+            println!("--- Expression Types ---");
+            for (expr_id, ty_id) in &semantic_ctx.tables.expr_types {
+                let ty = semantic_ctx.types.get(*ty_id);
+                println!("Expr {:?}: {:?}", expr_id, ty);
+            }
+            println!("----------------------\n");
             
             // MVIR phase
             let generator = MvirGenerator::new(&arena, &semantic_ctx);

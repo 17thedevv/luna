@@ -48,7 +48,7 @@ impl<'a> MvirGenerator<'a> {
                     self.current_function = Some(Function {
                         name: global_id,
                         blocks: Vec::new(),
-                        ret_ty: mellis_semantic::semantic_tables::SemanticTypeId(0),
+                        ret_ty: mellis_semantic::SemanticTypeId(0),
                     });
                     
                     let entry_label = self.new_label("entry");
@@ -106,7 +106,7 @@ impl<'a> MvirGenerator<'a> {
 
     fn generate_expr(&mut self, expr_id: &mellis_ast::ExprId) -> Operand {
         let expr = &self.arena.exprs[expr_id.0 as usize];
-        let ty_id = self.ctx.tables.expr_types.get(expr_id).copied().unwrap_or(mellis_semantic::semantic_tables::SemanticTypeId(0));
+        let ty_id = self.ctx.tables.expr_types.get(expr_id).copied().unwrap_or(mellis_semantic::SemanticTypeId(0));
         
         match expr {
             Expr::Literal(_tok) => {

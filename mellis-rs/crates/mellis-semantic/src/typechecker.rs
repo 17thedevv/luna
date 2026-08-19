@@ -1,6 +1,6 @@
-use crate::{SemanticContext, semantic_tables::SemanticTypeId};
+use crate::{SemanticContext, ty::{SemanticTypeId, SemanticType, BuiltinType}};
 use mellis_ast::{AstArena, Item, Stmt, Expr, Decl};
-use mellis_lexer::BuiltinKind;
+use mellis_lexer::{BuiltinKind, TokenKind};
 
 pub struct TypeChecker<'a> {
     ctx: &'a mut SemanticContext,
@@ -10,6 +10,26 @@ pub struct TypeChecker<'a> {
 impl<'a> TypeChecker<'a> {
     pub fn new(ctx: &'a mut SemanticContext, arena: &'a AstArena) -> Self {
         Self { ctx, arena }
+    }
+    
+    pub fn unify(&mut self, expected: SemanticTypeId, actual: SemanticTypeId) -> Result<(), String> {
+        let t1 = self.ctx.types.get(expected).clone();
+        let t2 = self.ctx.types.get(actual).clone();
+        
+        if expected == actual {
+            return Ok(());
+        }
+        
+        match (t1, t2) {
+            (SemanticType::InferenceVar(_), _) => {
+                // Simplistic unification: bind var to type (not actually updating context yet)
+                Ok(())
+            }
+            (_, SemanticType::InferenceVar(_)) => {
+                Ok(())
+            }
+            _ => Err(format!("Type mismatch")),
+        }
     }
 
     pub fn typecheck_items(&mut self, items: &[Item]) {
@@ -91,35 +111,45 @@ impl<'a> TypeChecker<'a> {
         let ty_id = match expr {
             Expr::Literal(tok) => {
                 // Determine type based on literal token type
-                // Dummy logic for now
-                SemanticTypeId(0) 
+                let kind = match tok.kind {
+                    TokenKind::IntegerLiteral | TokenKind::FloatLiteral => SemanticType::Primitive(BuiltinType::Int), // Simplified
+                    TokenKind::StringLiteral => SemanticType::Primitive(BuiltinType::String),
+                    TokenKind::KwTrue | TokenKind::KwFalse => SemanticType::Primitive(BuiltinType::Bool),
+                    _ => SemanticType::Error,
+                };
+                self.ctx.types.intern(kind)
             }
             Expr::Identifier { .. } => {
                 if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id) {
-                    // Get type of symbol from symbol table or decl definitions
-                    SemanticTypeId(0)
+                    // For now, if we don't have the symbol's type, return inference var
+                    self.ctx.types.new_inference_var()
                 } else {
-                    SemanticTypeId(0)
+                    self.ctx.types.intern(SemanticType::Error)
                 }
             }
             Expr::Binary { left, right, .. } => {
                 let l_ty = self.typecheck_expr(left);
                 let r_ty = self.typecheck_expr(right);
-                l_ty // simplified
+                
+                // For simplified logic: require left and right to be same, return left type
+                let _ = self.unify(l_ty, r_ty); 
+                l_ty 
             }
             Expr::Call { callee, args, .. } => {
                 self.typecheck_expr(callee);
                 for arg in args {
                     self.typecheck_expr(&arg.value);
                 }
-                SemanticTypeId(0) // return type of callee
+                // Return an inference variable as the return type for now
+                self.ctx.types.new_inference_var()
             }
             Expr::Assign { lvalue, value, .. } => {
-                self.typecheck_expr(lvalue);
-                self.typecheck_expr(value);
-                SemanticTypeId(0) // void/unit
+                let l_ty = self.typecheck_expr(lvalue);
+                let r_ty = self.typecheck_expr(value);
+                let _ = self.unify(l_ty, r_ty);
+                self.ctx.types.intern(SemanticType::Void)
             }
-            _ => SemanticTypeId(0)
+            _ => self.ctx.types.intern(SemanticType::Error)
         };
         
         self.ctx.tables.expr_types.insert(*expr_id, ty_id);

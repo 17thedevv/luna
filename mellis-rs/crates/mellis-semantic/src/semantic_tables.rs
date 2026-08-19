@@ -2,9 +2,7 @@ use mellis_ast::{ExprId, StmtId, DeclId, PatId, TypeId as AstTypeId};
 use mellis_common::ids::SymbolId;
 use std::collections::HashMap;
 
-// Placeholder for now, later we'll map to actual Type definitions
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
-pub struct SemanticTypeId(pub u32);
+use crate::ty::SemanticTypeId;
 
 pub struct SemanticTables {
     pub expr_types: HashMap<ExprId, SemanticTypeId>,
