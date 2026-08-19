@@ -21,6 +21,7 @@ dependencies = [
  "mellis-ast",
  "mellis-common",
  "mellis-lexer",
+ "mellis-mvir",
  "mellis-parser",
  "mellis-semantic",
 ]
@@ -30,6 +31,15 @@ name = "mellis-lexer"
 version = "0.1.0"
 dependencies = [
  "mellis-common",
+]
+
+[[package]]
+name = "mellis-mvir"
+version = "0.1.0"
+dependencies = [
+ "mellis-ast",
+ "mellis-common",
+ "mellis-semantic",
 ]
 
 [[package]]

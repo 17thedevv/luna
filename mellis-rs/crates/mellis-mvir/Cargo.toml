@@ -1,12 +1,9 @@
 [package]
-name = "mellis-driver"
+name = "mellis-mvir"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 mellis-common = { path = "../mellis-common" }
-mellis-lexer = { path = "../mellis-lexer" }
 mellis-ast = { path = "../mellis-ast" }
-mellis-parser = { path = "../mellis-parser" }
 mellis-semantic = { path = "../mellis-semantic" }
-mellis-mvir = { path = "../mellis-mvir" }

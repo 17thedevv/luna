@@ -3,6 +3,7 @@ use mellis_common::{CompilerSession, Diagnostic};
 use mellis_lexer::Lexer;
 use mellis_parser::Parser;
 use mellis_semantic::{SemanticContext, Resolver, TypeChecker};
+use mellis_mvir::{MvirGenerator, print_module};
 
 pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
     let mut session = CompilerSession::new();
@@ -38,6 +39,14 @@ pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
             
             println!("Resolved symbols: {}", semantic_ctx.tables.expr_symbols.len());
             println!("Typechecked expressions: {}", semantic_ctx.tables.expr_types.len());
+            
+            // MVIR phase
+            let generator = MvirGenerator::new(&arena, &semantic_ctx);
+            let module = generator.generate(&items);
+            
+            println!("\n--- Generated MVIR ---");
+            println!("{}", print_module(&module));
+            println!("----------------------\n");
             
         }
         Err(_) => {
