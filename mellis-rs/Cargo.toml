@@ -1,12 +1,8 @@
 [workspace]
 members = [
-    "crates/*"
+    "crates/mellis-common",
+    "crates/mellis-driver",
+    "crates/mellis-lexer",
+    "crates/mellis-ast",
+    "crates/mellis-parser",
 ]
-resolver = "2"
-
-[workspace.lints.clippy]
-# Cấu hình lint chuẩn để bắt lỗi tốt hơn
-pedantic = "warn"
-nursery = "warn"
-unwrap_used = "warn"
-expect_used = "warn"

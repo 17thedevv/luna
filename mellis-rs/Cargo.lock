@@ -3,11 +3,7 @@
 version = 4
 
 [[package]]
-name = "mellis-common"
-version = "0.1.0"
-
-[[package]]
-name = "mellis-driver"
+name = "mellis-ast"
 version = "0.1.0"
 dependencies = [
  "mellis-common",
@@ -15,8 +11,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "mellis-common"
+version = "0.1.0"
+
+[[package]]
+name = "mellis-driver"
+version = "0.1.0"
+dependencies = [
+ "mellis-ast",
+ "mellis-common",
+ "mellis-lexer",
+ "mellis-parser",
+]
+
+[[package]]
 name = "mellis-lexer"
 version = "0.1.0"
 dependencies = [
  "mellis-common",
+]
+
+[[package]]
+name = "mellis-parser"
+version = "0.1.0"
+dependencies = [
+ "mellis-ast",
+ "mellis-common",
+ "mellis-lexer",
 ]

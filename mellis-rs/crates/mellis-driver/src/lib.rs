@@ -1,47 +1,47 @@
+use mellis_ast::AstArena;
 use mellis_common::{CompilerSession, Diagnostic};
 use mellis_lexer::Lexer;
+use mellis_parser::Parser;
 
 pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
     let mut session = CompilerSession::new();
-    let file_id = session
-        .source_manager
-        .add_file(file_name.to_string(), input.to_string());
-
+    let file_id = session.source_manager.add_file(file_name.to_string(), input.to_string());
+    
     // Lexing phase
     let lexer = Lexer::new(input, file_id);
-    let mut tokens = Vec::new();
+    
+    // Parsing phase
+    let mut arena = AstArena::new();
+    let mut parser = Parser::new(lexer, &mut arena, file_id);
 
-    for token in lexer {
-        tokens.push(token);
-        // Ngừng lexing nếu gặp lỗi
-        if token.kind == mellis_lexer::TokenKind::Error {
-            session.diagnostics.push(
-                Diagnostic::error("Lexer encountered an invalid token.").with_span(token.span),
-            );
-            break;
+    let expr_result = parser.parse_expr();
+    let parser_diagnostics = parser.diagnostics;
+
+    // Dùng parse_expr() để thử nghiệm parse một biểu thức duy nhất (tạm thời)
+    match expr_result {
+        Ok(expr_id) => {
+            println!("Parsed Expr ID: {:?}", expr_id);
+            println!("AstArena Exprs count: {}", arena.exprs.len());
+            println!("First Expr: {:?}", arena.exprs[expr_id.0 as usize]);
+        }
+        Err(_) => {
+            println!("Failed to parse expression.");
         }
     }
 
-    if session.diagnostics.is_empty() {
-        // Debug print tokens for now
-        for t in &tokens {
-            println!("{:?}", t);
-        }
+    let mut all_diagnostics = session.diagnostics;
+    all_diagnostics.extend(parser_diagnostics);
+
+    if all_diagnostics.is_empty() {
         Ok(())
     } else {
-        Err(session.diagnostics.clone())
+        Err(all_diagnostics)
     }
 }
 
 pub fn render_diagnostics(input: &str, diagnostics: &[Diagnostic]) -> String {
     let mut session = CompilerSession::new();
-    session
-        .source_manager
-        .add_file("dummy.ms".to_string(), input.to_string());
-
-    diagnostics
-        .iter()
-        .map(|d| d.render(&session.source_manager))
-        .collect::<Vec<_>>()
-        .join("\n")
+    session.source_manager.add_file("dummy.ms".to_string(), input.to_string());
+    
+    diagnostics.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n")
 }
