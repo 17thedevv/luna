@@ -4,22 +4,53 @@ use mellis_lexer::Token;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BinaryOp {
-    Add, Sub, Mul, Div, Mod,
-    Eq, Ne, Lt, Le, Gt, Ge,
-    LogicAnd, LogicOr,
-    BitAnd, BitOr, BitXor, LShift, RShift,
-    Range, RangeInc,
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Mod,
+    Eq,
+    Ne,
+    Lt,
+    Le,
+    Gt,
+    Ge,
+    LogicAnd,
+    LogicOr,
+    BitAnd,
+    BitOr,
+    BitXor,
+    LShift,
+    RShift,
+    Range,
+    RangeInc,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum UnaryOp {
-    Neg, Not, BitNot, Deref, Ref, RefMut, PostInc, PostDec,
+    Neg,
+    Not,
+    BitNot,
+    Deref,
+    Ref,
+    RefMut,
+    PostInc,
+    PostDec,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AssignOp {
-    Assign, AddAssign, SubAssign, MulAssign, DivAssign, ModAssign,
-    BitAndAssign, BitOrAssign, BitXorAssign, LShiftAssign, RShiftAssign,
+    Assign,
+    AddAssign,
+    SubAssign,
+    MulAssign,
+    DivAssign,
+    ModAssign,
+    BitAndAssign,
+    BitOrAssign,
+    BitXorAssign,
+    LShiftAssign,
+    RShiftAssign,
 }
 
 #[derive(Debug, Clone)]

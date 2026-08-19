@@ -38,8 +38,6 @@ impl<'a> Lexer<'a> {
         }
     }
 
-
-
     fn advance(&mut self) -> u8 {
         if self.is_at_end() {
             return 0;
@@ -293,7 +291,9 @@ impl<'a> Lexer<'a> {
             } else if is_raw && self.peek() == b'"' {
                 let mut match_pounds = true;
                 for lookahead in 1..=pound_count {
-                    if self.pos + lookahead >= self.bytes.len() || self.bytes[self.pos + lookahead] != b'#' {
+                    if self.pos + lookahead >= self.bytes.len()
+                        || self.bytes[self.pos + lookahead] != b'#'
+                    {
                         match_pounds = false;
                         break;
                     }
