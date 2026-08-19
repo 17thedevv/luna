@@ -4,5 +4,5 @@ members = [
     "crates/mellis-driver",
     "crates/mellis-lexer",
     "crates/mellis-ast",
-    "crates/mellis-parser",
+    "crates/mellis-parser", "crates/mellis-semantic",
 ]

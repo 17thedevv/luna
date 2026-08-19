@@ -2,6 +2,7 @@ use mellis_ast::AstArena;
 use mellis_common::{CompilerSession, Diagnostic};
 use mellis_lexer::Lexer;
 use mellis_parser::Parser;
+use mellis_semantic::{SemanticContext, Resolver, TypeChecker};
 
 pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
     let mut session = CompilerSession::new();
@@ -25,6 +26,19 @@ pub fn compile(file_name: &str, input: &str) -> Result<(), Vec<Diagnostic>> {
             println!("AstArena Exprs count: {}", arena.exprs.len());
             println!("AstArena Stmts count: {}", arena.stmts.len());
             println!("AstArena Decls count: {}", arena.decls.len());
+            
+            // Semantic phase
+            let mut semantic_ctx = SemanticContext::new();
+            
+            let mut resolver = Resolver::new(&mut semantic_ctx, &arena);
+            resolver.resolve_items(&items);
+            
+            let mut typechecker = TypeChecker::new(&mut semantic_ctx, &arena);
+            typechecker.typecheck_items(&items);
+            
+            println!("Resolved symbols: {}", semantic_ctx.tables.expr_symbols.len());
+            println!("Typechecked expressions: {}", semantic_ctx.tables.expr_types.len());
+            
         }
         Err(_) => {
             println!("Failed to parse file.");
