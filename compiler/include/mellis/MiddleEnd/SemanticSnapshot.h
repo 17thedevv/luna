@@ -12,10 +12,12 @@
 
 namespace fl {
 
+class ProgramNode; // Forward declaration
+
 class SemanticSnapshot {
 public:
-    SemanticSnapshot(std::vector<const Type*> typeTable, const TypeContext& typeCtx, const SymbolTable& symTab)
-        : typeTable_(std::move(typeTable)), typeCtx_(typeCtx), symTab_(symTab) {}
+    SemanticSnapshot(std::vector<const Type*> typeTable, const TypeContext& typeCtx, const SymbolTable& symTab, const ProgramNode* program = nullptr)
+        : typeTable_(std::move(typeTable)), typeCtx_(typeCtx), symTab_(symTab), program_(program) {}
 
     const Type* typeOf(SymbolID id) const {
         if (id < typeTable_.size()) {
@@ -26,6 +28,7 @@ public:
 
     const TypeContext& getContext() const { return typeCtx_; }
     const SymbolTable& getSymbolTable() const { return symTab_; }
+    const ProgramNode* getProgram() const { return program_; }
 
     const std::vector<const Type*>& getTypeTable() const { return typeTable_; }
 
@@ -33,6 +36,7 @@ private:
     std::vector<const Type*> typeTable_;
     const TypeContext& typeCtx_;
     const SymbolTable& symTab_;
+    const ProgramNode* program_;
 };
 
 } // namespace fl

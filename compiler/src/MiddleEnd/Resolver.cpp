@@ -1,5 +1,6 @@
 #include <iostream>
 #include "mellis/MiddleEnd/Resolver.h"
+#include "mellis/Core/Intrinsic.h"
 #include "mellis/AST/ASTNode.h"
 #include "mellis/AST/DeclNode.h"
 #include "mellis/AST/ExprNode.h"
@@ -62,11 +63,26 @@ public:
                     }
                 }
                 if (!allFunctions) {
+                    std::cout << "[DEBUG] Redeclaration error: name=" << name << " kind=" << (int)kind << " scope=" << currentScope << "\n";
                     diag.error(loc, "Redeclaration of name '" + std::string(name) + "' in this scope.");
+                    auto optSyms = table.lookupInScope(id, currentScope);
+                    if (!optSyms.empty() && optSyms[0] != kInvalidSymbolID) {
+                        auto sym = table.getSymbol(optSyms[0]);
+                        if (sym.decl == declNode) return optSyms[0];
+                        std::cerr << "[DEBUG] Redeclaration of name '" << name << "'! sym.decl=" << sym.decl << " decl=" << declNode << " sym.kind=" << (int)sym.kind << " newKind=" << (int)kind << "\n";
+                        diag.error(loc, "Redeclaration of name '" + std::string(name) + "' in this scope.");
+                    }
                     return kInvalidSymbolID;
                 }
             } else {
-                diag.error(loc, "Redeclaration of name '" + std::string(name) + "' in this scope.");
+                std::cout << "[DEBUG] Redeclaration error: name=" << name << " kind=" << (int)kind << " scope=" << currentScope << "\n";
+                auto optSyms = table.lookupInScope(id, currentScope);
+                if (!optSyms.empty() && optSyms[0] != kInvalidSymbolID) {
+                    auto sym = table.getSymbol(optSyms[0]);
+                    if (sym.decl == declNode) return optSyms[0];
+                    std::cerr << "[DEBUG] Redeclaration of name '" << name << "'! sym.decl=" << sym.decl << " decl=" << declNode << " sym.kind=" << (int)sym.kind << " newKind=" << (int)kind << "\n";
+                    diag.error(loc, "Redeclaration of name '" + std::string(name) + "' in this scope.");
+                }
                 return kInvalidSymbolID;
             }
         }
@@ -91,6 +107,13 @@ public:
 
         auto optSym = table.lookup(id, currentScope);
         if (optSym.empty()) {
+            std::cout << "[DEBUG Resolver] name '" << name << "' not found in scope " << currentScope << ", falling back to Scope 0.\n";
+            optSym = table.lookupInScope(id, 0); // fallback to Global Scope
+            if (!optSym.empty()) {
+                std::cout << "[DEBUG Resolver] FOUND '" << name << "' in Scope 0!\n";
+            }
+        }
+        if (optSym.empty()) {
             diag.error(loc, "Use of undeclared name '" + std::string(name) + "'.");
             return {};
         }
@@ -101,8 +124,13 @@ public:
     
     std::vector<SymbolID> resolvePath(const std::vector<std::string_view>& path, SourceLocation loc) {
         if (path.empty()) return {};
+        std::cout << "[DEBUG resolvePath] Resolving path starting with '" << path[0] << "'\n";
         std::vector<SymbolID> currentSyms = resolve(path[0], loc);
-        if (currentSyms.empty()) return currentSyms;
+        if (currentSyms.empty()) {
+            std::cout << "[DEBUG resolvePath] resolve('" << path[0] << "') returned EMPTY\n";
+            return currentSyms;
+        }
+        std::cout << "[DEBUG resolvePath] resolve('" << path[0] << "') returned " << currentSyms.size() << " syms. First id=" << currentSyms[0] << "\n";
 
         for (size_t i = 1; i < path.size(); ++i) {
             if (currentSyms.size() > 1) {
@@ -130,11 +158,31 @@ public:
             }
             ScopeID nextScope = kInvalidScopeID;
             if (sym.kind == SymbolKind::Module) {
-                nextScope = static_cast<ModDeclNode*>(sym.decl)->bodyScopeId;
+                if (sym.decl != nullptr && static_cast<ModDeclNode*>(sym.decl)->bodyScopeId != kInvalidScopeID) {
+                    nextScope = static_cast<ModDeclNode*>(sym.decl)->bodyScopeId;
+                } else {
+                    nextScope = static_cast<ScopeID>(sym.mlibSymbolID);
+                }
             } else if (sym.kind == SymbolKind::ExternalModule) {
                 nextScope = static_cast<ScopeID>(sym.mlibSymbolID);
             } else if (sym.kind == SymbolKind::Enum) {
-                nextScope = static_cast<EnumDeclNode*>(sym.decl)->bodyScopeId;
+                if (sym.decl != nullptr && static_cast<EnumDeclNode*>(sym.decl)->bodyScopeId != kInvalidScopeID) {
+                    nextScope = static_cast<EnumDeclNode*>(sym.decl)->bodyScopeId;
+                } else {
+                    nextScope = static_cast<ScopeID>(sym.mlibSymbolID);
+                }
+                std::cout << "[DEBUG] resolvePath Enum '" << sym.name.view() << "' nextScope=" << nextScope 
+                          << " (sym.decl=" << (void*)sym.decl 
+                          << (sym.decl ? ", bodyScopeId=" + std::to_string(static_cast<EnumDeclNode*>(sym.decl)->bodyScopeId) : "") 
+                          << ", mlibSymbolID=" << sym.mlibSymbolID << ")\n";
+                
+                if (nextScope != kInvalidScopeID) {
+                    std::cout << "[DEBUG] bindings in nextScope: ";
+                    for (const auto& kv : table.getScope(nextScope).bindings) {
+                        std::cout << kv.first.str() << " ";
+                    }
+                    std::cout << "\n";
+                }
             }
             auto optNext = table.lookupInScope(Identifier(path[i]), nextScope);
             if (optNext.empty()) {
@@ -190,6 +238,15 @@ public:
     }
 
     void visit(FunctionDeclNode& node) override { 
+        if (node.isIntrinsic) {
+            auto intrinsicDecl = IntrinsicRegistry::get().lookup(std::string(node.name));
+            if (intrinsicDecl) {
+                node.intrinsicKind = intrinsicDecl->kind;
+            } else {
+                sm.diag.error(node.loc, "Unknown intrinsic function '" + std::string(node.name) + "'");
+            }
+        }
+
         if (node.symbolId == kInvalidSymbolID) {
             node.symbolId = sm.declare(node.name, SymbolKind::Function, node.loc, &node);
         }
@@ -213,6 +270,7 @@ public:
     }
 
     void visit(StructDeclNode& node) override { 
+        std::cerr << "[DEBUG] Resolver::visit(StructDeclNode) name='" << node.name << "' symbolId=" << node.symbolId << " this=" << &node << " line=" << node.loc.line << "\n";
         if (node.symbolId == kInvalidSymbolID) {
             node.symbolId = sm.declare(node.name, SymbolKind::Struct, node.loc, &node);
         }
@@ -244,7 +302,9 @@ public:
         for (auto& param : node.genericParams) {
             param.symbolId = sm.declare(param.name, SymbolKind::GenericParam, param.loc, nullptr);
         }
+        std::cout << "[DEBUG] Enum '" << node.name << "' has " << node.variants.size() << " variants\n";
         for (auto& v : node.variants) {
+            std::cout << "[DEBUG] Visiting variant '" << v->name << "'\n";
             v->accept(*this);
         }
 
@@ -253,6 +313,8 @@ public:
 
     void visit(EnumVariantNode& node) override { 
         node.symbolId = sm.declare(node.name, SymbolKind::EnumVariant, node.loc, &node);
+        node.bodyScopeId = sm.table.createScope(ScopeKind::Enum, sm.scopeStack.current());
+        sm.enterExistingScope(node.bodyScopeId); 
         int fieldIdx = 0;
         for (auto& f : node.fields) {
             if (!f->name.empty()) {
@@ -262,6 +324,7 @@ public:
             }
             fieldIdx++;
         }
+        sm.exitScope();
     }
 
     void visit(TraitDeclNode& node) override { 
@@ -328,9 +391,11 @@ public:
 
     void visit(ExternDeclNode& node) override { 
         if (node.func) {
+            node.func->visibility = node.visibility;
             node.func->accept(*this);
             if (node.func->symbolId != kInvalidSymbolID) {
                 sm.table.getMutableSymbol(node.func->symbolId).isExternal = true;
+                sm.table.getMutableSymbol(node.func->symbolId).visibility = node.visibility;
                 sm.table.getFunctionInfo(node.func->symbolId).borrowCheckStatus = BorrowCheckStatus::Skipped;
             }
         }
@@ -426,6 +491,7 @@ public:
     void visit(AwaitExpr&) override { }
     void visit(SizeofExpr&) override { }
     void visit(AlignofExpr&) override { }
+    void visit(TypeofExpr&) override { }
 };
 
 
@@ -520,7 +586,7 @@ public:
     void visit(BreakStmtNode&) override {}
     void visit(ContinueStmtNode&) override {}
     void visit(UnsafeStmtNode&) override {}
-    void visit(ComptimeStmtNode&) override {}
+    void visit(ComptimeStmtNode& node) override { if (node.body) node.body->accept(*this); }
 
     void visit(LiteralExpr&) override {}
     void visit(IdentifierExpr&) override {}
@@ -543,6 +609,7 @@ public:
     void visit(AwaitExpr&) override {}
     void visit(SizeofExpr&) override {}
     void visit(AlignofExpr&) override {}
+    void visit(TypeofExpr&) override {}
 };
 
 // =============================================================================
@@ -554,9 +621,16 @@ class ResolutionVisitor : public ASTVisitor, public TypeVisitor, public PatternV
     DiagnosticEngine& diag;
     std::vector<std::pair<uint16_t, LambdaExpr*>> activeLambdas;
     SymbolKind currentVarKind = SymbolKind::Variable;
+    
+    struct LoopInfo {
+        std::string label;
+        ASTNode* node;
+    };
+    std::vector<LoopInfo> loopStack_;
 
 public:
-    ResolutionVisitor(ScopeManager& sm, DiagnosticEngine& diag) : sm(sm), diag(diag) {}
+    ResolutionVisitor(ScopeManager& sm, DiagnosticEngine& diag)
+        : sm(sm), diag(diag) {}
 
     void visit(ProgramNode& node) override { 
         sm.enterExistingScope(sm.table.globalScopeId());
@@ -584,6 +658,7 @@ public:
     }
 
     void visit(FunctionDeclNode& node) override { 
+        std::cerr << "[DEBUG] Resolving function: " << node.name << std::endl;
         sm.currentFunctionDepth++;
         sm.enterExistingScope(node.bodyScopeId);
         
@@ -642,10 +717,12 @@ public:
     }
 
     void visit(EnumVariantNode& node) override { 
+        sm.enterExistingScope(node.bodyScopeId); 
         // tupleTypes not implemented in parser yet? Wait, EnumVariantNode has `fields`
         for (auto& f : node.fields) {
             if (f->type) f->type->accept(static_cast<TypeVisitor&>(*this));
         }
+        sm.exitScope();
     }
 
     void visit(TraitDeclNode& node) override { 
@@ -696,9 +773,11 @@ public:
     void visit(UseDeclNode& node) override { }
     void visit(ExternDeclNode& node) override { 
         if (node.func) {
+            node.func->visibility = node.visibility;
             node.func->accept(*this);
             if (node.func->symbolId != kInvalidSymbolID) {
                 sm.table.getMutableSymbol(node.func->symbolId).isExternal = true;
+                sm.table.getMutableSymbol(node.func->symbolId).visibility = node.visibility;
                 sm.table.getFunctionInfo(node.func->symbolId).borrowCheckStatus = BorrowCheckStatus::Skipped;
             }
         }
@@ -735,11 +814,14 @@ public:
     }
     
     void visit(WhileStmtNode& node) override { 
+        loopStack_.push_back({node.label, &node});
         node.condition->accept(static_cast<ASTVisitor&>(*this));
         node.body->accept(static_cast<ASTVisitor&>(*this));
+        loopStack_.pop_back();
     }
     
     void visit(ForStmtNode& node) override { 
+        loopStack_.push_back({node.label, &node});
         if (node.bodyScopeId == kInvalidSymbolID) {
             node.bodyScopeId = sm.table.createScope(ScopeKind::Loop, sm.scopeStack.current());
         }
@@ -764,6 +846,7 @@ public:
             if (node.body) node.body->accept(static_cast<ASTVisitor&>(*this));
             sm.exitScope();
         }
+        loopStack_.pop_back();
     }
     
     void visit(ReturnStmtNode& node) override { 
@@ -771,9 +854,44 @@ public:
     }
     
     void visit(BreakStmtNode& node) override { 
+        if (loopStack_.empty()) {
+            diag.error(node.loc, "'break' outside of loop");
+        } else if (node.label.empty()) {
+            node.targetLoop = loopStack_.back().node;
+        } else {
+            bool found = false;
+            for (auto it = loopStack_.rbegin(); it != loopStack_.rend(); ++it) {
+                if (it->label == node.label) {
+                    node.targetLoop = it->node;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                diag.error(node.loc, "Use of undeclared label '" + node.label + "'");
+            }
+        }
     }
     
-    void visit(ContinueStmtNode& node) override { }
+    void visit(ContinueStmtNode& node) override {
+        if (loopStack_.empty()) {
+            diag.error(node.loc, "'continue' outside of loop");
+        } else if (node.label.empty()) {
+            node.targetLoop = loopStack_.back().node;
+        } else {
+            bool found = false;
+            for (auto it = loopStack_.rbegin(); it != loopStack_.rend(); ++it) {
+                if (it->label == node.label) {
+                    node.targetLoop = it->node;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                diag.error(node.loc, "Use of undeclared label '" + node.label + "'");
+            }
+        }
+    }
     
     void visit(UnsafeStmtNode& node) override { 
         if (node.body) node.body->accept(static_cast<ASTVisitor&>(*this));
@@ -787,8 +905,10 @@ public:
     void visit(LiteralExpr&) override { }
     
     void visit(IdentifierExpr& node) override { 
+        std::cerr << "[DEBUG] Resolving identifier: " << (node.segments.empty() ? "<empty>" : node.segments[0]) << std::endl;
         if (!node.segments.empty()) {
             std::vector<SymbolID> ids = sm.resolvePath(node.segments, node.loc);
+            std::cerr << "[DEBUG] Finished resolvePath for " << (node.segments.empty() ? "<empty>" : node.segments[0]) << std::endl;
             if (node.segments.size() > 0 && node.segments.back() == "c") {
                 std::cerr << "[DEBUG] Resolver: resolvePath for 'c' returned " << ids.size() << " ids.\n";
             }
@@ -959,6 +1079,9 @@ public:
     void visit(AlignofExpr& node) override { 
         node.targetType->accept(static_cast<TypeVisitor&>(*this));
     }
+    void visit(TypeofExpr& node) override {
+        if (node.expr) node.expr->accept(*this);
+    }
 
     // --- Types ---
     void visit(BuiltinTypeNode&) override { }
@@ -966,16 +1089,48 @@ public:
         if (node.symbolId == kInvalidSymbolID && !node.segments.empty()) {
             auto ids = sm.resolve(node.segments[0], node.loc);
             if (!ids.empty()) {
-                SymbolID id = ids[0];
-                while (id != kInvalidSymbolID) {
-                    auto& sym = sm.table.getSymbol(id);
+                SymbolID currentSym = ids[0];
+                size_t i = 1;
+                while (i < node.segments.size()) {
+                    auto& sym = sm.table.getSymbol(currentSym);
+                    if (sym.kind != SymbolKind::Module && sym.kind != SymbolKind::Enum && sym.kind != SymbolKind::ExternalModule) {
+                        break;
+                    }
+                    ScopeID nextScope = kInvalidScopeID;
+                    if (sym.kind == SymbolKind::Module) {
+                        if (sym.decl != nullptr && static_cast<ModDeclNode*>(sym.decl)->bodyScopeId != kInvalidScopeID) {
+                            nextScope = static_cast<ModDeclNode*>(sym.decl)->bodyScopeId;
+                        } else {
+                            nextScope = static_cast<ScopeID>(sym.mlibSymbolID);
+                        }
+                    } else if (sym.kind == SymbolKind::ExternalModule) {
+                        nextScope = static_cast<ScopeID>(sym.mlibSymbolID);
+                    } else if (sym.kind == SymbolKind::Enum) {
+                        if (sym.decl != nullptr && static_cast<EnumDeclNode*>(sym.decl)->bodyScopeId != kInvalidScopeID) {
+                            nextScope = static_cast<EnumDeclNode*>(sym.decl)->bodyScopeId;
+                        } else {
+                            nextScope = static_cast<ScopeID>(sym.mlibSymbolID);
+                        }
+                    }
+                    if (nextScope == kInvalidScopeID) break;
+                    
+                    auto optNext = sm.table.lookupInScope(Identifier(node.segments[i]), nextScope);
+                    if (optNext.empty()) break;
+                    currentSym = optNext[0];
+                    i++;
+                }
+                
+                while (currentSym != kInvalidSymbolID) {
+                    auto& sym = sm.table.getSymbol(currentSym);
                     if (sym.kind == SymbolKind::Alias) {
-                        id = sym.aliasTo;
+                        currentSym = sym.aliasTo;
                     } else {
                         break;
                     }
                 }
-                node.symbolId = id;
+                std::cerr << "[DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] '" << node.segments[0] << "': i=" << i << ", currentSym=" << currentSym << "\n";
+                node.symbolId = currentSym;
+                node.resolvedPathLength = i;
             }
         }
         for (auto& arg : node.genericArgs) {
@@ -1080,11 +1235,11 @@ bool Resolver::resolve(ASTNode* root, ScopeID parentScope) {
     }
 
     // --- Pass 0: Builtins (always in global scope) ---
-    if (!sm.table.containsInScope(Identifier(std::string("void")), sm.table.globalScopeId())) {
-        sm.declare("void", SymbolKind::TypeAlias, SourceLocation{}, nullptr);
+    if (!sm.table.containsInScope(Identifier(std::string_view("void")), sm.table.globalScopeId())) {
+        sm.table.declareSymbol(Identifier(std::string_view("void")), SymbolKind::TypeAlias, sm.table.globalScopeId(), SourceLocation{}, nullptr);
     }
-    if (!sm.table.containsInScope(Identifier(std::string("str")), sm.table.globalScopeId())) {
-        sm.declare("str", SymbolKind::TypeAlias, SourceLocation{}, nullptr);
+    if (!sm.table.containsInScope(Identifier(std::string_view("str")), sm.table.globalScopeId())) {
+        sm.table.declareSymbol(Identifier(std::string_view("str")), SymbolKind::TypeAlias, sm.table.globalScopeId(), SourceLocation{}, nullptr);
     }
 
     if (isTopLevel) {
@@ -1094,13 +1249,20 @@ bool Resolver::resolve(ASTNode* root, ScopeID parentScope) {
     }
     
     if (diag_.hasErrors()) {
-        std::cerr << "[DEBUG] Resolver::resolve: diag already has errors BEFORE pass1: " << diag_.errorCount() << "\n";
+        std::cerr << "[DEBUG] Resolver::resolve: diag already has errors BEFORE pass1: " << diag_.errorCount() << " size: " << diag_.allDiagnostics().size() << "\n";
+        for (const auto& d : diag_.allDiagnostics()) {
+            std::cerr << "RAW ERROR: " << d.message << "\n";
+        }
     }
+    
     DeclarationVisitor pass1(sm);
     root->accept(pass1);
     
     if (diag_.hasErrors()) { 
         std::cerr << "[DEBUG] Resolver::resolve: Aborting after pass1 due to previous errors (" << diag_.errorCount() << ").\n";
+        for (const auto& d : diag_.allDiagnostics()) {
+            std::cerr << "RAW ERROR: " << d.message << "\n";
+        }
         sm.exitScope(); return false; 
     }
     

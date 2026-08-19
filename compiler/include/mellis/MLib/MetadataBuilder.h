@@ -31,7 +31,7 @@ public:
     uint32_t addFunction(const std::string& name, uint32_t namespaceID, uint32_t signatureTypeID);
     
     // Impls (These go into a separate section typically, but managed here for convenience)
-    uint32_t addImpl(uint32_t traitID, uint32_t targetTypeID);
+    uint32_t addImpl(const ImplEntry& entry);
 
     // Serialize all metadata tables (Namespace, Type, Trait, Function)
     void serializeMetadata(BinaryWriter& writer) const;
@@ -39,8 +39,13 @@ public:
     // Serialize impl table separately
     void serializeImpls(BinaryWriter& writer) const;
 
+    // TypeRefs
+    uint32_t addTypeRef(const fl::Type* type);
+    void serializeTypeRefs(BinaryWriter& writer) const;
+
 private:
     StringTableBuilder& stringTable;
+    const SemanticSnapshot* snapshot_ = nullptr;
 
     struct InternalNamespace {
         std::string name;
@@ -59,11 +64,18 @@ private:
         FunctionEntry entry;
     };
 
+    struct InternalTypeRef {
+        TypeRefRecord record;
+        std::vector<uint32_t> payload; // For variable length data like args
+    };
+
     std::vector<InternalNamespace> namespaces;
     std::vector<InternalType> types;
     std::vector<InternalTrait> traits;
     std::vector<InternalFunction> functions;
     std::vector<ImplEntry> impls;
+    std::vector<InternalTypeRef> typeRefs;
+    std::vector<std::vector<uint32_t>> implPayloads; // parallel to impls
 };
 
 } // namespace mlib

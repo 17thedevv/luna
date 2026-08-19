@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <set>
 #include <cstdint>
 
 namespace fl {
@@ -15,13 +14,11 @@ class StringTableBuilder {
 public:
     StringTableBuilder();
 
-    // Adds a string to the pending set. Does not return an ID/offset yet.
-    void addString(const std::string& str);
+    // Adds a string to the pending set and returns its offset.
+    uint32_t addString(const std::string& str);
 
-    // Sorts all pending strings alphabetically, assigns them offsets, and builds the buffer.
     void finalize();
 
-    // Retrieves the byte offset (StringID) for a string. Must be called after finalize().
     uint32_t getStringOffset(const std::string& str) const;
 
     // Serializes the entire string table into the provided writer
@@ -31,7 +28,6 @@ public:
     size_t getSize() const;
 
 private:
-    std::set<std::string> pendingStrings;
     std::map<std::string, uint32_t> stringMap;
     std::vector<uint8_t> buffer;
     bool finalized = false;

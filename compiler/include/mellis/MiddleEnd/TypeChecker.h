@@ -22,7 +22,7 @@ class MonomorphizationEngine;
 class TypeChecker {
 public:
     explicit TypeChecker(SymbolTable& table, DiagnosticEngine& diag, TypeContext& ctx, MonomorphizationEngine* monoEngine = nullptr);
-    bool check(ASTNode* root, ModuleID currentModule = 0);
+    bool check(ASTNode* root, ModuleID currentModule = 0, const std::vector<std::unique_ptr<class DeclNode>>* injectedGenerics = nullptr);
     const Type* typeOf(SymbolID id) const;
     std::function<const Type*(const TypeNode*)> evaluateASTFn;
     TypeContext& getContext() const { return ctx_; }

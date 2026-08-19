@@ -72,6 +72,7 @@ public:
     void visit(AwaitExpr& node) override;
     void visit(SizeofExpr& node) override {}
     void visit(AlignofExpr& node) override {}
+    void visit(TypeofExpr& node) override {}
     void visit(LiteralExpr& node) override {}
     void visit(IdentifierExpr& node) override {}
 };

@@ -9,6 +9,8 @@
 #include "mellis/MiddleEnd/ScopeStack.h"
 #include <vector>
 #include <string_view>
+#include <unordered_set>
+#include <string>
 
 namespace fl {
 
@@ -20,6 +22,11 @@ public:
         : diag_(diag), symbolTable_(symbolTable), moduleLoader_(moduleLoader) {}
 
     void resolve(ProgramNode& program) {
+        for (const auto& item : program.items) {
+            if (auto* modDecl = dynamic_cast<ModDeclNode*>(item.get())) {
+                localModules_.insert(std::string(modDecl->name));
+            }
+        }
         program.accept(*this);
     }
 
@@ -72,6 +79,7 @@ public:
     void visit(AwaitExpr&) override {}
     void visit(SizeofExpr&) override {}
     void visit(AlignofExpr&) override {}
+    void visit(TypeofExpr&) override {}
 
     void visit(MacroDeclNode&) override {}
     void visit(MacroCallExpr&) override {}
@@ -90,6 +98,10 @@ private:
     // Track the current module scope for path resolution
     // (mirrors the scope stack maintained by Resolver in Pass 1)
     ScopeID currentScope_ = 0; // global scope
+
+    std::unordered_set<std::string> localModules_;
+public:
+    const std::unordered_set<std::string>& getLocalModules() const { return localModules_; }
 };
 
 } // namespace fl

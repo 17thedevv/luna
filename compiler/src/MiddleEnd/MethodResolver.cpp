@@ -14,6 +14,7 @@ void MethodResolver::addTraitMethod(const std::string& name, SymbolID traitId, S
 }
 
 void MethodResolver::addInherentMethod(const std::string& name, const ImplDeclNode* implNode, SymbolID methodId, const FunctionType* type) {
+    std::cerr << "[DEBUG] addInherentMethod: " << name << " methodId=" << methodId << std::endl;
     MethodCandidate cand;
     cand.traitId = kInvalidSymbolID;
     cand.inherentImplNode = implNode;

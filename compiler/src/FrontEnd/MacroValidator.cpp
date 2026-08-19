@@ -208,6 +208,10 @@ void MacroValidator::visit(AlignofExpr& node) {
     if (node.targetType) node.targetType->accept(this->typeVisitor());
 }
 
+void MacroValidator::visit(TypeofExpr& node) {
+    if (node.expr) node.expr->accept(*this);
+}
+
 void MacroValidator::visit(PlaceholderStmt& node) {
 }
 

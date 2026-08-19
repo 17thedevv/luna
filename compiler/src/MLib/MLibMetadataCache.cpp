@@ -10,7 +10,14 @@ void MLibMetadataCache::registerType(SymbolID symbolID, const Type* type) {
 
 const Type* MLibMetadataCache::getType(SymbolID symbolID) const {
     auto it = cache.find(symbolID);
-    return (it != cache.end()) ? it->second : ctx.getUnknown();
+    if (it != cache.end()) {
+        if (it->second->getKind() == TypeKind::Unknown) {
+            std::cerr << "[MLibCache] getType(" << symbolID << ") found but is Unknown!\n";
+        }
+        return it->second;
+    }
+    std::cerr << "[MLibCache] getType(" << symbolID << ") cache MISS!\n";
+    return ctx.getUnknown();
 }
 
 const FunctionType* MLibMetadataCache::buildExternalFunctionType(

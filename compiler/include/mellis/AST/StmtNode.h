@@ -51,6 +51,7 @@ public:
 
 class WhileStmtNode : public StmtNode {
 public:
+    std::string                    label;
     std::unique_ptr<ExprNode>      condition;
     std::unique_ptr<BlockStmtNode> body;
     void accept(ASTVisitor& v) override;
@@ -62,6 +63,7 @@ enum class ForKind : uint8_t { ForEach, CStyle };
 class ForStmtNode : public StmtNode {
 public:
     ForKind kind;
+    std::string                    label;
     std::string_view               bindingName;
     std::unique_ptr<PatternNode>   pattern;
     SymbolID                       bindingId = kInvalidSymbolID;
@@ -88,12 +90,16 @@ public:
 
 class BreakStmtNode : public StmtNode {
 public:
+    std::string label;
+    ASTNode*    targetLoop = nullptr;
     void accept(ASTVisitor& v) override;
     ASTNode* cloneImpl() const override;
 };
 
 class ContinueStmtNode : public StmtNode {
 public:
+    std::string label;
+    ASTNode*    targetLoop = nullptr;
     void accept(ASTVisitor& v) override;
     ASTNode* cloneImpl() const override;
 };

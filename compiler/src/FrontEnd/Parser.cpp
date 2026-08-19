@@ -40,7 +40,7 @@ Token Parser::consume(TokenType type, const char* errorMessage) {
         advance();
         return t;
     }
-    SourceLocation loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    SourceLocation loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     diag.error(loc, errorMessage);
     throw ParseError();
 }
@@ -103,7 +103,7 @@ void Parser::consumeGenericEnd() {
         current.byteOffset += 1;
         return;
     }
-    diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected '>'");
+    diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected '>'");
     throw ParseError();
 }
 
@@ -113,7 +113,7 @@ std::vector<GenericParamNode> Parser::parseGenericParams() {
         if (!isGenericEnd(current.type)) {
             do {
                 GenericParamNode param;
-                param.loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                param.loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                 if (current.type == TokenType::LIFETIME) {
                     param.kind = GenericParamKind::Lifetime;
                     param.name = current.text;
@@ -122,12 +122,12 @@ std::vector<GenericParamNode> Parser::parseGenericParams() {
                         do {
                             if (current.type == TokenType::LIFETIME) {
                                 auto ltNode = std::make_unique<LifetimeNode>();
-                                ltNode->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                                ltNode->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                                 ltNode->name = current.text;
                                 advance();
                                 param.bounds.push_back(std::move(ltNode));
                             } else {
-                                diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected lifetime bound for a lifetime parameter");
+                                diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected lifetime bound for a lifetime parameter");
                                 throw ParseError();
                             }
                         } while (match(TokenType::PLUS));
@@ -208,7 +208,7 @@ std::vector<AnnotationNode> Parser::parseAnnotations() {
 
 UseTreeNode Parser::parseUseTree() {
     UseTreeNode node;
-    node.loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node.loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     if (match(TokenType::MULTIPLY)) {
         node.isGlob = true;
         return node;
@@ -225,7 +225,7 @@ UseTreeNode Parser::parseUseTree() {
             node.segments.push_back(current.text);
             advance();
         } else {
-            diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected identifier or string in use path");
+            diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected identifier or string in use path");
             throw ParseError();
         }
         
@@ -263,7 +263,7 @@ UseTreeNode Parser::parseUseTree() {
 
 std::unique_ptr<DeclNode> Parser::parseTypeAliasDecl() {
     auto node = std::make_unique<TypeAliasDeclNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_TYPE, "Expected 'type'");
     Token nameTok = consume(TokenType::IDENTIFIER, "Expected type alias name");
     node->name = nameTok.text;
@@ -284,6 +284,7 @@ std::unique_ptr<DeclNode> Parser::parseModDecl() {
     if (match(TokenType::SEMI)) {
         // Out-of-line module
         node->isOutlined = true;
+        std::cout << "[DEBUG] parseModDecl: sourceMgr=" << sourceMgr << "\n";
         if (sourceMgr) {
             std::string modPath = sourceMgr->resolveModulePath(fileId, node->name);
             if (modPath.empty()) {
@@ -304,6 +305,7 @@ std::unique_ptr<DeclNode> Parser::parseModDecl() {
                 }
             }
         } else {
+            std::cerr << "[DEBUG] HIT ELSE BRANCH! sourceMgr is " << sourceMgr << ", mod name is '" << node->name << "', at byteOffset=" << current.byteOffset << std::endl;
             diag.error(node->loc, "Out-of-line modules not supported without SourceManager");
         }
     } else {
@@ -325,7 +327,7 @@ std::unique_ptr<DeclNode> Parser::parseModDecl() {
 std::unique_ptr<DeclNode> Parser::parseUseDecl() {
 
     auto node = std::make_unique<UseDeclNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_USE, "Expected 'use'");
     node->tree = parseUseTree();
     if (current.type != TokenType::SEMI) { std::cout << "[DEBUG] parseUseDecl expected SEMI but got: " << (int)current.type << " text: " << std::string(current.text) << "\n"; } consume(TokenType::SEMI, "Expected ';' after use declaration");
@@ -338,12 +340,12 @@ std::unique_ptr<DeclNode> Parser::parseUseDecl() {
 
 std::unique_ptr<DeclNode> Parser::parseExternDecl() {
     auto node = std::make_unique<ExternDeclNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_EXTERN, "Expected 'extern'");
     auto func = parseFunctionDecl(true); // true means allow empty body
     auto fd = dynamic_cast<FunctionDeclNode*>(func.get());
     if (!fd) {
-        diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected function declaration after extern");
+        diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected function declaration after extern");
         throw ParseError();
     }
     fd->isUnsafe = true; // All extern functions are inherently unsafe
@@ -358,32 +360,35 @@ std::unique_ptr<ItemNode> Parser::parseDeclaration() {
     auto annots = parseAnnotations();
     Visibility visibility = Visibility::Internal;
     
-    bool isFunction = false;
-    if (current.type == TokenType::KW_FN || current.type == TokenType::KW_ASYNC) {
-        isFunction = true;
-    } else if (current.type == TokenType::KW_COMPTIME) {
-        if (peek.type == TokenType::KW_FN || peek.type == TokenType::KW_ASYNC) {
-            isFunction = true;
-        }
-    } else if (current.type == TokenType::KW_UNSAFE) {
-        if (peek.type == TokenType::KW_FN) {
-            isFunction = true;
-        }
-    }
     std::unique_ptr<DeclNode> decl;
     
     // Check export and extern modifiers first
     bool isExtern = false;
     if (match(TokenType::KW_EXPORT)) {
         visibility = Visibility::Public;
-    } else if (match(TokenType::KW_EXTERN)) {
+    }
+    if (match(TokenType::KW_EXTERN)) {
         isExtern = true;
+    }
+
+    bool isFunction = false;
+    if (current.type == TokenType::KW_FN || current.type == TokenType::KW_ASYNC || current.type == TokenType::KW_INTRINSIC) {
+        isFunction = true;
+    } else if (current.type == TokenType::KW_COMPTIME) {
+        std::cout << "[DEBUG] parseDeclaration KW_COMPTIME. peek.type=" << (int)peek.type << "\n";
+        if (peek.type == TokenType::KW_FN || peek.type == TokenType::KW_ASYNC || peek.type == TokenType::KW_INTRINSIC) {
+            isFunction = true;
+        }
+    } else if (current.type == TokenType::KW_UNSAFE) {
+        if (peek.type == TokenType::KW_FN || peek.type == TokenType::KW_INTRINSIC) {
+            isFunction = true;
+        }
     }
     
     if (current.type == TokenType::KW_DEC || current.type == TokenType::KW_CONST) {
         decl = parseVarDecl();
-    } else if (current.type == TokenType::KW_FN) {
-        decl = parseFunctionDecl(isExtern);
+    } else if (isFunction) {
+        decl = parseFunctionDecl(true); // Allow empty body for generic trait methods loaded from mlib
     } else if (current.type == TokenType::KW_STRUCT) {
         decl = parseStructDecl();
     } else if (current.type == TokenType::KW_ENUM) {
@@ -402,7 +407,7 @@ std::unique_ptr<ItemNode> Parser::parseDeclaration() {
         decl = parseMacroDecl();
     } else {
         if (!annots.empty() || visibility == Visibility::Public || isExtern) {
-            diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Annotations or modifiers not attached to a declaration");
+            diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Annotations or modifiers not attached to a declaration");
             throw ParseError();
         }
         return parseStatement();
@@ -430,7 +435,7 @@ std::unique_ptr<ItemNode> Parser::parseDeclaration() {
 
 std::unique_ptr<DeclNode> Parser::parseVarDecl() {
     auto varDecl = std::make_unique<VarDeclNode>();
-    varDecl->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    varDecl->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     if (match(TokenType::KW_EXPORT)) varDecl->visibility = Visibility::Public;
     if (match(TokenType::KW_CONST)) varDecl->isMutable = false;
     else { consume(TokenType::KW_DEC, "Expected 'dec' or 'const'"); varDecl->isMutable = true; }
@@ -456,12 +461,13 @@ std::unique_ptr<DeclNode> Parser::parseVarDecl() {
 
 std::unique_ptr<DeclNode> Parser::parseFunctionDecl(bool allowEmptyBody) {
     auto funcDecl = std::make_unique<FunctionDeclNode>();
-    funcDecl->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    funcDecl->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
 
     if (match(TokenType::KW_EXPORT)) funcDecl->visibility = Visibility::Public;
     if (match(TokenType::KW_COMPTIME)) funcDecl->isComptime = true;
     if (match(TokenType::KW_ASYNC)) funcDecl->isAsync = true;
     if (match(TokenType::KW_UNSAFE)) funcDecl->isUnsafe = true;
+    if (match(TokenType::KW_INTRINSIC)) funcDecl->isIntrinsic = true;
     
     consume(TokenType::KW_FN, "Expected 'fn'");
     Token nameTok = consume(TokenType::IDENTIFIER, "Expected function name");
@@ -477,7 +483,7 @@ std::unique_ptr<DeclNode> Parser::parseFunctionDecl(bool allowEmptyBody) {
                 break;
             }
             auto param = std::make_unique<ParamDeclNode>();
-            param->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            param->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             if (match(TokenType::DOT_DOT_DOT)) {
                 funcDecl->isVariadic = true;
                 break; // '...' must be the last parameter
@@ -505,7 +511,7 @@ std::unique_ptr<DeclNode> Parser::parseFunctionDecl(bool allowEmptyBody) {
                     param->type = parseType();
                 } else {
                     auto selfType = std::make_unique<NamedTypeNode>();
-                    selfType->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                    selfType->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                     selfType->segments.push_back("Self");
                     
                     if (isRef) {
@@ -519,6 +525,7 @@ std::unique_ptr<DeclNode> Parser::parseFunctionDecl(bool allowEmptyBody) {
                     }
                 }
             } else {
+                std::cerr << "[DEBUG] current type=" << (int)current.type << " peek type=" << (int)peek.type << "\n";
                 Token pName = consume(TokenType::IDENTIFIER, "Expected parameter name");
                 param->name = pName.text;
                 consume(TokenType::COLON, "Expected ':' after parameter name");
@@ -535,13 +542,13 @@ std::unique_ptr<DeclNode> Parser::parseFunctionDecl(bool allowEmptyBody) {
     } else {
         funcDecl->body = parseBlockStatement();
     }
-    funcDecl->endLoc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset + prev.text.length());
+    funcDecl->endLoc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset + prev.text.length());
     return funcDecl;
 }
 
 std::unique_ptr<DeclNode> Parser::parseMacroDecl() {
     auto node = std::make_unique<MacroDeclNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_MACRO, "Expected 'macro'");
     node->name = consume(TokenType::IDENTIFIER, "Expected macro name").text;
 
@@ -549,7 +556,7 @@ std::unique_ptr<DeclNode> Parser::parseMacroDecl() {
     if (!check(TokenType::R_PAREN)) {
         do {
             MacroParamNode param;
-            param.loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            param.loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             consume(TokenType::AT, "Expected '@' before macro parameter name");
             param.name = consume(TokenType::IDENTIFIER, "Expected macro parameter name").text;
             consume(TokenType::COLON, "Expected ':' after macro parameter name");
@@ -574,13 +581,13 @@ std::unique_ptr<DeclNode> Parser::parseMacroDecl() {
     node->body = parseBlockStatement();
     
     // Macro body ends exactly after the block '}'
-    node->endLoc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset + prev.text.length());
+    node->endLoc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset + prev.text.length());
     return node;
 }
 
 std::unique_ptr<DeclNode> Parser::parseStructDecl() {
     auto node = std::make_unique<StructDeclNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_STRUCT, "Expected 'struct'");
     Token nameTok = consume(TokenType::IDENTIFIER, "Expected struct name");
     node->name = nameTok.text;
@@ -590,7 +597,7 @@ std::unique_ptr<DeclNode> Parser::parseStructDecl() {
     consume(TokenType::L_BRACE, "Expected '{' for struct body");
     while (!check(TokenType::R_BRACE) && !check(TokenType::END_OF_FILE)) {
         auto field = std::make_unique<StructFieldNode>();
-        field->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        field->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         
         if (match(TokenType::KW_EXPORT)) {
             field->visibility = Visibility::Public;
@@ -604,13 +611,13 @@ std::unique_ptr<DeclNode> Parser::parseStructDecl() {
         consume(TokenType::SEMI, "Expected ';' after struct field");
     }
     consume(TokenType::R_BRACE, "Expected '}' to end struct body");
-    node->endLoc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset + prev.text.length());
+    node->endLoc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset + prev.text.length());
     return node;
 }
 
 std::unique_ptr<DeclNode> Parser::parseEnumDecl() {
     auto node = std::make_unique<EnumDeclNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_ENUM, "Expected 'enum'");
     Token nameTok = consume(TokenType::IDENTIFIER, "Expected enum name");
     node->name = nameTok.text;
@@ -620,7 +627,7 @@ std::unique_ptr<DeclNode> Parser::parseEnumDecl() {
     consume(TokenType::L_BRACE, "Expected '{' for enum body");
     while (!check(TokenType::R_BRACE) && !check(TokenType::END_OF_FILE)) {
         auto var = std::make_unique<EnumVariantNode>();
-        var->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        var->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         Token vName = consume(TokenType::IDENTIFIER, "Expected variant name");
         var->name = vName.text;
         
@@ -628,7 +635,7 @@ std::unique_ptr<DeclNode> Parser::parseEnumDecl() {
             if (!check(TokenType::R_PAREN)) {
                 do {
                     auto param = std::make_unique<ParamDeclNode>();
-                    param->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                    param->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                     if (check(TokenType::IDENTIFIER) && peek.type == TokenType::COLON) {
                         Token pName = consume(TokenType::IDENTIFIER, "");
                         param->name = pName.text;
@@ -644,13 +651,13 @@ std::unique_ptr<DeclNode> Parser::parseEnumDecl() {
         if (!match(TokenType::COMMA)) break;
     }
     consume(TokenType::R_BRACE, "Expected '}'");
-    node->endLoc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset + prev.text.length());
+    node->endLoc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset + prev.text.length());
     return node;
 }
 
 std::unique_ptr<DeclNode> Parser::parseTraitDecl() {
     auto node = std::make_unique<TraitDeclNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_TRAIT, "Expected 'trait'");
     Token nameTok = consume(TokenType::IDENTIFIER, "Expected trait name");
     node->name = nameTok.text;
@@ -660,18 +667,21 @@ std::unique_ptr<DeclNode> Parser::parseTraitDecl() {
     consume(TokenType::L_BRACE, "Expected '{'");
     while (!check(TokenType::R_BRACE) && !check(TokenType::END_OF_FILE)) {
         auto annots = parseAnnotations();
-        Visibility visibility = match(TokenType::KW_EXPORT) ? Visibility::Public : Visibility::Internal;
+        Visibility visibility = Visibility::Public;
+        if (match(TokenType::KW_EXPORT)) {
+            // Optional export keyword, ignored since trait items are always public
+        }
 
         if (match(TokenType::KW_TYPE)) {
             auto atNode = std::make_unique<TypeAliasDeclNode>();
-            atNode->loc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset);
+            atNode->loc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset);
             atNode->name = consume(TokenType::IDENTIFIER, "Expected associated type name").text;
             atNode->genericParams = parseGenericParams();
             if (match(TokenType::COLON)) {
                 do {
                     if (current.type == TokenType::LIFETIME) {
                         auto ltNode = std::make_unique<LifetimeNode>();
-                        ltNode->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                        ltNode->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                         ltNode->name = current.text;
                         advance();
                         atNode->bounds.push_back(std::move(ltNode));
@@ -694,18 +704,18 @@ std::unique_ptr<DeclNode> Parser::parseTraitDecl() {
         auto funcDecl = std::unique_ptr<FunctionDeclNode>(dynamic_cast<FunctionDeclNode*>(decl.release()));
         if (funcDecl) node->methods.push_back(std::move(funcDecl));
         else {
-            diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected function in trait");
+            diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected function in trait");
             throw ParseError();
         }
     }
     consume(TokenType::R_BRACE, "Expected '}'");
-    node->endLoc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset + prev.text.length());
+    node->endLoc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset + prev.text.length());
     return node;
 }
 
 std::unique_ptr<DeclNode> Parser::parseImplDecl() {
     auto node = std::make_unique<ImplDeclNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_IMPL, "Expected 'impl'");
     
     node->genericParams = parseGenericParams();
@@ -719,11 +729,11 @@ std::unique_ptr<DeclNode> Parser::parseImplDecl() {
     consume(TokenType::L_BRACE, "Expected '{'");
     while (!check(TokenType::R_BRACE) && !check(TokenType::END_OF_FILE)) {
         auto annots = parseAnnotations();
-        Visibility visibility = match(TokenType::KW_EXPORT) ? Visibility::Public : Visibility::Internal;
+        Visibility visibility = (node->traitType != nullptr || match(TokenType::KW_EXPORT)) ? Visibility::Public : Visibility::Internal;
         
         if (match(TokenType::KW_TYPE)) {
             auto atNode = std::make_unique<TypeAliasDeclNode>();
-            atNode->loc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset);
+            atNode->loc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset);
             atNode->name = consume(TokenType::IDENTIFIER, "Expected associated type name").text;
             atNode->genericParams = parseGenericParams();
             consume(TokenType::EQUAL, "Expected '=' in associated type implementation");
@@ -742,12 +752,12 @@ std::unique_ptr<DeclNode> Parser::parseImplDecl() {
         auto funcDecl = std::unique_ptr<FunctionDeclNode>(dynamic_cast<FunctionDeclNode*>(decl.release()));
         if (funcDecl) node->methods.push_back(std::move(funcDecl));
         else {
-            diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected function in impl block");
+            diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected function in impl block");
             throw ParseError();
         }
     }
     consume(TokenType::R_BRACE, "Expected '}'");
-    node->endLoc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset + prev.text.length());
+    node->endLoc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset + prev.text.length());
     return node;
 }
 
@@ -756,21 +766,39 @@ std::unique_ptr<DeclNode> Parser::parseImplDecl() {
 // ==========================================
 
 std::unique_ptr<StmtNode> Parser::parseStatement() {
-    if (check(TokenType::KW_IF)) return parseIfStatement();
-    if (check(TokenType::KW_WHILE)) return parseWhileStatement();
-    if (check(TokenType::KW_FOR)) return parseForStatement();
-    if (check(TokenType::KW_RETURN)) return parseReturnStatement();
-    if (check(TokenType::KW_BREAK)) return parseBreakStatement();
-    if (check(TokenType::KW_CONTINUE)) return parseContinueStatement();
-    if (check(TokenType::KW_PRINT)) return parsePrintStatement();
-    if (check(TokenType::L_BRACE)) return parseBlockStatement();
-    if (check(TokenType::KW_UNSAFE)) return parseUnsafeStatement();
-    if (check(TokenType::KW_COMPTIME)) return parseComptimeStatement();
-    return parseExpressionStatement();
+    std::string label = "";
+    if (check(TokenType::LIFETIME) && peek.type == TokenType::COLON) {
+        label = current.text;
+        advance(); // consume label
+        advance(); // consume colon
+    }
+
+    std::unique_ptr<StmtNode> stmt;
+    if (check(TokenType::KW_IF)) stmt = parseIfStatement();
+    else if (check(TokenType::KW_WHILE)) stmt = parseWhileStatement();
+    else if (check(TokenType::KW_FOR)) stmt = parseForStatement();
+    else if (check(TokenType::KW_RETURN)) stmt = parseReturnStatement();
+    else if (check(TokenType::KW_BREAK)) stmt = parseBreakStatement();
+    else if (check(TokenType::KW_CONTINUE)) stmt = parseContinueStatement();
+    else if (check(TokenType::KW_PRINT)) stmt = parsePrintStatement();
+    else if (check(TokenType::L_BRACE)) stmt = parseBlockStatement();
+    else if (check(TokenType::KW_UNSAFE)) stmt = parseUnsafeStatement();
+    else if (check(TokenType::KW_COMPTIME)) stmt = parseComptimeStatement();
+    else stmt = parseExpressionStatement();
+
+    if (!label.empty()) {
+        if (auto* w = dynamic_cast<WhileStmtNode*>(stmt.get())) w->label = label;
+        else if (auto* f = dynamic_cast<ForStmtNode*>(stmt.get())) f->label = label;
+        else {
+            diag.error(stmt->loc, "Label can only be applied to loops");
+            throw ParseError();
+        }
+    }
+    return stmt;
 }
 
 std::unique_ptr<StmtNode> Parser::parseAssignmentStatement() {
-    diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "parseAssignmentStatement not implemented");
+    diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "parseAssignmentStatement not implemented");
     throw ParseError();
 }
 
@@ -791,7 +819,7 @@ std::unique_ptr<StmtNode> Parser::parseExpressionStatement() {
 
 std::unique_ptr<BlockStmtNode> Parser::parseBlockStatement() {
     auto block = std::make_unique<BlockStmtNode>();
-    block->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    block->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::L_BRACE, "Expected '{' to start block");
     while (!check(TokenType::R_BRACE) && !check(TokenType::END_OF_FILE)) {
         block->body.push_back(parseDeclaration());
@@ -830,7 +858,7 @@ std::unique_ptr<BlockStmtNode> Parser::parseBlockStatement() {
 
 std::unique_ptr<StmtNode> Parser::parseIfStatement() {
     auto ifStmt = std::make_unique<IfStmtNode>();
-    ifStmt->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    ifStmt->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_IF, "Expected 'if'");
     ifStmt->condition = parseExpression(false); // Do not allow struct literals in condition
     ifStmt->thenBranch = parseBlockStatement();
@@ -843,7 +871,7 @@ std::unique_ptr<StmtNode> Parser::parseIfStatement() {
 
 std::unique_ptr<StmtNode> Parser::parseWhileStatement() {
     auto whileStmt = std::make_unique<WhileStmtNode>();
-    whileStmt->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    whileStmt->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_WHILE, "Expected 'while'");
     whileStmt->condition = parseExpression(false); // No struct literals
     whileStmt->body = parseBlockStatement();
@@ -851,7 +879,7 @@ std::unique_ptr<StmtNode> Parser::parseWhileStatement() {
 }
 
 std::unique_ptr<StmtNode> Parser::parseForStatement() {
-    SourceLocation loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    SourceLocation loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_FOR, "Expected 'for'");
     
     if (match(TokenType::AT)) {
@@ -906,7 +934,7 @@ std::unique_ptr<StmtNode> Parser::parseForStatement() {
 
 std::unique_ptr<StmtNode> Parser::parseReturnStatement() {
     auto retStmt = std::make_unique<ReturnStmtNode>();
-    retStmt->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    retStmt->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_RETURN, "Expected 'return'");
     if (!check(TokenType::SEMI)) retStmt->value = parseExpression();
     consume(TokenType::SEMI, "Expected ';' after return value");
@@ -915,16 +943,24 @@ std::unique_ptr<StmtNode> Parser::parseReturnStatement() {
 
 std::unique_ptr<StmtNode> Parser::parseBreakStatement() {
     auto stmt = std::make_unique<BreakStmtNode>();
-    stmt->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    stmt->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_BREAK, "Expected 'break'");
+    if (current.type == TokenType::LIFETIME) {
+        stmt->label = current.text;
+        advance();
+    }
     consume(TokenType::SEMI, "Expected ';' after break");
     return stmt;
 }
 
 std::unique_ptr<StmtNode> Parser::parseContinueStatement() {
     auto stmt = std::make_unique<ContinueStmtNode>();
-    stmt->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    stmt->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_CONTINUE, "Expected 'continue'");
+    if (current.type == TokenType::LIFETIME) {
+        stmt->label = current.text;
+        advance();
+    }
     consume(TokenType::SEMI, "Expected ';' after continue");
     return stmt;
 }
@@ -940,7 +976,7 @@ std::unique_ptr<StmtNode> Parser::parsePrintStatement() {
 
 std::unique_ptr<StmtNode> Parser::parseUnsafeStatement() {
     auto stmt = std::make_unique<UnsafeStmtNode>();
-    stmt->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    stmt->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_UNSAFE, "Expected 'unsafe'");
     stmt->body = parseBlockStatement();
     return stmt;
@@ -948,7 +984,7 @@ std::unique_ptr<StmtNode> Parser::parseUnsafeStatement() {
 
 std::unique_ptr<StmtNode> Parser::parseComptimeStatement() {
     auto stmt = std::make_unique<ComptimeStmtNode>();
-    stmt->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    stmt->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_COMPTIME, "Expected 'comptime'");
     stmt->body = parseBlockStatement();
     return stmt;
@@ -959,9 +995,15 @@ std::unique_ptr<StmtNode> Parser::parseComptimeStatement() {
 // ==========================================
 
 std::unique_ptr<TypeNode> Parser::parseType() {
+    bool isUnsafe = false;
+    if (match(TokenType::KW_UNSAFE)) {
+        isUnsafe = true;
+    }
+    
     if (match(TokenType::KW_FN)) {
         auto node = std::make_unique<FunctionTypeNode>();
-        node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
+        node->isUnsafe = isUnsafe;
         consume(TokenType::L_PAREN, "Expected '(' in function type parameters");
         if (!check(TokenType::R_PAREN)) {
             do {
@@ -974,27 +1016,33 @@ std::unique_ptr<TypeNode> Parser::parseType() {
         }
         return node;
     }
+    
+    if (isUnsafe) {
+        diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected 'fn' after 'unsafe' in function type");
+        throw ParseError();
+    }
+    
     if (current.type == TokenType::LIFETIME) {
         auto node = std::make_unique<LifetimeNode>();
-        node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         node->name = current.text;
         advance();
         return node;
     }
     if (match(TokenType::BANG)) {
         auto node = std::make_unique<NeverTypeNode>();
-        node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         return node;
     }
     if (match(TokenType::KW_DYN)) {
         auto node = std::make_unique<TraitObjectTypeNode>();
-        node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         node->trait = parseNamedType();
         return node;
     }
     if (match(TokenType::MULTIPLY)) {
         auto node = std::make_unique<PointerTypeNode>();
-        node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         
         node->isMutable = false; // default is immutable
         if (match(TokenType::KW_RW)) {
@@ -1008,10 +1056,10 @@ std::unique_ptr<TypeNode> Parser::parseType() {
     }
     if (match(TokenType::BIT_AND)) {
         auto node = std::make_unique<ReferenceTypeNode>();
-        node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         if (current.type == TokenType::LIFETIME) {
             auto lt = std::make_unique<LifetimeNode>();
-            lt->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            lt->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             lt->name = current.text;
             advance();
             node->lifetime = std::move(lt);
@@ -1022,7 +1070,7 @@ std::unique_ptr<TypeNode> Parser::parseType() {
     }
     if (match(TokenType::L_BRACKET)) {
         auto node = std::make_unique<ArrayTypeNode>();
-        node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         node->elementType = parseType();
         if (match(TokenType::COMMA)) {
             node->size = parseExpression(true);
@@ -1036,7 +1084,7 @@ std::unique_ptr<TypeNode> Parser::parseType() {
     }
     if (match(TokenType::L_PAREN)) {
         auto node = std::make_unique<TupleTypeNode>();
-        node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         if (!check(TokenType::R_PAREN)) {
             do {
                 node->elements.push_back(parseType());
@@ -1048,27 +1096,27 @@ std::unique_ptr<TypeNode> Parser::parseType() {
     if (check(TokenType::BUILTIN_TYPE)) {
         Token tok = consume(TokenType::BUILTIN_TYPE, "Expected builtin type");
         auto type = std::make_unique<BuiltinTypeNode>();
-        type->loc = SourceLocation::fromLineCol(kMainFileID, tok.line, tok.col, tok.byteOffset);
+        type->loc = SourceLocation::fromLineCol(fileId, tok.line, tok.col, tok.byteOffset);
         type->kind = tok.builtinKind;
         return type;
     }
     if (check(TokenType::IDENTIFIER) || check(TokenType::KW_SELF_TYP)) return parseNamedType();
     
     std::cerr << "[DEBUG] parseType failed at byte " << current.byteOffset << " token " << (int)current.type << " text: " << std::string(current.text) << "\n";
-    diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected a type");
+    diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected a type");
     throw ParseError();
 }
 
 std::unique_ptr<TypeNode> Parser::parseNamedType() {
     auto node = std::make_unique<NamedTypeNode>();
-    node->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    node->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     
     do {
         Token idTok = current;
         if (match(TokenType::IDENTIFIER) || match(TokenType::KW_SELF_TYP)) {
             // consumed
         } else {
-            diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected identifier or Self in type path");
+            diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected identifier or Self in type path");
             throw ParseError();
         }
         node->segments.push_back(idTok.text);
@@ -1303,7 +1351,7 @@ std::unique_ptr<ExprNode> Parser::parseUnary(bool allowStructLiteral) {
         Token op = current;
         advance();
         auto expr = std::make_unique<UnaryExpr>();
-        expr->loc = SourceLocation::fromLineCol(kMainFileID, op.line, op.col, op.byteOffset);
+        expr->loc = SourceLocation::fromLineCol(fileId, op.line, op.col, op.byteOffset);
         if (op.type == TokenType::MINUS) expr->op = UnaryOp::Neg;
         else if (op.type == TokenType::BANG) expr->op = UnaryOp::Not;
         else if (op.type == TokenType::BIT_NOT) expr->op = UnaryOp::BitNot;
@@ -1322,16 +1370,15 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
     
     while (true) {
         if (match(TokenType::QUESTION)) {
-            auto tryCall = std::make_unique<MethodCallExpr>();
-            tryCall->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
-            tryCall->object = std::move(expr);
-            tryCall->methodName = "__try";
-            expr = std::move(tryCall);
+            auto tryExpr = std::make_unique<TryExpr>();
+            tryExpr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
+            tryExpr->expr = std::move(expr);
+            expr = std::move(tryExpr);
             continue;
         }
         if (match(TokenType::PLUS_PLUS)) {
             auto unExpr = std::make_unique<UnaryExpr>();
-            unExpr->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            unExpr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             unExpr->op = UnaryOp::PostInc;
             unExpr->operand = std::move(expr);
             expr = std::move(unExpr);
@@ -1339,7 +1386,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
         }
         if (match(TokenType::MINUS_MINUS)) {
             auto unExpr = std::make_unique<UnaryExpr>();
-            unExpr->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            unExpr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             unExpr->op = UnaryOp::PostDec;
             unExpr->operand = std::move(expr);
             expr = std::move(unExpr);
@@ -1347,7 +1394,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
         }
         if (match(TokenType::BANG)) {
             auto macroCall = std::make_unique<MacroCallExpr>();
-            macroCall->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            macroCall->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             if (auto identExpr = dynamic_cast<IdentifierExpr*>(expr.get())) {
                 if (identExpr->segments.size() == 1) {
                     macroCall->name = std::string(identExpr->segments[0]);
@@ -1373,12 +1420,12 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
         if (match(TokenType::L_PAREN)) {
             // Function Call
             auto callExpr = std::make_unique<CallExpr>();
-            callExpr->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            callExpr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             callExpr->callee = std::move(expr);
             if (!check(TokenType::R_PAREN)) {
                 do {
                     CallArgNode arg;
-                    arg.loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                    arg.loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                     if (check(TokenType::IDENTIFIER) && peek.type == TokenType::COLON) {
                         Token idTok = consume(TokenType::IDENTIFIER, "");
                         consume(TokenType::COLON, "");
@@ -1393,7 +1440,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
         } else if (match(TokenType::L_BRACKET)) {
             // Array Indexing
             auto idxExpr = std::make_unique<IndexExpr>();
-            idxExpr->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            idxExpr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             idxExpr->base = std::move(expr);
             idxExpr->index = parseExpression(true);
             consume(TokenType::R_BRACKET, "Expected ']' after index");
@@ -1401,7 +1448,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
         } else if (match(TokenType::DOT)) {
             if (match(TokenType::KW_AWAIT)) {
                 auto awaitExpr = std::make_unique<AwaitExpr>();
-                awaitExpr->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                awaitExpr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                 awaitExpr->expr = std::move(expr);
                 expr = std::move(awaitExpr);
                 continue;
@@ -1409,7 +1456,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
             // Tuple index: t.0, t.1, t.2 ...
             if (current.type == TokenType::INTEGER_LITERAL) {
                 auto tupleIdx = std::make_unique<TupleIndexExpr>();
-                tupleIdx->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                tupleIdx->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                 tupleIdx->object = std::move(expr);
                 uint32_t idx = 0;
                 std::from_chars(current.text.data(),
@@ -1425,7 +1472,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
                 memberTok = current;
                 advance();
             } else {
-                diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected member name or tuple index");
+                diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected member name or tuple index");
                 throw ParseError();
             }
             
@@ -1433,14 +1480,14 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
             // Let's assume standard `a.foo()` for now.
             if (match(TokenType::L_PAREN)) {
                 auto methodCall = std::make_unique<MethodCallExpr>();
-                methodCall->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                methodCall->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                 methodCall->object = std::move(expr);
                 methodCall->methodName = memberTok.text;
                 
                 if (!check(TokenType::R_PAREN)) {
                     do {
                         CallArgNode arg;
-                        arg.loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                        arg.loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                         if (check(TokenType::IDENTIFIER) && peek.type == TokenType::COLON) {
                             Token idTok = consume(TokenType::IDENTIFIER, "");
                             consume(TokenType::COLON, "");
@@ -1454,7 +1501,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
                 expr = std::move(methodCall);
             } else {
                 auto memExpr = std::make_unique<MemberExpr>();
-                memExpr->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                memExpr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                 memExpr->object = std::move(expr);
                 memExpr->member = memberTok.text;
                 expr = std::move(memExpr);
@@ -1464,14 +1511,14 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
             // This is only valid if `expr` is an IdentifierExpr representing a path.
             if (auto idExpr = dynamic_cast<IdentifierExpr*>(expr.get())) {
                 auto structInit = std::make_unique<StructInitExpr>();
-                structInit->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                structInit->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                 structInit->path = idExpr->segments;
                 structInit->genericArgs = std::move(idExpr->genericArgs);
                 
                 consume(TokenType::L_BRACE, "");
                 while (!check(TokenType::R_BRACE) && !check(TokenType::END_OF_FILE)) {
                     FieldInitNode fieldInit;
-                    fieldInit.loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+                    fieldInit.loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
                     Token fName = consume(TokenType::IDENTIFIER, "Expected field name");
                     fieldInit.name = fName.text;
                     consume(TokenType::COLON, "Expected ':' after field name");
@@ -1487,7 +1534,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
         } else if (match(TokenType::QUESTION)) {
             // Postfix `?` — Try operator
             auto tryExpr = std::make_unique<TryExpr>();
-            tryExpr->loc = SourceLocation::fromLineCol(kMainFileID, prev.line, prev.col, prev.byteOffset);
+            tryExpr->loc = SourceLocation::fromLineCol(fileId, prev.line, prev.col, prev.byteOffset);
             tryExpr->expr = std::move(expr);
             expr = std::move(tryExpr);
         } else {
@@ -1500,7 +1547,7 @@ std::unique_ptr<ExprNode> Parser::parsePostfix(bool allowStructLiteral) {
 
 std::unique_ptr<ExprNode> Parser::parseValuePath() {
     auto ident = std::make_unique<IdentifierExpr>();
-    ident->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    ident->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     do {
         Token idTok;
         if (match(TokenType::KW_SELF_TYP)) {
@@ -1512,7 +1559,7 @@ std::unique_ptr<ExprNode> Parser::parseValuePath() {
             advance();
         } else {
             std::cerr << "[DEBUG] parseValuePath failed at byte " << current.byteOffset << " token " << (int)current.type << " text: " << std::string(current.text) << "\n";
-            diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected identifier in value path");
+            diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected identifier in value path");
             throw ParseError();
         }
         ident->segments.push_back(idTok.text);
@@ -1530,14 +1577,14 @@ std::unique_ptr<ExprNode> Parser::parseValuePath() {
 
 std::unique_ptr<ExprNode> Parser::parseMatchExpr() {
     auto matchExpr = std::make_unique<MatchExpr>();
-    matchExpr->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    matchExpr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     consume(TokenType::KW_MATCH, "Expected 'match'");
     matchExpr->subject = parseExpression(false); // No struct literals in match subject
     
     consume(TokenType::L_BRACE, "Expected '{' for match body");
     while (!check(TokenType::R_BRACE) && !check(TokenType::END_OF_FILE)) {
         MatchArmNode arm;
-        arm.loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        arm.loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         arm.pattern = parsePattern();
         consume(TokenType::ARROW, "Expected '->' after pattern");
         
@@ -1639,13 +1686,13 @@ std::unique_ptr<PatternNode> Parser::parsePattern() {
         return litPat;
     }
     
-    diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected a pattern (e.g., literal, identifier, or '_') in match arm");
+    diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected a pattern (e.g., literal, identifier, or '_') in match arm");
     throw ParseError();
 }
 
 std::unique_ptr<ExprNode> Parser::parseLambdaExpr() {
     auto lambda = std::make_unique<LambdaExpr>();
-    lambda->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+    lambda->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
     if (match(TokenType::KW_MOVE)) {
         lambda->isMove = true;
     }
@@ -1718,7 +1765,7 @@ std::unique_ptr<ExprNode> Parser::parsePrimary(bool allowStructLiteral) {
     if (match(TokenType::AT)) {
         Token ident = consume(TokenType::IDENTIFIER, "Expected identifier after '@'");
         auto ph = std::make_unique<PlaceholderExpr>();
-        ph->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        ph->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         ph->data.name = ident.text;
         return ph;
     }
@@ -1748,7 +1795,7 @@ std::unique_ptr<ExprNode> Parser::parsePrimary(bool allowStructLiteral) {
     }
     if (match(TokenType::L_BRACKET)) {
         auto arr = std::make_unique<ArrayLiteralExpr>();
-        arr->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        arr->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         if (!check(TokenType::R_BRACKET)) {
             do {
                 if (check(TokenType::DOT_DOT_DOT)) {
@@ -1765,13 +1812,13 @@ std::unique_ptr<ExprNode> Parser::parsePrimary(bool allowStructLiteral) {
     if (match(TokenType::L_PAREN)) {
         if (match(TokenType::R_PAREN)) {
             auto tup = std::make_unique<TupleLiteralExpr>();
-            tup->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            tup->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             return tup;
         }
         auto expr = parseExpression(true);
         if (match(TokenType::COMMA)) {
             auto tup = std::make_unique<TupleLiteralExpr>();
-            tup->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+            tup->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
             tup->elements.push_back(std::move(expr));
             if (!check(TokenType::R_PAREN)) {
                 do {
@@ -1786,7 +1833,7 @@ std::unique_ptr<ExprNode> Parser::parsePrimary(bool allowStructLiteral) {
     }
     if (match(TokenType::KW_SIZEOF)) {
         auto soe = std::make_unique<SizeofExpr>();
-        soe->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        soe->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         consume(TokenType::L_PAREN, "Expected '(' after sizeof");
         soe->targetType = parseType();
         consume(TokenType::R_PAREN, "Expected ')' after sizeof type");
@@ -1794,14 +1841,23 @@ std::unique_ptr<ExprNode> Parser::parsePrimary(bool allowStructLiteral) {
     }
     if (match(TokenType::KW_ALIGNOF)) {
         auto aoe = std::make_unique<AlignofExpr>();
-        aoe->loc = SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset);
+        aoe->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
         consume(TokenType::L_PAREN, "Expected '(' after alignof");
         aoe->targetType = parseType();
         consume(TokenType::R_PAREN, "Expected ')' after alignof type");
         return aoe;
     }
+    if (match(TokenType::KW_TYPEOF)) {
+        auto toe = std::make_unique<TypeofExpr>();
+        toe->loc = SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset);
+        consume(TokenType::L_PAREN, "Expected '(' after typeof");
+        toe->expr = parseExpression();
+        consume(TokenType::R_PAREN, "Expected ')' after typeof expression");
+        return toe;
+    }
 
-    diag.error(SourceLocation::fromLineCol(kMainFileID, current.line, current.col, current.byteOffset), "Expected expression (e.g., literal, identifier, or '(')");
+    diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected expression (e.g., literal, identifier, or '('). Got token " + std::to_string((int)current.type) + " text: " + std::string(current.text));
+    std::cout << "[DEBUG] Expected expression at line " << current.line << " col " << current.col << " token type " << (int)current.type << " text: " << current.text << "\n";
     throw ParseError();
 }
 

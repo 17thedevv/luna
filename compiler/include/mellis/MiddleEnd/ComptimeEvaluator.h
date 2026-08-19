@@ -39,7 +39,7 @@ public:
 
 class ComptimeEvaluator : public ASTVisitor {
 public:
-    explicit ComptimeEvaluator(DiagnosticEngine& diag);
+    explicit ComptimeEvaluator(DiagnosticEngine& diag, const SymbolTable& symbolTable);
 
     bool evaluateComptimeBlocks(ASTNode* root);
 
@@ -59,6 +59,13 @@ public:
     void visit(BinaryExpr& node) override;
     
     void visit(FunctionDeclNode& node) override;
+    void visit(WhileStmtNode& node) override;
+    
+    // New implementations for comptime expression evaluation
+    void visit(UnaryExpr& node) override;
+    void visit(IfStmtNode& node) override;
+    void visit(ArrayLiteralExpr& node) override;
+    void visit(TupleLiteralExpr& node) override;
     
     // Dummy implementations for abstract methods
     void visit(ParamDeclNode&) override {}
@@ -72,24 +79,19 @@ public:
     void visit(UseDeclNode&) override {}
     void visit(ExternDeclNode&) override {}
     void visit(TypeAliasDeclNode&) override {}
-    void visit(IfStmtNode&) override {}
-    void visit(WhileStmtNode&) override {}
     void visit(ForStmtNode&) override {}
-    void visit(ReturnStmtNode&) override {}
-    void visit(BreakStmtNode&) override {}
-    void visit(ContinueStmtNode&) override {}
-    void visit(UnsafeStmtNode&) override {}
+    void visit(ReturnStmtNode& node) override;
+    void visit(BreakStmtNode& node) override;
+    void visit(ContinueStmtNode& node) override;
+    void visit(UnsafeStmtNode& node) override;
     
-    void visit(UnaryExpr&) override {}
-    void visit(CallExpr&) override {}
+    void visit(CallExpr& node) override;
     void visit(MethodCallExpr&) override {}
     void visit(IndexExpr&) override {}
     void visit(MemberExpr&) override {}
     void visit(TupleIndexExpr&) override {}
     void visit(CastExpr&) override {}
     void visit(UnsizeCastExpr&) override {}
-    void visit(ArrayLiteralExpr&) override {}
-    void visit(TupleLiteralExpr&) override {}
     void visit(StructInitExpr&) override {}
     void visit(MatchExpr&) override {}
     void visit(LambdaExpr&) override {}
@@ -97,11 +99,20 @@ public:
     void visit(AwaitExpr&) override {}
     void visit(SizeofExpr&) override {}
     void visit(AlignofExpr&) override {}
+    void visit(TypeofExpr&) override {}
 
 private:
     DiagnosticEngine& diag_;
+    const SymbolTable& symbolTable_;
     ComptimeEnvironment* currentEnv_ = nullptr;
     mvir::ConstantValue lastResult_; // Used to pass values back from visit()
+    
+    // Control flow flags for comptime execution
+    bool isExecuting_ = false;
+    bool hasReturned_ = false;
+    bool hasBroken_ = false;
+    bool hasContinued_ = false;
+    mvir::ConstantValue returnVal_;
     
     mvir::ConstantValue popResult() {
         mvir::ConstantValue res = lastResult_;

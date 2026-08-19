@@ -33,9 +33,12 @@
 #pragma once
 #include "mellis/MiddleEnd/Symbol.h"
 #include "mellis/MiddleEnd/ScopeStack.h"
+#include "mellis/Core/WellKnownTraits.h"
 #include <vector>
 #include <optional>
 #include <string_view>
+#include <string>
+#include <unordered_map>
 
 namespace fl {
 
@@ -49,6 +52,7 @@ public:
 
     /// Creates the SymbolTable and eagerly allocates the global scope (ScopeID 0).
     SymbolTable();
+    ~SymbolTable();
 
     // Not copyable — the arena owns ASTNode back-pointers that should not be
     // duplicated. Move is fine (e.g., returning from a factory function).
@@ -166,11 +170,25 @@ public:
         return empty;
     }
 
+    // ── Well-Known Traits Registry ────────────────────────────────────────────
+
+    void registerWellKnownTrait(WellKnownTrait wkt, SymbolID id) {
+        wellKnownTraits_[wkt] = id;
+    }
+    
+    std::optional<SymbolID> getWellKnownTrait(WellKnownTrait wkt) const {
+        auto it = wellKnownTraits_.find(wkt);
+        if (it != wellKnownTraits_.end()) return it->second;
+        return std::nullopt;
+    }
+
 private:
     /// Auxiliary function data mapped by SymbolID
     std::unordered_map<SymbolID, FunctionInfo> functionInfos_;
     
     std::unordered_map<SymbolID, std::vector<SymbolID>> traitMethods_;
+
+    std::unordered_map<WellKnownTrait, SymbolID> wellKnownTraits_;
 
     /// Arena of all symbols — indexed by SymbolID.
     /// Grows monotonically; IDs are stable indices.

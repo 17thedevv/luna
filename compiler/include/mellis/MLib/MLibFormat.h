@@ -26,6 +26,7 @@ enum class SectionType : uint32_t {
     ImplTable = 11,
     MacroMetadata = 12,
     GenericMetadata = 13,
+    TypeRefTable = 14,
     Custom = 0xFFFFFFFF
 };
 
@@ -118,11 +119,64 @@ struct TypeEntry {
     uint32_t moduleID;
 };
 
+enum class TypeRefKind : uint8_t {
+    Primitive,
+    Named,         // Struct/Enum
+    Reference,
+    Pointer,
+    Array,
+    Slice,
+    Tuple,
+    GenericParam,
+    SelfType,
+    Associated,
+    TraitObject,
+    Function
+};
+
+struct TypeRefRecord {
+    TypeRefKind kind;
+    uint8_t  flags;       // mutability, etc.
+    uint16_t payloadSize; // bytes following this record
+};
+
+// Payload structures for TypeRefRecord
+struct TypeRefNamed {
+    uint32_t declarationTypeID; // TypeID in MLib
+    uint16_t argCount;
+    // Followed by argCount * uint32_t (TypeRef IDs)
+};
+
+struct TypeRefReference {
+    uint32_t innerTypeRefID;
+};
+
+struct TypeRefGenericParam {
+    uint32_t index;
+    uint32_t nameStringID;
+};
+
 struct TraitEntry {
     uint32_t nameStringID;
     uint32_t namespaceID;
     uint8_t  visibility;
     uint32_t moduleID;
+    uint16_t genericParamCount;
+    uint16_t methodCount;
+    uint32_t payloadSize;
+    // Payload follows:
+    // - genericParamCount * TraitGenericParam
+    // - methodCount * TraitMethodEntry
+};
+
+struct TraitGenericParam {
+    uint32_t nameStringID;
+};
+
+struct TraitMethodEntry {
+    uint32_t nameStringID;
+    uint32_t signatureTypeID; // index into TypeRefTable
+    uint8_t  hasDefaultImpl;
 };
 
 struct FunctionEntry {
@@ -155,8 +209,28 @@ struct ExternalReturnEntry {
 };
 
 struct ImplEntry {
-    uint32_t traitID;
-    uint32_t targetTypeID;
+    uint32_t selfTypeRefID;   // Index into TypeRefTable
+    uint32_t traitRefID;      // Index into TypeRefTable (or 0xFFFFFFFF)
+    uint16_t genericParamCount;
+    uint16_t methodCount;
+    uint16_t associatedTypeCount;
+    uint16_t boundCount;
+    uint32_t payloadSize;     // Total bytes of the payload
+    // Payload follows:
+    // - genericParamCount * ImplGenericParam
+    // - methodCount * uint32_t (FunctionID)
+    // - associatedTypeCount * uint32_t (TypeRefID)
+    // - boundCount * ImplBound
+};
+
+struct ImplGenericParam {
+    uint32_t nameStringID; // For debugging
+    // bounds will be handled by ImplBound referring to generic parameter indices
+};
+
+struct ImplBound {
+    uint32_t typeRefID; // The type being constrained
+    uint32_t traitRefID; // The trait it must implement
 };
 
 // ---------------------------------------------------------

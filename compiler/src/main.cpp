@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
     int optLevel = 0;
     std::string filepath = "";
 
+    std::vector<std::string> extraLibraryPaths;
     for (int i = 1; i < argc; ++i) {
         std::string arg = argv[i];
         if (arg == "-h" || arg == "--help") {
@@ -32,6 +33,10 @@ int main(int argc, char* argv[]) {
             emitLib = true;
         } else if (arg == "-O1") {
             optLevel = 1;
+        } else if (arg == "-L") {
+            if (i + 1 < argc) {
+                extraLibraryPaths.push_back(argv[++i]);
+            }
         } else if (filepath.empty() && arg[0] != '-') {
             filepath = arg;
         }
@@ -49,6 +54,7 @@ int main(int argc, char* argv[]) {
     // std::cout << "[MELLIS COMPILER]" << std::endl;
 
     CompilerSession session;
+    session.setLibraryPaths(extraLibraryPaths);
     bool success = session.compile(filepath, verbose, optLevel, emitLib);
 
     if (!success) {

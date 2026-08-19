@@ -54,6 +54,15 @@ Deconstructed deconstruct(PatternNode* pat) {
         for (auto& f : enm->fields) fields.push_back(f.get());
         return { Constructor{CtorKind::EnumVariant, "", enm->variantSymbolId, fields.size()}, fields };
     }
+    if (auto* strct = dynamic_cast<StructPatternNode*>(pat)) {
+        // Treat struct patterns similar to enum variants for exhaustiveness checking
+        // All fields of a struct must be provided (no missing fields are allowed)
+        std::vector<PatternNode*> fields;
+        for (auto& f : strct->fields) {
+            if (f.pattern) fields.push_back(f.pattern.get());
+        }
+        return { Constructor{CtorKind::EnumVariant, "", strct->structSymbolId, fields.size()}, fields };
+    }
     return { Constructor{CtorKind::Wildcard}, {} };
 }
 

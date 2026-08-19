@@ -237,4 +237,28 @@ void BorrowAnalyzer::transferTerminator(const mvir::Terminator& term, BorrowStat
     }
 }
 
+bool BorrowAnalyzer::isCopy(const Type* t) const {
+    if (!t) return false;
+    if (auto* closureTy = dynamic_cast<const ClosureType*>(t)) {
+        if (closureStorageMap_.find(closureTy) != closureStorageMap_.end() && 
+            closureStorageMap_.at(closureTy) == ClosureStorageKind::Heap) {
+            return false; // Heap closures are Move-Only
+        }
+    }
+
+    if (t->isCopy()) return true;
+
+    if (solver_) {
+        std::optional<SymbolID> copyTraitId = symTable_.getWellKnownTrait(WellKnownTrait::Copy);
+        if (copyTraitId.has_value()) {
+            Goal goal;
+            goal.kind = GoalKind::Trait;
+            goal.selfType = t;
+            goal.traitId = *copyTraitId;
+            return solver_->solve(goal).result == SolverResult::Success;
+        }
+    }
+    return false;
+}
+
 } // namespace fl

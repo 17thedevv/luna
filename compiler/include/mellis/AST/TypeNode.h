@@ -51,6 +51,7 @@ public:
     std::vector<std::unique_ptr<TypeNode>> genericArgs;
     std::vector<AssociatedBinding>         associatedBindings;
     SymbolID                               symbolId = kInvalidSymbolID;
+    size_t                                 resolvedPathLength = 1;
     void accept(TypeVisitor& v) override;
     void accept(ASTVisitor& v) override { }
     ASTNode* cloneImpl() const override;
@@ -97,6 +98,7 @@ class FunctionTypeNode : public TypeNode {
 public:
     std::vector<std::unique_ptr<TypeNode>> params;
     std::unique_ptr<TypeNode>              returnType;
+    bool                                   isUnsafe = false;
     void accept(TypeVisitor& v) override;
     void accept(ASTVisitor& v) override { }
     ASTNode* cloneImpl() const override;

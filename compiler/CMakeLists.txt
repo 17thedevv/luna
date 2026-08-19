@@ -100,4 +100,4 @@ add_executable(mellis
     ${CORE_SRC}
 )
 
-target_link_libraries(mellis PRIVATE ${LLVM_LIBS})
+target_link_libraries(mellis PRIVATE ${LLVM_LIBS} -lmsvcrt -lvcruntime -lucrt)

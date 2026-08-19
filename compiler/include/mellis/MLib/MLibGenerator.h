@@ -15,9 +15,11 @@
 
 namespace fl {
 
+class SourceManager;
+
 class MLibGenerator {
 public:
-    MLibGenerator(DiagnosticEngine& diag, const SemanticSnapshot& snapshot, MacroRegistry& macroReg, std::string_view sourceCode);
+    MLibGenerator(DiagnosticEngine& diag, const SemanticSnapshot& snapshot, MacroRegistry& macroReg, SourceManager& sourceManager);
 
     /// Generate a .mlib file from the LLVM module and SymbolTable metadata.
     ///
@@ -30,7 +32,7 @@ private:
     DiagnosticEngine& diag_;
     const SemanticSnapshot& snapshot_;
     MacroRegistry& macroReg_;
-    std::string_view sourceCode_;
+    SourceManager& sourceManager_;
 };
 
 } // namespace fl

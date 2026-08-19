@@ -9,6 +9,7 @@
 #include "mellis/Support/Diagnostic.h"
 #include <memory>
 #include <string_view>
+#include <stdexcept>
 
 namespace fl {
 
@@ -21,7 +22,9 @@ private:
     Token prev;        // Token đi trước hiện tại
 
     // Exception dùng cục bộ để panic mode recovery
-    struct ParseError {};
+    struct ParseError : public std::runtime_error {
+        ParseError() : std::runtime_error("Parse error") {}
+    };
     
     // Đồng bộ hoá sau lỗi để tiếp tục phân tích
     void synchronize();

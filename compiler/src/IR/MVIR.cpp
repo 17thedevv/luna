@@ -114,6 +114,23 @@ std::string AlignofInst::toString() const {
     return dest.toString() + " = alignof " + formatType(targetType);
 }
 
+std::string IntrinsicCallInst::toString() const {
+    std::string s;
+    if (dest) s += dest->toString() + " = ";
+    s += "call intrinsic_" + std::to_string((int)intrinsic) + "(";
+    for (size_t i = 0; i < typeArgs.size(); ++i) {
+        if (i > 0) s += ", ";
+        s += formatType(typeArgs[i]);
+    }
+    if (!typeArgs.empty() && !args.empty()) s += ", ";
+    for (size_t i = 0; i < args.size(); ++i) {
+        if (i > 0) s += ", ";
+        s += mvir::toString(args[i]);
+    }
+    s += ")";
+    return s;
+}
+
 std::string formatAluOp(AluOp op) {
     switch (op) {
         case AluOp::Add: return "add";

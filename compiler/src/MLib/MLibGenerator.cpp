@@ -15,6 +15,8 @@
 #include "mellis/MLib/MLibFormat.h"
 #include "mellis/MLib/SemanticFingerprint.h"
 #include "mellis/AST/DeclNode.h"
+#include "mellis/AST/ProgramNode.h"
+
 
 #include <llvm/MC/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
@@ -28,14 +30,15 @@
 #include <llvm/Support/FileSystem.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
 
+#include "mellis/Core/SourceManager.h"
 #include <fstream>
 #include <iostream>
 #include <algorithm>
 
 namespace fl {
 
-MLibGenerator::MLibGenerator(DiagnosticEngine& diag, const SemanticSnapshot& snapshot, MacroRegistry& macroReg, std::string_view sourceCode)
-    : diag_(diag), snapshot_(snapshot), macroReg_(macroReg), sourceCode_(sourceCode) {}
+MLibGenerator::MLibGenerator(DiagnosticEngine& diag, const SemanticSnapshot& snapshot, MacroRegistry& macroReg, SourceManager& sourceManager)
+    : diag_(diag), snapshot_(snapshot), macroReg_(macroReg), sourceManager_(sourceManager) {}
 
 bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& outputPath) {
     using namespace fl::mlib;
@@ -59,8 +62,10 @@ bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& output
     auto features = "";
     llvm::TargetOptions opt;
     auto rm = std::optional<llvm::Reloc::Model>();
+    std::cerr << "[MLibGen] target->createTargetMachine\n";
     auto targetMachine = target->createTargetMachine(targetTriple, cpu, features, opt, rm);
 
+    std::cerr << "[MLibGen] setDataLayout\n";
     llvmModule->setDataLayout(targetMachine->createDataLayout());
 
     // Run Optimization
@@ -75,18 +80,24 @@ bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& output
     PB.registerLoopAnalyses(LAM);
     PB.crossRegisterProxies(LAM, FAM, CGAM, MAM);
     llvm::ModulePassManager MPM = PB.buildPerModuleDefaultPipeline(llvm::OptimizationLevel::O1);
+    std::cerr << "[MLibGen] MPM.run\n";
     MPM.run(*llvmModule, MAM);
+    std::cerr << "[MLibGen] MPM.run DONE\n";
 
     // Emit object code to buffer
     llvm::SmallVector<char, 0> objBuffer;
     llvm::raw_svector_ostream objStream(objBuffer);
     llvm::legacy::PassManager pass;
+    std::cerr << "[MLibGen] addPassesToEmitFile\n";
     if (targetMachine->addPassesToEmitFile(pass, objStream, nullptr, llvm::CodeGenFileType::ObjectFile)) {
         diag_.error(SourceLocation{}, "TargetMachine không hỗ trợ phát sinh object file.");
         return false;
     }
+    std::cerr << "[MLibGen] pass.run\n";
     pass.run(*llvmModule);
+    std::cerr << "[MLibGen] pass.run DONE\n";
 
+    std::cerr << "[MLibGen] Building MLib Sections\n";
     // 2. Build MLib Sections
     
     // a. String Table
@@ -165,7 +176,23 @@ bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& output
 
     for (const Symbol* symPtr : symbols) {
         const auto& sym = *symPtr;
-        if (sym.isExternal || !sym.decl) continue;
+        if (!sym.decl || !sym.decl->loc.isValid()) continue;
+        
+        bool isChildOfImplOrTrait = false;
+        if (sym.declaredInScope != kInvalidScopeID) {
+            auto kindValue = static_cast<uint8_t>(snapshot_.getSymbolTable().getScope(sym.declaredInScope).kind);
+            if (sym.name.view() == "is_some" || sym.name.view() == "drop") {
+                std::cout << "[MLibGen Debug] " << sym.name.view() << " declaredInScope=" << sym.declaredInScope << " kindValue=" << (int)kindValue << "\n";
+            }
+            if (kindValue == static_cast<uint8_t>(fl::ScopeKind::Trait) || 
+                kindValue == static_cast<uint8_t>(fl::ScopeKind::Impl) || 
+                kindValue == static_cast<uint8_t>(fl::ScopeKind::Enum)) {
+                isChildOfImplOrTrait = true;
+            }
+        }
+        if (isChildOfImplOrTrait) {
+            continue;
+        }
 
         bool isGeneric = false;
         fl::mlib::GenericKind gkind;
@@ -186,16 +213,52 @@ bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& output
             uint32_t start = sym.decl->loc.offset;
             uint32_t end = sym.decl->endLoc.offset;
             std::cout << "[MLibGen] Found generic symbol: " << sym.name.view() << " start=" << start << " end=" << end << "\n";
-            if (end > start && end <= sourceCode_.size()) {
-                std::string rawSource(sourceCode_.substr(start, end - start));
+            std::string_view source = sourceManager_.getSource(sym.decl->loc.file);
+            if (end > start && end <= source.size()) {
+                std::string rawSource(source.substr(start, end - start));
                 if (sym.visibility == Visibility::Public) {
-                    rawSource = "export " + rawSource;
+                    if (rawSource.substr(0, 6) != "export") {
+                        rawSource = "export " + rawSource;
+                    }
                 }
                 std::cout << "[MLibGen] Serializing source:\n" << rawSource << "\n";
                 genericBuilder.addGeneric(gkind, std::string(sym.name.view()), rawSource);
             }
         }
     }
+
+    // EXPORT ALL IMPLS AS RAW SOURCE
+    std::cout << "[MLibGen] snapshot_.getProgram() = " << snapshot_.getProgram() << "\n";
+    if (snapshot_.getProgram()) {
+        std::function<void(const DeclNode*)> collectImpls = [&](const DeclNode* decl) {
+            if (!decl) return;
+            if (auto* mod = dynamic_cast<const ModDeclNode*>(decl)) {
+                for (const auto& item : mod->decls) collectImpls(item.get());
+            } else if (auto* impl = dynamic_cast<const ImplDeclNode*>(decl)) {
+                uint32_t start = impl->loc.offset;
+                uint32_t end = impl->endLoc.offset;
+                std::string_view source = sourceManager_.getSource(impl->loc.file);
+                if (end > start && end <= source.size()) {
+                    std::string rawSource(source.substr(start, end - start));
+                    std::string targetName = "";
+                    if (auto* namedTy = dynamic_cast<const NamedTypeNode*>(impl->selfType.get())) {
+                        if (!namedTy->segments.empty()) targetName = namedTy->segments.back();
+                    }
+                    if (!targetName.empty()) {
+                        std::cout << "[MLibGen] Serializing Impl as generic source for " << targetName << " from fileId=" << impl->loc.file << " start=" << start << " end=" << end << " sourceSize=" << source.size() << "\n";
+                        std::cout << "[MLibGen] Extracted source: " << rawSource << "\n";
+                        genericBuilder.addGeneric(fl::mlib::GenericKind::Impl, targetName, rawSource);
+                    }
+                } else {
+                    std::cout << "[MLibGen] ERROR: invalid bounds! start=" << start << " end=" << end << " sourceSize=" << source.size() << " fileId=" << impl->loc.file << "\n";
+                }
+            }
+        };
+        for (const auto& item : snapshot_.getProgram()->items) {
+            collectImpls(dynamic_cast<const DeclNode*>(item.get()));
+        }
+    }
+
     BinaryWriter genericWriter;
     genericBuilder.serialize(genericWriter);
     auto genericBytes = genericWriter.takeBuffer();
@@ -206,9 +269,12 @@ bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& output
     BinaryWriter objWriter;
     objBuilder.serialize(objWriter);
     auto finalObjBytes = objWriter.takeBuffer();
+    BinaryWriter typeRefWriter;
+    metadataBuilder.serializeTypeRefs(typeRefWriter);
+    auto typeRefBytes = typeRefWriter.takeBuffer();
 
     // ── Assemble the .mlib binary ─────────────────────────────────────────────
-    const uint32_t NUM_SECTIONS = 8;
+    const uint32_t NUM_SECTIONS = 9;
     const uint64_t headerSize   = sizeof(MLibHeader);
     const uint64_t tableSize    = NUM_SECTIONS * sizeof(SectionEntry);
     
@@ -225,6 +291,7 @@ bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& output
     uint64_t exportOffset   = getNextOffset(exportBytes.size());
     uint64_t typeOffset     = getNextOffset(metadataBytes.size());
     uint64_t traitOffset    = getNextOffset(implBytes.size());
+    uint64_t typeRefSectionOffset  = getNextOffset(typeRefBytes.size());
     uint64_t macroOffset    = getNextOffset(macroBytes.size());
     uint64_t genericOffset  = getNextOffset(genericBytes.size());
     uint64_t objOffset      = getNextOffset(finalObjBytes.size());
@@ -262,9 +329,10 @@ bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& output
         makeSection(3, SectionType::ExportTable,   exportOffset,   exportBytes.size()),
         makeSection(4, SectionType::TypeMetadata,  typeOffset,     metadataBytes.size()),
         makeSection(5, SectionType::TraitMetadata, traitOffset,    implBytes.size()),
-        makeSection(6, SectionType::MacroMetadata, macroOffset,    macroBytes.size()),
-        makeSection(7, SectionType::GenericMetadata, genericOffset, genericBytes.size()),
-        makeSection(8, SectionType::ObjectCode,    objOffset,      finalObjBytes.size()),
+        makeSection(6, SectionType::TypeRefTable,  typeRefSectionOffset, typeRefBytes.size()),
+        makeSection(7, SectionType::MacroMetadata, macroOffset,    macroBytes.size()),
+        makeSection(8, SectionType::GenericMetadata, genericOffset, genericBytes.size()),
+        makeSection(9, SectionType::ObjectCode,    objOffset,      finalObjBytes.size()),
     };
 
     std::ofstream out(outputPath, std::ios::binary);
@@ -280,6 +348,7 @@ bool MLibGenerator::generate(llvm::Module* llvmModule, const std::string& output
     out.write(reinterpret_cast<const char*>(exportBytes.data()), exportBytes.size());
     out.write(reinterpret_cast<const char*>(metadataBytes.data()), metadataBytes.size());
     out.write(reinterpret_cast<const char*>(implBytes.data()), implBytes.size());
+    out.write(reinterpret_cast<const char*>(typeRefBytes.data()), typeRefBytes.size());
     out.write(reinterpret_cast<const char*>(macroBytes.data()), macroBytes.size());
     out.write(reinterpret_cast<const char*>(genericBytes.data()), genericBytes.size());
     out.write(reinterpret_cast<const char*>(finalObjBytes.data()), finalObjBytes.size());

@@ -204,3 +204,46 @@ Abstractions should not introduce unnecessary runtime overhead.
 ## Syntax follows semantics
 
 Language syntax should emerge from a well-defined semantic model rather than forcing compiler implementation.
+# 9. Standard Library and Runtime Architecture
+
+**Dependency Flow:**
+```
+core
+  ↑
+alloc
+  ↑
+std
+```
+
+**Stack Architecture:**
+```
+                     Mellis Program
+                           │
+                           ▼
+                    lib/std (Mellis)
+                           │
+                    lib/alloc (Mellis)
+                           │
+                     lib/core (Mellis)
+                           │
+                 Runtime ABI (__mellis_*)
+                           │
+                           ▼
+                 Mellis Runtime (C/C++)
+                           │
+                 ┌─────────┴─────────┐
+                 ▼                   ▼
+              Platform            libc/OS
+```
+
+### Component Responsibilities
+
+1. **`lib/core/`**: Defines abstractions, traits, and foundational generic types (`Option`, `Result`, `Slice`) that wrap around language built-in primitives (`int_32`, `bool`, `pointer`). It does *not* define the primitives themselves.
+
+2. **`lib/alloc/`**: Provides dynamic structures like `Vec` and `String`. It uses an `Allocator` API that delegates to the Runtime ABI (`__mellis_alloc`, `__mellis_dealloc`). This decouples higher-level data structures from hardcoded runtime implementations.
+
+3. **`lib/std/`**: The hosted environment library (`std::io`, `std::fs`, `std::thread`, etc.). It does not directly call OS or `libc` functions. Instead, it delegates to the Runtime ABI (e.g., `__mellis_thread_spawn`).
+
+4. **Mellis Runtime (`runtime/`)**: Written in C/C++, this layer implements the `__mellis_*` ABI. It abstracts away the platform specifics. **The Mellis Runtime is NOT the C Runtime (CRT).** It sits above the OS/Platform and the C Runtime (`libc`), translating `__mellis_*` calls into appropriate `malloc`/`pthread`/`Win32` calls depending on the compilation profile (hosted vs freestanding vs embedded).
+
+5. **Platform Implementations (`runtime/src/platform/`)**: Contains OS-specific details (`windows`, `linux`, `macos`, `freestanding`, `embedded`). The platform implementation is strictly kept inside the Mellis Runtime, ensuring that the public API in `std` remains pure and platform-agnostic.

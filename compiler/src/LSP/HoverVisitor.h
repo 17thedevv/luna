@@ -185,6 +185,7 @@ public:
     void visit(AwaitExpr& node) override { shouldVisit(node); }
     void visit(SizeofExpr& node) override { shouldVisit(node); }
     void visit(AlignofExpr& node) override { shouldVisit(node); }
+    void visit(TypeofExpr& node) override { shouldVisit(node); }
     
     // Type visitor stubs
     void visit(BuiltinTypeNode& node) override { shouldVisit(node); }

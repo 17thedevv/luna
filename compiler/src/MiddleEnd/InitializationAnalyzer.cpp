@@ -88,7 +88,7 @@ void InitializationAnalyzer::transferInstruction(const mvir::Instruction& inst, 
     else if (auto* load = dynamic_cast<const mvir::LoadInst*>(&inst)) {
         Place srcPlace = resolvePlace(load->ptr, state);
         checkAccess(srcPlace, fakeLoc, state);
-        Place destPlace(mvir::Operand(mvir::Place(load->dest)));
+        Place destPlace(load->dest);
         state.initStateMap[destPlace.toString()] = InitState::Initialized;
     }
     else if (auto* store = dynamic_cast<const mvir::StoreInst*>(&inst)) {
@@ -149,6 +149,13 @@ void InitializationAnalyzer::transferInstruction(const mvir::Instruction& inst, 
         Place destPlace(mvir::Operand(mvir::Place(alu->dest)));
         state.initStateMap[destPlace.toString()] = InitState::Initialized;
     }
+    else if (auto* tupleExt = dynamic_cast<const mvir::TupleExtractInst*>(&inst)) {
+        if (auto* locId = mvir::getLocalIf(tupleExt->tuple)) {
+            checkAccess(resolvePlace(mvir::Operand(mvir::Place(*locId)), state), fakeLoc, state);
+        }
+        Place destPlace(tupleExt->dest);
+        state.initStateMap[destPlace.toString()] = InitState::Initialized;
+    }
     else if (auto* ext = dynamic_cast<const mvir::ExtractInst*>(&inst)) {
         if (auto* locId = mvir::getLocalIf(ext->base)) {
             checkAccess(resolvePlace(mvir::Operand(mvir::Place(*locId)), state), fakeLoc, state);
@@ -161,6 +168,16 @@ void InitializationAnalyzer::transferInstruction(const mvir::Instruction& inst, 
             checkAccess(resolvePlace(mvir::Operand(mvir::Place(*locId)), state), fakeLoc, state);
         }
         Place destPlace(mvir::Operand(mvir::Place(tag->dest)));
+        state.initStateMap[destPlace.toString()] = InitState::Initialized;
+    }
+    else if (auto* slice = dynamic_cast<const mvir::MakeSliceInst*>(&inst)) {
+        if (auto* locId = mvir::getLocalIf(slice->basePtr)) {
+            checkAccess(resolvePlace(mvir::Operand(mvir::Place(*locId)), state), fakeLoc, state);
+        }
+        if (auto* locId = mvir::getLocalIf(slice->length)) {
+            checkAccess(resolvePlace(mvir::Operand(mvir::Place(*locId)), state), fakeLoc, state);
+        }
+        Place destPlace(mvir::Operand(mvir::Place(slice->dest)));
         state.initStateMap[destPlace.toString()] = InitState::Initialized;
     }
     else if (auto* var = dynamic_cast<const mvir::VariantInst*>(&inst)) {

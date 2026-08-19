@@ -77,9 +77,9 @@ Fast incremental builds, diagnostics and IDE support are part of the language ex
 
 ---
 
-# What fdlang Intentionally Inherits
+# What Mellis Intentionally Inherits
 
-fdlang does not attempt to redesign concepts that have already been proven.
+Mellis does not attempt to redesign concepts that have already been proven.
 
 It intentionally adopts:
 

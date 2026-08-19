@@ -77,6 +77,7 @@ public:
     void visit(AwaitExpr&) override {}
     void visit(SizeofExpr&) override {}
     void visit(AlignofExpr&) override {}
+    void visit(TypeofExpr&) override {}
 
     void visit(MacroDeclNode&) override;
     void visit(PlaceholderExpr&) override {}

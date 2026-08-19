@@ -208,12 +208,18 @@ IRVerificationResult IRVerifier::verifyDominance(const mvir::Function& function)
                 definedLocals.insert(static_cast<const mvir::UnaryInst*>(inst.get())->dest.toString());
             } else if (opcode == mvir::Opcode::Extract) {
                 definedLocals.insert(static_cast<const mvir::ExtractInst*>(inst.get())->dest.toString());
+            } else if (opcode == mvir::Opcode::TupleExtract) {
+                definedLocals.insert(static_cast<const mvir::TupleExtractInst*>(inst.get())->dest.toString());
             } else if (opcode == mvir::Opcode::Tag) {
                 definedLocals.insert(static_cast<const mvir::TagInst*>(inst.get())->dest.toString());
             } else if (opcode == mvir::Opcode::Variant) {
                 definedLocals.insert(static_cast<const mvir::VariantInst*>(inst.get())->dest.toString());
             } else if (opcode == mvir::Opcode::MakeTraitObject) {
                 definedLocals.insert(static_cast<const mvir::MakeTraitObjectInst*>(inst.get())->dest.toString());
+            } else if (opcode == mvir::Opcode::IntrinsicCall) {
+                if (static_cast<const mvir::IntrinsicCallInst*>(inst.get())->dest) {
+                    definedLocals.insert(static_cast<const mvir::IntrinsicCallInst*>(inst.get())->dest->toString());
+                }
             } else if (opcode == mvir::Opcode::Call) {
                 if (static_cast<const mvir::CallInst*>(inst.get())->dest) {
                     definedLocals.insert(static_cast<const mvir::CallInst*>(inst.get())->dest->toString());
@@ -268,8 +274,16 @@ IRVerificationResult IRVerifier::verifyDominance(const mvir::Function& function)
                 res = checkOperand(static_cast<const mvir::UnaryInst*>(inst.get())->operand, "UnaryInst");
             } else if (opcode == mvir::Opcode::Extract) {
                 res = checkOperand(static_cast<const mvir::ExtractInst*>(inst.get())->base, "ExtractInst");
+            } else if (opcode == mvir::Opcode::TupleExtract) {
+                res = checkOperand(static_cast<const mvir::TupleExtractInst*>(inst.get())->tuple, "TupleExtractInst");
             } else if (opcode == mvir::Opcode::Tag) {
                 res = checkOperand(static_cast<const mvir::TagInst*>(inst.get())->base, "TagInst");
+            } else if (opcode == mvir::Opcode::IntrinsicCall) {
+                auto* icall = static_cast<const mvir::IntrinsicCallInst*>(inst.get());
+                for (const auto& arg : icall->args) {
+                    if (!res.ok) break;
+                    res = checkOperand(arg, "IntrinsicCallInst");
+                }
             } else if (opcode == mvir::Opcode::Call) {
                 auto* call = static_cast<const mvir::CallInst*>(inst.get());
                 for (const auto& arg : call->args) {
@@ -522,6 +536,13 @@ IRVerificationResult IRVerifier::verifySemanticClosure(const mvir::Module& modul
                 } else if (auto* var = dynamic_cast<const mvir::VariantInst*>(inst.get())) {
                     auto r = verifyTypeSemanticClosure(var->enumType, instCtx + " VariantInst enumType");
                     if (!r.ok) return r;
+                } else if (auto* icall = dynamic_cast<const mvir::IntrinsicCallInst*>(inst.get())) {
+                    for (size_t i = 0; i < icall->typeArgs.size(); ++i) {
+                        auto r = verifyTypeSemanticClosure(
+                            icall->typeArgs[i],
+                            instCtx + " IntrinsicCallInst typeArgs[" + std::to_string(i) + "]");
+                        if (!r.ok) return r;
+                    }
                 }
             }
         }

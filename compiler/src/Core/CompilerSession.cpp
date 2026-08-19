@@ -36,7 +36,7 @@
 
 namespace fl {
 
-CompilerSession::CompilerSession() : sourceManager_(diag_) {
+CompilerSession::CompilerSession() : sourceManager_(diag_), mlibMetadataCache_(typeContext_) {
     diag_.setSourceManager(&sourceManager_);
     diag_.addConsumer(std::make_shared<ConsoleDiagnosticConsumer>(&sourceManager_));
     initDefaultLibraryPaths();
@@ -148,7 +148,7 @@ bool CompilerSession::compile(const std::string& filepath, bool verbose, int opt
     
     // ── Phase 1.3: Import & Macro Resolution ─────────────────────
     if (verbose) std::cout << "[1.3] Phan giai Import & Macro..." << std::endl;
-    ModuleLoader moduleLoader(symbolTable_, diag_, mainFileDir.string(), &macroRegistry, libraryPaths_);
+    ModuleLoader moduleLoader(symbolTable_, diag_, mainFileDir.string(), &macroRegistry, libraryPaths_, &typeContext_, &mlibMetadataCache_);
     ImportResolver importResolver(diag_, symbolTable_, moduleLoader);
     MacroResolver macroResolver(macroRegistry, diag_);
     if (ast) {
@@ -156,9 +156,14 @@ bool CompilerSession::compile(const std::string& filepath, bool verbose, int opt
         if (prog) {
             importResolver.resolve(*prog);
             
+            auto strings = moduleLoader.takeInjectedStrings();
+            for (auto& s : strings) {
+                loadedInjectedStrings_.push_back(std::move(s));
+            }
+            
             auto generics = moduleLoader.takeInjectedGenerics();
             for (auto& g : generics) {
-                prog->items.push_back(std::move(g));
+                loadedGenericTemplates_.push_back(std::move(g));
             }
             macroResolver.resolve(*prog);
         }
@@ -210,19 +215,13 @@ bool CompilerSession::compile(const std::string& filepath, bool verbose, int opt
     MonomorphizationEngine monoEngine(symbolTable_, resolver, typeChecker, diag_);
     typeChecker.setMonomorphizationEngine(&monoEngine);
     // Attach MLibMetadataCache so TypeChecker can resolve external symbol types.
-    std::cerr << "[DEBUG] Creating MLibMetadataCache..." << std::endl;
-    MLibMetadataCache metadataCache(typeContext_);
-    typeChecker.setMetadataCache(&metadataCache);
+    std::cerr << "[DEBUG] Attaching MLibMetadataCache..." << std::endl;
+    typeChecker.setMetadataCache(&mlibMetadataCache_);
 
-    // Register Source-based generic Impl blocks loaded from .mlib
-    for (const auto& pair : moduleLoader.getInjectedGenericImpls()) {
-        SymbolID targetStructId = pair.first;
-        ImplDeclNode* implNode = pair.second;
-        monoEngine.registerGenericImpl(targetStructId, implNode);
-    }
+
 
     std::cerr << "[DEBUG] Calling TypeChecker::check..." << std::endl;
-    bool tcOk = typeChecker.check(ast.get());
+    bool tcOk = typeChecker.check(ast.get(), 0, &loadedGenericTemplates_);
     std::cerr << "[PHASE] TypeChecker done, tcOk=" << tcOk << std::endl;
 
     if (!tcOk) {
@@ -250,8 +249,8 @@ bool CompilerSession::compile(const std::string& filepath, bool verbose, int opt
 
     // ── Phase 4.75: Comptime Evaluation ──────────────────────────────────────
     if (verbose) std::cout << "[6.08] Evaluate Comptime blocks..." << std::endl;
-    ComptimeEvaluator comptimeEval(diag_);
-    bool comptimeOk = comptimeEval.evaluateComptimeBlocks(ast.get());
+    ComptimeEvaluator comptime(diag_, symbolTable_);
+    bool comptimeOk = comptime.evaluateComptimeBlocks(ast.get());
     std::cerr << "[PHASE] ComptimeEval done, ok=" << comptimeOk << std::endl;
     if (!comptimeOk) {
         diag_.error(SourceLocation::invalid(), "Comptime evaluation failed.");
@@ -371,8 +370,8 @@ bool CompilerSession::compile(const std::string& filepath, bool verbose, int opt
         
         std::string tempOutName = finalOutName + ".tmp";
 
-        fl::SemanticSnapshot snapshot(typeChecker.getTypeTable(), typeContext_, symbolTable_);
-        fl::MLibGenerator mlibGen(diag_, snapshot, macroRegistry, sourceCode);
+        fl::SemanticSnapshot snapshot(typeChecker.getTypeTable(), typeContext_, symbolTable_, dynamic_cast<const ProgramNode*>(ast.get()));
+        fl::MLibGenerator mlibGen(diag_, snapshot, macroRegistry, sourceManager_);
         bool mlibOk = mlibGen.generate(&llvmModule, tempOutName);
         if (!mlibOk) {
             diag_.error(SourceLocation::invalid(), "Tao file thu vien that bai.");

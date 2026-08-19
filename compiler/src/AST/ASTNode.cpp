@@ -53,6 +53,7 @@ void TryExpr::accept(ASTVisitor& v) { v.visit(*this); }
 void AwaitExpr::accept(ASTVisitor& v) { v.visit(*this); }
 void SizeofExpr::accept(ASTVisitor& v) { v.visit(*this); }
 void AlignofExpr::accept(ASTVisitor& v) { v.visit(*this); }
+void TypeofExpr::accept(ASTVisitor& v) { v.visit(*this); }
 void BuiltinTypeNode::accept(TypeVisitor& v) { v.visit(*this); }
 void LifetimeNode::accept(TypeVisitor& v) { v.visit(*this); }
 void NamedTypeNode::accept(TypeVisitor& v) { v.visit(*this); }

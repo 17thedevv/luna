@@ -3,8 +3,12 @@
 #include "mellis/MiddleEnd/Semantic/DataflowEngine.h"
 #include "mellis/MiddleEnd/Place.h"
 #include "mellis/Support/Diagnostic.h"
+#include "mellis/MiddleEnd/TraitSolver.h"
+#include "mellis/MiddleEnd/SymbolTable.h"
+#include <unordered_map>
 
 namespace fl {
+class TraitSolver;
 
 enum class MoveState {
     Valid,
@@ -26,23 +30,18 @@ class MoveAnalyzer : public DataflowPass<MoveStateData> {
     const mvir::Module* module_;
     DiagnosticEngine& diag_;
     std::unordered_map<const Type*, ClosureStorageKind>& closureStorageMap_;
+    TraitSolver* solver_;
+    SymbolTable* symTable_;
     bool hasError_ = false;
 
 public:
     MoveAnalyzer(const mvir::Module* module, DiagnosticEngine& diag, 
-                 std::unordered_map<const Type*, ClosureStorageKind>& closureStorageMap)
-        : module_(module), diag_(diag), closureStorageMap_(closureStorageMap) {}
+                 std::unordered_map<const Type*, ClosureStorageKind>& closureStorageMap,
+                 TraitSolver* solver = nullptr, SymbolTable* symTable = nullptr)
+        : module_(module), diag_(diag), closureStorageMap_(closureStorageMap), 
+          solver_(solver), symTable_(symTable) {}
 
-    bool isCopy(const Type* t) const {
-        if (!t) return false;
-        if (auto* closureTy = dynamic_cast<const ClosureType*>(t)) {
-            if (closureStorageMap_.find(closureTy) != closureStorageMap_.end() && 
-                closureStorageMap_.at(closureTy) == ClosureStorageKind::Heap) {
-                return false; // Heap closures are Move-Only
-            }
-        }
-        return t->isCopy();
-    }
+    bool isCopy(const Type* t) const;
 
     bool analyzeFunction(const mvir::Function& func) {
         hasError_ = false;

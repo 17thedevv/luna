@@ -73,6 +73,7 @@ public:
     void visit(AwaitExpr& node) override;
     void visit(SizeofExpr& node) override;
     void visit(AlignofExpr& node) override;
+    void visit(TypeofExpr& node) override;
 
 private:
     SymbolTable& table_;
@@ -111,6 +112,7 @@ private:
         mvir::LabelId stepLbl;
         mvir::LabelId endLbl;
         size_t scopeDepth;
+        ASTNode* loopNode;
     };
     std::vector<LoopTarget> loopTargets_;
 
@@ -136,6 +138,9 @@ private:
     mvir::Operand evaluateRValue(ExprNode& expr);
 
     void compileDecisionTree(DecisionNode* node, std::unordered_map<std::string, mvir::Operand>& places, const std::vector<mvir::LabelId>& armLabels, mvir::LabelId fallbackLbl);
+    void lowerPattern(PatternNode* pat, mvir::Operand sourceVal, const Type* sourceType);
+    
+    void emitCleanup(size_t targetScopeDepth);
 };
 
 } // namespace fl

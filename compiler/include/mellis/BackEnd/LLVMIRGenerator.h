@@ -62,6 +62,9 @@ private:
     
     // Coroutine Handle for the current async function
     llvm::Value* currentCoroHdl_ = nullptr;
+    // Promise type info for the current async function (set on entry)
+    llvm::Type* currentPromiseInnerTy_ = nullptr;
+    bool currentPromiseHasValueSlot_ = false;
 
     // ── Translation Helpers ──────────────────────────────────────────────────
 
@@ -74,6 +77,7 @@ private:
     // Pass 2: Emit instructions
     void emitFunctionBody(const mvir::Function* func);
     void emitInstruction(const mvir::Instruction* inst);
+    void emitIntrinsicCall(const mvir::IntrinsicCallInst* inst);
     void emitTerminator(const mvir::Terminator* term);
     
     // External declarations

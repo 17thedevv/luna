@@ -1,3 +1,4 @@
+#include <iostream>
 #pragma once
 #include <string>
 #include <string_view>
@@ -18,7 +19,7 @@ struct SourceFile {
 class SourceManager {
 public:
     SourceManager(DiagnosticEngine& diag);
-    ~SourceManager() = default;
+    ~SourceManager() { std::cerr << "[INSTRUMENT] SourceManager Destroyed\n"; }
 
     /// Loads a file and returns its FileID. If already loaded, returns the existing FileID.
     /// If the file cannot be loaded, reports a diagnostic error and returns kInvalidFileID.

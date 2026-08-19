@@ -158,6 +158,26 @@ bool DeadCodeEliminationPass::runOnFunction(mvir::Function& func) {
             else if (auto* var = dynamic_cast<mvir::VariantInst*>(it->get())) { isPure = true; destName = var->dest.name; }
             else if (auto* sz = dynamic_cast<mvir::SizeofInst*>(it->get())) { isPure = true; destName = sz->dest.name; }
             else if (auto* al = dynamic_cast<mvir::AlignofInst*>(it->get())) { isPure = true; destName = al->dest.name; }
+            else if (auto* ic = dynamic_cast<mvir::IntrinsicCallInst*>(it->get())) {
+                switch (ic->intrinsic) {
+                    // PURE: safe to eliminate if result is unused
+                    case IntrinsicKind::SizeOf:
+                    case IntrinsicKind::AlignOf:
+                    case IntrinsicKind::TypeOf:
+                    case IntrinsicKind::IsSized:
+                    case IntrinsicKind::NeedsDrop:
+                    case IntrinsicKind::PtrRead:
+                    case IntrinsicKind::StrLen:
+                    case IntrinsicKind::StrPtr:
+                        isPure = true;
+                        break;
+                    // IMPURE: observable side-effect, never eliminate
+                    default:
+                        isPure = false;
+                        break;
+                }
+                if (ic->dest) destName = ic->dest->name;
+            }
 
             // Ch : Tuy?t \?i KHNG match CallInst, VirtualCallInst v StoreInst vo \y (V\ chng Impure).
             
@@ -227,7 +247,10 @@ bool DropInsertionPass::runOnFunction(mvir::Function& func) {
             else if (auto* awt = dynamic_cast<mvir::AwaitInst*>(ptr)) destName = awt->dest.name;
             else if (auto* size = dynamic_cast<mvir::SizeofInst*>(ptr)) destName = size->dest.name;
             else if (auto* align = dynamic_cast<mvir::AlignofInst*>(ptr)) destName = align->dest.name;
-            
+            else if (auto* icall = dynamic_cast<mvir::IntrinsicCallInst*>(ptr)) {
+                if (icall->dest) destName = icall->dest->name;
+            }
+
             if (!destName.empty()) usesDefs.insert(destName);
             
             auto addUse = [&](const mvir::Operand& op) {
@@ -258,6 +281,9 @@ bool DropInsertionPass::runOnFunction(mvir::Function& func) {
             }
             else if (auto* awt = dynamic_cast<mvir::AwaitInst*>(ptr)) {
                 addUse(awt->futureVal);
+            }
+            else if (auto* icall = dynamic_cast<mvir::IntrinsicCallInst*>(ptr)) {
+                for (auto& arg : icall->args) addUse(arg);
             }
             
             newInsts.push_back(std::move(inst)); 

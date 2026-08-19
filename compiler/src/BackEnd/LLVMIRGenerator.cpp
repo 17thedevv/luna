@@ -236,7 +236,7 @@ llvm::Type* LLVMIRGenerator::mapType(const Type* type) {
             case BuiltinKind::F32: return llvm::Type::getFloatTy(context_);
             case BuiltinKind::F64: return llvm::Type::getDoubleTy(context_);
             case BuiltinKind::Bool: return llvm::Type::getInt1Ty(context_);
-            case BuiltinKind::Str: return llvm::PointerType::getUnqual(context_);
+            case BuiltinKind::Str: return llvm::StructType::get(context_, {llvm::PointerType::getUnqual(context_), llvm::Type::getInt64Ty(context_)});
             default: return llvm::Type::getVoidTy(context_);
         }
     }
@@ -281,8 +281,11 @@ llvm::Type* LLVMIRGenerator::mapType(const Type* type) {
         return llvm::StructType::get(context_, elements, false);
     }
     if (auto* et = dynamic_cast<const EnumType*>(type)) {
+        std::cerr << "[DEBUG mapType] EnumType enumSymbolId=" << et->enumSymbolId << " genericArgs=" << et->genericArgs.size() << "\n";
         if (mvirModule_) {
+            std::cerr << "[DEBUG mapType] typeDecls count=" << mvirModule_->typeDecls.size() << "\n";
             for (const auto& tDecl : mvirModule_->typeDecls) {
+                std::cerr << "[DEBUG mapType]   typeDecl id=" << tDecl.id << " name='" << tDecl.name << "' isEnum=" << tDecl.isEnum << "\n";
                 if (tDecl.id == et->enumSymbolId && tDecl.isEnum) {
                     std::string name = tDecl.name.substr(1);
                     if (structTypes_.count(name)) return structTypes_[name];
@@ -321,6 +324,7 @@ llvm::Type* LLVMIRGenerator::mapType(const Type* type) {
                 }
             }
         }
+        std::cerr << "[DEBUG mapType] FALLBACK for EnumType enumSymbolId=" << et->enumSymbolId << "\n";
         return llvm::StructType::get(context_, { llvm::Type::getInt32Ty(context_), llvm::ArrayType::get(llvm::Type::getInt64Ty(context_), 4) }, false);
     }
     if (auto* arr = dynamic_cast<const ArrayType*>(type)) {
@@ -533,10 +537,19 @@ void LLVMIRGenerator::emitFunctionBody(const mvir::Function* func) {
             currentCoroHdl_ = builder_.CreateCall(coroBeginFn, {coroId, alloc});
             
             // Promise Initialization
-            llvm::Type* promiseInnerTy = llvm::Type::getVoidTy(context_);
+            // For void async functions, inner type is just a status byte (no value slot needed).
+            // Using void in an LLVM struct is invalid, so use i8 as a placeholder.
+            llvm::Type* promiseInnerTy = llvm::Type::getInt8Ty(context_); // default: void -> i8 placeholder
+            bool hasValueSlot = false;
             if (auto* futTy = dynamic_cast<const FutureType*>(func->returnType)) {
-                promiseInnerTy = mapType(futTy->innerType);
+                if (futTy->innerType && futTy->innerType->getKind() != TypeKind::Void) {
+                    promiseInnerTy = mapType(futTy->innerType);
+                    hasValueSlot = true;
+                }
             }
+            // Cache the promise type for use in return terminator
+            currentPromiseHasValueSlot_ = hasValueSlot;
+            currentPromiseInnerTy_ = promiseInnerTy;
             llvm::StructType* promiseTy = llvm::StructType::get(context_, {llvm::Type::getInt8Ty(context_), promiseInnerTy});
             
             llvm::Function* coroPromiseFn = llvm::Intrinsic::getDeclaration(&module_, llvm::Intrinsic::coro_promise);
@@ -603,6 +616,11 @@ void LLVMIRGenerator::emitFunctionBody(const mvir::Function* func) {
                 builder_.SetInsertPoint(readyBB);
                 llvm::Value* resultPtr = builder_.CreateStructGEP(promiseTy, promisePtr, 1);
                 llvm::Value* res = builder_.CreateLoad(promiseInnerTy, resultPtr);
+                
+                // Destroy the inner coroutine frame to prevent memory leaks!
+                llvm::Function* coroDestroyFn = llvm::Intrinsic::getDeclaration(&module_, llvm::Intrinsic::coro_destroy);
+                builder_.CreateCall(coroDestroyFn, {futHdl});
+                
                 localValues_[awt->dest.name] = res;
                 continue;
             }
@@ -1117,8 +1135,125 @@ void LLVMIRGenerator::emitInstruction(const mvir::Instruction* inst) {
           llvm::Value* fieldPtr = builder_.CreateStructGEP(payloadTy, payloadPtr, extractInst->fieldIndex);
           llvm::Value* res = builder_.CreateLoad(fieldTypes[extractInst->fieldIndex], fieldPtr, extractInst->dest.name.substr(1));
           localValues_[extractInst->dest.name] = res;
+    }
+    else if (auto* icall = dynamic_cast<const mvir::IntrinsicCallInst*>(inst)) {
+        emitIntrinsicCall(icall);
+    }
+    else if (auto* tupleExtract = dynamic_cast<const mvir::TupleExtractInst*>(inst)) {
+        llvm::Value* baseVal = mapOperand(tupleExtract->tuple);
+        llvm::Value* res = builder_.CreateExtractValue(baseVal, tupleExtract->index, tupleExtract->dest.name.substr(1));
+        localValues_[tupleExtract->dest.name] = res;
     } else {
         std::cerr << "[DEBUG] Instruction NOT handled by any if-else block!" << std::endl;
+    }
+}
+
+
+void LLVMIRGenerator::emitIntrinsicCall(const mvir::IntrinsicCallInst* inst) {
+    if (!inst) return;
+    
+    switch (inst->intrinsic) {
+        case IntrinsicKind::PtrRead: {
+            if (inst->args.empty()) break;
+            llvm::Value* ptrVal = mapOperand(inst->args[0]);
+            
+            llvm::Type* pointeeTy = nullptr;
+            if (!inst->typeArgs.empty()) {
+                pointeeTy = mapType(inst->typeArgs[0]);
+            } else {
+                pointeeTy = llvm::Type::getInt64Ty(context_); // fallback
+            }
+            
+            llvm::Value* res = builder_.CreateLoad(pointeeTy, ptrVal);
+            if (inst->dest) {
+                res->setName(inst->dest->name.substr(1));
+                localValues_[inst->dest->name] = res;
+            }
+            break;
+        }
+        case IntrinsicKind::PtrWrite: {
+            if (inst->args.size() < 2) break;
+            llvm::Value* ptrVal = mapOperand(inst->args[0]);
+            llvm::Value* writeVal = mapOperand(inst->args[1]);
+            builder_.CreateStore(writeVal, ptrVal);
+            break;
+        }
+        case IntrinsicKind::MemCopy:
+        case IntrinsicKind::MemMove: {
+            if (inst->args.size() < 3) break;
+            llvm::Value* src = mapOperand(inst->args[0]);
+            llvm::Value* dest = mapOperand(inst->args[1]);
+            llvm::Value* count = mapOperand(inst->args[2]);
+            
+            llvm::Type* pointeeTy = nullptr;
+            if (!inst->typeArgs.empty()) {
+                pointeeTy = mapType(inst->typeArgs[0]);
+            }
+            if (!pointeeTy) pointeeTy = llvm::Type::getInt8Ty(context_);
+            
+            llvm::Value* sizeOfT = builder_.getInt64(module_.getDataLayout().getTypeAllocSize(pointeeTy));
+            
+            // Cast count to i64 if needed
+            llvm::Value* countI64 = count;
+            if (count->getType()->isIntegerTy() && count->getType()->getIntegerBitWidth() < 64) {
+                countI64 = builder_.CreateZExt(count, builder_.getInt64Ty());
+            }
+            
+            llvm::Value* numBytes = builder_.CreateMul(countI64, sizeOfT);
+            
+            bool isMove = (inst->intrinsic == IntrinsicKind::MemMove);
+            if (isMove) {
+                builder_.CreateMemMove(dest, llvm::MaybeAlign(1), src, llvm::MaybeAlign(1), numBytes);
+            } else {
+                builder_.CreateMemCpy(dest, llvm::MaybeAlign(1), src, llvm::MaybeAlign(1), numBytes);
+            }
+            break;
+        }
+        case IntrinsicKind::MemSet: {
+            if (inst->args.size() < 3) break;
+            llvm::Value* dest = mapOperand(inst->args[0]);
+            llvm::Value* val = mapOperand(inst->args[1]);
+            llvm::Value* count = mapOperand(inst->args[2]);
+            
+            llvm::Type* pointeeTy = nullptr;
+            if (!inst->typeArgs.empty()) {
+                pointeeTy = mapType(inst->typeArgs[0]);
+            }
+            if (!pointeeTy) pointeeTy = llvm::Type::getInt8Ty(context_);
+            
+            llvm::Value* sizeOfT = builder_.getInt64(module_.getDataLayout().getTypeAllocSize(pointeeTy));
+            
+            llvm::Value* countI64 = count;
+            if (count->getType()->isIntegerTy() && count->getType()->getIntegerBitWidth() < 64) {
+                countI64 = builder_.CreateZExt(count, builder_.getInt64Ty());
+            }
+            
+            llvm::Value* numBytes = builder_.CreateMul(countI64, sizeOfT);
+            
+            // Cast val to i8
+            llvm::Value* valI8 = val;
+            if (val->getType()->isIntegerTy() && val->getType()->getIntegerBitWidth() > 8) {
+                valI8 = builder_.CreateTrunc(val, builder_.getInt8Ty());
+            }
+            
+            builder_.CreateMemSet(dest, valI8, numBytes, llvm::MaybeAlign(1));
+            break;
+        }
+        case IntrinsicKind::Assume: {
+            if (inst->args.empty()) break;
+            llvm::Value* cond = mapOperand(inst->args[0]);
+            llvm::Function* assumeFn = llvm::Intrinsic::getDeclaration(&module_, llvm::Intrinsic::assume);
+            builder_.CreateCall(assumeFn, {cond});
+            break;
+        }
+        case IntrinsicKind::Unreachable: {
+            // Should be handled as Terminator but just in case
+            builder_.CreateUnreachable();
+            break;
+        }
+        default:
+            std::cerr << "[DEBUG LLVM] Unhandled IntrinsicCallInst for kind: " << (int)inst->intrinsic << "\n";
+            break;
     }
 }
 
@@ -1169,7 +1304,22 @@ void LLVMIRGenerator::emitTerminator(const mvir::Terminator* term) {
                 builder_.CreateRet(val);
             }
         } else {
-            builder_.CreateRetVoid();
+            // Void return path
+            if (currentCoroHdl_) {
+                // async fn returning void: set promise state = 1 (Done), coro_end, ret ptr
+                llvm::Function* coroPromiseFn = llvm::Intrinsic::getDeclaration(&module_, llvm::Intrinsic::coro_promise);
+                llvm::Value* promisePtr = builder_.CreateCall(coroPromiseFn, {currentCoroHdl_, builder_.getInt32(8), builder_.getInt1(false)});
+                
+                llvm::StructType* promiseTy = llvm::StructType::get(context_, {llvm::Type::getInt8Ty(context_), currentPromiseInnerTy_});
+                llvm::Value* statePtr = builder_.CreateStructGEP(promiseTy, promisePtr, 0);
+                builder_.CreateStore(builder_.getInt8(1), statePtr);
+                
+                llvm::Function* coroEndFn = llvm::Intrinsic::getDeclaration(&module_, llvm::Intrinsic::coro_end);
+                builder_.CreateCall(coroEndFn, {currentCoroHdl_, builder_.getInt1(0), llvm::ConstantTokenNone::get(context_)});
+                builder_.CreateRet(currentCoroHdl_);
+            } else {
+                builder_.CreateRetVoid();
+            }
         }
     }
     else if (dynamic_cast<const mvir::UnreachableTerm*>(term)) {

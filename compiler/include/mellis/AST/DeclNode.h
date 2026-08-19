@@ -83,6 +83,9 @@ public:
     bool isComptime = false;
     bool isVariadic = false;
     bool isUnsafe   = false;
+    bool isIntrinsic = false;
+    IntrinsicKind intrinsicKind = IntrinsicKind::None;
+    bool hasBody = true;  // false: intrinsic forward decl, extern fn, trait method
     void accept(ASTVisitor& v) override;
     ASTNode* cloneImpl() const override;
 };
@@ -112,6 +115,7 @@ public:
     std::string_view                             name;
     std::vector<std::unique_ptr<ParamDeclNode>>  fields;
     SymbolID                                     symbolId = kInvalidSymbolID;
+    ScopeID                                      bodyScopeId = kInvalidScopeID;
     void accept(ASTVisitor& v) override;
     ASTNode* cloneImpl() const override;
 };

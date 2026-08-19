@@ -33,6 +33,8 @@
 namespace fl {
 
 class MacroRegistry;
+class TypeContext;
+class MLibMetadataCache;
 
 class ModuleLoader {
 public:
@@ -40,7 +42,9 @@ public:
                  DiagnosticEngine& diag,
                  const std::string& mainFileDir,
                  MacroRegistry* macroRegistry = nullptr,
-                 const std::vector<std::string>& extraLibraryPaths = {});
+                 const std::vector<std::string>& extraLibraryPaths = {},
+                 TypeContext* typeContext = nullptr,
+                 MLibMetadataCache* metadataCache = nullptr);
 
     // Load an external module by resolving the longest valid path prefix.
     // - Returns cached VirtualScopeID immediately if loaded.
@@ -66,8 +70,11 @@ private:
     std::string mainFileDir;
     MacroRegistry* macroRegistry;
     std::vector<std::string> searchPaths;
+    TypeContext* typeContext;
+    MLibMetadataCache* mlibCache;
     std::unordered_map<std::string, ModuleRecord> moduleRecords_;
     std::vector<std::string> loadedMLibPaths_;
+    std::vector<std::vector<char>> loadedStringTables_;
 
     // Search for "<moduleName>.ms" and "<moduleName>.mlib", auto-compile .ms, return path to .mlib
     std::string resolveModulePath(std::string_view moduleName, SourceLocation loc);
@@ -85,25 +92,41 @@ private:
                                         uint64_t sectionOffset,
                                         uint64_t sectionSize);
 
+    struct RawTypeRef {
+        mlib::TypeRefRecord record;
+        std::vector<uint32_t> payload;
+    };
+
     // Register metadata entries from a section into the virtual scope.
     void registerFunctions(const std::vector<uint8_t>& fileData,
                            uint64_t sectionOffset,
                            uint64_t sectionSize,
                            ScopeID virtualScope,
                            const std::vector<char>& strings,
-                           const uint8_t moduleUUID[16]);
+                           const uint8_t moduleUUID[16],
+                           const std::vector<const Type*>& parsedTypeRefs);
 
     void registerTypes(const std::vector<uint8_t>& fileData,
                        uint64_t sectionOffset,
                        uint64_t sectionSize,
                        ScopeID virtualScope,
                        const std::vector<char>& strings,
-                       const uint8_t moduleUUID[16]);
+                       const uint8_t moduleUUID[16],
+                       const std::vector<const Type*>& parsedTypeRefs,
+                       std::vector<std::pair<SymbolID, uint32_t>>& pendingSignatures);
 
-    void registerTraits(const std::vector<uint8_t>& fileData,
+    void registerImpls(const std::vector<uint8_t>& fileData,
                         uint64_t sectionOffset, uint64_t sectionSize,
                         ScopeID virtualScope, const std::vector<char>& strings,
-                        const uint8_t moduleUUID[16]);
+                        const uint8_t moduleUUID[16],
+                        const std::vector<const Type*>& parsedTypeRefs);
+
+    std::vector<const Type*> parseTypeRefs(const std::vector<uint8_t>& fileData,
+                                           uint64_t sectionOffset, uint64_t sectionSize,
+                                           const std::vector<char>& strings,
+                                           ScopeID virtualScope);
+
+
 
     void loadMacroMetadata(const std::vector<uint8_t>& fileData,
                            uint64_t sectionOffset, uint64_t sectionSize,
@@ -127,9 +150,24 @@ public:
     std::vector<std::unique_ptr<class DeclNode>> takeInjectedGenerics() {
         return std::move(injectedGenerics_);
     }
+    std::vector<std::string> takeInjectedStrings() {
+        return std::move(injectedStrings_);
+    }
 private:
     std::vector<std::unique_ptr<class DeclNode>> injectedGenerics_;
     std::vector<std::pair<SymbolID, class ImplDeclNode*>> injectedImpls_;
+    std::vector<std::string> injectedStrings_;
+    
+    // Loaded TypeRefs for the current module being loaded
+    struct LoadedTypeRef {
+        mlib::TypeRefRecord record;
+        std::vector<uint32_t> payload;
+    };
+    std::vector<LoadedTypeRef> loadedTypeRefs_;
+    std::vector<SymbolID> loadedTypes_;
+    std::vector<SymbolID> loadedTraits_;
+    
+    const Type* reconstructType(uint32_t typeRefID, const std::vector<char>& strings, ScopeID virtualScope, TypeContext* typeCtx);
 };
 } // namespace fl
 

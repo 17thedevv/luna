@@ -6,6 +6,7 @@
 #include "mellis/Core/SourceManager.h"
 #include "mellis/MiddleEnd/SymbolTable.h"
 #include "mellis/MiddleEnd/TypeChecker.h"
+#include "mellis/MLib/MLibMetadataCache.h"
 
 namespace fl {
 
@@ -40,6 +41,8 @@ private:
 
     // Holds the absolute paths of all .mlib files that were dynamically loaded during compilation.
     std::vector<std::string> loadedMLibs_;
+    std::vector<std::unique_ptr<class DeclNode>> loadedGenericTemplates_;
+    std::vector<std::string> loadedInjectedStrings_;
 
     // Fills libraryPaths_ with default locations relative to the compiler exe.
     void initDefaultLibraryPaths();
@@ -48,6 +51,7 @@ private:
     SourceManager sourceManager_;
     SymbolTable symbolTable_;
     TypeContext typeContext_;
+    MLibMetadataCache mlibMetadataCache_;
     std::vector<std::string> libraryPaths_;
 
 };

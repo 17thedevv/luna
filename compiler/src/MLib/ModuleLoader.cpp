@@ -7,6 +7,7 @@
 #include "mellis/Support/OSUtils.h"
 #include "mellis/FrontEnd/Lexer.h"
 #include "mellis/FrontEnd/Parser.h"
+#include "mellis/MiddleEnd/Resolver.h"
 #include "mellis/FrontEnd/MacroRegistry.h"
 #include "mellis/Core/CompilerSession.h" // For child compilation
 #include <iostream>
@@ -15,6 +16,7 @@
 #include <stdexcept>
 #include <filesystem>
 #include <cstdlib>
+#include <set>
 
 namespace fl {
 
@@ -24,8 +26,14 @@ using namespace mlib;
 // Constructor
 // ─────────────────────────────────────────────────────────────────────────────
 
-ModuleLoader::ModuleLoader(SymbolTable& symbolTable, DiagnosticEngine& diag, const std::string& mainFileDir, MacroRegistry* macroRegistry, const std::vector<std::string>& extraLibraryPaths)
-    : symbolTable(symbolTable), diag(diag), mainFileDir(mainFileDir), macroRegistry(macroRegistry) {
+ModuleLoader::ModuleLoader(SymbolTable& symbolTable,
+                           DiagnosticEngine& diag,
+                           const std::string& mainFileDir,
+                           MacroRegistry* macroRegistry,
+                           const std::vector<std::string>& extraLibraryPaths,
+                           TypeContext* typeContext,
+                           MLibMetadataCache* metadataCache)
+    : symbolTable(symbolTable), diag(diag), mainFileDir(mainFileDir), macroRegistry(macroRegistry), typeContext(typeContext), mlibCache(metadataCache) {
     namespace fs = std::filesystem;
 
     // 1. Current Module Directory
@@ -84,7 +92,7 @@ ScopeID ModuleLoader::loadModule(const std::vector<std::string_view>& path, Sour
     std::string moduleName;
     std::string mlibPath;
     
-    for (size_t i = path.size(); i > 0; --i) {
+    for (size_t i = 1; i <= path.size(); ++i) {
         moduleName = "";
         for (size_t j = 0; j < i; ++j) {
             if (j > 0) moduleName += "/";
@@ -161,12 +169,29 @@ std::string ModuleLoader::resolveModulePath(std::string_view moduleName, SourceL
         fs::path msPath = fs::path(dir) / msName;
         fs::path mlibPath = fs::path(dir) / mlibName;
         
+        std::cout << "[DEBUG] Checking " << msPath.string() << " and " << mlibPath.string() << "\n";
+        
         bool hasMs = fs::exists(msPath);
         bool hasMlib = fs::exists(mlibPath);
         
         if (hasMs || hasMlib) {
             foundMsPath = hasMs ? msPath.string() : "";
             foundMlibPath = hasMlib ? mlibPath.string() : "";
+            break; // Stop at highest priority tier
+        }
+        
+        // Also check for directory modules: relPath/mod.ms and relPath/mod.mlib
+        fs::path dirMsPath = fs::path(dir) / relPath / "mod.ms";
+        fs::path dirMlibPath = fs::path(dir) / relPath / "mod.mlib";
+        
+        std::cout << "[DEBUG] Checking " << dirMsPath.string() << " and " << dirMlibPath.string() << "\n";
+        
+        bool hasDirMs = fs::exists(dirMsPath);
+        bool hasDirMlib = fs::exists(dirMlibPath);
+        
+        if (hasDirMs || hasDirMlib) {
+            foundMsPath = hasDirMs ? dirMsPath.string() : "";
+            foundMlibPath = hasDirMlib ? dirMlibPath.string() : "";
             break; // Stop at highest priority tier
         }
     }
@@ -191,11 +216,23 @@ std::string ModuleLoader::resolveModulePath(std::string_view moduleName, SourceL
     }
     
     if (needCompile) {
+        // Guard against infinite recursive compilation (e.g. self-importing packages)
+        static thread_local std::set<std::string> compilingModules;
+        std::string canonicalPath = fs::canonical(fs::path(foundMsPath)).string();
+        if (compilingModules.count(canonicalPath)) {
+            diag.error(loc, "Circular compilation detected for: " + foundMsPath);
+            return "";
+        }
+        compilingModules.insert(canonicalPath);
+
         std::cout << "[ModuleLoader] Compiling dependency " << foundMsPath << "..." << std::endl;
         CompilerSession childSession;
         // Don't recurse extraLibraryPaths excessively, just pass them
         childSession.setLibraryPaths(searchPaths); 
         bool ok = childSession.compile(foundMsPath, false, 0, true);
+
+        compilingModules.erase(canonicalPath);
+
         if (!ok) {
             diag.error(loc, "Failed to compile dependency: " + foundMsPath);
             return "";
@@ -245,6 +282,7 @@ void ModuleLoader::parseMLibMetadata(const std::string& path,
     uint32_t sectionCount = header->sectionCount;
 
     if (tableOffset + sectionCount * sizeof(SectionEntry) > static_cast<uint64_t>(fileSize)) {
+        std::cout << "DEBUG ModuleLoader: tableOffset=" << tableOffset << " sectionCount=" << sectionCount << " fileSize=" << fileSize << "\n";
         throw std::runtime_error("Section table out of bounds in: " + path);
     }
 
@@ -259,34 +297,62 @@ void ModuleLoader::parseMLibMetadata(const std::string& path,
         }
     }
 
-    // Pass 2: register Functions, Types, Traits into the virtual scope.
+    // Pass 2: register Types (Namespaces, Structs, Traits) into the virtual scope.
+    std::vector<std::pair<SymbolID, uint32_t>> pendingSignatures;
+    for (uint32_t i = 0; i < sectionCount; ++i) {
+        if (static_cast<SectionType>(sections[i].sectionType) == SectionType::TypeMetadata) {
+            registerTypes(fileData, sections[i].offset, sections[i].size,
+                           virtualScope, strings, moduleUUID, {}, pendingSignatures);
+            break;
+        }
+    }
+
+    // Pass 2.5: load GenericMetadata (needs to be in virtualScope for TypeRefTable)
+    for (uint32_t i = 0; i < sectionCount; ++i) {
+        if (static_cast<SectionType>(sections[i].sectionType) == SectionType::GenericMetadata) {
+            loadGenericMetadata(fileData, sections[i].offset, sections[i].size,
+                                strings, virtualScope, moduleName, moduleUUID);
+            break;
+        }
+    }
+
+    // Pass 3: find and parse TypeRefTable (can now use virtualScope for Named types)
+    std::vector<const Type*> parsedTypeRefs;
+    for (uint32_t i = 0; i < sectionCount; ++i) {
+        if (static_cast<SectionType>(sections[i].sectionType) == SectionType::TypeRefTable) {
+            parsedTypeRefs = parseTypeRefs(fileData, sections[i].offset, sections[i].size, strings, virtualScope);
+            break;
+        }
+    }
+
+    // Process pending signatures now that we have parsedTypeRefs
+    for (auto& p : pendingSignatures) {
+        if (mlibCache && p.second < parsedTypeRefs.size()) {
+            const Type* sigType = parsedTypeRefs[p.second];
+            if (sigType) {
+                mlibCache->registerType(p.first, sigType);
+                std::cout << "[MLibLoader] Registered signature later symId=" << p.first << " type=" << sigType->toString() << "\n";
+            }
+        }
+    }
+
+    // Pass 4: register Functions, Impls, Macro, GenericMetadata
     for (uint32_t i = 0; i < sectionCount; ++i) {
         auto type = static_cast<SectionType>(sections[i].sectionType);
-        std::cout << "[MLibLoader] Section " << i << " type=" << (uint32_t)type 
-                  << " offset=" << sections[i].offset << " size=" << sections[i].size << "\n";
         switch (type) {
             case SectionType::ExportTable:
                 registerFunctions(fileData, sections[i].offset, sections[i].size,
-                                  virtualScope, strings, moduleUUID);
+                                  virtualScope, strings, moduleUUID, parsedTypeRefs);
                 break;
-            case SectionType::TypeMetadata:
-                registerTypes(fileData, sections[i].offset, sections[i].size,
-                               virtualScope, strings, moduleUUID);
-                break;
-            case SectionType::TraitMetadata:
-                registerTraits(fileData, sections[i].offset, sections[i].size,
-                                virtualScope, strings, moduleUUID);
+            case SectionType::ImplTable:
+                registerImpls(fileData, sections[i].offset, sections[i].size,
+                                virtualScope, strings, moduleUUID, parsedTypeRefs);
                 break;
             case SectionType::MacroMetadata:
                 loadMacroMetadata(fileData, sections[i].offset, sections[i].size,
                                   strings, moduleName);
                 break;
-            case SectionType::GenericMetadata:
-                loadGenericMetadata(fileData, sections[i].offset, sections[i].size,
-                                    strings, virtualScope, moduleName, moduleUUID);
-                break;
             default:
-                // GenericMVIR, ObjectCode, Debug, Dependency — skip (lazy load).
                 break;
         }
     }
@@ -321,14 +387,17 @@ void ModuleLoader::registerFunctions(const std::vector<uint8_t>& fileData,
                                      uint64_t sectionSize,
                                      ScopeID virtualScope,
                                      const std::vector<char>& strings,
-                                     const uint8_t moduleUUID[16]) {
+                                     const uint8_t moduleUUID[16],
+                                     const std::vector<const Type*>& parsedTypeRefs) {
     if (sectionSize == 0) return;
 
     BinaryReader reader(fileData.data() + sectionOffset, sectionSize);
     uint32_t version = reader.readU32();
     (void)version; // Forward-compat: ignore unknown fields
 
+    std::cout << "[MLibLoader] Loading Functions...\n";
     uint32_t count = reader.readU32();
+    std::cout << "[MLibLoader] Found " << count << " functions\n";
     for (uint32_t i = 0; i < count; ++i) {
         FunctionEntry entry;
         reader.readStruct(entry);
@@ -338,8 +407,15 @@ void ModuleLoader::registerFunctions(const std::vector<uint8_t>& fileData,
 
         Identifier id(name);
         if (!symbolTable.containsInScope(id, virtualScope)) {
-            symbolTable.declareExternalSymbol(id, SymbolKind::Function,
+            SymbolID symId = symbolTable.declareExternalSymbol(id, SymbolKind::Function,
                                               virtualScope, i, moduleUUID);
+            if (mlibCache && entry.signatureTypeID < parsedTypeRefs.size()) {
+                const Type* sigType = parsedTypeRefs[entry.signatureTypeID];
+                if (sigType) {
+                    mlibCache->registerType(symId, sigType);
+                    std::cout << "[MLibLoader] Registered signature for " << name << "\n";
+                }
+            }
         }
     }
 }
@@ -349,7 +425,9 @@ void ModuleLoader::registerTypes(const std::vector<uint8_t>& fileData,
                                  uint64_t sectionSize,
                                  ScopeID virtualScope,
                                  const std::vector<char>& strings,
-                                 const uint8_t moduleUUID[16]) {
+                                 const uint8_t moduleUUID[16],
+                                 const std::vector<const Type*>& parsedTypeRefs,
+                                 std::vector<std::pair<SymbolID, uint32_t>>& pendingSignatures) {
     if (sectionSize == 0) return;
 
     BinaryReader reader(fileData.data() + sectionOffset, sectionSize);
@@ -360,6 +438,21 @@ void ModuleLoader::registerTypes(const std::vector<uint8_t>& fileData,
     for (uint32_t i = 0; i < nsCount; ++i) {
         NamespaceEntry entry;
         reader.readStruct(entry);
+        
+        auto name = resolveString(strings, entry.nameStringID);
+        if (name.empty()) continue;
+        std::cout << "[MLibLoader] Namespace: " << name << "\n";
+
+        Identifier id(name);
+        if (!symbolTable.containsInScope(id, virtualScope)) {
+            SymbolID nsId = symbolTable.declareExternalSymbol(id, SymbolKind::Module,
+                                                              virtualScope, 0, moduleUUID);
+            if (nsId != kInvalidSymbolID) {
+                // Store virtualScope as the "body scope" so resolvePath can find
+                // symbols like core::option::Option in the virtual scope
+                symbolTable.getMutableSymbol(nsId).mlibSymbolID = static_cast<uint32_t>(virtualScope);
+            }
+        }
     }
 
     // 2. Types
@@ -387,7 +480,19 @@ void ModuleLoader::registerTypes(const std::vector<uint8_t>& fileData,
         TraitEntry entry;
         reader.readStruct(entry);
 
+        for (uint16_t j = 0; j < entry.genericParamCount; ++j) {
+            TraitGenericParam gp;
+            reader.readStruct(gp);
+        }
+        for (uint16_t j = 0; j < entry.methodCount; ++j) {
+            TraitMethodEntry method;
+            reader.readStruct(method);
+            auto methodName = resolveString(strings, method.nameStringID);
+            std::cout << "[MLibLoader]   Method: " << methodName << " (sigType=" << method.signatureTypeID << ")\n";
+        }
+
         auto name = resolveString(strings, entry.nameStringID);
+        std::cout << "[MLibLoader] Loaded Trait: " << name << " with " << entry.methodCount << " methods.\n";
         if (name.empty()) continue;
         std::cout << "[MLibLoader] Trait: " << name << "\n";
 
@@ -399,8 +504,9 @@ void ModuleLoader::registerTypes(const std::vector<uint8_t>& fileData,
     }
 
     // 4. Functions
+    std::cout << "[MLibLoader] Loading Functions...\n";
     uint32_t funcCount = reader.readU32();
-    std::cout << "[MLibLoader] Loading " << funcCount << " functions\n";
+    std::cout << "[MLibLoader] Found " << funcCount << " functions\n";
     for (uint32_t i = 0; i < funcCount; ++i) {
         FunctionEntry entry;
         reader.readStruct(entry);
@@ -411,18 +517,30 @@ void ModuleLoader::registerTypes(const std::vector<uint8_t>& fileData,
 
         Identifier id(name);
         if (!symbolTable.containsInScope(id, virtualScope)) {
-            symbolTable.declareExternalSymbol(id, SymbolKind::Function,
+            SymbolID symId = symbolTable.declareExternalSymbol(id, SymbolKind::Function,
                                               virtualScope, i, moduleUUID);
+            if (mlibCache) {
+                if (!parsedTypeRefs.empty() && entry.signatureTypeID < parsedTypeRefs.size()) {
+                    const Type* sigType = parsedTypeRefs[entry.signatureTypeID];
+                    if (sigType) {
+                        mlibCache->registerType(symId, sigType);
+                        std::cout << "[MLibLoader] Registered signature for " << name << " symId=" << symId << " type=" << sigType->toString() << "\n";
+                    }
+                } else {
+                    pendingSignatures.push_back({symId, entry.signatureTypeID});
+                }
+            }
         }
     }
 }
 
-void ModuleLoader::registerTraits(const std::vector<uint8_t>& fileData,
+void ModuleLoader::registerImpls(const std::vector<uint8_t>& fileData,
                                   uint64_t sectionOffset,
                                   uint64_t sectionSize,
                                   ScopeID virtualScope,
                                   const std::vector<char>& strings,
-                                  const uint8_t moduleUUID[16]) {
+                                  const uint8_t moduleUUID[16],
+                                  const std::vector<const Type*>& parsedTypeRefs) {
     if (sectionSize == 0) return;
 
     BinaryReader reader(fileData.data() + sectionOffset, sectionSize);
@@ -430,8 +548,15 @@ void ModuleLoader::registerTraits(const std::vector<uint8_t>& fileData,
     for (uint32_t i = 0; i < count; ++i) {
         ImplEntry entry;
         reader.readStruct(entry);
-        // Impls are usually attached to types or traits.
-        // We can just skip them for now or register them into a global impl table.
+
+        std::cout << "[MLibLoader] Impl entry " << i
+                  << " selfTypeRefID=" << entry.selfTypeRefID
+                  << " traitRefID=" << entry.traitRefID
+                  << " genericParamCount=" << entry.genericParamCount
+                  << " methodCount=" << entry.methodCount
+                  << " associatedTypeCount=" << entry.associatedTypeCount
+                  << " boundCount=" << entry.boundCount
+                  << " payloadSize=" << entry.payloadSize << "\n";
     }
 }
 
@@ -460,9 +585,8 @@ void ModuleLoader::loadMacroMetadata(const std::vector<uint8_t>& fileData,
         }
         replacedSource += rawSource.substr(lastPos);
 
-        // 2. Parse the string into a MacroDeclNode
-        std::string* permanentStr = new std::string(replacedSource);
-        Lexer lexer(*permanentStr);
+        injectedStrings_.push_back(std::move(replacedSource));
+        Lexer lexer(injectedStrings_.back());
 
         Parser parser(lexer, diag);
         auto node = parser.parseMacroDecl();
@@ -506,14 +630,23 @@ void ModuleLoader::loadGenericMetadata(const std::vector<uint8_t>& fileData,
             lastPos = pos + crateStr.length();
         }
         replacedSource += rawSource.substr(lastPos);
+        
+        std::cout << "[MLibLoader] replacedSource: " << replacedSource << "\n";
 
         // 2. Parse the string into a DeclNode
-        // We heap allocate the string so string_views in the AST remain valid.
-        std::string* permanentStr = new std::string(replacedSource);
-        Lexer lexer(*permanentStr);
+        injectedStrings_.push_back(std::move(replacedSource));
+        Lexer lexer(injectedStrings_.back());
         Parser parser(lexer, diag);
         
-        auto item = parser.parseDeclaration();
+        std::unique_ptr<ItemNode> item;
+        try {
+            item = parser.parseDeclaration();
+        } catch (const std::exception& e) {
+            std::cout << "[CRITICAL] Parser crashed on generic: " << name << " with error: " << e.what() << "\n";
+            std::cout << "String was:\n" << injectedStrings_.back() << "\n";
+            throw;
+        }
+        
         if (auto decl = std::unique_ptr<DeclNode>(dynamic_cast<DeclNode*>(item.release()))) {
             // 3. Inject into virtual scope or Impl list
             if (kind == GenericKind::Impl) {
@@ -524,6 +657,8 @@ void ModuleLoader::loadGenericMetadata(const std::vector<uint8_t>& fileData,
                 } else {
                     diag.error(SourceLocation::invalid(), "Could not find target struct '" + name + "' in .mlib");
                 }
+                Resolver tempResolver(symbolTable, diag);
+                tempResolver.resolve(decl.get(), virtualScope);
                 injectedGenerics_.push_back(std::move(decl));
             } else {
                 // For Function, Struct, Enum: find the symbol in virtualScope and update its AST node
@@ -539,8 +674,26 @@ void ModuleLoader::loadGenericMetadata(const std::vector<uint8_t>& fileData,
                             symbolTable.getFunctionInfo(id).borrowCheckStatus = BorrowCheckStatus::Checked;
                             std::cout << "[DEBUG] Updated kind to Function for id " << id << "\n"; 
                         }
+                        else if (auto* ext = dynamic_cast<ExternDeclNode*>(d)) {
+                            if (ext->func) {
+                                ext->func->symbolId = id;
+                                symbolTable.getMutableSymbol(id).kind = SymbolKind::Function;
+                                symbolTable.getMutableSymbol(id).decl = ext->func.get();
+                            }
+                        }
                         else if (auto* sd = dynamic_cast<StructDeclNode*>(d)) { sd->symbolId = id; symbolTable.getMutableSymbol(id).kind = SymbolKind::Struct; std::cout << "[DEBUG] Updated kind to Struct for id " << id << "\n"; }
-                        else if (auto* ed = dynamic_cast<EnumDeclNode*>(d)) { ed->symbolId = id; symbolTable.getMutableSymbol(id).kind = SymbolKind::Enum; std::cout << "[DEBUG] Updated kind to Enum for id " << id << "\n"; }
+                        else if (auto* ed = dynamic_cast<EnumDeclNode*>(d)) { 
+                            ed->symbolId = id; 
+                            auto& msym = symbolTable.getMutableSymbol(id);
+                            msym.kind = SymbolKind::Enum; 
+                            msym.decl = ed;
+                            ed->bodyScopeId = symbolTable.createScope(ScopeKind::Enum, kInvalidScopeID);
+                            for (auto& variant : ed->variants) {
+                                SymbolID varId = symbolTable.declareExternalSymbol(Identifier(variant->name), SymbolKind::EnumVariant, ed->bodyScopeId, 0, moduleUUID);
+                                variant->symbolId = varId;
+                            }
+                            std::cout << "[DEBUG] Updated kind to Enum for id " << id << "\n"; 
+                        }
                         else if (auto* td = dynamic_cast<TraitDeclNode*>(d)) { td->symbolId = id; symbolTable.getMutableSymbol(id).kind = SymbolKind::Trait; std::cout << "[DEBUG] Updated kind to Trait for id " << id << "\n"; }
                         else if (auto* ta = dynamic_cast<TypeAliasDeclNode*>(d)) { ta->symbolId = id; symbolTable.getMutableSymbol(id).kind = SymbolKind::TypeAlias; std::cout << "[DEBUG] Updated kind to TypeAlias for id " << id << "\n"; }
                     }
@@ -558,6 +711,9 @@ void ModuleLoader::loadGenericMetadata(const std::vector<uint8_t>& fileData,
                         fd->symbolId = newId;
                         symbolTable.getFunctionInfo(newId).borrowCheckStatus = BorrowCheckStatus::Checked;
                     }
+                    else if (auto* ext = dynamic_cast<ExternDeclNode*>(d)) {
+                        if (ext->func) ext->func->symbolId = newId;
+                    }
                     else if (auto* sd = dynamic_cast<StructDeclNode*>(d)) sd->symbolId = newId;
                     else if (auto* ed = dynamic_cast<EnumDeclNode*>(d)) ed->symbolId = newId;
                     else if (auto* td = dynamic_cast<TraitDeclNode*>(d)) td->symbolId = newId;
@@ -565,9 +721,175 @@ void ModuleLoader::loadGenericMetadata(const std::vector<uint8_t>& fileData,
                     
                     symbolTable.getMutableSymbol(newId).decl = d;
                 }
+                Resolver tempResolver(symbolTable, diag);
+                tempResolver.resolve(decl.get(), virtualScope);
                 injectedGenerics_.push_back(std::move(decl));
+            }
+}
+    }
+}
+
+std::vector<const Type*> ModuleLoader::parseTypeRefs(const std::vector<uint8_t>& fileData,
+                                                       uint64_t sectionOffset, uint64_t sectionSize,
+                                                       const std::vector<char>& strings,
+                                                       ScopeID virtualScope) {
+    if (sectionSize == 0 || !typeContext) {
+        std::cout << "[MLibLoader] parseTypeRefs empty sectionSize=" << sectionSize << " typeContext=" << typeContext << "\n";
+        return {};
+    }
+
+    BinaryReader reader(fileData.data() + sectionOffset, sectionSize);
+    uint32_t count = reader.readU32();
+    std::cout << "[MLibLoader] parseTypeRefs count=" << count << "\n";
+    std::vector<RawTypeRef> raws(count);
+    
+    for (uint32_t i = 0; i < count; ++i) {
+        reader.readStruct(raws[i].record);
+        if (raws[i].record.payloadSize > 0) {
+            uint32_t numWords = raws[i].record.payloadSize / sizeof(uint32_t);
+            raws[i].payload.resize(numWords);
+            for (uint32_t j = 0; j < numWords; ++j) {
+                raws[i].payload[j] = reader.readU32();
             }
         }
     }
+
+    std::vector<const Type*> parsed(count, nullptr);
+    
+    std::function<const Type*(uint32_t)> resolve = [&](uint32_t id) -> const Type* {
+        if (id >= count) return typeContext->getUnknown();
+        if (parsed[id]) return parsed[id];
+        
+        const auto& raw = raws[id];
+        const Type* result = typeContext->getUnknown();
+        
+        using namespace mlib;
+        switch (static_cast<TypeRefKind>(raw.record.kind)) {
+            case TypeRefKind::Primitive: {
+                if (!raw.payload.empty()) {
+                    result = typeContext->getPrimitive(static_cast<BuiltinKind>(raw.payload[0]));
+                }
+                break;
+            }
+            case TypeRefKind::Pointer: {
+                if (!raw.payload.empty()) {
+                    const Type* pointee = resolve(raw.payload[0]);
+                    result = typeContext->create<PointerType>(pointee, (raw.record.flags & 1) != 0);
+                }
+                break;
+            }
+            case TypeRefKind::Reference: {
+                if (!raw.payload.empty()) {
+                    const Type* pointee = resolve(raw.payload[0]);
+                    result = typeContext->create<ReferenceType>(pointee, (raw.record.flags & 1) != 0);
+                }
+                break;
+            }
+            case TypeRefKind::Array: {
+                if (raw.payload.size() >= 2) {
+                    const Type* elem = resolve(raw.payload[0]);
+                    uint32_t len = raw.payload[1];
+                    result = typeContext->create<ArrayType>(elem, len);
+                }
+                break;
+            }
+            case TypeRefKind::Slice: {
+                if (!raw.payload.empty()) {
+                    const Type* elem = resolve(raw.payload[0]);
+                    result = typeContext->create<SliceType>(elem);
+                }
+                break;
+            }
+            case TypeRefKind::Tuple: {
+                if (!raw.payload.empty()) {
+                    uint32_t numElems = raw.payload[0];
+                    std::vector<const Type*> elems;
+                    for (uint32_t i = 0; i < numElems && (i + 1) < raw.payload.size(); ++i) {
+                        elems.push_back(resolve(raw.payload[i + 1]));
+                    }
+                    result = typeContext->create<TupleType>(elems);
+                }
+                break;
+            }
+            case TypeRefKind::Function: {
+                if (raw.payload.size() >= 3) {
+                    const Type* retType = resolve(raw.payload[0]);
+                    bool isVariadic = raw.payload[1] != 0;
+                    uint32_t numParams = raw.payload[2];
+                    std::vector<const Type*> paramTypes;
+                    std::vector<std::string> paramNames(numParams, "");
+                    for (uint32_t i = 0; i < numParams && (i + 3) < raw.payload.size(); ++i) {
+                        paramTypes.push_back(resolve(raw.payload[i + 3]));
+                    }
+                    result = typeContext->getFunctionType(paramNames, paramTypes, retType, isVariadic);
+                }
+                break;
+            }
+            case TypeRefKind::GenericParam: {
+                if (raw.payload.size() >= 2) {
+                    uint32_t paramId = raw.payload[0];
+                    uint32_t nameStringId = raw.payload[1];
+                    auto gpName = resolveString(strings, nameStringId);
+                    result = typeContext->create<GenericParamType>(paramId, std::string(gpName));
+                }
+                break;
+            }
+            case TypeRefKind::Named: {
+                if (raw.payload.size() >= 2) {
+                    uint32_t nameStringId = raw.payload[0];
+                    uint32_t numArgs = raw.payload[1];
+                    std::vector<const Type*> genericArgs;
+                    for (uint32_t i = 0; i < numArgs && (i + 2) < raw.payload.size(); ++i) {
+                        genericArgs.push_back(resolve(raw.payload[i + 2]));
+                    }
+                    
+                    auto nameView = resolveString(strings, nameStringId);
+                    if (!nameView.empty()) {
+                        std::string name(nameView);
+                        Identifier id(name);
+                        
+                        auto symIds = symbolTable.lookupInScope(id, virtualScope);
+                        if (!symIds.empty()) {
+                            SymbolID mappedSymId = symIds.front();
+                            const auto& sym = symbolTable.getSymbol(mappedSymId);
+                            if (sym.kind == SymbolKind::Struct) {
+                                result = typeContext->getStructType(mappedSymId, std::move(genericArgs));
+                            } else if (sym.kind == SymbolKind::Enum) {
+                                result = typeContext->getEnumType(mappedSymId, std::move(genericArgs));
+                            } else if (sym.kind == SymbolKind::Trait) {
+                                result = typeContext->getTraitType(mappedSymId);
+                            } else {
+                                std::cout << "[MLibLoader] Named type '" << name << "' found but kind is " << (int)sym.kind << "\n";
+                                result = typeContext->getUnknown();
+                            }
+                        } else {
+                            std::cout << "[MLibLoader] Named type '" << name << "' NOT FOUND in virtualScope " << virtualScope << "\n";
+                            result = typeContext->getUnknown();
+                        }
+                    } else {
+                        result = typeContext->getUnknown();
+                    }
+                }
+                break;
+            }
+            default:
+                break; 
+        }
+        
+        if (result && result->getKind() == TypeKind::Unknown) {
+            std::cout << "[MLibLoader] parseTypeRefs entry " << id << " resolved to unknown! Kind=" << (int)raw.record.kind << "\n";
+        }
+
+        
+        parsed[id] = result;
+        return result;
+    };
+
+    for (uint32_t i = 0; i < count; ++i) {
+        resolve(i);
+    }
+
+    return parsed;
 }
+
 } // namespace fl

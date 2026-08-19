@@ -21,8 +21,13 @@ namespace fl {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Returns true if `name` is already declared as a Module in the global scope.
-static bool isLocalModule(SymbolTable& st, std::string_view name) {
+static bool isLocalModule(SymbolTable& st, const std::unordered_set<std::string>& localModules, std::string_view name) {
+    if (name == "self" || name == "super" || name == "crate" || name == "root") {
+        return true;
+    }
+    if (localModules.find(std::string(name)) != localModules.end()) {
+        return true;
+    }
     auto optSym = st.lookupInScope(name, /* global scope = */ 0);
     if (optSym.empty()) return false;
     return st.getSymbol(optSym[0]).kind == SymbolKind::Module;
@@ -130,7 +135,7 @@ void ImportResolver::visit(UseDeclNode& node) {
 
     // Is the root a local module already declared in scope?
     // If so, the existing UseResolutionVisitor (Pass 1.5) handles it.
-    if (isLocalModule(symbolTable_, rootName)) return;
+    if (isLocalModule(symbolTable_, localModules_, rootName)) return;
 
     // External path: ask ModuleLoader for the virtual scope.
     size_t matchedSegments = 0;

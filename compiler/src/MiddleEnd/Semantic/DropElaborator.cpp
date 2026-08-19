@@ -18,7 +18,7 @@ void DropElaborator::elaborateFunction(mvir::Function& func) {
     InitializationAnalyzer initAnalyzer(module_, dummyDiag);
     initAnalyzer.analyzeFunction(func);
     
-    MoveAnalyzer moveAnalyzer(module_, dummyDiag, closureStorageMap_);
+    MoveAnalyzer moveAnalyzer(module_, dummyDiag, closureStorageMap_, solver_, symTable_);
     moveAnalyzer.analyzeFunction(func);
     
     for (auto& block : func.blocks) {

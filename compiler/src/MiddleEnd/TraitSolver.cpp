@@ -249,7 +249,11 @@ Solution TraitSolver::solveRecursive(const Goal& goal, size_t depth) {
             const Type* implTargetType = typeTable_[optSelfId[0]]; 
             if (!implTargetType) continue;
             
-            if (goal.selfType->equals(implTargetType)) {
+            const Type* baseType = goal.selfType;
+            if (auto* ref = dynamic_cast<const ReferenceType*>(baseType)) baseType = ref->pointee;
+            else if (auto* ptr = dynamic_cast<const PointerType*>(baseType)) baseType = ptr->pointee;
+            
+            if (goal.selfType->equals(implTargetType) || baseType->equals(implTargetType)) {
                 matchedMethods.push_back(cand.methodId);
                 if (!found) {
                     firstMatch = {SolverResult::Success, cand.inherentImplNode, {}, cand.methodId, false, 0};

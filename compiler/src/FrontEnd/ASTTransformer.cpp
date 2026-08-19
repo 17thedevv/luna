@@ -218,6 +218,10 @@ void ASTTransformer::visit(AlignofExpr& node) {
     if (node.targetType) node.targetType = transformType(std::move(node.targetType));
 }
 
+void ASTTransformer::visit(TypeofExpr& node) {
+    if (node.expr) node.expr = transformExpr(std::move(node.expr));
+}
+
 void ASTTransformer::visit(PlaceholderStmt& node) {
 }
 

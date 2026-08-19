@@ -2,6 +2,7 @@
 #include "mellis/AST/ASTNode.h"
 #include "mellis/Core/Types.h"
 #include "mellis/Core/FLType.h"
+#include "mellis/Core/Intrinsic.h"
 #include "mellis/AST/PlaceholderData.h"
 #include <vector>
 #include <memory>
@@ -25,14 +26,6 @@ struct OperatorResolution {
 enum class ValueCategory : uint8_t {
     RValue,
     LValue,
-};
-
-enum class IntrinsicKind : uint8_t {
-    None,
-    PtrAdd,
-    PtrSub,
-    PtrOffset,
-    PtrDiff,
 };
 
 class ExprNode : public ASTNode {
@@ -140,6 +133,7 @@ public:
     std::vector<SymbolID> overloadCandidates;
     SymbolID resolvedFn = kInvalidSymbolID;
     bool isClosureCall = false; // Set by TypeChecker if calling a closure struct
+    IntrinsicKind intrinsic = IntrinsicKind::None;
     void accept(ASTVisitor& v) override;
     ASTNode* cloneImpl() const override;
 };
@@ -285,6 +279,10 @@ public:
 class TryExpr : public ExprNode {
 public:
     std::unique_ptr<ExprNode> expr;
+    SymbolID isErrorMethod = kInvalidSymbolID;
+    SymbolID extractErrorMethod = kInvalidSymbolID;
+    SymbolID unwrapMethod = kInvalidSymbolID;
+    SymbolID fromErrorMethod = kInvalidSymbolID;
     void accept(ASTVisitor& v) override;
     ASTNode* cloneImpl() const override;
 };
@@ -308,6 +306,13 @@ class AlignofExpr : public ExprNode {
 public:
     std::unique_ptr<TypeNode> targetType;
     const Type* evaluatedTargetType = nullptr;
+    void accept(ASTVisitor& v) override;
+    ASTNode* cloneImpl() const override;
+};
+
+class TypeofExpr : public ExprNode {
+public:
+    std::unique_ptr<ExprNode> expr;
     void accept(ASTVisitor& v) override;
     ASTNode* cloneImpl() const override;
 };

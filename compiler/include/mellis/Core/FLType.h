@@ -355,14 +355,15 @@ public:
     const Type* returnType;
     bool isCallSite;
     bool isVariadic;
+    bool isUnsafe;
     
-    FunctionType(std::vector<std::string> names, std::vector<const Type*> params, const Type* ret, bool callSite = false, bool variadic = false)
-        : paramNames(std::move(names)), paramTypes(std::move(params)), paramEscapeBehaviors(params.size(), EscapeBehavior::Escaping), returnType(ret), isCallSite(callSite), isVariadic(variadic) {}
+    FunctionType(std::vector<std::string> names, std::vector<const Type*> params, const Type* ret, bool callSite = false, bool variadic = false, bool unsafe = false)
+        : paramNames(std::move(names)), paramTypes(std::move(params)), paramEscapeBehaviors(params.size(), EscapeBehavior::Escaping), returnType(ret), isCallSite(callSite), isVariadic(variadic), isUnsafe(unsafe) {}
 
         
     TypeKind getKind() const override { return TypeKind::Function; }
     std::string toString() const override {
-        std::string s = "fn(";
+        std::string s = isUnsafe ? "unsafe fn(" : "fn(";
         for (size_t i = 0; i < paramTypes.size(); ++i) {
             if (i < paramNames.size() && !paramNames[i].empty()) {
                 s += paramNames[i] + ": ";
@@ -376,6 +377,7 @@ public:
     }
     bool equals(const Type* other) const override {
         if (auto* o = dynamic_cast<const FunctionType*>(other)) {
+            if (isUnsafe != o->isUnsafe) return false;
             if (isVariadic != o->isVariadic) return false;
             if (paramTypes.size() != o->paramTypes.size()) return false;
             for (size_t i = 0; i < paramTypes.size(); ++i) {
@@ -693,13 +695,13 @@ public:
 class GenericParamType : public Type {
 public:
     SymbolID paramId;
-    std::string_view name;
+    std::string name;
     
-    GenericParamType(SymbolID id, std::string_view n) : paramId(id), name(n) {}
+    GenericParamType(SymbolID id, std::string n) : paramId(id), name(std::move(n)) {}
     
     TypeKind getKind() const override { return TypeKind::GenericParam; }
     std::string toString() const override {
-        return std::string(name) + " (" + std::to_string(paramId) + ")";
+        return name + " (" + std::to_string(paramId) + ")";
     }
     bool equals(const Type* other) const override {
         if (auto* o = dynamic_cast<const GenericParamType*>(other)) {
@@ -861,7 +863,12 @@ public:
     UnificationTable unificationTable;
     std::vector<LifetimeConstraint> lifetimeConstraints;
 
+    ~TypeContext() {
+        std::cerr << "[INSTRUMENT] TypeContext Destroyed\n";
+    }
+
     TypeContext() {
+        std::cerr << "[INSTRUMENT] TypeContext Created\n";
         // Pre-allocate singletons
         neverType_ = create<NeverType>();
         voidType_ = create<VoidType>();
@@ -938,24 +945,27 @@ public:
     }
 
     
-    const Type* substitute(const Type* t, const std::unordered_map<SymbolID, const Type*>& mapping) {
+    const Type* substitute(const Type* t, const std::unordered_map<SymbolID, const Type*>& mapping, const std::unordered_map<std::string, const Type*>& nameMapping = {}) {
         if (!t) return nullptr;
         if (auto* gp = dynamic_cast<const GenericParamType*>(t)) {
             auto it = mapping.find(gp->paramId);
             std::cerr << "[DEBUG substitute] GenericParam id=" << gp->paramId << " name='" << gp->name << "' found=" << (it != mapping.end()) << "\n";
             if (it != mapping.end()) return it->second;
+            auto nameIt = nameMapping.find(gp->name);
+            if (nameIt != nameMapping.end()) {
+                std::cerr << "[DEBUG substitute] GenericParam name='" << gp->name << "' found by name!\n";
+                return nameIt->second;
+            }
             return t;
         }
         if (auto* ptr = dynamic_cast<const PointerType*>(t)) {
-            return getPointerType(substitute(ptr->pointee, mapping), ptr->isMutable);
+            return getPointerType(substitute(ptr->pointee, mapping, nameMapping), ptr->isMutable);
         }
         if (auto* ref = dynamic_cast<const ReferenceType*>(t)) {
-            // Lifetime substitution would go here later (if mapping captures lifetimes)
-            return getReferenceType(substitute(ref->pointee, mapping), ref->isMutable, ref->lifetime);
+            return getReferenceType(substitute(ref->pointee, mapping, nameMapping), ref->isMutable, ref->lifetime);
         }
         if (auto* proj = dynamic_cast<const AssociatedTypeProjection*>(t)) {
-            // Substitute within the self type of the projection
-            const Type* newSelf = substitute(proj->selfType, mapping);
+            const Type* newSelf = substitute(proj->selfType, mapping, nameMapping);
             if (newSelf != proj->selfType) {
                 return getAssociatedProjection(newSelf, proj->traitId, proj->assocName);
             }
@@ -964,25 +974,25 @@ public:
         if (auto* st = dynamic_cast<const StructType*>(t)) {
             if (st->genericArgs.empty()) return t;
             std::vector<const Type*> newArgs;
-            for (auto* arg : st->genericArgs) newArgs.push_back(substitute(arg, mapping));
+            for (auto* arg : st->genericArgs) newArgs.push_back(substitute(arg, mapping, nameMapping));
             return getStructType(st->structSymbolId, std::move(newArgs));
         }
         if (auto* et = dynamic_cast<const EnumType*>(t)) {
             if (et->genericArgs.empty()) return t;
             std::vector<const Type*> newArgs;
-            for (auto* arg : et->genericArgs) newArgs.push_back(substitute(arg, mapping));
+            for (auto* arg : et->genericArgs) newArgs.push_back(substitute(arg, mapping, nameMapping));
             return getEnumType(et->enumSymbolId, std::move(newArgs));
         }
         if (auto* ft = dynamic_cast<const FunctionType*>(t)) {
             std::vector<const Type*> newParams;
-            for (auto* p : ft->paramTypes) newParams.push_back(substitute(p, mapping));
-            return getFunctionType(ft->paramNames, std::move(newParams), substitute(ft->returnType, mapping), ft->isCallSite);
+            for (auto* p : ft->paramTypes) newParams.push_back(substitute(p, mapping, nameMapping));
+            return getFunctionType(ft->paramNames, std::move(newParams), substitute(ft->returnType, mapping, nameMapping), ft->isCallSite, ft->isVariadic, ft->isUnsafe);
         }
         if (auto* at = dynamic_cast<const ArrayType*>(t)) {
-            return getArrayType(substitute(at->elementType, mapping), at->length);
+            return getArrayType(substitute(at->elementType, mapping, nameMapping), at->length);
         }
-        if (auto* st = dynamic_cast<const SliceType*>(t)) {
-            return getSliceType(substitute(st->elementType, mapping));
+        if (auto* sl = dynamic_cast<const SliceType*>(t)) {
+            return getSliceType(substitute(sl->elementType, mapping, nameMapping));
         }
         return t; // primitive, unknown, void, never, error
     }
@@ -1058,13 +1068,13 @@ public:
         return create<TypeAliasType>(aliasId, std::move(aliasName), std::move(genericArgs), aliasedType);
     }
 
-    const FunctionType* getFunctionType(std::vector<std::string> paramNames, std::vector<const Type*> paramTypes, const Type* returnType, bool isCallSite = false, bool isVariadic = false) {
+    const FunctionType* getFunctionType(std::vector<std::string> paramNames, std::vector<const Type*> paramTypes, const Type* returnType, bool isCallSite = false, bool isVariadic = false, bool isUnsafe = false) {
         // Full deduplication skipped for simplicity, just create
-        return create<FunctionType>(std::move(paramNames), std::move(paramTypes), returnType, isCallSite, isVariadic);
+        return create<FunctionType>(std::move(paramNames), std::move(paramTypes), returnType, isCallSite, isVariadic, isUnsafe);
     }
-    const FunctionType* getFunctionType(std::vector<const Type*> paramTypes, const Type* returnType, bool isCallSite = false, bool isVariadic = false) {
+    const FunctionType* getFunctionType(std::vector<const Type*> paramTypes, const Type* returnType, bool isCallSite = false, bool isVariadic = false, bool isUnsafe = false) {
         std::vector<std::string> emptyNames(paramTypes.size(), "");
-        return getFunctionType(std::move(emptyNames), std::move(paramTypes), returnType, isCallSite, isVariadic);
+        return getFunctionType(std::move(emptyNames), std::move(paramTypes), returnType, isCallSite, isVariadic, isUnsafe);
     }
     
     const ArrayType* getArrayType(const Type* elementType, size_t length) {
@@ -1081,7 +1091,7 @@ public:
                 if (gp->paramId == id) return gp;
             }
         }
-        return create<GenericParamType>(id, name);
+        return create<GenericParamType>(id, std::string(name));
     }
     
     const Type* getLifetimeType(const Lifetime& lt) {

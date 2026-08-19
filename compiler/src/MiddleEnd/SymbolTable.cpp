@@ -60,11 +60,12 @@ ScopeID SymbolTable::createScope(ScopeKind kind, ScopeID parentId) {
 // =============================================================================
 
 ScopeID SymbolTable::createVirtualModuleScope(std::string_view moduleName) {
-    // Virtual scopes are isolated — no parent, no scope-chain walk.
-    // They are accessed only by explicit lookupInScope(virtualScopeID).
+    // Virtual scopes now fall back to the global scope (0) instead of being fully isolated.
+    // This allows instantiated generics from .mlib files to resolve symbols that are imported
+    // in the consumer's global scope (e.g. core::option::Option).
     (void)moduleName; // Name is informational; ID is the canonical key
     ScopeID newId = static_cast<ScopeID>(scopes_.size());
-    scopes_.push_back(Scope{newId, kInvalidScopeID, {}, ScopeKind::Module, ScopeBindings{}});
+    scopes_.push_back(Scope{newId, 0, {}, ScopeKind::Module, ScopeBindings{}});
     return newId;
 }
 
@@ -132,14 +133,16 @@ SymbolID SymbolTable::declareExternalSymbol(const Identifier& name,
 std::vector<SymbolID> SymbolTable::lookup(std::string_view name,
                                              ScopeID fromScope) const {
     ScopeID current = fromScope;
-
+    bool isOption = (name == "Option");
+    if (isOption) std::cerr << "[DEBUG] lookup 'Option' starting at scope " << fromScope << "\n";
     while (current != kInvalidScopeID) {
         assert(current < scopes_.size() && "lookup: corrupted scope chain");
         const Scope& scope = scopes_[current];
-
+        if (isOption) std::cerr << "[DEBUG] lookup 'Option' checking scope " << current << " (kind=" << (int)scope.kind << ", parent=" << scope.parentId << ")\n";
         Identifier key(name);
         auto range = scope.bindings.equal_range(key);
         if (range.first != range.second) {
+            if (isOption) std::cerr << "[DEBUG] lookup 'Option' FOUND in scope " << current << " -> symbolId " << range.first->second << "\n";
             std::vector<SymbolID> results;
             for (auto it = range.first; it != range.second; ++it) {
                 results.push_back(it->second);
@@ -149,7 +152,7 @@ std::vector<SymbolID> SymbolTable::lookup(std::string_view name,
 
         current = scope.parentId;
     }
-
+    if (isOption) std::cerr << "[DEBUG] lookup 'Option' NOT FOUND\n";
     return {};
 }
 
@@ -174,6 +177,7 @@ bool SymbolTable::containsInScope(const Identifier& name, ScopeID scope) const {
 
 std::vector<SymbolID> SymbolTable::lookupInScope(std::string_view name,
                                                     ScopeID scope) const {
+    if (scope == kInvalidScopeID) return {};
     assert(scope < scopes_.size() && "lookupInScope: invalid ScopeID");
     Identifier key(name);
     auto range = scopes_[scope].bindings.equal_range(key);
@@ -207,5 +211,8 @@ const Scope& SymbolTable::getScope(ScopeID id) const {
     assert(id < scopes_.size() && "getScope: invalid ScopeID");
     return scopes_[id];
 }
+
+
+SymbolTable::~SymbolTable() {}
 
 } // namespace fl

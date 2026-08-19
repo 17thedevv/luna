@@ -1,6 +1,40 @@
 #include "mellis/MiddleEnd/Semantic/MoveAnalyzer.h"
+#include "mellis/Core/WellKnownTraits.h"
+#include "mellis/MiddleEnd/SymbolTable.h"
+#include "mellis/MiddleEnd/TraitSolver.h"
+#include <iostream>
 
 namespace fl {
+
+bool MoveAnalyzer::isCopy(const Type* t) const {
+    if (!t) return false;
+    if (auto* closureTy = dynamic_cast<const ClosureType*>(t)) {
+        if (closureStorageMap_.find(closureTy) != closureStorageMap_.end() && 
+            closureStorageMap_.at(closureTy) == ClosureStorageKind::Heap) {
+            return false; // Heap closures are Move-Only
+        }
+    }
+    
+    // Primitive types (and some others like pointer) return true inherently
+    if (t->isCopy()) return true;
+    
+    // Check TraitSolver for core::Copy
+    if (solver_ && symTable_) {
+        std::optional<SymbolID> copyTraitId = symTable_->getWellKnownTrait(WellKnownTrait::Copy);
+        if (copyTraitId.has_value()) {
+            Goal goal;
+            goal.kind = GoalKind::Trait;
+            goal.selfType = t;
+            goal.traitId = copyTraitId.value();
+            Solution sol = solver_->solve(goal);
+            if (sol.result == SolverResult::Success) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
 
 Place MoveAnalyzer::resolvePlace(const mvir::Operand& op, const MoveStateData& state) const {
     if (auto* locId = mvir::getLocalIf(op)) {

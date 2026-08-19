@@ -95,15 +95,15 @@ void CFGBuilder::visitWhile(WhileStmtNode* node) {
     currentBlock->addSuccessor(bodyBlock);
     currentBlock->addSuccessor(exitBlock);
     
-    breakTargets.push_back(exitBlock);
-    continueTargets.push_back(condBlock);
+    currentBlock->addSuccessor(exitBlock);
+    
+    loopTargets.push_back({node, exitBlock, condBlock});
     
     currentBlock = bodyBlock;
     visit(node->body.get());
     if (currentBlock) currentBlock->addSuccessor(condBlock);
     
-    breakTargets.pop_back();
-    continueTargets.pop_back();
+    loopTargets.pop_back();
     
     currentBlock = exitBlock;
 }
@@ -122,8 +122,7 @@ void CFGBuilder::visitFor(ForStmtNode* node) {
     currentBlock->addSuccessor(bodyBlock);
     currentBlock->addSuccessor(exitBlock);
     
-    breakTargets.push_back(exitBlock);
-    continueTargets.push_back(stepBlock);
+    loopTargets.push_back({node, exitBlock, stepBlock});
     
     currentBlock = bodyBlock;
     visit(node->body.get());
@@ -131,10 +130,9 @@ void CFGBuilder::visitFor(ForStmtNode* node) {
     
     currentBlock = stepBlock;
     if (node->step) visit(node->step.get());
-    currentBlock->addSuccessor(condBlock);
+    if (currentBlock) currentBlock->addSuccessor(condBlock);
     
-    breakTargets.pop_back();
-    continueTargets.pop_back();
+    loopTargets.pop_back();
     
     currentBlock = exitBlock;
 }
@@ -165,19 +163,35 @@ void CFGBuilder::visitReturn(ReturnStmtNode* node) {
 }
 
 void CFGBuilder::visitBreak(BreakStmtNode* node) {
-    if (breakTargets.empty()) {
+    if (loopTargets.empty()) {
         diag.error(node->loc, "'break' outside of loop");
     } else {
-        currentBlock->addSuccessor(breakTargets.back());
+        BasicBlock* target = nullptr;
+        if (node->targetLoop) {
+            for (auto it = loopTargets.rbegin(); it != loopTargets.rend(); ++it) {
+                if (it->loopNode == node->targetLoop) { target = it->breakTarget; break; }
+            }
+        } else {
+            target = loopTargets.back().breakTarget;
+        }
+        if (target) currentBlock->addSuccessor(target);
     }
     currentBlock = nullptr;
 }
 
 void CFGBuilder::visitContinue(ContinueStmtNode* node) {
-    if (continueTargets.empty()) {
+    if (loopTargets.empty()) {
         diag.error(node->loc, "'continue' outside of loop");
     } else {
-        currentBlock->addSuccessor(continueTargets.back());
+        BasicBlock* target = nullptr;
+        if (node->targetLoop) {
+            for (auto it = loopTargets.rbegin(); it != loopTargets.rend(); ++it) {
+                if (it->loopNode == node->targetLoop) { target = it->continueTarget; break; }
+            }
+        } else {
+            target = loopTargets.back().continueTarget;
+        }
+        if (target) currentBlock->addSuccessor(target);
     }
     currentBlock = nullptr;
 }

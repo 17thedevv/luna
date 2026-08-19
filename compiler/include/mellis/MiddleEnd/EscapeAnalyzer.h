@@ -65,6 +65,7 @@ public:
     void visit(AwaitExpr& node) override { if(node.expr) node.expr->accept(*this); }
     void visit(SizeofExpr&) override {}
     void visit(AlignofExpr&) override {}
+    void visit(TypeofExpr&) override {}
     void visit(LiteralExpr&) override {}
     void visit(IdentifierExpr&) override {}
 

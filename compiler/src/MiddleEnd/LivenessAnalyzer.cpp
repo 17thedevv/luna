@@ -95,7 +95,10 @@ LivenessInfo LivenessAnalyzer::computeLiveness(const mvir::Function& func) {
                 else if (auto* awt = dynamic_cast<const mvir::AwaitInst*>(inst)) destName = awt->dest.name;
                 else if (auto* size = dynamic_cast<const mvir::SizeofInst*>(inst)) destName = size->dest.name;
                 else if (auto* align = dynamic_cast<const mvir::AlignofInst*>(inst)) destName = align->dest.name;
-                
+                else if (auto* icall = dynamic_cast<const mvir::IntrinsicCallInst*>(inst)) {
+                    if (icall->dest) destName = icall->dest->name;
+                }
+
                 if (!destName.empty()) {
                     in.erase(destName);
                 }
@@ -130,6 +133,9 @@ LivenessInfo LivenessAnalyzer::computeLiveness(const mvir::Function& func) {
                 }
                 else if (auto* awt = dynamic_cast<const mvir::AwaitInst*>(inst)) {
                     addUse(awt->futureVal);
+                }
+                else if (auto* icall = dynamic_cast<const mvir::IntrinsicCallInst*>(inst)) {
+                    for (auto& arg : icall->args) addUse(arg);
                 }
             }
             

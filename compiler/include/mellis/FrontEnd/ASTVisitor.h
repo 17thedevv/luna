@@ -51,6 +51,7 @@ class TryExpr;
 class AwaitExpr;
 class SizeofExpr;
 class AlignofExpr;
+class TypeofExpr;
 
 class BuiltinTypeNode;
 class LifetimeNode;
@@ -123,6 +124,7 @@ public:
     virtual void visit(AwaitExpr&)         = 0;
     virtual void visit(SizeofExpr&)        = 0;
     virtual void visit(AlignofExpr&)       = 0;
+    virtual void visit(TypeofExpr&)        = 0;
 
     // Macros & Placeholders (Phase 1)
     virtual void visit(class MacroDeclNode&) {}

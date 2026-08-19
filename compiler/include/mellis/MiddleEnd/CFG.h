@@ -62,8 +62,12 @@ class CFGBuilder {
     BasicBlock* currentBlock;
     
     // Loop control stacks
-    std::vector<BasicBlock*> breakTargets;
-    std::vector<BasicBlock*> continueTargets;
+    struct LoopTargetCFG {
+        ASTNode* loopNode;
+        BasicBlock* breakTarget;
+        BasicBlock* continueTarget;
+    };
+    std::vector<LoopTargetCFG> loopTargets;
     
 public:
     CFGBuilder(DiagnosticEngine& diag) : diag(diag), cfg(nullptr), currentBlock(nullptr) {}

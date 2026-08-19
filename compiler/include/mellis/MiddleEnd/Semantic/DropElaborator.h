@@ -9,10 +9,12 @@ namespace fl {
 class DropElaborator {
     mvir::Module* module_;
     std::unordered_map<const Type*, ClosureStorageKind>& closureStorageMap_;
+    TraitSolver* solver_;
+    SymbolTable* symTable_;
 
 public:
-    explicit DropElaborator(mvir::Module* module, std::unordered_map<const Type*, ClosureStorageKind>& closureStorageMap) 
-        : module_(module), closureStorageMap_(closureStorageMap) {}
+    explicit DropElaborator(mvir::Module* module, std::unordered_map<const Type*, ClosureStorageKind>& closureStorageMap, TraitSolver* solver = nullptr, SymbolTable* symTable = nullptr) 
+        : module_(module), closureStorageMap_(closureStorageMap), solver_(solver), symTable_(symTable) {}
 
     void run();
 

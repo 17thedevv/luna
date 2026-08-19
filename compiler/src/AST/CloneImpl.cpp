@@ -334,6 +334,7 @@ ASTNode* NamedTypeNode::cloneImpl() const {
     copy->loc = this->loc;
     copy->segments = this->segments;
     copy->symbolId = this->symbolId;
+    copy->resolvedPathLength = this->resolvedPathLength;
     for (const auto& arg : this->genericArgs) {
         copy->genericArgs.push_back(arg->cloneAs<TypeNode>());
     }
@@ -387,6 +388,7 @@ ASTNode* TupleTypeNode::cloneImpl() const {
 ASTNode* FunctionTypeNode::cloneImpl() const {
     auto copy = new FunctionTypeNode();
     copy->loc = this->loc;
+    copy->isUnsafe = this->isUnsafe;
     for (const auto& p : this->params) {
         copy->params.push_back(p->cloneAs<TypeNode>());
     }
@@ -726,6 +728,10 @@ ASTNode* TryExpr::cloneImpl() const {
     copy->loc = this->loc;
     copy->inferredType = this->inferredType;
     if (this->expr) copy->expr = this->expr->cloneAs<ExprNode>();
+    copy->isErrorMethod = this->isErrorMethod;
+    copy->extractErrorMethod = this->extractErrorMethod;
+    copy->unwrapMethod = this->unwrapMethod;
+    copy->fromErrorMethod = this->fromErrorMethod;
     return copy;
 }
 ASTNode* SizeofExpr::cloneImpl() const { 
@@ -741,6 +747,13 @@ ASTNode* AlignofExpr::cloneImpl() const {
     return copy;
 }
 
+ASTNode* TypeofExpr::cloneImpl() const { 
+    auto copy = new TypeofExpr();
+    copy->loc = this->loc;
+    if (this->expr) copy->expr = this->expr->cloneAs<ExprNode>();
+    return copy;
+}
+
 ASTNode* IfStmtNode::cloneImpl() const {
     auto copy = new IfStmtNode();
     copy->loc = this->loc;
@@ -753,6 +766,7 @@ ASTNode* IfStmtNode::cloneImpl() const {
 ASTNode* WhileStmtNode::cloneImpl() const {
     auto copy = new WhileStmtNode();
     copy->loc = this->loc;
+    copy->label = this->label;
     if (this->condition) copy->condition = this->condition->cloneAs<ExprNode>();
     if (this->body) copy->body = this->body->cloneAs<BlockStmtNode>();
     return copy;
@@ -762,6 +776,7 @@ ASTNode* ForStmtNode::cloneImpl() const {
     auto copy = new ForStmtNode();
     copy->loc = this->loc;
     copy->kind = this->kind;
+    copy->label = this->label;
     copy->bindingName = this->bindingName;
     copy->bindingId = this->bindingId;
     copy->iterMethodId = this->iterMethodId;
@@ -778,11 +793,15 @@ ASTNode* ForStmtNode::cloneImpl() const {
 ASTNode* BreakStmtNode::cloneImpl() const { 
     auto copy = new BreakStmtNode();
     copy->loc = this->loc;
+    copy->label = this->label;
+    copy->targetLoop = this->targetLoop;
     return copy;
 }
 ASTNode* ContinueStmtNode::cloneImpl() const { 
     auto copy = new ContinueStmtNode();
     copy->loc = this->loc;
+    copy->label = this->label;
+    copy->targetLoop = this->targetLoop;
     return copy;
 }
 ASTNode* UnsafeStmtNode::cloneImpl() const {

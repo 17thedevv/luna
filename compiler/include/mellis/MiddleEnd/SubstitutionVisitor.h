@@ -102,6 +102,7 @@ public:
     void visit(AwaitExpr&) override;
     void visit(SizeofExpr&) override;
     void visit(AlignofExpr&) override;
+    void visit(TypeofExpr&) override;
 };
 
 } // namespace fl

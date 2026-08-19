@@ -19,6 +19,7 @@
 #include "mellis/Core/FLType.h"
 #include "mellis/IR/ConstantValue.h"
 #include "mellis/AST/ASTNode.h" // For Visibility
+#include "mellis/Core/Intrinsic.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -153,7 +154,9 @@ enum class Opcode : uint8_t {
     // Extract
     Extract, TupleExtract, Tag, Variant, MakeTraitObject, MakeSlice, Call, VirtualCall, Await, BoundsCheck,
     // Terminators
-    Jump, Branch, Switch, Ret, Unreachable
+    Jump, Branch, Switch, Ret, Unreachable,
+    
+    IntrinsicCall
 };
 
 struct Instruction {
@@ -283,6 +286,17 @@ struct AlignofInst : public Instruction {
     std::string toString() const override;
 };
 
+struct IntrinsicCallInst : public Instruction {
+    Opcode getOpcode() const override { return Opcode::IntrinsicCall; }
+    IntrinsicKind intrinsic;
+    std::optional<LocalId> dest;
+    std::vector<Operand> args;
+    std::vector<const Type*> typeArgs;
+
+    IntrinsicCallInst(IntrinsicKind intrinsic, std::optional<LocalId> dest, std::vector<Operand> args, std::vector<const Type*> typeArgs = {})
+        : intrinsic(intrinsic), dest(std::move(dest)), args(std::move(args)), typeArgs(std::move(typeArgs)) {}
+    std::string toString() const override;
+};
 // ── ALU Instructions ─────────────────────────────────────────────────────────
 
 enum class AluOp {

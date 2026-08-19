@@ -20,6 +20,7 @@ std::unique_ptr<TypeNode> SubstitutionVisitor::substituteType(std::unique_ptr<Ty
         }
         if (!named->segments.empty()) {
             std::string baseName = std::string(named->segments[0]);
+            if (baseName == "T") std::cerr << "[DEBUG] SubstitutionVisitor: checking type 'T'\n";
             if (genericSubstitution.typeSubstitutions.count(baseName)) {
                 std::cerr << "[DEBUG] SubstitutionVisitor: Substituted '" << baseName << "' with its replacement.\n";
                 auto* subNode = genericSubstitution.typeSubstitutions.at(baseName).get();
@@ -33,6 +34,7 @@ std::unique_ptr<TypeNode> SubstitutionVisitor::substituteType(std::unique_ptr<Ty
                     return newNamed;
                 }
             } else {
+                if (baseName == "T") std::cerr << "[DEBUG] SubstitutionVisitor: NO substitution found for 'T'.\n";
                 std::cerr << "[DEBUG] SubstitutionVisitor: NO substitution found for '" << baseName << "'.\n";
             }
         }
@@ -61,6 +63,8 @@ std::unique_ptr<TypeNode> SubstitutionVisitor::substituteType(std::unique_ptr<Ty
             param = substituteType(std::move(param));
         }
         func->returnType = substituteType(std::move(func->returnType));
+    } else {
+        std::cerr << "[DEBUG] SubstitutionVisitor: Skipping node type " << typeid(*type).name() << "\n";
     }
 
     return type;
@@ -117,7 +121,9 @@ void SubstitutionVisitor::visit(TypeAliasDeclNode& n) {
 // ==========================================
 
 void SubstitutionVisitor::visit(BlockStmtNode& n) {
+    std::cerr << "[DEBUG] SubstitutionVisitor: visiting BlockStmtNode with " << n.body.size() << " stmts.\n";
     for (auto& s : n.body) s->accept(*this);
+    if (n.tailExpr) n.tailExpr->accept(*this);
 }
 void SubstitutionVisitor::visit(ExprStmtNode& n) {
     if (n.expr) n.expr->accept(*this);
@@ -195,6 +201,7 @@ void SubstitutionVisitor::visit(TupleIndexExpr& n) {
     if (n.object) n.object->accept(*this);
 }
 void SubstitutionVisitor::visit(CastExpr& n) {
+    std::cerr << "[DEBUG] SubstitutionVisitor: visiting CastExpr\n";
     if (n.expr) n.expr->accept(*this);
     n.targetType = substituteType(std::move(n.targetType));
 }
@@ -208,6 +215,7 @@ void SubstitutionVisitor::visit(TupleLiteralExpr& n) {
     for (auto& e : n.elements) e->accept(*this);
 }
 void SubstitutionVisitor::visit(StructInitExpr& n) {
+    std::cerr << "[DEBUG] SubstitutionVisitor: visiting StructInitExpr with " << n.genericArgs.size() << " genericArgs\n";
     for (auto& arg : n.genericArgs) {
         arg = substituteType(std::move(arg));
     }
@@ -237,6 +245,9 @@ void SubstitutionVisitor::visit(SizeofExpr& n) {
 }
 void SubstitutionVisitor::visit(AlignofExpr& n) {
     n.targetType = substituteType(std::move(n.targetType));
+}
+void SubstitutionVisitor::visit(TypeofExpr& n) {
+    if (n.expr) n.expr->accept(*this);
 }
 
 } // namespace fl

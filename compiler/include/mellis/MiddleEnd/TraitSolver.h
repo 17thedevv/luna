@@ -18,13 +18,13 @@ struct Goal {
     GoalKind kind;
     
     // For Trait & ObjectSafety Goals
-    const Type* selfType;
-    SymbolID traitId;
+    const Type* selfType = nullptr;
+    SymbolID traitId = kInvalidSymbolID;
     std::vector<const Type*> genericArgs;
     
     // For Projection Goal (<T as Trait>::Assoc == U)
     std::string assocName;
-    const Type* expectedType; 
+    const Type* expectedType = nullptr; 
     
     // For MethodResolution Goal
     std::string methodName;
