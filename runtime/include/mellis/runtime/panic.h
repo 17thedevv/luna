@@ -20,9 +20,13 @@
 extern "C" {
 #endif
 
-// Primary panic entry point. Called by compiler-generated code via MVIR PanicInst.
-// info must not be null; embedded builds may use a partial PanicInfo.
-MELLIS_NORETURN void __mellis_panic(const MellisPanicInfo* info);
+// Phase 15 primary panic entry point. `msg` and `loc` are UTF-8 byte slices;
+// loc may be null when source-location data is unavailable.
+MELLIS_NORETURN void __mellis_panic(const uint8_t* msg, uint64_t len,
+                                    const uint8_t* loc);
+
+// Compatibility entry point for the pre-Phase-15 structured ABI.
+MELLIS_NORETURN void __mellis_panic_info(const MellisPanicInfo* info);
 
 // Array/slice index out of bounds.
 MELLIS_NORETURN void __mellis_bounds_fail(size_t idx, size_t len,

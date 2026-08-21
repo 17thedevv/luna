@@ -281,11 +281,11 @@ llvm::Type* LLVMIRGenerator::mapType(const Type* type) {
         return llvm::StructType::get(context_, elements, false);
     }
     if (auto* et = dynamic_cast<const EnumType*>(type)) {
-        std::cerr << "[DEBUG mapType] EnumType enumSymbolId=" << et->enumSymbolId << " genericArgs=" << et->genericArgs.size() << "\n";
+        extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG mapType] EnumType enumSymbolId=" << et->enumSymbolId << " genericArgs=" << et->genericArgs.size() << "\n";
         if (mvirModule_) {
-            std::cerr << "[DEBUG mapType] typeDecls count=" << mvirModule_->typeDecls.size() << "\n";
+            extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG mapType] typeDecls count=" << mvirModule_->typeDecls.size() << "\n";
             for (const auto& tDecl : mvirModule_->typeDecls) {
-                std::cerr << "[DEBUG mapType]   typeDecl id=" << tDecl.id << " name='" << tDecl.name << "' isEnum=" << tDecl.isEnum << "\n";
+                extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG mapType]   typeDecl id=" << tDecl.id << " name='" << tDecl.name << "' isEnum=" << tDecl.isEnum << "\n";
                 if (tDecl.id == et->enumSymbolId && tDecl.isEnum) {
                     std::string name = tDecl.name.substr(1);
                     if (structTypes_.count(name)) return structTypes_[name];
@@ -324,7 +324,7 @@ llvm::Type* LLVMIRGenerator::mapType(const Type* type) {
                 }
             }
         }
-        std::cerr << "[DEBUG mapType] FALLBACK for EnumType enumSymbolId=" << et->enumSymbolId << "\n";
+        extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG mapType] FALLBACK for EnumType enumSymbolId=" << et->enumSymbolId << "\n";
         return llvm::StructType::get(context_, { llvm::Type::getInt32Ty(context_), llvm::ArrayType::get(llvm::Type::getInt64Ty(context_), 4) }, false);
     }
     if (auto* arr = dynamic_cast<const ArrayType*>(type)) {
@@ -638,7 +638,7 @@ void LLVMIRGenerator::emitFunctionBody(const mvir::Function* func) {
 
 void LLVMIRGenerator::emitInstruction(const mvir::Instruction* inst) {
     if (!inst) return;
-    std::cerr << "[DEBUG LLVMIRGenerator] emitting instruction type: " << typeid(*inst).name() << std::endl;
+    extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG LLVMIRGenerator] emitting instruction type: " << typeid(*inst).name() << std::endl;
 
     if (auto* drop = dynamic_cast<const mvir::DropInst*>(inst)) {
         if (!drop->type) return;
@@ -800,9 +800,9 @@ void LLVMIRGenerator::emitInstruction(const mvir::Instruction* inst) {
                 pointerTypes_[load->dest.name] = mapType(pTy->pointee);
             }
 
-            std::cerr << "[DEBUG] Added LoadInst dest to localValues: " << load->dest.name << " (type: " << val->getType()->getTypeID() << ")" << std::endl;
+            extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG] Added LoadInst dest to localValues: " << load->dest.name << " (type: " << val->getType()->getTypeID() << ")" << std::endl;
         } else {
-            std::cerr << "[DEBUG] LoadInst pointeeTy is Void, NOT added: " << load->dest.name << std::endl;
+            extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG] LoadInst pointeeTy is Void, NOT added: " << load->dest.name << std::endl;
         }
     }
     else if (auto* store = dynamic_cast<const mvir::StoreInst*>(inst)) {
@@ -1144,7 +1144,7 @@ void LLVMIRGenerator::emitInstruction(const mvir::Instruction* inst) {
         llvm::Value* res = builder_.CreateExtractValue(baseVal, tupleExtract->index, tupleExtract->dest.name.substr(1));
         localValues_[tupleExtract->dest.name] = res;
     } else {
-        std::cerr << "[DEBUG] Instruction NOT handled by any if-else block!" << std::endl;
+        extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG] Instruction NOT handled by any if-else block!" << std::endl;
     }
 }
 
@@ -1252,7 +1252,7 @@ void LLVMIRGenerator::emitIntrinsicCall(const mvir::IntrinsicCallInst* inst) {
             break;
         }
         default:
-            std::cerr << "[DEBUG LLVM] Unhandled IntrinsicCallInst for kind: " << (int)inst->intrinsic << "\n";
+            extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG LLVM] Unhandled IntrinsicCallInst for kind: " << (int)inst->intrinsic << "\n";
             break;
     }
 }

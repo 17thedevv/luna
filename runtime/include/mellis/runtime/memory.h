@@ -29,6 +29,10 @@ void* __mellis_alloc(size_t size, size_t align);
 // Hosted default allocators may ignore size/align.
 void  __mellis_dealloc(void* ptr, size_t size, size_t align);
 
+// Phase 15 stable spelling. Kept alongside __mellis_dealloc so existing
+// C++-generated objects remain link-compatible.
+void  __mellis_free(void* ptr, size_t size, size_t align);
+
 // Reallocate memory. Returns null on OOM (old allocation is preserved).
 // ptr: original pointer (or null, in which case behaves like alloc).
 // old_size, new_size, align must be consistent with the original allocation.

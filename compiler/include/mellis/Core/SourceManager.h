@@ -19,7 +19,7 @@ struct SourceFile {
 class SourceManager {
 public:
     SourceManager(DiagnosticEngine& diag);
-    ~SourceManager() { std::cerr << "[INSTRUMENT] SourceManager Destroyed\n"; }
+    ~SourceManager() { extern bool g_quiet; if (!g_quiet) std::cerr << "[INSTRUMENT] SourceManager Destroyed\n"; }
 
     /// Loads a file and returns its FileID. If already loaded, returns the existing FileID.
     /// If the file cannot be loaded, reports a diagnostic error and returns kInvalidFileID.

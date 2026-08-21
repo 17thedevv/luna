@@ -95,7 +95,7 @@ SymbolID SymbolTable::declareSymbol(const Identifier& name,
     // Precondition: caller verified no duplicate via containsInScope().
     scopes_[scope].bindings.emplace(name, newId);
 
-    std::cerr << "[DEBUG SymbolTable] declareSymbol id=" << newId << " name='" << name.str() << "' kind=" << (int)kind << " scope=" << scope << std::endl;
+    extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG SymbolTable] declareSymbol id=" << newId << " name='" << name.str() << "' kind=" << (int)kind << " scope=" << scope << std::endl;
 
     return newId;
 }

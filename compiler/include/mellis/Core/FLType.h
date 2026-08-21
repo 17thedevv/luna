@@ -864,11 +864,11 @@ public:
     std::vector<LifetimeConstraint> lifetimeConstraints;
 
     ~TypeContext() {
-        std::cerr << "[INSTRUMENT] TypeContext Destroyed\n";
+        extern bool g_quiet; if (!g_quiet) std::cerr << "[INSTRUMENT] TypeContext Destroyed\n";
     }
 
     TypeContext() {
-        std::cerr << "[INSTRUMENT] TypeContext Created\n";
+        extern bool g_quiet; if (!g_quiet) std::cerr << "[INSTRUMENT] TypeContext Created\n";
         // Pre-allocate singletons
         neverType_ = create<NeverType>();
         voidType_ = create<VoidType>();

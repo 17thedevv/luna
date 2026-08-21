@@ -43,7 +43,11 @@ impl<'a> Parser<'a> {
 
         if self.match_token(TokenKind::LBracket) {
             let element_type = self.parse_type()?;
-            self.consume(TokenKind::Semi, "Expected ';' in array type")?;
+            if !self.match_token(TokenKind::Semi) && !self.match_token(TokenKind::Comma) {
+                let span = self.peek().span;
+                self.error_at_current("Expected ';' or ',' in array type", span);
+                return Err(());
+            }
             let size = self.parse_expression(true)?;
             self.consume(TokenKind::RBracket, "Expected ']' after array size")?;
             return Ok(self.arena.alloc_type(Type::Array { element_type, size }));

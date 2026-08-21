@@ -31,6 +31,7 @@ message(STATUS "Mellis Runtime: building for platform '${MELLIS_PLATFORM}'")
 set(RUNTIME_CORE_SRC
     src/memory/memory.c
     src/panic/panic.c
+    src/io/io.c
     src/startup/startup.c
 )
 

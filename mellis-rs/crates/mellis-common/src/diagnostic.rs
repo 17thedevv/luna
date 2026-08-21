@@ -40,7 +40,7 @@ impl Diagnostic {
 
         if let (Some(span), Some(file)) = (
             self.span,
-            source_manager.get_file(self.span.unwrap().file_id),
+            self.span.and_then(|s| source_manager.get_file(s.file_id)),
         ) {
             let (line, col) = file.get_line_col(span.start);
             out.push_str(&format!("{}: {}\n", level_str, self.message));
@@ -51,13 +51,14 @@ impl Diagnostic {
                 out.push_str(&format!("{:<3}| {}\n", line, line_str));
 
                 let indent = " ".repeat((col - 1) as usize);
-                let length = std::cmp::max(1, span.end - span.start) as usize;
+                let length = std::cmp::max(1, span.end.saturating_sub(span.start)) as usize;
                 let carets = "^".repeat(length);
                 out.push_str(&format!("   | {}{}\n", indent, carets));
             }
+        } else {
+            out.push_str(&format!("{}: {}\n", level_str, self.message));
         }
 
-        // Fallback if no span or file not found
-        format!("{}: {}", level_str, self.message)
+        out
     }
 }

@@ -18,54 +18,79 @@ pub struct LabelId {
     pub name: String,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct ValueId(pub u32);
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct BlockId(pub u32);
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Operand {
-    Local(LocalId),
+    Value(ValueId),
     Global(GlobalId),
+    Block(BlockId),
     Number(String),
     Boolean(bool),
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Instruction {
-    Alloca {
-        dest: LocalId,
-        ty: SemanticTypeId,
-    },
+    Alloca, // ty is kept in ValueData
+    Assign(Operand), // For constant folding or aliases
     Store {
         ptr: Operand,
         value: Operand,
     },
     Load {
-        dest: LocalId,
         ptr: Operand,
-        ty: SemanticTypeId,
     },
     Add {
-        dest: LocalId,
         left: Operand,
         right: Operand,
-        ty: SemanticTypeId,
     },
     Sub {
-        dest: LocalId,
         left: Operand,
         right: Operand,
-        ty: SemanticTypeId,
     },
     Mul {
-        dest: LocalId,
         left: Operand,
         right: Operand,
-        ty: SemanticTypeId,
+    },
+    Eq {
+        left: Operand,
+        right: Operand,
     },
     Call {
-        dest: Option<LocalId>,
         callee: Operand,
         args: Vec<Operand>,
-        ret_ty: SemanticTypeId,
     },
-    // Other binary, unary ops can be added here
+    BoundsCheck {
+        index: Operand,
+        len: Operand,
+    },
+    Borrow {
+        is_rw: bool,
+        base: Operand,
+    },
+    Variant {
+        enum_ty: SemanticTypeId,
+        variant_idx: u32,
+        args: Vec<Operand>,
+    },
+    Tag {
+        value: Operand,
+    },
+    Extract {
+        value: Operand,
+        variant_idx: u32,
+        field_idx: u32,
+    },
+}
+
+#[derive(Clone, Debug)]
+pub struct ValueData {
+    pub inst: Instruction,
+    pub ty: SemanticTypeId,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -87,15 +112,25 @@ pub enum Terminator {
 #[derive(Clone, Debug)]
 pub struct BasicBlock {
     pub label: LabelId,
-    pub instructions: Vec<Instruction>,
-    pub terminator: Option<Terminator>, // Should always have one in a valid BB
+    pub insts: Vec<ValueId>,
+    pub terminator: Option<Terminator>,
 }
 
 #[derive(Clone, Debug)]
 pub struct Function {
     pub name: GlobalId,
     pub blocks: Vec<BasicBlock>,
+    pub values: Vec<ValueData>,
     pub ret_ty: SemanticTypeId,
+}
+
+impl Function {
+    pub fn value(&self, id: ValueId) -> &ValueData {
+        &self.values[id.0 as usize]
+    }
+    pub fn block(&self, id: BlockId) -> &BasicBlock {
+        &self.blocks[id.0 as usize]
+    }
 }
 
 #[derive(Clone, Debug)]

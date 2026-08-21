@@ -14,7 +14,7 @@
 
 // --- Primary Panic -----------------------------------------------------------
 
-MELLIS_NORETURN void __mellis_panic(const MellisPanicInfo* info) {
+MELLIS_NORETURN void __mellis_panic_info(const MellisPanicInfo* info) {
     if (info) {
         const char* file = info->file ? info->file : "<unknown>";
         const char* msg  = (info->message && info->message_len > 0)
@@ -28,6 +28,19 @@ MELLIS_NORETURN void __mellis_panic(const MellisPanicInfo* info) {
         fprintf(stderr, "\nmellis: PANIC (no info)\n");
     }
     abort();
+}
+
+MELLIS_NORETURN void __mellis_panic(const uint8_t* msg, uint64_t len,
+                                    const uint8_t* loc) {
+    MellisPanicInfo info = {
+        .message = (const char*)msg,
+        .message_len = (size_t)len,
+        .file = (const char*)loc,
+        .line = 0,
+        .column = 0,
+        .error_code = MELLIS_ERR_INVALID_STATE,
+    };
+    __mellis_panic_info(&info);
 }
 
 // --- Bounds Failure ----------------------------------------------------------

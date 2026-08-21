@@ -47,6 +47,10 @@ void __mellis_dealloc(void* ptr, size_t size, size_t align) {
 #endif
 }
 
+void __mellis_free(void* ptr, size_t size, size_t align) {
+    __mellis_dealloc(ptr, size, align);
+}
+
 // --- Reallocation ------------------------------------------------------------
 
 void* __mellis_realloc(void* ptr, size_t old_size, size_t new_size, size_t align) {

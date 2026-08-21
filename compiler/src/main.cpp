@@ -1,3 +1,4 @@
+bool g_quiet = false;
 #include <iostream>
 #include <string>
 #include "mellis/Core/CompilerSession.h"
@@ -27,6 +28,8 @@ int main(int argc, char* argv[]) {
             return 0;
         } else if (arg == "--lsp") {
             runLsp = true;
+        } else if (arg == "--quiet") {
+            g_quiet = true;
         } else if (arg == "-v" || arg == "--verbose") {
             verbose = true;
         } else if (arg == "-lib") {

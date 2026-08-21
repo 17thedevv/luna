@@ -22,11 +22,16 @@ pub enum Mutability {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct LifetimeId(pub u32);
 
+pub type TypeSubst = HashMap<String, SemanticTypeId>;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SemanticType {
     Primitive(BuiltinType),
     Struct(SymbolId, Vec<SemanticTypeId>),
+    Enum(SymbolId, Vec<SemanticTypeId>),
     Tuple(Vec<SemanticTypeId>),
+    Array(SemanticTypeId, u64),
+    Slice(SemanticTypeId),
     Function { params: Vec<SemanticTypeId>, return_type: SemanticTypeId },
     Pointer(SemanticTypeId),
     Reference(LifetimeId, Mutability, SemanticTypeId),
@@ -34,6 +39,7 @@ pub enum SemanticType {
     Never,
     Error,
     InferenceVar(u32),
+    Generic(String),
 }
 
 pub struct TypeContext {
@@ -79,5 +85,44 @@ impl TypeContext {
         let id = self.next_inference_var;
         self.next_inference_var += 1;
         self.intern(SemanticType::InferenceVar(id))
+    }
+    
+    pub fn subst(&mut self, id: SemanticTypeId, subst: &TypeSubst) -> SemanticTypeId {
+        let ty = self.get(id).clone();
+        match ty {
+            SemanticType::Generic(name) => {
+                if let Some(&new_id) = subst.get(&name) {
+                    new_id
+                } else {
+                    id
+                }
+            }
+            SemanticType::Struct(sym, args) => {
+                let new_args: Vec<_> = args.iter().map(|&a| self.subst(a, subst)).collect();
+                self.intern(SemanticType::Struct(sym, new_args))
+            }
+            SemanticType::Enum(sym, args) => {
+                let new_args: Vec<_> = args.iter().map(|&a| self.subst(a, subst)).collect();
+                self.intern(SemanticType::Enum(sym, new_args))
+            }
+            SemanticType::Tuple(args) => {
+                let new_args: Vec<_> = args.iter().map(|&a| self.subst(a, subst)).collect();
+                self.intern(SemanticType::Tuple(new_args))
+            }
+            SemanticType::Function { params, return_type } => {
+                let new_params: Vec<_> = params.iter().map(|&p| self.subst(p, subst)).collect();
+                let new_ret = self.subst(return_type, subst);
+                self.intern(SemanticType::Function { params: new_params, return_type: new_ret })
+            }
+            SemanticType::Pointer(inner) => {
+                let new_inner = self.subst(inner, subst);
+                self.intern(SemanticType::Pointer(new_inner))
+            }
+            SemanticType::Reference(lt, mutability, inner) => {
+                let new_inner = self.subst(inner, subst);
+                self.intern(SemanticType::Reference(lt, mutability, new_inner))
+            }
+            _ => id, // Primitive, Void, Error, Never, InferenceVar
+        }
     }
 }

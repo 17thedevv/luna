@@ -4,32 +4,53 @@ use std::fs;
 use std::process;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let mut args: Vec<String> = env::args().collect();
+    args.remove(0);
 
-    if args.len() < 2 {
-        eprintln!("Usage: mellis-rs <file.ms>");
-        process::exit(1);
+    let mut quiet = false;
+    let mut file_path = None;
+
+    for arg in args {
+        if arg == "--quiet" {
+            quiet = true;
+        } else {
+            file_path = Some(arg);
+        }
     }
 
-    let file_path = &args[1];
-    let source = fs::read_to_string(file_path).unwrap_or_else(|err| {
+    let file_path = match file_path {
+        Some(path) => path,
+        None => {
+            eprintln!("Usage: mellis-rs [--quiet] <file.ms>");
+            process::exit(1);
+        }
+    };
+
+    let source = fs::read_to_string(&file_path).unwrap_or_else(|err| {
         eprintln!("Error reading file {}: {}", file_path, err);
         process::exit(1);
     });
 
-    // In Phase 2, we setup a session here to render diagnostics if needed.
     let mut session = CompilerSession::new();
     session
         .source_manager
         .add_file(file_path.clone(), source.clone());
 
-    match mellis_driver::compile(file_path, &source) {
+    let options = mellis_driver::CompilerOptions {
+        quiet,
+        ..Default::default()
+    };
+    match mellis_driver::compile(&file_path, &source, &options) {
         Ok(_) => {
-            println!("Compiled successfully.");
+            if !quiet {
+                println!("Compiled successfully.");
+            }
             process::exit(0);
         }
         Err(diagnostics) => {
+            eprintln!("Number of diagnostics: {}", diagnostics.len());
             for diag in diagnostics {
+                eprintln!("RAW DIAGNOSTIC: {:?}", diag);
                 eprintln!("{}", diag.render(&session.source_manager));
             }
             process::exit(1);

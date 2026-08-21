@@ -1,6 +1,6 @@
 # Mellis Compiler Rewrite v2 — Rust Bootstrap Strategy
 
-Tài liệu này định nghĩa chiến lược chính thức cho việc viết lại (rewrite) Mellis Compiler sang Rust, với mục tiêu biến Rust thành **Bootstrap Compiler** an toàn và hiệu năng, tạo bước đệm hoàn hảo để tiến tới mục tiêu tối hậu: **Self-hosted Mellis**.
+Tài liệu này định nghĩa chiến lược chính thức cho việc viết lại (rewrite) Mellis Compiler sang Rust, với mục tiêu xây dựng một trình biên dịch hoàn thiện, ổn định và an toàn, biến Rust thành nền tảng chính thức của hệ sinh thái Mellis.
 
 > [!IMPORTANT]
 > Đây KHÔNG PHẢI là quá trình dịch thuật 1:1 từ C++ sang Rust. Đây là một bản implement hoàn toàn mới (New Primary Implementation), lấy C++ compiler làm **Regression Oracle**.
@@ -11,10 +11,8 @@ Tài liệu này định nghĩa chiến lược chính thức cho việc viết 
 
 ```mermaid
 graph TD
-    M[Mellis Language] -->|Compile| R[Rust Bootstrap Compiler]
-    M -->|Compile| MC[Mellis Compiler written in .ms]
-    R -->|Bootstrap| MC
-    MC -->|Self-host| SH[Self-hosted Mellis]
+    M[Mellis Language] -->|Compile| R[Rust Compiler]
+    R -->|Produce| E[Executable]
 ```
 
 Trong giai đoạn Rewrite:
@@ -88,5 +86,3 @@ Không đợi code xong mới test. Mỗi thay đổi phải được đối chi
 - **[12] LLVM Backend**: Đánh giá `inkwell` vs `llvm-sys` qua 1 Spike nhỏ trước khi làm toàn bộ.
 - **[13] Full differential testing**: Chạy tool `mellis-diff test.ms` xuyên suốt toàn bộ codebase.
 - **[14] Rust becomes primary compiler**: Đạt 100% Parity. C++ lùi về làm reference. Các tính năng mới từ nay chỉ viết trên Rust.
-- **[15] Mellis-written compiler**: Bắt đầu tự viết compiler bằng `.ms`.
-- **[16] Self-hosted Mellis**: Dùng Rust để biên dịch `.ms` compiler, hoàn thành vòng đời Self-hosting. (Rust lúc này lui về làm bootstrap thuần túy).

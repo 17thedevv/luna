@@ -11,3 +11,8 @@ mellis-parser = { path = "../mellis-parser" }
 mellis-semantic = { path = "../mellis-semantic" }
 mellis-mvir = { path = "../mellis-mvir" }
 mellis-backend = { path = "../mellis-backend" }
+mellis-borrowck = { path = "../mellis-borrowck" }
+mellis-mlib = { version = "0.1.0", path = "../mellis-mlib" }
+mellis-optimizer = { version = "0.1.0", path = "../mellis-optimizer" }
+inkwell = { version = "0.5.0", features = ["llvm18-0"] }
+llvm-sys = { version = "180.0.0", features = ["no-llvm-linking"] }

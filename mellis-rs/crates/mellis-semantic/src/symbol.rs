@@ -12,6 +12,7 @@ pub enum SymbolKind {
     Constant,
     Struct,
     Enum,
+    EnumVariant(u32),
     Trait,
     TraitMethod,
     Alias,
@@ -109,8 +110,8 @@ impl SymbolTable {
         while let Some(scope_id) = current {
             let scope = &self.scopes[scope_id.0 as usize];
             if let Some(syms) = scope.symbols.get(name) {
-                if !syms.is_empty() {
-                    return Some(syms[0]); // Return first found
+                if let Some(&last_sym) = syms.last() {
+                    return Some(last_sym);
                 }
             }
             current = scope.parent;

@@ -1,5 +1,5 @@
 use crate::Parser;
-use mellis_ast::{Annotation, Decl, DeclId, Item, Visibility};
+use mellis_ast::{Annotation, Decl, DeclId, Item, Visibility, GenericParam, GenericParamKind};
 use mellis_lexer::TokenKind;
 
 impl<'a> Parser<'a> {
@@ -26,6 +26,12 @@ impl<'a> Parser<'a> {
             self.parse_func_decl(visibility, annotations, is_extern)?
         } else if self.match_token(TokenKind::KwStruct) {
             self.parse_struct_decl(visibility, annotations)?
+        } else if self.match_token(TokenKind::KwEnum) {
+            self.parse_enum_decl(visibility, annotations)?
+        } else if self.match_token(TokenKind::KwTrait) {
+            self.parse_trait_decl(visibility, annotations)?
+        } else if self.match_token(TokenKind::KwImpl) {
+            self.parse_impl_decl(visibility, annotations)?
         } else {
             // Not a decl, parse as statement
             if is_extern || visibility == Visibility::Public {
@@ -118,11 +124,20 @@ impl<'a> Parser<'a> {
                     break;
                 }
 
-                let p_name = self
-                    .consume(TokenKind::Identifier, "Expected parameter name")?
-                    .span;
-                self.consume(TokenKind::Colon, "Expected ':' after parameter name")?;
-                let ty = Some(self.parse_type()?);
+                let p_name = if self.check(TokenKind::Identifier) || self.check(TokenKind::KwSelfVal) {
+                    let span = self.peek().span;
+                    self.advance();
+                    span
+                } else {
+                    let span = self.peek().span;
+                    self.error_at_current("Expected parameter name", span);
+                    return Err(());
+                };
+                let ty = if self.match_token(TokenKind::Colon) {
+                    Some(self.parse_type()?)
+                } else {
+                    None
+                };
 
                 params.push(self.arena.alloc_decl(Decl::Param {
                     annotations: Vec::new(),
@@ -191,8 +206,10 @@ impl<'a> Parser<'a> {
                 ty,
                 visibility: Visibility::Public,
             });
-            if !self.match_token(TokenKind::Comma) {
-                break;
+            if !self.match_token(TokenKind::Semi) && !self.match_token(TokenKind::Comma) {
+                if !self.check(TokenKind::RBrace) {
+                    self.consume(TokenKind::Semi, "Expected ';' or ',' after struct field")?;
+                }
             }
         }
         self.consume(TokenKind::RBrace, "Expected '}'")?;
@@ -202,6 +219,193 @@ impl<'a> Parser<'a> {
             name,
             generic_params,
             fields,
+        }))
+    }
+
+    fn parse_generic_params(&mut self) -> Vec<GenericParam> {
+        let mut params = Vec::new();
+        if self.match_token(TokenKind::LessThan) {
+            while !self.check(TokenKind::GreaterThan) && !self.is_at_end() {
+                if self.check(TokenKind::Identifier) {
+                    let name = self.advance().span;
+                    let mut bounds = Vec::new();
+                    if self.match_token(TokenKind::Colon) {
+                        // Parse trait bounds: T: Trait + Trait2
+                        loop {
+                            if let Ok(ty) = self.parse_type() {
+                                bounds.push(ty);
+                            }
+                            if !self.match_token(TokenKind::Plus) {
+                                break;
+                            }
+                        }
+                    }
+                    params.push(GenericParam {
+                        name,
+                        kind: GenericParamKind::Type,
+                        bounds,
+                    });
+                } else if self.check(TokenKind::Lifetime) {
+                    // Skip lifetimes for now
+                    self.advance();
+                } else {
+                    break;
+                }
+                if !self.match_token(TokenKind::Comma) {
+                    break;
+                }
+            }
+            let _ = self.consume(TokenKind::GreaterThan, "Expected '>' after generic params");
+        }
+        params
+    }
+
+    fn parse_enum_decl(
+        &mut self,
+        visibility: Visibility,
+        annotations: Vec<Annotation>,
+    ) -> Result<DeclId, ()> {
+        let name = self
+            .consume(TokenKind::Identifier, "Expected enum name")?
+            .span;
+        let generic_params = self.parse_generic_params();
+        self.consume(TokenKind::LBrace, "Expected '{' for enum body")?;
+        let mut variants = Vec::new();
+        while !self.check(TokenKind::RBrace) && !self.is_at_end() {
+            let v_name = self
+                .consume(TokenKind::Identifier, "Expected variant name")?
+                .span;
+            let mut fields = Vec::new();
+            if self.match_token(TokenKind::LParen) {
+                if !self.check(TokenKind::RParen) {
+                    loop {
+                        // Check if it's `name: Type` or just `Type`
+                        let has_label = self.check(TokenKind::Identifier)
+                            && self.peek_next().kind == TokenKind::Colon;
+                        let p_name = if has_label {
+                            let n = self.advance().span;
+                            self.advance(); // consume ':'
+                            n
+                        } else {
+                            self.peek().span // use position as fallback name
+                        };
+                        let ty = Some(self.parse_type()?);
+                        fields.push(self.arena.alloc_decl(Decl::Param {
+                            annotations: Vec::new(),
+                            visibility: Visibility::Public,
+                            name: p_name,
+                            ty,
+                            is_variadic: false,
+                            is_self: false,
+                        }));
+                        if !self.match_token(TokenKind::Comma) {
+                            break;
+                        }
+                    }
+                }
+                self.consume(TokenKind::RParen, "Expected ')' after variant fields")?;
+            }
+            variants.push(mellis_ast::EnumVariant {
+                name: v_name,
+                fields,
+            });
+            if !self.match_token(TokenKind::Comma) {
+                break;
+            }
+        }
+        self.consume(TokenKind::RBrace, "Expected '}'")?;
+        Ok(self.arena.alloc_decl(Decl::Enum {
+            annotations,
+            visibility,
+            name,
+            generic_params,
+            variants,
+        }))
+    }
+
+    fn parse_trait_decl(
+        &mut self,
+        visibility: Visibility,
+        annotations: Vec<Annotation>,
+    ) -> Result<DeclId, ()> {
+        let name = self
+            .consume(TokenKind::Identifier, "Expected trait name")?
+            .span;
+        let generic_params = self.parse_generic_params();
+        self.consume(TokenKind::LBrace, "Expected '{'")?;
+        let mut methods = Vec::new();
+        let associated_types = Vec::new();
+        while !self.check(TokenKind::RBrace) && !self.is_at_end() {
+            // Skip annotations/visibility for now
+            let _ = self.match_token(TokenKind::KwExport);
+            if self.check(TokenKind::KwFn) || self.check(TokenKind::KwUnsafe) {
+                let m = self.parse_func_decl(Visibility::Public, Vec::new(), false)?;
+                methods.push(m);
+            } else if self.match_token(TokenKind::KwType) {
+                // Skip associated type declarations for now
+                let _ = self.advance(); // type name
+                if self.match_token(TokenKind::Colon) {
+                    // Skip bounds
+                    while !self.check(TokenKind::Semi) && !self.check(TokenKind::RBrace) && !self.is_at_end() {
+                        self.advance();
+                    }
+                }
+                let _ = self.match_token(TokenKind::Semi);
+            } else {
+                self.advance(); // skip unexpected tokens
+            }
+        }
+        self.consume(TokenKind::RBrace, "Expected '}'")?;
+        Ok(self.arena.alloc_decl(Decl::Trait {
+            annotations,
+            visibility,
+            name,
+            generic_params,
+            associated_types,
+            methods,
+        }))
+    }
+
+    fn parse_impl_decl(
+        &mut self,
+        visibility: Visibility,
+        annotations: Vec<Annotation>,
+    ) -> Result<DeclId, ()> {
+        let generic_params = self.parse_generic_params();
+        let first_type = self.parse_type()?;
+        let (self_type, trait_type) = if self.match_token(TokenKind::KwFor) {
+            let actual_self_type = self.parse_type()?;
+            (actual_self_type, Some(first_type))
+        } else {
+            (first_type, None)
+        };
+        self.consume(TokenKind::LBrace, "Expected '{'")?;
+        let mut methods = Vec::new();
+        let associated_types = Vec::new();
+        while !self.check(TokenKind::RBrace) && !self.is_at_end() {
+            let _ = self.match_token(TokenKind::KwExport);
+            if self.check(TokenKind::KwFn) || self.check(TokenKind::KwUnsafe) || self.check(TokenKind::KwIntrinsic) {
+                let m = self.parse_func_decl(Visibility::Public, Vec::new(), false)?;
+                methods.push(m);
+            } else if self.match_token(TokenKind::KwType) {
+                // Skip associated type impl
+                while !self.check(TokenKind::Semi) && !self.check(TokenKind::RBrace) && !self.is_at_end() {
+                    self.advance();
+                }
+                let _ = self.match_token(TokenKind::Semi);
+            } else {
+                self.advance();
+            }
+        }
+        self.consume(TokenKind::RBrace, "Expected '}'")?;
+        Ok(self.arena.alloc_decl(Decl::Impl {
+            annotations,
+            visibility,
+            generic_params,
+            self_type,
+            trait_type,
+            associated_types,
+            methods,
         }))
     }
 }

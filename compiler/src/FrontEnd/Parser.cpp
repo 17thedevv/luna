@@ -305,7 +305,7 @@ std::unique_ptr<DeclNode> Parser::parseModDecl() {
                 }
             }
         } else {
-            std::cerr << "[DEBUG] HIT ELSE BRANCH! sourceMgr is " << sourceMgr << ", mod name is '" << node->name << "', at byteOffset=" << current.byteOffset << std::endl;
+            extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG] HIT ELSE BRANCH! sourceMgr is " << sourceMgr << ", mod name is '" << node->name << "', at byteOffset=" << current.byteOffset << std::endl;
             diag.error(node->loc, "Out-of-line modules not supported without SourceManager");
         }
     } else {
@@ -525,7 +525,7 @@ std::unique_ptr<DeclNode> Parser::parseFunctionDecl(bool allowEmptyBody) {
                     }
                 }
             } else {
-                std::cerr << "[DEBUG] current type=" << (int)current.type << " peek type=" << (int)peek.type << "\n";
+                extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG] current type=" << (int)current.type << " peek type=" << (int)peek.type << "\n";
                 Token pName = consume(TokenType::IDENTIFIER, "Expected parameter name");
                 param->name = pName.text;
                 consume(TokenType::COLON, "Expected ':' after parameter name");
@@ -1102,7 +1102,7 @@ std::unique_ptr<TypeNode> Parser::parseType() {
     }
     if (check(TokenType::IDENTIFIER) || check(TokenType::KW_SELF_TYP)) return parseNamedType();
     
-    std::cerr << "[DEBUG] parseType failed at byte " << current.byteOffset << " token " << (int)current.type << " text: " << std::string(current.text) << "\n";
+    extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG] parseType failed at byte " << current.byteOffset << " token " << (int)current.type << " text: " << std::string(current.text) << "\n";
     diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected a type");
     throw ParseError();
 }
@@ -1558,7 +1558,7 @@ std::unique_ptr<ExprNode> Parser::parseValuePath() {
             idTok = current;
             advance();
         } else {
-            std::cerr << "[DEBUG] parseValuePath failed at byte " << current.byteOffset << " token " << (int)current.type << " text: " << std::string(current.text) << "\n";
+            extern bool g_quiet; if (!g_quiet) std::cerr << "[DEBUG] parseValuePath failed at byte " << current.byteOffset << " token " << (int)current.type << " text: " << std::string(current.text) << "\n";
             diag.error(SourceLocation::fromLineCol(fileId, current.line, current.col, current.byteOffset), "Expected identifier in value path");
             throw ParseError();
         }

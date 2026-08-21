@@ -1,11 +1,10 @@
-# Mellis v1.0 — Official Roadmap: The Self-Hosting Milestone
+# Mellis v1.0 — Official Roadmap: The Rust Bootstrap Milestone
 
-Mục tiêu tối thượng của Mellis v1.0 không chỉ là một trình biên dịch hoàn thiện, mà là một ngôn ngữ **Self-Hosting**.
+Mục tiêu tối thượng của Mellis v1.0 là xây dựng một trình biên dịch hoàn thiện, ổn định và an toàn bằng **Rust**, thay thế hoàn toàn phiên bản C++ ban đầu.
 Định nghĩa hoàn thành (Definition of Done) cho v1.0:
-1. **Stage 0**: Trình biên dịch C++ (hiện tại).
-2. **Stage 1**: Trình biên dịch Mellis được viết bằng ngôn ngữ Mellis, biên dịch bởi Stage 0.
-3. **Stage 2**: Trình biên dịch Mellis biên dịch lại chính mã nguồn của nó (bởi Stage 1).
-4. **Xác thực**: `stage1 == stage2` (Tối thiểu về mặt ngữ nghĩa/behavior, lý tưởng nhất là deterministic output artifact).
+1. **Stage 0**: Trình biên dịch C++ (Oracle/Reference hiện tại).
+2. **Stage 1**: Trình biên dịch Mellis được viết lại hoàn toàn bằng Rust (`mellis-rs`).
+3. **Xác thực**: Đạt 100% Parity (ngữ nghĩa/behavior/output artifact) giữa bản C++ và bản Rust trên toàn bộ codebase thông qua Differential Testing. Trình biên dịch Rust chính thức trở thành primary compiler.
 
 ---
 
@@ -57,28 +56,7 @@ Mục tiêu tối thượng của Mellis v1.0 không chỉ là một trình biê
 
 ---
 
-## Phase 3 — Mellis Compiler Rewrite (Viết lại bằng Mellis)
-*Mục tiêu: Chuyển đổi toàn bộ source code C++ sang Mellis (`.ms`).*
-
-- `lexer.ms`
-- `parser.ms`
-- `AST/` (khai báo các struct và enum)
-- `resolver.ms`
-- `typechecker.ms`
-- `MVIR/` (generation và lowering)
-- `llvm_backend.ms` (hoặc giao tiếp FFI với LLVM C API)
-
----
-
-## Phase 4 — Bootstrap (The v1.0 Gate)
-*Mục tiêu: Hoàn tất chu trình Self-Hosting và xác thực.*
-
-1. **Stage 0 Build**: C++ compiler `mellis-stage0` biên dịch toàn bộ mã nguồn ở Phase 3.
-2. **Stage 1 Generation**: Sinh ra `mellis-stage1` (trình biên dịch viết bằng Mellis, chạy dưới dạng mã máy).
-3. **Stage 2 Generation**: Dùng `mellis-stage1` biên dịch lại chính mã nguồn ở Phase 3 để sinh ra `mellis-stage2`.
-4. **Verification**: Đảm bảo `mellis-stage1 == mellis-stage2` (đạt mức identity compiler).
-
 🚀 **Mellis v1.0 Public Release** chính thức được phát hành với cấu trúc:
-- Trình biên dịch 100% tự chủ (Self-hosted).
+- Trình biên dịch 100% viết bằng Rust, đảm bảo an toàn bộ nhớ và hiệu năng cao.
 - Công cụ CLI đi kèm: `mellis build`, `mellis run`, `mellis test`.
 - Package chuẩn `std` bao gồm đầy đủ `fs`, `path`, `env`, `process`.

@@ -12,8 +12,11 @@ pub struct SemanticTables {
     pub pat_types: HashMap<PatId, SemanticTypeId>,
     
     pub decl_symbols: HashMap<DeclId, SymbolId>,
+    pub symbol_decls: HashMap<SymbolId, DeclId>,
+    
     
     pub ast_type_to_semantic: HashMap<AstTypeId, SemanticTypeId>,
+    pub symbol_types: HashMap<SymbolId, SemanticTypeId>,
 }
 
 impl SemanticTables {
@@ -24,7 +27,9 @@ impl SemanticTables {
             pat_symbols: HashMap::new(),
             pat_types: HashMap::new(),
             decl_symbols: HashMap::new(),
+            symbol_decls: HashMap::new(),
             ast_type_to_semantic: HashMap::new(),
+            symbol_types: HashMap::new(),
         }
     }
 }

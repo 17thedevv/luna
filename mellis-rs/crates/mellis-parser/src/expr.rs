@@ -554,10 +554,12 @@ impl<'a> Parser<'a> {
             }
         }
         self.consume(TokenKind::BitOr, "Expected '|'")?;
-        self.consume(TokenKind::Arrow, "Expected '->' after lambda parameters")?;
-
         // Simplified lambda return type parsing logic for now (omitting bookmark rollback for brevity)
-        let return_type = None; // For real implementation, attempt to parse type if present
+        let return_type = if self.match_token(TokenKind::Arrow) {
+            Some(self.parse_type()?)
+        } else {
+            None
+        };
 
         let body = if self.check(TokenKind::LBrace) {
             self.parse_block_stmt()?
