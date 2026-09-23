@@ -375,12 +375,12 @@ RAW ERROR: No method named 'eq' found for type '<Struct<24> as Trait<4294967295>
 [DEBUG substitute] GenericParam id=19 name='Self' found=1
 [DEBUG substitute] GenericParam id=19 name='Self' found=1
 [PHASE] TypeChecker done, tcOk=0
-D:\fdlang\tests\modules\e9_assoc_projection.ms: error: No method named 'eq' found for type '<Struct<24> as Trait<4294967295>>::Value'
+tests\modules\e9_assoc_projection.ms: error: No method named 'eq' found for type '<Struct<24> as Trait<4294967295>>::Value'
 error: Type mismatch: expected 'int_32', found '<T (33) as Trait<4294967295>>::Value'
- --> D:\fdlang\tests\modules\e9_assoc_projection.ms:18:5
+ --> tests\modules\e9_assoc_projection.ms:18:5
   |
 18 |     return item.get_value();
   |     ^
-D:\fdlang\tests\modules\e9_assoc_projection.ms: error: Compilation aborted due to TypeChecker errors.
+tests\modules\e9_assoc_projection.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

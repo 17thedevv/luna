@@ -2,22 +2,22 @@
 65
 === STDOUT ===
 [DEBUG] parseUseTree after segment: 45 ;
-[DEBUG] Checking D:\fdlang\tests\modules\lib.ms and D:\fdlang\tests\modules\lib.mlib
-[DEBUG] Checking D:\fdlang\tests\modules\lib\mod.ms and D:\fdlang\tests\modules\lib\mod.mlib
-[DEBUG] Checking D:\fdlang\lib.ms and D:\fdlang\lib.mlib
-[DEBUG] Checking D:\fdlang\lib\mod.ms and D:\fdlang\lib\mod.mlib
-[DEBUG] Checking D:\fdlang\lib\lib.ms and D:\fdlang\lib\lib.mlib
-[DEBUG] Checking D:\fdlang\lib\lib\mod.ms and D:\fdlang\lib\lib\mod.mlib
-[DEBUG] Checking D:\fdlang\libs\lib.ms and D:\fdlang\libs\lib.mlib
-[DEBUG] Checking D:\fdlang\libs\lib\mod.ms and D:\fdlang\libs\lib\mod.mlib
-[DEBUG] Checking D:\fdlang\tests\modules\lib\lib.ms and D:\fdlang\tests\modules\lib\lib.mlib
-[DEBUG] Checking D:\fdlang\tests\modules\lib\lib\mod.ms and D:\fdlang\tests\modules\lib\lib\mod.mlib
-[DEBUG] Checking D:\fdlang\tests\modules\lib.ms and D:\fdlang\tests\modules\lib.mlib
-[DEBUG] Checking D:\fdlang\tests\modules\lib\mod.ms and D:\fdlang\tests\modules\lib\mod.mlib
-[DEBUG] Checking D:\fdlang\build_release\compiler\lib\lib.ms and D:\fdlang\build_release\compiler\lib\lib.mlib
-[DEBUG] Checking D:\fdlang\build_release\compiler\lib\lib\mod.ms and D:\fdlang\build_release\compiler\lib\lib\mod.mlib
-[DEBUG] Checking D:\fdlang\build_release\compiler\Release\lib\lib.ms and D:\fdlang\build_release\compiler\Release\lib\lib.mlib
-[DEBUG] Checking D:\fdlang\build_release\compiler\Release\lib\lib\mod.ms and D:\fdlang\build_release\compiler\Release\lib\lib\mod.mlib
+[DEBUG] Checking tests\modules\lib.ms and tests\modules\lib.mlib
+[DEBUG] Checking tests\modules\lib\mod.ms and tests\modules\lib\mod.mlib
+[DEBUG] Checking lib.ms and lib.mlib
+[DEBUG] Checking lib\mod.ms and lib\mod.mlib
+[DEBUG] Checking lib\lib.ms and lib\lib.mlib
+[DEBUG] Checking lib\lib\mod.ms and lib\lib\mod.mlib
+[DEBUG] Checking libs\lib.ms and libs\lib.mlib
+[DEBUG] Checking libs\lib\mod.ms and libs\lib\mod.mlib
+[DEBUG] Checking tests\modules\lib\lib.ms and tests\modules\lib\lib.mlib
+[DEBUG] Checking tests\modules\lib\lib\mod.ms and tests\modules\lib\lib\mod.mlib
+[DEBUG] Checking tests\modules\lib.ms and tests\modules\lib.mlib
+[DEBUG] Checking tests\modules\lib\mod.ms and tests\modules\lib\mod.mlib
+[DEBUG] Checking build_release\compiler\lib\lib.ms and build_release\compiler\lib\lib.mlib
+[DEBUG] Checking build_release\compiler\lib\lib\mod.ms and build_release\compiler\lib\lib\mod.mlib
+[DEBUG] Checking build_release\compiler\Release\lib\lib.ms and build_release\compiler\Release\lib\lib.mlib
+[DEBUG] Checking build_release\compiler\Release\lib\lib\mod.ms and build_release\compiler\Release\lib\lib\mod.mlib
 Solving constraint: fn(int_32) -> ?T0 == unknown
 Solving constraint: int_32 == ?T0
 === STDERR ===
@@ -46,11 +46,11 @@ RAW ERROR: Cannot find module matching path 'lib' in library paths.
 [DEBUG] Resolver::resolve: Aborting after pass1 due to previous errors (1).
 RAW ERROR: Cannot find module matching path 'lib' in library paths.
 error: Cannot find module matching path 'lib' in library paths.
- --> D:\fdlang\tests\modules\consumer.ms:1:6
+ --> tests\modules\consumer.ms:1:6
   |
 1 | use lib;
   |      ^
-D:\fdlang\tests\modules\consumer.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
+tests\modules\consumer.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
 [DEBUG] Resolver finished!
 [DEBUG] Creating TypeChecker...
 [DEBUG] Creating MonomorphizationEngine...
@@ -80,16 +80,16 @@ D:\fdlang\tests\modules\consumer.ms: error: Resolver that bai, nhung tiep tuc de
 [DEBUG] CG visiting item: class fl::FunctionDeclNode
 [PHASE] TypeChecker done, tcOk=0
 error: Cannot find module matching path 'lib' in library paths.
- --> D:\fdlang\tests\modules\consumer.ms:1:6
+ --> tests\modules\consumer.ms:1:6
   |
 1 | use lib;
   |      ^
-D:\fdlang\tests\modules\consumer.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
+tests\modules\consumer.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
 error: Type mismatch: expected 'fn(int_32) -> ?T0', found 'unknown'
- --> D:\fdlang\tests\modules\consumer.ms:4:37
+ --> tests\modules\consumer.ms:4:37
   |
 4 |     return lib::identity@<int_32>(42);
   |                                     ^
-D:\fdlang\tests\modules\consumer.ms: error: Compilation aborted due to TypeChecker errors.
+tests\modules\consumer.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

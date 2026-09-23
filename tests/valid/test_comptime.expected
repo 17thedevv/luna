@@ -53,8 +53,8 @@ Solving constraint: fn(int_32) -> int_32 == fn(n: int_32) -> int_32
 [DEBUG Semantic] Analyzing function: @factorial
 [DEBUG Semantic] Analyzing function: @add_five
 [DEBUG Semantic] Analyzing function: @main
-; ModuleID = 'D:\fdlang\tests\valid\test_comptime.ms'
-source_filename = "D:\\fdlang\\tests\\valid\\test_comptime.ms"
+; ModuleID = 'tests\valid\test_comptime.ms'
+source_filename = "tests\\valid\\test_comptime.ms"
 
 define i32 @factorial(i32 %"0") {
 entry0:
@@ -90,7 +90,7 @@ entry0:
   ret void
 }
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -99,7 +99,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void

@@ -5,7 +5,7 @@ Module {
                 name: "_MFN10test_modelE",
                 symbol_id: Some(
                     SymbolId(
-                        149,
+                        175,
                     ),
                 ),
             },
@@ -125,7 +125,7 @@ Module {
                         ),
                     },
                     ty: SemanticTypeId(
-                        117,
+                        144,
                     ),
                     span: Some(
                         Span {
@@ -144,7 +144,7 @@ Module {
                 ValueData {
                     inst: Alloca,
                     ty: SemanticTypeId(
-                        117,
+                        144,
                     ),
                     span: Some(
                         Span {
@@ -174,7 +174,7 @@ Module {
                         ),
                     },
                     ty: SemanticTypeId(
-                        117,
+                        144,
                     ),
                     span: Some(
                         Span {
@@ -199,7 +199,7 @@ Module {
                         ),
                     },
                     ty: SemanticTypeId(
-                        117,
+                        144,
                     ),
                     span: Some(
                         Span {
@@ -321,7 +321,7 @@ Module {
                 name: "main",
                 symbol_id: Some(
                     SymbolId(
-                        150,
+                        176,
                     ),
                 ),
             },
@@ -363,7 +363,7 @@ Module {
                             name: "_MFN10test_modelE",
                             symbol_id: Some(
                                 SymbolId(
-                                    149,
+                                    175,
                                 ),
                             ),
                         },

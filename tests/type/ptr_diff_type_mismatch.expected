@@ -117,7 +117,7 @@ Solving constraint: ?T1 == &' mut int_32
 [DEBUG] CG visiting ProgramNode
 [DEBUG] CG visiting item: class fl::FunctionDeclNode
 [PHASE] TypeChecker done, tcOk=0
-D:\fdlang\tests\type\ptr_diff_type_mismatch.ms: error: Pointer difference requires both pointers to have the same pointee type.
-D:\fdlang\tests\type\ptr_diff_type_mismatch.ms: error: Compilation aborted due to TypeChecker errors.
+tests\type\ptr_diff_type_mismatch.ms: error: Pointer difference requires both pointers to have the same pointee type.
+tests\type\ptr_diff_type_mismatch.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

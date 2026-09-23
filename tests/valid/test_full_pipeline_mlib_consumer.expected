@@ -5,8 +5,8 @@
 [DEBUG] parseUseTree after segment: 46 ,
 [DEBUG] parseUseTree after segment: 46 ,
 [DEBUG] parseUseTree after segment: 51 }
-[DEBUG] Checking D:\fdlang\tests\valid\test_full_pipeline_mlib_producer.ms and D:\fdlang\tests\valid\test_full_pipeline_mlib_producer.mlib
-[ModuleLoader] Compiling dependency D:\fdlang\tests\valid\test_full_pipeline_mlib_producer.ms...
+[DEBUG] Checking tests\valid\test_full_pipeline_mlib_producer.ms and tests\valid\test_full_pipeline_mlib_producer.mlib
+[ModuleLoader] Compiling dependency tests\valid\test_full_pipeline_mlib_producer.ms...
 [DEBUG] Enum 'Result' has 2 variants
 [DEBUG] Visiting variant 'Ok'
 [DEBUG] Visiting variant 'Err'
@@ -34,10 +34,10 @@ Solving constraint: ?T2 == void
 Solving constraint: Enum<18<?T6, ?T7>> == Enum<18<T (30), E (31)>>
 Solving constraint: int_32 == ?T8
 Solving constraint: ?T2 == void
-; ModuleID = 'D:\fdlang\tests\valid\test_full_pipeline_mlib_producer.ms'
-source_filename = "D:\\fdlang\\tests\\valid\\test_full_pipeline_mlib_producer.ms"
+; ModuleID = 'tests\valid\test_full_pipeline_mlib_producer.ms'
+source_filename = "tests\\valid\\test_full_pipeline_mlib_producer.ms"
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -46,7 +46,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void
@@ -273,8 +273,8 @@ Solving constraint: ?T38 == void
 [DEBUG Semantic] Analyzing function: @process_49
 [DEBUG Semantic] Analyzing function: @main
 [DEBUG Semantic] Analyzing function: @handle_result_SuccessData_ErrorData
-; ModuleID = 'D:\fdlang\tests\valid\test_full_pipeline_mlib_consumer.ms'
-source_filename = "D:\\fdlang\\tests\\valid\\test_full_pipeline_mlib_consumer.ms"
+; ModuleID = 'tests\valid\test_full_pipeline_mlib_consumer.ms'
+source_filename = "tests\\valid\\test_full_pipeline_mlib_consumer.ms"
 
 %SuccessData = type { i32 }
 %ErrorData = type { i32 }
@@ -404,7 +404,7 @@ match_unreachable4:                               ; preds = %match_tag_next8
   unreachable
 }
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -413,7 +413,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void

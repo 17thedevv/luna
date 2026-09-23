@@ -20,8 +20,8 @@ Solving constraint: Enum<18<?T1>> == Enum<27>
 [DEBUG MVIRGenerator] EnumDeclNode Option_int_32 symbolId=27
 [DEBUG Semantic] Analyzing function: @test_refutable_local
 [DEBUG Semantic] Analyzing function: @main
-; ModuleID = 'D:\fdlang\tests\invalid\refutable_binding.ms'
-source_filename = "D:\\fdlang\\tests\\invalid\\refutable_binding.ms"
+; ModuleID = 'tests\invalid\refutable_binding.ms'
+source_filename = "tests\\invalid\\refutable_binding.ms"
 
 %Option_int_32 = type { i32, [1 x i32] }
 
@@ -38,7 +38,7 @@ entry0:
   ret void
 }
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -47,7 +47,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void
@@ -207,6 +207,6 @@ attributes #0 = { nounwind memory(argmem: readwrite) }
 Function return type does not match operand type of return inst!
   ret void
  i32
-D:\fdlang\tests\invalid\refutable_binding.ms: error: Loi trong qua trinh sinh LLVM IR.
+tests\invalid\refutable_binding.ms: error: Loi trong qua trinh sinh LLVM IR.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

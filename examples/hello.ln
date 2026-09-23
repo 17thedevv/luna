@@ -1,5 +1,5 @@
 // 1. Sửa cú pháp FFI (bỏ chữ fn nếu Parser của bạn không yêu cầu, 
-// hoặc giữ 'extern fn' nếu EBNF của bạn quy định vậy - dưới đây tôi viết chuẩn FDLang nhất)
+// hoặc giữ 'extern fn' nếu EBNF của bạn quy định vậy - dưới đây tôi viết chuẩn Luna nhất)
 extern fn printf(format: str, ...) -> int_32; 
 
 // 2. Struct
@@ -10,7 +10,7 @@ struct Point {
 
 // 3. Trait
 trait Printable {
-    // Shorthand self (FDLang will parse it as self: Self)
+    // Shorthand self (Luna will parse it as self: Self)
     fn display(self); 
 }
 

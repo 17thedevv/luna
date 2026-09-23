@@ -481,10 +481,10 @@ RAW ERROR: Type mismatch: expected '*const uint_8', found 'str'
 [DEBUG implementsTrait] solve result=0
 [PHASE] TypeChecker done, tcOk=0
 error: Type mismatch: expected '*const uint_8', found 'str'
- --> D:\fdlang\tests\valid\test_full_pipeline.ms:12:9
+ --> tests\valid\test_full_pipeline.ms:12:9
   |
 12 |         return "number";
   |         ^
-D:\fdlang\tests\valid\test_full_pipeline.ms: error: Compilation aborted due to TypeChecker errors.
+tests\valid\test_full_pipeline.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

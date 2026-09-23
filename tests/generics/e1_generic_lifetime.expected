@@ -22,8 +22,8 @@ Solving constraint: &' int_32 == &' int_32
 [DEBUG Semantic] Analyzing function: @display_23
 [DEBUG Semantic] Analyzing function: @main
 [DEBUG Semantic] Analyzing function: @identity_unmangled_int_32
-; ModuleID = 'D:\fdlang\tests\generics\e1_generic_lifetime.ms'
-source_filename = "D:\\fdlang\\tests\\generics\\e1_generic_lifetime.ms"
+; ModuleID = 'tests\generics\e1_generic_lifetime.ms'
+source_filename = "tests\\generics\\e1_generic_lifetime.ms"
 
 define void @display_23(ptr %"0") {
 entry0:
@@ -53,7 +53,7 @@ entry0:
   ret ptr %"2"
 }
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -62,7 +62,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void

@@ -79,7 +79,7 @@ impl ExternalComponentDiscovery {
             });
         }
 
-        // Legacy read compatibility: `.ms` is the historical Mellis source extension.
+        // Legacy read compatibility: `.ms` is the historical source extension.
         let ms_path = external_dir.join(format!("{}.ms", path_str));
         if ms_path.exists() {
             return Ok(ExternalComponentDescriptor {

@@ -10,23 +10,32 @@ fn tool(name: &str) -> PathBuf {
 
 pub fn runtime_library() -> Result<PathBuf, String> {
     let mut candidates = Vec::new();
+
+    // 1. Explicit override via LUNA_RUNTIME_LIB
+    if let Some(path) = env::var_os("LUNA_RUNTIME_LIB") {
+        candidates.push(PathBuf::from(path));
+    }
+
+    // 2. Explicit home directory via LUNA_HOME
     if let Some(home) = env::var_os("LUNA_HOME") {
         candidates.push(PathBuf::from(&home).join("runtime").join("luna-runtime.lib"));
         candidates.push(PathBuf::from(&home).join("build").join("runtime").join("Release").join("luna-runtime.lib"));
     }
-    if let Some(path) = env::var_os("LUNA_RUNTIME_LIB") {
-        candidates.push(PathBuf::from(path));
-    }
     
+    // 3. Relative to current compiler executable and its ancestors
     if let Ok(exe_path) = env::current_exe() {
         if let Some(dir) = exe_path.parent() {
             candidates.push(dir.join("luna-runtime.lib"));
+            for ancestor in dir.ancestors() {
+                candidates.push(ancestor.join("runtime").join("luna-runtime.lib"));
+                candidates.push(ancestor.join("build").join("runtime").join("Release").join("luna-runtime.lib"));
+            }
         }
     }
     
-    candidates.push(PathBuf::from("runtime/luna-runtime.lib"));
-    candidates.push(PathBuf::from("D:\\fdlang\\runtime\\luna-runtime.lib"));
-    candidates.push(PathBuf::from("D:\\fdlang\\build\\runtime\\Release\\luna-runtime.lib"));
+    // 4. Relative to current working directory
+    candidates.push(PathBuf::from("runtime").join("luna-runtime.lib"));
+    candidates.push(PathBuf::from("build").join("runtime").join("Release").join("luna-runtime.lib"));
 
     candidates.into_iter().find(|path| path.is_file()).ok_or_else(||
         "luna runtime library not found; set LUNA_HOME or LUNA_RUNTIME_LIB or place it alongside the compiler".into())

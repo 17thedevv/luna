@@ -728,6 +728,6 @@ entry0:
 [DEBUG] MVIRGenerator: returning operand %3
 [DEBUG MVIRGenerator] done item[6]
 [PHASE] MVIRGenerator done
-D:\fdlang\tests\generics\e10_generic_iter.ms: error: MVIR Verification failed: Use of undefined temporary/local  in StoreInst
+tests\generics\e10_generic_iter.ms: error: MVIR Verification failed: Use of undefined temporary/local  in StoreInst
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

@@ -24,8 +24,8 @@ Solving constraint: fn(str) -> int_32 == fn(fmt: str, ...) -> int_32
 Solving constraint: int_32 == int_32
 [DEBUG Semantic] Analyzing function: @main
 [DEBUG Semantic] Analyzing function: @__LambdaFunc_2581932491776
-; ModuleID = 'D:\fdlang\tests\borrow\test_no_drop.ms'
-source_filename = "D:\\fdlang\\tests\\borrow\\test_no_drop.ms"
+; ModuleID = 'tests\borrow\test_no_drop.ms'
+source_filename = "tests\\borrow\\test_no_drop.ms"
 
 @str_1 = private constant [21 x i8] c"Before closure call\0A\00"
 @str_2 = private constant [20 x i8] c"Inside closure: %d\0A\00"
@@ -44,7 +44,7 @@ entry0:
   %"8" = alloca ptr, align 8
   %"0" = call i32 ({ ptr, i64 }, ...) @printf(ptr @str_1)
   store i32 42, ptr %"2", align 4
-  %"3_alloc" = call ptr @__mellis_alloc(i64 16, i64 8)
+  %"3_alloc" = call ptr @__luna_alloc(i64 16, i64 8)
   store ptr %"3_alloc", ptr %"3", align 8
   %deref = load ptr, ptr %"3", align 8
   %fld = getelementptr inbounds { ptr, i32 }, ptr %deref, i32 0, i32 0
@@ -79,15 +79,15 @@ entry0:
   %"5" = call i32 ({ ptr, i64 }, ...) @printf(ptr @str_2, i32 %"4")
   %heap_clos.drop.load = load ptr, ptr %"1", align 8
   %heap_free.load = load ptr, ptr %"1", align 8
-  call void @__mellis_dealloc(ptr %heap_free.load, i64 16, i64 8)
+  call void @__luna_dealloc(ptr %heap_free.load, i64 16, i64 8)
   ret void
 }
 
-declare ptr @__mellis_alloc(i64, i64)
+declare ptr @__luna_alloc(i64, i64)
 
-declare void @__mellis_dealloc(ptr, i64, i64)
+declare void @__luna_dealloc(ptr, i64, i64)
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -96,7 +96,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void
@@ -376,6 +376,6 @@ Call parameter type does not match function signature!
 ptr @str_2
  { ptr, i64 }  %"5" = call i32 ({ ptr, i64 }, ...) @printf(ptr @str_2, i32 %"4")
 
-D:\fdlang\tests\borrow\test_no_drop.ms: error: Loi trong qua trinh sinh LLVM IR.
+tests\borrow\test_no_drop.ms: error: Loi trong qua trinh sinh LLVM IR.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

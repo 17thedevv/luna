@@ -99,7 +99,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec s = string_from_str("Hello, Mellis!");
+    dec s = string_from_str("Hello to Luna!");
     if s.len() != (14 as u64) {
         return 1;
     }
@@ -746,11 +746,11 @@ import <iter_collect>;
 
 fn main() -> i32 {
     dec rw s = string_new();
-    s.push_str("Mellis");
+    s.push_str("Luna");
     s.push_str(" ");
     s.push_str("Language");
     
-    if s.len() != (15 as u64) {
+    if s.len() != (13 as u64) {
         return 1;
     }
     
@@ -795,7 +795,7 @@ import <iter_collect>;
 import <io>;
 
 fn main() -> i32 {
-    dec s = string_from_str("Hello from Mellis String stdlib!");
+    dec s = string_from_str("Hello from Luna String stdlib!");
     io::println(s.as_bytes());
     return 0;
 }
@@ -803,7 +803,7 @@ fn main() -> i32 {
 
     let (code, stdout, stderr) = run_binary_with_output(&dir, src, &opts, &[]).expect("Failed to run");
     assert_eq!(code, 0, "S15 Native IO test must pass (code: {}, stderr: {})", code, stderr);
-    assert!(stdout.contains("Hello from Mellis String stdlib!"), "stdout must contain string message: {}", stdout);
+    assert!(stdout.contains("Hello from Luna String stdlib!"), "stdout must contain string message: {}", stdout);
 }
 
 /// S16: `Clone` and `Eq` implementation

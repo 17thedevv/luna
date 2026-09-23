@@ -4,7 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join("mellis_import_invariants_tests").join(test_name);
+    let dir = std::env::temp_dir().join("luna_import_invariants_tests").join(test_name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).expect("Failed to create test temp dir");
     dir

@@ -79,10 +79,10 @@ Solving constraint: ?T0 == &' mut int_32
 [DEBUG] CG visiting item: class fl::FunctionDeclNode
 [PHASE] TypeChecker done, tcOk=0
 error: Pointer arithmetic requires an unsafe block.
- --> D:\fdlang\tests\valid\unsafe_intrinsic_method_call.ms:4:13
+ --> tests\valid\unsafe_intrinsic_method_call.ms:4:13
   |
 4 |     p.add(1);
   |             ^
-D:\fdlang\tests\valid\unsafe_intrinsic_method_call.ms: error: Compilation aborted due to TypeChecker errors.
+tests\valid\unsafe_intrinsic_method_call.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

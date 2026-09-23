@@ -24,26 +24,22 @@ impl<T, E> Result<T, E> {
     export fn as_ref(self: &Self) -> Result<&T, &E> life_from(self) {
         if self.is_ok() {
             unsafe {
-                dec val_ptr = ((self as *Self as u64) + (4 as u64)) as *T;
-                return Result::Ok(&*val_ptr);
+                return Result::Ok(&*(((self as *Self as u64) + (8 as u64)) as *T));
             }
         }
         unsafe {
-            dec err_ptr = ((self as *Self as u64) + (4 as u64)) as *E;
-            return Result::Err(&*err_ptr);
+            return Result::Err(&*(((self as *Self as u64) + (8 as u64)) as *E));
         }
     }
 
     export fn as_mut(self: &rw Self) -> Result<&rw T, &rw E> life_from(self) {
         if self.is_ok() {
             unsafe {
-                dec val_ptr = ((self as *rw Self as u64) + (4 as u64)) as *rw T;
-                return Result::Ok(&rw *val_ptr);
+                return Result::Ok(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw T));
             }
         }
         unsafe {
-            dec err_ptr = ((self as *rw Self as u64) + (4 as u64)) as *rw E;
-            return Result::Err(&rw *err_ptr);
+            return Result::Err(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw E));
         }
     }
 
@@ -95,6 +91,13 @@ impl<T, E> Result<T, E> {
             Result::Err(e) -> Result::Err(f(e)),
         };
     }
+
+    export fn or_else<F>(self: Self, f: fn(E) -> Result<T, F>) -> Result<T, F> {
+        return match self {
+            Result::Ok(val) -> Result::Ok(val),
+            Result::Err(e) -> f(e),
+        };
+    }
 }
 
 export trait OptionExt<T> {
@@ -109,3 +112,36 @@ impl<T> OptionExt<T> for Option<T> {
         };
     }
 }
+
+export fn result_flatten<T, E>(res: Result<Result<T, E>, E>) -> Result<T, E> {
+    return match res {
+        Result::Ok(inner) -> inner,
+        Result::Err(e) -> Result::Err(e),
+    };
+}
+
+export fn option_transpose<T, E>(opt: Option<Result<T, E>>) -> Result<Option<T>, E> {
+    return match opt {
+        Option::Some(res) -> {
+            match res {
+                Result::Ok(val) -> Result::Ok(Option::Some(val)),
+                Result::Err(e) -> Result::Err(e),
+            }
+        },
+        Option::None -> Result::Ok(Option::None),
+    };
+}
+
+export fn result_transpose<T, E>(res: Result<Option<T>, E>) -> Option<Result<T, E>> {
+    return match res {
+        Result::Ok(opt) -> {
+            match opt {
+                Option::Some(val) -> Option::Some(Result::Ok(val)),
+                Option::None -> Option::None,
+            }
+        },
+        Result::Err(e) -> Option::Some(Result::Err(e)),
+    };
+}
+
+

@@ -24,10 +24,10 @@
 [DEBUG] current type=54 peek type=43
 [DEBUG] current type=54 peek type=43
 error: Expected expression (e.g., literal, identifier, or '('). Got token 47 text: .
- --> D:\fdlang\tests\invalid\neg_object_safety.ms:28:5
+ --> tests\invalid\neg_object_safety.ms:28:5
   |
 28 | xz/.,mnb
   |     ^
-D:\fdlang\tests\invalid\neg_object_safety.ms: error: Parsing that bai.
+tests\invalid\neg_object_safety.ms: error: Parsing that bai.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

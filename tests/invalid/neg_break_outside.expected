@@ -26,11 +26,11 @@ Solving constraint: int_32 == int_32
 [DEBUG] Resolver::resolve: Running pass2.
 [DEBUG] Resolving function: main
 error: 'break' outside of loop
- --> D:\fdlang\tests\invalid\neg_break_outside.ms:5:5
+ --> tests\invalid\neg_break_outside.ms:5:5
   |
 5 |     break;
   |     ^
-D:\fdlang\tests\invalid\neg_break_outside.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
+tests\invalid\neg_break_outside.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
 [DEBUG] Resolver finished!
 [DEBUG] Creating TypeChecker...
 [DEBUG] Creating MonomorphizationEngine...
@@ -50,11 +50,11 @@ D:\fdlang\tests\invalid\neg_break_outside.ms: error: Resolver that bai, nhung ti
 [DEBUG] CG visiting item: class fl::FunctionDeclNode
 [PHASE] TypeChecker done, tcOk=0
 error: 'break' outside of loop
- --> D:\fdlang\tests\invalid\neg_break_outside.ms:5:5
+ --> tests\invalid\neg_break_outside.ms:5:5
   |
 5 |     break;
   |     ^
-D:\fdlang\tests\invalid\neg_break_outside.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
-D:\fdlang\tests\invalid\neg_break_outside.ms: error: Compilation aborted due to TypeChecker errors.
+tests\invalid\neg_break_outside.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
+tests\invalid\neg_break_outside.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

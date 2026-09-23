@@ -99,6 +99,33 @@ impl Ord for isize {
 // Generic comparison utilities
 // =========================================================================
 
+export fn min<T: Ord>(a: T, b: T) -> T {
+    if a.cmp(&b) <= 0 {
+        return a;
+    }
+    return b;
+}
+
+export fn max<T: Ord>(a: T, b: T) -> T {
+    if a.cmp(&b) >= 0 {
+        return a;
+    }
+    return b;
+}
+
+export fn clamp<T: Ord>(val: T, lo: T, hi: T) -> T {
+    if hi.cmp(&lo) < 0 {
+        __luna_panic_default();
+    }
+    if val.cmp(&lo) < 0 {
+        return lo;
+    }
+    if val.cmp(&hi) > 0 {
+        return hi;
+    }
+    return val;
+}
+
 export fn min_i32(a: i32, b: i32) -> i32 {
     if a <= b { return a; }
     return b;
@@ -134,3 +161,4 @@ export fn clamp_u64(val: u64, lo: u64, hi: u64) -> u64 {
 }
 
 extern fn __luna_panic_default();
+

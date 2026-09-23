@@ -392,7 +392,7 @@ impl RegionBorrowContext {
                         val_data.span.clone(),
                     );
                     if let Some(ctx) = ctx {
-                        if let luna_semantic::SemanticType::Reference(..) = ctx.types.get(val_data.ty) {
+                        if crate::borrow_analysis::type_has_borrow(val_data.ty, ctx) {
                             is_param_ref.insert(*p_idx as u16, true);
                         }
                     }

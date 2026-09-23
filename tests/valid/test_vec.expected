@@ -6,11 +6,11 @@
 [DEBUG] parseUseTree after segment: 50 {
 [DEBUG] parseUseTree after segment: 46 ,
 [DEBUG] parseUseTree after segment: 51 }
-[DEBUG] Checking D:\fdlang\tests\valid\core.ms and D:\fdlang\tests\valid\core.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\core\mod.ms and D:\fdlang\tests\valid\core\mod.mlib
-[DEBUG] Checking D:\fdlang\core.ms and D:\fdlang\core.mlib
-[DEBUG] Checking D:\fdlang\core\mod.ms and D:\fdlang\core\mod.mlib
-[DEBUG] Checking D:\fdlang\lib\core.ms and D:\fdlang\lib\core.mlib
+[DEBUG] Checking tests\valid\core.ms and tests\valid\core.mlib
+[DEBUG] Checking tests\valid\core\mod.ms and tests\valid\core\mod.mlib
+[DEBUG] Checking core.ms and core.mlib
+[DEBUG] Checking core\mod.ms and core\mod.mlib
+[DEBUG] Checking lib\core.ms and lib\core.mlib
 [MLibLoader] Loading 12 namespaces
 [MLibLoader] Namespace: arithmetic
 [MLibLoader] Namespace: clone
@@ -71,7 +71,7 @@
 [MLibLoader] Trait: Sub
 [MLibLoader] Loading Functions...
 [MLibLoader] Found 1 functions
-[MLibLoader] Function: __mellis_panic
+[MLibLoader] Function: __luna_panic
 [MLibLoader] Loading generic: Add rawSource size=92
 [MLibLoader] replacedSource: export trait Add<Rhs> {
     type Output;
@@ -220,7 +220,7 @@
 
             Option::None -> {
 
-                __mellis_panic()
+                __luna_panic()
 
             }
 
@@ -303,8 +303,8 @@
 [DEBUG] resolvePath final: currentSym=29 kind=6
 [DEBUG] resolvePath Enum 'Option' nextScope=23 (sym.decl=00000266636733F0, bodyScopeId=23, mlibSymbolID=0)
 [DEBUG] bindings in nextScope: None T Some 
-[DEBUG resolvePath] Resolving path starting with '__mellis_panic'
-[DEBUG resolvePath] resolve('__mellis_panic') returned 1 syms. First id=45
+[DEBUG resolvePath] Resolving path starting with '__luna_panic'
+[DEBUG resolvePath] resolve('__luna_panic') returned 1 syms. First id=45
 [DEBUG resolvePath] Resolving path starting with 'self'
 [DEBUG resolvePath] resolve('self') returned 1 syms. First id=135
 [DEBUG resolvePath] Resolving path starting with 'Option'
@@ -410,7 +410,7 @@
 
             Result::Err(_) -> {
 
-                __mellis_panic()
+                __luna_panic()
 
             }
 
@@ -479,8 +479,8 @@
 [DEBUG] resolvePath final: currentSym=30 kind=6
 [DEBUG] resolvePath Enum 'Result' nextScope=33 (sym.decl=000002666366F220, bodyScopeId=33, mlibSymbolID=1)
 [DEBUG] bindings in nextScope: T E Ok Err 
-[DEBUG resolvePath] Resolving path starting with '__mellis_panic'
-[DEBUG resolvePath] resolve('__mellis_panic') returned 1 syms. First id=45
+[DEBUG resolvePath] Resolving path starting with '__luna_panic'
+[DEBUG resolvePath] resolve('__luna_panic') returned 1 syms. First id=45
 [DEBUG resolvePath] Resolving path starting with 'self'
 [DEBUG resolvePath] resolve('self') returned 1 syms. First id=159
 [DEBUG resolvePath] Resolving path starting with 'Result'
@@ -541,16 +541,16 @@
 [MLibLoader] Registered signature later symId=45 type=fn() -> int_4
 [MLibLoader] Loading Functions...
 [MLibLoader] Found 0 functions
-[DEBUG] Checking D:\fdlang\tests\valid\core.ms and D:\fdlang\tests\valid\core.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\core\mod.ms and D:\fdlang\tests\valid\core\mod.mlib
-[DEBUG] Checking D:\fdlang\core.ms and D:\fdlang\core.mlib
-[DEBUG] Checking D:\fdlang\core\mod.ms and D:\fdlang\core\mod.mlib
-[DEBUG] Checking D:\fdlang\lib\core.ms and D:\fdlang\lib\core.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\alloc.ms and D:\fdlang\tests\valid\alloc.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\alloc\mod.ms and D:\fdlang\tests\valid\alloc\mod.mlib
-[DEBUG] Checking D:\fdlang\alloc.ms and D:\fdlang\alloc.mlib
-[DEBUG] Checking D:\fdlang\alloc\mod.ms and D:\fdlang\alloc\mod.mlib
-[DEBUG] Checking D:\fdlang\lib\alloc.ms and D:\fdlang\lib\alloc.mlib
+[DEBUG] Checking tests\valid\core.ms and tests\valid\core.mlib
+[DEBUG] Checking tests\valid\core\mod.ms and tests\valid\core\mod.mlib
+[DEBUG] Checking core.ms and core.mlib
+[DEBUG] Checking core\mod.ms and core\mod.mlib
+[DEBUG] Checking lib\core.ms and lib\core.mlib
+[DEBUG] Checking tests\valid\alloc.ms and tests\valid\alloc.mlib
+[DEBUG] Checking tests\valid\alloc\mod.ms and tests\valid\alloc\mod.mlib
+[DEBUG] Checking alloc.ms and alloc.mlib
+[DEBUG] Checking alloc\mod.ms and alloc\mod.mlib
+[DEBUG] Checking lib\alloc.ms and lib\alloc.mlib
 [MLibLoader] Loading 14 namespaces
 [MLibLoader] Namespace: allocator
 [MLibLoader] Namespace: arithmetic
@@ -619,11 +619,11 @@
 [MLibLoader] Trait: Sub
 [MLibLoader] Loading Functions...
 [MLibLoader] Found 7 functions
-[MLibLoader] Function: __mellis_alloc
-[MLibLoader] Function: __mellis_dealloc
-[MLibLoader] Function: __mellis_panic
-[MLibLoader] Function: __mellis_panic
-[MLibLoader] Function: __mellis_realloc
+[MLibLoader] Function: __luna_alloc
+[MLibLoader] Function: __luna_dealloc
+[MLibLoader] Function: __luna_panic
+[MLibLoader] Function: __luna_panic
+[MLibLoader] Function: __luna_realloc
 [MLibLoader] Function: vec_new
 [MLibLoader] Function: vec_with_capacity
 [MLibLoader] Loading generic: Allocator rawSource size=161
@@ -673,7 +673,7 @@
 
     dec align = alignof(T);
 
-    dec ptr = __mellis_alloc(size, align) as *rw T;
+    dec ptr = __luna_alloc(size, align) as *rw T;
 
     return Vec {
 
@@ -693,8 +693,8 @@
 [DEBUG resolvePath] resolve('vec_new') returned 1 syms. First id=208
 [DEBUG resolvePath] Resolving path starting with 'capacity'
 [DEBUG resolvePath] resolve('capacity') returned 1 syms. First id=226
-[DEBUG resolvePath] Resolving path starting with '__mellis_alloc'
-[DEBUG resolvePath] resolve('__mellis_alloc') returned 1 syms. First id=204
+[DEBUG resolvePath] Resolving path starting with '__luna_alloc'
+[DEBUG resolvePath] resolve('__luna_alloc') returned 1 syms. First id=204
 [DEBUG resolvePath] Resolving path starting with 'size'
 [DEBUG resolvePath] resolve('size') returned 1 syms. First id=227
 [DEBUG resolvePath] Resolving path starting with 'align'
@@ -708,20 +708,20 @@
 [MLibLoader] Loading generic: GlobalAlloc rawSource size=271
 [MLibLoader] replacedSource: impl Allocator for GlobalAlloc {
     fn alloc(self, size: uint_64, align: uint_64) -> *rw uint_8 {
-        return __mellis_alloc(size, align);
+        return __luna_alloc(size, align);
     }
     fn dealloc(self, ptr: *rw uint_8, size: uint_64, align: uint_64) {
-        __mellis_dealloc(ptr, size, align);
+        __luna_dealloc(ptr, size, align);
     }
 }
-[DEBUG resolvePath] Resolving path starting with '__mellis_alloc'
-[DEBUG resolvePath] resolve('__mellis_alloc') returned 1 syms. First id=204
+[DEBUG resolvePath] Resolving path starting with '__luna_alloc'
+[DEBUG resolvePath] resolve('__luna_alloc') returned 1 syms. First id=204
 [DEBUG resolvePath] Resolving path starting with 'size'
 [DEBUG resolvePath] resolve('size') returned 1 syms. First id=233
 [DEBUG resolvePath] Resolving path starting with 'align'
 [DEBUG resolvePath] resolve('align') returned 1 syms. First id=234
-[DEBUG resolvePath] Resolving path starting with '__mellis_dealloc'
-[DEBUG resolvePath] resolve('__mellis_dealloc') returned 1 syms. First id=205
+[DEBUG resolvePath] Resolving path starting with '__luna_dealloc'
+[DEBUG resolvePath] resolve('__luna_dealloc') returned 1 syms. First id=205
 [DEBUG resolvePath] Resolving path starting with 'ptr'
 [DEBUG resolvePath] resolve('ptr') returned 1 syms. First id=237
 [DEBUG resolvePath] Resolving path starting with 'size'
@@ -813,7 +813,7 @@
 
         dec align = alignof(T);
 
-        dec new_ptr = __mellis_alloc(new_size, align) as *rw T;
+        dec new_ptr = __luna_alloc(new_size, align) as *rw T;
 
 
 
@@ -839,7 +839,7 @@
 
             dec old_size = self.cap * sizeof(T);
 
-            __mellis_dealloc(self.ptr as *rw uint_8, old_size, align);
+            __luna_dealloc(self.ptr as *rw uint_8, old_size, align);
 
         }
 
@@ -916,8 +916,8 @@
 [DEBUG resolvePath] resolve('self') returned 1 syms. First id=252
 [DEBUG resolvePath] Resolving path starting with 'new_cap'
 [DEBUG resolvePath] resolve('new_cap') returned 1 syms. First id=255
-[DEBUG resolvePath] Resolving path starting with '__mellis_alloc'
-[DEBUG resolvePath] resolve('__mellis_alloc') returned 1 syms. First id=204
+[DEBUG resolvePath] Resolving path starting with '__luna_alloc'
+[DEBUG resolvePath] resolve('__luna_alloc') returned 1 syms. First id=204
 [DEBUG resolvePath] Resolving path starting with 'new_size'
 [DEBUG resolvePath] resolve('new_size') returned 1 syms. First id=256
 [DEBUG resolvePath] Resolving path starting with 'align'
@@ -946,8 +946,8 @@
 [DEBUG resolvePath] resolve('i') returned 1 syms. First id=259
 [DEBUG resolvePath] Resolving path starting with 'self'
 [DEBUG resolvePath] resolve('self') returned 1 syms. First id=252
-[DEBUG resolvePath] Resolving path starting with '__mellis_dealloc'
-[DEBUG resolvePath] resolve('__mellis_dealloc') returned 1 syms. First id=205
+[DEBUG resolvePath] Resolving path starting with '__luna_dealloc'
+[DEBUG resolvePath] resolve('__luna_dealloc') returned 1 syms. First id=205
 [DEBUG resolvePath] Resolving path starting with 'self'
 [DEBUG resolvePath] resolve('self') returned 1 syms. First id=252
 [DEBUG resolvePath] Resolving path starting with 'old_size'
@@ -973,7 +973,7 @@
 
             dec align = alignof(T);
 
-            __mellis_dealloc(self.ptr as *rw uint_8, size, align);
+            __luna_dealloc(self.ptr as *rw uint_8, size, align);
 
             self.cap = 0 as uint_64;
 
@@ -990,8 +990,8 @@
 [DEBUG resolvePath] resolve('self') returned 1 syms. First id=266
 [DEBUG resolvePath] Resolving path starting with 'self'
 [DEBUG resolvePath] resolve('self') returned 1 syms. First id=266
-[DEBUG resolvePath] Resolving path starting with '__mellis_dealloc'
-[DEBUG resolvePath] resolve('__mellis_dealloc') returned 1 syms. First id=205
+[DEBUG resolvePath] Resolving path starting with '__luna_dealloc'
+[DEBUG resolvePath] resolve('__luna_dealloc') returned 1 syms. First id=205
 [DEBUG resolvePath] Resolving path starting with 'self'
 [DEBUG resolvePath] resolve('self') returned 1 syms. First id=266
 [DEBUG resolvePath] Resolving path starting with 'size'
@@ -1385,8 +1385,8 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG] lookup 'Option' checking scope 38 (kind=9, parent=1)
 [DEBUG] lookup 'Option' checking scope 1 (kind=1, parent=0)
 [DEBUG] lookup 'Option' FOUND in scope 1 -> symbolId 29
-[DEBUG] Resolving identifier: __mellis_panic
-[DEBUG] Finished resolvePath for __mellis_panic
+[DEBUG] Resolving identifier: __luna_panic
+[DEBUG] Finished resolvePath for __luna_panic
 [DEBUG] Resolving function: unwrap_or
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'T': i=1, currentSym=127
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'Self': i=1, currentSym=126
@@ -1547,8 +1547,8 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG SymbolTable] declareSymbol id=165 name='val' kind=0 scope=73
 [DEBUG] Resolving identifier: val
 [DEBUG] Finished resolvePath for val
-[DEBUG] Resolving identifier: __mellis_panic
-[DEBUG] Finished resolvePath for __mellis_panic
+[DEBUG] Resolving identifier: __luna_panic
+[DEBUG] Finished resolvePath for __luna_panic
 [DEBUG] Resolving function: unwrap_or
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'T': i=1, currentSym=150
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'Self': i=1, currentSym=149
@@ -1647,8 +1647,8 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG SymbolTable] declareSymbol id=228 name='align' kind=0 scope=90
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'T': i=1, currentSym=225
 [DEBUG SymbolTable] declareSymbol id=229 name='ptr' kind=0 scope=90
-[DEBUG] Resolving identifier: __mellis_alloc
-[DEBUG] Finished resolvePath for __mellis_alloc
+[DEBUG] Resolving identifier: __luna_alloc
+[DEBUG] Finished resolvePath for __luna_alloc
 [DEBUG] Resolving identifier: size
 [DEBUG] Finished resolvePath for size
 [DEBUG] Resolving identifier: align
@@ -1682,8 +1682,8 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'Self': i=1, currentSym=230
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'uint_64': i=1, currentSym=4
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'uint_64': i=1, currentSym=4
-[DEBUG] Resolving identifier: __mellis_alloc
-[DEBUG] Finished resolvePath for __mellis_alloc
+[DEBUG] Resolving identifier: __luna_alloc
+[DEBUG] Finished resolvePath for __luna_alloc
 [DEBUG] Resolving identifier: size
 [DEBUG] Finished resolvePath for size
 [DEBUG] Resolving identifier: align
@@ -1693,8 +1693,8 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'uint_8': i=1, currentSym=1
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'uint_64': i=1, currentSym=4
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'uint_64': i=1, currentSym=4
-[DEBUG] Resolving identifier: __mellis_dealloc
-[DEBUG] Finished resolvePath for __mellis_dealloc
+[DEBUG] Resolving identifier: __luna_dealloc
+[DEBUG] Finished resolvePath for __luna_dealloc
 [DEBUG] Resolving identifier: ptr
 [DEBUG] Finished resolvePath for ptr
 [DEBUG] Resolving identifier: size
@@ -1803,8 +1803,8 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG SymbolTable] declareSymbol id=257 name='align' kind=0 scope=111
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'T': i=1, currentSym=241
 [DEBUG SymbolTable] declareSymbol id=258 name='new_ptr' kind=0 scope=111
-[DEBUG] Resolving identifier: __mellis_alloc
-[DEBUG] Finished resolvePath for __mellis_alloc
+[DEBUG] Resolving identifier: __luna_alloc
+[DEBUG] Finished resolvePath for __luna_alloc
 [DEBUG] Resolving identifier: new_size
 [DEBUG] Finished resolvePath for new_size
 [DEBUG] Resolving identifier: align
@@ -1849,8 +1849,8 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG] Resolving identifier: self
 [DEBUG] Finished resolvePath for self
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'T': i=1, currentSym=241
-[DEBUG] Resolving identifier: __mellis_dealloc
-[DEBUG] Finished resolvePath for __mellis_dealloc
+[DEBUG] Resolving identifier: __luna_dealloc
+[DEBUG] Finished resolvePath for __luna_dealloc
 [DEBUG] Resolving identifier: self
 [DEBUG] Finished resolvePath for self
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'uint_8': i=1, currentSym=1
@@ -1885,8 +1885,8 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'T': i=1, currentSym=264
 [DEBUG SymbolTable] declareSymbol id=268 name='align' kind=0 scope=120
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'T': i=1, currentSym=264
-[DEBUG] Resolving identifier: __mellis_dealloc
-[DEBUG] Finished resolvePath for __mellis_dealloc
+[DEBUG] Resolving identifier: __luna_dealloc
+[DEBUG] Finished resolvePath for __luna_dealloc
 [DEBUG] Resolving identifier: self
 [DEBUG] Finished resolvePath for self
 [DEBUG Resolver NamedTypeNode] Resolved path length for segment[0] 'uint_8': i=1, currentSym=1
@@ -2289,7 +2289,7 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG] ConstraintGen::visit(CallExpr)
 [DEBUG] ConstraintGen::visit(CallExpr) callee is NOT NULL. Type=class fl::IdentifierExpr
 [DEBUG] ConstraintGen::visit(IdentifierExpr) symId=4294967295 overloads=1
-[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=204 name=__mellis_alloc tableSize=276
+[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=204 name=__luna_alloc tableSize=276
 [DEBUG] ConstraintGen::visit(IdentifierExpr) baseType ptr=00000266636991D0 kind=3
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast1
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast2
@@ -2347,7 +2347,7 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG] ConstraintGen::visit(CallExpr)
 [DEBUG] ConstraintGen::visit(CallExpr) callee is NOT NULL. Type=class fl::IdentifierExpr
 [DEBUG] ConstraintGen::visit(IdentifierExpr) symId=4294967295 overloads=1
-[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=204 name=__mellis_alloc tableSize=276
+[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=204 name=__luna_alloc tableSize=276
 [DEBUG] ConstraintGen::visit(IdentifierExpr) baseType ptr=00000266636991D0 kind=3
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast1
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast2
@@ -2379,7 +2379,7 @@ Solving constraint: ?T97 == *mut int_32
 [DEBUG] ConstraintGen::visit(CallExpr)
 [DEBUG] ConstraintGen::visit(CallExpr) callee is NOT NULL. Type=class fl::IdentifierExpr
 [DEBUG] ConstraintGen::visit(IdentifierExpr) symId=4294967295 overloads=1
-[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=205 name=__mellis_dealloc tableSize=276
+[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=205 name=__luna_dealloc tableSize=276
 [DEBUG] ConstraintGen::visit(IdentifierExpr) baseType ptr=00000266636992B0 kind=3
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast1
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast2
@@ -2979,7 +2979,7 @@ RAW ERROR: No method named 'pop' found for type 'Struct<188<int_32>>'
 [DEBUG] ConstraintGen::visit(CallExpr)
 [DEBUG] ConstraintGen::visit(CallExpr) callee is NOT NULL. Type=class fl::IdentifierExpr
 [DEBUG] ConstraintGen::visit(IdentifierExpr) symId=4294967295 overloads=1
-[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=204 name=__mellis_alloc tableSize=293
+[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=204 name=__luna_alloc tableSize=293
 [DEBUG] ConstraintGen::visit(IdentifierExpr) baseType ptr=00000266636991D0 kind=3
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast1
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast2
@@ -3140,7 +3140,7 @@ RAW ERROR: No method named 'pop' found for type 'Struct<188<int_32>>'
 [DEBUG] ConstraintGen::visit(CallExpr)
 [DEBUG] ConstraintGen::visit(CallExpr) callee is NOT NULL. Type=class fl::IdentifierExpr
 [DEBUG] ConstraintGen::visit(IdentifierExpr) symId=4294967295 overloads=1
-[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=205 name=__mellis_dealloc tableSize=293
+[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=205 name=__luna_dealloc tableSize=293
 [DEBUG] ConstraintGen::visit(IdentifierExpr) baseType ptr=00000266636992B0 kind=3
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast1
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast2
@@ -3498,7 +3498,7 @@ RAW ERROR: Type annotation needed
 [DEBUG] ConstraintGen::visit(CallExpr)
 [DEBUG] ConstraintGen::visit(CallExpr) callee is NOT NULL. Type=class fl::IdentifierExpr
 [DEBUG] ConstraintGen::visit(IdentifierExpr) symId=4294967295 overloads=1
-[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=45 name=__mellis_panic tableSize=315
+[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=45 name=__luna_panic tableSize=315
 [DEBUG] ConstraintGen::visit(IdentifierExpr) baseType ptr=000002666367F880 kind=3
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast1
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast2
@@ -3882,7 +3882,7 @@ RAW ERROR: Type annotation needed
 [DEBUG] ConstraintGen::visit(CallExpr)
 [DEBUG] ConstraintGen::visit(CallExpr) callee is NOT NULL. Type=class fl::IdentifierExpr
 [DEBUG] ConstraintGen::visit(IdentifierExpr) symId=4294967295 overloads=1
-[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=205 name=__mellis_dealloc tableSize=318
+[DEBUG] ConstraintGen::visit(IdentifierExpr) overload[0]=205 name=__luna_dealloc tableSize=318
 [DEBUG] ConstraintGen::visit(IdentifierExpr) baseType ptr=00000266636992B0 kind=3
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast1
 [DEBUG] ConstraintGen::visit(IdentifierExpr) cast2
@@ -3992,166 +3992,166 @@ RAW ERROR: Type annotation needed
 [DEBUG TraitSolver] Solving goal: kind=2 self=?T10 traitId=4294967295
 [PHASE] TypeChecker done, tcOk=0
 error: Type mismatch: expected 'Struct<188<T (225)>>', found 'unknown'
- --> D:\fdlang\tests\valid\test_vec.ms:3:9
+ --> tests\valid\test_vec.ms:3:9
   |
 3 | use alloc::vec::{Vec, vec_new};
   |         ^
 error: Type mismatch: expected 'Struct<188<int_32>>', found 'unknown'
- --> D:\fdlang\tests\valid\test_vec.ms:6:5
+ --> tests\valid\test_vec.ms:6:5
   |
 6 |     dec v: Vec<int_32> = vec_new@<int_32>();
   |     ^
 error: No method named 'push' found for type 'Struct<188<int_32>>'
- --> D:\fdlang\tests\valid\test_vec.ms:7:14
+ --> tests\valid\test_vec.ms:7:14
   |
 7 |     v.push(42);
   |              ^
 error: No method named 'pop' found for type 'Struct<188<int_32>>'
- --> D:\fdlang\tests\valid\test_vec.ms:8:26
+ --> tests\valid\test_vec.ms:8:26
   |
 8 |     dec item = v.pop();
   |                          ^
 error: No method named 'grow' found for type 'unknown'
- --> D:\fdlang\tests\valid\test_vec.ms:5:25
+ --> tests\valid\test_vec.ms:5:25
   |
 5 | fn main(args: [str]) -> int_32 {
   |                         ^
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'unknown', found 'uint_64'
+tests\valid\test_vec.ms: error: Type mismatch: expected 'unknown', found 'uint_64'
 error: Type mismatch: expected 'unknown', found 'uint_64'
- --> D:\fdlang\tests\valid\test_vec.ms:43:41
+ --> tests\valid\test_vec.ms:43:41
 error: Type mismatch: expected 'unknown', found 'uint_64'
- --> D:\fdlang\tests\valid\test_vec.ms:56:31
-D:\fdlang\tests\valid\test_vec.ms: error: No method named 'mul' found for type 'unknown'
-D:\fdlang\tests\valid\test_vec.ms: error: No method named 'add' found for type 'unknown'
+ --> tests\valid\test_vec.ms:56:31
+tests\valid\test_vec.ms: error: No method named 'mul' found for type 'unknown'
+tests\valid\test_vec.ms: error: No method named 'add' found for type 'unknown'
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:4:24
+ --> tests\valid\test_vec.ms:4:24
   |
 4 | 
   |                        ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:4:37
+ --> tests\valid\test_vec.ms:4:37
   |
 4 | 
   |                                     ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:5:25
+ --> tests\valid\test_vec.ms:5:25
   |
 5 | fn main(args: [str]) -> int_32 {
   |                         ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:7:40
+ --> tests\valid\test_vec.ms:7:40
   |
 7 |     v.push(42);
   |                                        ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:7:67
+ --> tests\valid\test_vec.ms:7:67
   |
 7 |     v.push(42);
   |                                                                   ^
-D:\fdlang\tests\valid\test_vec.ms: error: Type annotation needed
+tests\valid\test_vec.ms: error: Type annotation needed
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:11:20
+ --> tests\valid\test_vec.ms:11:20
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:11:33
+ --> tests\valid\test_vec.ms:11:33
 error: No method named 'is_some' found for type 'unknown'
- --> D:\fdlang\tests\valid\test_vec.ms:10:25
+ --> tests\valid\test_vec.ms:10:25
   |
 10 | }
   |                         ^
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T71>>', found 'unknown'
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T72>>', found 'unknown'
+tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T71>>', found 'unknown'
+tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T72>>', found 'unknown'
 error: Type mismatch: expected 'unknown', found 'void'
- --> D:\fdlang\tests\valid\test_vec.ms:14:9
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T75>>', found 'unknown'
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T76>>', found 'unknown'
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T78>>', found 'unknown'
+ --> tests\valid\test_vec.ms:14:9
+tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T75>>', found 'unknown'
+tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T76>>', found 'unknown'
+tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T78>>', found 'unknown'
 error: Type mismatch: expected 'fn(unknown) -> ?T80', found 'unknown'
- --> D:\fdlang\tests\valid\test_vec.ms:31:52
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T82>>', found 'unknown'
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T85>>', found 'unknown'
+ --> tests\valid\test_vec.ms:31:52
+tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T82>>', found 'unknown'
+tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T85>>', found 'unknown'
 error: Type mismatch: expected 'fn(unknown) -> ?T86', found 'unknown'
- --> D:\fdlang\tests\valid\test_vec.ms:38:38
-D:\fdlang\tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T87>>', found 'unknown'
+ --> tests\valid\test_vec.ms:38:38
+tests\valid\test_vec.ms: error: Type mismatch: expected 'Enum<29<?T87>>', found 'unknown'
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:10:25
+ --> tests\valid\test_vec.ms:10:25
   |
 10 | }
   |                         ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:10:9
+ --> tests\valid\test_vec.ms:10:9
   |
 10 | }
   |         ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:9:49
+ --> tests\valid\test_vec.ms:9:49
   |
 9 |     return item.unwrap_or(0);
   |                                                 ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:31:52
+ --> tests\valid\test_vec.ms:31:52
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:15:24
+ --> tests\valid\test_vec.ms:15:24
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:18:20
+ --> tests\valid\test_vec.ms:18:20
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:18:33
+ --> tests\valid\test_vec.ms:18:33
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:19:40
+ --> tests\valid\test_vec.ms:19:40
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:19:67
+ --> tests\valid\test_vec.ms:19:67
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:35:24
+ --> tests\valid\test_vec.ms:35:24
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:38:35
+ --> tests\valid\test_vec.ms:38:35
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:45:24
+ --> tests\valid\test_vec.ms:45:24
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:47:36
+ --> tests\valid\test_vec.ms:47:36
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:48:41
+ --> tests\valid\test_vec.ms:48:41
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:51:21
+ --> tests\valid\test_vec.ms:51:21
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:51:29
+ --> tests\valid\test_vec.ms:51:29
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:55:41
+ --> tests\valid\test_vec.ms:55:41
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:56:42
+ --> tests\valid\test_vec.ms:56:42
 error: Type mismatch: expected 'unknown', found 'uint_64'
- --> D:\fdlang\tests\valid\test_vec.ms:6:31
+ --> tests\valid\test_vec.ms:6:31
   |
 6 |     dec v: Vec<int_32> = vec_new@<int_32>();
   |                               ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:3:24
+ --> tests\valid\test_vec.ms:3:24
   |
 3 | use alloc::vec::{Vec, vec_new};
   |                        ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:6:42
+ --> tests\valid\test_vec.ms:6:42
   |
 6 |     dec v: Vec<int_32> = vec_new@<int_32>();
   |                                          ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:7:14
+ --> tests\valid\test_vec.ms:7:14
   |
 7 |     v.push(42);
   |              ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:8:26
+ --> tests\valid\test_vec.ms:8:26
   |
 8 |     dec item = v.pop();
   |                          ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:8:5
+ --> tests\valid\test_vec.ms:8:5
   |
 8 |     dec item = v.pop();
   |     ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_vec.ms:9:13
+ --> tests\valid\test_vec.ms:9:13
   |
 9 |     return item.unwrap_or(0);
   |             ^
-D:\fdlang\tests\valid\test_vec.ms: error: Compilation aborted due to TypeChecker errors.
+tests\valid\test_vec.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

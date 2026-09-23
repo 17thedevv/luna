@@ -239,10 +239,10 @@ Solving constraint: int_32 == int_32
 [DEBUG CallExpr] gFn->genericParams.size() = 0
 [PHASE] TypeChecker done, tcOk=0
 error: Type mismatch: expected 'fn(int_32) -> int_32', found '[closure@27]'
- --> D:\fdlang\tests\closure\test_full_pipeline_closure.ms:2:5
+ --> tests\closure\test_full_pipeline_closure.ms:2:5
   |
 2 |     return |y: int_32| -> int_32 {
   |     ^
-D:\fdlang\tests\closure\test_full_pipeline_closure.ms: error: Compilation aborted due to TypeChecker errors.
+tests\closure\test_full_pipeline_closure.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

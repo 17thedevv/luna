@@ -1,6 +1,6 @@
 // test_try.ms
 // Tests for the ? (try) operator on Option
-// Uses ONLY existing Mellis syntax confirmed from lib/core and e2e tests.
+// Uses ONLY existing Luna syntax confirmed from lib/core and e2e tests.
 
 extern fn __luna_panic();
 

@@ -1,5 +1,7 @@
 import <__lang_option>;
 import <__lang_iterator>;
+import <__lang_into_iterator>;
+import <mem>;
 
 // =========================================================================
 // Iterator Adapters: Map, Filter, Enumerate, Take, Skip, Zip
@@ -220,3 +222,267 @@ export fn iter_chain<A: Iterator<Item>, B: Iterator<Item>, Item>(a: A, b: B) -> 
         a_done: false,
     };
 }
+
+// =========================================================================
+// Peekable Adapter
+// =========================================================================
+
+export struct Peekable<I, Item> {
+    private iter: I,
+    private peeked: Option<Item>,
+};
+
+impl<I: Iterator<Item>, Item> Peekable<I, Item> {
+    export fn peek(self: &rw Self) -> Option<&Item> life_from(self) {
+        if self.peeked.is_none() {
+            self.peeked = self.iter.next();
+        }
+        return self.peeked.as_ref();
+    }
+}
+
+impl<I: Iterator<Item>, Item> Iterator<Item> for Peekable<I, Item> {
+    fn next(self: &rw Self) -> Option<Item> {
+        if self.peeked.is_some() {
+            dec opt = mem::replace<Option<Item>>(&rw self.peeked, Option::None);
+            return opt;
+        }
+        return self.iter.next();
+    }
+}
+
+export fn iter_peekable<I: Iterator<Item>, Item>(iter: I) -> Peekable<I, Item> {
+    return Peekable<I, Item> {
+        iter: iter,
+        peeked: Option::None,
+    };
+}
+
+// =========================================================================
+// FilterMap Adapter
+// =========================================================================
+
+export struct FilterMap<I, Item, Out> {
+    private iter: I,
+    private f: fn(Item) -> Option<Out>,
+};
+
+impl<I: Iterator<Item>, Item, Out> Iterator<Out> for FilterMap<I, Item, Out> {
+    fn next(self: &rw Self) -> Option<Out> {
+        while true {
+            dec opt = self.iter.next();
+            match opt {
+                Option::Some(x) -> {
+                    dec f_ptr = self.f;
+                    dec mapped = f_ptr(x);
+                    match mapped {
+                        Option::Some(y) -> {
+                            return Option::Some(y);
+                        },
+                        Option::None -> {},
+                    }
+                },
+                Option::None -> {
+                    return Option::None;
+                },
+            }
+        }
+        return Option::None;
+    }
+}
+
+export fn iter_filter_map<I: Iterator<Item>, Item, Out>(iter: I, f: fn(Item) -> Option<Out>) -> FilterMap<I, Item, Out> {
+    return FilterMap<I, Item, Out> {
+        iter: iter,
+        f: f,
+    };
+}
+
+// =========================================================================
+// TakeWhile Adapter
+// =========================================================================
+
+export struct TakeWhile<I, Item> {
+    private iter: I,
+    private pred: fn(&Item) -> bool,
+    private done: bool,
+};
+
+impl<I: Iterator<Item>, Item> Iterator<Item> for TakeWhile<I, Item> {
+    fn next(self: &rw Self) -> Option<Item> {
+        if self.done {
+            return Option::None;
+        }
+        dec opt = self.iter.next();
+        match opt {
+            Option::Some(x) -> {
+                dec p_fn = self.pred;
+                if p_fn(&x) {
+                    return Option::Some(x);
+                } else {
+                    self.done = true;
+                    return Option::None;
+                }
+            },
+            Option::None -> {
+                self.done = true;
+                return Option::None;
+            },
+        }
+        return Option::None;
+    }
+}
+
+export fn iter_take_while<I: Iterator<Item>, Item>(iter: I, pred: fn(&Item) -> bool) -> TakeWhile<I, Item> {
+    return TakeWhile<I, Item> {
+        iter: iter,
+        pred: pred,
+        done: false,
+    };
+}
+
+// =========================================================================
+// Step Trait & Range Types
+// =========================================================================
+
+export trait Step {
+    fn step_forward(self: &Self) -> Self;
+    fn step_less(self: &Self, other: &Self) -> bool;
+    fn step_eq(self: &Self, other: &Self) -> bool;
+    fn step_greater(self: &Self, other: &Self) -> bool;
+}
+
+impl Step for u8 {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as u8); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for u16 {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as u16); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for u32 {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as u32); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for u64 {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as u64); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for usize {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as usize); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for i8 {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as i8); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for i16 {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as i16); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for i32 {
+    fn step_forward(self: &Self) -> Self { return *self + 1; }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for i64 {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as i64); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+impl Step for isize {
+    fn step_forward(self: &Self) -> Self { return *self + (1 as isize); }
+    fn step_less(self: &Self, other: &Self) -> bool { return *self < *other; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return *self == *other; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return *self > *other; }
+}
+
+export struct Range<T> {
+    export current: T,
+    export end: T,
+};
+
+export fn range<T>(start: T, end: T) -> Range<T> {
+    return Range<T> {
+        current: start,
+        end: end,
+    };
+}
+
+export struct RangeInclusive<T> {
+    export current: T,
+    export end: T,
+    export exhausted: bool,
+};
+
+export fn range_inclusive<T>(start: T, end: T) -> RangeInclusive<T> {
+    return RangeInclusive<T> {
+        current: start,
+        end: end,
+        exhausted: false,
+    };
+}
+
+impl<T: Step> Iterator<T> for Range<T> {
+    fn next(self: &rw Self) -> Option<T> {
+        if self.current.step_less(&self.end) {
+            dec val = self.current;
+            self.current = self.current.step_forward();
+            return Option::Some(val);
+        }
+        return Option::None;
+    }
+}
+
+impl<T: Step> Iterator<T> for RangeInclusive<T> {
+    fn next(self: &rw Self) -> Option<T> {
+        if self.exhausted { return Option::None; }
+        if self.current.step_greater(&self.end) { return Option::None; }
+        if self.current.step_eq(&self.end) {
+            self.exhausted = true;
+            return Option::Some(self.current);
+        }
+        dec val = self.current;
+        self.current = self.current.step_forward();
+        return Option::Some(val);
+    }
+}
+
+impl<T> IntoIterator<T, Range<T>> for Range<T> {
+    fn into_iter(self: Self) -> Range<T> {
+        return self;
+    }
+}
+
+impl<T> IntoIterator<T, RangeInclusive<T>> for RangeInclusive<T> {
+    fn into_iter(self: Self) -> RangeInclusive<T> {
+        return self;
+    }
+}
+
+
