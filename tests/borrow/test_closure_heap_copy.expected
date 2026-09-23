@@ -182,7 +182,7 @@ Solving constraint: int_32 == int_32
 [DEBUG CallExpr] gFn->genericParams.size() = 1
 [DEBUG MonomorphizationEngine] bounds check for param 'T' has 0 bounds
 error: Type mismatch: expected 'fn() -> ?T0', found 'T (19)'
- --> D:\fdlang\tests\borrow\test_closure_heap_copy.ms:2:16
+ --> tests\borrow\test_closure_heap_copy.ms:2:16
   |
 2 |     return f();
   |                ^

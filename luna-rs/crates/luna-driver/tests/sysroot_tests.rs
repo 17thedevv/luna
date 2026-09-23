@@ -7,7 +7,7 @@ use std::fs;
 use std::path::PathBuf;
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join("mellis_sysroot_tests").join(name);
+    let dir = std::env::temp_dir().join("luna_sysroot_tests").join(name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir
@@ -21,7 +21,7 @@ fn write_manifest(root: &std::path::Path, body: &str) {
 
 #[test]
 fn test_sysroot_missing_dir_diagnostic() {
-    let non_existent = PathBuf::from("C:/definitely_does_not_exist_mellis_sysroot_12345");
+    let non_existent = PathBuf::from("C:/definitely_does_not_exist_luna_sysroot_12345");
     let res = Sysroot::discover(Some(non_existent.to_str().unwrap()));
     assert!(res.is_err(), "Expected error for nonexistent sysroot path");
     let diags = res.err().unwrap().into_diagnostics();

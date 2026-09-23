@@ -11,8 +11,8 @@ Solving constraint: int_32 == int_32
 Solving constraint: [int_32; 3] == [int_32; 3]
 Solving constraint: int_32 == ?T0
 [DEBUG Semantic] Analyzing function: @main
-; ModuleID = 'D:\fdlang\tests\codegen\array_bounds.ms'
-source_filename = "D:\\fdlang\\tests\\codegen\\array_bounds.ms"
+; ModuleID = 'tests\codegen\array_bounds.ms'
+source_filename = "tests\\codegen\\array_bounds.ms"
 
 define i32 @main() {
 entry0:
@@ -40,7 +40,7 @@ entry0:
   br i1 false, label %bounds_fail, label %bounds_ok
 
 bounds_fail:                                      ; preds = %entry0
-  call void @__mellis_bounds_fail(i64 1, i64 3, ptr null, i32 0)
+  call void @__luna_bounds_fail(i64 1, i64 3, ptr null, i32 0)
   unreachable
 
 bounds_ok:                                        ; preds = %entry0
@@ -50,9 +50,9 @@ bounds_ok:                                        ; preds = %entry0
   ret i32 %"7"
 }
 
-declare void @__mellis_bounds_fail(i64, i64, ptr, i32)
+declare void @__luna_bounds_fail(i64, i64, ptr, i32)
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -61,7 +61,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void

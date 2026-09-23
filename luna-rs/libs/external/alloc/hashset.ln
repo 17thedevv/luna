@@ -1,6 +1,7 @@
 import <hashmap>;
 import <hash>;
 import <cmp>;
+import <clone>;
 import <__lang_option>;
 import <__lang_iterator>;
 import <__lang_into_iterator>;
@@ -106,6 +107,78 @@ module std {
         }
     }
 
+    impl<T: Clone + Hash + Eq> HashSet<T> {
+        export fn union_owned(self: &Self, other: &Self) -> HashSet<T> {
+            dec rw res = hashset_new<T>();
+            dec rw it_a = self.iter();
+            while true {
+                dec item = it_a.next();
+                match item {
+                    Option::Some(val) -> {
+                        res.insert((*val).clone());
+                    },
+                    Option::None -> { break; },
+                }
+            }
+            dec rw it_b = other.iter();
+            while true {
+                dec item = it_b.next();
+                match item {
+                    Option::Some(val) -> {
+                        res.insert((*val).clone());
+                    },
+                    Option::None -> { break; },
+                }
+            }
+            return res;
+        }
+
+        export fn intersection_owned(self: &Self, other: &Self) -> HashSet<T> {
+            dec rw res = hashset_new<T>();
+            dec rw it_a = self.iter();
+            while true {
+                dec item = it_a.next();
+                match item {
+                    Option::Some(val) -> {
+                        if other.contains(val) {
+                            res.insert((*val).clone());
+                        }
+                    },
+                    Option::None -> { break; },
+                }
+            }
+            return res;
+        }
+
+        export fn difference_owned(self: &Self, other: &Self) -> HashSet<T> {
+            dec rw res = hashset_new<T>();
+            dec rw it_a = self.iter();
+            while true {
+                dec item = it_a.next();
+                match item {
+                    Option::Some(val) -> {
+                        if other.contains(val) == false {
+                            res.insert((*val).clone());
+                        }
+                    },
+                    Option::None -> { break; },
+                }
+            }
+            return res;
+        }
+    }
+
+    export fn union_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+        return a.union_owned(b);
+    }
+
+    export fn intersection_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+        return a.intersection_owned(b);
+    }
+
+    export fn difference_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+        return a.difference_owned(b);
+    }
 }
 
 export type SetIter<T> = std::SetIter<T>;
@@ -114,9 +187,22 @@ export type HashSet<T> = std::HashSet<T>;
 export fn hashset_new<T>() -> HashSet<T> { return std::hashset_new<T>(); }
 export fn hashset_with_capacity<T>(capacity: u64) -> HashSet<T> { return std::hashset_with_capacity<T>(capacity); }
 
+export fn union_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+    return std::union_owned<T>(a, b);
+}
+
+export fn intersection_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+    return std::intersection_owned<T>(a, b);
+}
+
+export fn difference_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+    return std::difference_owned<T>(a, b);
+}
+
 impl<T> IntoIterator<T, SetIntoIter<T>> for std::HashSet<T> {
     fn into_iter(self: Self) -> SetIntoIter<T> {
         return self.into_iter();
     }
 }
+
 

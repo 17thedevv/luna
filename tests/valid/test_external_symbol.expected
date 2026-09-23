@@ -22,15 +22,15 @@
 [DEBUG SymbolTable] declareSymbol id=16 name='str' kind=12 scope=0
 [INSTRUMENT] TypeContext Created
 error: Expected ';' after expression
- --> D:\fdlang\tests\valid\test_external_symbol.ms:1:9
+ --> tests\valid\test_external_symbol.ms:1:9
   |
 1 | import "external_mod";
   |         ^
 error: Expected expression (e.g., literal, identifier, or '('). Got token 45 text: ;
- --> D:\fdlang\tests\valid\test_external_symbol.ms:1:24
+ --> tests\valid\test_external_symbol.ms:1:24
   |
 1 | import "external_mod";
   |                        ^
-D:\fdlang\tests\valid\test_external_symbol.ms: error: Parsing that bai.
+tests\valid\test_external_symbol.ms: error: Parsing that bai.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

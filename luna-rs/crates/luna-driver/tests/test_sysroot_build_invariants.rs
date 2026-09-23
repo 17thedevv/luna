@@ -2,7 +2,7 @@
 //!
 //! These tests verify:
 //! - Canonical dependency DAG integrity (read-only against canonical sysroot)
-//! - Persistent canonical .obj and .llib sidecar invariant (25 providers, 25 .ln, 25 .llib, 25 .obj)
+//! - Persistent canonical .obj and .llib sidecar invariant (26 providers, 26 .ln, 26 .llib, 26 .obj)
 //! - Absence of orphan/monolithic legacy artifacts
 //! - External builder execution and lock mutual exclusion strictly within ISOLATED test sysroots
 //!
@@ -19,7 +19,7 @@ use std::path::PathBuf;
 /// SECTION 4D.1: CANONICAL DEPENDENCY GRAPH VALIDATION (READ-ONLY)
 /// ======================================================================
 
-/// Test that all 25 canonical providers have no unknown dependencies,
+/// Test that all 26 canonical providers have no unknown dependencies,
 /// no self-edges, no duplicate nodes, and all edges resolve.
 #[test]
 fn test_canonical_dag_integrity() {
@@ -35,8 +35,8 @@ fn test_canonical_dag_integrity() {
 
     let provider_count = canonical_providers.len();
     assert_eq!(
-        provider_count, 25,
-        "Expected exactly 25 canonical providers, got {}",
+        provider_count, 26,
+        "Expected exactly 26 canonical providers, got {}",
         provider_count
     );
 
@@ -88,7 +88,7 @@ fn test_canonical_dag_integrity() {
         }
     }
 
-    assert_eq!(graph.len(), 25, "Expected 25 graph nodes");
+    assert_eq!(graph.len(), 26, "Expected 26 graph nodes");
 
     for (provider, deps) in &graph {
         for dep in deps {
@@ -96,7 +96,7 @@ fn test_canonical_dag_integrity() {
         }
     }
 
-    assert_eq!(all_edges.len(), 61, "Expected exactly 61 dependency edges in canonical DAG");
+    assert_eq!(all_edges.len(), 71, "Expected exactly 71 dependency edges in canonical DAG");
 }
 
 /// Helper: extract provider imports from source content
@@ -142,7 +142,7 @@ fn extract_provider_imports(
 /// Frozen Policy: Each canonical sysroot provider owns one persistent canonical .obj sidecar
 /// and one canonical .llib artifact.
 ///
-/// Invariant: 25 canonical providers -> exactly 25 .ln, 25 .llib, 25 .obj.
+/// Invariant: 26 canonical providers -> exactly 26 .ln, 26 .llib, 26 .obj.
 #[test]
 fn test_canonical_persistent_obj_and_llib_sidecars() {
     let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
@@ -176,7 +176,7 @@ fn test_canonical_persistent_obj_and_llib_sidecars() {
         );
     }
 
-    assert_eq!(canonical_count, 25, "Expected 25 canonical providers");
+    assert_eq!(canonical_count, 26, "Expected 26 canonical providers");
 
     // Obsolete monolithic artifacts must NOT exist
     let legacy_monolithic = [
@@ -230,8 +230,8 @@ fn test_no_orphan_obj_sidecars() {
     }
 
     assert_eq!(
-        found_obj_files.len(), 25,
-        "Expected exactly 25 canonical .obj files in sysroot"
+        found_obj_files.len(), 26,
+        "Expected exactly 26 canonical .obj files in sysroot"
     );
 }
 

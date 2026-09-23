@@ -61,6 +61,11 @@ name = "io"
 path = "io/io"
 visibility = "public"
 
+[[provider]]
+name = "num"
+path = "core/num"
+visibility = "public"
+
 # --- Transitional Entries (Phase 3 Removal Candidates) ---
 [[provider]]
 name = "box"

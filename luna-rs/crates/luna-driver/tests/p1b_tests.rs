@@ -4,7 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join("mellis_p1b_tests").join(name);
+    let dir = std::env::temp_dir().join("luna_p1b_tests").join(name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir
@@ -362,7 +362,7 @@ fn test_case_12_external_loan_terminates_on_future_drop() {
 // 13. Movable future is not thread-sendable (Rule E invariant)
 #[test]
 fn test_case_13_movable_future_not_send() {
-    // Under Mellis Rule E, future movability in memory does NOT imply thread transferability (Send).
+    // Under Luna Rule E, future movability in memory does NOT imply thread transferability (Send).
     // An async fn capturing non-static borrows remains strictly lifetime-bound to the caller frame.
     let src = r#"
         async fn local_async(x: &rw i32) -> i32 {

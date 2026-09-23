@@ -27,11 +27,11 @@ Solving constraint: int_32 == int_32
 [DEBUG] Resolver::resolve: Running pass2.
 [DEBUG] Resolving function: main
 error: Use of undeclared label ''outer'
- --> D:\fdlang\tests\invalid\neg_labeled_break.ms:6:9
+ --> tests\invalid\neg_labeled_break.ms:6:9
   |
 6 |         break 'outer;
   |         ^
-D:\fdlang\tests\invalid\neg_labeled_break.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
+tests\invalid\neg_labeled_break.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
 [DEBUG] Resolver finished!
 [DEBUG] Creating TypeChecker...
 [DEBUG] Creating MonomorphizationEngine...
@@ -51,11 +51,11 @@ D:\fdlang\tests\invalid\neg_labeled_break.ms: error: Resolver that bai, nhung ti
 [DEBUG] CG visiting item: class fl::FunctionDeclNode
 [PHASE] TypeChecker done, tcOk=0
 error: Use of undeclared label ''outer'
- --> D:\fdlang\tests\invalid\neg_labeled_break.ms:6:9
+ --> tests\invalid\neg_labeled_break.ms:6:9
   |
 6 |         break 'outer;
   |         ^
-D:\fdlang\tests\invalid\neg_labeled_break.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
-D:\fdlang\tests\invalid\neg_labeled_break.ms: error: Compilation aborted due to TypeChecker errors.
+tests\invalid\neg_labeled_break.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
+tests\invalid\neg_labeled_break.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

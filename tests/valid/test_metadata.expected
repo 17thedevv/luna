@@ -2,22 +2,22 @@
 65
 === STDOUT ===
 [DEBUG] parseUseTree after segment: 45 ;
-[DEBUG] Checking D:\fdlang\tests\valid\metadata_mod.ms and D:\fdlang\tests\valid\metadata_mod.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\metadata_mod\mod.ms and D:\fdlang\tests\valid\metadata_mod\mod.mlib
-[DEBUG] Checking D:\fdlang\metadata_mod.ms and D:\fdlang\metadata_mod.mlib
-[DEBUG] Checking D:\fdlang\metadata_mod\mod.ms and D:\fdlang\metadata_mod\mod.mlib
-[DEBUG] Checking D:\fdlang\lib\metadata_mod.ms and D:\fdlang\lib\metadata_mod.mlib
-[DEBUG] Checking D:\fdlang\lib\metadata_mod\mod.ms and D:\fdlang\lib\metadata_mod\mod.mlib
-[DEBUG] Checking D:\fdlang\libs\metadata_mod.ms and D:\fdlang\libs\metadata_mod.mlib
-[DEBUG] Checking D:\fdlang\libs\metadata_mod\mod.ms and D:\fdlang\libs\metadata_mod\mod.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\lib\metadata_mod.ms and D:\fdlang\tests\valid\lib\metadata_mod.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\lib\metadata_mod\mod.ms and D:\fdlang\tests\valid\lib\metadata_mod\mod.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\metadata_mod.ms and D:\fdlang\tests\valid\metadata_mod.mlib
-[DEBUG] Checking D:\fdlang\tests\valid\metadata_mod\mod.ms and D:\fdlang\tests\valid\metadata_mod\mod.mlib
-[DEBUG] Checking D:\fdlang\build_release\compiler\lib\metadata_mod.ms and D:\fdlang\build_release\compiler\lib\metadata_mod.mlib
-[DEBUG] Checking D:\fdlang\build_release\compiler\lib\metadata_mod\mod.ms and D:\fdlang\build_release\compiler\lib\metadata_mod\mod.mlib
-[DEBUG] Checking D:\fdlang\build_release\compiler\Release\lib\metadata_mod.ms and D:\fdlang\build_release\compiler\Release\lib\metadata_mod.mlib
-[DEBUG] Checking D:\fdlang\build_release\compiler\Release\lib\metadata_mod\mod.ms and D:\fdlang\build_release\compiler\Release\lib\metadata_mod\mod.mlib
+[DEBUG] Checking tests\valid\metadata_mod.ms and tests\valid\metadata_mod.mlib
+[DEBUG] Checking tests\valid\metadata_mod\mod.ms and tests\valid\metadata_mod\mod.mlib
+[DEBUG] Checking metadata_mod.ms and metadata_mod.mlib
+[DEBUG] Checking metadata_mod\mod.ms and metadata_mod\mod.mlib
+[DEBUG] Checking lib\metadata_mod.ms and lib\metadata_mod.mlib
+[DEBUG] Checking lib\metadata_mod\mod.ms and lib\metadata_mod\mod.mlib
+[DEBUG] Checking libs\metadata_mod.ms and libs\metadata_mod.mlib
+[DEBUG] Checking libs\metadata_mod\mod.ms and libs\metadata_mod\mod.mlib
+[DEBUG] Checking tests\valid\lib\metadata_mod.ms and tests\valid\lib\metadata_mod.mlib
+[DEBUG] Checking tests\valid\lib\metadata_mod\mod.ms and tests\valid\lib\metadata_mod\mod.mlib
+[DEBUG] Checking tests\valid\metadata_mod.ms and tests\valid\metadata_mod.mlib
+[DEBUG] Checking tests\valid\metadata_mod\mod.ms and tests\valid\metadata_mod\mod.mlib
+[DEBUG] Checking build_release\compiler\lib\metadata_mod.ms and build_release\compiler\lib\metadata_mod.mlib
+[DEBUG] Checking build_release\compiler\lib\metadata_mod\mod.ms and build_release\compiler\lib\metadata_mod\mod.mlib
+[DEBUG] Checking build_release\compiler\Release\lib\metadata_mod.ms and build_release\compiler\Release\lib\metadata_mod.mlib
+[DEBUG] Checking build_release\compiler\Release\lib\metadata_mod\mod.ms and build_release\compiler\Release\lib\metadata_mod\mod.mlib
 Solving constraint: uint_64 == uint_64
 Solving constraint: ?T0 == &' mut unknown
 Solving constraint: fn(*mut unknown) -> ?T1 == unknown
@@ -53,11 +53,11 @@ RAW ERROR: Cannot find module matching path 'metadata_mod' in library paths.
 [DEBUG] Resolver::resolve: Aborting after pass1 due to previous errors (1).
 RAW ERROR: Cannot find module matching path 'metadata_mod' in library paths.
 error: Cannot find module matching path 'metadata_mod' in library paths.
- --> D:\fdlang\tests\valid\test_metadata.ms:1:6
+ --> tests\valid\test_metadata.ms:1:6
   |
 1 | use metadata_mod;
   |      ^
-D:\fdlang\tests\valid\test_metadata.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
+tests\valid\test_metadata.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
 [DEBUG] Resolver finished!
 [DEBUG] Creating TypeChecker...
 [DEBUG] Creating MonomorphizationEngine...
@@ -116,21 +116,21 @@ D:\fdlang\tests\valid\test_metadata.ms: error: Resolver that bai, nhung tiep tuc
 [DEBUG] InferenceVar at loc: 8:42 type: ?T1
 [PHASE] TypeChecker done, tcOk=0
 error: Cannot find module matching path 'metadata_mod' in library paths.
- --> D:\fdlang\tests\valid\test_metadata.ms:1:6
+ --> tests\valid\test_metadata.ms:1:6
   |
 1 | use metadata_mod;
   |      ^
-D:\fdlang\tests\valid\test_metadata.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
+tests\valid\test_metadata.ms: error: Resolver that bai, nhung tiep tuc de test MVIR...
 error: Type mismatch: expected 'fn(*mut unknown) -> ?T1', found 'unknown'
- --> D:\fdlang\tests\valid\test_metadata.ms:8:42
+ --> tests\valid\test_metadata.ms:8:42
   |
 8 |     metadata_mod::uses_trait@<MyStruct>(&rw s as *rw MyStruct);
   |                                          ^
 error: Type annotation needed
- --> D:\fdlang\tests\valid\test_metadata.ms:8:42
+ --> tests\valid\test_metadata.ms:8:42
   |
 8 |     metadata_mod::uses_trait@<MyStruct>(&rw s as *rw MyStruct);
   |                                          ^
-D:\fdlang\tests\valid\test_metadata.ms: error: Compilation aborted due to TypeChecker errors.
+tests\valid\test_metadata.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

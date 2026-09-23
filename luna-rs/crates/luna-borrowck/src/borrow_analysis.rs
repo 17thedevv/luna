@@ -5,7 +5,7 @@ use luna_mvir::{Function, GlobalId, Instruction, Operand, Terminator, ValueId, V
 use luna_semantic::{SemanticContext, SemanticType};
 use std::collections::{HashMap, HashSet};
 
-fn type_has_borrow(ty: luna_semantic::SemanticTypeId, ctx: &SemanticContext) -> bool {
+pub(crate) fn type_has_borrow(ty: luna_semantic::SemanticTypeId, ctx: &SemanticContext) -> bool {
     match ctx.types.get(ty) {
         SemanticType::Reference(..) => true,
         SemanticType::Struct(_, args, fields) | SemanticType::Enum(_, args, fields) => {
@@ -919,7 +919,7 @@ impl<'a> BorrowAnalyzer<'a> {
                 match &val_data.origin {
                     ValueOrigin::Global => true,
                     ValueOrigin::Parameter(_) => {
-                        // In Mellis, a parameter loan is external only if the parameter type is a Reference
+                        // In Luna, a parameter loan is external only if the parameter type is a Reference
                         // (i.e. caller storage). By-value parameters are stored in EnvStruct (local).
                         if let Some(ctx) = self.ctx {
                             matches!(ctx.types.get(val_data.ty), SemanticType::Reference(..))
@@ -1186,6 +1186,14 @@ pub fn compute_place_desc(
                     curr_val = Some(*base_v);
                 } else { break; }
             }
+            Instruction::Add { left, right } | Instruction::Sub { left, right } => {
+                path.push(Projection::Unknown);
+                if let Operand::Value(base_v) = left {
+                    curr_val = Some(*base_v);
+                } else if let Operand::Value(base_v) = right {
+                    curr_val = Some(*base_v);
+                } else { break; }
+            }
             _ => {
                 root_val = Some(v);
                 break;
@@ -1249,6 +1257,16 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                         is_rw,
                     };
                     state.direct_provenance.entry(val_id).or_default().insert(loan);
+                } else if let Some(ctx) = self.ctx {
+                    if type_has_borrow(val_data.ty, ctx) {
+                        let val_id = ValueId(i as u32);
+                        let loan = Loan {
+                            id: val_id,
+                            place: Operand::Value(val_id),
+                            is_rw: false,
+                        };
+                        state.carried_provenance.entry(val_id).or_default().insert(loan);
+                    }
                 }
             }
         }
@@ -1753,7 +1771,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                             access_kind = crate::effect::AccessKind::None;
                                         }
                                         SemanticType::Reference(_, is_mut, _) => {
-                                            // Safe Mellis reference contract
+                                            // Safe Luna reference contract
                                             escape_kind = crate::effect::EscapeKind::NoEscape;
                                             access_kind = if *is_mut == luna_semantic::ty::Mutability::Mutable { 
                                                 crate::effect::AccessKind::ReadWrite 
@@ -2166,7 +2184,8 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                         if let Some(prov) = state.carried_provenance.get(v).cloned() {
                             state.carried_provenance.entry(val_id).or_default().extend(prov);
                         }
-                        if !state.direct_provenance.get(&check_val).map_or(true, |s| s.is_empty())
+                        if check_val != *v
+                            || !state.direct_provenance.get(&check_val).map_or(true, |s| s.is_empty())
                             || !state.carried_provenance.get(&check_val).map_or(true, |s| s.is_empty())
                         {
                             state.aliases.insert(val_id, Operand::Value(check_val));

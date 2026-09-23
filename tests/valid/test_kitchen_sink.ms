@@ -1,5 +1,5 @@
 // test_kitchen_sink.ms
-// Thử nghiệm toàn bộ các tính năng cơ bản của Mellis
+// Thử nghiệm toàn bộ các tính năng cơ bản của Luna
 
 // 1. Enums và Generics
 enum Option<T> {

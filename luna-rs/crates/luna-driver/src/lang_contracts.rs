@@ -34,7 +34,7 @@ impl LangContractManifest {
                     contract_id: "option",
                     provider_id: "__lang_option",
                     visibility_kind: VisibilityKind::CompilerContract,
-                    auto_visible_symbols: &["Option", "Option::Some", "Option::None"],
+                    auto_visible_symbols: &["Option", "Option::Some", "Option::None", "option_flatten"],
                 },
                 LangContractEntry {
                     contract_id: "iterator",

@@ -1,10 +1,10 @@
-//! Lifetime expression AST nodes for Mellis.
+//! Lifetime expression AST nodes for Luna.
 //!
 //! This module defines the AST representation for lifetime expressions,
 //! following the Implementation Contract specification.
 //!
 //! ## Syntax
-//! ```mellis
+//! ```luna
 //! life_from(a)              // origin from a
 //! life_from(a | b | c)      // origin from any of them
 //! where outlives(a, b)      // constraint: 'b ≤ 'a
@@ -18,7 +18,7 @@ use luna_common::ids::Span;
 /// This represents the `life_from(x)` syntax in function signatures.
 ///
 /// # Examples
-/// ```mellis
+/// ```luna
 /// fn foo(x: &i32) -> &i32 life_from(x)
 /// fn bar(a: &i32, b: &i32) -> &i32 life_from(a | b)
 /// ```
@@ -84,7 +84,7 @@ impl std::fmt::Display for LifetimeTargetAst {
 /// A lifetime constraint clause.
 ///
 /// Canonical syntax:
-/// ```mellis
+/// ```luna
 /// requires life(longer) >= life(shorter)
 /// requires life(shorter) <= life(longer)
 /// ```
@@ -110,7 +110,7 @@ pub type LifetimeConstraint = LifetimeConstraintAst;
 /// annotations via `life_from` and `requires` clauses.
 ///
 /// # Examples
-/// ```mellis
+/// ```luna
 /// fn foo(x: &i32) -> &i32 life_from(x)
 /// fn bar(a: &i32, b: &i32) -> &i32
 ///     life_from(a | b)
@@ -148,7 +148,7 @@ impl FnLifetimeSignature {
 /// A struct's lifetime contract containing postfix outlives constraints.
 ///
 /// Canonical syntax:
-/// ```mellis
+/// ```luna
 /// struct Holder {
 ///     value: &T,
 /// } requires life(value) >= life(self);

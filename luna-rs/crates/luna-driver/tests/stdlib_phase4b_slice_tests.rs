@@ -401,3 +401,122 @@ fn test_slice_copy_and_fill() {
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("Execution must succeed");
     assert_eq!(code, 0, "test_slice_copy_and_fill failed with code {}: {}", code, stderr);
 }
+
+#[test]
+fn test_slice_split_at_and_split_at_mut() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("split_at");
+
+    let src = r#"
+        import <vec>;
+        import <slice>;
+
+        fn main() -> i32 {
+            dec rw v = vec_new<i32>();
+            v.push(10);
+            v.push(20);
+            v.push(30);
+            v.push(40);
+
+            // 1. Immutable split_at at mid = 2
+            dec tuple_imm = split_at<i32>(v.as_slice(), 2 as u64);
+            dec left_imm = tuple_imm.0;
+            dec right_imm = tuple_imm.1;
+            if left_imm.len != (2 as usize) { return 1; }
+            if right_imm.len != (2 as usize) { return 2; }
+            if left_imm[0] != 10 { return 3; }
+            if left_imm[1] != 20 { return 4; }
+            if right_imm[0] != 30 { return 5; }
+            if right_imm[1] != 40 { return 6; }
+
+            // 2. Mutable split_at_mut at mid = 2
+            dec tuple_mut = split_at_mut<i32>(v.as_mut_slice(), 2 as u64);
+            dec left_mut = tuple_mut.0;
+            dec right_mut = tuple_mut.1;
+            left_mut[0] = 100;
+            right_mut[1] = 400;
+
+            if v.as_slice()[0] != 100 { return 7; }
+            if v.as_slice()[1] != 20 { return 8; }
+            if v.as_slice()[2] != 30 { return 9; }
+            if v.as_slice()[3] != 400 { return 10; }
+
+            // 3. Boundary split at 0 and at len
+            dec tuple_zero = split_at<i32>(v.as_slice(), 0 as u64);
+            if tuple_zero.0.len != (0 as usize) { return 11; }
+            if tuple_zero.1.len != (4 as usize) { return 12; }
+
+            dec tuple_full = split_at<i32>(v.as_slice(), 4 as u64);
+            if tuple_full.0.len != (4 as usize) { return 13; }
+            if tuple_full.1.len != (0 as usize) { return 14; }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+
+    let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("Execution must succeed");
+    assert_eq!(code, 0, "test_slice_split_at_and_split_at_mut failed with code {}: {}", code, stderr);
+}
+
+#[test]
+fn test_generic_slice_sort_ord() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("generic_sort");
+
+    let src = r#"
+        import <vec>;
+        import <slice>;
+        import <cmp>;
+
+        fn main() -> i32 {
+            // Test slice_sort<T: Ord> directly with i32
+            dec rw v = vec_new<i32>();
+            v.push(99);
+            v.push(12);
+            v.push(54);
+            v.push(1);
+            v.push(77);
+            v.push(33);
+
+            slice_sort<i32>(v.as_mut_slice());
+
+            dec s = v.as_slice();
+            if s[0] != 1 { return 1; }
+            if s[1] != 12 { return 2; }
+            if s[2] != 33 { return 3; }
+            if s[3] != 54 { return 4; }
+            if s[4] != 77 { return 5; }
+            if s[5] != 99 { return 6; }
+
+            // Test generic slice_fill and slice_copy_from_slice
+            dec rw v2 = vec_new<i32>();
+            v2.push(0);
+            v2.push(0);
+            v2.push(0);
+            slice_fill<i32>(v2.as_mut_slice(), 42);
+            if v2.as_slice()[0] != 42 { return 7; }
+            if v2.as_slice()[1] != 42 { return 8; }
+            if v2.as_slice()[2] != 42 { return 9; }
+
+            dec rw v3 = vec_new<i32>();
+            v3.push(0);
+            v3.push(0);
+            v3.push(0);
+            slice_copy_from_slice<i32>(v3.as_mut_slice(), v2.as_slice());
+            if v3.as_slice()[0] != 42 { return 10; }
+            if v3.as_slice()[1] != 42 { return 11; }
+            if v3.as_slice()[2] != 42 { return 12; }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+
+    let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("Execution must succeed");
+    assert_eq!(code, 0, "test_generic_slice_sort_ord failed with code {}: {}", code, stderr);
+}

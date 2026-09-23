@@ -26,8 +26,7 @@ impl<T> Option<T> {
     export fn as_ref(self: &Self) -> Option<&T> life_from(self) {
         if self.is_some() {
             unsafe {
-                dec val_ptr = ((self as *Self as u64) + (4 as u64)) as *T;
-                return Option::Some(&*val_ptr);
+                return Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *T));
             }
         }
         return Option::None;
@@ -36,8 +35,7 @@ impl<T> Option<T> {
     export fn as_mut(self: &rw Self) -> Option<&rw T> life_from(self) {
         if self.is_some() {
             unsafe {
-                dec val_ptr = ((self as *rw Self as u64) + (4 as u64)) as *rw T;
-                return Option::Some(&rw *val_ptr);
+                return Option::Some(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw T));
             }
         }
         return Option::None;
@@ -104,3 +102,12 @@ impl<T> Option<T> {
         }
     }
 }
+
+export fn option_flatten<T>(opt: Option<Option<T>>) -> Option<T> {
+    return match opt {
+        Option::Some(inner) -> inner,
+        Option::None -> Option::None,
+    };
+}
+
+

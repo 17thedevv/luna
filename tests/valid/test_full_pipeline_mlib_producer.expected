@@ -28,10 +28,10 @@ Solving constraint: ?T2 == void
 Solving constraint: Enum<18<?T6, ?T7>> == Enum<18<T (30), E (31)>>
 Solving constraint: int_32 == ?T8
 Solving constraint: ?T2 == void
-; ModuleID = 'D:\fdlang\tests\valid\test_full_pipeline_mlib_producer.ms'
-source_filename = "D:\\fdlang\\tests\\valid\\test_full_pipeline_mlib_producer.ms"
+; ModuleID = 'tests\valid\test_full_pipeline_mlib_producer.ms'
+source_filename = "tests\\valid\\test_full_pipeline_mlib_producer.ms"
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -40,7 +40,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void
@@ -244,7 +244,7 @@ lld-link: error: undefined symbol: main
 >>>               libcmt.lib(exe_main.obj):(int __cdecl invoke_main(void))
 >>> referenced by D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288
 >>>               libcmt.lib(exe_main.obj):(int __cdecl __scrt_common_main_seh(void))
-D:\fdlang\tests\valid\test_full_pipeline_mlib_producer.ms: error: Trinh lien ket (lld-link) that bai khi tao D:\fdlang\tests\valid\test_full_pipeline_mlib_producer.exe. Kiem tra xem ban da cai dat LLVM chua.
-D:\fdlang\tests\valid\test_full_pipeline_mlib_producer.ms: error: Tao file thuc thi that bai.
+tests\valid\test_full_pipeline_mlib_producer.ms: error: Trinh lien ket (lld-link) that bai khi tao tests\valid\test_full_pipeline_mlib_producer.exe. Kiem tra xem ban da cai dat LLVM chua.
+tests\valid\test_full_pipeline_mlib_producer.ms: error: Tao file thuc thi that bai.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

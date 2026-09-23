@@ -216,10 +216,10 @@ Solving constraint: ?T2 == ?T8
 [DEBUG MatchAnalyzer] resolvedTy is EnumType. enumSymbolId=35
 [PHASE] MatchAnalyzer done, ok=0
 error: non-exhaustive patterns: `Ok(None)` not covered
- --> D:\fdlang\tests\valid\nested_nonexhaustive.ms:12:5
+ --> tests\valid\nested_nonexhaustive.ms:12:5
   |
 12 |     match res {
   |     ^
-D:\fdlang\tests\valid\nested_nonexhaustive.ms: error: Non-exhaustive match or invalid pattern. Aborting compilation.
+tests\valid\nested_nonexhaustive.ms: error: Non-exhaustive match or invalid pattern. Aborting compilation.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

@@ -168,15 +168,15 @@ Solving constraint: fn() -> Struct<19> == fn() -> Struct<19>
 [DEBUG TraitSolver] Solving goal: kind=2 self=Struct<19> traitId=4294967295
 [PHASE] TypeChecker done, tcOk=0
 error: Method 'get_value' is private.
- --> D:\fdlang\tests\invalid\e1_visibility_leak.ms:19:33
+ --> tests\invalid\e1_visibility_leak.ms:19:33
   |
 19 |     dec val = key.get_value();          // Error: SecretKey::get_value is private
   |                                 ^
 error: Field 'value' of struct 'SecretKey' is private.
- --> D:\fdlang\tests\invalid\e1_visibility_leak.ms:20:30
+ --> tests\invalid\e1_visibility_leak.ms:20:30
   |
 20 |     dec inner = key.value;              // Error: field value is private
   |                              ^
-D:\fdlang\tests\invalid\e1_visibility_leak.ms: error: Compilation aborted due to TypeChecker errors.
+tests\invalid\e1_visibility_leak.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

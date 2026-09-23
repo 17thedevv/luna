@@ -2,6 +2,8 @@ import <__alloc_global>;
 import <slice>;
 import <ptr>;
 import <mem>;
+import <clone>;
+import <cmp>;
 import <__lang_drop>;
 import <__lang_option>;
 import <__lang_iterator>;
@@ -240,6 +242,34 @@ impl<T> Vec<T> {
         self.cap = new_cap;
     }
 
+    export fn reserve(self: &rw Self, additional: u64) {
+        if self.len + additional <= self.cap {
+            return;
+        }
+        dec rw new_cap = self.len + additional;
+        if new_cap < self.cap * (2 as u64) {
+            new_cap = self.cap * (2 as u64);
+        }
+        if new_cap < (4 as u64) {
+            new_cap = 4 as u64;
+        }
+
+        dec new_size = new_cap * (mem::size_of<T>() as u64);
+        dec align = mem::align_of<T>() as u64;
+        dec new_ptr = __luna_alloc(new_size, align) as u64 as *rw T;
+
+        if self.cap > (0 as u64) {
+            unsafe {
+                ptr::copy<T>(self.ptr as *T, new_ptr, self.len);
+            }
+            dec old_size = self.cap * (mem::size_of<T>() as u64);
+            __luna_dealloc(self.ptr as *rw u8, old_size, align);
+        }
+
+        self.ptr = new_ptr;
+        self.cap = new_cap;
+    }
+
     export fn iter(self: &Self) -> SliceIter<T> life_from(self) {
         return slice_iter<T>(self.as_slice());
     }
@@ -304,6 +334,35 @@ impl<T> Vec<T> {
         self.len = write;
     }
 
+    // Remove consecutive duplicate elements via Eq.
+    // Duplicates are dropped exactly once.
+    export fn dedup<T: Eq>(self: &rw Self) {
+        if self.len <= (1 as u64) { return; }
+        dec rw write: u64 = 1 as u64;
+        dec rw read: u64 = 1 as u64;
+        while read < self.len {
+            unsafe {
+                dec p_read = ptr::add<T>(self.ptr as *T, read);
+                dec p_prev = ptr::add<T>(self.ptr as *T, write - (1 as u64));
+                dec r_ref = &*p_read;
+                dec p_ref = &*p_prev;
+                if p_ref.eq(r_ref) {
+                    dec p_read_mut = ptr::add_mut<T>(self.ptr, read);
+                    ptr::drop_in_place<T>(p_read_mut);
+                } else {
+                    if read != write {
+                        dec p_write = ptr::add_mut<T>(self.ptr, write);
+                        dec val = ptr::read<T>(p_read);
+                        ptr::write<T>(p_write, val);
+                    }
+                    write = write + (1 as u64);
+                }
+            }
+            read = read + (1 as u64);
+        }
+        self.len = write;
+    }
+
     // Remove consecutive duplicate elements using comparator function.
     // Duplicates are dropped exactly once.
     export fn dedup_by(self: &rw Self, same_bucket: fn(&T, &T) -> bool) {
@@ -358,6 +417,20 @@ impl<T> Vec<T> {
         self.len = write;
     }
 
+
+    // Resizes the Vec in-place so that len is equal to new_len.
+    export fn resize<T: Clone>(self: &rw Self, new_len: u64, value: T) {
+        if new_len < self.len {
+            self.truncate(new_len);
+        } else {
+            dec rw count = new_len - self.len;
+            while count > (0 as u64) {
+                self.push(value.clone());
+                count = count - (1 as u64);
+            }
+        }
+    }
+
     // Resize Vec: if new_len < len, truncate and drop extras;
     // if new_len > len, generate new elements using supplier function.
     export fn resize_with(self: &rw Self, new_len: u64, f: fn() -> T) {
@@ -387,6 +460,20 @@ impl<T> Vec<T> {
                     running = false;
                 },
             }
+        }
+    }
+
+    // Extend Vec from a slice of cloneable elements
+    export fn extend_from_slice<T: Clone>(self: &rw Self, slice: &[T]) {
+        dec slen = slice.len as u64;
+        if slen == (0 as u64) {
+            return;
+        }
+        self.reserve(slen);
+        dec rw i: u64 = 0 as u64;
+        while i < slen {
+            self.push(slice[i].clone());
+            i = i + (1 as u64);
         }
     }
 
@@ -464,5 +551,36 @@ impl<T> Drop for Vec<T> {
             dec old_size = self.cap * (mem::size_of<T>() as u64);
             __luna_dealloc(self.ptr as *rw u8, old_size, mem::align_of<T>() as u64);
         }
+    }
+}
+
+impl<T: Clone> Clone for Vec<T> {
+    export fn clone(self: &Self) -> Self {
+        dec rw res: Vec<T> = vec_with_capacity<T>(self.len);
+        dec s = self.as_slice();
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            res.push(s[i].clone());
+            i = i + (1 as u64);
+        }
+        return res;
+    }
+}
+
+impl<T: Eq> Eq for Vec<T> {
+    export fn eq(self: &Self, other: &Self) -> bool {
+        if self.len != other.len {
+            return false;
+        }
+        dec s1 = self.as_slice();
+        dec s2 = other.as_slice();
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            if s1[i].eq(&s2[i]) == false {
+                return false;
+            }
+            i = i + (1 as u64);
+        }
+        return true;
     }
 }

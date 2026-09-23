@@ -274,3 +274,91 @@ fn test_vec_resize_and_extend() {
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("Execution must succeed");
     assert_eq!(code, 0, "test_vec_resize_and_extend failed with code {}: {}", code, stderr);
 }
+
+#[test]
+fn test_vec_clone_and_eq() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("clone_eq");
+
+    let src = r#"
+        import <vec>;
+        import <clone>;
+        import <cmp>;
+
+        fn main() -> i32 {
+            dec rw v1 = vec_new<i32>();
+            v1.push(100);
+            v1.push(200);
+            v1.push(300);
+
+            dec v2 = v1.clone();
+            if v1.len() != v2.len() { return 1; }
+            if v1.eq(&v2) == false { return 2; }
+
+            dec rw v3 = vec_new<i32>();
+            v3.push(100);
+            v3.push(200);
+            v3.push(999);
+            if v1.eq(&v3) { return 3; }
+
+            dec rw v4 = vec_new<i32>();
+            v4.push(100);
+            v4.push(200);
+            if v1.eq(&v4) { return 4; }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+
+    let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("Execution must succeed");
+    assert_eq!(code, 0, "test_vec_clone_and_eq failed with code {}: {}", code, stderr);
+}
+
+#[test]
+fn test_vec_extend_from_slice() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("extend_slice");
+
+    let src = r#"
+        import <vec>;
+        import <clone>;
+
+        fn get_val(v: &Vec<i32>, idx: u64) -> i32 {
+            match v.get(idx) {
+                Option::Some(x) -> *x,
+                Option::None -> 0 - 1,
+            }
+        }
+
+        fn main() -> i32 {
+            dec rw v1 = vec_new<i32>();
+            v1.push(1);
+            v1.push(2);
+
+            dec rw v2 = vec_new<i32>();
+            v2.push(3);
+            v2.push(4);
+            v2.push(5);
+
+            v1.extend_from_slice(v2.as_slice());
+            if v1.len() != (5 as u64) { return 1; }
+            if get_val(&v1, 0 as u64) != 1 { return 2; }
+            if get_val(&v1, 1 as u64) != 2 { return 3; }
+            if get_val(&v1, 2 as u64) != 3 { return 4; }
+            if get_val(&v1, 3 as u64) != 4 { return 5; }
+            if get_val(&v1, 4 as u64) != 5 { return 6; }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+
+    let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("Execution must succeed");
+    assert_eq!(code, 0, "test_vec_extend_from_slice failed with code {}: {}", code, stderr);
+}
+

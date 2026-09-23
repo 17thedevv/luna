@@ -4,7 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join("mellis_p3_tests").join(name);
+    let dir = std::env::temp_dir().join("luna_p3_tests").join(name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir
@@ -471,7 +471,7 @@ fn test_case_17_array_to_slice_empty_array() {
 }
 
 // -----------------------------------------------------------------------------
-// Group 6: Mellis Trait Object ABI v1 (Tests 18–22)
+// Group 6: Luna Trait Object ABI v1 (Tests 18–22)
 // -----------------------------------------------------------------------------
 
 // 18. Vtable drop glue invokes concrete Drop implementation

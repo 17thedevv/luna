@@ -277,3 +277,238 @@ fn test_result_and_then_and_unwrap_or_else() {
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
+
+#[test]
+fn test_combinator_laziness_short_circuit() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("comb_laziness");
+
+    let src = r#"
+        import <core/panic>;
+        import <result>;
+
+        fn must_not_be_called_val() -> i32 {
+            __luna_panic();
+            return 999;
+        }
+
+        fn must_not_be_called_opt() -> Option<i32> {
+            __luna_panic();
+            return Option::None;
+        }
+
+        fn must_not_be_called_res(e: i32) -> Result<i32, i32> {
+            __luna_panic();
+            return Result::Err(e);
+        }
+
+        fn fallback_val() -> i32 {
+            return 42;
+        }
+
+        fn fallback_opt() -> Option<i32> {
+            return Option::Some(84);
+        }
+
+        fn fallback_res(e: i32) -> Result<i32, i32> {
+            return Result::Ok(e + 10);
+        }
+
+        fn main() -> i32 {
+            // 1. Option::unwrap_or_else on Some does NOT call callback (would panic)
+            dec some_opt: Option<i32> = Option::Some(100);
+            dec v1 = some_opt.unwrap_or_else(must_not_be_called_val);
+            if v1 != 100 { return 1; }
+
+            // Option::unwrap_or_else on None calls callback exactly once
+            dec none_opt: Option<i32> = Option::None;
+            dec v2 = none_opt.unwrap_or_else(fallback_val);
+            if v2 != 42 { return 2; }
+
+            // 2. Option::or_else on Some does NOT call callback (would panic)
+            dec some_opt2: Option<i32> = Option::Some(200);
+            dec o1 = some_opt2.or_else(must_not_be_called_opt);
+            if o1.unwrap_or(0) != 200 { return 3; }
+
+            // Option::or_else on None calls callback exactly once
+            dec none_opt2: Option<i32> = Option::None;
+            dec o2 = none_opt2.or_else(fallback_opt);
+            if o2.unwrap_or(0) != 84 { return 4; }
+
+            // 3. Result::or_else on Ok does NOT call callback (would panic)
+            dec ok_res: Result<i32, i32> = Result::Ok(300);
+            dec r1 = ok_res.or_else<i32>(must_not_be_called_res);
+            if r1.unwrap() != 300 { return 5; }
+
+            // Result::or_else on Err calls callback exactly once
+            dec err_res: Result<i32, i32> = Result::Err(5);
+            dec r2 = err_res.or_else<i32>(fallback_res);
+            if r2.unwrap() != 15 { return 6; }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
+    assert_eq!(code, 0, "stderr: {}", stderr);
+}
+
+#[test]
+fn test_flatten_family() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("comb_flatten");
+
+    let src = r#"
+        import <result>;
+
+        fn main() -> i32 {
+            // Option::option_flatten: Option<Option<T>> -> Option<T>
+            dec some_some: Option<Option<i32>> = Option::Some(Option::Some(42));
+            dec f1 = option_flatten<i32>(some_some);
+            if f1.is_some() == false { return 1; }
+            if f1.unwrap() != 42 { return 2; }
+
+            dec some_none: Option<Option<i32>> = Option::Some(Option::None);
+            dec f2 = option_flatten<i32>(some_none);
+            if f2.is_some() == true { return 3; }
+
+            dec none_none: Option<Option<i32>> = Option::None;
+            dec f3 = option_flatten<i32>(none_none);
+            if f3.is_some() == true { return 4; }
+
+            // Result::result_flatten: Result<Result<T, E>, E> -> Result<T, E>
+            dec ok_ok: Result<Result<i32, i32>, i32> = Result::Ok(Result::Ok(99));
+            dec rf1 = result_flatten<i32, i32>(ok_ok);
+            if rf1.is_ok() == false { return 5; }
+            if rf1.unwrap() != 99 { return 6; }
+
+            dec ok_err: Result<Result<i32, i32>, i32> = Result::Ok(Result::Err(7));
+            dec rf2 = result_flatten<i32, i32>(ok_err);
+            if rf2.is_err() == false { return 7; }
+            if rf2.err().unwrap() != 7 { return 8; }
+
+            dec err_outer: Result<Result<i32, i32>, i32> = Result::Err(13);
+            dec rf3 = result_flatten<i32, i32>(err_outer);
+            if rf3.is_err() == false { return 9; }
+            if rf3.err().unwrap() != 13 { return 10; }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
+    assert_eq!(code, 0, "stderr: {}", stderr);
+}
+
+#[test]
+fn test_transpose_family() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("comb_transpose");
+
+    let src = r#"
+        import <result>;
+
+        fn main() -> i32 {
+            // Option::option_transpose: Option<Result<T, E>> -> Result<Option<T>, E>
+            dec opt_ok: Option<Result<i32, i32>> = Option::Some(Result::Ok(55));
+            dec t1 = option_transpose<i32, i32>(opt_ok);
+            if t1.is_ok() == false { return 1; }
+            dec inner1 = t1.unwrap();
+            if inner1.is_some() == false { return 2; }
+            if inner1.unwrap() != 55 { return 3; }
+
+            dec opt_err: Option<Result<i32, i32>> = Option::Some(Result::Err(9));
+            dec t2 = option_transpose<i32, i32>(opt_err);
+            if t2.is_err() == false { return 4; }
+            if t2.err().unwrap() != 9 { return 5; }
+
+            dec opt_none: Option<Result<i32, i32>> = Option::None;
+            dec t3 = option_transpose<i32, i32>(opt_none);
+            if t3.is_ok() == false { return 6; }
+            dec inner3 = t3.unwrap();
+            if inner3.is_some() == true { return 7; }
+
+            // Result::result_transpose: Result<Option<T>, E> -> Option<Result<T, E>>
+            dec res_some: Result<Option<i32>, i32> = Result::Ok(Option::Some(77));
+            dec rt1 = result_transpose<i32, i32>(res_some);
+            if rt1.is_some() == false { return 8; }
+            dec inner_res1 = rt1.unwrap();
+            if inner_res1.is_ok() == false { return 9; }
+            if inner_res1.unwrap() != 77 { return 10; }
+
+            dec res_none: Result<Option<i32>, i32> = Result::Ok(Option::None);
+            dec rt2 = result_transpose<i32, i32>(res_none);
+            if rt2.is_some() == true { return 11; }
+
+            dec res_err: Result<Option<i32>, i32> = Result::Err(15);
+            dec rt3 = result_transpose<i32, i32>(res_err);
+            if rt3.is_some() == false { return 12; }
+            dec inner_res3 = rt3.unwrap();
+            if inner_res3.is_err() == false { return 13; }
+            if inner_res3.err().unwrap() != 15 { return 14; }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
+    assert_eq!(code, 0, "stderr: {}", stderr);
+}
+
+#[test]
+fn test_result_or_else() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("res_or_else");
+
+    let src = r#"
+        import <result>;
+        import <core/panic>;
+
+        fn must_not_run(e: i32) -> Result<i32, i32> {
+            __luna_panic();
+            return Result::Err(999);
+        }
+
+        fn recover_ok(e: i32) -> Result<i32, i32> {
+            return Result::Ok(e * 10);
+        }
+
+        fn transform_err(e: i32) -> Result<i32, i32> {
+            return Result::Err(e + 500);
+        }
+
+        fn main() -> i32 {
+            // Case 1: Ok(x).or_else(...) -> callback called 0 times (would panic if called), returns Ok(x)
+            dec ok_val: Result<i32, i32> = Result::Ok(42);
+            dec r1 = ok_val.or_else<i32>(must_not_run);
+            if r1.is_ok() == false { return 1; }
+            if r1.unwrap() != 42 { return 2; }
+
+            // Case 2: Err(e).or_else(recover_ok) -> callback called exactly 1 time, recovers to Ok(e * 10)
+            dec err_val: Result<i32, i32> = Result::Err(7);
+            dec r2 = err_val.or_else<i32>(recover_ok);
+            if r2.is_ok() == false { return 3; }
+            if r2.unwrap() != 70 { return 4; }
+
+            // Case 3: Err(e).or_else(transform_err) -> callback called exactly 1 time, yields new Err(e + 500)
+            dec err_val2: Result<i32, i32> = Result::Err(13);
+            dec r3 = err_val2.or_else<i32>(transform_err);
+            if r3.is_err() == false { return 5; }
+            if r3.err().unwrap() != 513 { return 6; }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
+    assert_eq!(code, 0, "stderr: {}", stderr);
+}
+

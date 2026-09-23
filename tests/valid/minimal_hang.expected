@@ -22,10 +22,10 @@
 [DEBUG SymbolTable] declareSymbol id=16 name='str' kind=12 scope=0
 [INSTRUMENT] TypeContext Created
 error: Expected ';' after struct field
- --> D:\fdlang\tests\valid\minimal_hang.ms:1:34
+ --> tests\valid\minimal_hang.ms:1:34
   |
 1 | struct Vec<T> { ptr: *rw T }
   |                                  ^
-D:\fdlang\tests\valid\minimal_hang.ms: error: Parsing that bai.
+tests\valid\minimal_hang.ms: error: Parsing that bai.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

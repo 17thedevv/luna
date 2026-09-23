@@ -1,4 +1,4 @@
-﻿use luna_borrowck::borrow_analysis::BorrowAnalyzer;
+use luna_borrowck::borrow_analysis::BorrowAnalyzer;
 use luna_mvir::*;
 use luna_semantic::{SemanticContext, SemanticTypeId, ty::{SemanticType, Mutability}};
 
@@ -50,7 +50,7 @@ fn test_ffi_escape_then_reentrant_callback_conflict() {
         },
         
         // --- C-side holds the pointer (MayEscape) ---
-        // ... sometime later, C-side calls back into Mellis or a thread is running ...
+        // ... sometime later, C-side calls back into Luna or a thread is running ...
 
         // ffi_invoke_callback() -> simulate the event firing or some other function call
         Instruction::CallDirect {
@@ -58,9 +58,9 @@ fn test_ffi_escape_then_reentrant_callback_conflict() {
             args: vec![]
         },
 
-        // --- Mellis-side tries to read `arg0` concurrently ---
+        // --- Luna-side tries to read `arg0` concurrently ---
         // Because `v1` escaped into C space and hasn't been explicitly released, the mutable loan on `arg0`
-        // MUST still be active. This Load is an aliasing violation (Mellis reads while C-side holds mut ptr).
+        // MUST still be active. This Load is an aliasing violation (Luna reads while C-side holds mut ptr).
         Instruction::Load { ptr: Operand::Value(ValueId(0)) }, 
     ]);
     

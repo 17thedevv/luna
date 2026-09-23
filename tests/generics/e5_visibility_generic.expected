@@ -222,10 +222,10 @@ Solving constraint: Struct<19<int_32>> == Struct<19<?T5>>
 [DEBUG] MonomorphizationEngine::instantiateStruct mangledName='View_int_32' for baseName='View' argCount=1
 [PHASE] TypeChecker done, tcOk=0
 error: Field 'data' of struct 'View_int_32' is private.
- --> D:\fdlang\tests\generics\e5_visibility_generic.ms:14:23
+ --> tests\generics\e5_visibility_generic.ms:14:23
   |
 14 |     dec x = v.data; 
   |                       ^
-D:\fdlang\tests\generics\e5_visibility_generic.ms: error: Compilation aborted due to TypeChecker errors.
+tests\generics\e5_visibility_generic.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

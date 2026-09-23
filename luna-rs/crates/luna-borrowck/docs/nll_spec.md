@@ -1,13 +1,13 @@
-# Mellis Non-Lexical Lifetimes (NLL) Spec
+# Luna Non-Lexical Lifetimes (NLL) Spec
 
-This document describes the design and implementation of Non-Lexical Lifetimes (NLL) inside the Mellis compiler.
+This document describes the design and implementation of Non-Lexical Lifetimes (NLL) inside the Luna compiler.
 
 ## Core Concepts
 
 ### 1. Loan Identity and Stability
-The primary building block of NLL in Mellis is the `Loan`. In earlier lifetime implementations, loans were often represented by dynamically generated identifiers (e.g., an incrementing `usize`) which caused issues when propagating through control-flow loops. 
+The primary building block of NLL in Luna is the `Loan`. In earlier lifetime implementations, loans were often represented by dynamically generated identifiers (e.g., an incrementing `usize`) which caused issues when propagating through control-flow loops. 
 
-In Mellis, a **Loan's identity is directly mapped to the `ValueId`** of the `mellis-mvir` Instruction that originated the borrow (the `Borrow` instruction). This guarantees:
+In Luna, a **Loan's identity is directly mapped to the `ValueId`** of the `luna-mvir` Instruction that originated the borrow (the `Borrow` instruction). This guarantees:
 - **Stability**: Back-edges in a Control Flow Graph (CFG) do not generate infinite new loans.
 - **Convergence**: A fixed-point iteration over the CFG will naturally converge in a finite number of steps because the universe of loans is strictly bounded by the number of `Borrow` instructions.
 
@@ -23,7 +23,7 @@ The core region computation uses a forward dataflow analysis.
 - **Fixed-Point Iteration**: The `dataflow.rs` engine propagates these abstract states iteratively across the CFG blocks until no state changes. The stability of `Loan = ValueId` guarantees this terminates rapidly (in practice, less than ~32 iterations even on complex cyclic CFGs).
 
 ### 3. Call-Effect Integration
-Mellis integrates NLL with the Interprocedural Call-Effect summary (`CallEffectSummary`):
+Luna integrates NLL with the Interprocedural Call-Effect summary (`CallEffectSummary`):
 - When a loan is active and the borrowed data is passed to a function call, the `Call-Effect` lattice evaluates the side-effects.
 - **Read / ReadWrite**: A mutable/immutable borrow may be aliased or modified. If there is a conflict (e.g., passing a mutable loan to two conflicting arguments), it emits a diagnostic.
 - **MayEscape**: If the called function is known to let a reference outlive the call (e.g. returning it or storing it into a global variable), the Call-Effect mechanism poisons the provenance via the `MayEscape` flag. Subsequent invalid usages trigger an aliasing or use-after-free error, correctly identifying the escape path.

@@ -415,25 +415,25 @@ Solving constraint: int_32 == ?T11
 [DEBUG CallExpr] gFn->genericParams.size() = 1
 [PHASE] TypeChecker done, tcOk=0
 error: Type mismatch: expected 'dyn Trait<18> + '', found 'Struct<23>'
- --> D:\fdlang\tests\valid\test_dyn_dispatch.ms:36:5
+ --> tests\valid\test_dyn_dispatch.ms:36:5
   |
 36 |     dec dg: &dyn Greeter = &d;
   |     ^
 error: Type mismatch: expected 'dyn Trait<18> + '', found 'Struct<25>'
- --> D:\fdlang\tests\valid\test_dyn_dispatch.ms:37:5
+ --> tests\valid\test_dyn_dispatch.ms:37:5
   |
 37 |     dec cg: &dyn Greeter = &c;
   |     ^
 error: Cannot infer type for generic parameter
- --> D:\fdlang\tests\valid\test_dyn_dispatch.ms:39:33
+ --> tests\valid\test_dyn_dispatch.ms:39:33
   |
 39 |     dec dog_val = call_greet(dg);
   |                                 ^
 error: Cannot infer type for generic parameter
- --> D:\fdlang\tests\valid\test_dyn_dispatch.ms:40:33
+ --> tests\valid\test_dyn_dispatch.ms:40:33
   |
 40 |     dec cat_val = call_greet(cg);
   |                                 ^
-D:\fdlang\tests\valid\test_dyn_dispatch.ms: error: Compilation aborted due to TypeChecker errors.
+tests\valid\test_dyn_dispatch.ms: error: Compilation aborted due to TypeChecker errors.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed

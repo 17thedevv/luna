@@ -31,8 +31,8 @@ Solving constraint: int_32 == int_32
 [DEBUG Semantic] Analyzing function: @drop_30
 [DEBUG Semantic] Analyzing function: @main
 [DEBUG Semantic] Analyzing function: @__LambdaFunc_1289341922064
-; ModuleID = 'D:\fdlang\tests\borrow\test_closure_heap_drop.ms'
-source_filename = "D:\\fdlang\\tests\\borrow\\test_closure_heap_drop.ms"
+; ModuleID = 'tests\borrow\test_closure_heap_drop.ms'
+source_filename = "tests\\borrow\\test_closure_heap_drop.ms"
 
 %Resource = type { i32 }
 
@@ -68,7 +68,7 @@ entry0:
   store i32 42, ptr %fld, align 4
   %"4" = load %Resource, ptr %"3", align 4
   store %Resource %"4", ptr %"2", align 4
-  %"5_alloc" = call ptr @__mellis_alloc(i64 16, i64 8)
+  %"5_alloc" = call ptr @__luna_alloc(i64 16, i64 8)
   store ptr %"5_alloc", ptr %"5", align 8
   %deref = load ptr, ptr %"5", align 8
   %fld1 = getelementptr inbounds { ptr, %Resource }, ptr %deref, i32 0, i32 0
@@ -106,15 +106,15 @@ entry0:
   %0 = getelementptr inbounds { ptr, %Resource }, ptr %heap_clos.drop.load, i32 0, i32 1
   call void @drop_30(ptr %0)
   %heap_free.load = load ptr, ptr %"1", align 8
-  call void @__mellis_dealloc(ptr %heap_free.load, i64 16, i64 8)
+  call void @__luna_dealloc(ptr %heap_free.load, i64 16, i64 8)
   ret void
 }
 
-declare ptr @__mellis_alloc(i64, i64)
+declare ptr @__luna_alloc(i64, i64)
 
-declare void @__mellis_dealloc(ptr, i64, i64)
+declare void @__luna_dealloc(ptr, i64, i64)
 
-define linkonce i1 @mellis_coro_is_done(ptr %0) {
+define linkonce i1 @luna_coro_is_done(ptr %0) {
 entry:
   %1 = call i1 @llvm.coro.done(ptr %0)
   ret i1 %1
@@ -123,7 +123,7 @@ entry:
 ; Function Attrs: nounwind memory(argmem: readwrite)
 declare i1 @llvm.coro.done(ptr nocapture readonly) #0
 
-define linkonce void @mellis_coro_resume(ptr %0) {
+define linkonce void @luna_coro_resume(ptr %0) {
 entry:
   call void @llvm.coro.resume(ptr %0)
   ret void
@@ -535,6 +535,6 @@ Call parameter type does not match function signature!
 ptr @str_3
  { ptr, i64 }  %"5" = call i32 ({ ptr, i64 }, ...) @printf(ptr @str_3, i32 %"4")
 
-D:\fdlang\tests\borrow\test_closure_heap_drop.ms: error: Loi trong qua trinh sinh LLVM IR.
+tests\borrow\test_closure_heap_drop.ms: error: Loi trong qua trinh sinh LLVM IR.
 [INSTRUMENT] TypeContext Destroyed
 [INSTRUMENT] SourceManager Destroyed
