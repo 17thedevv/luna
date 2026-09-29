@@ -31,8 +31,10 @@ invalid** (stop — no fallback).
 - **Legacy `emit_mlib` option field** — compatibility spelling only. It selects
   canonical `.llib` emission; explicit `.mlib` output paths are rejected. No
   current writer or CLI route emits `.mlib`.
-- **`Mlib*` type names / `MLIB_*` constants** — retained aliases in `luna-llib`
-  (no broad rename in this phase).
+- **`Mlib*` type names / `MLIB_*` constants** — legacy names remain in parts of
+  the internal serialization representation; the active reader/writer APIs use
+  `LlibReader` / `LlibWriter`, while compatibility aliases remain available.
+  These internal names do not select or emit `.mlib` artifacts.
 - **`__mellis_*` runtime ABI** — no active declarations or definitions remain in
   `runtime/`; those names occur only in historical documentation and are not a
   compatibility ABI.
