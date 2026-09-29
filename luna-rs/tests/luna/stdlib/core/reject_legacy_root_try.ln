@@ -1,0 +1,5 @@
+fn consume<T: Try>(value: T) {
+    dec flow = value.branch();
+}
+
+fn main() {}

@@ -2,6 +2,9 @@ use luna_driver::{check, compile, CompilerOptions};
 use luna_driver::sysroot::Sysroot;
 use std::fs;
 use std::path::PathBuf;
+use std::sync::OnceLock;
+
+static SOURCE_ONLY_ROOT: OnceLock<PathBuf> = OnceLock::new();
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
     let dir = std::env::temp_dir()
@@ -10,6 +13,38 @@ fn create_temp_dir(test_name: &str) -> PathBuf {
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).expect("Failed to create test temp dir");
     dir
+}
+
+fn source_only_sysroot() -> Sysroot {
+    let root = SOURCE_ONLY_ROOT.get_or_init(|| {
+        let canonical = Sysroot::discover_for_test().expect("test sysroot must exist");
+        let root = create_temp_dir("source_only_sysroot");
+        copy_tree(canonical.external_dir(), &root.join("libs").join("external"));
+        remove_artifacts(&root.join("libs").join("external"));
+        root
+    });
+    Sysroot::from_root(root.clone()).expect("source-only test sysroot")
+}
+
+fn copy_tree(source: &std::path::Path, destination: &std::path::Path) {
+    fs::create_dir_all(destination).expect("create source-only sysroot directory");
+    for entry in fs::read_dir(source).expect("enumerate source sysroot") {
+        let entry = entry.expect("read source sysroot entry");
+        let from = entry.path();
+        let to = destination.join(entry.file_name());
+        if from.is_dir() { copy_tree(&from, &to); }
+        else { fs::copy(from, to).expect("copy source sysroot file"); }
+    }
+}
+
+fn remove_artifacts(root: &std::path::Path) {
+    for entry in fs::read_dir(root).expect("enumerate source-only sysroot") {
+        let path = entry.expect("read source-only sysroot entry").path();
+        if path.is_dir() { remove_artifacts(&path); }
+        else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale sysroot artifact");
+        }
+    }
 }
 
 fn make_opts(test_sysroot: &Sysroot) -> CompilerOptions {
@@ -23,7 +58,7 @@ fn make_opts(test_sysroot: &Sysroot) -> CompilerOptions {
 /// 1. Option::as_ref valid read
 #[test]
 fn test_opt_as_ref_valid_read() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("opt_as_ref_valid_read");
     let opts = make_opts(&test_sysroot);
 
@@ -38,19 +73,19 @@ import <ptr>;
 import <iter_adapters>;
 import <iter_consumers>;
 
-fn read_opt(opt: &Option<i32>) -> i32 {
+fn read_opt(opt: &std::Option<i32>) -> i32 {
     dec ref_opt = opt.as_ref();
     if ref_opt.is_some() {
         match ref_opt {
-            Option::Some(r) -> { return *r; },
-            Option::None -> { return 0; },
+            std::Option::Some(r) -> { return *r; },
+            std::Option::None -> { return 0; },
         }
     }
     return 0;
 }
 
 fn main() -> i32 {
-    dec o = Option::Some(42);
+    dec o = std::Option::Some(42);
     return read_opt(&o);
 }
 "#;
@@ -63,7 +98,7 @@ fn main() -> i32 {
 /// 2. Option::as_ref mutation conflict rejected
 #[test]
 fn test_opt_as_ref_mutation_conflict_rejected() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("opt_as_ref_mutation_conflict");
     let opts = make_opts(&test_sysroot);
 
@@ -79,12 +114,12 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 fn main() {
-    dec rw opt = Option::Some(10);
+    dec rw opt = std::Option::Some(10);
     dec r = opt.as_ref();
-    opt = Option::Some(20); // Mutating owner while `r` is live MUST be rejected!
+    opt = std::Option::Some(20); // Mutating owner while `r` is live MUST be rejected!
     match r {
-        Option::Some(val) -> { dec _v = *val; },
-        Option::None -> (),
+        std::Option::Some(val) -> { dec _v = *val; },
+        std::Option::None -> (),
     }
 }
 "#;
@@ -103,7 +138,7 @@ fn main() {
 /// 3. Option::as_ref mutation allowed after borrow dies (NLL)
 #[test]
 fn test_opt_as_ref_mutation_after_drop_allowed() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("opt_as_ref_after_drop");
     let opts = make_opts(&test_sysroot);
 
@@ -119,18 +154,18 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 fn main() {
-    dec rw opt = Option::Some(10);
+    dec rw opt = std::Option::Some(10);
     dec r = opt.as_ref();
     match r {
-        Option::Some(val) -> { dec _v1 = *val; },
-        Option::None -> (),
+        std::Option::Some(val) -> { dec _v1 = *val; },
+        std::Option::None -> (),
     }
     // `r` is dead now; mutating `opt` MUST succeed
-    opt = Option::Some(30);
+    opt = std::Option::Some(30);
     dec r2 = opt.as_ref();
     match r2 {
-        Option::Some(val2) -> { dec _v2 = *val2; },
-        Option::None -> (),
+        std::Option::Some(val2) -> { dec _v2 = *val2; },
+        std::Option::None -> (),
     }
 }
 "#;
@@ -143,7 +178,7 @@ fn main() {
 /// 4. Option::as_mut valid write
 #[test]
 fn test_opt_as_mut_valid_write() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("opt_as_mut_valid_write");
     let opts = make_opts(&test_sysroot);
 
@@ -158,20 +193,20 @@ import <ptr>;
 import <iter_adapters>;
 import <iter_consumers>;
 
-fn modify_opt(opt: &rw Option<i32>) {
+fn modify_opt(opt: &rw std::Option<i32>) {
     dec rw mut_opt = opt.as_mut();
     match mut_opt {
-        Option::Some(r) -> *r = 99,
-        Option::None -> (),
+        std::Option::Some(r) -> *r = 99,
+        std::Option::None -> (),
     }
 }
 
 fn main() -> i32 {
-    dec rw o = Option::Some(1);
+    dec rw o = std::Option::Some(1);
     modify_opt(&rw o);
     match o {
-        Option::Some(v) -> { return v; },
-        Option::None -> { return 0; },
+        std::Option::Some(v) -> { return v; },
+        std::Option::None -> { return 0; },
     }
 }
 "#;
@@ -184,7 +219,7 @@ fn main() -> i32 {
 /// 5. Option::as_mut exclusive borrow conflict rejected
 #[test]
 fn test_opt_as_mut_exclusive_borrow_conflict_rejected() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("opt_as_mut_conflict");
     let opts = make_opts(&test_sysroot);
 
@@ -200,16 +235,16 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 fn main() {
-    dec rw opt = Option::Some(10);
+    dec rw opt = std::Option::Some(10);
     dec m = opt.as_mut();
     dec r = opt.as_ref(); // Cannot take shared borrow while exclusive borrow `m` is active!
     match m {
-        Option::Some(v) -> { dec _v1 = *v; },
-        Option::None -> (),
+        std::Option::Some(v) -> { dec _v1 = *v; },
+        std::Option::None -> (),
     }
     match r {
-        Option::Some(v) -> { dec _v2 = *v; },
-        Option::None -> (),
+        std::Option::Some(v) -> { dec _v2 = *v; },
+        std::Option::None -> (),
     }
 }
 "#;
@@ -228,7 +263,7 @@ fn main() {
 /// 6. Result::as_ref and Result::as_mut on Ok and Err branches
 #[test]
 fn test_res_as_ref_and_as_mut_contract() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("res_as_ref_as_mut");
     let opts = make_opts(&test_sysroot);
 
@@ -243,27 +278,27 @@ import <ptr>;
 import <iter_adapters>;
 import <iter_consumers>;
 
-fn check_ok(res: &Result<i32, i32>) -> bool {
+fn check_ok(res: &std::Result<i32, i32>) -> bool {
     dec r = res.as_ref();
     return r.is_ok();
 }
 
-fn check_err(res: &Result<i32, i32>) -> bool {
+fn check_err(res: &std::Result<i32, i32>) -> bool {
     dec r = res.as_ref();
     return r.is_err();
 }
 
-fn modify_res(res: &rw Result<i32, i32>) {
+fn modify_res(res: &rw std::Result<i32, i32>) {
     dec rw m = res.as_mut();
     match m {
-        Result::Ok(val) -> *val = 100,
-        Result::Err(err) -> *err = 500,
+        std::Result::Ok(val) -> *val = 100,
+        std::Result::Err(err) -> *err = 500,
     }
 }
 
 fn main() {
-    dec rw r_ok: Result<i32, i32> = Result::Ok(1);
-    dec rw r_err: Result<i32, i32> = Result::Err(2);
+    dec rw r_ok: std::Result<i32, i32> = std::Result::Ok(1);
+    dec rw r_err: std::Result<i32, i32> = std::Result::Err(2);
 
     dec _c1 = check_ok(&r_ok);
     dec _c2 = check_err(&r_err);
@@ -281,7 +316,7 @@ fn main() {
 /// 7. Returning as_ref() of local Option escapes function scope -> REJECT E3005
 #[test]
 fn test_opt_res_local_escape_rejected() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("opt_res_local_escape");
     let opts = make_opts(&test_sysroot);
 
@@ -296,8 +331,8 @@ import <ptr>;
 import <iter_adapters>;
 import <iter_consumers>;
 
-fn escape_opt() -> Option<&i32> {
-    dec local_opt = Option::Some(42);
+fn escape_opt() -> std::Option<&i32> {
+    dec local_opt = std::Option::Some(42);
     return local_opt.as_ref();
 }
 "#;
@@ -316,7 +351,7 @@ fn escape_opt() -> Option<&i32> {
 /// 8. Generic nested projection: Option<Option<&T>>
 #[test]
 fn test_opt_res_nested_generic_projection() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("opt_res_nested_generic");
     let opts = make_opts(&test_sysroot);
 
@@ -331,19 +366,19 @@ import <ptr>;
 import <iter_adapters>;
 import <iter_consumers>;
 
-fn inspect_nested<T>(outer: &Option<Option<T>>) -> bool {
+fn inspect_nested<T>(outer: &std::Option<std::Option<T>>) -> bool {
     dec o = outer.as_ref();
     match o {
-        Option::Some(inner_ref) -> {
+        std::Option::Some(inner_ref) -> {
             dec i = inner_ref.as_ref();
             return i.is_some();
         }
-        Option::None -> { return false; },
+        std::Option::None -> { return false; },
     }
 }
 
 fn main() {
-    dec nested: Option<Option<i32>> = Option::Some(Option::Some(99));
+    dec nested: std::Option<std::Option<i32>> = std::Option::Some(std::Option::Some(99));
     dec _r = inspect_nested<i32>(&nested);
 }
 "#;
@@ -356,7 +391,7 @@ fn main() {
 /// 9. Source .ln vs .llib parity for Option / Result as_ref and as_mut
 #[test]
 fn test_opt_res_source_and_llib_parity() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let dir = create_temp_dir("opt_res_llib_parity");
     let lib_src_path = dir.join("my_provider.ln");
     let lib_bin_path = dir.join("my_provider.llib");
@@ -376,11 +411,11 @@ import <iter_consumers>;
 module my_provider {
     const DUMMY: i32 = 0;
 
-    export fn extract_opt_val(opt: &Option<i32>) -> &i32 life_from(opt) {
+    export fn extract_opt_val(opt: &std::Option<i32>) -> &i32 life_from(opt) {
         dec r = opt.as_ref();
         match r {
-            Option::Some(val) -> { return val; },
-            Option::None -> { return &DUMMY; },
+            std::Option::Some(val) -> { return val; },
+            std::Option::None -> { return &DUMMY; },
         }
     }
 }
@@ -411,9 +446,9 @@ import <iter_consumers>;
 import "my_provider";
 
 fn main() {
-    dec rw opt = Option::Some(100);
+    dec rw opt = std::Option::Some(100);
     dec v = my_provider::extract_opt_val(&opt);
-    opt = Option::Some(200); // Conflict: mutating `opt` while `v` (borrowed from `opt`) is live!
+    opt = std::Option::Some(200); // Conflict: mutating `opt` while `v` (borrowed from `opt`) is live!
     dec _v = *v;
 }
 "#;

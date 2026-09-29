@@ -6,6 +6,7 @@
 
 #include "luna/runtime/io.h"
 #include "luna/runtime/memory.h"
+#include "io_read_all_internal.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -100,6 +101,59 @@ static void luna_rt_free_cstr(char* cbuf, char* stack_buf) {
 
 // --- Whole-File I/O ----------------------------------------------------------
 
+#if defined(_WIN32)
+typedef struct LunaRtWindowsReadContext {
+    HANDLE handle;
+} LunaRtWindowsReadContext;
+
+static LunaRtReadResult luna_rt_read_next_windows(
+    void* context,
+    uint8_t* destination,
+    size_t capacity,
+    size_t* out_bytes
+) {
+    LunaRtWindowsReadContext* read_context = (LunaRtWindowsReadContext*)context;
+    DWORD request = capacity > MAXDWORD ? MAXDWORD : (DWORD)capacity;
+    DWORD bytes_read = 0;
+    if (!ReadFile(read_context->handle, destination, request, &bytes_read, NULL)) {
+        DWORD error = GetLastError();
+        return error == ERROR_HANDLE_EOF ? LUNA_RT_READ_EOF : LUNA_RT_READ_ERROR;
+    }
+    if (bytes_read == 0) {
+        return LUNA_RT_READ_EOF;
+    }
+    *out_bytes = (size_t)bytes_read;
+    return LUNA_RT_READ_DATA;
+}
+#else
+typedef struct LunaRtPosixReadContext {
+    int fd;
+} LunaRtPosixReadContext;
+
+static LunaRtReadResult luna_rt_read_next_posix(
+    void* context,
+    uint8_t* destination,
+    size_t capacity,
+    size_t* out_bytes
+) {
+    LunaRtPosixReadContext* read_context = (LunaRtPosixReadContext*)context;
+#ifdef SSIZE_MAX
+    size_t request = capacity > (size_t)SSIZE_MAX ? (size_t)SSIZE_MAX : capacity;
+#else
+    size_t request = capacity > (size_t)PTRDIFF_MAX ? (size_t)PTRDIFF_MAX : capacity;
+#endif
+    ssize_t bytes_read = read(read_context->fd, destination, request);
+    if (bytes_read > 0) {
+        *out_bytes = (size_t)bytes_read;
+        return LUNA_RT_READ_DATA;
+    }
+    if (bytes_read == 0) {
+        return LUNA_RT_READ_EOF;
+    }
+    return errno == EINTR ? LUNA_RT_READ_INTERRUPTED : LUNA_RT_READ_ERROR;
+}
+#endif
+
 int32_t __luna_read_file(
     const uint8_t*  path_ptr,
     size_t          path_len,
@@ -129,7 +183,7 @@ int32_t __luna_read_file(
     HANDLE hFile = CreateFileW(
         wpath,
         GENERIC_READ,
-        FILE_SHARE_READ,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
         NULL,
         OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL,
@@ -150,49 +204,21 @@ int32_t __luna_read_file(
     luna_rt_free_wchar(wpath, stack_wpath);
 
     LARGE_INTEGER fsize;
-    if (!GetFileSizeEx(hFile, &fsize)) {
-        CloseHandle(hFile);
-        return LUNA_STATUS_IO_ERROR;
+    size_t hint = 0;
+    if (GetFileSizeEx(hFile, &fsize) && fsize.QuadPart > 0 && (uint64_t)fsize.QuadPart <= SIZE_MAX) {
+        hint = (size_t)fsize.QuadPart;
     }
-
-    if (fsize.QuadPart < 0 || (uint64_t)fsize.QuadPart > SIZE_MAX) {
-        CloseHandle(hFile);
-        return LUNA_STATUS_OUT_OF_MEMORY;
-    }
-
-    if (fsize.QuadPart == 0) {
-        CloseHandle(hFile);
-        *out_ptr = (uint8_t*)__luna_alloc(0, 1);
-        *out_len = 0;
-        *out_cap = 0;
-        return LUNA_STATUS_OK;
-    }
-
-    size_t total_size = (size_t)fsize.QuadPart;
-    uint8_t* buf = (uint8_t*)__luna_alloc(total_size, 1);
-
-    size_t total_read = 0;
-    while (total_read < total_size) {
-        size_t remaining = total_size - total_read;
-        DWORD chunk = (remaining > 0x40000000) ? 0x40000000 : (DWORD)remaining;
-        DWORD bytes_read = 0;
-        if (!ReadFile(hFile, buf + total_read, chunk, &bytes_read, NULL)) {
-            __luna_dealloc(buf, total_size, 1);
-            CloseHandle(hFile);
-            return LUNA_STATUS_IO_ERROR;
-        }
-        if (bytes_read == 0) {
-            // EOF reached before total_size (e.g. concurrent truncation / pipe EOF)
-            break;
-        }
-        total_read += bytes_read;
-    }
-
+    LunaRtWindowsReadContext read_context = { hFile };
+    int32_t status = luna_rt_read_all(
+        luna_rt_read_next_windows,
+        &read_context,
+        hint,
+        out_ptr,
+        out_len,
+        out_cap
+    );
     CloseHandle(hFile);
-    *out_ptr = buf;
-    *out_len = total_read;
-    *out_cap = total_size;
-    return LUNA_STATUS_OK;
+    return status;
 
 #else
     char stack_cpath[1024];
@@ -201,7 +227,10 @@ int32_t __luna_read_file(
         return LUNA_STATUS_INVALID_ARGUMENT;
     }
 
-    int fd = open(cpath, O_RDONLY);
+    int fd;
+    do {
+        fd = open(cpath, O_RDONLY);
+    } while (fd < 0 && errno == EINTR);
     if (fd < 0) {
         luna_rt_free_cstr(cpath, stack_cpath);
         if (errno == ENOENT) return LUNA_STATUS_NOT_FOUND;
@@ -210,48 +239,22 @@ int32_t __luna_read_file(
     }
     luna_rt_free_cstr(cpath, stack_cpath);
 
+    size_t hint = 0;
     struct stat st;
-    if (fstat(fd, &st) != 0) {
-        close(fd);
-        return LUNA_STATUS_IO_ERROR;
+    if (fstat(fd, &st) == 0 && st.st_size > 0 && (uint64_t)st.st_size <= SIZE_MAX) {
+        hint = (size_t)st.st_size;
     }
-
-    if (st.st_size < 0 || (uint64_t)st.st_size > SIZE_MAX) {
-        close(fd);
-        return LUNA_STATUS_OUT_OF_MEMORY;
-    }
-
-    if (st.st_size == 0) {
-        close(fd);
-        *out_ptr = (uint8_t*)__luna_alloc(0, 1);
-        *out_len = 0;
-        *out_cap = 0;
-        return LUNA_STATUS_OK;
-    }
-
-    size_t total_size = (size_t)st.st_size;
-    uint8_t* buf = (uint8_t*)__luna_alloc(total_size, 1);
-
-    size_t total_read = 0;
-    while (total_read < total_size) {
-        ssize_t n = read(fd, buf + total_read, total_size - total_read);
-        if (n < 0) {
-            __luna_dealloc(buf, total_size, 1);
-            close(fd);
-            return LUNA_STATUS_IO_ERROR;
-        }
-        if (n == 0) {
-            // EOF reached before total_size
-            break;
-        }
-        total_read += (size_t)n;
-    }
-
+    LunaRtPosixReadContext read_context = { fd };
+    int32_t status = luna_rt_read_all(
+        luna_rt_read_next_posix,
+        &read_context,
+        hint,
+        out_ptr,
+        out_len,
+        out_cap
+    );
     close(fd);
-    *out_ptr = buf;
-    *out_len = total_read;
-    *out_cap = total_size;
-    return LUNA_STATUS_OK;
+    return status;
 #endif
 }
 
@@ -305,11 +308,14 @@ int32_t __luna_write_file(
             CloseHandle(hFile);
             return LUNA_STATUS_IO_ERROR;
         }
+        if (bytes_written == 0) {
+            CloseHandle(hFile);
+            return LUNA_STATUS_IO_ERROR;
+        }
         total_written += bytes_written;
     }
 
-    CloseHandle(hFile);
-    return LUNA_STATUS_OK;
+    return CloseHandle(hFile) ? LUNA_STATUS_OK : LUNA_STATUS_IO_ERROR;
 
 #else
     char stack_cpath[1024];
@@ -329,6 +335,9 @@ int32_t __luna_write_file(
     size_t total_written = 0;
     while (total_written < data_len) {
         ssize_t n = write(fd, data_ptr + total_written, data_len - total_written);
+        if (n < 0 && errno == EINTR) {
+            continue;
+        }
         if (n <= 0) {
             close(fd);
             return LUNA_STATUS_IO_ERROR;
@@ -336,8 +345,7 @@ int32_t __luna_write_file(
         total_written += (size_t)n;
     }
 
-    close(fd);
-    return LUNA_STATUS_OK;
+    return close(fd) == 0 ? LUNA_STATUS_OK : LUNA_STATUS_IO_ERROR;
 #endif
 }
 

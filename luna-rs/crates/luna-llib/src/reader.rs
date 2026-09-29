@@ -7,6 +7,7 @@ pub enum MlibError {
     Io(std::io::Error),
     InvalidMagic,
     VersionMismatch(u16),
+    UnsupportedContractVersion(u32),
     UnknownSection(u32),
     CorruptedData,
 }
@@ -19,10 +20,212 @@ impl From<std::io::Error> for MlibError {
     }
 }
 
-pub struct MlibReader;
-pub type LlibReader = MlibReader;
+pub struct LlibReader;
+pub type MlibReader = LlibReader;
 
-impl MlibReader {
+#[cfg(test)]
+mod raw_anchor_validation_tests {
+    use super::*;
+    use crate::metadata::{CanonicalInterface, CanonicalType, ExportedSymbol, StableSymbolId};
+    use luna_semantic::ty::{BuiltinType, Mutability};
+    use std::collections::BTreeMap;
+
+    fn symbol(kind: &str, path: &str, ty_index: Option<u32>) -> ExportedSymbol {
+        ExportedSymbol {
+            kind: kind.into(),
+            ty_index,
+            visibility: 1,
+            generic_params: Vec::new(),
+            symbol_id: StableSymbolId { provider_name: "test".into(), symbol_path: path.into() },
+            children: BTreeMap::new(),
+            lifetime_contract: None,
+            type_lifetime_contract: None,
+            raw_storage_anchor_contract: None,
+            raw_pointer_effects: None,
+            is_unsafe: false,
+        }
+    }
+
+    fn interface(contract: luna_semantic::CanonicalRawStorageAnchorContract) -> CanonicalInterface {
+        let mut field = symbol("Variable", "Owner.ptr", Some(0));
+        field.symbol_id = StableSymbolId { provider_name: "test".into(), symbol_path: "Owner.ptr".into() };
+        let mut owner = symbol("Struct", "Owner", None);
+        owner.children.insert("ptr".into(), field);
+        owner.raw_storage_anchor_contract = Some(contract);
+        CanonicalInterface {
+            exported_symbols: BTreeMap::from([("Owner".into(), owner)]),
+            types: vec![CanonicalType::Pointer(Mutability::Mutable, 1), CanonicalType::Primitive(BuiltinType::U8)],
+            traits: BTreeMap::new(),
+            impl_headers: Vec::new(),
+        }
+    }
+
+    #[test]
+    fn rejects_unknown_anchor_contract_version() {
+        let iface = interface(luna_semantic::CanonicalRawStorageAnchorContract {
+            version: 999,
+            field_names: vec!["ptr".into()],
+        });
+        assert!(matches!(validate_raw_storage_anchor_contracts(&iface), Err(MlibError::UnsupportedContractVersion(999))));
+    }
+
+    #[test]
+    fn rejects_contract_on_non_struct_or_non_pointer_field() {
+        let mut iface = interface(luna_semantic::CanonicalRawStorageAnchorContract::new(vec!["ptr".into()]));
+        iface.exported_symbols.get_mut("Owner").unwrap().kind = "Enum".into();
+        assert!(matches!(validate_raw_storage_anchor_contracts(&iface), Err(MlibError::CorruptedData)));
+
+        let mut iface = interface(luna_semantic::CanonicalRawStorageAnchorContract::new(vec!["ptr".into()]));
+        iface.types[0] = CanonicalType::Primitive(BuiltinType::U8);
+        assert!(matches!(validate_raw_storage_anchor_contracts(&iface), Err(MlibError::CorruptedData)));
+    }
+
+    #[test]
+    fn rejects_raw_pointer_effect_parameter_outside_function_signature() {
+        use crate::metadata::{
+            CanonicalRawPointerAnchor, CanonicalRawPointerEffect,
+            CanonicalRawPointerEffects, CanonicalRawPointerOrigin,
+        };
+        let mut function = symbol("Function", "relay", Some(0));
+        function.raw_pointer_effects = Some(CanonicalRawPointerEffects {
+            returned: CanonicalRawPointerEffect {
+                origin: CanonicalRawPointerOrigin::FromParameters(vec![1]),
+                anchor: CanonicalRawPointerAnchor::Unknown,
+            },
+            direct_fields: BTreeMap::new(),
+        });
+        let interface = CanonicalInterface {
+            exported_symbols: BTreeMap::from([("relay".into(), function)]),
+            types: vec![CanonicalType::Function { params: vec![1], return_type: 2 }],
+            traits: BTreeMap::new(),
+            impl_headers: Vec::new(),
+        };
+        assert!(matches!(validate_raw_pointer_effects(&interface), Err(MlibError::CorruptedData)));
+    }
+}
+
+fn check_semantic_metadata_version(data: &[u8]) -> Result<(), MlibError> {
+    if data.len() < std::mem::size_of::<u16>() {
+        return Err(MlibError::CorruptedData);
+    }
+    let version = u16::from_le_bytes([data[0], data[1]]);
+    if version == crate::format::SEMANTIC_METADATA_VERSION {
+        Ok(())
+    } else {
+        Err(MlibError::VersionMismatch(version))
+    }
+}
+
+/// Validate stable raw-storage contracts before exposing artifact metadata to
+/// semantic reconstruction. A malformed contract must never be silently
+/// dropped by a downstream decoder.
+pub fn validate_raw_storage_anchor_contracts(
+    interface: &crate::metadata::CanonicalInterface,
+) -> Result<(), MlibError> {
+    fn visit(
+        symbol: &crate::metadata::ExportedSymbol,
+        interface: &crate::metadata::CanonicalInterface,
+    ) -> Result<(), MlibError> {
+        if let Some(contract) = &symbol.raw_storage_anchor_contract {
+            if contract.version != luna_semantic::CanonicalRawStorageAnchorContract::CURRENT_VERSION {
+                return Err(MlibError::UnsupportedContractVersion(contract.version));
+            }
+            if symbol.kind != "Struct" || contract.field_names.is_empty() {
+                return Err(MlibError::CorruptedData);
+            }
+            let mut previous: Option<&str> = None;
+            for field_name in &contract.field_names {
+                if previous.is_some_and(|p| p >= field_name.as_str()) {
+                    return Err(MlibError::CorruptedData);
+                }
+                previous = Some(field_name);
+                let field = symbol.children.get(field_name).ok_or(MlibError::CorruptedData)?;
+                let ty_index = field.ty_index.ok_or(MlibError::CorruptedData)? as usize;
+                if !matches!(interface.types.get(ty_index), Some(crate::metadata::CanonicalType::Pointer(_, _))) {
+                    return Err(MlibError::CorruptedData);
+                }
+            }
+        }
+        for child in symbol.children.values() {
+            visit(child, interface)?;
+        }
+        Ok(())
+    }
+
+    for symbol in interface.exported_symbols.values() {
+        visit(symbol, interface)?;
+    }
+    Ok(())
+}
+
+/// Validate stable raw-pointer return effects before exposing them to callers.
+/// Parameter indices are interpreted against the canonical function type;
+/// no borrowck state or session-local identity is read from the artifact.
+pub fn validate_raw_pointer_effects(
+    interface: &crate::metadata::CanonicalInterface,
+) -> Result<(), MlibError> {
+    use crate::metadata::{CanonicalRawPointerAnchor, CanonicalRawPointerAnchorSource, CanonicalRawPointerOrigin};
+
+    fn validate_effect(
+        effect: &crate::metadata::CanonicalRawPointerEffect,
+        parameter_count: usize,
+    ) -> Result<(), MlibError> {
+        if let CanonicalRawPointerOrigin::FromParameters(parameters) = &effect.origin {
+            if parameters.iter().any(|parameter| *parameter as usize >= parameter_count) {
+                return Err(MlibError::CorruptedData);
+            }
+        }
+        if let CanonicalRawPointerAnchor::From(sources) = &effect.anchor {
+            for source in sources {
+                match source {
+                    CanonicalRawPointerAnchorSource::RawParameter(parameter) => {
+                        if *parameter as usize >= parameter_count { return Err(MlibError::CorruptedData); }
+                    }
+                    CanonicalRawPointerAnchorSource::OwnerField { parameter, field_name } => {
+                        if *parameter as usize >= parameter_count || field_name.is_empty() {
+                            return Err(MlibError::CorruptedData);
+                        }
+                    }
+                    CanonicalRawPointerAnchorSource::Unknown => {}
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn visit(
+        symbol: &crate::metadata::ExportedSymbol,
+        interface: &crate::metadata::CanonicalInterface,
+    ) -> Result<(), MlibError> {
+        if let Some(effects) = &symbol.raw_pointer_effects {
+            if !matches!(symbol.kind.as_str(), "Function" | "ExternFunction") {
+                return Err(MlibError::CorruptedData);
+            }
+            let ty_index = symbol.ty_index.ok_or(MlibError::CorruptedData)? as usize;
+            let Some(crate::metadata::CanonicalType::Function { params, .. }) = interface.types.get(ty_index) else {
+                return Err(MlibError::CorruptedData);
+            };
+            validate_effect(&effects.returned, params.len())?;
+            for (field_name, effect) in &effects.direct_fields {
+                if field_name.is_empty() { return Err(MlibError::CorruptedData); }
+                validate_effect(effect, params.len())?;
+            }
+        }
+        for child in symbol.children.values() { visit(child, interface)?; }
+        Ok(())
+    }
+
+    for symbol in interface.exported_symbols.values() { visit(symbol, interface)?; }
+    Ok(())
+}
+
+fn validate_header_versions(header: &LlibHeader) -> Result<(), MlibError> {
+    if header.mvir_version != crate::format::LLIB_MVIR_VERSION {
+        return Err(MlibError::VersionMismatch(header.mvir_version));
+    }
+    Ok(())
+}
+impl LlibReader {
     pub fn read_manifest<R: Read + Seek>(reader: &mut R) -> Result<crate::format::Manifest, MlibError> {
         let header = LlibHeader::read_from(reader)?;
         if header.magic != LLIB_MAGIC && header.magic != MLIB_MAGIC {
@@ -31,6 +234,7 @@ impl MlibReader {
         if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
             return Err(MlibError::VersionMismatch(header.format_version));
         }
+        validate_header_versions(&header)?;
         reader.seek(SeekFrom::Start(header.section_table_offset))?;
         for _ in 0..header.section_count {
             let section = SectionEntry::read_from(reader)?;
@@ -54,6 +258,7 @@ impl MlibReader {
         if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
             return Err(MlibError::VersionMismatch(header.format_version));
         }
+        validate_header_versions(&header)?;
         reader.seek(SeekFrom::Start(header.section_table_offset))?;
         for _ in 0..header.section_count {
             let section = SectionEntry::read_from(reader)?;
@@ -77,6 +282,7 @@ impl MlibReader {
         if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
             return Err(MlibError::VersionMismatch(header.format_version));
         }
+        validate_header_versions(&header)?;
         
         reader.seek(SeekFrom::Start(header.section_table_offset))?;
 
@@ -136,7 +342,17 @@ impl MlibReader {
                     reader.seek(SeekFrom::Start(section.offset))?;
                     let mut data = vec![0u8; section.size as usize];
                     reader.read_exact(&mut data)?;
-                    semantic_opt = Some(bincode::deserialize(&data).map_err(|_| MlibError::CorruptedData)?);
+                    // `metadata_version` is the first field in the canonical
+                    // bincode envelope. Check it before decoding the versioned
+                    // payload so an older schema (which lacks required fields)
+                    // is rejected explicitly rather than reported as generic
+                    // corruption or silently defaulted.
+                    check_semantic_metadata_version(&data)?;
+                    let metadata: crate::metadata::SemanticMetadata =
+                        bincode::deserialize(&data).map_err(|_| MlibError::CorruptedData)?;
+                    validate_raw_storage_anchor_contracts(&metadata.interface)?;
+                    validate_raw_pointer_effects(&metadata.interface)?;
+                    semantic_opt = Some(metadata);
                 }
                 SectionType::TypeMetadata => {
                     reader.seek(SeekFrom::Start(section.offset))?;
@@ -257,6 +473,17 @@ impl MlibReader {
                 let s = Self::read_string(r)?;
                 Ok(MlibOperand::Char(s))
             }
+            7 => {
+                let mut ty_buf = [0u8; 1];
+                r.read_exact(&mut ty_buf)?;
+                let ty = if ty_buf[0] == 0 {
+                    crate::ir::MlibFloatType::F32
+                } else {
+                    crate::ir::MlibFloatType::F64
+                };
+                let text = Self::read_string(r)?;
+                Ok(MlibOperand::Float { text, ty })
+            }
             _ => Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "Invalid operand tag")),
         }
     }
@@ -278,9 +505,20 @@ impl MlibReader {
                 let value = Self::deserialize_operand(r)?;
                 Ok(MlibInstruction::Store { ptr, value })
             }
+            0x28 => {
+                let mut ptr_buf = [0u8; 4];
+                r.read_exact(&mut ptr_buf)?;
+                let ptr = u32::from_le_bytes(ptr_buf);
+                let value = Self::deserialize_operand(r)?;
+                Ok(MlibInstruction::StoreAnchored { ptr, value })
+            }
             3 => {
                 let ptr = Self::deserialize_operand(r)?;
                 Ok(MlibInstruction::Load { ptr })
+            }
+            0x71 => {
+                let value = Self::deserialize_operand(r)?;
+                Ok(MlibInstruction::Neg { value })
             }
             4 => {
                 let callee = Self::read_string(r)?;
@@ -515,9 +753,17 @@ impl MlibReader {
                 let base = Self::deserialize_operand(r)?;
                 let mut field_buf = [0u8; 4];
                 r.read_exact(&mut field_buf)?;
+                let mut name_tag = [0u8; 1];
+                r.read_exact(&mut name_tag)?;
+                let field_name = match name_tag[0] {
+                    0 => None,
+                    1 => Some(Self::read_string(r)?),
+                    _ => return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "invalid field-name tag")),
+                };
                 Ok(MlibInstruction::FieldPtr {
                     base,
                     field_idx: u32::from_le_bytes(field_buf),
+                    field_name,
                 })
             }
             13 => {
@@ -723,6 +969,10 @@ impl MlibReader {
         if header.magic != LLIB_MAGIC && header.magic != MLIB_MAGIC {
             return Err(MlibError::InvalidMagic);
         }
+        if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
+            return Err(MlibError::VersionMismatch(header.format_version));
+        }
+        validate_header_versions(&header)?;
         
         reader.seek(SeekFrom::Start(header.section_table_offset))?;
 
@@ -745,5 +995,30 @@ impl MlibReader {
         }
         
         Ok(None)
+    }
+}
+
+#[cfg(test)]
+mod semantic_metadata_version_tests {
+    use super::check_semantic_metadata_version;
+    use crate::format::SEMANTIC_METADATA_VERSION;
+    use crate::MlibError;
+
+    #[test]
+    fn old_semantic_metadata_is_rejected_before_payload_decode() {
+        let old_version = SEMANTIC_METADATA_VERSION - 1;
+        let bytes = old_version.to_le_bytes();
+        assert!(matches!(
+            check_semantic_metadata_version(&bytes),
+            Err(MlibError::VersionMismatch(version)) if version == old_version
+        ));
+    }
+
+    #[test]
+    fn truncated_semantic_metadata_version_is_corrupt() {
+        assert!(matches!(
+            check_semantic_metadata_version(&[0]),
+            Err(MlibError::CorruptedData)
+        ));
     }
 }

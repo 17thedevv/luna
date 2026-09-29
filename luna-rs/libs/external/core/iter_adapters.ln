@@ -3,8 +3,11 @@ import <__lang_iterator>;
 import <__lang_into_iterator>;
 import <mem>;
 
+export module std {
+    export module iter {
+
 // =========================================================================
-// Iterator Adapters: Map, Filter, Enumerate, Take, Skip, Zip
+// std::Iterator Adapters: Map, Filter, Enumerate, Take, Skip, Zip
 // =========================================================================
 
 export struct Map<I, Item, Out> {
@@ -12,16 +15,16 @@ export struct Map<I, Item, Out> {
     private f: fn(Item) -> Out,
 };
 
-impl<I: Iterator<Item>, Item, Out> Iterator<Out> for Map<I, Item, Out> {
-    fn next(self: &rw Self) -> Option<Out> {
+impl<I: std::Iterator<Item>, Item, Out> std::Iterator<Out> for Map<I, Item, Out> {
+    fn next(self: &rw Self) -> std::Option<Out> life_from(self) {
         dec opt = self.iter.next();
         match opt {
-            Option::Some(x) -> {
+            std::Option::Some(x) -> {
                 dec f_ptr = self.f;
-                return Option::Some(f_ptr(x));
+                return std::Option::Some(f_ptr(x));
             },
-            Option::None -> {
-                return Option::None;
+            std::Option::None -> {
+                return std::Option::None;
             },
         }
     }
@@ -33,24 +36,24 @@ export struct Filter<I, Item> {
     private pred: fn(Item) -> bool,
 };
 
-impl<I: Iterator<Item>, Item> Iterator<Item> for Filter<I, Item> {
-    fn next(self: &rw Self) -> Option<Item> {
+impl<I: std::Iterator<Item>, Item> std::Iterator<Item> for Filter<I, Item> {
+    fn next(self: &rw Self) -> std::Option<Item> life_from(self) {
         dec rw running = true;
         while running {
             dec opt = self.iter.next();
             match opt {
-                Option::Some(x) -> {
+                std::Option::Some(x) -> {
                     dec p_ptr = self.pred;
                     if p_ptr(x) {
-                        return Option::Some(x);
+                        return std::Option::Some(x);
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     running = false;
                 },
             }
         }
-        return Option::None;
+        return std::Option::None;
     }
 }
 
@@ -59,17 +62,17 @@ export struct Enumerate<I, Item> {
     private count: u64,
 };
 
-impl<I: Iterator<Item>, Item> Iterator<(u64, Item)> for Enumerate<I, Item> {
-    fn next(self: &rw Self) -> Option<(u64, Item)> {
+impl<I: std::Iterator<Item>, Item> std::Iterator<(u64, Item)> for Enumerate<I, Item> {
+    fn next(self: &rw Self) -> std::Option<(u64, Item)> life_from(self) {
         dec opt = self.iter.next();
         match opt {
-            Option::Some(x) -> {
+            std::Option::Some(x) -> {
                 dec cur = self.count;
                 self.count = self.count + (1 as u64);
-                return Option::Some((cur, x));
+                return std::Option::Some((cur, x));
             },
-            Option::None -> {
-                return Option::None;
+            std::Option::None -> {
+                return std::Option::None;
             },
         }
     }
@@ -80,19 +83,19 @@ export struct Take<I, Item> {
     private remaining: u64,
 };
 
-impl<I: Iterator<Item>, Item> Iterator<Item> for Take<I, Item> {
-    fn next(self: &rw Self) -> Option<Item> {
+impl<I: std::Iterator<Item>, Item> std::Iterator<Item> for Take<I, Item> {
+    fn next(self: &rw Self) -> std::Option<Item> life_from(self) {
         if self.remaining == (0 as u64) {
-            return Option::None;
+            return std::Option::None;
         }
         dec item_opt = self.iter.next();
         match item_opt {
-            Option::Some(x) -> {
+            std::Option::Some(x) -> {
                 self.remaining = self.remaining - (1 as u64);
-                return Option::Some(x);
+                return std::Option::Some(x);
             },
-            Option::None -> {
-                return Option::None;
+            std::Option::None -> {
+                return std::Option::None;
             },
         }
     }
@@ -103,15 +106,15 @@ export struct Skip<I, Item> {
     private to_skip: u64,
 };
 
-impl<I: Iterator<Item>, Item> Iterator<Item> for Skip<I, Item> {
-    fn next(self: &rw Self) -> Option<Item> {
+impl<I: std::Iterator<Item>, Item> std::Iterator<Item> for Skip<I, Item> {
+    fn next(self: &rw Self) -> std::Option<Item> life_from(self) {
         while self.to_skip > (0 as u64) {
             self.to_skip = self.to_skip - (1 as u64);
             dec opt = self.iter.next();
             match opt {
-                Option::Some(_) -> {},
-                Option::None -> {
-                    return Option::None;
+                std::Option::Some(_) -> {},
+                std::Option::None -> {
+                    return std::Option::None;
                 },
             }
         }
@@ -124,64 +127,64 @@ export struct Zip<A, B, ItemA, ItemB> {
     private b: B,
 };
 
-impl<A: Iterator<ItemA>, B: Iterator<ItemB>, ItemA, ItemB> Iterator<(ItemA, ItemB)> for Zip<A, B, ItemA, ItemB> {
-    fn next(self: &rw Self) -> Option<(ItemA, ItemB)> {
+impl<A: std::Iterator<ItemA>, B: std::Iterator<ItemB>, ItemA, ItemB> std::Iterator<(ItemA, ItemB)> for Zip<A, B, ItemA, ItemB> {
+    fn next(self: &rw Self) -> std::Option<(ItemA, ItemB)> life_from(self) {
         dec opt_a = self.a.next();
         match opt_a {
-            Option::Some(x) -> {
+            std::Option::Some(x) -> {
                 dec opt_b = self.b.next();
                 match opt_b {
-                    Option::Some(y) -> {
-                        return Option::Some((x, y));
+                    std::Option::Some(y) -> {
+                        return std::Option::Some((x, y));
                     },
-                    Option::None -> {
-                        return Option::None;
+                    std::Option::None -> {
+                        return std::Option::None;
                     },
                 }
             },
-            Option::None -> {
-                return Option::None;
+            std::Option::None -> {
+                return std::Option::None;
             },
         }
     }
 }
 
-export fn iter_map<I: Iterator<Item>, Item, Out>(iter: I, f: fn(Item) -> Out) -> Map<I, Item, Out> {
+export fn iter_map<I: std::Iterator<Item>, Item, Out>(iter: I, f: fn(Item) -> Out) -> Map<I, Item, Out> life_from(iter) {
     return Map<I, Item, Out> {
         iter: iter,
         f: f,
     };
 }
 
-export fn iter_filter<I: Iterator<Item>, Item>(iter: I, pred: fn(Item) -> bool) -> Filter<I, Item> {
+export fn iter_filter<I: std::Iterator<Item>, Item>(iter: I, pred: fn(Item) -> bool) -> Filter<I, Item> life_from(iter) {
     return Filter<I, Item> {
         iter: iter,
         pred: pred,
     };
 }
 
-export fn iter_enumerate<I: Iterator<Item>, Item>(iter: I) -> Enumerate<I, Item> {
+export fn iter_enumerate<I: std::Iterator<Item>, Item>(iter: I) -> Enumerate<I, Item> life_from(iter) {
     return Enumerate<I, Item> {
         iter: iter,
         count: 0 as u64,
     };
 }
 
-export fn iter_take<I: Iterator<Item>, Item>(iter: I, n: u64) -> Take<I, Item> {
+export fn iter_take<I: std::Iterator<Item>, Item>(iter: I, n: u64) -> Take<I, Item> life_from(iter) {
     return Take<I, Item> {
         iter: iter,
         remaining: n,
     };
 }
 
-export fn iter_skip<I: Iterator<Item>, Item>(iter: I, n: u64) -> Skip<I, Item> {
+export fn iter_skip<I: std::Iterator<Item>, Item>(iter: I, n: u64) -> Skip<I, Item> life_from(iter) {
     return Skip<I, Item> {
         iter: iter,
         to_skip: n,
     };
 }
 
-export fn iter_zip<A: Iterator<ItemA>, B: Iterator<ItemB>, ItemA, ItemB>(a: A, b: B) -> Zip<A, B, ItemA, ItemB> {
+export fn iter_zip<A: std::Iterator<ItemA>, B: std::Iterator<ItemB>, ItemA, ItemB>(a: A, b: B) -> Zip<A, B, ItemA, ItemB> life_from(a | b) {
     return Zip<A, B, ItemA, ItemB> {
         a: a,
         b: b,
@@ -198,15 +201,15 @@ export struct Chain<A, B, Item> {
     private a_done: bool,
 };
 
-impl<A: Iterator<Item>, B: Iterator<Item>, Item> Iterator<Item> for Chain<A, B, Item> {
-    fn next(self: &rw Self) -> Option<Item> {
+impl<A: std::Iterator<Item>, B: std::Iterator<Item>, Item> std::Iterator<Item> for Chain<A, B, Item> {
+    fn next(self: &rw Self) -> std::Option<Item> life_from(self) {
         if self.a_done == false {
             dec opt_a = self.a.next();
             match opt_a {
-                Option::Some(x) -> {
-                    return Option::Some(x);
+                std::Option::Some(x) -> {
+                    return std::Option::Some(x);
                 },
-                Option::None -> {
+                std::Option::None -> {
                     self.a_done = true;
                 },
             }
@@ -215,7 +218,7 @@ impl<A: Iterator<Item>, B: Iterator<Item>, Item> Iterator<Item> for Chain<A, B, 
     }
 }
 
-export fn iter_chain<A: Iterator<Item>, B: Iterator<Item>, Item>(a: A, b: B) -> Chain<A, B, Item> {
+export fn iter_chain<A: std::Iterator<Item>, B: std::Iterator<Item>, Item>(a: A, b: B) -> Chain<A, B, Item> life_from(a | b) {
     return Chain<A, B, Item> {
         a: a,
         b: b,
@@ -229,11 +232,11 @@ export fn iter_chain<A: Iterator<Item>, B: Iterator<Item>, Item>(a: A, b: B) -> 
 
 export struct Peekable<I, Item> {
     private iter: I,
-    private peeked: Option<Item>,
+    private peeked: std::Option<Item>,
 };
 
-impl<I: Iterator<Item>, Item> Peekable<I, Item> {
-    export fn peek(self: &rw Self) -> Option<&Item> life_from(self) {
+impl<I: std::Iterator<Item>, Item> Peekable<I, Item> {
+    export fn peek(self: &rw Self) -> std::Option<&Item> life_from(self) {
         if self.peeked.is_none() {
             self.peeked = self.iter.next();
         }
@@ -241,20 +244,20 @@ impl<I: Iterator<Item>, Item> Peekable<I, Item> {
     }
 }
 
-impl<I: Iterator<Item>, Item> Iterator<Item> for Peekable<I, Item> {
-    fn next(self: &rw Self) -> Option<Item> {
+impl<I: std::Iterator<Item>, Item> std::Iterator<Item> for Peekable<I, Item> {
+    fn next(self: &rw Self) -> std::Option<Item> life_from(self) {
         if self.peeked.is_some() {
-            dec opt = mem::replace<Option<Item>>(&rw self.peeked, Option::None);
+            dec opt = std::mem::replace<std::Option<Item>>(&rw self.peeked, std::Option::None);
             return opt;
         }
         return self.iter.next();
     }
 }
 
-export fn iter_peekable<I: Iterator<Item>, Item>(iter: I) -> Peekable<I, Item> {
+export fn iter_peekable<I: std::Iterator<Item>, Item>(iter: I) -> Peekable<I, Item> life_from(iter) {
     return Peekable<I, Item> {
         iter: iter,
-        peeked: Option::None,
+        peeked: std::Option::None,
     };
 }
 
@@ -264,34 +267,34 @@ export fn iter_peekable<I: Iterator<Item>, Item>(iter: I) -> Peekable<I, Item> {
 
 export struct FilterMap<I, Item, Out> {
     private iter: I,
-    private f: fn(Item) -> Option<Out>,
+    private f: fn(Item) -> std::Option<Out>,
 };
 
-impl<I: Iterator<Item>, Item, Out> Iterator<Out> for FilterMap<I, Item, Out> {
-    fn next(self: &rw Self) -> Option<Out> {
+impl<I: std::Iterator<Item>, Item, Out> std::Iterator<Out> for FilterMap<I, Item, Out> {
+    fn next(self: &rw Self) -> std::Option<Out> life_from(self) {
         while true {
             dec opt = self.iter.next();
             match opt {
-                Option::Some(x) -> {
+                std::Option::Some(x) -> {
                     dec f_ptr = self.f;
                     dec mapped = f_ptr(x);
                     match mapped {
-                        Option::Some(y) -> {
-                            return Option::Some(y);
+                        std::Option::Some(y) -> {
+                            return std::Option::Some(y);
                         },
-                        Option::None -> {},
+                        std::Option::None -> {},
                     }
                 },
-                Option::None -> {
-                    return Option::None;
+                std::Option::None -> {
+                    return std::Option::None;
                 },
             }
         }
-        return Option::None;
+        return std::Option::None;
     }
 }
 
-export fn iter_filter_map<I: Iterator<Item>, Item, Out>(iter: I, f: fn(Item) -> Option<Out>) -> FilterMap<I, Item, Out> {
+export fn iter_filter_map<I: std::Iterator<Item>, Item, Out>(iter: I, f: fn(Item) -> std::Option<Out>) -> FilterMap<I, Item, Out> life_from(iter) {
     return FilterMap<I, Item, Out> {
         iter: iter,
         f: f,
@@ -308,32 +311,32 @@ export struct TakeWhile<I, Item> {
     private done: bool,
 };
 
-impl<I: Iterator<Item>, Item> Iterator<Item> for TakeWhile<I, Item> {
-    fn next(self: &rw Self) -> Option<Item> {
+impl<I: std::Iterator<Item>, Item> std::Iterator<Item> for TakeWhile<I, Item> {
+    fn next(self: &rw Self) -> std::Option<Item> life_from(self) {
         if self.done {
-            return Option::None;
+            return std::Option::None;
         }
         dec opt = self.iter.next();
         match opt {
-            Option::Some(x) -> {
+            std::Option::Some(x) -> {
                 dec p_fn = self.pred;
                 if p_fn(&x) {
-                    return Option::Some(x);
+                    return std::Option::Some(x);
                 } else {
                     self.done = true;
-                    return Option::None;
+                    return std::Option::None;
                 }
             },
-            Option::None -> {
+            std::Option::None -> {
                 self.done = true;
-                return Option::None;
+                return std::Option::None;
             },
         }
-        return Option::None;
+        return std::Option::None;
     }
 }
 
-export fn iter_take_while<I: Iterator<Item>, Item>(iter: I, pred: fn(&Item) -> bool) -> TakeWhile<I, Item> {
+export fn iter_take_while<I: std::Iterator<Item>, Item>(iter: I, pred: fn(&Item) -> bool) -> TakeWhile<I, Item> life_from(iter) {
     return TakeWhile<I, Item> {
         iter: iter,
         pred: pred,
@@ -448,40 +451,43 @@ export fn range_inclusive<T>(start: T, end: T) -> RangeInclusive<T> {
     };
 }
 
-impl<T: Step> Iterator<T> for Range<T> {
-    fn next(self: &rw Self) -> Option<T> {
+impl<T: Step> std::Iterator<T> for Range<T> {
+    fn next(self: &rw Self) -> std::Option<T> life_from(self) {
         if self.current.step_less(&self.end) {
             dec val = self.current;
             self.current = self.current.step_forward();
-            return Option::Some(val);
+            return std::Option::Some(val);
         }
-        return Option::None;
+        return std::Option::None;
     }
 }
 
-impl<T: Step> Iterator<T> for RangeInclusive<T> {
-    fn next(self: &rw Self) -> Option<T> {
-        if self.exhausted { return Option::None; }
-        if self.current.step_greater(&self.end) { return Option::None; }
+impl<T: Step> std::Iterator<T> for RangeInclusive<T> {
+    fn next(self: &rw Self) -> std::Option<T> life_from(self) {
+        if self.exhausted { return std::Option::None; }
+        if self.current.step_greater(&self.end) { return std::Option::None; }
         if self.current.step_eq(&self.end) {
             self.exhausted = true;
-            return Option::Some(self.current);
+            return std::Option::Some(self.current);
         }
         dec val = self.current;
         self.current = self.current.step_forward();
-        return Option::Some(val);
+        return std::Option::Some(val);
     }
 }
 
-impl<T> IntoIterator<T, Range<T>> for Range<T> {
+impl<T> std::IntoIterator<T, Range<T>> for Range<T> {
     fn into_iter(self: Self) -> Range<T> {
         return self;
     }
 }
 
-impl<T> IntoIterator<T, RangeInclusive<T>> for RangeInclusive<T> {
+impl<T> std::IntoIterator<T, RangeInclusive<T>> for RangeInclusive<T> {
     fn into_iter(self: Self) -> RangeInclusive<T> {
         return self;
+    }
+}
+
     }
 }
 

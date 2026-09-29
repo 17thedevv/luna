@@ -1,0 +1,10 @@
+unsafe fn conflicting(pointer: *rw i32) {
+    unsafe {
+        dec rw first = &rw *pointer;
+        dec rw second = &rw *pointer;
+        *first = 1;
+        *second = 2;
+    }
+}
+
+fn main() {}

@@ -19,6 +19,7 @@ pub struct InterfaceDecoder {
     allocated_generic_params: std::collections::HashSet<luna_common::ids::SymbolId>,
     symbol_lifetime_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalLifetimeContract>,
     symbol_type_lifetime_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalTypeLifetimeContract>,
+    symbol_raw_storage_anchor_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalRawStorageAnchorContract>,
     unsafe_functions: std::collections::HashSet<luna_common::ids::SymbolId>,
     known_providers: HashMap<String, ProviderId>,
 }
@@ -46,6 +47,7 @@ impl InterfaceDecoder {
             allocated_generic_params: std::collections::HashSet::new(),
             symbol_lifetime_contracts: HashMap::new(),
             symbol_type_lifetime_contracts: HashMap::new(),
+            symbol_raw_storage_anchor_contracts: HashMap::new(),
             unsafe_functions: std::collections::HashSet::new(),
             known_providers,
         }
@@ -69,7 +71,9 @@ impl InterfaceDecoder {
         }
     }
 
-    pub fn decode(mut self) -> ProviderInterface {
+    pub fn decode(mut self) -> Result<ProviderInterface, luna_llib::MlibError> {
+        luna_llib::reader::validate_raw_storage_anchor_contracts(&self.interface)?;
+        luna_llib::reader::validate_raw_pointer_effects(&self.interface)?;
         // Decode all types to populate type context first
         for i in 0..self.interface.types.len() {
             self.decode_type_index(i as u32);
@@ -178,12 +182,13 @@ impl InterfaceDecoder {
             impl_self_types.insert(key, self_type);
         }
 
-        ProviderInterface {
+        Ok(ProviderInterface {
             id: self.provider_id,
             name: self.provider_name,
             interface_fingerprint: self.interface_fingerprint,
             exported_symbols,
             symbol_types,
+            symbol_struct_field_names: HashMap::new(),
             types: self.types,
             lang_items: HashMap::new(), // Not implemented in v1 SemanticMetadata
             generic_param_symbols,
@@ -211,12 +216,15 @@ impl InterfaceDecoder {
             raw_generic_param_symbols: HashMap::new(),
             symbol_lifetime_contracts: self.symbol_lifetime_contracts,
             symbol_type_lifetime_contracts: self.symbol_type_lifetime_contracts,
+            symbol_raw_storage_anchor_contracts: self.symbol_raw_storage_anchor_contracts,
+            raw_pointer_effects_by_path: HashMap::new(),
             symbol_ffi_sync_noescape: HashMap::new(),
             trait_methods,
             unsafe_functions: self.unsafe_functions,
             trait_bounds: HashMap::new(),
             assoc_type_bounds: HashMap::new(),
-        }
+            method_to_impl_decl: HashMap::new(),
+        })
     }
 
     fn collect_trait_methods(
@@ -307,6 +315,11 @@ impl InterfaceDecoder {
         }
         if let Some(contract) = &exported.type_lifetime_contract {
             self.symbol_type_lifetime_contracts.insert(sym_id, contract.clone());
+        }
+        if let Some(contract) = &exported.raw_storage_anchor_contract {
+            // `decode` validates the complete canonical interface first; do
+            // not silently discard an unsupported semantic contract version.
+            self.symbol_raw_storage_anchor_contracts.insert(sym_id, contract.clone());
         }
         if let Some(ty_idx) = exported.ty_index {
             if let Some(&sem_ty_id) = self.type_map.get(&ty_idx) {

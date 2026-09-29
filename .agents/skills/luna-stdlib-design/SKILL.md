@@ -130,7 +130,7 @@ Safe byte APIs may accept arbitrary bytes ([u8]).
 String-producing or String-accepting APIs MUST validate UTF-8.
 ```
 - Safe APIs must **never** assume "the caller promises UTF-8" unless the input already carries a type-level UTF-8 invariant (e.g. `&String` or `str`).
-- `Writer::write_utf8(bytes: &[u8])`: Must validate UTF-8 before appending to internal storage, returning `Err(FmtError::InvalidUtf8)` on failure.
+- Formatting sinks accept Unicode scalar values through `Writer::write_char(char)`. This keeps the text boundary explicit: `String` remains valid UTF-8, while `Vec<u8>` remains arbitrary bytes. Do not add byte-writing methods to the formatting writer unless a later design explicitly defines their validation contract.
 
 ### 2.2 Borrow & Region Invariants
 Stdlib designs must honor the 4 Fundamental Region Invariants:
@@ -234,8 +234,8 @@ fn main(args: [str]) -> i32
 ### 5.4 Formatting & Display
 - **Strict Layering**: `core/fmt` MUST NOT depend on `alloc`.
   - `core/fmt`: defines `trait Writer`, `trait Display`, `enum FmtError`.
-  - `alloc/string`: implements `Writer for String` and depends on `core/fmt`.
-- Formatting primitives must support writing into fixed buffers, raw slices, or custom writers without forcing heap allocations (`String`).
+  - `alloc/string`: implements `Writer for String` and `Display for String`, and depends on `core/fmt`.
+- The generic writer contract must remain implementable by non-allocating custom sinks. v1 ships `String` as its first owned sink; it does not promise fixed-buffer, raw-slice, file, or streaming writer implementations.
 
 ### 5.5 Numerics & Floats
 - Luna supports primitive inherent methods directly.

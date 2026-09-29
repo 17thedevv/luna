@@ -2,7 +2,7 @@ use luna_driver::{compile, check, CompilerOptions};
 use luna_driver::sysroot::Sysroot;
 use luna_llib::MlibReader;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
     let dir = std::env::temp_dir()
@@ -29,17 +29,15 @@ fn locate_canonical_vec_ln() -> PathBuf {
     vec_path
 }
 
-fn locate_canonical_vec_llib() -> PathBuf {
-    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    manifest_dir
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .join("libs")
-        .join("external")
-        .join("alloc")
-        .join("vec.llib")
+fn has_exported_path(
+    symbols: &std::collections::BTreeMap<String, luna_llib::metadata::ExportedSymbol>,
+    path: &str,
+) -> bool {
+    symbols.iter().any(|(name, symbol)| {
+        name == path
+            || symbol.symbol_id.symbol_path == path
+            || has_exported_path(&symbol.children, path)
+    })
 }
 
 /// Phase 5 & 6 Proof 1: vec.ln compiles to vec.llib with canonical lifetime contracts.
@@ -78,22 +76,9 @@ fn test_proof_1_alloc_compiles_to_llib_with_contracts() {
     let meta = semantic_metadata.expect("vec.llib must contain SemanticMetadata");
     let exported = &meta.interface.exported_symbols;
 
-    assert!(exported.contains_key("Vec"), "Vec must be exported");
-    assert!(exported.contains_key("VecIter"), "VecIter must be exported");
-    assert!(exported.contains_key("VecIterMut"), "VecIterMut must be exported");
-
-    // Sync canonical libs/external/alloc/vec.llib with freshly validated build
-    let canonical_llib = locate_canonical_vec_llib();
-    let tmp = canonical_llib.with_file_name(format!("{}.publish{}", canonical_llib.file_name().unwrap().to_string_lossy(), std::process::id()));
-    let _ = fs::copy(&out_llib, &tmp);
-    let _ = fs::rename(&tmp, &canonical_llib);
-    let out_obj = dir.join("vec.obj");
-    if out_obj.exists() {
-        let canonical_obj = canonical_llib.with_extension("obj");
-        let tmp_obj = canonical_obj.with_file_name(format!("{}.publish{}", canonical_obj.file_name().unwrap().to_string_lossy(), std::process::id()));
-        let _ = fs::copy(&out_obj, &tmp_obj);
-        let _ = fs::rename(&tmp_obj, &canonical_obj);
-    }
+    assert!(has_exported_path(exported, "std::Vec"), "std::Vec must be exported");
+    assert!(has_exported_path(exported, "std::VecIter"), "std::VecIter must be exported");
+    assert!(has_exported_path(exported, "std::VecIterMut"), "std::VecIterMut must be exported");
 }
 
 /// Phase 5 Proof 2: Vec::get borrowck enforcement.
@@ -127,7 +112,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec r = v.get(0 as u64);
     v.push(20); // Conflict: v is mutably borrowed while r holds active borrow of v!
@@ -160,7 +145,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec r = v.get(0 as u64);
     dec _ = r;
@@ -206,7 +191,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec rw it = v.iter();
     v.push(20); // Conflict: v mutated while iterator `it` is active!
@@ -251,7 +236,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec rw it = v.iter();
     v.clear(); // Conflict: v cleared while iterator `it` is active!
@@ -296,7 +281,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec rw it = v.iter();
     v.grow(); // Conflict: realloc/grow while iterator `it` is active!
@@ -341,7 +326,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec rw it = v.iter();
     dec _ = it.next_ref();
@@ -389,7 +374,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec rw it = v.iter_mut();
     v.push(20); // Conflict: exclusive borrow by iter_mut!
@@ -422,7 +407,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec rw it = v.iter_mut();
     dec opt_ref = it.next_mut();
@@ -496,7 +481,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec rw it = v.iter();
     v.push(20);
@@ -520,7 +505,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as u64);
     v.push(10);
     dec rw it = v.iter();
     dec _ = it.next_ref();

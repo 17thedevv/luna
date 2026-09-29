@@ -1,6 +1,8 @@
-use std::{fs, path::PathBuf, process::Command};
+use std::{fs, path::PathBuf, process::Command, sync::OnceLock};
 use luna_driver::{compile, CompilerOptions};
 use luna_driver::sysroot::Sysroot;
+
+static SOURCE_ONLY_ROOT: OnceLock<PathBuf> = OnceLock::new();
 
 fn create_temp_dir(name: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!("luna_c_gap_06_{}", name));
@@ -9,8 +11,40 @@ fn create_temp_dir(name: &str) -> PathBuf {
     dir
 }
 
+fn source_only_sysroot() -> Sysroot {
+    let root = SOURCE_ONLY_ROOT.get_or_init(|| {
+        let canonical = Sysroot::discover_for_test().expect("test sysroot must exist");
+        let root = create_temp_dir("source_only_sysroot");
+        copy_tree(canonical.external_dir(), &root.join("libs").join("external"));
+        remove_artifacts(&root.join("libs").join("external"));
+        root
+    });
+    Sysroot::from_root(root.clone()).expect("source-only test sysroot")
+}
+
+fn copy_tree(source: &std::path::Path, destination: &std::path::Path) {
+    fs::create_dir_all(destination).expect("create source-only sysroot directory");
+    for entry in fs::read_dir(source).expect("enumerate source sysroot") {
+        let entry = entry.expect("read source sysroot entry");
+        let from = entry.path();
+        let to = destination.join(entry.file_name());
+        if from.is_dir() { copy_tree(&from, &to); }
+        else { fs::copy(from, to).expect("copy source sysroot file"); }
+    }
+}
+
+fn remove_artifacts(root: &std::path::Path) {
+    for entry in fs::read_dir(root).expect("enumerate source-only sysroot") {
+        let path = entry.expect("read source-only sysroot entry").path();
+        if path.is_dir() { remove_artifacts(&path); }
+        else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale sysroot artifact");
+        }
+    }
+}
+
 fn compile_and_run(test_name: &str, source: &str) -> (i32, String, String) {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_only_sysroot();
     let temp = create_temp_dir(test_name);
     let main_path = temp.join("main.ln");
     let exe_path = temp.join(format!("{}.exe", test_name));

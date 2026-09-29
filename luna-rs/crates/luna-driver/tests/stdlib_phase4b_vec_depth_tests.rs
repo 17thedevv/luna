@@ -53,15 +53,15 @@ fn test_vec_swap_remove() {
     let src = r#"
         import <vec>;
 
-        fn get_val(v: &Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
             match v.get(idx) {
-                Option::Some(x) -> *x,
-                Option::None -> 0 - 1,
+                std::Option::Some(x) -> *x,
+                std::Option::None -> 0 - 1,
             }
         }
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(20);
             v.push(30);
@@ -94,10 +94,10 @@ fn test_vec_retain() {
     let src = r#"
         import <vec>;
 
-        fn get_val(v: &Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
             match v.get(idx) {
-                Option::Some(x) -> *x,
-                Option::None -> 0 - 1,
+                std::Option::Some(x) -> *x,
+                std::Option::None -> 0 - 1,
             }
         }
 
@@ -106,7 +106,7 @@ fn test_vec_retain() {
         }
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(1);
             v.push(2);
             v.push(3);
@@ -139,15 +139,15 @@ fn test_vec_dedup() {
     let src = r#"
         import <vec>;
 
-        fn get_val(v: &Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
             match v.get(idx) {
-                Option::Some(x) -> *x,
-                Option::None -> 0 - 1,
+                std::Option::Some(x) -> *x,
+                std::Option::None -> 0 - 1,
             }
         }
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(1);
             v.push(1);
             v.push(2);
@@ -182,15 +182,15 @@ fn test_vec_insert_and_remove() {
     let src = r#"
         import <vec>;
 
-        fn get_val(v: &Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
             match v.get(idx) {
-                Option::Some(x) -> *x,
-                Option::None -> 0 - 1,
+                std::Option::Some(x) -> *x,
+                std::Option::None -> 0 - 1,
             }
         }
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(30);
 
@@ -226,10 +226,10 @@ fn test_vec_resize_and_extend() {
         import <vec>;
         import <slice>;
 
-        fn get_val(v: &Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
             match v.get(idx) {
-                Option::Some(x) -> *x,
-                Option::None -> 0 - 1,
+                std::Option::Some(x) -> *x,
+                std::Option::None -> 0 - 1,
             }
         }
 
@@ -238,7 +238,7 @@ fn test_vec_resize_and_extend() {
         }
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(1);
             v.push(2);
 
@@ -254,7 +254,7 @@ fn test_vec_resize_and_extend() {
             if get_val(&v, 0 as u64) != 1 { return 5; }
 
             // extend_from_iter with owned elements from another Vec
-            dec rw v2 = vec_new<i32>();
+            dec rw v2 = std::vec_new<i32>();
             v2.push(10);
             v2.push(20);
             v2.push(30);
@@ -286,7 +286,7 @@ fn test_vec_clone_and_eq() {
         import <cmp>;
 
         fn main() -> i32 {
-            dec rw v1 = vec_new<i32>();
+            dec rw v1 = std::vec_new<i32>();
             v1.push(100);
             v1.push(200);
             v1.push(300);
@@ -295,13 +295,13 @@ fn test_vec_clone_and_eq() {
             if v1.len() != v2.len() { return 1; }
             if v1.eq(&v2) == false { return 2; }
 
-            dec rw v3 = vec_new<i32>();
+            dec rw v3 = std::vec_new<i32>();
             v3.push(100);
             v3.push(200);
             v3.push(999);
             if v1.eq(&v3) { return 3; }
 
-            dec rw v4 = vec_new<i32>();
+            dec rw v4 = std::vec_new<i32>();
             v4.push(100);
             v4.push(200);
             if v1.eq(&v4) { return 4; }
@@ -326,19 +326,19 @@ fn test_vec_extend_from_slice() {
         import <vec>;
         import <clone>;
 
-        fn get_val(v: &Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
             match v.get(idx) {
-                Option::Some(x) -> *x,
-                Option::None -> 0 - 1,
+                std::Option::Some(x) -> *x,
+                std::Option::None -> 0 - 1,
             }
         }
 
         fn main() -> i32 {
-            dec rw v1 = vec_new<i32>();
+            dec rw v1 = std::vec_new<i32>();
             v1.push(1);
             v1.push(2);
 
-            dec rw v2 = vec_new<i32>();
+            dec rw v2 = std::vec_new<i32>();
             v2.push(3);
             v2.push(4);
             v2.push(5);

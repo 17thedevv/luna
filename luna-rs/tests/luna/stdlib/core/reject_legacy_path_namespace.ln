@@ -1,0 +1,8 @@
+import <path>;
+import <string>;
+
+fn main() {
+    dec left = std::string_from_str("left");
+    dec right = std::string_from_str("right");
+    dec joined = path::join(&left, &right);
+}

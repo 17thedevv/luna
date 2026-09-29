@@ -1,0 +1,10 @@
+unsafe fn conflicting(pointer: *rw i32) {
+    unsafe {
+        dec rw exclusive = &rw *pointer;
+        dec shared = &*pointer;
+        *exclusive = 1;
+        *shared;
+    }
+}
+
+fn main() {}

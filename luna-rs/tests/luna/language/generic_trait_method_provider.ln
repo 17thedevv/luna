@@ -1,0 +1,32 @@
+module probe {
+    export trait Supported {}
+
+    export trait Echo {
+        fn echo<U: Supported>(self: &Self, value: U) -> U;
+    }
+
+    export trait Keyed<K> {
+        fn choose<U>(self: &Self, key: K, value: U) -> U;
+    }
+
+    export struct Token {};
+
+    export struct Holder<T> {
+        export marker: T,
+    };
+
+    impl Supported for i32 {}
+    impl Supported for u64 {}
+
+    impl Echo for Token {
+        fn echo<V: Supported>(self: &Self, value: V) -> V {
+            return value;
+        }
+    }
+
+    impl<T> Keyed<T> for Holder<T> {
+        fn choose<V>(self: &Self, key: T, value: V) -> V {
+            return value;
+        }
+    }
+}

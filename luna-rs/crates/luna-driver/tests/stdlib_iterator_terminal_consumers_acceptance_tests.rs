@@ -75,11 +75,11 @@ fn test_iter_fold_basic() {
 
         fn main() -> i32 {
             dec arr: [i32; 5] = [1, 2, 3, 4, 5];
-            dec it1 = slice_iter<i32>(&arr);
-            dec sum = iter_fold(it1, 0, add);
+            dec it1 = std::slice::slice_iter<i32>(&arr);
+            dec sum = std::iter::iter_fold(it1, 0, add);
 
-            dec it2 = slice_iter<i32>(&arr);
-            dec prod = iter_fold(it2, 1, mul);
+            dec it2 = std::slice::slice_iter<i32>(&arr);
+            dec prod = std::iter::iter_fold(it2, 1, mul);
 
             // sum = 1 + 2 + 3 + 4 + 5 = 15
             // prod = 1 * 2 * 3 * 4 * 5 = 120
@@ -124,12 +124,12 @@ fn test_iter_count_basic() {
 
         fn main() -> i32 {
             dec arr: [i32; 6] = [1, 2, 3, 4, 5, 6];
-            dec it1 = slice_iter<i32>(&arr);
-            dec c1 = iter_count(it1);
+            dec it1 = std::slice::slice_iter<i32>(&arr);
+            dec c1 = std::iter::iter_count(it1);
 
-            dec it2 = slice_iter<i32>(&arr);
-            dec filtered = iter_filter(it2, is_even);
-            dec c2 = iter_count(filtered);
+            dec it2 = std::slice::slice_iter<i32>(&arr);
+            dec filtered = std::iter::iter_filter(it2, is_even);
+            dec c2 = std::iter::iter_count(filtered);
 
             if c1 != (6 as u64) {
                 return 1;
@@ -183,16 +183,16 @@ fn test_iter_for_each_basic() {
             dec c_ptr = &rw ctx as *rw Context;
 
             dec arr: [i32; 4] = [10, 20, 30, 40];
-            dec it = slice_iter<i32>(&arr);
+            dec it = std::slice::slice_iter<i32>(&arr);
 
             dec rw running = true;
             while running {
                 dec opt = it.next();
                 match opt {
-                    Option::Some(x) -> {
+                    std::Option::Some(x) -> {
                         visit_item(c_ptr, x);
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -243,11 +243,11 @@ fn test_iter_any_basic() {
 
         fn main() -> i32 {
             dec arr: [i32; 5] = [10, 20, 150, 40, 50];
-            dec it1 = slice_iter<i32>(&arr);
-            dec has_gt_hundred = iter_any(it1, is_gt_hundred);
+            dec it1 = std::slice::slice_iter<i32>(&arr);
+            dec has_gt_hundred = std::iter::iter_any(it1, is_gt_hundred);
 
-            dec it2 = slice_iter<i32>(&arr);
-            dec has_negative = iter_any(it2, is_negative);
+            dec it2 = std::slice::slice_iter<i32>(&arr);
+            dec has_negative = std::iter::iter_any(it2, is_negative);
 
             if has_gt_hundred == false {
                 return 1;
@@ -294,12 +294,12 @@ fn test_iter_all_basic() {
 
         fn main() -> i32 {
             dec arr: [i32; 4] = [2, 4, 6, 8];
-            dec it1 = slice_iter<i32>(&arr);
-            dec all_even = iter_all(it1, is_even);
+            dec it1 = std::slice::slice_iter<i32>(&arr);
+            dec all_even = std::iter::iter_all(it1, is_even);
 
             dec arr2: [i32; 4] = [2, 4, 7, 8];
-            dec it2 = slice_iter<i32>(&arr2);
-            dec all_even_mixed = iter_all(it2, is_even);
+            dec it2 = std::slice::slice_iter<i32>(&arr2);
+            dec all_even_mixed = std::iter::iter_all(it2, is_even);
 
             if all_even == false {
                 return 1;
@@ -320,7 +320,7 @@ fn test_iter_all_basic() {
     assert_eq!(code, 0, "All basic failed (code: {}, stderr: {})", code, stderr);
 }
 
-/// 6. Basic find: returns Option::Some(&T) when present, Option::None when absent
+/// 6. Basic find: returns std::Option::Some(&T) when present, std::Option::None when absent
 #[test]
 fn test_iter_find_basic() {
     let sysroot = Sysroot::discover_for_test().expect("sysroot required");
@@ -346,20 +346,20 @@ fn test_iter_find_basic() {
 
         fn main() -> i32 {
             dec arr: [i32; 5] = [10, 20, 42, 50, 60];
-            dec it1 = slice_iter<i32>(&arr);
-            dec opt1 = iter_find(it1, is_target);
+            dec it1 = std::slice::slice_iter<i32>(&arr);
+            dec opt1 = std::iter::iter_find(it1, is_target);
 
             dec found_val = match opt1 {
-                Option::Some(r) -> *r,
-                Option::None -> 0,
+                std::Option::Some(r) -> *r,
+                std::Option::None -> 0,
             };
 
-            dec it2 = slice_iter<i32>(&arr);
-            dec opt2 = iter_find(it2, is_absent);
+            dec it2 = std::slice::slice_iter<i32>(&arr);
+            dec opt2 = std::iter::iter_find(it2, is_absent);
 
             dec is_absent_none = match opt2 {
-                Option::Some(_) -> false,
-                Option::None -> true,
+                std::Option::Some(_) -> false,
+                std::Option::None -> true,
             };
 
             if found_val != 42 {
@@ -411,11 +411,11 @@ fn test_iter_terminal_pipeline_chaining() {
 
         fn main() -> i32 {
             dec arr: [i32; 10] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-            dec it = slice_iter<i32>(&arr);
-            dec filtered = iter_filter(it, is_even);          // 2, 4, 6, 8, 10
-            dec mapped = iter_map(filtered, square);          // 4, 16, 36, 64, 100
-            dec pipeline = iter_take(mapped, 3 as u64);       // 4, 16, 36
-            dec sum = iter_fold(pipeline, 0, add);            // 4 + 16 + 36 = 56
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec filtered = std::iter::iter_filter(it, is_even);          // 2, 4, 6, 8, 10
+            dec mapped = std::iter::iter_map(filtered, square);          // 4, 16, 36, 64, 100
+            dec pipeline = std::iter::iter_take(mapped, 3 as u64);       // 4, 16, 36
+            dec sum = std::iter::iter_fold(pipeline, 0, add);            // 4 + 16 + 36 = 56
 
             if sum != 56 {
                 return 1;
@@ -465,7 +465,7 @@ import <iter_collect>;
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -482,7 +482,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v = vec_with_capacity<TrackedItem>(5 as u64);
+                dec rw v = std::vec_with_capacity<TrackedItem>(5 as u64);
                 dec rw i: i32 = 1;
                 while i <= 5 {
                     unsafe {
@@ -491,8 +491,8 @@ import <iter_collect>;
                     v.push(TrackedItem { val: i, counter: c_ptr });
                     i = i + 1;
                 }
-                dec it = slice_iter<TrackedItem>(v.as_slice());
-                dec matched = iter_any(it, is_match);
+                dec it = std::slice::slice_iter<TrackedItem>(v.as_slice());
+                dec matched = std::iter::iter_any(it, is_match);
 
                 if matched == false {
                     return 1;
@@ -555,7 +555,7 @@ import <iter_collect>;
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -572,7 +572,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v = vec_with_capacity<TrackedItem>(4 as u64);
+                dec rw v = std::vec_with_capacity<TrackedItem>(4 as u64);
                 dec rw i: i32 = 1;
                 while i <= 4 {
                     unsafe {
@@ -583,8 +583,8 @@ import <iter_collect>;
                 }
 
                 // Item 1 is odd -> iter_all exits immediately on element 1!
-                dec it = slice_iter<TrackedItem>(v.as_slice());
-                dec all_even = iter_all(it, is_even);
+                dec it = std::slice::slice_iter<TrackedItem>(v.as_slice());
+                dec all_even = std::iter::iter_all(it, is_even);
 
                 if all_even == true {
                     return 1;
@@ -646,7 +646,7 @@ import <iter_collect>;
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -663,7 +663,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v = vec_with_capacity<TrackedItem>(5 as u64);
+                dec rw v = std::vec_with_capacity<TrackedItem>(5 as u64);
                 dec rw i: i32 = 1;
                 while i <= 5 {
                     unsafe {
@@ -673,12 +673,12 @@ import <iter_collect>;
                     i = i + 1;
                 }
 
-                dec it = slice_iter<TrackedItem>(v.as_slice());
-                dec opt = iter_find(it, is_target);
+                dec it = std::slice::slice_iter<TrackedItem>(v.as_slice());
+                dec opt = std::iter::iter_find(it, is_target);
 
                 dec found_val = match opt {
-                    Option::Some(r) -> (*r).val,
-                    Option::None -> 0,
+                    std::Option::Some(r) -> (*r).val,
+                    std::Option::None -> 0,
                 };
 
                 if found_val != 3 {
@@ -735,11 +735,11 @@ fn test_terminal_consumers_source_vs_llib_parity() {
 
         fn main() -> i32 {
             dec arr: [i32; 4] = [10, 20, 30, 40];
-            dec it1 = slice_iter<i32>(&arr);
-            dec sum = iter_fold(it1, 0, add);
+            dec it1 = std::slice::slice_iter<i32>(&arr);
+            dec sum = std::iter::iter_fold(it1, 0, add);
 
-            dec it2 = slice_iter<i32>(&arr);
-            dec all_pos = iter_all(it2, is_positive);
+            dec it2 = std::slice::slice_iter<i32>(&arr);
+            dec all_pos = std::iter::iter_all(it2, is_positive);
 
             if sum != 100 {
                 return 1;
@@ -769,7 +769,7 @@ fn test_iter_find_owned_droptracker() {
     let dir = create_temp_dir("find_owned_drop");
 
     // Part A: Proves that for non-Copy items, passing Item by value to pred consumes it,
-    // so returning Option::Some(x) is safely and strictly rejected by the borrow checker!
+    // so returning std::Option::Some(x) is safely and strictly rejected by the borrow checker!
     let reject_src = r#"
         import <core/panic>;
         import <mem>;
@@ -790,7 +790,7 @@ fn test_iter_find_owned_droptracker() {
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -807,9 +807,9 @@ fn test_iter_find_owned_droptracker() {
             len: u64,
         };
 
-        impl Iterator<TrackedItem> for OwnedPairIter {
-            fn next(self: &rw Self) -> Option<TrackedItem> {
-                return Option::None;
+        impl std::Iterator<TrackedItem> for OwnedPairIter {
+            fn next(self: &rw Self) -> std::Option<TrackedItem> {
+                return std::Option::None;
             }
         }
 
@@ -819,8 +819,8 @@ fn test_iter_find_owned_droptracker() {
 
         fn main() -> i32 {
             dec it = OwnedPairIter { buf: 0 as u64 as *rw TrackedItem, pos: 0 as u64, len: 0 as u64 };
-            // Must be rejected by Borrowck because pred(x) consumes x, making return Option::Some(x) an illegal use of moved value!
-            dec opt = iter_find(it, is_second);
+            // Must be rejected by Borrowck because pred(x) consumes x, making return std::Option::Some(x) an illegal use of moved value!
+            dec opt = std::iter::iter_find(it, is_second);
             return 0;
         }
     "#;
@@ -834,7 +834,7 @@ fn test_iter_find_owned_droptracker() {
     let check_res = check(reject_path.to_str().unwrap(), reject_src.to_string(), &check_opts);
     assert!(
         check_res.is_err(),
-        "BorrowCk MUST reject iter_find with owned non-Copy item because pred consumes item before Option::Some(x)"
+        "BorrowCk MUST reject iter_find with owned non-Copy item because pred consumes item before std::Option::Some(x)"
     );
     let diags = check_res.unwrap_err();
     let has_moved_err = diags.iter().any(|d| d.message.contains("Use of moved value"));
@@ -864,23 +864,23 @@ fn test_iter_find_owned_droptracker() {
             len: u64,
         };
 
-        impl Drop for OwnedCopyIter {
+        impl std::Drop for OwnedCopyIter {
             fn drop(self: &rw Self) {
                 dec size = self.len * (sizeof(i32) as u64);
                 __luna_dealloc(self.buf as *rw u8, size, 4 as u64);
             }
         }
 
-        impl Iterator<i32> for OwnedCopyIter {
-            fn next(self: &rw Self) -> Option<i32> {
+        impl std::Iterator<i32> for OwnedCopyIter {
+            fn next(self: &rw Self) -> std::Option<i32> {
                 if self.pos < self.len {
                     unsafe {
-                        dec p = ptr::add_mut<i32>(self.buf, self.pos);
+                        dec p = std::ptr::add_mut<i32>(self.buf, self.pos);
                         self.pos = self.pos + (1 as u64);
-                        return Option::Some(ptr::read<i32>(p as *i32));
+                        return std::Option::Some(std::ptr::read<i32>(p as *i32));
                     }
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
@@ -892,9 +892,9 @@ fn test_iter_find_owned_droptracker() {
             dec size = 3 as u64 * (sizeof(i32) as u64);
             dec raw_buf = __luna_alloc(size, 4 as u64) as *rw i32;
             unsafe {
-                ptr::write<i32>(ptr::add_mut<i32>(raw_buf, 0 as u64), 10);
-                ptr::write<i32>(ptr::add_mut<i32>(raw_buf, 1 as u64), 20);
-                ptr::write<i32>(ptr::add_mut<i32>(raw_buf, 2 as u64), 30);
+                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 0 as u64), 10);
+                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 1 as u64), 20);
+                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 2 as u64), 30);
             }
             dec it = OwnedCopyIter {
                 buf: raw_buf,
@@ -902,11 +902,11 @@ fn test_iter_find_owned_droptracker() {
                 len: 3 as u64,
             };
 
-            dec opt = iter_find(it, is_target);
+            dec opt = std::iter::iter_find(it, is_target);
 
             dec found_val = match opt {
-                Option::Some(v) -> v,
-                Option::None -> 0,
+                std::Option::Some(v) -> v,
+                std::Option::None -> 0,
             };
 
             if found_val != 20 {
@@ -951,7 +951,7 @@ fn test_iter_any_owned_droptracker() {
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -968,12 +968,12 @@ fn test_iter_any_owned_droptracker() {
             len: u64,
         };
 
-        impl Drop for OwnedTripleIter {
+        impl std::Drop for OwnedTripleIter {
             fn drop(self: &rw Self) {
                 dec rw i = self.pos;
                 while i < self.len {
                     unsafe {
-                        ptr::drop_in_place<TrackedItem>(ptr::add_mut<TrackedItem>(self.buf, i));
+                        std::ptr::drop_in_place<TrackedItem>(std::ptr::add_mut<TrackedItem>(self.buf, i));
                     }
                     i = i + (1 as u64);
                 }
@@ -982,16 +982,16 @@ fn test_iter_any_owned_droptracker() {
             }
         }
 
-        impl Iterator<TrackedItem> for OwnedTripleIter {
-            fn next(self: &rw Self) -> Option<TrackedItem> {
+        impl std::Iterator<TrackedItem> for OwnedTripleIter {
+            fn next(self: &rw Self) -> std::Option<TrackedItem> {
                 if self.pos < self.len {
                     unsafe {
-                        dec p = ptr::add_mut<TrackedItem>(self.buf, self.pos);
+                        dec p = std::ptr::add_mut<TrackedItem>(self.buf, self.pos);
                         self.pos = self.pos + (1 as u64);
-                        return Option::Some(ptr::read<TrackedItem>(p as *TrackedItem));
+                        return std::Option::Some(std::ptr::read<TrackedItem>(p as *TrackedItem));
                     }
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
@@ -1010,9 +1010,9 @@ fn test_iter_any_owned_droptracker() {
                 dec size = 3 as u64 * (sizeof(TrackedItem) as u64);
                 dec raw_buf = __luna_alloc(size, 8 as u64) as *rw TrackedItem;
                 unsafe {
-                    ptr::write<TrackedItem>(ptr::add_mut<TrackedItem>(raw_buf, 0 as u64), TrackedItem { val: 10, counter: c_ptr });
-                    ptr::write<TrackedItem>(ptr::add_mut<TrackedItem>(raw_buf, 1 as u64), TrackedItem { val: 20, counter: c_ptr });
-                    ptr::write<TrackedItem>(ptr::add_mut<TrackedItem>(raw_buf, 2 as u64), TrackedItem { val: 30, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 0 as u64), TrackedItem { val: 10, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 1 as u64), TrackedItem { val: 20, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 2 as u64), TrackedItem { val: 30, counter: c_ptr });
                 }
                 dec it = OwnedTripleIter {
                     buf: raw_buf,
@@ -1022,7 +1022,7 @@ fn test_iter_any_owned_droptracker() {
 
                 // iter_any checks item 1 (false -> dropped in predicate), item 2 (true -> dropped in predicate)
                 // then early exits!
-                dec res = iter_any(it, is_second);
+                dec res = std::iter::iter_any(it, is_second);
 
                 if res == false {
                     return 1;
@@ -1077,7 +1077,7 @@ fn test_iter_all_owned_droptracker() {
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -1094,12 +1094,12 @@ fn test_iter_all_owned_droptracker() {
             len: u64,
         };
 
-        impl Drop for OwnedTripleIter {
+        impl std::Drop for OwnedTripleIter {
             fn drop(self: &rw Self) {
                 dec rw i = self.pos;
                 while i < self.len {
                     unsafe {
-                        ptr::drop_in_place<TrackedItem>(ptr::add_mut<TrackedItem>(self.buf, i));
+                        std::ptr::drop_in_place<TrackedItem>(std::ptr::add_mut<TrackedItem>(self.buf, i));
                     }
                     i = i + (1 as u64);
                 }
@@ -1108,16 +1108,16 @@ fn test_iter_all_owned_droptracker() {
             }
         }
 
-        impl Iterator<TrackedItem> for OwnedTripleIter {
-            fn next(self: &rw Self) -> Option<TrackedItem> {
+        impl std::Iterator<TrackedItem> for OwnedTripleIter {
+            fn next(self: &rw Self) -> std::Option<TrackedItem> {
                 if self.pos < self.len {
                     unsafe {
-                        dec p = ptr::add_mut<TrackedItem>(self.buf, self.pos);
+                        dec p = std::ptr::add_mut<TrackedItem>(self.buf, self.pos);
                         self.pos = self.pos + (1 as u64);
-                        return Option::Some(ptr::read<TrackedItem>(p as *TrackedItem));
+                        return std::Option::Some(std::ptr::read<TrackedItem>(p as *TrackedItem));
                     }
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
@@ -1136,9 +1136,9 @@ fn test_iter_all_owned_droptracker() {
                 dec size = 3 as u64 * (sizeof(TrackedItem) as u64);
                 dec raw_buf = __luna_alloc(size, 8 as u64) as *rw TrackedItem;
                 unsafe {
-                    ptr::write<TrackedItem>(ptr::add_mut<TrackedItem>(raw_buf, 0 as u64), TrackedItem { val: 11, counter: c_ptr });
-                    ptr::write<TrackedItem>(ptr::add_mut<TrackedItem>(raw_buf, 1 as u64), TrackedItem { val: 20, counter: c_ptr });
-                    ptr::write<TrackedItem>(ptr::add_mut<TrackedItem>(raw_buf, 2 as u64), TrackedItem { val: 30, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 0 as u64), TrackedItem { val: 11, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 1 as u64), TrackedItem { val: 20, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 2 as u64), TrackedItem { val: 30, counter: c_ptr });
                 }
                 dec it = OwnedTripleIter {
                     buf: raw_buf,
@@ -1147,7 +1147,7 @@ fn test_iter_all_owned_droptracker() {
                 };
 
                 // Item 1 is odd -> iter_all returns false on element 1 immediately!
-                dec res = iter_all(it, is_even);
+                dec res = std::iter::iter_all(it, is_even);
 
                 if res == true {
                     return 1;
@@ -1202,7 +1202,7 @@ fn test_iter_fold_droptracker_accumulator() {
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedAcc {
+        impl std::Drop for TrackedAcc {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -1231,13 +1231,13 @@ fn test_iter_fold_droptracker_accumulator() {
                 dec init_acc = TrackedAcc { val: 0, counter: c_ptr };
 
                 dec arr: [i32; 3] = [10, 20, 30];
-                dec it = slice_iter<i32>(&arr);
+                dec it = std::slice::slice_iter<i32>(&arr);
 
                 // fold replaces acc 3 times:
                 // step 1: acc0 (val 0) + 10 -> acc1 (val 10), acc0 dropped
                 // step 2: acc1 (val 10) + 20 -> acc2 (val 30), acc1 dropped
                 // step 3: acc2 (val 30) + 30 -> acc3 (val 60), acc2 dropped
-                dec final_acc = iter_fold(it, init_acc, add_step);
+                dec final_acc = std::iter::iter_fold(it, init_acc, add_step);
 
                 if final_acc.val != 60 {
                     return 1;

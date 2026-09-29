@@ -737,7 +737,7 @@ impl TypeRepr {
         let mut fn_return = None;
 
         match self {
-            TypeRepr::Struct { name, type_params, .. } => {
+            TypeRepr::Struct { type_params, .. } => {
                 // Compute field info based on type_params context
                 // For now, just include the type_params as "fields"
                 for (i, tp) in type_params.iter().enumerate() {
@@ -747,10 +747,6 @@ impl TypeRepr {
                         index: i,
                         offset: None,
                     });
-                }
-                // If this is a concrete struct with resolved params, use those fields
-                if !type_params.is_empty() || name == "Vec" || name == "Option" {
-                    // These have type param fields in their definition
                 }
             }
             TypeRepr::Enum { variants: evariants, .. } => {

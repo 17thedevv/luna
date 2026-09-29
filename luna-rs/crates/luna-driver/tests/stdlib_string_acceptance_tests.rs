@@ -99,7 +99,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec s = string_from_str("Hello to Luna!");
+    dec s = std::string_from_str("Hello to Luna!");
     if s.len() != (14 as u64) {
         return 1;
     }
@@ -149,11 +149,11 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<u8>();
+    dec rw v = std::vec_new<u8>();
     v.push(206 as u8); // 0xCE
     v.push(191 as u8); // 0xBF (Greek alpha 'α')
     
-    dec opt = string_from_bytes(v.as_slice());
+    dec opt = std::string_from_bytes(v.as_slice());
     if opt.is_none() {
         return 1;
     }
@@ -202,7 +202,7 @@ import <iter_collect>;
 
 fn main() -> i32 {
     // "Việt" -> V (86), i (105), ệ (225, 187, 135), t (116) = 6 bytes
-    dec rw v = vec_new<u8>();
+    dec rw v = std::vec_new<u8>();
     v.push(86 as u8);  // 'V'
     v.push(105 as u8); // 'i'
     v.push(225 as u8); // 'ệ' byte 1
@@ -210,7 +210,7 @@ fn main() -> i32 {
     v.push(135 as u8); // 'ệ' byte 3
     v.push(116 as u8); // 't'
 
-    dec opt = string_from_bytes(v.as_slice());
+    dec opt = std::string_from_bytes(v.as_slice());
     if opt.is_none() {
         return 1;
     }
@@ -254,13 +254,13 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<u8>();
+    dec rw v = std::vec_new<u8>();
     v.push(240 as u8); // 0xF0
     v.push(159 as u8); // 0x9F
     v.push(166 as u8); // 0xA6
     v.push(128 as u8); // 0x80 (Crab emoji)
 
-    dec opt = string_from_bytes(v.as_slice());
+    dec opt = std::string_from_bytes(v.as_slice());
     if opt.is_none() {
         return 1;
     }
@@ -305,11 +305,11 @@ import <iter_collect>;
 
 fn main() -> i32 {
     // 0xC2 without continuation byte (next byte is ASCII 'A' = 65)
-    dec rw v = vec_new<u8>();
+    dec rw v = std::vec_new<u8>();
     v.push(194 as u8);
     v.push(65 as u8);
 
-    dec opt = string_from_bytes(v.as_slice());
+    dec opt = std::string_from_bytes(v.as_slice());
     if opt.is_some() {
         return 1; // Must be rejected
     }
@@ -349,11 +349,11 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<u8>();
+    dec rw v = std::vec_new<u8>();
     v.push(192 as u8); // 0xC0
     v.push(128 as u8); // 0x80 (Overlong NUL)
 
-    dec opt = string_from_bytes(v.as_slice());
+    dec opt = std::string_from_bytes(v.as_slice());
     if opt.is_some() {
         return 1; // Overlong must be rejected
     }
@@ -365,7 +365,7 @@ fn main() -> i32 {
     assert_eq!(code, 0, "S6 Overlong UTF-8 rejection must pass (code: {}, stderr: {})", code, stderr);
 }
 
-/// S7: UTF-16 surrogate range (0xD800..0xDFFF) rejected
+/// S7: UTF-16 surrogate std::iter::range (0xD800..0xDFFF) rejected
 #[test]
 fn test_s7_string_surrogates_rejected() {
     let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
@@ -394,12 +394,12 @@ import <iter_collect>;
 
 fn main() -> i32 {
     // 0xED 0xA0 0x80 -> encodes 0xD800 (surrogate half)
-    dec rw v = vec_new<u8>();
+    dec rw v = std::vec_new<u8>();
     v.push(237 as u8);
     v.push(160 as u8);
     v.push(128 as u8);
 
-    dec opt = string_from_bytes(v.as_slice());
+    dec opt = std::string_from_bytes(v.as_slice());
     if opt.is_some() {
         return 1; // Surrogate must be rejected
     }
@@ -440,7 +440,7 @@ import <iter_collect>;
 
 fn main() -> i32 {
     // "Việt" -> 6 bytes: V (0), i (1), ệ (2..5), t (5..6)
-    dec rw v = vec_new<u8>();
+    dec rw v = std::vec_new<u8>();
     v.push(86 as u8);  // 'V'
     v.push(105 as u8); // 'i'
     v.push(225 as u8); // 'ệ' byte 1
@@ -448,7 +448,7 @@ fn main() -> i32 {
     v.push(135 as u8); // 'ệ' byte 3
     v.push(116 as u8); // 't'
 
-    dec rw s = string_from_bytes(v.as_slice()).unwrap();
+    dec rw s = std::string_from_bytes(v.as_slice()).unwrap();
     // Truncate after 'Vi' (index 2 is a valid scalar boundary)
     s.truncate(2 as u64);
     if s.len() != (2 as u64) {
@@ -495,7 +495,7 @@ import <iter_collect>;
 
 fn main() -> i32 {
     // "Việt" -> 'ệ' starts at index 2 (length 3 bytes: 2, 3, 4)
-    dec rw v = vec_new<u8>();
+    dec rw v = std::vec_new<u8>();
     v.push(86 as u8);
     v.push(105 as u8);
     v.push(225 as u8);
@@ -503,7 +503,7 @@ fn main() -> i32 {
     v.push(135 as u8);
     v.push(116 as u8);
 
-    dec rw s = string_from_bytes(v.as_slice()).unwrap();
+    dec rw s = std::string_from_bytes(v.as_slice()).unwrap();
     // Index 3 is in the middle of 'ệ' -> MUST PANIC!
     s.truncate(3 as u64);
     return 0;
@@ -542,7 +542,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw s = string_new();
+    dec rw s = std::string_new();
     s.push_str("Hello");
     s.push_str(" ");
     s.push_str("World");
@@ -589,7 +589,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw s = string_new();
+    dec rw s = std::string_new();
     s.push_char('A'); // 1-byte
     if s.len() != (1 as u64) {
         return 1;
@@ -633,12 +633,12 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-fn consume_string(s: String) -> u64 {
+fn consume_string(s: std::String) -> u64 {
     return s.len();
 }
 
 fn main() -> i32 {
-    dec s = string_from_str("Temporary string that gets moved and dropped");
+    dec s = std::string_from_str("Temporary string that gets moved and dropped");
     dec len = consume_string(s);
     if len != (44 as u64) {
         return 1;
@@ -679,7 +679,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn test_conflict() {
-    dec rw s = string_from_str("hello");
+    dec rw s = std::string_from_str("hello");
     dec b = s.as_bytes();
     s.push_str("world"); // MUST FAIL: s is mutably borrowed while b is active
     dec first = b[0];
@@ -745,7 +745,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw s = string_new();
+    dec rw s = std::string_new();
     s.push_str("Luna");
     s.push_str(" ");
     s.push_str("Language");
@@ -795,8 +795,8 @@ import <iter_collect>;
 import <io>;
 
 fn main() -> i32 {
-    dec s = string_from_str("Hello from Luna String stdlib!");
-    io::println(s.as_bytes());
+    dec s = std::string_from_str("Hello from Luna String stdlib!");
+    std::io::println(s.as_bytes());
     return 0;
 }
 "#;
@@ -834,7 +834,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec s1 = string_from_str("apple");
+    dec s1 = std::string_from_str("apple");
     dec rw s2 = s1.clone();
     
     if s1.eq(&s2) == false {

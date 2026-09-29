@@ -60,32 +60,32 @@ fn test_mem_swap_and_replace() {
         };
 
         fn main() -> i32 {
-            // 1. Primitive mem::swap
+            // 1. Primitive std::mem::swap
             dec rw a: i32 = 100;
             dec rw b: i32 = 200;
-            mem::swap<i32>(&rw a, &rw b);
+            std::mem::swap<i32>(&rw a, &rw b);
             if a != 200 { return 1; }
             if b != 100 { return 2; }
 
-            // 2. Aggregate struct mem::swap
+            // 2. Aggregate struct std::mem::swap
             dec rw p1 = Point { x: 1, y: 2 };
             dec rw p2 = Point { x: 8, y: 9 };
-            mem::swap<Point>(&rw p1, &rw p2);
+            std::mem::swap<Point>(&rw p1, &rw p2);
             if p1.x != 8 { return 3; }
             if p1.y != 9 { return 4; }
             if p2.x != 1 { return 5; }
             if p2.y != 2 { return 6; }
 
-            // 3. mem::replace
+            // 3. std::mem::replace
             dec rw dest: i32 = 500;
-            dec old = mem::replace<i32>(&rw dest, 999);
+            dec old = std::mem::replace<i32>(&rw dest, 999);
             if old != 500 { return 7; }
             if dest != 999 { return 8; }
 
-            // 4. ptr::swap with identical pointers (no-op precondition)
+            // 4. std::ptr::swap with identical pointers (no-op precondition)
             unsafe {
                 dec ptr_a = &rw a as *rw i32;
-                ptr::swap<i32>(ptr_a, ptr_a);
+                std::ptr::swap<i32>(ptr_a, ptr_a);
                 if a != 200 { return 9; }
             }
 
@@ -113,7 +113,7 @@ fn test_ptr_swap_direct() {
             counter: *rw i32,
         };
 
-        impl Drop for DropProbe {
+        impl std::Drop for DropProbe {
             fn drop(self: &rw Self) {
                 if (self.counter as u64) != (0 as u64) {
                     unsafe {
@@ -131,7 +131,7 @@ fn test_ptr_swap_direct() {
                 unsafe {
                     dec ptr1 = &rw p1 as *rw DropProbe;
                     dec ptr2 = &rw p2 as *rw DropProbe;
-                    ptr::swap<DropProbe>(ptr1, ptr2);
+                    std::ptr::swap<DropProbe>(ptr1, ptr2);
                 }
 
                 // During and immediately after swap, 0 drops have occurred
@@ -155,7 +155,7 @@ fn test_ptr_swap_direct() {
             unsafe {
                 dec px = &rw x as *rw i32;
                 dec py = &rw y as *rw i32;
-                ptr::swap<i32>(px, py);
+                std::ptr::swap<i32>(px, py);
             }
             if x != 222 { return 1; }
             if y != 111 { return 2; }
@@ -163,7 +163,7 @@ fn test_ptr_swap_direct() {
             // Case 2: a == b -> valid no-op
             unsafe {
                 dec px2 = &rw x as *rw i32;
-                ptr::swap<i32>(px2, px2);
+                std::ptr::swap<i32>(px2, px2);
             }
             if x != 222 { return 3; }
 

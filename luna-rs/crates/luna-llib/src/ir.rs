@@ -59,7 +59,9 @@ pub enum MlibInstruction {
     HeapAlloc,
     Assign(MlibOperand),
     Store { ptr: u32, value: MlibOperand },
+    StoreAnchored { ptr: u32, value: MlibOperand },
     Load { ptr: MlibOperand },
+    Neg { value: MlibOperand },
     CallDirect { callee: String, args: Vec<MlibOperand> },
     CallIndirect { callee: MlibOperand, args: Vec<MlibOperand> },
     CallClosure { closure: MlibOperand, args: Vec<MlibOperand> },
@@ -121,7 +123,7 @@ pub enum MlibInstruction {
     Variant { enum_ty: u32, variant_idx: u32, args: Vec<MlibOperand> },
     Tag { value: MlibOperand },
     Extract { value: MlibOperand, variant_idx: u32, field_idx: u32 },
-    FieldPtr { base: MlibOperand, field_idx: u32 },
+    FieldPtr { base: MlibOperand, field_idx: u32, field_name: Option<String> },
     Drop { value: MlibOperand },
     HeapFree { value: MlibOperand },
     MarkInit { value: MlibOperand },
@@ -146,6 +148,12 @@ pub enum MlibTerminator {
     MissingReturn,
 }
 
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+pub enum MlibFloatType {
+    F32,
+    F64,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum MlibOperand {
     Value(u32),
@@ -155,4 +163,5 @@ pub enum MlibOperand {
     Global(String),
     StringRef(String),
     Char(String),
+    Float { text: String, ty: MlibFloatType },
 }

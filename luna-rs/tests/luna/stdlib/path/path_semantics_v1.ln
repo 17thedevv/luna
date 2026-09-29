@@ -1,0 +1,115 @@
+import <path>;
+import <string>;
+import <vec>;
+
+fn string_is(actual: &std::String, expected: str) -> bool {
+    dec wanted = std::string_from_str(expected);
+    return actual.eq(&wanted);
+}
+
+fn option_is_string(actual: std::Option<std::String>, expected: str) -> bool {
+    return match actual {
+        std::Option::Some(value) -> string_is(&value, expected),
+        std::Option::None -> false,
+    };
+}
+
+fn option_is_none(actual: std::Option<std::String>) -> bool {
+    return match actual {
+        std::Option::Some(_) -> false,
+        std::Option::None -> true,
+    };
+}
+
+fn main() -> i32 {
+    dec empty = std::string_from_str("");
+    dec a = std::string_from_str("a");
+    dec b = std::string_from_str("b");
+    dec a_slash = std::string_from_str("a/");
+    dec b_slash_c = std::string_from_str("b/c");
+
+    if string_is(&std::path::join(&empty, &a), "a") == false { return 1; }
+    if string_is(&std::path::join(&a, &empty), "a") == false { return 2; }
+    if string_is(&std::path::join(&a, &b), "a/b") == false { return 3; }
+    if string_is(&std::path::join(&a_slash, &b), "a/b") == false { return 4; }
+    if string_is(&std::path::join(&a, &b_slash_c), "a/b/c") == false { return 5; }
+
+    dec dotted = std::string_from_str("../b");
+    dec dot = std::string_from_str(".");
+    dec dotdot = std::string_from_str("..");
+    if string_is(&std::path::join(&a, &dot), "a/.") == false { return 6; }
+    if string_is(&std::path::join(&a, &dotdot), "a/..") == false { return 7; }
+    if string_is(&std::path::join(&a, &dotted), "a/../b") == false { return 8; }
+
+    dec rooted = std::string_from_str("/c");
+    dec a_b = std::string_from_str("a/b");
+    if string_is(&std::path::join(&a_b, &rooted), "/c") == false { return 9; }
+    if string_is(&std::path::join(&empty, &rooted), "/c") == false { return 10; }
+    dec slash_a = std::string_from_str("/a");
+    if string_is(&std::path::join(&slash_a, &b), "/a/b") == false { return 11; }
+    dec drive_spelling = std::string_from_str("C:/a");
+    dec rooted_b = std::string_from_str("/b");
+    if string_is(&std::path::join(&drive_spelling, &rooted_b), "/b") == false { return 12; }
+
+    // Backslash and NUL are ordinary valid UTF-8 bytes at the lexical layer.
+    dec rw backslash_bytes = std::vec_new<u8>();
+    backslash_bytes.push(97 as u8);
+    backslash_bytes.push(92 as u8);
+    backslash_bytes.push(98 as u8);
+    dec backslash_lhs = std::string_from_bytes(backslash_bytes.as_slice()).unwrap();
+    dec backslash_joined = std::path::join(&backslash_lhs, &std::string_from_str("c"));
+    dec backslash_result = backslash_joined.as_bytes();
+    if (backslash_result.len as u64) != (5 as u64) { return 13; }
+    if backslash_result[0] != (97 as u8) || backslash_result[1] != (92 as u8) { return 14; }
+    if backslash_result[2] != (98 as u8) || backslash_result[3] != (47 as u8) { return 15; }
+    if backslash_result[4] != (99 as u8) { return 16; }
+
+    dec rw nul_bytes = std::vec_new<u8>();
+    nul_bytes.push(97 as u8);
+    nul_bytes.push(0 as u8);
+    dec nul_lhs = std::string_from_bytes(nul_bytes.as_slice()).unwrap();
+    dec nul_joined = std::path::join(&nul_lhs, &b);
+    dec nul_result = nul_joined.as_bytes();
+    if (nul_result.len as u64) != (4 as u64) { return 17; }
+    if nul_result[0] != (97 as u8) || nul_result[1] != (0 as u8) { return 18; }
+    if nul_result[2] != (47 as u8) || nul_result[3] != (98 as u8) { return 19; }
+
+    dec parent_input = std::string_from_str("a/b");
+    if option_is_string(std::path::parent(&parent_input), "a") == false { return 20; }
+    dec trailing_parent_input = std::string_from_str("a/b/");
+    if option_is_string(std::path::parent(&trailing_parent_input), "a/b") == false { return 21; }
+    dec root = std::string_from_str("/");
+    if option_is_none(std::path::parent(&root)) == false { return 22; }
+    if option_is_none(std::path::parent(&a)) == false { return 23; }
+    if option_is_none(std::path::parent(&empty)) == false { return 24; }
+
+    dec file_path = std::string_from_str("a/b.txt");
+    if option_is_string(std::path::file_name(&file_path), "b.txt") == false { return 25; }
+    dec single_component = std::string_from_str("a");
+    if option_is_string(std::path::file_name(&single_component), "a") == false { return 26; }
+    dec trailing_file = std::string_from_str("a/b/");
+    if option_is_none(std::path::file_name(&trailing_file)) == false { return 27; }
+    if option_is_none(std::path::file_name(&root)) == false { return 28; }
+    if option_is_none(std::path::file_name(&empty)) == false { return 29; }
+    if option_is_none(std::path::file_name(&dot)) == false { return 30; }
+    if option_is_none(std::path::file_name(&dotdot)) == false { return 31; }
+
+    if option_is_string(std::path::extension(&file_path), "txt") == false { return 32; }
+    dec archive = std::string_from_str("a/archive.tar.gz");
+    if option_is_string(std::path::extension(&archive), "gz") == false { return 33; }
+    dec gitignore = std::string_from_str("a/.gitignore");
+    if option_is_none(std::path::extension(&gitignore)) == false { return 34; }
+    dec config = std::string_from_str(".config.json");
+    if option_is_string(std::path::extension(&config), "json") == false { return 35; }
+    dec no_extension = std::string_from_str("a/file");
+    if option_is_none(std::path::extension(&no_extension)) == false { return 36; }
+    dec trailing_dot = std::string_from_str("file.");
+    if option_is_none(std::path::extension(&trailing_dot)) == false { return 37; }
+    if option_is_none(std::path::extension(&dot)) == false { return 38; }
+    if option_is_none(std::path::extension(&dotdot)) == false { return 39; }
+    if option_is_none(std::path::extension(&root)) == false { return 40; }
+    if option_is_none(std::path::extension(&trailing_file)) == false { return 41; }
+    if option_is_none(std::path::extension(&empty)) == false { return 42; }
+
+    return 0;
+}

@@ -128,7 +128,7 @@ fn test_0_sysroot_builder_rebuilds_nested_io_artifacts() {
     );
 }
 
-/// IO-1: io::println outputs slice bytes followed by newline
+/// IO-1: std::io::println outputs slice bytes followed by newline
 #[test]
 fn test_io_println_stdout() {
     let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
@@ -148,7 +148,7 @@ import <io>;
 
 fn main() -> i32 {
     dec msg: [u8; 5] = [72 as u8, 101 as u8, 108 as u8, 108 as u8, 111 as u8];
-    io::println(&msg);
+    std::io::println(&msg);
     return 0;
 }
 "#;
@@ -164,12 +164,12 @@ fn main() -> i32 {
     let res = luna_driver::check(src_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "Checking io::println must succeed: {:?}",
+        "Checking std::io::println must succeed: {:?}",
         res.err()
     );
 }
 
-/// IO-2: io::print and io::println sequencing
+/// IO-2: std::io::print and std::io::println sequencing
 #[test]
 fn test_io_print_and_println_sequencing() {
     let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
@@ -190,8 +190,8 @@ import <io>;
 fn main() -> i32 {
     dec part1: [u8; 7] = [72 as u8, 101 as u8, 108 as u8, 108 as u8, 111 as u8, 44 as u8, 32 as u8];
     dec part2: [u8; 6] = [87 as u8, 111 as u8, 114 as u8, 108 as u8, 100 as u8, 33 as u8];
-    io::print(&part1);
-    io::println(&part2);
+    std::io::print(&part1);
+    std::io::println(&part2);
     return 0;
 }
 "#;
@@ -253,7 +253,7 @@ fn main() -> i32 {
     );
 }
 
-/// IO-4: io::eprintln outputs to stderr
+/// IO-4: std::io::eprintln outputs to stderr
 #[test]
 fn test_io_eprintln_stderr() {
     let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
@@ -273,7 +273,7 @@ import <io>;
 
 fn main() -> i32 {
     dec err_msg: [u8; 6] = [69 as u8, 114 as u8, 114 as u8, 111 as u8, 114 as u8, 33 as u8];
-    io::eprintln(&err_msg);
+    std::io::eprintln(&err_msg);
     return 0;
 }
 "#;
@@ -289,7 +289,7 @@ fn main() -> i32 {
     let res = luna_driver::check(src_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "Checking io::eprintln must succeed: {:?}",
+        "Checking std::io::eprintln must succeed: {:?}",
         res.err()
     );
 }

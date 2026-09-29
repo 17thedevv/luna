@@ -27,6 +27,13 @@ impl<'a> InterproceduralContext<'a> {
         }
     }
 
+    /// Seed canonical summaries for imported bodyless functions. These are
+    /// stable, parameter-relative semantic facts decoded by the driver; local
+    /// function bodies are still inferred normally below.
+    pub fn seed_summary(&mut self, function: GlobalId, summary: CallEffectSummary) {
+        self.summaries.insert(function, summary);
+    }
+
     /// Computes the fixed-point summaries for all functions in the module.
     pub fn compute_summaries(&mut self, module: &Module) {
         let mut worklist: HashSet<GlobalId> = module.functions.iter().map(|f| f.name.clone()).collect();
@@ -58,7 +65,8 @@ impl<'a> InterproceduralContext<'a> {
             // In MVIR, arguments are represented as Alloca instructions at the beginning of the entry block.
             // Let's assume `count_arguments` for now.
             let arg_count = count_arguments(f);
-            self.summaries.insert(f.name.clone(), CallEffectSummary::default_for_args(arg_count));
+            self.summaries.entry(f.name.clone())
+                .or_insert_with(|| CallEffectSummary::default_for_args(arg_count));
         }
 
         // Fixed-point iteration
@@ -70,6 +78,11 @@ impl<'a> InterproceduralContext<'a> {
             for gid in current_worklist {
                 if let Some(&func) = f_map.get(&gid) {
                     if func.is_extern { continue; }
+                    // Imported declarations may be represented as empty
+                    // stubs. Their canonical artifact summary is authoritative
+                    // for the call effect; never replace it with an inference
+                    // over a body that is deliberately absent.
+                    if func.blocks.is_empty() && self.summaries.contains_key(&gid) { continue; }
                     let arg_count = count_arguments(func);
                     let mut arg_values = vec![];
                     for i in 0..arg_count {

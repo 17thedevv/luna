@@ -3,18 +3,18 @@ struct UserIter {
     limit: i32,
 };
 
-impl Iterator<i32> for UserIter {
-    fn next(self: &rw Self) -> Option<i32> {
+impl std::Iterator<i32> for UserIter {
+    fn next(self: &rw Self) -> std::Option<i32> {
         if self.current < self.limit {
             dec value = self.current;
             self.current = self.current + 1;
-            return Option::Some(value);
+            return std::Option::Some(value);
         }
-        return Option::None;
+        return std::Option::None;
     }
 }
 
-impl IntoIterator<i32, UserIter> for UserIter {
+impl std::IntoIterator<i32, UserIter> for UserIter {
     fn into_iter(self: Self) -> UserIter {
         return self;
     }

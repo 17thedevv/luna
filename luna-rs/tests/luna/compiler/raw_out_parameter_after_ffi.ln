@@ -1,0 +1,16 @@
+extern fn __test_write_out_parameter(out_value: *rw u64) -> i32;
+
+fn main() -> i32 {
+    dec rw out_value: u64 = 0 as u64;
+    dec rw status: i32 = 0 as i32;
+    unsafe {
+        status = __test_write_out_parameter(&rw out_value as *rw u64);
+    }
+    if status != (0 as i32) {
+        return 1;
+    }
+    if out_value != (42 as u64) {
+        return 2;
+    }
+    return 0;
+}

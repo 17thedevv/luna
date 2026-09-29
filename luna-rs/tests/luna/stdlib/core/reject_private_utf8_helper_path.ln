@@ -1,0 +1,6 @@
+import <string>;
+
+fn main() {
+    dec bytes: [u8; 1] = [65 as u8];
+    dec valid = std::utf8::validate(&bytes);
+}

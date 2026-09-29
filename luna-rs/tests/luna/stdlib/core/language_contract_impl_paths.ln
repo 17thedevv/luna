@@ -1,0 +1,39 @@
+import <ptr>;
+
+struct CopyProbe {
+    value: i32,
+};
+
+impl std::Copy for CopyProbe {}
+
+fn require_copy<T: std::Copy>(value: T) {}
+
+struct DropProbe {
+    counter: *rw i32,
+};
+
+impl std::Drop for DropProbe {
+    fn drop(self: &rw Self) {
+        unsafe {
+            *self.counter = *self.counter + 1;
+        }
+    }
+}
+
+fn main() -> i32 {
+    dec original = CopyProbe { value: 42 };
+    if original.value != 42 {
+        return 1;
+    }
+    require_copy(original);
+
+    dec rw drops = 0;
+    {
+        dec probe = DropProbe { counter: &rw drops as *rw i32 };
+    }
+    if drops != 1 {
+        return 2;
+    }
+
+    return 0;
+}

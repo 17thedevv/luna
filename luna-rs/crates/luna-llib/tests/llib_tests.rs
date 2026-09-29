@@ -19,7 +19,7 @@ fn dummy_module() -> Module {
     
     // Add some dummy instructions
     func.values.push(ValueData { inst: Instruction::Alloca, ty: SemanticTypeId(0), span: None, origin: ValueOrigin::Temporary });
-    func.values.push(ValueData { inst: Instruction::Load { ptr: Operand::Value(ValueId(0)) }, ty: SemanticTypeId(0), span: None, origin: ValueOrigin::Temporary });
+    func.values.push(ValueData { inst: Instruction::FieldPtr { base: Operand::Value(ValueId(0)), field_idx: 0, field_name: Some("payload".into()) }, ty: SemanticTypeId(0), span: None, origin: ValueOrigin::Temporary });
     
     // Add block
     func.blocks.push(BasicBlock {
@@ -61,6 +61,10 @@ fn test_golden_roundtrip() {
     assert_eq!(mlib_module.functions.len(), 1);
     assert_eq!(mlib_module.functions[0].name, "test_func");
     assert_eq!(mlib_module.functions[0].values.len(), 2);
+    assert!(matches!(
+        &mlib_module.functions[0].values[1].inst,
+        luna_llib::MlibInstruction::FieldPtr { field_idx: 0, field_name: Some(name), .. } if name == "payload"
+    ));
 }
 
 #[test]
@@ -72,6 +76,18 @@ fn test_version_mismatch() {
     
     let mut cursor = Cursor::new(buffer);
     let result = MlibReader::read_module(&mut cursor).map(|(m, _, _, _)| m);
+    assert!(matches!(result, Err(luna_llib::MlibError::VersionMismatch(999))));
+}
+
+#[test]
+fn test_mvir_version_mismatch() {
+    let mut buffer = Vec::new();
+    let mut header = MlibHeader::new();
+    header.mvir_version = 999;
+    header.write_to(&mut buffer).unwrap();
+
+    let mut cursor = Cursor::new(buffer);
+    let result = MlibReader::read_module(&mut cursor);
     assert!(matches!(result, Err(luna_llib::MlibError::VersionMismatch(999))));
 }
 

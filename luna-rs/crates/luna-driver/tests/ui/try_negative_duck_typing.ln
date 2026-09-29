@@ -5,8 +5,8 @@ struct Fake<T> {
 };
 
 impl<T> Fake<T> {
-    fn branch(self: Self) -> ControlFlow<Fake<T>, T> {
-        return ControlFlow::Continue(self.value);
+    fn branch(self: Self) -> std::ControlFlow<Fake<T>, T> {
+        return std::ControlFlow::Continue(self.value);
     }
 
     fn from_residual(residual: Fake<T>) -> Self {

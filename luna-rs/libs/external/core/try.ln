@@ -2,6 +2,7 @@ import <core/panic>;
 import <__lang_option>;
 import <result>;
 
+export module std {
 #[lang("from_residual")]
 export trait FromResidual<R> {
     #[lang("from_residual_fn")]
@@ -17,7 +18,7 @@ export trait Try {
     fn from_output(v: Self::Output) -> Self;
     
     #[lang("try_branch")]
-    fn branch(self: Self) -> ControlFlow<Self::Residual, Self::Output>;
+    fn branch(self: Self) -> std::ControlFlow<Self::Residual, Self::Output>;
 }
 
 #[lang("control_flow")]
@@ -32,27 +33,28 @@ export enum Infallible {
     InfallibleVariant,
 }
 
-impl<T, E> FromResidual<Result<Infallible, E> > for Result<T, E> {
-    fn from_residual(residual: Result<Infallible, E>) -> Self {
+impl<T, E> std::FromResidual<std::Result<std::Infallible, E> > for std::Result<T, E> {
+    fn from_residual(residual: std::Result<std::Infallible, E>) -> Self {
         return match residual {
-            Result::Err(e) -> Result::Err(e),
-            Result::Ok(_) -> __luna_panic(),
+            std::Result::Err(e) -> std::Result::Err(e),
+            std::Result::Ok(_) -> __luna_panic(),
         };
     }
 }
 
-impl<T, E> Try for Result<T, E> {
+impl<T, E> std::Try for std::Result<T, E> {
     type Output = T;
-    type Residual = Result<Infallible, E>;
+    type Residual = std::Result<std::Infallible, E>;
     
     fn from_output(v: T) -> Self {
-        return Result::Ok(v);
+        return std::Result::Ok(v);
     }
     
-    fn branch(self: Self) -> ControlFlow<Result<Infallible, E>, T> {
+    fn branch(self: Self) -> std::ControlFlow<std::Result<std::Infallible, E>, T> {
         return match self {
-            Result::Ok(v) -> ControlFlow::Continue(v),
-            Result::Err(e) -> ControlFlow::Break(Result::Err(e)),
+            std::Result::Ok(v) -> std::ControlFlow::Continue(v),
+            std::Result::Err(e) -> std::ControlFlow::Break(std::Result::Err(e)),
         };
     }
+}
 }

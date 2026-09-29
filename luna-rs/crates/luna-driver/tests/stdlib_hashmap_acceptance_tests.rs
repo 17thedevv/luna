@@ -1,5 +1,5 @@
 // =============================================================================
-// Stdlib Phase 04.4 HashMap<K, V> Acceptance Tests
+// Stdlib Phase 04.4 std::HashMap<K, V> Acceptance Tests
 //
 // Verifies:
 //   1. Empty Lifecycle (default constructor, capacity, empty state, clean drop)
@@ -139,7 +139,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_new<i32, i32>();
+            dec rw map = std::hashmap_new<i32, i32>();
             if map.len() != (0 as u64) {
                 return 1;
             }
@@ -147,7 +147,7 @@ import <iter_collect>;
                 return 2;
             }
 
-            dec rw map_cap = hashmap_with_capacity<i32, i32>(16 as u64);
+            dec rw map_cap = std::hashmap_with_capacity<i32, i32>(16 as u64);
             if map_cap.capacity() != (16 as u64) {
                 return 3;
             }
@@ -191,7 +191,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             dec ins1 = map.insert(10, 100);
             dec ins2 = map.insert(20, 200);
             dec ins3 = map.insert(30, 300);
@@ -205,8 +205,8 @@ import <iter_collect>;
 
             dec k10: i32 = 10;
             dec v10 = match map.get(&k10) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v10 != 100 {
                 return 3;
@@ -214,8 +214,8 @@ import <iter_collect>;
 
             dec k20: i32 = 20;
             dec v20 = match map.get(&k20) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v20 != 200 {
                 return 4;
@@ -223,8 +223,8 @@ import <iter_collect>;
 
             dec k99: i32 = 99;
             dec v99 = match map.get(&k99) {
-                Option::Some(_) -> 1,
-                Option::None -> 0,
+                std::Option::Some(_) -> 1,
+                std::Option::None -> 0,
             };
             if v99 != 0 {
                 return 5;
@@ -266,7 +266,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(1, 10);
             map.insert(2, 20);
 
@@ -320,24 +320,24 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(5, 50);
 
             dec k5: i32 = 5;
             dec mut_opt = map.get_mut(&k5);
             match mut_opt {
-                Option::Some(val_ref) -> {
+                std::Option::Some(val_ref) -> {
                     *val_ref = 555;
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 1;
                 },
             }
 
             dec read_opt = map.get(&k5);
             dec final_val = match read_opt {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
 
             if final_val != 555 {
@@ -380,7 +380,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             dec ins1 = map.insert(7, 70);
             if ins1 == false {
                 return 1;
@@ -399,8 +399,8 @@ import <iter_collect>;
 
             dec k7: i32 = 7;
             dec v = match map.get(&k7) {
-                Option::Some(val) -> *val,
-                Option::None -> 0,
+                std::Option::Some(val) -> *val,
+                std::Option::None -> 0,
             };
             if v != 777 {
                 return 5;
@@ -442,7 +442,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(1, 10);
             map.insert(2, 20);
             map.insert(3, 30);
@@ -503,7 +503,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(1, 10);
             map.insert(2, 20);
             map.insert(3, 30);
@@ -568,20 +568,20 @@ import <iter_collect>;
             forced_hash: u64,
         };
 
-        impl Hash for CollidingKey {
+        impl std::Hash for CollidingKey {
             fn hash(self: &Self) -> u64 {
                 return self.forced_hash;
             }
         }
 
-        impl Eq for CollidingKey {
+        impl std::Eq for CollidingKey {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.id == other.id;
             }
         }
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<CollidingKey, i32>(16 as u64);
+            dec rw map = std::hashmap_with_capacity<CollidingKey, i32>(16 as u64);
 
             dec k1 = CollidingKey { id: 1 as u64, forced_hash: 42 as u64 };
             dec k2 = CollidingKey { id: 2 as u64, forced_hash: 42 as u64 };
@@ -604,8 +604,8 @@ import <iter_collect>;
             // Verify remaining keys past the tombstone are still found
             dec q3 = CollidingKey { id: 3 as u64, forced_hash: 42 as u64 };
             dec v3 = match map.get(&q3) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v3 != 300 {
                 return 2;
@@ -613,8 +613,8 @@ import <iter_collect>;
 
             dec q4 = CollidingKey { id: 4 as u64, forced_hash: 42 as u64 };
             dec v4 = match map.get(&q4) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v4 != 400 {
                 return 3;
@@ -656,7 +656,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
 
             // Insert 25 elements, forcing multiple resizes (8 -> 16 -> 32 -> 64)
             dec rw i: i32 = 1;
@@ -676,8 +676,8 @@ import <iter_collect>;
             dec rw j: i32 = 1;
             while j <= 25 {
                 dec val = match map.get(&j) {
-                    Option::Some(v) -> *v,
-                    Option::None -> 0,
+                    std::Option::Some(v) -> *v,
+                    std::Option::None -> 0,
                 };
                 if val != (j * 10) {
                     return 3;
@@ -719,7 +719,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(1, 10);
 
             dec k1: i32 = 1;
@@ -728,8 +728,8 @@ import <iter_collect>;
             map.insert(2, 20); // ERROR: mutating map while val_ref is live
 
             dec x = match val_ref {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             return x;
         }
@@ -760,7 +760,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(1, 10);
 
             dec k1: i32 = 1;
@@ -769,8 +769,8 @@ import <iter_collect>;
             dec read_attempt = map.get(&k1); // ERROR: reading map while exclusive borrow is active
 
             match mut_ref {
-                Option::Some(v) -> { *v = 100; },
-                Option::None -> {},
+                std::Option::Some(v) -> { *v = 100; },
+                std::Option::None -> {},
             }
             return 0;
         }
@@ -809,7 +809,7 @@ import <iter_collect>;
             drop_ptr: *rw i32,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 if (self.drop_ptr as u64) != (0 as u64) {
                     unsafe {
@@ -819,20 +819,20 @@ import <iter_collect>;
             }
         }
 
-        impl Hash for TrackedItem {
+        impl std::Hash for TrackedItem {
             fn hash(self: &Self) -> u64 {
                 return self.id as u64;
             }
         }
 
-        impl Eq for TrackedItem {
+        impl std::Eq for TrackedItem {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.id == other.id;
             }
         }
 
         fn run_map_lifecycle(drop_count_ptr: *rw i32) -> i32 {
-            dec rw map = hashmap_with_capacity<TrackedItem, TrackedItem>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<TrackedItem, TrackedItem>(8 as u64);
 
             // Insert 6 key-value pairs (12 tracked items)
             dec rw i: i32 = 1;
@@ -946,7 +946,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_new<i32, i32>();
+            dec rw map = std::hashmap_new<i32, i32>();
             map.insert(100, 1000);
             map.insert(200, 2000);
 
@@ -954,12 +954,12 @@ import <iter_collect>;
             dec k200: i32 = 200;
 
             dec v1 = match map.get(&k100) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             dec v2 = match map.get(&k200) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
 
             if v1 != 1000 || v2 != 2000 {

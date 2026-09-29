@@ -1,3 +1,4 @@
+export module std {
 export trait Hash {
     fn hash(self: &Self) -> u64;
 }
@@ -21,3 +22,4 @@ impl Hash for i16 { fn hash(self: &Self) -> u64 { return *self as u64; } }
 impl Hash for i32 { fn hash(self: &Self) -> u64 { return *self as u64; } }
 impl Hash for i64 { fn hash(self: &Self) -> u64 { return *self as u64; } }
 impl Hash for isize { fn hash(self: &Self) -> u64 { return *self as u64; } }
+}

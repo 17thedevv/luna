@@ -89,7 +89,7 @@ fn parse_emit(emit_opt: &Option<String>) -> (bool, bool, bool) {
             match e.trim() {
                 "mvir" => emit_mvir = true,
                 "llvm" => emit_llvm = true,
-                "llib" | "mlib" => emit_llib = true,
+                "llib" => emit_llib = true,
                 other => {
                     eprintln!("Unknown emit type: {}", other);
                     process::exit(1);
@@ -116,7 +116,7 @@ fn main() {
                 eprintln!("Error opening {}: {}", file.display(), err);
                 process::exit(1);
             });
-            match luna_llib::reader::MlibReader::read_manifest(&mut f) {
+            match luna_llib::reader::LlibReader::read_manifest(&mut f) {
                 Ok(manifest) => {
                     let json = serde_json::to_string_pretty(&manifest).expect("Failed to serialize manifest to JSON");
                     println!("{}", json);

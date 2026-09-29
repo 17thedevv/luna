@@ -1,9 +1,12 @@
 import <vec>;
+import <default>;
 import <core/panic>;
 import <ptr>;
 import <mem>;
 import <__lang_option>;
 import <__lang_drop>;
+import <fmt>;
+import <result>;
 
 module utf8 {
     export fn validate(bytes: &[u8]) -> bool {
@@ -91,7 +94,7 @@ module utf8 {
         return (b & (192 as u8)) != (128 as u8);
     }
 
-    export fn encode_char(ch: char, out_vec: &rw Vec<u8>) {
+    export fn encode_char(ch: char, out_vec: &rw std::Vec<u8>) {
         dec code = ch as u32;
         if code <= (127 as u32) {
             out_vec.push(code as u8);
@@ -111,53 +114,59 @@ module utf8 {
     }
 }
 
-
 module std {
+
     export struct String {
-        private vec: Vec<u8>,
+        private vec: std::Vec<u8>,
     };
 
     export fn string_new() -> String {
         return String {
-            vec: vec_new<u8>(),
+            vec: std::vec_new<u8>(),
         };
+    }
+
+    impl std::Default for String {
+        fn default() -> Self {
+            return string_new();
+        }
     }
 
     export fn string_with_capacity(capacity: u64) -> String {
         return String {
-            vec: vec_with_capacity<u8>(capacity),
+            vec: std::vec_with_capacity<u8>(capacity),
         };
     }
 
-    export fn string_from_bytes(bytes: &[u8]) -> Option<String> {
+    export fn string_from_bytes(bytes: &[u8]) -> std::Option<String> {
         if utf8::validate(bytes) == false {
-            return Option::None;
+            return std::Option::None;
         }
         dec len = bytes.len as u64;
-        dec rw v = vec_with_capacity<u8>(len);
+        dec rw v = std::vec_with_capacity<u8>(len);
         dec rw i: u64 = 0 as u64;
         while i < len {
             v.push(bytes[i]);
             i = i + (1 as u64);
         }
-        return Option::Some(String { vec: v });
+        return std::Option::Some(String { vec: v });
     }
 
     export fn string_from_str(s: str) -> String {
         dec s_ptr = s as *u8;
         dec rw len: u64 = 0 as u64;
         unsafe {
-            while (*(ptr::add<u8>(s_ptr, len))) != (0 as u8) {
+            while (*(std::ptr::add<u8>(s_ptr, len))) != (0 as u8) {
                 len = len + (1 as u64);
             }
-            dec slice = slice_from_raw_parts<u8>(s_ptr, len);
+            dec slice = std::mem::slice_from_raw_parts<u8>(s_ptr, len);
             if utf8::validate(slice) == false {
                 __luna_panic();
             }
-            dec rw v = vec_with_capacity<u8>(len);
+            dec rw v = std::vec_with_capacity<u8>(len);
             dec rw i: u64 = 0 as u64;
             while i < len {
-                v.push(*(ptr::add<u8>(s_ptr, i)));
+                v.push(*(std::ptr::add<u8>(s_ptr, i)));
                 i = i + (1 as u64);
             }
             return String { vec: v };
@@ -193,16 +202,16 @@ module std {
             dec s_ptr = s as *u8;
             dec rw len: u64 = 0 as u64;
             unsafe {
-                while (*(ptr::add<u8>(s_ptr, len))) != (0 as u8) {
+                while (*(std::ptr::add<u8>(s_ptr, len))) != (0 as u8) {
                     len = len + (1 as u64);
                 }
-                dec slice = slice_from_raw_parts<u8>(s_ptr, len);
+                dec slice = std::mem::slice_from_raw_parts<u8>(s_ptr, len);
                 if utf8::validate(slice) == false {
                     __luna_panic();
                 }
                 dec rw i: u64 = 0 as u64;
                 while i < len {
-                    self.vec.push(*(ptr::add<u8>(s_ptr, i)));
+                    self.vec.push(*(std::ptr::add<u8>(s_ptr, i)));
                     i = i + (1 as u64);
                 }
             }
@@ -225,7 +234,7 @@ module std {
         export fn clone(self: &Self) -> String {
             dec bytes = self.as_bytes();
             dec len = bytes.len as u64;
-            dec rw v = vec_with_capacity<u8>(len);
+            dec rw v = std::vec_with_capacity<u8>(len);
             dec rw i: u64 = 0 as u64;
             while i < len {
                 v.push(bytes[i]);
@@ -252,18 +261,52 @@ module std {
         }
     }
 
-}
+    impl std::fmt::Writer for String {
+        fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+            self.push_char(value);
+            return std::Result::Ok;
+        }
+    }
 
-export type String = std::String;
-export fn string_new() -> String {
-    return std::string_new();
-}
-export fn string_with_capacity(capacity: u64) -> String {
-    return std::string_with_capacity(capacity);
-}
-export fn string_from_str(s: str) -> String {
-    return std::string_from_str(s);
-}
-export fn string_from_bytes(bytes: &[u8]) -> Option<String> {
-    return std::string_from_bytes(bytes);
+    impl std::fmt::Display for String {
+        fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, std::fmt::FmtError> {
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                dec first = bytes[i];
+                if first <= (127 as u8) {
+                    if writer.write_char(first as char).is_err() {
+                        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+                    }
+                    i = i + (1 as u64);
+                } else if first <= (223 as u8) {
+                    dec code = (((first & (31 as u8)) as u32) << (6 as u32))
+                        | ((bytes[i + (1 as u64)] & (63 as u8)) as u32);
+                    if writer.write_char(code as char).is_err() {
+                        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+                    }
+                    i = i + (2 as u64);
+                } else if first <= (239 as u8) {
+                    dec code = (((first & (15 as u8)) as u32) << (12 as u32))
+                        | (((bytes[i + (1 as u64)] & (63 as u8)) as u32) << (6 as u32))
+                        | ((bytes[i + (2 as u64)] & (63 as u8)) as u32);
+                    if writer.write_char(code as char).is_err() {
+                        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+                    }
+                    i = i + (3 as u64);
+                } else {
+                    dec code = (((first & (7 as u8)) as u32) << (18 as u32))
+                        | (((bytes[i + (1 as u64)] & (63 as u8)) as u32) << (12 as u32))
+                        | (((bytes[i + (2 as u64)] & (63 as u8)) as u32) << (6 as u32))
+                        | ((bytes[i + (3 as u64)] & (63 as u8)) as u32);
+                    if writer.write_char(code as char).is_err() {
+                        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+                    }
+                    i = i + (4 as u64);
+                }
+            }
+            return std::Result::Ok;
+        }
+    }
 }

@@ -1,0 +1,15 @@
+import <path>;
+import <string>;
+
+fn main() -> i32 {
+    dec lhs = std::string_from_str("a");
+    dec rhs = std::string_from_str("b");
+    dec joined = std::path::join(&lhs, &rhs);
+    dec bytes = joined.as_bytes();
+
+    if (bytes.len as u64) != (3 as u64) { return 1; }
+    if bytes[0] != (97 as u8) { return 2; }
+    if bytes[1] != (47 as u8) { return 3; }
+    if bytes[2] != (98 as u8) { return 4; }
+    return 0;
+}

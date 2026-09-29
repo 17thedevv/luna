@@ -1,0 +1,25 @@
+import <result>;
+
+fn source(ok: bool) -> std::Result<i32, i32> {
+    if ok {
+        return std::Result::Ok(41);
+    }
+    return std::Result::Err(9);
+}
+
+fn propagate(ok: bool) -> std::Result<i32, i32> {
+    dec value = source(ok)?;
+    return std::Result::Ok(value + 1);
+}
+
+fn main() -> i32 {
+    dec success = propagate(true).unwrap();
+    if success != 42 {
+        return 1;
+    }
+    dec failure = propagate(false);
+    if failure.is_err() {
+        return 0;
+    }
+    return 2;
+}

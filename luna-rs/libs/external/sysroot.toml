@@ -40,6 +40,7 @@ visibility = "public"
 name = "copy"
 path = "core/copy"
 visibility = "public"
+lang_contract = "copy"
 
 [[provider]]
 name = "iter_adapters"
@@ -55,6 +56,7 @@ visibility = "public"
 name = "try"
 path = "core/try"
 visibility = "public"
+lang_contract = "try"
 
 [[provider]]
 name = "io"
@@ -62,11 +64,41 @@ path = "io/io"
 visibility = "public"
 
 [[provider]]
+name = "file"
+path = "file/file"
+visibility = "public"
+
+[[provider]]
+name = "path"
+path = "path/path"
+visibility = "public"
+
+[[provider]]
 name = "num"
 path = "core/num"
 visibility = "public"
 
-# --- Transitional Entries (Phase 3 Removal Candidates) ---
+[[provider]]
+name = "default"
+path = "core/default"
+visibility = "public"
+
+[[provider]]
+name = "convert"
+path = "core/convert"
+visibility = "public"
+
+[[provider]]
+name = "float"
+path = "core/float"
+visibility = "public"
+
+[[provider]]
+name = "fmt"
+path = "core/fmt"
+visibility = "public"
+
+# --- Canonical public providers with alloc-backed implementations ---
 [[provider]]
 name = "box"
 path = "alloc/box"
@@ -101,9 +133,10 @@ visibility = "public"
 
 # --- Internal / Implementation Providers ---
 [[provider]]
-name = "core/panic"
+name = "panic"
 path = "core/panic"
 visibility = "public"
+aliases = ["core/panic"]
 
 [[provider]]
 name = "__alloc_global"

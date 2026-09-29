@@ -1949,9 +1949,9 @@ mod phase2c_controls {
         assert_compile_success("ctrl_zero_field_no_prov", src, "Zero-field struct must not retain provenance");
     }
 
-    // Control 10: Cast must propagate provenance interprocedurally (INVALID)
+    // Control 10: A returned raw pointer does not keep a Luna safe loan alive.
     #[test]
-    fn test_ctrl_cast_propagates_provenance() {
+    fn test_ctrl_cast_to_raw_pointer_does_not_keep_safe_loan() {
         let src = r#"
             fn cast_ref(r: &rw i32) -> *rw i32 {
                 return r as *rw i32;
@@ -1966,7 +1966,7 @@ mod phase2c_controls {
                 return *r2;
             }
         "#;
-        assert_compile_error("ctrl_cast_prov", src, "already borrowed", "Cast-derived pointer must retain loan and reject second mutable borrow");
+        assert_compile_success("ctrl_cast_raw_no_safe_loan", src, "Raw pointers do not implicitly maintain safe-loan liveness");
     }
 
     // Control 11: PtrOffset must propagate provenance interprocedurally (INVALID)

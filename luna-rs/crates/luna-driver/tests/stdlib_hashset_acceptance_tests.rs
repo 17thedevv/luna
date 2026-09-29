@@ -1,5 +1,5 @@
 // =============================================================================
-// Stdlib Phase 04.5 HashSet<T> Acceptance Tests
+// Stdlib Phase 04.5 std::HashSet<T> Acceptance Tests
 //
 // Verifies:
 //   1. Empty Lifecycle (default constructor, capacity, empty state, clean drop)
@@ -116,7 +116,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_new<i32>();
+            dec rw set = std::hashset_new<i32>();
             if set.len() != (0 as u64) {
                 return 1;
             }
@@ -124,7 +124,7 @@ import <iter_collect>;
                 return 2;
             }
 
-            dec rw set_cap = hashset_with_capacity<i32>(16 as u64);
+            dec rw set_cap = std::hashset_with_capacity<i32>(16 as u64);
             if set_cap.capacity() != (16 as u64) {
                 return 3;
             }
@@ -171,7 +171,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
 
             dec ins10 = set.insert(10);
             dec ins20 = set.insert(20);
@@ -241,7 +241,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
 
             dec first_ins = set.insert(42);
             if first_ins == false {
@@ -308,7 +308,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
             set.insert(100);
             set.insert(200);
             set.insert(300);
@@ -387,7 +387,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
             set.insert(1);
             set.insert(2);
             set.insert(3);
@@ -468,20 +468,20 @@ import <iter_collect>;
             fixed_hash: u64,
         };
 
-        impl Hash for CollidingKey {
+        impl std::Hash for CollidingKey {
             fn hash(self: &Self) -> u64 {
                 return self.fixed_hash;
             }
         }
 
-        impl Eq for CollidingKey {
+        impl std::Eq for CollidingKey {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.id == other.id;
             }
         }
 
         fn main() -> i32 {
-            dec rw set = hashset_with_capacity<CollidingKey>(8 as u64);
+            dec rw set = std::hashset_with_capacity<CollidingKey>(8 as u64);
 
             // Three distinct keys that all produce hash = 3
             dec k1 = CollidingKey { id: 10, fixed_hash: 3 as u64 };
@@ -557,7 +557,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
 
             // Insert 25 elements, forcing multiple resizes (8 -> 16 -> 32 -> 64)
             dec rw i: i32 = 1;
@@ -629,7 +629,7 @@ import <iter_collect>;
             drop_ptr: *rw i32,
         };
 
-        impl Drop for TrackedElement {
+        impl std::Drop for TrackedElement {
             fn drop(self: &rw Self) {
                 if (self.drop_ptr as u64) != (0 as u64) {
                     unsafe {
@@ -639,20 +639,20 @@ import <iter_collect>;
             }
         }
 
-        impl Hash for TrackedElement {
+        impl std::Hash for TrackedElement {
             fn hash(self: &Self) -> u64 {
                 return self.id as u64;
             }
         }
 
-        impl Eq for TrackedElement {
+        impl std::Eq for TrackedElement {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.id == other.id;
             }
         }
 
         fn run_set_lifecycle(drop_count_ptr: *rw i32) -> i32 {
-            dec rw set = hashset_with_capacity<TrackedElement>(8 as u64);
+            dec rw set = std::hashset_with_capacity<TrackedElement>(8 as u64);
 
             // Insert 6 elements (6 tracked elements created)
             dec rw i: i32 = 1;
@@ -775,7 +775,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_new<i32>();
+            dec rw set = std::hashset_new<i32>();
             set.insert(100);
             set.insert(200);
 
@@ -855,7 +855,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_new<i32>();
+            dec rw set = std::hashset_new<i32>();
             dec m = set.map; // ERROR: field `map` is private
             return 0;
         }
@@ -889,7 +889,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw m = hashmap_new<i32, ()>();
+            dec rw m = std::hashmap_new<i32, ()>();
             dec set = std::HashSet<i32> { map: m }; // ERROR: cannot construct struct with private fields
             return 0;
         }

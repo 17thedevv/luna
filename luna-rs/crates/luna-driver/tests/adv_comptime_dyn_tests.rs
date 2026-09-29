@@ -125,7 +125,7 @@ fn test_adv_comptime_02_make_trait_object_and_call() {
     // v2 = FieldPtr { base: v1, field_idx: 0 } -> &val
     method_fn.values.push(ValueData {
         ty: i32_ty,
-        inst: Instruction::FieldPtr { base: Operand::Value(ValueId(1)), field_idx: 0 },
+        inst: Instruction::FieldPtr { base: Operand::Value(ValueId(1)), field_idx: 0, field_name: None },
         origin: ValueOrigin::Temporary,
         span: None,
     });
@@ -171,7 +171,7 @@ fn test_adv_comptime_02_make_trait_object_and_call() {
     // v1 = FieldPtr { base: v0, field_idx: 0 }
     caller_fn.values.push(ValueData {
         ty: i32_ty,
-        inst: Instruction::FieldPtr { base: Operand::Value(ValueId(0)), field_idx: 0 },
+        inst: Instruction::FieldPtr { base: Operand::Value(ValueId(0)), field_idx: 0, field_name: None },
         origin: ValueOrigin::Temporary,
         span: None,
     });

@@ -1,0 +1,5 @@
+struct Probe { value: i32 };
+
+impl Copy for Probe {}
+
+fn main() {}

@@ -93,8 +93,8 @@ fn test_iter_map_basic() {
 
         fn main() -> i32 {
             dec arr: [i32; 5] = [1, 2, 3, 4, 5];
-            dec it = slice_iter<i32>(&arr);
-            dec rw mapped = iter_map(it, square);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec rw mapped = std::iter::iter_map(it, square);
 
             dec rw sum: i32 = 0;
             dec rw count: i32 = 0;
@@ -102,11 +102,11 @@ fn test_iter_map_basic() {
             while running {
                 dec opt = mapped.next();
                 match opt {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         count = count + 1;
                         sum = sum + val;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -155,8 +155,8 @@ fn test_iter_filter_basic() {
 
         fn main() -> i32 {
             dec arr: [i32; 6] = [1, 2, 3, 4, 5, 6];
-            dec it = slice_iter<i32>(&arr);
-            dec rw filtered = iter_filter(it, is_even);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec rw filtered = std::iter::iter_filter(it, is_even);
 
             dec rw sum: i32 = 0;
             dec rw count: i32 = 0;
@@ -164,11 +164,11 @@ fn test_iter_filter_basic() {
             while running {
                 dec opt = filtered.next();
                 match opt {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         count = count + 1;
                         sum = sum + *val;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -213,8 +213,8 @@ fn test_iter_enumerate_basic() {
 
         fn main() -> i32 {
             dec arr: [i32; 3] = [10, 20, 30];
-            dec it = slice_iter<i32>(&arr);
-            dec rw enumerated = iter_enumerate(it);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec rw enumerated = std::iter::iter_enumerate(it);
 
             dec rw idx_sum: u64 = 0 as u64;
             dec rw val_sum: i32 = 0;
@@ -223,12 +223,12 @@ fn test_iter_enumerate_basic() {
             while running {
                 dec opt = enumerated.next();
                 match opt {
-                    Option::Some(pair) -> {
+                    std::Option::Some(pair) -> {
                         count = count + 1;
                         idx_sum = idx_sum + pair.0;
                         val_sum = val_sum + *pair.1;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -277,8 +277,8 @@ fn test_iter_take_exact_count() {
 
         fn main() -> i32 {
             dec arr: [i32; 5] = [10, 20, 30, 40, 50];
-            dec it = slice_iter<i32>(&arr);
-            dec rw taken = iter_take(it, 3 as u64);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec rw taken = std::iter::iter_take(it, 3 as u64);
 
             dec rw sum: i32 = 0;
             dec rw count: i32 = 0;
@@ -286,11 +286,11 @@ fn test_iter_take_exact_count() {
             while running {
                 dec opt = taken.next();
                 match opt {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         count = count + 1;
                         sum = sum + *val;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -307,8 +307,8 @@ fn test_iter_take_exact_count() {
             // Further next() calls return None cleanly
             dec opt2 = taken.next();
             match opt2 {
-                Option::Some(_) -> { return 3; },
-                Option::None -> {},
+                std::Option::Some(_) -> { return 3; },
+                std::Option::None -> {},
             }
 
             return 0;
@@ -342,8 +342,8 @@ fn test_iter_skip_exact_count() {
 
         fn main() -> i32 {
             dec arr: [i32; 5] = [10, 20, 30, 40, 50];
-            dec it = slice_iter<i32>(&arr);
-            dec rw skipped = iter_skip(it, 3 as u64);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec rw skipped = std::iter::iter_skip(it, 3 as u64);
 
             dec rw sum: i32 = 0;
             dec rw count: i32 = 0;
@@ -351,11 +351,11 @@ fn test_iter_skip_exact_count() {
             while running {
                 dec opt = skipped.next();
                 match opt {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         count = count + 1;
                         sum = sum + *val;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -401,9 +401,9 @@ fn test_iter_zip_unequal_lengths() {
         fn main() -> i32 {
             dec a: [i32; 4] = [1, 2, 3, 4];
             dec b: [i32; 2] = [10, 20];
-            dec it_a = slice_iter<i32>(&a);
-            dec it_b = slice_iter<i32>(&b);
-            dec rw zipped = iter_zip(it_a, it_b);
+            dec it_a = std::slice::slice_iter<i32>(&a);
+            dec it_b = std::slice::slice_iter<i32>(&b);
+            dec rw zipped = std::iter::iter_zip(it_a, it_b);
 
             dec rw sum_a: i32 = 0;
             dec rw sum_b: i32 = 0;
@@ -412,12 +412,12 @@ fn test_iter_zip_unequal_lengths() {
             while running {
                 dec opt = zipped.next();
                 match opt {
-                    Option::Some(pair) -> {
+                    std::Option::Some(pair) -> {
                         count = count + 1;
                         sum_a = sum_a + *pair.0;
                         sum_b = sum_b + *pair.1;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -473,10 +473,10 @@ fn test_iter_adapter_pipeline_chaining() {
 
         fn main() -> i32 {
             dec arr: [i32; 10] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-            dec it = slice_iter<i32>(&arr);
-            dec filtered = iter_filter(it, is_even);       // 2, 4, 6, 8, 10
-            dec mapped = iter_map(filtered, square);       // 4, 16, 36, 64, 100
-            dec rw pipeline = iter_take(mapped, 3 as u64); // 4, 16, 36
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec filtered = std::iter::iter_filter(it, is_even);       // 2, 4, 6, 8, 10
+            dec mapped = std::iter::iter_map(filtered, square);       // 4, 16, 36, 64, 100
+            dec rw pipeline = std::iter::iter_take(mapped, 3 as u64); // 4, 16, 36
 
             dec rw sum: i32 = 0;
             dec rw count: i32 = 0;
@@ -484,11 +484,11 @@ fn test_iter_adapter_pipeline_chaining() {
             while running {
                 dec opt = pipeline.next();
                 match opt {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         count = count + 1;
                         sum = sum + val;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -537,18 +537,18 @@ fn test_adapter_source_vs_llib_parity() {
 
         fn main() -> i32 {
             dec arr: [i32; 3] = [1, 2, 3];
-            dec it = slice_iter<i32>(&arr);
-            dec rw mapped = iter_map(it, add_ten);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec rw mapped = std::iter::iter_map(it, add_ten);
 
             dec rw sum: i32 = 0;
             dec rw running = true;
             while running {
                 dec opt = mapped.next();
                 match opt {
-                    Option::Some(v) -> {
+                    std::Option::Some(v) -> {
                         sum = sum + v;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -603,7 +603,7 @@ import <iter_collect>;
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -620,7 +620,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v = vec_with_capacity<TrackedItem>(5 as u64);
+                dec rw v = std::vec_with_capacity<TrackedItem>(5 as u64);
                 dec rw i: i32 = 1;
                 while i <= 5 {
                     unsafe {
@@ -634,17 +634,17 @@ import <iter_collect>;
                 // Filter keeps even (2, 4), rejects odd (1, 3, 5).
                 // With borrowed iteration, iterator yields &TrackedItem without transferring ownership.
                 dec it = v.iter();
-                dec rw filtered = iter_filter(it, is_even);
+                dec rw filtered = std::iter::iter_filter(it, is_even);
 
                 dec rw count: i32 = 0;
                 dec rw running = true;
                 while running {
                     dec opt = filtered.next();
                     match opt {
-                        Option::Some(item) -> {
+                        std::Option::Some(item) -> {
                             count = count + 1;
                         },
-                        Option::None -> {
+                        std::Option::None -> {
                             running = false;
                         },
                     }
@@ -715,7 +715,7 @@ import <iter_collect>;
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -728,7 +728,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v_a = vec_with_capacity<TrackedItem>(3 as u64);
+                dec rw v_a = std::vec_with_capacity<TrackedItem>(3 as u64);
                 dec rw i: i32 = 1;
                 while i <= 3 {
                     unsafe {
@@ -742,18 +742,18 @@ import <iter_collect>;
                 dec b_arr: [i32; 1] = [100];
 
                 dec it_a = v_a.iter();
-                dec it_b = slice_iter<i32>(&b_arr);
-                dec rw zipped = iter_zip(it_a, it_b);
+                dec it_b = std::slice::slice_iter<i32>(&b_arr);
+                dec rw zipped = std::iter::iter_zip(it_a, it_b);
 
                 // Step 1: yields (&TrackedItem 1, &100)
                 dec opt1 = zipped.next();
                 match opt1 {
-                    Option::Some(pair) -> {
+                    std::Option::Some(pair) -> {
                         if *pair.1 != 100 {
                             return 1;
                         }
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         return 2;
                     },
                 }
@@ -761,10 +761,10 @@ import <iter_collect>;
                 // Step 2: Stream B is exhausted, Zip returns None
                 dec opt2 = zipped.next();
                 match opt2 {
-                    Option::Some(_) -> {
+                    std::Option::Some(_) -> {
                         return 3;
                     },
-                    Option::None -> {},
+                    std::Option::None -> {},
                 }
 
                 // Invariant: Iterator borrows from collections, so it does NOT drop backing elements!
@@ -826,14 +826,14 @@ import <iter_collect>;
         }
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(1, 10);
             map.insert(2, 20);
 
             dec it = map.iter();
-            dec f_it = iter_filter(it, pred);
-            dec m_it = iter_map(f_it, map_fn);
-            dec rw t_it = iter_take(m_it, 2 as u64);
+            dec f_it = std::iter::iter_filter(it, pred);
+            dec m_it = std::iter::iter_map(f_it, map_fn);
+            dec rw t_it = std::iter::iter_take(m_it, 2 as u64);
 
             // MUTATION WHILE ADAPTER CHAIN HOLDS BORROW:
             // Borrowck must detect carried provenance through filter -> map -> take

@@ -41,6 +41,7 @@ pub use lifetime::{
     LIFETIME_RELATION_ABI_VERSION, CanonicalProvenance, CanonicalContractSubject, CanonicalOutlivesConstraint, CanonicalLifetimeContract,
     ResolvedTypeLifetimeSubject, ResolvedTypeOutlivesConstraint, ResolvedTypeLifetimeContract,
     CanonicalFieldPath, CanonicalTypeLifetimeSubject, CanonicalTypeOutlivesConstraint, CanonicalTypeLifetimeContract,
+    CanonicalRawStorageAnchorContract, ResolvedRawStorageAnchorContract,
     LifetimeObligation,
 };
 
@@ -127,11 +128,6 @@ impl SemanticContext {
                             trait_id: Some(drop_sym),
                             self_type_def: (*sym_id).into(),
                         })
-                    })
-                    || self.tables.trait_impls.keys().any(|k| {
-                        k.self_type_def == (*sym_id).into() && k.trait_id.map_or(false, |ts| {
-                            (ts.0 as usize) < self.symbol_table.symbols.len() && self.symbol_table.symbols[ts.0 as usize].name == "Drop"
-                        })
                     });
                 if has_drop_impl {
                     true
@@ -145,11 +141,6 @@ impl SemanticContext {
                         self.tables.trait_impls.contains_key(&crate::semantic_tables::ImplKey {
                             trait_id: Some(drop_sym),
                             self_type_def: (*sym_id).into(),
-                        })
-                    })
-                    || self.tables.trait_impls.keys().any(|k| {
-                        k.self_type_def == (*sym_id).into() && k.trait_id.map_or(false, |ts| {
-                            (ts.0 as usize) < self.symbol_table.symbols.len() && self.symbol_table.symbols[ts.0 as usize].name == "Drop"
                         })
                     });
                 if has_drop_impl {

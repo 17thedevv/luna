@@ -1,0 +1,5 @@
+fn consume<T: Iterator<i32>>(iter: &rw T) {
+    dec next = iter.next();
+}
+
+fn main() {}

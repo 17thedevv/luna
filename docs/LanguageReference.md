@@ -227,6 +227,32 @@ fn run_process<T: Process>(item: T) -> i32 {
 }
 ```
 
+Trait methods may declare method-level type parameters. Statically dispatched
+calls infer or explicitly provide those arguments and are monomorphized like
+other generic calls:
+
+```mellis
+trait Echo {
+    fn echo<U>(self: &Self, value: U) -> U;
+}
+
+struct Token {};
+
+impl Echo for Token {
+    fn echo<V>(self: &Self, value: V) -> V {
+        return value;
+    }
+}
+
+fn use_echo<T: Echo>(value: &T) -> i32 {
+    return value.echo<i32>(42 as i32);
+}
+```
+
+The implementation's method type parameters correspond positionally to the
+trait method's parameters; their source names may differ. A trait with a
+type-generic method is not object-safe and cannot be used as `dyn Trait`.
+
 ---
 
 ## 7. Generics

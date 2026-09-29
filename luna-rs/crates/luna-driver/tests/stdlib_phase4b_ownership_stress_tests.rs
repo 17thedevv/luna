@@ -59,7 +59,7 @@ struct DropProbe {
     counter: *rw i32,
 };
 
-impl Drop for DropProbe {
+impl std::Drop for DropProbe {
     fn drop(self: &rw Self) {
         if (self.counter as u64) != (0 as u64) {
             unsafe {
@@ -69,7 +69,7 @@ impl Drop for DropProbe {
     }
 }
 
-impl Clone for DropProbe {
+impl std::Clone for DropProbe {
     fn clone(self: &Self) -> Self {
         return DropProbe {
             id: self.id,
@@ -78,13 +78,13 @@ impl Clone for DropProbe {
     }
 }
 
-impl Eq for DropProbe {
+impl std::Eq for DropProbe {
     fn eq(self: &Self, other: &Self) -> bool {
         return self.id == other.id;
     }
 }
 
-impl Ord for DropProbe {
+impl std::Ord for DropProbe {
     fn cmp(self: &Self, other: &Self) -> i32 {
         if self.id < other.id { return 0 - 1; }
         if self.id > other.id { return 1; }
@@ -92,7 +92,7 @@ impl Ord for DropProbe {
     }
 }
 
-impl Hash for DropProbe {
+impl std::Hash for DropProbe {
     fn hash(self: &Self) -> u64 {
         return self.id as u64;
     }
@@ -108,7 +108,7 @@ fn test_ownership_stress_vec_swap_remove() {
         {}
 
         fn run_test(drops: *rw i32) -> i32 {{
-            dec rw v = vec_new<DropProbe>();
+            dec rw v = std::vec_new<DropProbe>();
             v.push(DropProbe {{ id: 10, counter: drops }});
             v.push(DropProbe {{ id: 20, counter: drops }});
             v.push(DropProbe {{ id: 30, counter: drops }});
@@ -171,7 +171,7 @@ fn test_ownership_stress_vec_retain() {
         }}
 
         fn run_test(drops: *rw i32) -> i32 {{
-            dec rw v = vec_new<DropProbe>();
+            dec rw v = std::vec_new<DropProbe>();
             v.push(DropProbe {{ id: 1, counter: drops }});
             v.push(DropProbe {{ id: 2, counter: drops }});
             v.push(DropProbe {{ id: 3, counter: drops }});
@@ -224,7 +224,7 @@ fn test_ownership_stress_vec_dedup() {
         {}
 
         fn run_test(drops: *rw i32) -> i32 {{
-            dec rw v = vec_new<DropProbe>();
+            dec rw v = std::vec_new<DropProbe>();
             v.push(DropProbe {{ id: 1, counter: drops }});
             v.push(DropProbe {{ id: 1, counter: drops }});
             v.push(DropProbe {{ id: 2, counter: drops }});
@@ -280,7 +280,7 @@ fn test_ownership_stress_vec_resize_and_clone() {
         {}
 
         fn run_shrink_test(drops: *rw i32) -> i32 {{
-            dec rw v = vec_new<DropProbe>();
+            dec rw v = std::vec_new<DropProbe>();
             v.push(DropProbe {{ id: 10, counter: drops }});
             v.push(DropProbe {{ id: 20, counter: drops }});
             v.push(DropProbe {{ id: 30, counter: drops }});
@@ -302,7 +302,7 @@ fn test_ownership_stress_vec_resize_and_clone() {
         }}
 
         fn run_grow_and_clone_test(drops: *rw i32) -> i32 {{
-            dec rw v = vec_new<DropProbe>();
+            dec rw v = std::vec_new<DropProbe>();
             v.push(DropProbe {{ id: 1, counter: drops }});
             v.push(DropProbe {{ id: 2, counter: drops }});
 
@@ -365,7 +365,7 @@ fn test_ownership_stress_hashmap_insert_if_absent_and_get_or_insert() {
         {}
 
         fn run_insert_if_absent_test(drops: *rw i32) -> i32 {{
-            dec rw map = hashmap_new<DropProbe, DropProbe>();
+            dec rw map = std::hashmap_new<DropProbe, DropProbe>();
 
             // 1. First insert: key absent -> inserted -> 0 drops
             dec inserted = map.insert_if_absent(
@@ -394,7 +394,7 @@ fn test_ownership_stress_hashmap_insert_if_absent_and_get_or_insert() {
         }}
 
         fn run_get_or_insert_test(drops: *rw i32) -> i32 {{
-            dec rw map = hashmap_new<DropProbe, DropProbe>();
+            dec rw map = std::hashmap_new<DropProbe, DropProbe>();
 
             // 1. Key absent: inserted -> 0 drops
             {{
@@ -463,13 +463,13 @@ fn test_ownership_stress_mem_swap_replace_and_slice_sort() {
             dec rw p2 = DropProbe {{ id: 20, counter: drops }};
 
             {{
-                mem::swap<DropProbe>(&rw p1, &rw p2);
+                std::mem::swap<DropProbe>(&rw p1, &rw p2);
             }}
 
             if p1.id != 20 {{ return 1; }}
             if p2.id != 10 {{ return 2; }}
             unsafe {{
-                // mem::swap does not drop either element
+                // std::mem::swap does not drop either element
                 if *drops != 0 {{ return 3; }}
             }}
 
@@ -479,7 +479,7 @@ fn test_ownership_stress_mem_swap_replace_and_slice_sort() {
         fn run_replace_test(drops: *rw i32) -> i32 {{
             dec rw dest = DropProbe {{ id: 100, counter: drops }};
             {{
-                dec old = mem::replace<DropProbe>(&rw dest, DropProbe {{ id: 200, counter: drops }});
+                dec old = std::mem::replace<DropProbe>(&rw dest, DropProbe {{ id: 200, counter: drops }});
                 if old.id != 100 {{ return 4; }}
                 unsafe {{
                     // Neither is dropped yet
@@ -496,7 +496,7 @@ fn test_ownership_stress_mem_swap_replace_and_slice_sort() {
         }}
 
         fn run_sort_test(drops: *rw i32) -> i32 {{
-            dec rw v = vec_new<DropProbe>();
+            dec rw v = std::vec_new<DropProbe>();
             v.push(DropProbe {{ id: 50, counter: drops }});
             v.push(DropProbe {{ id: 10, counter: drops }});
             v.push(DropProbe {{ id: 40, counter: drops }});
@@ -508,7 +508,7 @@ fn test_ownership_stress_mem_swap_replace_and_slice_sort() {
             }}
 
             {{
-                slice_sort<DropProbe>(v.as_mut_slice());
+                std::slice::slice_sort<DropProbe>(v.as_mut_slice());
             }}
 
             // slice_sort moves elements via in-place swap, NO drops occur during sorting!
@@ -527,14 +527,14 @@ fn test_ownership_stress_mem_swap_replace_and_slice_sort() {
         }}
 
         fn main() -> i32 {{
-            // Test mem::swap
+            // Test std::mem::swap
             dec rw d1: i32 = 0;
             dec res1 = run_swap_test(&rw d1 as *rw i32);
             if res1 != 0 {{ return res1; }}
             // When p1 and p2 drop -> total = 2
             if d1 != 2 {{ return 15; }}
 
-            // Test mem::replace
+            // Test std::mem::replace
             dec rw d2: i32 = 0;
             dec res2 = run_replace_test(&rw d2 as *rw i32);
             if res2 != 0 {{ return res2; }}

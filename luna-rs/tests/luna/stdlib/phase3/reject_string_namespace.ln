@@ -1,5 +1,5 @@
 import <string>;
 
 fn main() {
-    dec value: string::String = string_new();
+    dec value: string::String = std::string_new();
 }

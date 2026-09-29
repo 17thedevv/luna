@@ -1,0 +1,22 @@
+trait MutableMethod {
+    fn bump<U>(self: &rw Self, marker: U);
+}
+
+struct Counter {
+    value: i32,
+};
+
+impl MutableMethod for Counter {
+    fn bump<V>(self: &rw Self, marker: V) {
+        self.value = self.value + 1;
+    }
+}
+
+fn call_through_shared<T: MutableMethod>(value: &T) {
+    value.bump<i32>(1 as i32);
+}
+
+fn main() {
+    dec counter = Counter { value: 0 };
+    call_through_shared(&counter);
+}

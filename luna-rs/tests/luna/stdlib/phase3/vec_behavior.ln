@@ -1,7 +1,7 @@
 import <vec>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
     v.push(30);
@@ -11,10 +11,10 @@ fn main() -> i32 {
     dec rw borrowing = true;
     while borrowing {
         match borrowed.next() {
-            Option::Some(item) -> {
+            std::Option::Some(item) -> {
                 borrowed_sum = borrowed_sum + *item;
             },
-            Option::None -> { borrowing = false; },
+            std::Option::None -> { borrowing = false; },
         }
     }
     if borrowed_sum != 60 {
@@ -22,12 +22,12 @@ fn main() -> i32 {
     }
 
     match v.pop() {
-        Option::Some(value) -> {
+        std::Option::Some(value) -> {
             if value != 30 {
                 return 2;
             }
         },
-        Option::None -> { return 3; },
+        std::Option::None -> { return 3; },
     }
     v.truncate(1 as u64);
     if v.len() != (1 as u64) {

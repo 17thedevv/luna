@@ -51,7 +51,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn test_read() -> bool {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
     v.push(30);
@@ -112,7 +112,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn test_write() -> bool {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
     v.push(30);
@@ -177,7 +177,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn bad_mutation() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
 
@@ -226,7 +226,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn allowed_seq() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
 
@@ -272,7 +272,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
 
@@ -362,7 +362,7 @@ import <iter_collect>;
 import "indexer";
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(32);
     dec total = indexer::sum_first_two(v.as_slice());

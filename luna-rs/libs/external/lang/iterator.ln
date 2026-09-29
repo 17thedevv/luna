@@ -1,6 +1,8 @@
 import <__lang_option>;
 
+export module std {
 #[lang("iterator")]
 export trait Iterator<Item> {
-    fn next(self: &rw Self) -> Option<Item>;
+    fn next(self: &rw Self) -> std::Option<Item> life_from(self);
+}
 }

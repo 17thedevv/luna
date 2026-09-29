@@ -194,13 +194,25 @@ enum_variant_list ::= enum_variant ("," enum_variant)* ","?
 enum_variant ::= IDENTIFIER ("(" parameters ")")?
 
 // --- STRUCT, TRAIT VÀ IMPL ---
-struct_decl ::= annotation* "export"? KW_STRUCT IDENTIFIER generic_params? "{" struct_field_list? "}"
+struct_decl ::= annotation* "export"? KW_STRUCT IDENTIFIER generic_params? "{" struct_field_list? "}" struct_contract_clause* ";"
 struct_field_list ::= struct_field ("," struct_field)* ","?
 struct_field::= "export"? IDENTIFIER ":" type
+struct_contract_clause ::= "requires" lifetime_constraint_list
+                         | "requires" raw_storage_anchor
+lifetime_constraint_list ::= lifetime_constraint ("," lifetime_constraint)*
+lifetime_constraint ::= life_target (">=" | "<=") life_target
+raw_storage_anchor ::= "anchor" "(" IDENTIFIER ")" "=" "self"
+
+// RAW-STORAGE-ANCHOR-v1: `anchor(field)` accepts only one direct struct field
+// whose declared type is `*T` or `*rw T`. Its identity is the owning type plus
+// the canonical field name; it is distinct from `life(field)` and is carried
+// through `.llib` semantic metadata. Nested projections and non-pointer fields
+// are rejected. Example:
+// export struct RawOwner { private data: *rw u8, } requires anchor(data) = self;
 
 trait_decl  ::= annotation* "export"? KW_TRAIT IDENTIFIER generic_params? "{" trait_method* "}"
 
-trait_method::= KW_FN IDENTIFIER "(" parameters? ")" ("->" type)? ";"
+trait_method::= KW_FN IDENTIFIER generic_params? "(" parameters? ")" ("->" type)? ";"
 
 impl_decl   ::= inherent_impl | full_trait_impl
 

@@ -1,5 +1,12 @@
 # Freeze Audit: Stdlib-04.6 Collection Iterators (`RawTableIter`, `MapIter`, `Keys`, `Values`, `SetIter`)
 
+> Historical API-path note: this 2026-09-14 report records the pre-STD-NAMESPACE-01
+> collection namespace state. Its iterator/lifetime evidence remains historical;
+> public companion paths are superseded by the collection surface migration in
+> `docs/std_namespace_01_canonical_namespace.md` (`std::MapIter`, `std::MapIntoIter`,
+> `std::Keys`, `std::Values`, `std::SetIter`, and `std::SetIntoIter`). RawTable
+> iterator engines remain internal.
+
 **Status:** PASS — FROZEN  
 **Phase:** Stdlib-04.6  
 **Date:** 2026-09-14  

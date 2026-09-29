@@ -1,0 +1,18 @@
+extern fn __test_ffi_write_pointer(out_value: *rw *rw i32) -> i32;
+
+fn main() -> i32 {
+    dec rw out_value: *rw i32 = 0 as *rw i32;
+    dec rw status = 0 as i32;
+    unsafe {
+        status = __test_ffi_write_pointer(&rw out_value as *rw *rw i32);
+    }
+    if status != (0 as i32) { return 1; }
+    unsafe {
+        dec transient = &*out_value;
+        // The borrow is rooted in the unknown pointee address, not in the
+        // local slot that held the pointer value before/after the extern call.
+        out_value = 0 as *rw i32;
+        if *transient == (0 as i32) { return 2; }
+    }
+    return 0;
+}

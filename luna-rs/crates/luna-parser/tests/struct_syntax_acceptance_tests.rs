@@ -96,3 +96,42 @@ fn test_struct_syntax_05_double_semicolon_rejected() {
         "Expected syntax error for redundant second semicolon, but got success with no diagnostics"
     );
 }
+
+/// RAW-STORAGE-ANCHOR-v1: direct raw pointer field syntax and canonical name
+/// survive parsing independently of ordinary lifetime clauses.
+#[test]
+fn test_struct_raw_storage_anchor_syntax() {
+    let input = "struct RawOwner { data: *rw u8, } requires anchor(data) = self;";
+    let (result, arena, diags) = parse(input);
+    assert!(diags.is_empty(), "Expected no diagnostics, got: {:?}", diags);
+    let items = result.expect("parse successful");
+    let Item::Decl(decl_id) = items[0] else { panic!("Expected struct declaration") };
+    let Decl::Struct { raw_storage_anchor_contract, lifetime_contract, .. } = &arena.decls[decl_id.0 as usize] else {
+        panic!("Expected Decl::Struct");
+    };
+    assert!(lifetime_contract.is_none());
+    let contract = raw_storage_anchor_contract.as_ref().expect("expected raw anchor contract");
+    assert_eq!(contract.anchors.len(), 1);
+    assert_eq!(contract.anchors[0].field_name, "data");
+}
+
+#[test]
+fn test_struct_lifetime_and_raw_anchor_clauses_coexist() {
+    let input = "struct Owner { borrowed: &i32, data: *rw u8, } requires life(borrowed) >= life(self) requires anchor(data) = self;";
+    let (result, arena, diags) = parse(input);
+    assert!(diags.is_empty(), "Expected no diagnostics, got: {:?}", diags);
+    let items = result.expect("parse successful");
+    let Item::Decl(decl_id) = items[0] else { panic!("Expected struct declaration") };
+    let Decl::Struct { raw_storage_anchor_contract, lifetime_contract, .. } = &arena.decls[decl_id.0 as usize] else {
+        panic!("Expected Decl::Struct");
+    };
+    assert_eq!(lifetime_contract.as_ref().unwrap().constraints.len(), 1);
+    assert_eq!(raw_storage_anchor_contract.as_ref().unwrap().anchors[0].field_name, "data");
+}
+
+#[test]
+fn test_struct_raw_storage_anchor_rejects_nested_path_syntax() {
+    let input = "struct RawOwner { data: *rw u8, } requires anchor(nested.data) = self;";
+    let (result, _arena, diags) = parse(input);
+    assert!(result.is_err() || !diags.is_empty(), "nested anchor paths are not in v1 grammar");
+}

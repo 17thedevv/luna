@@ -1,13 +1,13 @@
 import <result>;
 import <try>;
 
-fn generic_try<T, E>(x: Result<T, E>) -> Result<T, E> {
+fn generic_try<T, E>(x: std::Result<T, E>) -> std::Result<T, E> {
     dec val = x?;
-    return Result::Ok(val);
+    return std::Result::Ok(val);
 }
 
 fn main() -> i32 {
-    dec res: Result<i32, i32> = Result::Ok(10);
+    dec res: std::Result<i32, i32> = std::Result::Ok(10);
     dec final_res = generic_try(res);
     return 0;
 }

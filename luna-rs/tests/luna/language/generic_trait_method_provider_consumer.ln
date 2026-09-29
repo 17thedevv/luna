@@ -1,0 +1,32 @@
+import "generic_trait_method_provider";
+
+fn dispatch_echo<T: probe::Echo>(value: &T) -> i32 {
+    return value.echo<i32>(51 as i32) - (51 as i32);
+}
+
+fn dispatch_keyed<T: probe::Keyed<i16>>(value: &T) -> u64 {
+    return value.choose<u64>(5 as i16, 67 as u64) - (67 as u64);
+}
+
+fn main() -> i32 {
+    dec token = probe::Token {};
+    if dispatch_echo(&token) != 0 {
+        return 1;
+    }
+    if token.echo<u64>(71 as u64) != (71 as u64) {
+        return 2;
+    }
+
+    dec holder = probe::Holder<i16> { marker: 11 as i16 };
+    if dispatch_keyed(&holder) != 0 as u64 {
+        return 3;
+    }
+    if holder.choose<i32>(13 as i16, 79 as i32) != (79 as i32) {
+        return 4;
+    }
+    dec wide_holder = probe::Holder<u32> { marker: 83 as u32 };
+    if wide_holder.choose<u16>(89 as u32, 97 as u16) != (97 as u16) {
+        return 5;
+    }
+    return 0;
+}

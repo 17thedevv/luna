@@ -80,7 +80,7 @@ pub fn verify_function(func: &Function) -> Result<(), Vec<String>> {
         let ctx = format!("Value {}", i);
         match &value.inst {
             Instruction::Nop => {}
-            Instruction::MarkInit { value } | Instruction::HeapFree { value } | Instruction::Drop { value, .. } => {
+            Instruction::MarkInit { value } | Instruction::HeapFree { value } | Instruction::Drop { value, .. } | Instruction::Neg { value } => {
                 check_operand(value, &mut errors, &ctx);
             }
             Instruction::CallIntrinsic { args, .. } => {
@@ -95,7 +95,7 @@ pub fn verify_function(func: &Function) -> Result<(), Vec<String>> {
             Instruction::Assign(val) => {
                 check_operand(val, &mut errors, &ctx);
             }
-            Instruction::Store { ptr, value: val } => {
+            Instruction::Store { ptr, value: val } | Instruction::StoreAnchored { ptr, value: val } => {
                 check_operand(ptr, &mut errors, &ctx);
                 check_operand(val, &mut errors, &ctx);
             }
@@ -162,9 +162,6 @@ pub fn verify_function(func: &Function) -> Result<(), Vec<String>> {
             Instruction::Null { .. } |
             Instruction::Cast { .. } |
             Instruction::PtrOffset { .. } => {}
-            Instruction::Drop { value, .. } => {
-                check_operand(value, &mut errors, &ctx);
-            }
             Instruction::Tag { value } => {
                 check_operand(value, &mut errors, &ctx);
             }

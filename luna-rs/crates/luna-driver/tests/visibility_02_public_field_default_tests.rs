@@ -363,7 +363,7 @@ fn test_tc_vis_02_4_cross_module_access_public_field() {
 // =============================================================================
 
 #[test]
-fn test_tc_vis_02_5_source_mlib_parity() {
+fn test_tc_vis_02_5_source_llib_parity() {
     let dir = setup_test_dir("tc_vis_02_5_parity");
 
     let prov = r#"
@@ -380,10 +380,10 @@ fn test_tc_vis_02_5_source_mlib_parity() {
     let prov_path = dir.join("data_mod.ln");
     fs::write(&prov_path, prov).unwrap();
 
-    // Compile to .mlib
-    let mlib_path = dir.join("data_mod.mlib");
+    // Compile to the canonical .llib artifact.
+    let llib_path = dir.join("data_mod.llib");
     let opts_prov = CompilerOptions {
-        output_path: Some(mlib_path.to_str().unwrap().to_string()),
+        output_path: Some(llib_path.to_str().unwrap().to_string()),
         emit_llvm: false,
         emit_mvir: false,
         emit_mlib: true,
@@ -393,13 +393,13 @@ fn test_tc_vis_02_5_source_mlib_parity() {
         ..Default::default()
     };
     let compile_prov = luna_driver::compile(prov_path.to_str().unwrap(), prov.to_string(), &opts_prov);
-    assert!(compile_prov.is_ok(), "Failed to compile to mlib: {:?}", compile_prov.err());
-    assert!(mlib_path.exists(), "data_mod.mlib was not generated");
+    assert!(compile_prov.is_ok(), "Failed to compile to llib: {:?}", compile_prov.err());
+    assert!(llib_path.exists(), "data_mod.llib was not generated");
 
-    // Remove source, consumer MUST use .mlib
+    // Remove source, consumer MUST use .llib
     let _ = fs::remove_file(&prov_path);
 
-    // 1. Positive: Read implicit public field from .mlib
+    // 1. Positive: Read implicit public field from .llib
     let pass_src = r#"
         import "data_mod";
 
@@ -409,9 +409,9 @@ fn test_tc_vis_02_5_source_mlib_parity() {
         }
     "#;
     let pass_res = check_source(&dir, "main_pass.ln", pass_src);
-    assert!(pass_res.is_ok(), "Expected public field read from mlib to succeed, got: {:?}", pass_res.err());
+    assert!(pass_res.is_ok(), "Expected public field read from llib to succeed, got: {:?}", pass_res.err());
 
-    // 2. Negative: Read explicit private field from .mlib
+    // 2. Negative: Read explicit private field from .llib
     let fail_src = r#"
         import "data_mod";
 
@@ -421,11 +421,11 @@ fn test_tc_vis_02_5_source_mlib_parity() {
         }
     "#;
     let fail_res = check_source(&dir, "main_fail.ln", fail_src);
-    assert!(fail_res.is_err(), "Expected private field read from mlib to fail");
+    assert!(fail_res.is_err(), "Expected private field read from llib to fail");
     let diags = fail_res.err().unwrap();
     assert!(
         diags.iter().any(|d| d.message.contains("Field `z` of struct `Data` is private")),
-        "Expected private field diagnostic from mlib, got: {:?}", diags
+        "Expected private field diagnostic from llib, got: {:?}", diags
     );
 }
 

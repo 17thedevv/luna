@@ -1,0 +1,165 @@
+import <result>;
+
+export module std {
+    export module fmt {
+        export enum FmtError {
+            WriteFailed,
+        }
+
+        export trait Writer {
+            fn write_char(self: &rw Self, value: char) -> std::Result<void, FmtError>;
+        }
+
+        export trait Display {
+            fn fmt<W: std::fmt::Writer>(
+                self: &Self,
+                writer: &rw W
+            ) -> std::Result<void, FmtError>;
+        }
+
+        fn write_u64<W: std::fmt::Writer>(value: u64, writer: &rw W) -> std::Result<void, FmtError> {
+            if value >= (10 as u64) {
+                if write_u64(value / (10 as u64), writer).is_err() {
+                    return std::Result::Err(FmtError::WriteFailed);
+                }
+            }
+            dec digit = (value % (10 as u64)) as u8;
+            if writer.write_char((digit + (48 as u8)) as char).is_err() {
+                return std::Result::Err(FmtError::WriteFailed);
+            }
+            return std::Result::Ok;
+        }
+
+        fn write_i64<W: std::fmt::Writer>(value: i64, writer: &rw W) -> std::Result<void, FmtError> {
+            if value < (0 as i64) {
+                if writer.write_char('-').is_err() {
+                    return std::Result::Err(FmtError::WriteFailed);
+                }
+                dec magnitude = ((-(value + (1 as i64))) as u64) + (1 as u64);
+                return write_u64(magnitude, writer);
+            }
+            return write_u64(value as u64, writer);
+        }
+
+        fn write_u128<W: std::fmt::Writer>(value: u128, writer: &rw W) -> std::Result<void, FmtError> {
+            if value >= (10 as u128) {
+                if write_u128(value / (10 as u128), writer).is_err() {
+                    return std::Result::Err(FmtError::WriteFailed);
+                }
+            }
+            dec digit = (value % (10 as u128)) as u8;
+            if writer.write_char((digit + (48 as u8)) as char).is_err() {
+                return std::Result::Err(FmtError::WriteFailed);
+            }
+            return std::Result::Ok;
+        }
+
+        fn write_i128<W: std::fmt::Writer>(value: i128, writer: &rw W) -> std::Result<void, FmtError> {
+            if value < (0 as i128) {
+                if writer.write_char('-').is_err() {
+                    return std::Result::Err(FmtError::WriteFailed);
+                }
+                // Avoid negating the signed minimum value.
+                dec magnitude = ((-(value + (1 as i128))) as u128) + (1 as u128);
+                return write_u128(magnitude, writer);
+            }
+            return write_u128(value as u128, writer);
+        }
+
+        impl Display for bool {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                if *self {
+                    if writer.write_char('t').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('u').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                } else {
+                    if writer.write_char('f').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('a').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('l').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('s').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                }
+                return std::Result::Ok;
+            }
+        }
+
+        impl Display for char {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return writer.write_char(*self);
+            }
+        }
+
+        impl Display for u8 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_u64(*self as u64, writer);
+            }
+        }
+
+        impl Display for u16 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_u64(*self as u64, writer);
+            }
+        }
+
+        impl Display for u32 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_u64(*self as u64, writer);
+            }
+        }
+
+        impl Display for u64 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_u64(*self, writer);
+            }
+        }
+
+        impl Display for u128 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_u128(*self, writer);
+            }
+        }
+
+        impl Display for usize {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_u64(*self as u64, writer);
+            }
+        }
+
+        impl Display for i8 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_i64(*self as i64, writer);
+            }
+        }
+
+        impl Display for i16 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_i64(*self as i64, writer);
+            }
+        }
+
+        impl Display for i32 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_i64(*self as i64, writer);
+            }
+        }
+
+        impl Display for i64 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_i64(*self, writer);
+            }
+        }
+
+        impl Display for i128 {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_i128(*self, writer);
+            }
+        }
+
+        impl Display for isize {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                return write_i64(*self as i64, writer);
+            }
+        }
+    }
+}

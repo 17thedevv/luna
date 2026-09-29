@@ -1,0 +1,24 @@
+extern fn __test_ffi_read_file_style(
+    out_ptr: *rw *rw u8,
+    out_len: *rw usize,
+    out_cap: *rw usize
+) -> i32;
+
+fn main() -> i32 {
+    dec rw out_ptr: *rw u8 = 0 as *rw u8;
+    dec rw out_len: usize = 0 as usize;
+    dec rw out_cap: usize = 0 as usize;
+    dec rw status = 0 as i32;
+    unsafe {
+        status = __test_ffi_read_file_style(
+            &rw out_ptr as *rw *rw u8,
+            &rw out_len as *rw usize,
+            &rw out_cap as *rw usize
+        );
+    }
+    if status != (0 as i32) { return 1; }
+    if out_ptr == (0 as *rw u8) { return 2; }
+    if out_len == (0 as usize) { return 3; }
+    if out_cap < out_len { return 4; }
+    return 0;
+}

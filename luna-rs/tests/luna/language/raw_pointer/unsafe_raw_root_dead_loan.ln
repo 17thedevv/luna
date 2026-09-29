@@ -1,0 +1,10 @@
+unsafe fn sequential(pointer: *rw i32) {
+    unsafe {
+        dec rw first = &rw *pointer;
+        *first = 1;
+        dec rw second = &rw *pointer;
+        *second = 2;
+    }
+}
+
+fn main() {}

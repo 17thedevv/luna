@@ -1,0 +1,7 @@
+struct Probe { value: i32 };
+
+impl Drop for Probe {
+    fn drop(self: &rw Self) {}
+}
+
+fn main() {}

@@ -1,0 +1,15 @@
+unsafe fn read_twice(pointer: *i32) -> i32 {
+    unsafe {
+        dec first = &*pointer;
+        dec second = &*pointer;
+        return *first + *second;
+    }
+}
+
+fn main() {
+    dec value = 11;
+    unsafe {
+        dec pointer = &value as *i32;
+        if read_twice(pointer) != 22 { return; }
+    }
+}

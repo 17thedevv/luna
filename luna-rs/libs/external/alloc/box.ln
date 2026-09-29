@@ -6,27 +6,29 @@ import <__lang_drop>;
 module std {
     export struct Box<T> {
         private ptr: *rw T,
-    };
+    } requires anchor(ptr) = self;
 
     export fn box_new<T>(val: T) -> Box<T> {
-        dec size = mem::size_of<T>();
-        dec align = mem::align_of<T>();
+        dec size = std::mem::size_of<T>();
+        dec align = std::mem::align_of<T>();
         dec raw = __luna_alloc(size, align) as *rw T;
         unsafe {
-            ptr::write<T>(raw, val);
+            std::ptr::write<T>(raw, val);
         }
-        return Box<T> {
-            ptr: raw,
-        };
+        unsafe {
+            return Box<T> {
+                ptr: raw,
+            };
+        }
     }
 
     export fn box_into_inner<T>(b: Box<T>) -> T {
         dec rw boxed = b;
         dec raw = boxed.ptr;
-        boxed.ptr = 0 as u64 as *rw T;
         unsafe {
-            dec val = ptr::read<T>(raw as *T);
-            __luna_dealloc(raw as *rw u8, mem::size_of<T>(), mem::align_of<T>());
+            boxed.ptr = 0 as u64 as *rw T;
+            dec val = std::ptr::read<T>(raw as *T);
+            __luna_dealloc(raw as *rw u8, std::mem::size_of<T>(), std::mem::align_of<T>());
             return val;
         }
     }
@@ -45,18 +47,16 @@ module std {
         }
     }
 
-    impl<T> Drop for Box<T> {
+    impl<T> std::Drop for Box<T> {
         fn drop(self: &rw Self) {
             if (self.ptr as u64) != (0 as u64) {
                 unsafe {
-                    ptr::drop_in_place<T>(self.ptr);
-                    __luna_dealloc(self.ptr as *rw u8, mem::size_of<T>(), mem::align_of<T>());
+                    std::ptr::drop_in_place<T>(self.ptr);
+                    __luna_dealloc(self.ptr as *rw u8, std::mem::size_of<T>(), std::mem::align_of<T>());
+                    self.ptr = 0 as u64 as *rw T;
                 }
-                self.ptr = 0 as u64 as *rw T;
             }
         }
     }
 }
-
-export type Box<T> = std::Box<T>;
 

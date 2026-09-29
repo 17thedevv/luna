@@ -5,11 +5,11 @@ trait Drop {
     fn drop(self: &rw Self);
 }
 
-impl Drop for StructA {
+impl std::Drop for StructA {
     fn drop(self: &rw Self) {}
 }
 
-impl Drop for StructB {
+impl std::Drop for StructB {
     fn drop(self: &rw Self) {}
 }
 

@@ -180,6 +180,46 @@ fn main() {
     assert!(res.is_ok(), "STRUCT-LIFE-06: Move to shorter carrier must be accepted: {:?}", res.err());
 }
 
+/// RAW-STORAGE-ANCHOR-v1: a direct pointer field may carry a type-level
+/// owner contract without acquiring a safe loan merely from the declaration.
+#[test]
+fn test_raw_storage_anchor_direct_pointer_contract_resolves() {
+    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let dir = create_temp_dir("raw_anchor_direct_pointer");
+    let opts = make_opts(&test_sysroot, None);
+    let src = "struct RawOwner { data: *rw u8, } requires anchor(data) = self; fn main() {}";
+    let path = dir.join("test.ln");
+    fs::write(&path, src).unwrap();
+    let res = check(path.to_str().unwrap(), src.to_string(), &opts);
+    assert!(res.is_ok(), "direct raw pointer anchor should typecheck: {:?}", res.err());
+}
+
+#[test]
+fn test_raw_storage_anchor_rejects_non_pointer_field() {
+    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let dir = create_temp_dir("raw_anchor_non_pointer");
+    let opts = make_opts(&test_sysroot, None);
+    let src = "struct BadOwner { data: u8, } requires anchor(data) = self; fn main() {}";
+    let path = dir.join("test.ln");
+    fs::write(&path, src).unwrap();
+    let res = check(path.to_str().unwrap(), src.to_string(), &opts);
+    let errors = res.expect_err("non-pointer anchor target must be rejected");
+    assert!(errors.iter().any(|d| d.message.contains("E_RAW_STORAGE_ANCHOR_FIELD")), "wrong diagnostic: {errors:?}");
+}
+
+#[test]
+fn test_raw_storage_anchor_rejects_copy_impl() {
+    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let dir = create_temp_dir("raw_anchor_copy");
+    let opts = make_opts(&test_sysroot, None);
+    let src = "import <copy>; struct RawOwner { data: *rw u8, } requires anchor(data) = self; impl std::Copy for RawOwner {} fn main() {}";
+    let path = dir.join("test.ln");
+    fs::write(&path, src).unwrap();
+    let res = check(path.to_str().unwrap(), src.to_string(), &opts);
+    let errors = res.expect_err("anchor-bearing type must not implement Copy");
+    assert!(errors.iter().any(|d| d.message.contains("E_RAW_STORAGE_ANCHOR_COPY")), "wrong diagnostic: {errors:?}");
+}
+
 /// STRUCT-LIFE-07: Joined field provenance checked universally/conservatively across CFG paths.
 #[test]
 fn test_struct_life_07_joined_field_provenance_cfg() {
@@ -582,14 +622,15 @@ fn test_struct_life_16_missing_provenance_shadow_gap() {
 /// STRUCT-LIFE-17: .llib metadata schema compatibility/version behavior is deterministic.
 #[test]
 fn test_struct_life_17_llib_version_compatibility() {
-    use luna_llib::format::{LlibHeader, LLIB_FORMAT_VERSION};
+    use luna_llib::format::{LlibHeader, LLIB_FORMAT_VERSION, SEMANTIC_METADATA_VERSION};
     use luna_llib::MlibError;
     use luna_llib::reader::MlibReader;
     use luna_semantic::CanonicalTypeLifetimeContract;
     use std::io::Cursor;
 
     assert_eq!(CanonicalTypeLifetimeContract::CURRENT_VERSION, 1, "STRUCT-LIFE-17: Contract schema version must be 1");
-    assert_eq!(LLIB_FORMAT_VERSION, 1, "STRUCT-LIFE-17: Current LLIB_FORMAT_VERSION is 1");
+    assert_eq!(LLIB_FORMAT_VERSION, 2, "RAW-STORAGE-ANCHOR reuses the outer format; the semantic metadata section has its own gate");
+    assert_eq!(SEMANTIC_METADATA_VERSION, 3, "raw-pointer effect metadata requires an explicit semantic schema bump");
 
     // An artifact with an incompatible version (e.g. 999) must be rejected with VersionMismatch
     let mut header = LlibHeader::new();
@@ -804,6 +845,7 @@ fn test_struct_life_20_alias_identity_is_place_based() {
                 inst: Instruction::FieldPtr {
                     base: Operand::Value(ValueId(0)),
                     field_idx: 0,
+                    field_name: None,
                 },
                 ty: SemanticTypeId(0),
                 span: None,
@@ -813,6 +855,7 @@ fn test_struct_life_20_alias_identity_is_place_based() {
                 inst: Instruction::FieldPtr {
                     base: Operand::Value(ValueId(0)),
                     field_idx: 0,
+                    field_name: None,
                 },
                 ty: SemanticTypeId(0),
                 span: None,

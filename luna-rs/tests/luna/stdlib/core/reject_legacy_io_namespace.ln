@@ -1,0 +1,6 @@
+import <io>;
+
+fn main() {
+    dec message: [u8; 1] = [65 as u8];
+    io::println(&message);
+}

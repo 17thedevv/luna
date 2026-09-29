@@ -1,0 +1,5 @@
+import <hashmap>;
+
+fn main() {
+    dec table: std::RawTable<i32, i32>;
+}

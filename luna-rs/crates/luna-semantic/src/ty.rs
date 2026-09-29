@@ -1,5 +1,5 @@
 use luna_common::ids::SymbolId;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SemanticTypeId(pub u32);
@@ -308,7 +308,11 @@ impl TypeContext {
         !flags.0 && !flags.1 && !flags.2 && !flags.3 // has_infer, has_generic, has_error, has_projection
     }
 
-    pub fn contains_reference(&self, ty_id: SemanticTypeId) -> bool {
+    /// Returns true when a type's stored representation contains either a safe
+    /// reference, a raw pointer, or an unsized slice component. This is a
+    /// representation/capability query; it must not be used to infer safe-loan
+    /// liveness.
+    pub fn contains_pointer_or_reference(&self, ty_id: SemanticTypeId) -> bool {
         if ty_id.0 == 0 {
             return false;
         }
@@ -316,14 +320,55 @@ impl TypeContext {
         match self.get(ty_id) {
             SemanticType::Reference(..) | SemanticType::Pointer(..) | SemanticType::Slice(..) => true,
             SemanticType::Struct(_, _, fields) | SemanticType::Enum(_, _, fields) => {
-                fields.iter().any(|&f| self.contains_reference(f))
+                fields.iter().any(|&f| self.contains_pointer_or_reference(f))
             }
-            SemanticType::Tuple(elems) => elems.iter().any(|&e| self.contains_reference(e)),
+            SemanticType::Tuple(elems) => elems.iter().any(|&e| self.contains_pointer_or_reference(e)),
             SemanticType::Array(elem, _) | SemanticType::Future(elem) | SemanticType::Range(elem) => {
-                self.contains_reference(*elem)
+                self.contains_pointer_or_reference(*elem)
             }
             _ => false,
         }
+    }
+
+    /// Compatibility alias for the historical representation query. New
+    /// lifetime/effect analysis must use `contains_safe_reference` instead.
+    pub fn contains_reference(&self, ty_id: SemanticTypeId) -> bool {
+        self.contains_pointer_or_reference(ty_id)
+    }
+
+    /// Returns whether a value's semantic contents can carry a Luna safe loan.
+    /// Raw pointers and unsized slice types do not themselves keep safe loans
+    /// alive. Aggregates recurse through by-value semantic contents; a raw
+    /// pointer field is intentionally not evidence that its pointee is a safe
+    /// reference carrier.
+    pub fn contains_safe_reference(&self, ty_id: SemanticTypeId) -> bool {
+        fn visit(types: &TypeContext, id: SemanticTypeId, seen: &mut HashSet<SemanticTypeId>) -> bool {
+            if id.0 == 0 {
+                return false;
+            }
+            let id = types.resolve(id);
+            if !seen.insert(id) {
+                return false;
+            }
+            match types.get(id) {
+                SemanticType::Reference(..) => true,
+                SemanticType::Struct(_, _, fields) | SemanticType::Enum(_, _, fields) => {
+                    fields.iter().any(|&field| visit(types, field, seen))
+                }
+                SemanticType::Tuple(elements) => elements.iter().any(|&element| visit(types, element, seen)),
+                SemanticType::Array(element, _) | SemanticType::Future(element) | SemanticType::Range(element) => {
+                    visit(types, *element, seen)
+                }
+                SemanticType::Closure(_, captures, _) => captures.iter().any(|&capture| visit(types, capture, seen)),
+                // Unresolved generic/projection types may instantiate to a safe
+                // reference-bearing type. Monomorphic analysis resolves these
+                // before exporting a concrete effect summary.
+                SemanticType::GenericParam(_) | SemanticType::InferenceVar(_) | SemanticType::Projection { .. } => true,
+                SemanticType::Pointer(..) | SemanticType::Slice(_) => false,
+                _ => false,
+            }
+        }
+        visit(self, ty_id, &mut HashSet::new())
     }
 
     /// Returns true if the type is unsized (cannot appear in value position).
@@ -493,5 +538,38 @@ impl TypeContext {
                 self.intern(SemanticType::Projection { self_type: new_self, trait_id: new_trait, assoc_type: new_assoc })
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod safe_reference_shape_tests {
+    use super::*;
+    use luna_common::ids::SymbolId;
+
+    #[test]
+    fn representation_and_safe_loan_shape_are_distinct() {
+        let mut types = TypeContext::new();
+        let u8_ty = types.intern(SemanticType::Primitive(BuiltinType::U8));
+        let u64_ty = types.intern(SemanticType::Primitive(BuiltinType::U64));
+        let raw = types.intern(SemanticType::Pointer(Mutability::Mutable, u8_ty));
+        let safe_ref = types.intern(SemanticType::Reference(LifetimeId(1), Mutability::Immutable, u8_ty));
+        let raw_backed_container = types.intern(SemanticType::Struct(
+            SymbolId(10),
+            vec![u8_ty],
+            vec![raw, u64_ty, u64_ty],
+        ));
+        let mixed_pair = types.intern(SemanticType::Struct(
+            SymbolId(11),
+            vec![],
+            vec![safe_ref, u64_ty],
+        ));
+
+        assert!(types.contains_pointer_or_reference(raw));
+        assert!(types.contains_reference(raw)); // legacy representation alias
+        assert!(!types.contains_safe_reference(raw));
+        assert!(types.contains_pointer_or_reference(raw_backed_container));
+        assert!(!types.contains_safe_reference(raw_backed_container));
+        assert!(types.contains_safe_reference(safe_ref));
+        assert!(types.contains_safe_reference(mixed_pair));
     }
 }

@@ -38,7 +38,7 @@ fn make_opts(sysroot: &Sysroot, extra_path: Option<&Path>) -> CompilerOptions {
     }
 }
 
-/// P1 & P2: `import <ptr>; ptr::read(...)` and `ptr::write(...)` succeed in unsafe context.
+/// P1 & P2: `import <ptr>; std::ptr::read(...)` and `std::ptr::write(...)` succeed in unsafe context.
 #[test]
 fn test_p1_p2_ptr_read_write() {
     let sysroot = Sysroot::discover_for_test().expect("sysroot required");
@@ -57,8 +57,8 @@ fn test_p1_p2_ptr_read_write() {
             dec x: i32 = 42;
             dec rw y: i32 = 0;
             unsafe {
-                dec val = ptr::read<i32>(&x as *i32);
-                ptr::write<i32>(&rw y as *rw i32, val);
+                dec val = std::ptr::read<i32>(&x as *i32);
+                std::ptr::write<i32>(&rw y as *rw i32, val);
             }
             return y;
         }
@@ -68,7 +68,7 @@ fn test_p1_p2_ptr_read_write() {
     let res = check(main_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "ptr::read and ptr::write must succeed: {:?}",
+        "std::ptr::read and std::ptr::write must succeed: {:?}",
         res.err()
     );
 }
@@ -104,7 +104,7 @@ fn test_p3_core_ptr_namespace_rejected() {
     );
 }
 
-/// P4: `import <mem>; mem::copy(...)`, `mem::set(...)`, and `mem::zero(...)` succeed.
+/// P4: `import <mem>; std::mem::copy(...)`, `std::mem::set(...)`, and `std::mem::zero(...)` succeed.
 #[test]
 fn test_p4_mem_primitives() {
     let sysroot = Sysroot::discover_for_test().expect("sysroot required");
@@ -125,9 +125,9 @@ fn test_p4_mem_primitives() {
             dec src_ptr = &src_byte as *u8;
             dec dst_ptr = &rw dst_byte as *rw u8;
             unsafe {
-                mem::copy(src_ptr, dst_ptr, 1 as u64);
-                mem::set(dst_ptr, 128 as u8, 1 as u64);
-                mem::zero(dst_ptr, 1 as u64);
+                std::mem::copy(src_ptr, dst_ptr, 1 as u64);
+                std::mem::set(dst_ptr, 128 as u8, 1 as u64);
+                std::mem::zero(dst_ptr, 1 as u64);
             }
         }
     "#;
@@ -136,7 +136,7 @@ fn test_p4_mem_primitives() {
     let res = check(main_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "mem::copy, mem::set, and mem::zero must succeed: {:?}",
+        "std::mem::copy, std::mem::set, and std::mem::zero must succeed: {:?}",
         res.err()
     );
 }
@@ -158,7 +158,7 @@ fn test_p5_unsafe_enforcement() {
         import <iter_consumers>;
         fn main() {
             dec x: i32 = 42;
-            dec val = ptr::read<i32>(&x as *i32);
+            dec val = std::ptr::read<i32>(&x as *i32);
         }
     "#;
     fs::write(&main_path, src).unwrap();
@@ -166,7 +166,7 @@ fn test_p5_unsafe_enforcement() {
     let res = check(main_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_err(),
-        "ptr::read outside unsafe block must be rejected"
+        "std::ptr::read outside unsafe block must be rejected"
     );
     let errs = res.unwrap_err();
     assert!(
@@ -177,7 +177,7 @@ fn test_p5_unsafe_enforcement() {
     );
 }
 
-/// P6 & P7: Pointer arithmetic (`ptr::add`, `ptr::offset`, `ptr::diff`).
+/// P6 & P7: Pointer arithmetic (`std::ptr::add`, `std::ptr::offset`, `std::ptr::diff`).
 #[test]
 fn test_p6_p7_ptr_arithmetic_and_diff() {
     let sysroot = Sysroot::discover_for_test().expect("sysroot required");
@@ -198,9 +198,9 @@ fn test_p6_p7_ptr_arithmetic_and_diff() {
             dec p_a = &a as *i32;
             dec p_b = &b as *i32;
             unsafe {
-                dec p_next = ptr::add<i32>(p_a, 1 as u64);
-                dec p_back = ptr::offset<i32>(p_next, -1 as i64);
-                dec distance = ptr::diff<i32>(p_b, p_a);
+                dec p_next = std::ptr::add<i32>(p_a, 1 as u64);
+                dec p_back = std::ptr::offset<i32>(p_next, -1 as i64);
+                dec distance = std::ptr::diff<i32>(p_b, p_a);
                 return distance as i32;
             }
         }
@@ -210,12 +210,12 @@ fn test_p6_p7_ptr_arithmetic_and_diff() {
     let res = check(main_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "ptr::add, ptr::offset, and ptr::diff must succeed: {:?}",
+        "std::ptr::add, std::ptr::offset, and std::ptr::diff must succeed: {:?}",
         res.err()
     );
 }
 
-/// P9: `ptr::read` does not synthesize safe borrow provenance (PTR-MEM-1).
+/// P9: `std::ptr::read` does not synthesize safe borrow provenance (PTR-MEM-1).
 #[test]
 fn test_p9_ptr_read_does_not_infer_lifetime() {
     let sysroot = Sysroot::discover_for_test().expect("sysroot required");
@@ -234,7 +234,7 @@ fn test_p9_ptr_read_does_not_infer_lifetime() {
             dec local: i32 = 999;
             unsafe {
                 // Reading an owned value from raw pointer does NOT borrow local
-                return ptr::read<i32>(&local as *i32);
+                return std::ptr::read<i32>(&local as *i32);
             }
         }
         fn main() {
@@ -246,12 +246,12 @@ fn test_p9_ptr_read_does_not_infer_lifetime() {
     let res = check(main_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "ptr::read must produce an owned value without lifetime escape error: {:?}",
+        "std::ptr::read must produce an owned value without lifetime escape error: {:?}",
         res.err()
     );
 }
 
-/// P11: Generic `T` with user-defined struct and `ptr::copy`.
+/// P11: Generic `T` with user-defined struct and `std::ptr::copy`.
 #[test]
 fn test_p11_generic_struct_ptr_copy() {
     let sysroot = Sysroot::discover_for_test().expect("sysroot required");
@@ -274,8 +274,8 @@ fn test_p11_generic_struct_ptr_copy() {
             dec p1 = Point { x: 10, y: 20 };
             dec rw p2 = Point { x: 0, y: 0 };
             unsafe {
-                ptr::copy<Point>(&p1 as *Point, &rw p2 as *rw Point, 1 as u64);
-                dec read_back = ptr::read<Point>(&p2 as *Point);
+                std::ptr::copy<Point>(&p1 as *Point, &rw p2 as *rw Point, 1 as u64);
+                dec read_back = std::ptr::read<Point>(&p2 as *Point);
             }
         }
     "#;
@@ -284,12 +284,12 @@ fn test_p11_generic_struct_ptr_copy() {
     let res = check(main_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "ptr::copy and ptr::read on struct Point must succeed: {:?}",
+        "std::ptr::copy and std::ptr::read on struct Point must succeed: {:?}",
         res.err()
     );
 }
 
-/// P14 & P15: `mem::size_of` and `mem::align_of` layout queries.
+/// P14 & P15: `std::mem::size_of` and `std::mem::align_of` layout queries.
 #[test]
 fn test_p14_p15_size_of_align_of() {
     let sysroot = Sysroot::discover_for_test().expect("sysroot required");
@@ -309,9 +309,9 @@ fn test_p14_p15_size_of_align_of() {
             export payload: u64,
         };
         fn main() -> i32 {
-            dec sz_i32 = mem::size_of<i32>();
-            dec sz_pkt = mem::size_of<Packet>();
-            dec al_pkt = mem::align_of<Packet>();
+            dec sz_i32 = std::mem::size_of<i32>();
+            dec sz_pkt = std::mem::size_of<Packet>();
+            dec al_pkt = std::mem::align_of<Packet>();
             return (sz_i32 + sz_pkt + al_pkt) as i32;
         }
     "#;
@@ -320,7 +320,7 @@ fn test_p14_p15_size_of_align_of() {
     let res = check(main_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "mem::size_of and mem::align_of must succeed: {:?}",
+        "std::mem::size_of and std::mem::align_of must succeed: {:?}",
         res.err()
     );
 }
@@ -366,8 +366,8 @@ fn test_p8_component_llib_interface() {
             dec x: i32 = 100;
             dec rw y: i32 = 0;
             unsafe {
-                dec val = ptr::read<i32>(&x as *i32);
-                ptr::write<i32>(&rw y as *rw i32, val + 1);
+                dec val = std::ptr::read<i32>(&x as *i32);
+                std::ptr::write<i32>(&rw y as *rw i32, val + 1);
             }
             return y;
         }

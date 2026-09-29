@@ -1,0 +1,7 @@
+import <hashmap>;
+import <hashset>;
+
+fn main() {
+    dec map: hashmap::HashMap<i32, i32> = std::hashmap_new<i32, i32>();
+    dec set: hashset::HashSet<i32> = std::hashset_new<i32>();
+}

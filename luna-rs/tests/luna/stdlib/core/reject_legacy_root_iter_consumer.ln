@@ -1,0 +1,10 @@
+import <slice>;
+import <iter_consumers>;
+
+fn add(acc: i32, value: &i32) -> i32 { return acc + *value; }
+
+fn main() {
+    dec values: [i32; 1] = [1];
+    dec iter = std::slice::slice_iter<i32>(&values);
+    dec sum = iter_fold(iter, 0, add);
+}

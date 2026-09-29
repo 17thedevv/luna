@@ -55,6 +55,8 @@ pub enum DiagnosticCode {
     BorrowConflict = 3003,
     MissingReturnValue = 3004,
     LocalBorrowEscape = 3005,
+    RawStorageAnchorMismatch = 3010,
+    RawStorageAnchorViolation = 3011,
     AsyncBorrowAcrossAwait = 4001,
     ComptimeStepLimitExceeded = 4002,
     ComptimeUnserializableEscape = 4003,

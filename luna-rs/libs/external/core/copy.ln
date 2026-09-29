@@ -1,2 +1,20 @@
-#[lang("copy")]
-export trait Copy {}
+export module std {
+    #[lang("copy")]
+    export trait Copy {}
+
+    // Scalar value types are freely duplicable under Luna's built-in value semantics.
+    impl Copy for bool {}
+    impl Copy for char {}
+    impl Copy for u8 {}
+    impl Copy for u16 {}
+    impl Copy for u32 {}
+    impl Copy for u64 {}
+    impl Copy for usize {}
+    impl Copy for i8 {}
+    impl Copy for i16 {}
+    impl Copy for i32 {}
+    impl Copy for i64 {}
+    impl Copy for isize {}
+    impl Copy for f32 {}
+    impl Copy for f64 {}
+}

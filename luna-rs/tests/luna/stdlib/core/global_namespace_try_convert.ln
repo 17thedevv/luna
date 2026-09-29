@@ -1,0 +1,25 @@
+import <convert>;
+import <float>;
+import <panic>;
+import <result>;
+
+fn maybe_panic(should_panic: bool) {
+    if should_panic {
+        std::panic();
+    }
+}
+
+fn main() -> i32 {
+    dec value: u16 = 255 as u16;
+    dec converted: std::Result<u8, std::TryConvertError> = value.try_convert();
+    match converted {
+        std::Result::Ok(narrow) -> { if narrow != (255 as u8) { return 1; } },
+        std::Result::Err(_) -> { return 2; },
+    }
+
+    dec float_value: f32 = 1.5 as f32;
+    if float_value.abs() != (1.5 as f32) { return 3; }
+    if std::f32_nan().is_nan() == false { return 4; }
+    maybe_panic(false);
+    return 0;
+}

@@ -1,8 +1,8 @@
 export struct MyType {};
 
-impl Iterator<MyType> for &MyType {
-    fn next(self: &rw Self) -> Option<MyType> {
-        return Option::None;
+impl std::Iterator<MyType> for &MyType {
+    fn next(self: &rw Self) -> std::Option<MyType> {
+        return std::Option::None;
     }
 }
 

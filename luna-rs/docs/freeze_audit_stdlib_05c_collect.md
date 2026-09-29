@@ -1,5 +1,11 @@
 # Freeze Audit: Stdlib-05.3 Iterator Subsystem — Collection Transformers (`collect`)
 
+> Historical API-path note: this report predates STD-NAMESPACE-01 collection
+> migration. Its behavior/drop evidence remains historical; public helper paths
+> are superseded by `std::iter_collect_vec`, `std::iter_collect_hashset`, and
+> `std::iter_collect_hashmap` as recorded in
+> `docs/std_namespace_01_canonical_namespace.md`.
+
 ## 1. Executive Summary
 
 - **Phase**: Stdlib-05.3

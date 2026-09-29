@@ -47,7 +47,7 @@ Direct raw-pointer returns (`*T` and `*rw T`) carry no safe lifetime capability 
 ### Normative Contract:
 An aggregate crossing an extern boundary is valid only when its FFI provenance behavior is already defined by frozen Luna semantics.
 
-Direct raw pointers (`*T`, `*rw T`) and direct safe references (`&T`, `&rw T`) remain supported under their respective direct parameter contracts (synchronous borrows for safe references, tracked escape/`#[sync_noescape]` for raw pointers).
+Direct raw pointers (`*T`, `*rw T`) and direct safe references (`&T`, `&rw T`) remain supported under distinct contracts. Safe references keep their explicit synchronous borrow semantics. Raw pointers receive call-scoped pointee access checks (`*T`: read; `*rw T`: read/write), but do not create or extend a safe loan and do not infer a safe lifetime/escape relationship. The caller remains responsible for pointer validity and any foreign retention beyond the call. This does not change the existing FFI rejection of by-value aggregates that transitively contain pointer/reference capabilities.
 
 By-value aggregates crossing FFI (whether as parameters or as return values) are currently supported **only when they contain no provenance-bearing reference/pointer capability transitively**.
 

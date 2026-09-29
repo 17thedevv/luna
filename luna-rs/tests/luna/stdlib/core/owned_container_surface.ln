@@ -1,0 +1,76 @@
+import <box>;
+import <default>;
+import <ptr>;
+import <string>;
+import <vec>;
+
+struct DropProbe {
+    counter: *rw i32,
+};
+
+impl std::Drop for DropProbe {
+    fn drop(self: &rw Self) {
+        unsafe {
+            *self.counter = *self.counter + 1;
+        }
+    }
+}
+
+fn fill_nested_boxes(counter: &rw i32) {
+    dec rw values: std::Vec<std::Box<std::Box<DropProbe>>> = std::vec_new<std::Box<std::Box<DropProbe>>>();
+    values.push(std::box_new<std::Box<DropProbe>>(std::box_new<DropProbe>(DropProbe { counter: counter as *rw i32 })));
+    values.push(std::box_new<std::Box<DropProbe>>(std::box_new<DropProbe>(DropProbe { counter: counter as *rw i32 })));
+    values.reserve(1 as u64);
+}
+
+fn main() -> i32 {
+    dec rw values: std::Vec<i32> = std::vec_with_capacity<i32>(2 as u64);
+    values.push(20);
+    values.push(22);
+    values.push(42);
+    if *values.get(2 as u64).unwrap() != 42 || values.len() != (3 as u64) {
+        return 1;
+    }
+
+    dec rw iter = values.iter();
+    match iter.next() {
+        std::Option::Some(item) -> { if *item != 20 { return 2; } },
+        std::Option::None -> { return 3; },
+    }
+
+    dec cloned = values.clone();
+    if *cloned.get(1 as u64).unwrap() != 22 {
+        return 4;
+    }
+    dec empty: std::Vec<i32> = std::Default::default();
+    if empty.is_empty() == false {
+        return 5;
+    }
+
+    dec rw text: std::String = std::string_from_str("Luna");
+    text.push_char('!');
+    if text.len() != (5 as u64) || text.as_bytes()[4] != (33 as u8) {
+        return 6;
+    }
+    match std::string_from_bytes(text.as_bytes()) {
+        std::Option::Some(copy) -> { if copy.len() != (5 as u64) { return 7; } },
+        std::Option::None -> { return 8; },
+    }
+
+    dec rw boxed: std::Box<i32> = std::box_new<i32>(9);
+    *boxed.as_mut() = 17;
+    if *boxed.as_ref() != 17 {
+        return 9;
+    }
+    dec inner = std::box_into_inner<i32>(boxed);
+    if inner != 17 {
+        return 10;
+    }
+
+    dec rw drops: i32 = 0;
+    fill_nested_boxes(&rw drops);
+    if drops != 2 {
+        return 11;
+    }
+    return 0;
+}

@@ -89,7 +89,7 @@ fn parse_emit(emit_opt: &Option<String>) -> (bool, bool, bool) {
             match e.trim() {
                 "mvir" => emit_mvir = true,
                 "llvm" => emit_llvm = true,
-                "llib" | "mlib" => emit_llib = true,
+                "llib" => emit_llib = true,
                 other => {
                     eprintln!("Unknown emit type: {}", other);
                     process::exit(1);

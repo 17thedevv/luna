@@ -56,78 +56,78 @@ fn test_iter_chain() {
 
         fn main() -> i32 {
             // 1. Normal chain: [1, 2] + [3, 4]
-            dec rw v1 = vec_new<i32>();
+            dec rw v1 = std::vec_new<i32>();
             v1.push(1);
             v1.push(2);
 
-            dec rw v2 = vec_new<i32>();
+            dec rw v2 = std::vec_new<i32>();
             v2.push(3);
             v2.push(4);
 
-            dec rw ch1 = iter_chain(v1.into_iter(), v2.into_iter());
+            dec rw ch1 = std::iter::iter_chain(v1.into_iter(), v2.into_iter());
             match ch1.next() {
-                Option::Some(x) -> { if x != 1 { return 1; } },
-                Option::None -> { return 2; },
+                std::Option::Some(x) -> { if x != 1 { return 1; } },
+                std::Option::None -> { return 2; },
             }
             match ch1.next() {
-                Option::Some(x) -> { if x != 2 { return 3; } },
-                Option::None -> { return 4; },
+                std::Option::Some(x) -> { if x != 2 { return 3; } },
+                std::Option::None -> { return 4; },
             }
             match ch1.next() {
-                Option::Some(x) -> { if x != 3 { return 5; } },
-                Option::None -> { return 6; },
+                std::Option::Some(x) -> { if x != 3 { return 5; } },
+                std::Option::None -> { return 6; },
             }
             match ch1.next() {
-                Option::Some(x) -> { if x != 4 { return 7; } },
-                Option::None -> { return 8; },
+                std::Option::Some(x) -> { if x != 4 { return 7; } },
+                std::Option::None -> { return 8; },
             }
             match ch1.next() {
-                Option::Some(_) -> { return 9; },
-                Option::None -> {},
+                std::Option::Some(_) -> { return 9; },
+                std::Option::None -> {},
             }
 
             // 2. Empty first: [] + [10, 20]
-            dec rw v_empty1 = vec_new<i32>();
-            dec rw v3 = vec_new<i32>();
+            dec rw v_empty1 = std::vec_new<i32>();
+            dec rw v3 = std::vec_new<i32>();
             v3.push(10);
             v3.push(20);
 
-            dec rw ch2 = iter_chain(v_empty1.into_iter(), v3.into_iter());
+            dec rw ch2 = std::iter::iter_chain(v_empty1.into_iter(), v3.into_iter());
             match ch2.next() {
-                Option::Some(x) -> { if x != 10 { return 10; } },
-                Option::None -> { return 11; },
+                std::Option::Some(x) -> { if x != 10 { return 10; } },
+                std::Option::None -> { return 11; },
             }
             match ch2.next() {
-                Option::Some(x) -> { if x != 20 { return 12; } },
-                Option::None -> { return 13; },
+                std::Option::Some(x) -> { if x != 20 { return 12; } },
+                std::Option::None -> { return 13; },
             }
             match ch2.next() {
-                Option::Some(_) -> { return 14; },
-                Option::None -> {},
+                std::Option::Some(_) -> { return 14; },
+                std::Option::None -> {},
             }
 
             // 3. Empty second: [99] + []
-            dec rw v4 = vec_new<i32>();
+            dec rw v4 = std::vec_new<i32>();
             v4.push(99);
-            dec rw v_empty2 = vec_new<i32>();
+            dec rw v_empty2 = std::vec_new<i32>();
 
-            dec rw ch3 = iter_chain(v4.into_iter(), v_empty2.into_iter());
+            dec rw ch3 = std::iter::iter_chain(v4.into_iter(), v_empty2.into_iter());
             match ch3.next() {
-                Option::Some(x) -> { if x != 99 { return 15; } },
-                Option::None -> { return 16; },
+                std::Option::Some(x) -> { if x != 99 { return 15; } },
+                std::Option::None -> { return 16; },
             }
             match ch3.next() {
-                Option::Some(_) -> { return 17; },
-                Option::None -> {},
+                std::Option::Some(_) -> { return 17; },
+                std::Option::None -> {},
             }
 
             // 4. Both empty: [] + []
-            dec rw v_empty3 = vec_new<i32>();
-            dec rw v_empty4 = vec_new<i32>();
-            dec rw ch4 = iter_chain(v_empty3.into_iter(), v_empty4.into_iter());
+            dec rw v_empty3 = std::vec_new<i32>();
+            dec rw v_empty4 = std::vec_new<i32>();
+            dec rw ch4 = std::iter::iter_chain(v_empty3.into_iter(), v_empty4.into_iter());
             match ch4.next() {
-                Option::Some(_) -> { return 18; },
-                Option::None -> {},
+                std::Option::Some(_) -> { return 18; },
+                std::Option::None -> {},
             }
 
             return 0;
@@ -159,28 +159,28 @@ fn test_iter_position() {
         }
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(20);
             v.push(42);
             v.push(50);
 
-            dec pos = iter_position(v.into_iter(), is_forty_two);
+            dec pos = std::iter::iter_position(v.into_iter(), is_forty_two);
             match pos {
-                Option::Some(idx) -> {
+                std::Option::Some(idx) -> {
                     if idx != (2 as u64) { return 1; }
                 },
-                Option::None -> { return 2; },
+                std::Option::None -> { return 2; },
             }
 
-            dec rw v2 = vec_new<i32>();
+            dec rw v2 = std::vec_new<i32>();
             v2.push(10);
             v2.push(20);
 
-            dec pos2 = iter_position(v2.into_iter(), is_missing);
+            dec pos2 = std::iter::iter_position(v2.into_iter(), is_missing);
             match pos2 {
-                Option::Some(_) -> { return 3; },
-                Option::None -> {},
+                std::Option::Some(_) -> { return 3; },
+                std::Option::None -> {},
             }
 
             return 0;
@@ -204,37 +204,37 @@ fn test_iter_nth() {
         import <iter_consumers>;
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(100);
             v.push(200);
             v.push(300);
 
             // nth(0) is first
-            dec item0 = iter_nth(v.into_iter(), 0 as u64);
+            dec item0 = std::iter::iter_nth(v.into_iter(), 0 as u64);
             match item0 {
-                Option::Some(x) -> { if x != 100 { return 1; } },
-                Option::None -> { return 2; },
+                std::Option::Some(x) -> { if x != 100 { return 1; } },
+                std::Option::None -> { return 2; },
             }
 
             // nth(2) is third
-            dec rw v2 = vec_new<i32>();
+            dec rw v2 = std::vec_new<i32>();
             v2.push(100);
             v2.push(200);
             v2.push(300);
-            dec item2 = iter_nth(v2.into_iter(), 2 as u64);
+            dec item2 = std::iter::iter_nth(v2.into_iter(), 2 as u64);
             match item2 {
-                Option::Some(x) -> { if x != 300 { return 3; } },
-                Option::None -> { return 4; },
+                std::Option::Some(x) -> { if x != 300 { return 3; } },
+                std::Option::None -> { return 4; },
             }
 
             // nth(5) is out of bounds -> None
-            dec rw v3 = vec_new<i32>();
+            dec rw v3 = std::vec_new<i32>();
             v3.push(100);
             v3.push(200);
-            dec item5 = iter_nth(v3.into_iter(), 5 as u64);
+            dec item5 = std::iter::iter_nth(v3.into_iter(), 5 as u64);
             match item5 {
-                Option::Some(_) -> { return 5; },
-                Option::None -> {},
+                std::Option::Some(_) -> { return 5; },
+                std::Option::None -> {},
             }
 
             return 0;
@@ -258,23 +258,23 @@ fn test_iter_last() {
         import <iter_consumers>;
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(1);
             v.push(5);
             v.push(9);
 
-            dec last_val = iter_last(v.into_iter());
+            dec last_val = std::iter::iter_last(v.into_iter());
             match last_val {
-                Option::Some(x) -> { if x != 9 { return 1; } },
-                Option::None -> { return 2; },
+                std::Option::Some(x) -> { if x != 9 { return 1; } },
+                std::Option::None -> { return 2; },
             }
 
             // Empty iterator -> None
-            dec rw v_empty = vec_new<i32>();
-            dec empty_last = iter_last(v_empty.into_iter());
+            dec rw v_empty = std::vec_new<i32>();
+            dec empty_last = std::iter::iter_last(v_empty.into_iter());
             match empty_last {
-                Option::Some(_) -> { return 3; },
-                Option::None -> {},
+                std::Option::Some(_) -> { return 3; },
+                std::Option::None -> {},
             }
 
             return 0;
@@ -299,29 +299,29 @@ fn test_iter_sum_i32() {
         import <iter_consumers>;
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(20);
             v.push(30);
 
-            dec total = iter_sum_i32(v.into_iter());
+            dec total = std::iter::iter_sum_i32(v.into_iter());
             if total != 60 { return 1; }
 
             // Empty sum -> 0
-            dec rw v_empty = vec_new<i32>();
-            dec empty_total = iter_sum_i32(v_empty.into_iter());
+            dec rw v_empty = std::vec_new<i32>();
+            dec empty_total = std::iter::iter_sum_i32(v_empty.into_iter());
             if empty_total != 0 { return 2; }
 
             // Chained iterator sum
-            dec rw a = vec_new<i32>();
+            dec rw a = std::vec_new<i32>();
             a.push(1);
             a.push(2);
 
-            dec rw b = vec_new<i32>();
+            dec rw b = std::vec_new<i32>();
             b.push(3);
             b.push(4);
 
-            dec chained_total = iter_sum_i32(iter_chain(a.into_iter(), b.into_iter()));
+            dec chained_total = std::iter::iter_sum_i32(std::iter::iter_chain(a.into_iter(), b.into_iter()));
             if chained_total != 10 { return 3; }
 
             return 0;

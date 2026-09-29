@@ -1,7 +1,8 @@
 use crate::dataflow::{DataflowAnalysis, DataflowEngine};
-use crate::effect::{CallEffectSummary, ReturnEffect};
+use crate::effect::{direct_raw_pointer_fields, CallEffectSummary, RawPointerAnchorReturnEffect, RawPointerAnchorSource, RawPointerReturnEffect, ReturnEffect};
 use luna_common::{Diagnostic, DiagnosticCode};
 use luna_mvir::{Function, GlobalId, Instruction, Operand, Terminator, ValueId, ValueOrigin};
+use luna_semantic::ty::Mutability;
 use luna_semantic::{SemanticContext, SemanticType};
 use std::collections::{HashMap, HashSet};
 
@@ -58,7 +59,7 @@ impl<'a> DataflowAnalysis<LivenessState> for LivenessAnalyzer<'a> {
                     if let Operand::Value(v) = arg { state.live.insert(*v); }
                 }
             }
-            Instruction::Store { ptr, value } => {
+            Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                 if let Operand::Value(ptr_val) = ptr {
                     state.live.insert(*ptr_val);
                 }
@@ -165,6 +166,91 @@ pub struct Loan {
     pub is_rw: bool,
 }
 
+fn type_has_raw_pointer(ty: luna_semantic::SemanticTypeId, ctx: &SemanticContext, seen: &mut HashSet<luna_semantic::SemanticTypeId>) -> bool {
+    if !seen.insert(ty) { return false; }
+    match ctx.types.get(ty) {
+        SemanticType::Pointer(..) => true,
+        SemanticType::Struct(_, args, fields) | SemanticType::Enum(_, args, fields) => {
+            args.iter().chain(fields).any(|field| type_has_raw_pointer(*field, ctx, seen))
+        }
+        SemanticType::Tuple(fields) => fields.iter().any(|field| type_has_raw_pointer(*field, ctx, seen)),
+        SemanticType::Array(inner, _) => type_has_raw_pointer(*inner, ctx, seen),
+        _ => false,
+    }
+}
+
+/// Address origin carried by a raw pointer. This is deliberately not a `Loan`:
+/// raw pointers do not keep safe loans live. `Unknown` is an explicit
+/// alternative so a CFG merge cannot discard an untracked/foreign origin and
+/// accidentally certify the remaining known origin as exhaustive.
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+pub enum RawPointerOrigin {
+    FromPlace { place: Operand, is_rw: bool },
+    /// A known null pointer value is never promotable to a safe reference,
+    /// even when carried in a type with an owner-anchor contract.
+    Null,
+    Unknown,
+}
+
+/// Type-level anchor evidence is a must-property, not an origin and not a
+/// loan. `Unknown` remains explicit at all merges so one known branch cannot
+/// certify an untracked branch.
+#[derive(Clone, PartialEq, Eq, Hash, Debug)]
+pub enum RawPointerAnchor {
+    AnchoredTo(PlaceDesc),
+    Unknown,
+}
+
+impl RawPointerOrigin {
+    fn from_loan(loan: &Loan) -> Self {
+        Self::FromPlace {
+            place: loan.place.clone(),
+            is_rw: loan.is_rw,
+        }
+    }
+
+    fn as_loan(&self, id: ValueId, is_rw: bool) -> Option<Loan> {
+        match self {
+            Self::FromPlace { place, is_rw: origin_is_rw } if !is_rw || *origin_is_rw => {
+                Some(Loan {
+                    id,
+                    place: place.clone(),
+                    is_rw,
+                })
+            }
+            Self::FromPlace { .. } | Self::Null | Self::Unknown => None,
+        }
+    }
+
+    fn into_escaped_loan(&self, id: ValueId) -> Option<Loan> {
+        match self {
+            Self::FromPlace { place, is_rw } => Some(Loan {
+                id,
+                place: place.clone(),
+                is_rw: *is_rw,
+            }),
+            Self::Null | Self::Unknown => None,
+        }
+    }
+
+    fn is_local(&self, aliases: &HashMap<ValueId, Operand>, ending_locals: &HashSet<ValueId>) -> bool {
+        match self {
+            Self::FromPlace { place, .. } => {
+                let mut current = place;
+                while let Operand::Value(value) = current {
+                    if let Some(alias) = aliases.get(value) {
+                        current = alias;
+                    } else {
+                        break;
+                    }
+                }
+                matches!(current, Operand::Value(value) if ending_locals.contains(value))
+            }
+            Self::Null | Self::Unknown => false,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Projection {
     Field(u32),
@@ -199,8 +285,40 @@ impl OverlapResult {
 
 #[derive(Clone, Default, PartialEq, Debug)]
 pub struct BorrowStateData {
+    /// Distinguishes a dataflow bottom block state from a real incoming state
+    /// so must-anchor facts are not weakened on the first predecessor edge.
+    initialized: bool,
     pub direct_provenance: HashMap<ValueId, HashSet<Loan>>,
     pub carried_provenance: HashMap<ValueId, HashSet<Loan>>,
+    /// Candidate storage origins carried by raw pointers. These are not loans
+    /// and are excluded from liveness/conflict checks until an explicit
+    /// raw-to-safe `Borrow` promotes them.
+    pub raw_pointer_provenance: HashMap<ValueId, HashSet<RawPointerOrigin>>,
+    /// Analysis-local raw-pointer lineages. Unlike `raw_pointer_provenance`,
+    /// these identify unknown raw values for temporary unsafe loans only.
+    pub unsafe_raw_roots: HashMap<ValueId, HashSet<ValueId>>,
+    pub raw_pointer_storage: HashMap<PlaceDesc, HashSet<RawPointerOrigin>>,
+    pub unsafe_raw_root_storage: HashMap<PlaceDesc, HashSet<ValueId>>,
+    /// Type-contract anchor facts are separate from raw address origins and
+    /// from safe loans. They identify the logical owner whose lifetime bounds
+    /// a pointer value after explicit unsafe establishment.
+    pub raw_pointer_anchors: HashMap<ValueId, HashSet<RawPointerAnchor>>,
+    /// Marks borrow-result values whose temporary safe loans originate at an
+    /// unknown raw pointer. The value IDs are function-local analysis keys.
+    pub unsafe_raw_root_loans: HashMap<ValueId, HashSet<ValueId>>,
+    pub raw_pointer_anchor_storage: HashMap<PlaceDesc, HashSet<RawPointerAnchor>>,
+    /// Raw pointers loaded from contract-declared fields require anchor
+    /// evidence at any later raw-to-safe conversion.
+    pub raw_pointer_requires_anchor: HashSet<ValueId>,
+    pub raw_pointer_requires_anchor_storage: HashSet<PlaceDesc>,
+    /// A raw-pointer field whose value was written through an opaque raw
+    /// access cannot recover its type-level owner anchor from the field
+    /// contract alone. The external writer did not establish that invariant.
+    pub raw_pointer_anchor_invalidated_storage: HashSet<PlaceDesc>,
+    /// A raw pointer stored in memory was overwritten through an opaque raw
+    /// write. This kill marker prevents older fixed-point/CFG facts from
+    /// resurrecting the pre-call pointer value at a later load.
+    pub raw_pointer_value_invalidated_storage: HashSet<PlaceDesc>,
     pub field_provenance: HashMap<PlaceDesc, ProvenanceSet>,
     pub escaped_loans: HashSet<Loan>,
     pub aliases: HashMap<ValueId, Operand>,
@@ -215,6 +333,7 @@ pub struct BorrowAnalyzer<'a> {
     loop_info: crate::cfg::LoopInfo,
     callee_summaries: Option<&'a HashMap<GlobalId, CallEffectSummary>>,
     ctx: Option<&'a SemanticContext>,
+    safe_reference_values: HashSet<ValueId>,
     func: &'a Function,
     pub emit_diagnostics: bool,
 }
@@ -227,6 +346,7 @@ impl<'a> BorrowAnalyzer<'a> {
         func: &'a Function,
     ) -> Self {
         let loop_info = crate::cfg::analyze_loops(func);
+        let safe_reference_values = reference_value_ids(&func.values, ctx);
         Self {
             diagnostics: Vec::new(),
             live_before,
@@ -235,6 +355,7 @@ impl<'a> BorrowAnalyzer<'a> {
             loop_info,
             callee_summaries,
             ctx,
+            safe_reference_values,
             func,
             emit_diagnostics: false,
         }
@@ -421,11 +542,11 @@ impl<'a> BorrowAnalyzer<'a> {
                                 }
                             }
                         }
-                        Instruction::Store { ptr, value } => {
+                        Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                             let mut field_store_info = None;
                             if let Operand::Value(ptr_v) = ptr {
                                 if (ptr_v.0 as usize) < analyzer.func.values.len() {
-                                    if let Instruction::FieldPtr { base, field_idx } = &analyzer.func.values[ptr_v.0 as usize].inst {
+                                    if let Instruction::FieldPtr { base, field_idx, .. } = &analyzer.func.values[ptr_v.0 as usize].inst {
                                         field_store_info = Some((base.clone(), *field_idx));
                                     }
                                 }
@@ -433,7 +554,7 @@ impl<'a> BorrowAnalyzer<'a> {
                                     let resolved = analyzer.resolve_alias(ptr, &current_state);
                                     if let Operand::Value(rv) = resolved {
                                         if (rv.0 as usize) < analyzer.func.values.len() {
-                                            if let Instruction::FieldPtr { base, field_idx } = &analyzer.func.values[rv.0 as usize].inst {
+                                            if let Instruction::FieldPtr { base, field_idx, .. } = &analyzer.func.values[rv.0 as usize].inst {
                                                 field_store_info = Some((base.clone(), *field_idx));
                                             }
                                         }
@@ -644,6 +765,12 @@ impl<'a> BorrowAnalyzer<'a> {
                     ).with_aliases(current_state.aliases.clone());
 
                     if let Terminator::Ret { value: Some(Operand::Value(val)) } = term {
+                        if !analyzer.unsafe_raw_loans_for_carrier(*val, &current_state).is_empty() {
+                            analyzer.emit_raw_escape_diagnostic(
+                                *val,
+                                "a reference derived from unknown raw provenance cannot be returned, directly or inside an aggregate",
+                            );
+                        }
                         let mut ret_loans = Vec::new();
                         if let Some(loans) = current_state.direct_provenance.get(val) {
                             ret_loans.extend(loans.iter().map(|l| l.place.clone()));
@@ -833,6 +960,274 @@ impl<'a> BorrowAnalyzer<'a> {
         current
     }
 
+    fn declared_anchor_owner(&self, field_ptr: ValueId, state: &BorrowStateData) -> Option<PlaceDesc> {
+        let ctx = self.ctx?;
+        let Instruction::FieldPtr { base, field_name: Some(field_name), .. } =
+            &self.func.values.get(field_ptr.0 as usize)?.inst else { return None; };
+        let base_value = match self.resolve_alias(base, state) {
+            Operand::Value(v) => *v,
+            _ => return None,
+        };
+        let mut owner_ty = ctx.types.resolve(self.func.values.get(base_value.0 as usize)?.ty);
+        loop {
+            match ctx.types.get(owner_ty) {
+                SemanticType::Pointer(_, inner) | SemanticType::Reference(_, _, inner) => {
+                    owner_ty = ctx.types.resolve(*inner);
+                }
+                SemanticType::Struct(owner_sym, ..) => {
+                    let contract = ctx.tables.raw_storage_anchor_contracts.get(owner_sym)?;
+                    if !contract.field_names.iter().any(|name| name == field_name) {
+                        return None;
+                    }
+                    return Some(self.compute_place_desc(base, state));
+                }
+                _ => return None,
+            }
+        }
+    }
+
+    fn direct_call_is_extern(&self, callee: &GlobalId) -> bool {
+        let Some(ctx) = self.ctx else { return false; };
+        let symbol_id = callee.symbol_id.or_else(|| {
+            ctx.symbol_table.lookup(&callee.name, luna_semantic::symbol::ScopeId(0))
+        });
+        symbol_id.is_some_and(|symbol_id| {
+            ctx.tables.extern_functions.contains(&symbol_id)
+                || ctx.symbol_table.get_symbol(symbol_id).kind == luna_semantic::symbol::SymbolKind::ExternFunction
+        })
+    }
+
+    fn raw_pointer_mutability(&self, arg: &Operand) -> Option<Mutability> {
+        let ctx = self.ctx?;
+        let Operand::Value(value) = arg else { return None; };
+        match ctx.types.get(self.func.value(*value).ty) {
+            SemanticType::Pointer(mutability, _) => Some(mutability.clone()),
+            _ => None,
+        }
+    }
+
+    /// Apply the memory access implied by a raw-pointer FFI parameter to its
+    /// known pointee origins for this call only. Raw pointer origins remain a
+    /// separate domain and are never inserted into `escaped_loans` here.
+    fn check_ffi_raw_pointer_access(
+        &mut self,
+        arg: &Operand,
+        call_id: ValueId,
+        state: &BorrowStateData,
+    ) -> Vec<PlaceDesc> {
+        let Some(mutability) = self.raw_pointer_mutability(arg) else { return Vec::new(); };
+        let Operand::Value(pointer) = arg else { return Vec::new(); };
+        let origins = state.raw_pointer_provenance.get(pointer).cloned().unwrap_or_default();
+        let mut written_places = Vec::new();
+        for origin in origins {
+            let RawPointerOrigin::FromPlace { place, .. } = origin else { continue; };
+            self.check_access(&place, false, call_id, state);
+            if mutability == Mutability::Mutable {
+                self.check_access(&place, true, call_id, state);
+                let target = self.compute_place_desc(&place, state);
+                written_places.push(target);
+            }
+        }
+        written_places
+    }
+
+    fn places_may_overlap(a: &PlaceDesc, b: &PlaceDesc) -> bool {
+        if a.root != b.root { return false; }
+        for (left, right) in a.projections.iter().zip(&b.projections) {
+            match (left, right) {
+                (Projection::Field(a), Projection::Field(b)) if a != b => return false,
+                (Projection::Tuple(a), Projection::Tuple(b)) if a != b => return false,
+                (Projection::Field(_) | Projection::Tuple(_), Projection::Field(_) | Projection::Tuple(_)) => {}
+                _ => return true,
+            }
+        }
+        // Equal places and a prefix/containing aggregate overlap.
+        true
+    }
+
+    /// A raw `*rw` FFI argument may replace the value stored at its pointee.
+    /// Forget stored-value facts (especially raw pointer origin/anchor facts)
+    /// after the call; never derive them from the slot address.
+    fn invalidate_ffi_written_facts(&self, written: &PlaceDesc, state: &mut BorrowStateData) {
+        state.raw_pointer_anchor_invalidated_storage.insert(written.clone());
+        state.raw_pointer_value_invalidated_storage.insert(written.clone());
+        for (place, origins) in &mut state.raw_pointer_storage {
+            if Self::places_may_overlap(place, written) {
+                origins.clear();
+                origins.insert(RawPointerOrigin::Unknown);
+                state.raw_pointer_value_invalidated_storage.insert(place.clone());
+            }
+        }
+        for (place, anchors) in &mut state.raw_pointer_anchor_storage {
+            if Self::places_may_overlap(place, written) {
+                anchors.clear();
+                anchors.insert(RawPointerAnchor::Unknown);
+                state.raw_pointer_anchor_invalidated_storage.insert(place.clone());
+            }
+        }
+        state.raw_pointer_requires_anchor_storage.retain(|place| !Self::places_may_overlap(place, written));
+        state.unsafe_raw_root_storage.retain(|place, _| !Self::places_may_overlap(place, written));
+        state.field_provenance.retain(|place, _| !Self::places_may_overlap(place, written));
+    }
+
+    fn is_null_pointer_value(&self, value: &Operand) -> bool {
+        fn visit(func: &Function, value: &Operand, depth: usize) -> bool {
+            if depth > 16 { return false; }
+            match value {
+                Operand::Number(number) => number.trim().parse::<i128>().is_ok_and(|number| number == 0),
+                Operand::Value(value_id) => match func.values.get(value_id.0 as usize).map(|v| &v.inst) {
+                    Some(Instruction::Null { .. }) => true,
+                    Some(Instruction::Cast { value, .. }) => visit(func, value, depth + 1),
+                    _ => false,
+                },
+                _ => false,
+            }
+        }
+        visit(self.func, value, 0)
+    }
+
+    fn anchor_owner_allows_mutable_borrow(&self, owner: &PlaceDesc, state: &BorrowStateData) -> bool {
+        let Some(ctx) = self.ctx else { return false; };
+        let Operand::Value(owner_value) = self.resolve_alias(&owner.root, state) else { return true; };
+        match ctx.types.get(self.func.values.get(owner_value.0 as usize).map(|v| v.ty).unwrap_or(ctx.types.error_id())) {
+            SemanticType::Reference(_, mutability, _) | SemanticType::Pointer(mutability, _) => {
+                *mutability == Mutability::Mutable
+            }
+            // Without an explicit reference/pointer capability on the owner
+            // place, borrow analysis cannot prove a mutable logical receiver.
+            // Do not infer it merely from the raw field's `*rw` type.
+            _ => false,
+        }
+    }
+
+    fn invalidate_raw_pointer_anchors_for_owner(
+        &self,
+        owner: &PlaceDesc,
+        except_value: Option<ValueId>,
+        state: &mut BorrowStateData,
+    ) {
+        for (value, anchors) in &mut state.raw_pointer_anchors {
+            if Some(*value) == except_value { continue; }
+            if anchors.iter().any(|anchor| matches!(anchor, RawPointerAnchor::AnchoredTo(anchor_owner) if anchor_owner == owner)) {
+                anchors.retain(|anchor| !matches!(anchor, RawPointerAnchor::AnchoredTo(anchor_owner) if anchor_owner == owner));
+                anchors.insert(RawPointerAnchor::Unknown);
+            }
+        }
+        for anchors in state.raw_pointer_anchor_storage.values_mut() {
+            if anchors.iter().any(|anchor| matches!(anchor, RawPointerAnchor::AnchoredTo(anchor_owner) if anchor_owner == owner)) {
+                anchors.retain(|anchor| !matches!(anchor, RawPointerAnchor::AnchoredTo(anchor_owner) if anchor_owner == owner));
+                anchors.insert(RawPointerAnchor::Unknown);
+            }
+        }
+    }
+
+    fn copy_raw_pointer_storage_facts(&self, source: &PlaceDesc, destination: &PlaceDesc, state: &mut BorrowStateData) {
+        if source == destination { return; }
+        let raw_origins: Vec<_> = state.raw_pointer_storage.iter()
+            .filter(|(place, _)| place.root == source.root && place.projections.starts_with(&source.projections))
+            .map(|(place, facts)| {
+                let mut target = destination.clone();
+                target.projections.extend_from_slice(&place.projections[source.projections.len()..]);
+                (target, facts.clone())
+            }).collect();
+        let raw_roots: Vec<_> = state.unsafe_raw_root_storage.iter()
+            .filter(|(place, _)| place.root == source.root && place.projections.starts_with(&source.projections))
+            .map(|(place, roots)| {
+                let mut target = destination.clone();
+                target.projections.extend_from_slice(&place.projections[source.projections.len()..]);
+                (target, roots.clone())
+            }).collect();
+        let anchors: Vec<_> = state.raw_pointer_anchor_storage.iter()
+            .filter(|(place, _)| place.root == source.root && place.projections.starts_with(&source.projections))
+            .map(|(place, facts)| {
+                let mut target = destination.clone();
+                target.projections.extend_from_slice(&place.projections[source.projections.len()..]);
+                let rebased = facts.iter().map(|anchor| match anchor {
+                    RawPointerAnchor::AnchoredTo(owner)
+                        if owner.root == source.root && owner.projections.starts_with(&source.projections) => {
+                            let mut new_owner = destination.clone();
+                            new_owner.projections.extend_from_slice(&owner.projections[source.projections.len()..]);
+                            RawPointerAnchor::AnchoredTo(new_owner)
+                        }
+                    other => other.clone(),
+                }).collect();
+                (target, rebased)
+            }).collect();
+        let requires: Vec<_> = state.raw_pointer_requires_anchor_storage.iter()
+            .filter(|place| place.root == source.root && place.projections.starts_with(&source.projections))
+            .map(|place| {
+                let mut target = destination.clone();
+                target.projections.extend_from_slice(&place.projections[source.projections.len()..]);
+                target
+            }).collect();
+        for (place, facts) in raw_origins { state.raw_pointer_storage.insert(place, facts); }
+        for (place, roots) in raw_roots { state.unsafe_raw_root_storage.insert(place, roots); }
+        for (place, facts) in anchors { state.raw_pointer_anchor_storage.insert(place, facts); }
+        for place in requires { state.raw_pointer_requires_anchor_storage.insert(place); }
+    }
+
+    fn raw_value_roots(&self, state: &BorrowStateData, value: &Operand) -> HashSet<ValueId> {
+        let Operand::Value(value_id) = value else { return HashSet::new(); };
+        if let Some(roots) = state.unsafe_raw_roots.get(value_id) {
+            return roots.clone();
+        }
+        let resolved = self.resolve_alias(value, state);
+        if let Operand::Value(resolved_id) = resolved {
+            state.unsafe_raw_roots.get(resolved_id).cloned()
+                .unwrap_or_default()
+        } else {
+            HashSet::new()
+        }
+    }
+
+    /// Convert a raw-value lineage into a disjoint analysis-only root for
+    /// local unsafe loans. Synthetic IDs are outside this function's MVIR
+    /// value range, so place normalization cannot follow a pointer load's
+    /// alias back to the storage slot that held the pointer value.
+    fn unsafe_raw_root_place(&self, root: ValueId) -> Operand {
+        let synthetic = (self.func.values.len() as u32)
+            .checked_add(root.0)
+            .expect("function-local unsafe raw root identity overflow");
+        Operand::Value(ValueId(synthetic))
+    }
+
+    fn unsafe_raw_loans_for_carrier(&self, carrier: ValueId, state: &BorrowStateData) -> HashSet<Loan> {
+        let mut found = HashSet::new();
+        let mut pending = vec![carrier];
+        let mut seen = HashSet::new();
+        while let Some(value) = pending.pop() {
+            if !seen.insert(value) { continue; }
+            found.extend(state.direct_provenance.get(&value).into_iter().flatten()
+                .filter(|loan| state.unsafe_raw_root_loans.contains_key(&loan.id)).cloned());
+            found.extend(state.carried_provenance.get(&value).into_iter().flatten()
+                .filter(|loan| state.unsafe_raw_root_loans.contains_key(&loan.id)).cloned());
+            if let Some(Operand::Value(alias)) = state.aliases.get(&value) { pending.push(*alias); }
+        }
+        found
+    }
+
+    fn is_function_local_storage(&self, place: &Operand, state: &BorrowStateData) -> bool {
+        let mut current = match self.resolve_alias(place, state) {
+            Operand::Value(value) => Some(*value),
+            _ => None,
+        };
+        let mut seen = HashSet::new();
+        while let Some(value) = current {
+            if !seen.insert(value) { return false; }
+            match self.func.values.get(value.0 as usize).map(|data| &data.inst) {
+                Some(Instruction::Alloca) => return true,
+                Some(Instruction::FieldPtr { base, .. }) => {
+                    current = match self.resolve_alias(base, state) {
+                        Operand::Value(base) => Some(*base),
+                        _ => None,
+                    };
+                }
+                _ => return false,
+            }
+        }
+        false
+    }
+
     fn active_loans(&self, val_id: ValueId, state: &BorrowStateData) -> HashSet<Loan> {
         let mut active = state.escaped_loans.clone();
         let mut queue = Vec::new();
@@ -908,34 +1303,35 @@ impl<'a> BorrowAnalyzer<'a> {
     }
 
     fn is_external_loan(&self, loan: &Loan, state: &BorrowStateData) -> bool {
-        let resolved = self.resolve_alias(&loan.place, state);
-        match resolved {
-            Operand::Global(_) => true,
-            Operand::Value(v) => {
-                if (v.0 as usize) >= self.func.values.len() {
-                    return false;
-                }
-                let val_data = &self.func.values[v.0 as usize];
-                match &val_data.origin {
-                    ValueOrigin::Global => true,
-                    ValueOrigin::Parameter(_) => {
-                        // In Luna, a parameter loan is external only if the parameter type is a Reference
-                        // (i.e. caller storage). By-value parameters are stored in EnvStruct (local).
-                        if let Some(ctx) = self.ctx {
-                            matches!(ctx.types.get(val_data.ty), SemanticType::Reference(..))
-                        } else {
-                            false
-                        }
-                    }
-                    ValueOrigin::Local | ValueOrigin::Temporary => false,
-                }
-            }
-            _ => false,
+        // Only the loan that enters this function as a reference parameter is
+        // external. A loan created locally (including one returned by a call)
+        // may point at that same parameter, but it is still a live reborrow
+        // which must prevent conflicting accesses through the parent value.
+        // Classifying by `loan.place` incorrectly erased such reborrows merely
+        // because their storage ultimately came from an external reference.
+        let Some(val_data) = self.func.values.get(loan.id.0 as usize) else {
+            return false;
+        };
+        match &val_data.origin {
+            ValueOrigin::Global => true,
+            ValueOrigin::Parameter(_) => self.ctx.is_some_and(|ctx| {
+                matches!(ctx.types.get(val_data.ty), SemanticType::Reference(..))
+            }),
+            ValueOrigin::Local | ValueOrigin::Temporary => false,
         }
     }
 
     pub fn compute_place_desc(&self, op: &Operand, state: &BorrowStateData) -> PlaceDesc {
-        compute_place_desc(op, &self.func.values, Some(&state.aliases))
+        compute_place_desc(op, &self.func.values, Some(&state.aliases), None)
+    }
+
+    fn compute_overlap_place_desc(&self, op: &Operand, state: &BorrowStateData) -> PlaceDesc {
+        compute_place_desc(
+            op,
+            &self.func.values,
+            Some(&state.aliases),
+            Some(&self.safe_reference_values),
+        )
     }
 
     pub fn compute_provenance_sources(&self, value: &Operand, state: &BorrowStateData) -> ProvenanceSet {
@@ -987,8 +1383,8 @@ impl<'a> BorrowAnalyzer<'a> {
     }
     
     fn check_overlap(&self, p1: &Operand, p2: &Operand, state: &BorrowStateData) -> OverlapResult {
-        let desc1 = self.compute_place_desc(p1, state);
-        let desc2 = self.compute_place_desc(p2, state);
+        let desc1 = self.compute_overlap_place_desc(p1, state);
+        let desc2 = self.compute_overlap_place_desc(p2, state);
         
         if desc1.root != desc2.root {
             return OverlapResult::DefinitelyDisjoint;
@@ -1007,12 +1403,27 @@ impl<'a> BorrowAnalyzer<'a> {
                         return OverlapResult::DefinitelyDisjoint;
                     }
                 }
+                (Projection::Deref, Projection::Deref) => {}
                 _ => {
                     return OverlapResult::MayOverlap;
                 }
             }
         }
-        
+
+        // The storage slot holding a reference is distinct from the place it
+        // designates. A path which crosses a dereference boundary cannot
+        // overlap a prefix that stops at the reference slot.
+        if desc1.projections.len() != desc2.projections.len() {
+            let longer = if desc1.projections.len() > desc2.projections.len() {
+                &desc1.projections
+            } else {
+                &desc2.projections
+            };
+            if matches!(longer.get(min_len), Some(Projection::Deref)) {
+                return OverlapResult::DefinitelyDisjoint;
+            }
+        }
+
         OverlapResult::DefinitelyOverlap
     }
 
@@ -1114,12 +1525,81 @@ impl<'a> BorrowAnalyzer<'a> {
         
         state.direct_provenance.entry(val_id).or_default().insert(new_loan);
     }
+
+    fn issue_unsafe_root_loan(&mut self, root: ValueId, is_rw: bool, val_id: ValueId, state: &BorrowStateData) {
+        if !self.emit_diagnostics { return; }
+        for loan in self.active_loans(val_id, state) {
+            if state.unsafe_raw_root_loans.get(&loan.id).is_some_and(|roots| roots.contains(&root)) && (loan.is_rw || is_rw) {
+                let existing = if loan.is_rw { "&rw" } else { "&" };
+                let requested = if is_rw { "&rw" } else { "&" };
+                let mut diag = Diagnostic::error(format!(
+                    "Cannot create {requested} from this raw pointer while its UnsafeRawRoot is already borrowed as {existing}"
+                )).with_code(DiagnosticCode::BorrowConflict);
+                diag.span = self.func.values[val_id.0 as usize].span.clone();
+                if !self.diagnostics.iter().any(|old| old.message == diag.message && old.span == diag.span) {
+                    self.diagnostics.push(diag);
+                }
+            }
+        }
+    }
+
+    fn emit_raw_escape_diagnostic(&mut self, val_id: ValueId, message: &str) {
+        if !self.emit_diagnostics { return; }
+        let mut diag = Diagnostic::error(format!("UnsafeRawRoot loan cannot escape: {message}"))
+            .with_code(DiagnosticCode::LocalBorrowEscape);
+        diag.span = self.func.values.get(val_id.0 as usize).and_then(|value| value.span.clone());
+        if !self.diagnostics.iter().any(|old| old.message == diag.message && old.span == diag.span) {
+            self.diagnostics.push(diag);
+        }
+    }
+
+    /// Returns the semantic safe-reference contract for one direct-call
+    /// parameter when it can be proven from the canonical function type.
+    /// MVIR may lower both safe references and raw pointers to pointer-shaped
+    /// values, so call escape checking must inspect the callee's source-level
+    /// signature rather than the lowered argument representation.
+    fn direct_call_safe_ref_param(
+        &self,
+        callee: &GlobalId,
+        arg_index: usize,
+    ) -> Option<(Mutability, bool)> {
+        let ctx = self.ctx?;
+        let symbol = callee.symbol_id?;
+        let fn_ty = ctx.tables.symbol_types.get(&symbol).copied()?;
+        let fn_ty = ctx.types.resolve(fn_ty);
+        let SemanticType::Function { params, return_type } = ctx.types.get(fn_ty) else {
+            return None;
+        };
+        let param_ty = ctx.types.resolve(*params.get(arg_index)?);
+        let SemanticType::Reference(_, mutability, _) = ctx.types.get(param_ty) else {
+            return None;
+        };
+
+        // A potentially reference-bearing result may carry this temporary
+        // UnsafeRawRoot loan out of the call. Generic/projection result types
+        // deliberately count as potentially carrying a loan.
+        let result_may_carry_safe_loan = ctx.types.contains_safe_reference(*return_type);
+        Some((mutability.clone(), !result_may_carry_safe_loan))
+    }
+}
+
+pub fn reference_value_ids(
+    func_values: &[luna_mvir::ValueData],
+    ctx: Option<&SemanticContext>,
+) -> HashSet<ValueId> {
+    let Some(ctx) = ctx else { return HashSet::new(); };
+    func_values.iter().enumerate().filter_map(|(index, value)| {
+        let ty = ctx.types.resolve(value.ty);
+        matches!(ctx.types.get(ty), SemanticType::Reference(..))
+            .then_some(ValueId(index as u32))
+    }).collect()
 }
 
 pub fn compute_place_desc(
     op: &Operand,
     func_values: &[luna_mvir::ValueData],
     aliases: Option<&HashMap<ValueId, Operand>>,
+    safe_reference_values: Option<&HashSet<ValueId>>,
 ) -> PlaceDesc {
     let mut curr_val = if let Operand::Value(v) = op { Some(*v) } else { None };
     let mut path = Vec::new();
@@ -1132,7 +1612,7 @@ pub fn compute_place_desc(
         }
         let inst = &func_values[v.0 as usize].inst;
         match inst {
-            Instruction::FieldPtr { base, field_idx } => {
+            Instruction::FieldPtr { base, field_idx, .. } => {
                 path.push(Projection::Field(*field_idx));
                 if let Operand::Value(base_v) = base {
                     curr_val = Some(*base_v);
@@ -1168,7 +1648,7 @@ pub fn compute_place_desc(
                     false
                 };
 
-                if !is_local_storage {
+                if safe_reference_values.is_some_and(|values| values.contains(&v)) || !is_local_storage {
                     path.push(Projection::Deref);
                 }
                 if let Operand::Value(base_v) = ptr {
@@ -1229,13 +1709,29 @@ fn print_operand_name(op: &Operand) -> String {
         Operand::Boolean(b) => b.to_string(),
         Operand::StringRef(s) => format!("\"{}\"", s),
         Operand::Char(c) => format!("'{}'", c),
+        Operand::Float { text, .. } => text.clone(),
     }
 }
 
 impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
     fn init_entry_state(&mut self, func: &Function, state: &mut BorrowStateData) {
+        state.initialized = true;
         for (i, val_data) in func.values.iter().enumerate() {
             if let ValueOrigin::Parameter(_) = val_data.origin {
+                let val_id = ValueId(i as u32);
+                if self.ctx.is_some_and(|ctx| matches!(ctx.types.get(val_data.ty), SemanticType::Pointer(..))) {
+                    // A raw-pointer parameter has an origin, but it is not
+                    // known to this function until a caller supplies evidence.
+                    state.raw_pointer_provenance.entry(val_id).or_default().insert(RawPointerOrigin::Unknown);
+                    state.raw_pointer_anchors.entry(val_id).or_default().insert(RawPointerAnchor::Unknown);
+                    state.unsafe_raw_roots.entry(val_id).or_default().insert(val_id);
+                    if matches!(val_data.inst, Instruction::Alloca) {
+                        state.unsafe_raw_root_storage.insert(
+                            PlaceDesc { root: Operand::Value(val_id), projections: Vec::new() },
+                            HashSet::from([val_id]),
+                        );
+                    }
+                }
                 let is_ref = if let Some(ctx) = self.ctx {
                     matches!(ctx.types.get(val_data.ty), SemanticType::Reference(..))
                 } else {
@@ -1250,7 +1746,6 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     } else {
                         false
                     };
-                    let val_id = ValueId(i as u32);
                     let loan = Loan {
                         id: val_id,
                         place: Operand::Value(val_id),
@@ -1447,9 +1942,19 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     }
                 }
             }
-            Instruction::Store { ptr, value } => {
+            Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                 self.check_access(value, false, val_id, state);
                 self.check_access(ptr, true, val_id, state);
+                if let Operand::Value(value_id) = value {
+                    if !self.unsafe_raw_loans_for_carrier(*value_id, state).is_empty()
+                        && !self.is_function_local_storage(ptr, state)
+                    {
+                        self.emit_raw_escape_diagnostic(
+                            *value_id,
+                            "storing the reference through non-local storage would outlive the unsafe access domain",
+                        );
+                    }
+                }
                 
                 // If ptr is a Value, it inherits provenance from value (for alias tracking in borrowck)
                 // Actually, if we store a reference into a local, that local now holds the provenance.
@@ -1474,15 +1979,141 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                         && (resolved_ptr.0 as usize) < self.func.values.len()
                         && matches!(self.func.values[resolved_ptr.0 as usize].inst, Instruction::Alloca);
 
+                    let address_roots = self.raw_value_roots(state, value);
+                    if !address_roots.is_empty() {
+                        let dest = self.compute_place_desc(ptr, state);
+                        if is_direct_alloca {
+                            state.unsafe_raw_root_storage.insert(dest, address_roots);
+                        } else {
+                            state.unsafe_raw_root_storage.entry(dest).or_default().extend(address_roots);
+                        }
+                    }
+
+                    let value_is_raw_pointer = if let Some(ctx) = self.ctx {
+                        if let Operand::Value(value_id) = value {
+                            matches!(ctx.types.get(self.func.value(*value_id).ty), SemanticType::Pointer(..))
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    };
+                    if value_is_raw_pointer {
+                        let dest = self.compute_place_desc(ptr, state);
+                        let dest_for_anchor_check = dest.clone();
+                        let anchor_owner = self.declared_anchor_owner(*ptr_val, state);
+                        let origins = if let Operand::Value(value_id) = value {
+                            state.raw_pointer_provenance.get(value_id).cloned().unwrap_or_default()
+                        } else {
+                            HashSet::new()
+                        };
+                        let roots = self.raw_value_roots(state, value);
+                        if is_direct_alloca || anchor_owner.is_some() {
+                            state.raw_pointer_storage.insert(dest.clone(), origins);
+                            state.unsafe_raw_root_storage.insert(dest.clone(), roots);
+                        } else {
+                            state.raw_pointer_storage.entry(dest.clone()).or_default().extend(origins);
+                            state.unsafe_raw_root_storage.entry(dest.clone()).or_default().extend(roots);
+                        }
+
+                        let is_null = self.is_null_pointer_value(value);
+                        let is_explicit_anchor_store = matches!(
+                            self.func.values.get(val_id.0 as usize).map(|v| &v.inst),
+                            Some(Instruction::StoreAnchored { .. })
+                        );
+                        if let Some(owner) = &anchor_owner {
+                            // Existing raw pointer copies refer to the previous
+                            // field value. Replacing that storage invalidates
+                            // their owner/field proof; a subsequent load can
+                            // obtain a fresh proof from the type contract.
+                            let stored_pointer_value = match value { Operand::Value(value_id) => Some(*value_id), _ => None };
+                            self.invalidate_raw_pointer_anchors_for_owner(owner, stored_pointer_value, state);
+                        }
+                        state.raw_pointer_requires_anchor_storage.remove(&dest);
+                        if let Some(owner) = anchor_owner {
+                            if is_null {
+                                // Null is a valid sentinel for an empty owner,
+                                // so retain the logical owner contract while
+                                // its distinct raw-origin fact prevents promotion.
+                                state.raw_pointer_anchor_storage.insert(
+                                    dest.clone(),
+                                    HashSet::from([RawPointerAnchor::AnchoredTo(owner.clone())]),
+                                );
+                                state.raw_pointer_requires_anchor_storage.insert(dest);
+                            } else if is_explicit_anchor_store {
+                                let anchors = HashSet::from([RawPointerAnchor::AnchoredTo(owner.clone())]);
+                                state.raw_pointer_anchor_storage.insert(dest.clone(), anchors);
+                                state.raw_pointer_requires_anchor_storage.insert(dest);
+                            } else {
+                                let rhs_anchors = if let Operand::Value(value_id) = value {
+                                    state.raw_pointer_anchors.get(value_id).cloned()
+                                        .unwrap_or_else(|| HashSet::from([RawPointerAnchor::Unknown]))
+                                } else {
+                                    HashSet::from([RawPointerAnchor::Unknown])
+                                };
+                                let matches_owner = rhs_anchors.len() == 1
+                                    && rhs_anchors.contains(&RawPointerAnchor::AnchoredTo(owner.clone()));
+                                if !matches_owner && self.emit_diagnostics {
+                                    let mut diag = Diagnostic::error(
+                                        "RawStorageAnchorMismatch: safe store does not prove the pointer is anchored to this owner",
+                                    ).with_code(DiagnosticCode::RawStorageAnchorMismatch);
+                                    diag.span = self.func.values[val_id.0 as usize].span.clone();
+                                    self.diagnostics.push(diag);
+                                }
+                                if matches_owner {
+                                    state.raw_pointer_anchor_storage.insert(dest.clone(), rhs_anchors);
+                                    state.raw_pointer_requires_anchor_storage.insert(dest);
+                                } else {
+                                    state.raw_pointer_anchor_storage.insert(
+                                        dest.clone(),
+                                        HashSet::from([RawPointerAnchor::Unknown]),
+                                    );
+                                    state.raw_pointer_requires_anchor_storage.insert(dest);
+                                }
+                            }
+                        } else {
+                            let rhs_anchors = if let Operand::Value(value_id) = value {
+                                state.raw_pointer_anchors.get(value_id).cloned()
+                                    .unwrap_or_else(|| HashSet::from([RawPointerAnchor::Unknown]))
+                            } else {
+                                HashSet::from([RawPointerAnchor::Unknown])
+                            };
+                            state.raw_pointer_anchor_storage.insert(dest.clone(), rhs_anchors);
+                            if let Operand::Value(value_id) = value {
+                                if state.raw_pointer_requires_anchor.contains(value_id) {
+                                    state.raw_pointer_requires_anchor_storage.insert(dest);
+                                }
+                            }
+                        }
+                        let established_anchor = state.raw_pointer_anchor_storage.get(&dest_for_anchor_check).is_some_and(|anchors| {
+                            !anchors.is_empty()
+                                && anchors.iter().all(|anchor| matches!(anchor, RawPointerAnchor::AnchoredTo(_)))
+                        });
+                        if established_anchor {
+                            state.raw_pointer_anchor_invalidated_storage.remove(&dest_for_anchor_check);
+                        }
+                        state.raw_pointer_value_invalidated_storage.remove(&dest_for_anchor_check);
+                    }
+
+                    if let (Some(ctx), Operand::Value(value_id)) = (self.ctx, value) {
+                        if !matches!(ctx.types.get(self.func.value(*value_id).ty), SemanticType::Pointer(..))
+                            && type_has_raw_pointer(self.func.value(*value_id).ty, ctx, &mut HashSet::new())
+                        {
+                            let source = self.compute_place_desc(value, state);
+                            let destination = self.compute_place_desc(ptr, state);
+                            self.copy_raw_pointer_storage_facts(&source, &destination, state);
+                        }
+                    }
+
                     // Check if ptr is a FieldPtr (or alias to FieldPtr)
                     let mut field_ptr_info = None;
                     if (ptr_val.0 as usize) < self.func.values.len() {
-                        if let Instruction::FieldPtr { base, field_idx } = &self.func.values[ptr_val.0 as usize].inst {
+                        if let Instruction::FieldPtr { base, field_idx, .. } = &self.func.values[ptr_val.0 as usize].inst {
                             field_ptr_info = Some((base.clone(), *field_idx));
                         }
                     }
                     if field_ptr_info.is_none() && (resolved_ptr.0 as usize) < self.func.values.len() {
-                        if let Instruction::FieldPtr { base, field_idx } = &self.func.values[resolved_ptr.0 as usize].inst {
+                        if let Instruction::FieldPtr { base, field_idx, .. } = &self.func.values[resolved_ptr.0 as usize].inst {
                             field_ptr_info = Some((base.clone(), *field_idx));
                         }
                     }
@@ -1589,6 +2220,12 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             }
             Instruction::Load { ptr } => {
                 self.check_access(ptr, false, val_id, state);
+                if let Operand::Value(ptr_val) = ptr {
+                    let place = self.compute_place_desc(&Operand::Value(*ptr_val), state);
+                    if let Some(roots) = state.unsafe_raw_root_storage.get(&place).cloned() {
+                        state.unsafe_raw_roots.entry(val_id).or_default().extend(roots);
+                    }
+                }
                 // Load from a pointer inherits its provenance if loaded value can hold references
                 let is_ref_like = if let Some(ctx) = self.ctx {
                     if (val_id.0 as usize) < self.func.values.len() {
@@ -1608,11 +2245,142 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                 } else {
                     true
                 };
+                let loads_raw_pointer = if let Some(ctx) = self.ctx {
+                    matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))
+                } else {
+                    false
+                };
+                if loads_raw_pointer {
+                    let place = if let Operand::Value(ptr_val) = ptr {
+                        Some(self.compute_place_desc(&Operand::Value(*ptr_val), state))
+                    } else {
+                        None
+                    };
+                    let mut origins = HashSet::new();
+                    if let Some(place) = &place {
+                        let invalidated = state.raw_pointer_value_invalidated_storage.iter()
+                            .any(|written| Self::places_may_overlap(written, place));
+                        if invalidated {
+                            origins.insert(RawPointerOrigin::Unknown);
+                        } else if let Some(stored_origins) = state.raw_pointer_storage.get(place) {
+                            // The stored pointer value's origin is distinct
+                            // from the origin of the address used to load it.
+                            origins.extend(stored_origins.iter().cloned());
+                        } else {
+                            // Built-in slices are safe borrowed fat values
+                            // whose first field is defined to be the element
+                            // data pointer. Extracting that field preserves
+                            // the safe reference's actual origin; unlike an
+                            // arbitrary user struct pointer field, this is a
+                            // language-defined representation relation, not
+                            // provenance inferred from the field-slot address.
+                            let slice_data_origin = if let Operand::Value(field_ptr) = ptr {
+                                match self.func.values.get(field_ptr.0 as usize).map(|value| &value.inst) {
+                                    Some(Instruction::FieldPtr { base, field_idx: 0, .. }) => {
+                                        let base_ty = if let Operand::Value(base_value) = base {
+                                            self.ctx.map(|ctx| ctx.types.get(self.func.value(*base_value).ty))
+                                        } else { None };
+                                        let is_slice_data = base_ty.is_some_and(|ty| match ty {
+                                            SemanticType::Slice(_) => true,
+                                            SemanticType::Reference(_, _, inner) | SemanticType::Pointer(_, inner) => {
+                                                self.ctx.is_some_and(|ctx| matches!(ctx.types.get(*inner), SemanticType::Slice(_)))
+                                            }
+                                            _ => false,
+                                        });
+                                        if is_slice_data {
+                                            if let Operand::Value(base_value) = base {
+                                                let resolved = self.resolve_alias(base, state);
+                                                let source_value = match resolved {
+                                                    Operand::Value(value) => *value,
+                                                    _ => *base_value,
+                                                };
+                                                let mut derived = HashSet::new();
+                                                derived.extend(state.direct_provenance.get(&source_value).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                                                derived.extend(state.carried_provenance.get(&source_value).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                                                derived
+                                            } else {
+                                                HashSet::new()
+                                            }
+                                        } else {
+                                            HashSet::new()
+                                        }
+                                    }
+                                    _ => HashSet::new(),
+                                }
+                            } else {
+                                HashSet::new()
+                            };
+                            if slice_data_origin.is_empty() {
+                                // For all ordinary pointer fields, the
+                                // address operand identifies the field slot,
+                                // not the pointer value stored there. Without
+                                // a stored-value fact, origin stays unknown.
+                                origins.insert(RawPointerOrigin::Unknown);
+                            } else {
+                                origins.extend(slice_data_origin);
+                            }
+                        }
+                    }
+                    // The Load result is the SSA pointer value. Replace any
+                    // stale facts left by an earlier dataflow iteration;
+                    // invalidation must not union the pre-FFI value back in.
+                    state.raw_pointer_provenance.insert(val_id, origins);
+                    let stored_roots = place.as_ref()
+                        .and_then(|place| state.unsafe_raw_root_storage.get(place)).cloned();
+                    // A load's result is the pointer value. If no stored
+                    // lineage survives (including after an opaque FFI write),
+                    // give that value a fresh function-local root instead of
+                    // reusing the address/identity of the slot that held it.
+                    state.unsafe_raw_roots.insert(
+                        val_id,
+                        stored_roots.unwrap_or_else(|| HashSet::from([val_id])),
+                    );
+                    let anchors = if let Operand::Value(ptr_val) = ptr {
+                        let contract_owner = self.declared_anchor_owner(*ptr_val, state);
+                        let anchor_was_invalidated = place.as_ref().is_some_and(|place| {
+                            state.raw_pointer_anchor_invalidated_storage.iter()
+                                .any(|invalidated| Self::places_may_overlap(invalidated, place))
+                        });
+                        let stored_anchors = place.as_ref()
+                            .and_then(|place| state.raw_pointer_anchor_storage.get(place)).cloned();
+                        let requires_anchor = contract_owner.is_some() || place.as_ref()
+                            .is_some_and(|place| state.raw_pointer_requires_anchor_storage.contains(place));
+                        if requires_anchor {
+                            state.raw_pointer_requires_anchor.insert(val_id);
+                        }
+                        let has_local_anchor_evidence = stored_anchors.as_ref().is_some_and(|anchors| {
+                            anchors.iter().any(|anchor| matches!(anchor, RawPointerAnchor::AnchoredTo(_)))
+                        });
+                        if anchor_was_invalidated {
+                            HashSet::from([RawPointerAnchor::Unknown])
+                        } else if has_local_anchor_evidence {
+                            stored_anchors.unwrap_or_default()
+                        } else if let Some(owner) = contract_owner {
+                            // Unknown/missing per-value facts do not erase the
+                            // declared type invariant. Explicit local anchors
+                            // (including a conflicting owner) still take
+                            // priority; an uncontracted pointer field has no
+                            // such reconstruction path.
+                            HashSet::from([RawPointerAnchor::AnchoredTo(owner)])
+                        } else {
+                            stored_anchors.unwrap_or_else(|| HashSet::from([RawPointerAnchor::Unknown]))
+                        }
+                    } else {
+                        HashSet::from([RawPointerAnchor::Unknown])
+                    };
+                    // This load is the semantic source for the SSA pointer
+                    // value. Replace stale placeholder facts for that value:
+                    // a prior Unknown must not be unioned with a contract-
+                    // reconstructed anchor and thereby erase the unique
+                    // owner proof.
+                    state.raw_pointer_anchors.insert(val_id, anchors);
+                }
                 if is_ref_like {
                     if let Operand::Value(ptr_val) = ptr {
                         let resolved = self.resolve_alias(ptr, state);
                         let check_val = if let Operand::Value(rv) = resolved { *rv } else { *ptr_val };
                         state.aliases.insert(val_id, Operand::Value(check_val));
+                        if !loads_raw_pointer {
                         if let Some(prov) = state.direct_provenance.get(&check_val).cloned() {
                             state.direct_provenance.entry(val_id).or_default().extend(prov);
                         }
@@ -1625,11 +2393,14 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                         if let Some(prov) = state.carried_provenance.get(ptr_val).cloned() {
                             state.carried_provenance.entry(val_id).or_default().extend(prov);
                         }
+                        }
 
-                        // Copy field provenance if loading aggregate through pointer to a new place
+                        // A scalar raw pointer load transfers the pointer value's
+                        // own origin and anchor above. The slot's aggregate
+                        // field facts describe different storage.
                         let dest_desc = self.compute_place_desc(&Operand::Value(val_id), state);
                         let src_desc = self.compute_place_desc(ptr, state);
-                        if dest_desc != src_desc {
+                        if !loads_raw_pointer && dest_desc != src_desc {
                             let mut to_copy = Vec::new();
                             for (place, prov_set) in &state.field_provenance {
                                 if place.root == src_desc.root && place.projections.starts_with(&src_desc.projections) {
@@ -1640,6 +2411,14 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                             }
                             for (new_place, prov_set) in to_copy {
                                 state.field_provenance.entry(new_place).or_default().sources.extend(prov_set.sources);
+                            }
+                            if let Some(ctx) = self.ctx {
+                                if type_has_raw_pointer(self.func.value(val_id).ty, ctx, &mut HashSet::new()) {
+                                    // Aggregate loads transfer facts for embedded raw fields.
+                                    // Copying that subtree through a scalar pointer can grow
+                                    // Deref projections indefinitely across a CFG loop.
+                                    self.copy_raw_pointer_storage_facts(&src_desc, &dest_desc, state);
+                                }
                             }
                         }
                     }
@@ -1662,6 +2441,8 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                         applied_summary = Some(sum.clone());
                     }
                 }
+                let is_extern_call = self.direct_call_is_extern(callee);
+                let mut ffi_written_places = Vec::new();
                 if callee.name == "register_callback" {
                 }
                 
@@ -1669,6 +2450,23 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     for (i, arg) in args.iter().enumerate() {
                         if i < sum.args.len() {
                             let arg_effect = &sum.args[i];
+                            if is_extern_call && self.raw_pointer_mutability(arg).is_some() {
+                                ffi_written_places.extend(self.check_ffi_raw_pointer_access(arg, val_id, state));
+                                continue;
+                            }
+                            if let Operand::Value(arg_value) = arg {
+                                if !self.unsafe_raw_loans_for_carrier(*arg_value, state).is_empty()
+                                    && (sum.is_opaque || matches!(
+                                        arg_effect.escape,
+                                        crate::effect::EscapeKind::MayEscape | crate::effect::EscapeKind::Unknown
+                                    ))
+                                {
+                                    self.emit_raw_escape_diagnostic(
+                                        *arg_value,
+                                        "the callee has no proven non-escaping parameter effect",
+                                    );
+                                }
+                            }
                             
                             // Check specific access (write access if required)
                             if arg_effect.access == crate::effect::AccessKind::Write || arg_effect.access == crate::effect::AccessKind::ReadWrite {
@@ -1683,6 +2481,9 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                     }
                                     if let Some(prov) = state.carried_provenance.get(arg_v).cloned() {
                                         state.escaped_loans.extend(prov);
+                                    }
+                                    if let Some(origins) = state.raw_pointer_provenance.get(arg_v) {
+                                        state.escaped_loans.extend(origins.iter().filter_map(|origin| origin.into_escaped_loan(*arg_v)));
                                     }
                                 }
                             }
@@ -1699,6 +2500,26 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                             state.direct_provenance.entry(val_id).or_default().extend(prov);
                                         }
                                     }
+
+                                    // A returned reference is a fresh
+                                    // call-site reborrow of its actual source,
+                                    // not merely another spelling of the
+                                    // caller's incoming parameter loan. Keep
+                                    // the inherited provenance above, but add
+                                    // this local loan so it remains live and
+                                    // blocks parent mutation until the result
+                                    // dies.
+                                    if let Some(ctx) = self.ctx {
+                                        if let SemanticType::Reference(_, mutability, _) =
+                                            ctx.types.get(self.func.value(val_id).ty)
+                                        {
+                                            state.direct_provenance.entry(val_id).or_default().insert(Loan {
+                                                id: val_id,
+                                                place: args[idx].clone(),
+                                                is_rw: *mutability == luna_semantic::ty::Mutability::Mutable,
+                                            });
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1713,10 +2534,155 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                             state.direct_provenance.entry(val_id).or_default().extend(prov);
                                         }
                                     }
+
+                                    // `BorrowsCarried` describes how the
+                                    // function body found the returned loan;
+                                    // it does not mean the call-site result is
+                                    // just the original parameter value. A
+                                    // direct reference result is still a new
+                                    // reborrow whose liveness must freeze its
+                                    // parent while the result is live.
+                                    if let Some(ctx) = self.ctx {
+                                        if let SemanticType::Reference(_, mutability, _) =
+                                            ctx.types.get(self.func.value(val_id).ty)
+                                        {
+                                            state.direct_provenance.entry(val_id).or_default().insert(Loan {
+                                                id: val_id,
+                                                place: args[idx].clone(),
+                                                is_rw: *mutability == luna_semantic::ty::Mutability::Mutable,
+                                            });
+                                        }
+                                    }
                                 }
                             }
                         }
                         _ => {}
+                    }
+                    if self.ctx.map(|ctx| matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))).unwrap_or(false) {
+                        if let RawPointerReturnEffect::From(indices) = &sum.raw_pointer_ret {
+                            for &idx in indices {
+                                if let Some(Operand::Value(arg_val)) = args.get(idx) {
+                                    if let Some(origins) = state.raw_pointer_provenance.get(arg_val).cloned() {
+                                        state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                                    }
+                                    let roots = self.raw_value_roots(state, &Operand::Value(*arg_val));
+                                    state.unsafe_raw_roots.entry(val_id).or_default().extend(roots);
+                                    let anchors = state.raw_pointer_anchors.get(arg_val).cloned()
+                                        .unwrap_or_else(|| HashSet::from([RawPointerAnchor::Unknown]));
+                                    state.raw_pointer_anchors.entry(val_id).or_default().extend(anchors);
+                                    if state.raw_pointer_requires_anchor.contains(arg_val) {
+                                        state.raw_pointer_requires_anchor.insert(val_id);
+                                    }
+                                }
+                            }
+                        } else if matches!(sum.raw_pointer_ret, RawPointerReturnEffect::Unknown) {
+                            // An imprecise summary cannot certify a unique
+                            // lineage. Retain every raw argument candidate so
+                            // later local loans conservatively overlap; the
+                            // promotion gate rejects a multi-root set.
+                            for arg in args {
+                                if let Operand::Value(arg_val) = arg {
+                                    if self.ctx.is_some_and(|ctx| matches!(ctx.types.get(self.func.value(*arg_val).ty), SemanticType::Pointer(..))) {
+                                        let roots = self.raw_value_roots(state, arg);
+                                        state.unsafe_raw_roots.entry(val_id).or_default().extend(roots);
+                                    }
+                                }
+                            }
+                        }
+                        match &sum.raw_pointer_anchor_ret {
+                            RawPointerAnchorReturnEffect::From(sources) => {
+                                for source in sources {
+                                    match source {
+                                        RawPointerAnchorSource::RawParam(index) => {
+                                            if let Some(Operand::Value(arg_val)) = args.get(*index) {
+                                                let anchors = state.raw_pointer_anchors.get(arg_val).cloned()
+                                                    .unwrap_or_else(|| HashSet::from([RawPointerAnchor::Unknown]));
+                                                state.raw_pointer_anchors.entry(val_id).or_default().extend(anchors);
+                                                if state.raw_pointer_requires_anchor.contains(arg_val) {
+                                                    state.raw_pointer_requires_anchor.insert(val_id);
+                                                }
+                                            } else {
+                                                state.raw_pointer_anchors.entry(val_id).or_default().insert(RawPointerAnchor::Unknown);
+                                            }
+                                        }
+                                        RawPointerAnchorSource::OwnerField { param, .. } => {
+                                            if let Some(arg) = args.get(*param) {
+                                                let owner = self.compute_place_desc(arg, state);
+                                                state.raw_pointer_anchors.entry(val_id).or_default()
+                                                    .insert(RawPointerAnchor::AnchoredTo(owner));
+                                                state.raw_pointer_requires_anchor.insert(val_id);
+                                            } else {
+                                                state.raw_pointer_anchors.entry(val_id).or_default().insert(RawPointerAnchor::Unknown);
+                                            }
+                                        }
+                                        RawPointerAnchorSource::Unknown => {
+                                            state.raw_pointer_anchors.entry(val_id).or_default().insert(RawPointerAnchor::Unknown);
+                                        }
+                                    }
+                                }
+                            }
+                            RawPointerAnchorReturnEffect::Unknown => {
+                                state.raw_pointer_anchors.entry(val_id).or_default().insert(RawPointerAnchor::Unknown);
+                            }
+                            RawPointerAnchorReturnEffect::Independent => {}
+                        }
+                    }
+                    if let Some(ctx) = self.ctx {
+                        let result_ty = self.func.value(val_id).ty;
+                        let result_place = self.compute_place_desc(&Operand::Value(val_id), state);
+                        for (field_index, field_name) in direct_raw_pointer_fields(ctx, result_ty) {
+                            let mut field_place = result_place.clone();
+                            field_place.projections.push(Projection::Field(field_index));
+                            let Some(field_effect) = sum.raw_pointer_field_ret.get(&field_name) else {
+                                state.raw_pointer_storage.insert(field_place.clone(), HashSet::from([RawPointerOrigin::Unknown]));
+                                state.raw_pointer_anchor_storage.insert(field_place, HashSet::from([RawPointerAnchor::Unknown]));
+                                continue;
+                            };
+                            let mut origins = HashSet::new();
+                            match &field_effect.origin {
+                                RawPointerReturnEffect::From(indices) => for &index in indices {
+                                    if let Some(Operand::Value(arg_value)) = args.get(index) {
+                                        origins.extend(state.raw_pointer_provenance.get(arg_value).into_iter().flatten().cloned());
+                                    }
+                                },
+                                RawPointerReturnEffect::Unknown => { origins.insert(RawPointerOrigin::Unknown); }
+                                RawPointerReturnEffect::Independent => {}
+                            }
+                            if matches!(field_effect.origin, RawPointerReturnEffect::From(_)) && origins.is_empty() {
+                                origins.insert(RawPointerOrigin::Unknown);
+                            }
+                            state.raw_pointer_storage.insert(field_place.clone(), origins);
+
+                            // A declared type contract remains the authority for
+                            // owner-relative fields returned from source or .llib.
+                            // It is not inferred from the field slot address.
+                            let contracted = if let SemanticType::Struct(symbol, ..) = ctx.types.get(ctx.types.resolve(result_ty)) {
+                                ctx.tables.raw_storage_anchor_contracts.get(symbol)
+                                    .is_some_and(|contract| contract.field_names.contains(&field_name))
+                            } else { false };
+                            if contracted { continue; }
+                            let mut anchors = HashSet::new();
+                            match &field_effect.anchor {
+                                RawPointerAnchorReturnEffect::From(sources) => for source in sources {
+                                    match source {
+                                        RawPointerAnchorSource::RawParam(index) => {
+                                            if let Some(Operand::Value(arg_value)) = args.get(*index) {
+                                                anchors.extend(state.raw_pointer_anchors.get(arg_value).into_iter().flatten().cloned());
+                                            } else { anchors.insert(RawPointerAnchor::Unknown); }
+                                        }
+                                        RawPointerAnchorSource::OwnerField { param, .. } => {
+                                            if let Some(arg) = args.get(*param) {
+                                                anchors.insert(RawPointerAnchor::AnchoredTo(self.compute_place_desc(arg, state)));
+                                            } else { anchors.insert(RawPointerAnchor::Unknown); }
+                                        }
+                                        RawPointerAnchorSource::Unknown => { anchors.insert(RawPointerAnchor::Unknown); }
+                                    }
+                                },
+                                RawPointerAnchorReturnEffect::Unknown => { anchors.insert(RawPointerAnchor::Unknown); }
+                                RawPointerAnchorReturnEffect::Independent => {}
+                            }
+                            state.raw_pointer_anchor_storage.insert(field_place, anchors);
+                        }
                     }
                 } else {
                     // Opaque call conservative fallback using CE6 ABI rules
@@ -1726,6 +2692,21 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     }
 
                     for (arg_pos, arg) in args.iter().enumerate() {
+                        if is_extern_call && self.raw_pointer_mutability(arg).is_some() {
+                            ffi_written_places.extend(self.check_ffi_raw_pointer_access(arg, val_id, state));
+                            continue;
+                        }
+                        let safe_ref_param = self.direct_call_safe_ref_param(callee, arg_pos);
+                        if let Operand::Value(arg_value) = arg {
+                            if !self.unsafe_raw_loans_for_carrier(*arg_value, state).is_empty()
+                                && !safe_ref_param.as_ref().is_some_and(|(_, non_escaping)| *non_escaping)
+                            {
+                                self.emit_raw_escape_diagnostic(
+                                    *arg_value,
+                                    "a direct callee has neither a body-derived non-escaping summary nor a safe-reference-only call contract",
+                                );
+                            }
+                        }
                         let mut escape_kind = crate::effect::EscapeKind::Unknown;
                         let mut access_kind = crate::effect::AccessKind::ReadWrite;
                         let mut has_sync_noescape = false;
@@ -1743,7 +2724,19 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                         if let Operand::Value(val_id) = arg {
                             if let Some(ctx) = self.ctx {
                                 let val_data = self.func.value(*val_id);
-                                if let Instruction::Borrow { is_rw, .. } = val_data.inst {
+                                if let Some((mutability, non_escaping)) = &safe_ref_param {
+                                    if *non_escaping {
+                                        escape_kind = crate::effect::EscapeKind::NoEscape;
+                                        access_kind = if *mutability == Mutability::Mutable {
+                                            crate::effect::AccessKind::ReadWrite
+                                        } else {
+                                            crate::effect::AccessKind::Read
+                                        };
+                                    }
+                                }
+                                if escape_kind == crate::effect::EscapeKind::Unknown
+                                    && let Instruction::Borrow { is_rw, .. } = val_data.inst
+                                {
                                     if matches!(ctx.types.get(val_data.ty), SemanticType::Pointer(..)) {
                                         escape_kind = if has_sync_noescape {
                                             crate::effect::EscapeKind::NoEscape
@@ -1810,6 +2803,9 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                 if let Some(prov) = state.carried_provenance.get(arg_v).cloned() {
                                     state.escaped_loans.extend(prov);
                                 }
+                                if let Some(origins) = state.raw_pointer_provenance.get(arg_v) {
+                                    state.escaped_loans.extend(origins.iter().filter_map(|origin| origin.into_escaped_loan(*arg_v)));
+                                }
                             }
                         }
 
@@ -1820,6 +2816,10 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                             self.check_access(arg, true, val_id, state);
                         }
                     }
+                }
+
+                for written_place in ffi_written_places {
+                    self.invalidate_ffi_written_facts(&written_place, state);
                 }
 
                 // Apply CanonicalLifetimeContract provenance if declared on callee
@@ -1980,6 +2980,17 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                          escape_kind = escape_kind.merge(&cb_worst_escape);
                     }
 
+                    if let Operand::Value(arg_value) = arg {
+                        if !self.unsafe_raw_loans_for_carrier(*arg_value, state).is_empty()
+                            && matches!(escape_kind, crate::effect::EscapeKind::MayEscape | crate::effect::EscapeKind::Unknown)
+                        {
+                            self.emit_raw_escape_diagnostic(
+                                *arg_value,
+                                "an indirect or opaque callee is not proven non-escaping",
+                            );
+                        }
+                    }
+
                     if !is_future_ret && (escape_kind == crate::effect::EscapeKind::MayEscape || escape_kind == crate::effect::EscapeKind::Unknown) {
                         if let Operand::Value(arg_v) = arg {
                             if let Some(prov) = state.direct_provenance.get(arg_v).cloned() {
@@ -1987,6 +2998,9 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                             }
                             if let Some(prov) = state.carried_provenance.get(arg_v).cloned() {
                                 state.escaped_loans.extend(prov);
+                            }
+                            if let Some(origins) = state.raw_pointer_provenance.get(arg_v) {
+                                state.escaped_loans.extend(origins.iter().filter_map(|origin| origin.into_escaped_loan(*arg_v)));
                             }
                         }
                     }
@@ -2023,18 +3037,15 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             }
             Instruction::Borrow { is_rw, base } => {
                 let is_base_ptr_or_ref = if let Operand::Value(b_v) = base {
-                    if let Some(ctx) = self.ctx {
-                        if (b_v.0 as usize) < self.func.values.len() {
-                            matches!(
-                                ctx.types.get(self.func.values[b_v.0 as usize].ty),
-                                SemanticType::Pointer(..) | SemanticType::Reference(..)
-                            )
-                        } else {
-                            false
-                        }
-                    } else {
-                        false
-                    }
+                    let is_storage_address = self.func.values.get(b_v.0 as usize).is_some_and(|value| {
+                        matches!(value.inst, Instruction::Alloca | Instruction::FieldPtr { .. })
+                    });
+                    !is_storage_address && self.ctx.is_some_and(|ctx| {
+                        matches!(
+                            ctx.types.get(self.func.value(*b_v).ty),
+                            SemanticType::Pointer(..) | SemanticType::Reference(..)
+                        )
+                    })
                 } else {
                     false
                 };
@@ -2042,6 +3053,127 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                 if !is_base_ptr_or_ref {
                     // Issue a loan on the variable/storage being borrowed
                     self.issue_loan(base, *is_rw, val_id, state);
+                }
+
+                let result_is_raw_pointer = self.ctx.is_some_and(|ctx| {
+                    matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))
+                });
+                if result_is_raw_pointer {
+                    let mut origins = HashSet::new();
+                    if !is_base_ptr_or_ref {
+                        origins.extend(state.direct_provenance.get(&val_id).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                        origins.extend(state.carried_provenance.get(&val_id).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                    } else if let Operand::Value(base_value) = base {
+                        let base_ty = self.ctx.map(|ctx| ctx.types.get(self.func.value(*base_value).ty));
+                        if base_ty.is_some_and(|ty| matches!(ty, SemanticType::Pointer(..))) {
+                            origins.extend(state.raw_pointer_provenance.get(base_value).into_iter().flatten().cloned());
+                            let roots = self.raw_value_roots(state, base);
+                            state.unsafe_raw_roots.entry(val_id).or_default().extend(roots);
+                            if let Some(anchors) = state.raw_pointer_anchors.get(base_value).cloned() {
+                                state.raw_pointer_anchors.entry(val_id).or_default().extend(anchors);
+                            }
+                        } else {
+                            origins.extend(state.direct_provenance.get(base_value).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                            origins.extend(state.carried_provenance.get(base_value).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                        }
+                    }
+                    if origins.is_empty() {
+                        origins.insert(RawPointerOrigin::Unknown);
+                    }
+                    state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                }
+
+                if let (true, Operand::Value(base_val)) = (is_base_ptr_or_ref, base) {
+                    let base_is_raw_pointer = self.ctx.map(|ctx| {
+                        matches!(ctx.types.get(self.func.value(*base_val).ty), SemanticType::Pointer(..))
+                    }).unwrap_or(false);
+                    let result_is_safe_reference = self.ctx.map(|ctx| {
+                        matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Reference(..))
+                    }).unwrap_or(false);
+                    if base_is_raw_pointer && result_is_safe_reference {
+                        let origins = state.raw_pointer_provenance.get(base_val).cloned().unwrap_or_default();
+                        let origins_are_known_and_compatible = !origins.is_empty()
+                            && origins.iter().all(|origin| origin.as_loan(val_id, *is_rw).is_some());
+                        if state.raw_pointer_requires_anchor.contains(base_val) {
+                            let anchor = state.raw_pointer_anchors.get(base_val).and_then(|anchors| {
+                                if anchors.len() == 1 {
+                                    anchors.iter().find_map(|anchor| match anchor {
+                                        RawPointerAnchor::AnchoredTo(owner) => Some(owner.clone()),
+                                        RawPointerAnchor::Unknown => None,
+                                    })
+                                } else { None }
+                            });
+                            let raw_pointer_can_satisfy_mutability = self.ctx.map(|ctx| {
+                                matches!(
+                                    ctx.types.get(self.func.value(*base_val).ty),
+                                    SemanticType::Pointer(Mutability::Mutable, _) if *is_rw
+                                ) || (!*is_rw && matches!(
+                                    ctx.types.get(self.func.value(*base_val).ty),
+                                    SemanticType::Pointer(..)
+                                ))
+                            }).unwrap_or(false)
+                                && (!*is_rw || anchor.as_ref().map_or(false, |owner| {
+                                    self.anchor_owner_allows_mutable_borrow(owner, state)
+                                }));
+                            let may_be_null = origins.contains(&RawPointerOrigin::Null);
+                            if let Some(owner) = anchor.filter(|_| raw_pointer_can_satisfy_mutability && !may_be_null) {
+                                // The declared anchor invariant (established at
+                                // an explicit unsafe boundary or trusted as a
+                                // public type contract) is the compatibility
+                                // evidence for this conversion. Raw address
+                                // origin remains a separate fact and may be
+                                // Unknown; it is never rewritten into the
+                                // logical owner or used as the owner loan.
+                                state.direct_provenance.entry(val_id).or_default().insert(Loan {
+                                    id: val_id,
+                                    place: owner.root,
+                                    is_rw: *is_rw,
+                                });
+                            } else if self.emit_diagnostics {
+                                let mut diag = Diagnostic::error(
+                                    "RawStorageAnchorViolation: raw-to-safe reference conversion requires one valid declared anchor and compatible mutability",
+                                ).with_code(DiagnosticCode::RawStorageAnchorViolation);
+                                diag.span = self.func.values[val_id.0 as usize].span.clone();
+                                if !self.diagnostics.iter().any(|existing| existing.message == diag.message && existing.span == diag.span) {
+                                    self.diagnostics.push(diag);
+                                }
+                            }
+                        } else if origins_are_known_and_compatible {
+                            for origin in origins {
+                                if let Some(loan) = origin.as_loan(val_id, *is_rw) {
+                                    state.direct_provenance.entry(val_id).or_default().insert(loan);
+                                }
+                            }
+                        } else if !origins.is_empty()
+                            && origins.iter().all(|origin| matches!(origin, RawPointerOrigin::Unknown))
+                            && !state.raw_pointer_requires_anchor.contains(base_val)
+                        {
+                            // Unknown raw origin may establish a temporary
+                            // safe loan at this unsafe raw-to-safe boundary.
+                            // It remains an analysis-local root and therefore
+                            // cannot satisfy `life_from` or escape the function.
+                            let roots = state.unsafe_raw_roots.get(base_val).cloned()
+                                .unwrap_or_else(|| HashSet::from([*base_val]));
+                            if roots.len() == 1 {
+                                let root = *roots.iter().next().unwrap();
+                                let loan = Loan {
+                                    id: val_id,
+                                    place: self.unsafe_raw_root_place(root),
+                                    is_rw: *is_rw,
+                                };
+                                self.issue_unsafe_root_loan(root, *is_rw, val_id, state);
+                                state.unsafe_raw_root_loans.entry(val_id).or_default().insert(root);
+                                state.direct_provenance.entry(val_id).or_default().insert(loan);
+                            } else if self.emit_diagnostics {
+                                self.emit_raw_escape_diagnostic(val_id, "ambiguous unknown raw-pointer lineage cannot form a safe reference");
+                            }
+                        } else if !state.raw_pointer_requires_anchor.contains(base_val) {
+                            self.emit_raw_escape_diagnostic(
+                                val_id,
+                                "a merged or missing raw-pointer origin is not sufficient to create a safe reference",
+                            );
+                        }
+                    }
                 }
                 
                 // If base has provenance, the borrow carries it
@@ -2054,17 +3186,22 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                             current = *alias_v;
                         } else { break; }
                     }
-                    if let Some(prov) = state.direct_provenance.get(&resolved_base).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.carried_provenance.get(&resolved_base).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.direct_provenance.get(base_v).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.carried_provenance.get(base_v).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
+                    let raw_pointer_base = self.ctx.is_some_and(|ctx| {
+                        matches!(ctx.types.get(self.func.value(*base_v).ty), SemanticType::Pointer(..))
+                    });
+                    if !is_base_ptr_or_ref || !raw_pointer_base {
+                        if let Some(prov) = state.direct_provenance.get(&resolved_base).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.carried_provenance.get(&resolved_base).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.direct_provenance.get(base_v).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.carried_provenance.get(base_v).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
                     }
                     state.aliases.insert(val_id, Operand::Value(*base_v));
                 }
@@ -2126,22 +3263,33 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                 }
             }
             Instruction::Tag { .. } => {}
-            Instruction::FieldPtr { base, field_idx: _ } => {
+            Instruction::FieldPtr { base, field_idx: _, .. } => {
                 if let Operand::Value(b) = base {
                     let resolved = self.resolve_alias(base, state);
                     let check_val = if let Operand::Value(rv) = resolved { *rv } else { *b };
                     state.aliases.insert(val_id, Operand::Value(check_val));
-                    if let Some(prov) = state.direct_provenance.get(&check_val).cloned() {
-                        state.direct_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.carried_provenance.get(&check_val).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.direct_provenance.get(b).cloned() {
-                        state.direct_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.carried_provenance.get(b).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
+                    let is_raw_pointer = self.ctx.map(|ctx| {
+                        matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))
+                    }).unwrap_or(false);
+                    if is_raw_pointer {
+                        let mut origins = HashSet::new();
+                        origins.extend(state.direct_provenance.get(&check_val).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                        origins.extend(state.direct_provenance.get(b).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                        origins.extend(state.carried_provenance.get(b).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                        state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                    } else {
+                        if let Some(prov) = state.direct_provenance.get(&check_val).cloned() {
+                            state.direct_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.carried_provenance.get(&check_val).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.direct_provenance.get(b).cloned() {
+                            state.direct_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.carried_provenance.get(b).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
                     }
                 }
             }
@@ -2156,11 +3304,27 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     let resolved = self.resolve_alias(ptr, state);
                     let check_val = if let Operand::Value(rv) = resolved { *rv } else { *p };
                     state.aliases.insert(val_id, Operand::Value(check_val));
-                    if let Some(prov) = state.direct_provenance.get(&check_val).cloned() {
-                        state.direct_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.carried_provenance.get(&check_val).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
+                    let is_raw_pointer = self.ctx.map(|ctx| {
+                        matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))
+                    }).unwrap_or(false);
+                    if is_raw_pointer {
+                        let mut origins = state.raw_pointer_provenance.get(&check_val).cloned().unwrap_or_default();
+                        origins.extend(state.raw_pointer_provenance.get(p).cloned().unwrap_or_default());
+                        state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                        let mut anchors = state.raw_pointer_anchors.get(&check_val).cloned().unwrap_or_default();
+                        anchors.extend(state.raw_pointer_anchors.get(p).cloned().unwrap_or_default());
+                        if anchors.is_empty() { anchors.insert(RawPointerAnchor::Unknown); }
+                        state.raw_pointer_anchors.entry(val_id).or_default().extend(anchors);
+                        if state.raw_pointer_requires_anchor.contains(&check_val) || state.raw_pointer_requires_anchor.contains(p) {
+                            state.raw_pointer_requires_anchor.insert(val_id);
+                        }
+                    } else {
+                        if let Some(prov) = state.direct_provenance.get(&check_val).cloned() {
+                            state.direct_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.carried_provenance.get(&check_val).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
                     }
                 }
             }
@@ -2168,6 +3332,27 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             | Instruction::Sub { left, right, .. } => {
                 self.check_access(left, false, val_id, state);
                 self.check_access(right, false, val_id, state);
+                let mut address_roots = self.raw_value_roots(state, left);
+                address_roots.extend(self.raw_value_roots(state, right));
+                if !address_roots.is_empty() {
+                    state.unsafe_raw_roots.entry(val_id).or_default().extend(address_roots);
+                }
+                if matches!(inst, Instruction::Add { .. } | Instruction::Sub { .. }) {
+                    let mut origins = HashSet::new();
+                    let mut anchors = HashSet::new();
+                    for operand in [left, right] {
+                        if let Operand::Value(value) = operand {
+                            origins.extend(state.raw_pointer_provenance.get(value).cloned().unwrap_or_default());
+                            anchors.extend(state.raw_pointer_anchors.get(value).cloned().unwrap_or_default());
+                        }
+                    }
+                    state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                    if anchors.is_empty() { anchors.insert(RawPointerAnchor::Unknown); }
+                    state.raw_pointer_anchors.entry(val_id).or_default().extend(anchors);
+                    if [left, right].iter().any(|operand| matches!(operand, Operand::Value(value) if state.raw_pointer_requires_anchor.contains(value))) {
+                        state.raw_pointer_requires_anchor.insert(val_id);
+                    }
+                }
                 for op in [left, right] {
                     if let Operand::Value(v) = op {
                         let resolved = self.resolve_alias(op, state);
@@ -2229,12 +3414,31 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             }
             Instruction::Assign(op) => {
                 if let Operand::Value(v) = op {
-                    state.aliases.insert(val_id, Operand::Value(*v));
-                    if let Some(prov) = state.direct_provenance.get(v).cloned() {
-                        state.direct_provenance.entry(val_id).or_default().extend(prov);
+                    let address_roots = self.raw_value_roots(state, op);
+                    if !address_roots.is_empty() {
+                        state.unsafe_raw_roots.entry(val_id).or_default().extend(address_roots);
                     }
-                    if let Some(prov) = state.carried_provenance.get(v).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
+                    state.aliases.insert(val_id, Operand::Value(*v));
+                    let is_raw_pointer = self.ctx.map(|ctx| {
+                        matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))
+                    }).unwrap_or(false);
+                    if is_raw_pointer {
+                        if let Some(origins) = state.raw_pointer_provenance.get(v).cloned() {
+                            state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                        }
+                        let anchors = state.raw_pointer_anchors.get(v).cloned()
+                            .unwrap_or_else(|| HashSet::from([RawPointerAnchor::Unknown]));
+                        state.raw_pointer_anchors.entry(val_id).or_default().extend(anchors);
+                        if state.raw_pointer_requires_anchor.contains(v) {
+                            state.raw_pointer_requires_anchor.insert(val_id);
+                        }
+                    } else {
+                        if let Some(prov) = state.direct_provenance.get(v).cloned() {
+                            state.direct_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.carried_provenance.get(v).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
                     }
                     let dest_desc = self.compute_place_desc(&Operand::Value(val_id), state);
                     let src_desc = self.compute_place_desc(op, state);
@@ -2250,25 +3454,87 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                         for (new_place, prov_set) in to_copy {
                             state.field_provenance.entry(new_place).or_default().sources.extend(prov_set.sources);
                         }
+                        if !is_raw_pointer {
+                            if let Some(ctx) = self.ctx {
+                                if type_has_raw_pointer(self.func.value(val_id).ty, ctx, &mut HashSet::new()) {
+                                    self.copy_raw_pointer_storage_facts(&src_desc, &dest_desc, state);
+                                }
+                            }
+                        }
                     }
                 }
             }
             Instruction::Cast { value, .. } => {
+                let destination_is_raw = self.ctx.map(|ctx| {
+                    matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))
+                }).unwrap_or(false);
+                if destination_is_raw && self.is_null_pointer_value(value) {
+                    state.raw_pointer_provenance.entry(val_id).or_default().insert(RawPointerOrigin::Null);
+                }
+                let address_roots = self.raw_value_roots(state, value);
+                if !address_roots.is_empty() {
+                    state.unsafe_raw_roots.entry(val_id).or_default().extend(address_roots);
+                }
                 if let Operand::Value(v) = value {
                     let resolved = self.resolve_alias(value, state);
                     let check_val = if let Operand::Value(rv) = resolved { *rv } else { *v };
                     state.aliases.insert(val_id, Operand::Value(check_val));
-                    if let Some(prov) = state.direct_provenance.get(&check_val).cloned() {
-                        state.direct_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.carried_provenance.get(&check_val).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.direct_provenance.get(v).cloned() {
-                        state.direct_provenance.entry(val_id).or_default().extend(prov);
-                    }
-                    if let Some(prov) = state.carried_provenance.get(v).cloned() {
-                        state.carried_provenance.entry(val_id).or_default().extend(prov);
+                    let source_is_safe_reference = self.ctx.map(|ctx| {
+                        matches!(ctx.types.get(self.func.value(*v).ty), SemanticType::Reference(..))
+                    }).unwrap_or(false);
+                    let source_is_raw = self.ctx.map(|ctx| {
+                        matches!(ctx.types.get(self.func.value(*v).ty), SemanticType::Pointer(..))
+                    }).unwrap_or(false);
+                    let source_has_raw_origin = state.raw_pointer_provenance.contains_key(&check_val)
+                        || state.raw_pointer_provenance.contains_key(v);
+                    if destination_is_raw && source_is_safe_reference {
+                        // A reference-to-raw cast denotes the place borrowed by
+                        // the safe reference. Do not confuse that with any raw
+                        // pointer value that happens to be stored in the place
+                        // address used by lowering as an alias.
+                        let mut origins = HashSet::new();
+                        origins.extend(state.direct_provenance.get(v).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                        origins.extend(state.carried_provenance.get(v).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                        state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                    } else if source_has_raw_origin {
+                        let mut origins = state.raw_pointer_provenance.get(&check_val).cloned().unwrap_or_default();
+                        origins.extend(state.raw_pointer_provenance.get(v).cloned().unwrap_or_default());
+                        state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                        let anchors = state.raw_pointer_anchors.get(&check_val).cloned()
+                            .or_else(|| state.raw_pointer_anchors.get(v).cloned())
+                            .unwrap_or_else(|| HashSet::from([RawPointerAnchor::Unknown]));
+                        state.raw_pointer_anchors.entry(val_id).or_default().extend(anchors);
+                        if state.raw_pointer_requires_anchor.contains(&check_val) || state.raw_pointer_requires_anchor.contains(v) {
+                            state.raw_pointer_requires_anchor.insert(val_id);
+                        }
+                    } else if source_is_raw {
+                        // A raw pointer cast to an integer without tracked origin
+                        // stays unknown; it must not inherit a safe loan.
+                    } else {
+                        let destination_is_raw = self.ctx.map(|ctx| {
+                            matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))
+                        }).unwrap_or(false);
+                        if destination_is_raw {
+                            let mut origins = HashSet::new();
+                            origins.extend(state.direct_provenance.get(&check_val).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                            origins.extend(state.carried_provenance.get(&check_val).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                            origins.extend(state.direct_provenance.get(v).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                            origins.extend(state.carried_provenance.get(v).into_iter().flatten().map(RawPointerOrigin::from_loan));
+                            state.raw_pointer_provenance.entry(val_id).or_default().extend(origins);
+                        } else {
+                        if let Some(prov) = state.direct_provenance.get(&check_val).cloned() {
+                            state.direct_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.carried_provenance.get(&check_val).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.direct_provenance.get(v).cloned() {
+                            state.direct_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(prov) = state.carried_provenance.get(v).cloned() {
+                            state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        }
                     }
                     let dest_desc = self.compute_place_desc(&Operand::Value(val_id), state);
                     let src_desc = self.compute_place_desc(value, state);
@@ -2288,6 +3554,40 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                 }
             }
             Instruction::Alloca | _ => {}
+        }
+
+        // A raw-pointer value with no positive origin evidence is explicitly
+        // unknown. Keeping that fact in the lattice is essential at joins.
+        if self.ctx.is_some_and(|ctx| matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))) {
+            state.raw_pointer_provenance.entry(val_id).or_insert_with(|| {
+                HashSet::from([RawPointerOrigin::Unknown])
+            });
+            if !state.unsafe_raw_roots.contains_key(&val_id) {
+                let roots = match inst {
+                    Instruction::Assign(value) | Instruction::Cast { value, .. } => self.raw_value_roots(state, value),
+                    Instruction::Add { left, right } | Instruction::Sub { left, right } => {
+                        let mut roots = self.raw_value_roots(state, left);
+                        roots.extend(self.raw_value_roots(state, right));
+                        roots
+                    }
+                    Instruction::CallIndirect { args, .. } | Instruction::CallClosure { args, .. } => {
+                        let mut roots = HashSet::new();
+                        for arg in args {
+                            if let Operand::Value(arg_val) = arg {
+                                if self.ctx.is_some_and(|ctx| matches!(ctx.types.get(self.func.value(*arg_val).ty), SemanticType::Pointer(..))) {
+                                    roots.extend(self.raw_value_roots(state, arg));
+                                }
+                            }
+                        }
+                        roots
+                    }
+                    _ => HashSet::new(),
+                };
+                state.unsafe_raw_roots.insert(val_id, if roots.is_empty() { HashSet::from([val_id]) } else { roots });
+            }
+            state.raw_pointer_anchors.entry(val_id).or_insert_with(|| {
+                HashSet::from([RawPointerAnchor::Unknown])
+            });
         }
     }
 
@@ -2320,6 +3620,9 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     false
                 }
             };
+            let is_local_raw_origin = |origin: &RawPointerOrigin| {
+                origin.is_local(&aliases_snapshot, &ending_locals)
+            };
 
             for loans in state.direct_provenance.values_mut() {
                 loans.retain(|loan| !is_local_loan(loan, &aliases_snapshot));
@@ -2327,14 +3630,50 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             for loans in state.carried_provenance.values_mut() {
                 loans.retain(|loan| !is_local_loan(loan, &aliases_snapshot));
             }
+            for origins in state.raw_pointer_provenance.values_mut() {
+                origins.retain(|origin| !is_local_raw_origin(origin));
+            }
+            for roots in state.unsafe_raw_roots.values_mut() {
+                roots.retain(|root| !ending_locals.contains(root));
+            }
+            for anchors in state.raw_pointer_anchors.values_mut() {
+                anchors.retain(|anchor| match anchor {
+                    RawPointerAnchor::AnchoredTo(place) => !matches!(place.root, Operand::Value(root) if ending_locals.contains(&root)),
+                    RawPointerAnchor::Unknown => true,
+                });
+                if anchors.is_empty() { anchors.insert(RawPointerAnchor::Unknown); }
+            }
             state.escaped_loans.retain(|loan| !is_local_loan(loan, &aliases_snapshot));
 
             // Step 3: Kill all provenance held by ending local carriers
             for local_val in &ending_locals {
                 state.direct_provenance.remove(local_val);
                 state.carried_provenance.remove(local_val);
+                state.unsafe_raw_root_loans.remove(local_val);
+                state.raw_pointer_provenance.remove(local_val);
+                state.unsafe_raw_roots.remove(local_val);
+                state.raw_pointer_anchors.remove(local_val);
+                state.raw_pointer_requires_anchor.remove(local_val);
                 state.aliases.remove(local_val);
             }
+            state.raw_pointer_storage.retain(|place, _| {
+                !matches!(place.root, Operand::Value(root) if ending_locals.contains(&root))
+            });
+            state.unsafe_raw_root_storage.retain(|place, _| {
+                !matches!(place.root, Operand::Value(root) if ending_locals.contains(&root))
+            });
+            state.raw_pointer_anchor_storage.retain(|place, _| {
+                !matches!(place.root, Operand::Value(root) if ending_locals.contains(&root))
+            });
+            state.raw_pointer_anchor_invalidated_storage.retain(|place| {
+                !matches!(place.root, Operand::Value(root) if ending_locals.contains(&root))
+            });
+            state.raw_pointer_value_invalidated_storage.retain(|place| {
+                !matches!(place.root, Operand::Value(root) if ending_locals.contains(&root))
+            });
+            state.raw_pointer_requires_anchor_storage.retain(|place| {
+                !matches!(place.root, Operand::Value(root) if ending_locals.contains(&root))
+            });
         }
 
         // Fixed-point pruning: prune carriers that are dead at the target block entry
@@ -2359,10 +3698,21 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     true
                 }
             });
+            state.raw_pointer_provenance.retain(|carrier, origins| {
+                if origins.is_empty() { return false; }
+                let is_local = (carrier.0 as usize) < self.func.values.len()
+                    && matches!(self.func.values[carrier.0 as usize].origin, ValueOrigin::Local | ValueOrigin::Temporary);
+                if is_local { entry_live.contains(carrier) } else { true }
+            });
         }
     }
 
     fn merge(&mut self, dest: &mut BorrowStateData, src: &BorrowStateData) -> bool {
+        if !dest.initialized {
+            *dest = src.clone();
+            dest.initialized = true;
+            return true;
+        }
         let mut changed = false;
         for (v, loans) in &src.direct_provenance {
             let dest_loans = dest.direct_provenance.entry(*v).or_default();
@@ -2376,6 +3726,97 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             let dest_loans = dest.carried_provenance.entry(*v).or_default();
             for loan in loans {
                 if dest_loans.insert(loan.clone()) {
+                    changed = true;
+                }
+            }
+        }
+        for (loan_value, roots) in &src.unsafe_raw_root_loans {
+            let dest_roots = dest.unsafe_raw_root_loans.entry(*loan_value).or_default();
+            let old_len = dest_roots.len();
+            dest_roots.extend(roots.iter().copied());
+            if dest_roots.len() != old_len { changed = true; }
+        }
+        for (v, origins) in &src.raw_pointer_provenance {
+            let dest_origins = dest.raw_pointer_provenance.entry(*v).or_default();
+            let old_len = dest_origins.len();
+            dest_origins.extend(origins.iter().cloned());
+            if dest_origins.len() != old_len {
+                changed = true;
+            }
+        }
+        for (v, roots) in &src.unsafe_raw_roots {
+            let dest_roots = dest.unsafe_raw_roots.entry(*v).or_default();
+            let old_len = dest_roots.len();
+            dest_roots.extend(roots.iter().copied());
+            if dest_roots.len() != old_len { changed = true; }
+        }
+        for (place, origins) in &src.raw_pointer_storage {
+            let dest_origins = dest.raw_pointer_storage.entry(place.clone()).or_default();
+            let old_len = dest_origins.len();
+            dest_origins.extend(origins.iter().cloned());
+            if dest_origins.len() != old_len {
+                changed = true;
+            }
+        }
+        for (place, roots) in &src.unsafe_raw_root_storage {
+            let dest_roots = dest.unsafe_raw_root_storage.entry(place.clone()).or_default();
+            let old_len = dest_roots.len();
+            dest_roots.extend(roots.iter().copied());
+            if dest_roots.len() != old_len { changed = true; }
+        }
+        // Anchor storage is a must-fact. A store on one incoming edge and no
+        // fact on another must become AnchoredTo(A) | Unknown, never merely A.
+        let anchor_storage_keys: HashSet<_> = dest.raw_pointer_anchor_storage.keys()
+            .chain(src.raw_pointer_anchor_storage.keys()).cloned().collect();
+        for place in anchor_storage_keys {
+            let dest_entry = dest.raw_pointer_anchor_storage.entry(place.clone()).or_default();
+            let old_len = dest_entry.len();
+            if !src.raw_pointer_anchor_storage.contains_key(&place) {
+                dest_entry.insert(RawPointerAnchor::Unknown);
+            } else if !dest_entry.is_empty() {
+                // Union with all alternatives from the incoming edge.
+                dest_entry.extend(src.raw_pointer_anchor_storage[&place].iter().cloned());
+            } else {
+                dest_entry.insert(RawPointerAnchor::Unknown);
+                dest_entry.extend(src.raw_pointer_anchor_storage[&place].iter().cloned());
+            }
+            if dest_entry.len() != old_len { changed = true; }
+        }
+        let anchor_value_keys: HashSet<_> = dest.raw_pointer_anchors.keys()
+            .chain(src.raw_pointer_anchors.keys()).copied().collect();
+        for value in anchor_value_keys {
+            let dest_entry = dest.raw_pointer_anchors.entry(value).or_default();
+            let old_len = dest_entry.len();
+            if !src.raw_pointer_anchors.contains_key(&value) {
+                dest_entry.insert(RawPointerAnchor::Unknown);
+            } else if !dest_entry.is_empty() {
+                dest_entry.extend(src.raw_pointer_anchors[&value].iter().cloned());
+            } else {
+                dest_entry.insert(RawPointerAnchor::Unknown);
+                dest_entry.extend(src.raw_pointer_anchors[&value].iter().cloned());
+            }
+            if dest_entry.len() != old_len { changed = true; }
+        }
+        for value in &src.raw_pointer_requires_anchor {
+            if dest.raw_pointer_requires_anchor.insert(*value) { changed = true; }
+        }
+        for place in &src.raw_pointer_requires_anchor_storage {
+            if dest.raw_pointer_requires_anchor_storage.insert(place.clone()) { changed = true; }
+        }
+        for place in &src.raw_pointer_anchor_invalidated_storage {
+            if dest.raw_pointer_anchor_invalidated_storage.insert(place.clone()) { changed = true; }
+        }
+        for place in &src.raw_pointer_value_invalidated_storage {
+            if dest.raw_pointer_value_invalidated_storage.insert(place.clone()) { changed = true; }
+        }
+        // A kill marker dominates prior stored-value candidates at CFG joins.
+        for (place, origins) in &mut dest.raw_pointer_storage {
+            if dest.raw_pointer_value_invalidated_storage.iter()
+                .any(|written| Self::places_may_overlap(written, place))
+            {
+                if origins.len() != 1 || !origins.contains(&RawPointerOrigin::Unknown) {
+                    origins.clear();
+                    origins.insert(RawPointerOrigin::Unknown);
                     changed = true;
                 }
             }

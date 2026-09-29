@@ -8,7 +8,7 @@
 //   - Box<T> (ptr)
 //   - String (vec)
 //   - RawTable<K, V> (states, hashes, keys, values, cap, len, tombstones)
-//   - SliceIter<T> / SliceIterMut<T> (ptr, end)
+//   - std::slice::SliceIter<T> / std::slice::SliceIterMut<T> (ptr, end)
 //
 // Simultaneously, pure data structs without field annotations must remain
 // implicitly public for field access, field mutation, and struct literal construction.
@@ -93,7 +93,7 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-        fn test_access(v: &Vec<i32>) {
+        fn test_access(v: &std::Vec<i32>) {
             dec p = v.ptr;
         }
 
@@ -129,7 +129,7 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-        fn test_access(v: &Vec<i32>) -> u64 {
+        fn test_access(v: &std::Vec<i32>) -> u64 {
             return v.len;
         }
 
@@ -165,7 +165,7 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-        fn test_mutate(v: &rw Vec<i32>) {
+        fn test_mutate(v: &rw std::Vec<i32>) {
             v.cap = 100 as u64;
         }
 
@@ -201,8 +201,8 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-        fn construct() -> Vec<i32> {
-            return Vec<i32> {
+        fn construct() -> std::Vec<i32> {
+            return std::Vec<i32> {
                 ptr: 0 as u64 as *rw i32,
                 len: 0 as u64,
                 cap: 0 as u64,
@@ -436,7 +436,7 @@ fn test_raw_table_provider_rejects_direct_user_import() {
 }
 
 // =============================================================================
-// SECTION 5: Real <core> SliceIter<T> / SliceIterMut<T> Encapsulation
+// SECTION 5: Real <core> std::slice::SliceIter<T> / std::slice::SliceIterMut<T> Encapsulation
 // =============================================================================
 
 #[test]
@@ -452,7 +452,7 @@ fn test_real_core_slice_iter_cannot_access_ptr_or_end() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn test_access(it: &SliceIter<i32>) {
+        fn test_access(it: &std::slice::SliceIter<i32>) {
             dec p = it.ptr;
         }
 
@@ -482,7 +482,7 @@ fn test_real_core_slice_iter_mut_cannot_access_ptr_or_end() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn test_access(it: &SliceIterMut<i32>) {
+        fn test_access(it: &std::slice::SliceIterMut<i32>) {
             dec e = it.end;
         }
 
@@ -655,21 +655,21 @@ import <iter_collect>;
             }
 
             // 2. Vec public methods
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(20);
             if v.len() != (2 as u64) {
                 return 3;
             }
 
-            // 3. String public methods
+            // 3. std::String public methods
             dec s = std::string_from_str("Hello");
             if s.len() != (5 as u64) {
                 return 4;
             }
 
             // 4. HashMap public methods (RawTable remains internal)
-            dec rw t = hashmap_new<i32, i32>();
+            dec rw t = std::hashmap_new<i32, i32>();
             t.insert(1, 100);
             t.insert(2, 200);
             dec k1: i32 = 1;

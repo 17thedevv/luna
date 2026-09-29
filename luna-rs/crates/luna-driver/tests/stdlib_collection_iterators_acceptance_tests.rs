@@ -134,12 +134,12 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_new<i32, i32>();
+            dec rw map = std::hashmap_new<i32, i32>();
             dec rw it = map.iter();
             dec opt = it.next();
             match opt {
-                Option::Some(_) -> { return 1; },
-                Option::None -> { return 0; },
+                std::Option::Some(_) -> { return 1; },
+                std::Option::None -> { return 0; },
             }
         }
     "#;
@@ -176,7 +176,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(1, 10);
             map.insert(2, 20);
             map.insert(3, 30);
@@ -192,12 +192,12 @@ import <iter_collect>;
             while running {
                 dec opt = it.next();
                 match opt {
-                    Option::Some(pair) -> {
+                    std::Option::Some(pair) -> {
                         count = count + 1;
                         key_sum = key_sum + *pair.0;
                         val_sum = val_sum + *pair.1;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -249,7 +249,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(16 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(16 as u64);
             dec rw i: i32 = 1;
             while i <= 8 {
                 map.insert(i, i * 10);
@@ -276,12 +276,12 @@ import <iter_collect>;
             while running {
                 dec opt = it.next();
                 match opt {
-                    Option::Some(pair) -> {
+                    std::Option::Some(pair) -> {
                         count = count + 1;
                         key_sum = key_sum + *pair.0;
                         val_sum = val_sum + *pair.1;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -333,7 +333,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(10, 100);
             map.insert(20, 200);
             map.insert(30, 300);
@@ -346,11 +346,11 @@ import <iter_collect>;
             while k_running {
                 dec opt = k_it.next();
                 match opt {
-                    Option::Some(k) -> {
+                    std::Option::Some(k) -> {
                         k_count = k_count + 1;
                         k_sum = k_sum + *k;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         k_running = false;
                     },
                 }
@@ -368,11 +368,11 @@ import <iter_collect>;
             while v_running {
                 dec opt = v_it.next();
                 match opt {
-                    Option::Some(v) -> {
+                    std::Option::Some(v) -> {
                         v_count = v_count + 1;
                         v_sum = v_sum + *v;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         v_running = false;
                     },
                 }
@@ -418,7 +418,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
             set.insert(10);
             set.insert(20);
             set.insert(30);
@@ -431,11 +431,11 @@ import <iter_collect>;
             while running {
                 dec opt = it.next();
                 match opt {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         count = count + 1;
                         sum = sum + *val;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -484,7 +484,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
             set.insert(1);
             set.insert(2);
             set.insert(3);
@@ -502,11 +502,11 @@ import <iter_collect>;
             while running {
                 dec opt = it.next();
                 match opt {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         count = count + 1;
                         sum = sum + *val;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }
@@ -553,7 +553,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(1, 10);
 
             dec rw it = map.iter(); // Borrows map
@@ -614,7 +614,7 @@ fn test_iter_source_vs_llib_parity() {
         import <iter_collect>;
         
         fn main() -> i32 {
-            dec rw map = hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
             map.insert(100, 1000);
             map.insert(200, 2000);
 
@@ -626,11 +626,11 @@ fn test_iter_source_vs_llib_parity() {
             while running {
                 dec opt = it.next();
                 match opt {
-                    Option::Some(pair) -> {
+                    std::Option::Some(pair) -> {
                         count = count + 1;
                         sum = sum + *pair.0 + *pair.1;
                     },
-                    Option::None -> {
+                    std::Option::None -> {
                         running = false;
                     },
                 }

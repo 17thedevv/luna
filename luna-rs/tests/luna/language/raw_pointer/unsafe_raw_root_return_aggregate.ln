@@ -1,0 +1,10 @@
+struct Wrapper { value: &i32 };
+
+unsafe fn escape(pointer: *i32) -> Wrapper life_from(pointer) {
+    unsafe {
+        dec reference = &*pointer;
+        return Wrapper { value: reference };
+    }
+}
+
+fn main() {}

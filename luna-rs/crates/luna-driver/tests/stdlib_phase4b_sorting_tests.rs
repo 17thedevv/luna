@@ -66,7 +66,7 @@ fn test_sorting_adversarial_and_inconsistent() {
 
         fn main() -> i32 {
             // 1. Adversarial input with duplicates: verify O(n log n) termination
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             dec rw i: i32 = 100;
             while i > 0 {
                 v.push(i % 7);
@@ -74,7 +74,7 @@ fn test_sorting_adversarial_and_inconsistent() {
             }
 
             // Generic sort via Ord
-            slice_sort<i32>(v.as_mut_slice());
+            std::slice::slice_sort<i32>(v.as_mut_slice());
 
             // Verify monotonic non-decreasing order
             dec s = v.as_slice();
@@ -88,14 +88,14 @@ fn test_sorting_adversarial_and_inconsistent() {
 
             // 2. Inconsistent comparator: MUST terminate without infinite loop
             // and must preserve all elements (multiset preservation)
-            dec rw v_incon = vec_new<i32>();
+            dec rw v_incon = std::vec_new<i32>();
             v_incon.push(4);
             v_incon.push(2);
             v_incon.push(9);
             v_incon.push(1);
             v_incon.push(7);
 
-            slice_sort_by<i32>(v_incon.as_mut_slice(), inconsistent_cmp);
+            std::slice::slice_sort_by<i32>(v_incon.as_mut_slice(), inconsistent_cmp);
 
             // Multiset check: length unchanged, sum unchanged
             if v_incon.len() != (5 as u64) {

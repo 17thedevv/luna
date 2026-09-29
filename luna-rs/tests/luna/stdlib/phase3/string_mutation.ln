@@ -1,7 +1,7 @@
 import <string>;
 
 fn main() -> i32 {
-    dec rw s = string_from_str("Hi");
+    dec rw s = std::string_from_str("Hi");
     s.push_char('!');
     s.push_str(" Luna");
     if s.len() != (8 as u64) {

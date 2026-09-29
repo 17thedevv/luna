@@ -1,6 +1,7 @@
 import <core/panic>;
 import <__lang_option>;
 
+export module std {
 export enum Result<T, E> {
     Ok(T),
     Err(E),
@@ -43,17 +44,17 @@ impl<T, E> Result<T, E> {
         }
     }
 
-    export fn ok(self: Self) -> Option<T> {
+    export fn ok(self: Self) -> std::Option<T> {
         return match self {
-            Result::Ok(val) -> Option::Some(val),
-            Result::Err(e) -> Option::None,
+            Result::Ok(val) -> std::Option::Some(val),
+            Result::Err(e) -> std::Option::None,
         };
     }
 
-    export fn err(self: Self) -> Option<E> {
+    export fn err(self: Self) -> std::Option<E> {
         return match self {
-            Result::Ok(val) -> Option::None,
-            Result::Err(e) -> Option::Some(e),
+            Result::Ok(val) -> std::Option::None,
+            Result::Err(e) -> std::Option::Some(e),
         };
     }
 
@@ -104,11 +105,11 @@ export trait OptionExt<T> {
     fn ok_or<E>(self: Self, err: E) -> Result<T, E>;
 }
 
-impl<T> OptionExt<T> for Option<T> {
+impl<T> OptionExt<T> for std::Option<T> {
     fn ok_or<E>(self: Self, err: E) -> Result<T, E> {
         return match self {
-            Option::Some(val) -> Result::Ok(val),
-            Option::None -> Result::Err(err),
+            std::Option::Some(val) -> Result::Ok(val),
+            std::Option::None -> Result::Err(err),
         };
     }
 }
@@ -120,28 +121,30 @@ export fn result_flatten<T, E>(res: Result<Result<T, E>, E>) -> Result<T, E> {
     };
 }
 
-export fn option_transpose<T, E>(opt: Option<Result<T, E>>) -> Result<Option<T>, E> {
+export fn option_transpose<T, E>(opt: std::Option<Result<T, E>>) -> Result<std::Option<T>, E> {
     return match opt {
-        Option::Some(res) -> {
+        std::Option::Some(res) -> {
             match res {
-                Result::Ok(val) -> Result::Ok(Option::Some(val)),
+                Result::Ok(val) -> Result::Ok(std::Option::Some(val)),
                 Result::Err(e) -> Result::Err(e),
             }
         },
-        Option::None -> Result::Ok(Option::None),
+        std::Option::None -> Result::Ok(std::Option::None),
     };
 }
 
-export fn result_transpose<T, E>(res: Result<Option<T>, E>) -> Option<Result<T, E>> {
+export fn result_transpose<T, E>(res: Result<std::Option<T>, E>) -> std::Option<Result<T, E>> {
     return match res {
         Result::Ok(opt) -> {
             match opt {
-                Option::Some(val) -> Option::Some(Result::Ok(val)),
-                Option::None -> Option::None,
+                std::Option::Some(val) -> std::Option::Some(Result::Ok(val)),
+                std::Option::None -> std::Option::None,
             }
         },
-        Result::Err(e) -> Option::Some(Result::Err(e)),
+        Result::Err(e) -> std::Option::Some(Result::Err(e)),
     };
+}
+
 }
 
 

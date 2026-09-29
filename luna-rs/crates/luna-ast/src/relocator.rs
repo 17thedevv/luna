@@ -249,7 +249,7 @@ impl AstRelocator {
                 if let Some(b) = body { *b = self.shift_stmt_id(*b); }
                 self.relocate_lifetime_signature(lifetime_signature);
             }
-            Decl::Struct { annotations, name, generic_params, fields, lifetime_contract, .. } => {
+            Decl::Struct { annotations, name, generic_params, fields, lifetime_contract, raw_storage_anchor_contract, .. } => {
                 self.relocate_annotations(annotations);
                 self.shift_span(name);
                 self.relocate_generic_params(generic_params);
@@ -259,6 +259,11 @@ impl AstRelocator {
                 }
                 if let Some(c) = lifetime_contract {
                     self.relocate_struct_lifetime_contract(c);
+                }
+                if let Some(c) = raw_storage_anchor_contract {
+                    for anchor in &mut c.anchors {
+                        self.shift_span(&mut anchor.span);
+                    }
                 }
             }
             Decl::Enum { annotations, name, generic_params, variants, .. } => {

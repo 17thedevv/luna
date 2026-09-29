@@ -331,7 +331,7 @@ module mod_a {
         export counter: *rw i32,
     };
 
-    impl Drop for TrackA {
+    impl std::Drop for TrackA {
         fn drop(self: &rw Self) {
             unsafe {
                 *self.counter = *self.counter + 10;
@@ -345,7 +345,7 @@ module mod_b {
         export counter: *rw i32,
     };
 
-    impl Drop for TrackB {
+    impl std::Drop for TrackB {
         fn drop(self: &rw Self) {
             unsafe {
                 *self.counter = *self.counter + 20;

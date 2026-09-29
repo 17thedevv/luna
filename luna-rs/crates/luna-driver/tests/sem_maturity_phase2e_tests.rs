@@ -449,9 +449,9 @@ fn sem_extern_06_conflicting_refs_to_extern_call_rejected() {
     );
 }
 
-// EXTERN-07: Raw pointer derived from tracked borrow without #[sync_noescape] -> may-escape
+// EXTERN-07: Raw-pointer FFI access is call-scoped; it does not retain a safe loan.
 #[test]
-fn sem_extern_07_raw_ptr_derived_from_borrow_may_escape() {
+fn sem_extern_07_raw_ptr_derived_from_borrow_is_call_scoped() {
     let src = r#"
         extern fn ext_ptr(p: *i32);
 
@@ -463,16 +463,11 @@ fn sem_extern_07_raw_ptr_derived_from_borrow_may_escape() {
         }
     "#;
     let res = test_check("sem_extern_07", src);
-    assert!(res.is_err(), "Raw pointer without #[sync_noescape] derived from local loan must retain loan into escaped_loans");
-    let errs = res.err().unwrap();
-    assert!(
-        errs.iter().any(|d| d.message.contains("Cannot write to") && d.message.contains("borrowed as &")),
-        "Expected write-borrow conflict on escaped loan, got: {:?}",
-        errs
-    );
+    assert!(res.is_ok(), "Raw pointer FFI access must not retain a safe loan after return: {:?}", res.err());
 }
 
-// EXTERN-08: Raw pointer + existing #[sync_noescape] contract -> loan ends after call
+// EXTERN-08: Existing #[sync_noescape] spelling remains accepted; raw-pointer
+// FFI loans are call-scoped with or without this annotation.
 #[test]
 fn sem_extern_08_raw_ptr_with_sync_noescape_allows_mutation_after() {
     let src = r#"
@@ -486,7 +481,7 @@ fn sem_extern_08_raw_ptr_with_sync_noescape_allows_mutation_after() {
         }
     "#;
     let res = test_check("sem_extern_08", src);
-    assert!(res.is_ok(), "Raw pointer with #[sync_noescape] must release loan after call: {:?}", res.err());
+    assert!(res.is_ok(), "Raw pointer FFI access must not retain a safe loan: {:?}", res.err());
 }
 
 // EXTERN-09: Opaque raw pointer without tracked provenance -> do not fabricate a loan
@@ -557,9 +552,9 @@ fn sem_extern_12_extern_call_in_loop_safe_ref() {
     assert!(res.is_ok(), "Synchronous safe &rw reference in loop must be released per iteration: {:?}", res.err());
 }
 
-// EXTERN-13: Raw pointer derived from loan without #[sync_noescape] escapes -> subsequent write in loop rejected
+// EXTERN-13: Opaque FFI retention is an unsafe raw-pointer obligation, not a safe loan.
 #[test]
-fn sem_extern_13_extern_raw_ptr_may_escape_in_loop() {
+fn sem_extern_13_raw_ptr_ffi_does_not_extend_safe_loan_in_loop() {
     let src = r#"
         extern fn ext_retain_ptr(p: *i32);
 
@@ -575,13 +570,7 @@ fn sem_extern_13_extern_raw_ptr_may_escape_in_loop() {
         }
     "#;
     let res = test_check("sem_extern_13", src);
-    assert!(res.is_err(), "Raw pointer without #[sync_noescape] must retain loan in escaped_loans and reject subsequent write");
-    let errs = res.err().unwrap();
-    assert!(
-        errs.iter().any(|d| d.message.contains("Cannot write to") && d.message.contains("borrowed as &")),
-        "Expected write-borrow conflict on escaped loan, got: {:?}",
-        errs
-    );
+    assert!(res.is_ok(), "Raw pointer FFI calls must not create a persistent safe loan: {:?}", res.err());
 }
 
 // EXTERN-14: RULE-EXTERN-REF-RETURN-01 - Safe-Reference Returns

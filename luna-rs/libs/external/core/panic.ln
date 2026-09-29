@@ -1,1 +1,9 @@
+extern fn __luna_panic_default() -> !;
+
 export extern fn __luna_panic() -> !;
+
+export module std {
+export fn panic() -> ! {
+    __luna_panic_default();
+}
+}

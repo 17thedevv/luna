@@ -652,6 +652,8 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             field_sym_ids.push(f_sym_id);
                         }
                         self.ctx.tables.struct_fields.insert(sym_id, field_sym_ids);
+                        self.ctx.tables.struct_field_names.insert(sym_id, fields.iter()
+                            .map(|field| self.get_span_text(field.name).to_string()).collect());
                         
                         if !generic_params.is_empty() {
                             for (idx, gp) in generic_params.iter().enumerate() {
@@ -675,11 +677,15 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         }
                         
                         self.resolve_struct_lifetime_contract(decl_id);
+                        self.resolve_struct_raw_storage_anchor_contract(decl_id);
                         self.current_scope = prev_scope;
                     }
                     Decl::Extern { func, .. } => {
                         let item = Item::Decl(*func);
                         self.declare_item(&item, DeclarationContext::Free);
+                        if let Some(symbol) = self.ctx.tables.decl_symbols.get(func).copied() {
+                            self.ctx.tables.extern_functions.insert(symbol);
+                        }
                     }
                     Decl::Enum {
                         name,
@@ -984,7 +990,15 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             })
                         });
 
-                        let self_key_opt: Option<crate::semantic_tables::ImplSelfTypeKey> = {
+                        // An unresolved explicit trait path is not an
+                        // inherent impl. Leave it out of the impl index; the
+                        // typechecker resolves the full path after all source
+                        // declarations have been visited and reports an
+                        // unresolved-trait diagnostic if it is still absent.
+                        let self_key_opt: Option<crate::semantic_tables::ImplSelfTypeKey> =
+                            if trait_type.is_some() && trait_sym_opt.is_none() {
+                                None
+                            } else {
                             let self_ast_ty = &self.arena.types[self_type.0 as usize];
                             if let luna_ast::Type::Builtin(kind) = self_ast_ty {
                                 let bt = match kind {
@@ -1028,9 +1042,11 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
 
                             let mut method_syms = Vec::new();
                             for method_id in methods {
+                                self.ctx.tables.method_to_impl_decl.insert(*method_id, *decl_id);
                                 if let Some(&m_sym) = self.ctx.tables.decl_symbols.get(method_id) {
                                     method_syms.push(m_sym);
                                     self.ctx.tables.method_impls.insert(m_sym, key.clone());
+                                    self.ctx.tables.method_sym_to_impl_decl.insert(m_sym, *decl_id);
                                 }
                             }
                             self.ctx
@@ -2251,5 +2267,56 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                 self.ctx.tables.type_lifetime_contracts.insert(struct_sym, canonical_contract);
             }
         }
+    }
+
+    /// Resolves field-name-based raw storage anchor declarations. Canonical
+    /// metadata retains the field name; session-local symbols are only used
+    /// during semantic validation.
+    pub fn resolve_struct_raw_storage_anchor_contract(&mut self, decl_id: &luna_ast::DeclId) {
+        let decl = &self.arena.decls[decl_id.0 as usize];
+        let Decl::Struct { name, fields, raw_storage_anchor_contract, .. } = decl else { return; };
+        let Some(contract_ast) = raw_storage_anchor_contract else { return; };
+        let struct_name = self.get_span_text(*name).to_string();
+        let Some(&struct_sym) = self.ctx.tables.decl_symbols.get(decl_id) else { return; };
+        let field_syms = self.ctx.tables.struct_fields.get(&struct_sym).cloned().unwrap_or_default();
+        let mut seen = std::collections::HashSet::new();
+        let mut resolved_fields = Vec::new();
+        let mut canonical_names = Vec::new();
+        let mut has_error = false;
+        for anchor in &contract_ast.anchors {
+            if !seen.insert(anchor.field_name.clone()) {
+                self.ctx.diagnostics.push(
+                    luna_common::Diagnostic::error(format!(
+                        "duplicate raw storage anchor for field '{}' in struct '{}'",
+                        anchor.field_name, struct_name
+                    )).with_span(anchor.span),
+                );
+                has_error = true;
+                continue;
+            }
+            let index = fields.iter().position(|field| self.get_span_text(field.name) == anchor.field_name);
+            match index.and_then(|i| field_syms.get(i).copied()) {
+                Some(field_sym) => {
+                    resolved_fields.push(field_sym);
+                    canonical_names.push(anchor.field_name.clone());
+                }
+                None => {
+                    self.ctx.diagnostics.push(
+                        luna_common::Diagnostic::error(format!(
+                            "raw storage anchor field '{}' not found in struct '{}'",
+                            anchor.field_name, struct_name
+                        )).with_span(anchor.span),
+                    );
+                    has_error = true;
+                }
+            }
+        }
+        if has_error {
+            return;
+        }
+        let canonical = crate::CanonicalRawStorageAnchorContract::new(canonical_names);
+        let resolved = crate::ResolvedRawStorageAnchorContract { fields: resolved_fields };
+        self.ctx.tables.raw_storage_anchor_contracts.insert(struct_sym, canonical);
+        self.ctx.tables.resolved_raw_storage_anchor_contracts.insert(struct_sym, resolved);
     }
 }

@@ -108,16 +108,41 @@ fn test_canonical_build_emits_llib_only_not_mlib() {
     );
 }
 
+/// The writer surface is canonical-only; `.mlib` remains read compatibility.
+#[test]
+fn test_writer_rejects_legacy_mlib_output_path() {
+    let dir = temp_dir("reject_mlib_write");
+    let sysroot = sysroot_root();
+    let source = dir.join("foo.ln");
+    let mlib = dir.join("foo.mlib");
+    fs::write(&source, PROV_ONE).unwrap();
+    let opts = CompilerOptions {
+        output_path: Some(mlib.to_string_lossy().to_string()),
+        search_paths: vec![dir.to_string_lossy().to_string(), sysroot],
+        emit_mlib: true,
+        no_link: true,
+        quiet: true,
+        ..Default::default()
+    };
+    let result = compile(source.to_str().unwrap(), PROV_ONE.to_string(), &opts);
+    assert!(result.is_err(), "legacy .mlib output must be rejected");
+    assert!(!mlib.exists(), "rejected .mlib output must not be created");
+}
+
 /// COMPAT-PRECEDENCE-01: canonical source (`.ln`) precedes a legacy `.mlib` artifact.
 #[test]
 fn test_local_source_precedes_legacy_mlib_artifact() {
     let dir = temp_dir("ln_over_mlib");
     let sysroot = sysroot_root();
 
-    // Legacy artifact named `foo.mlib` whose `val` returns 2.
+    // Legacy read-only artifact named `foo.mlib` whose `val` returns 2.
+    // Build it canonically, then rename the bytes to exercise the legacy reader.
+    let llib = dir.join("foo.llib");
     let mlib = dir.join("foo.mlib");
-    compile_src(&dir, PROV_TWO, &mlib, &sysroot, false, true);
-    assert!(mlib.exists(), "legacy .mlib must be emitted");
+    compile_src(&dir, PROV_TWO, &llib, &sysroot, true, false);
+    fs::copy(&llib, &mlib).unwrap();
+    fs::remove_file(&llib).unwrap();
+    assert!(mlib.exists(), "legacy .mlib fixture must exist");
     let _ = fs::remove_file(dir.join("tmp_src.ln"));
 
     // Canonical source named `foo.ln` whose `val` returns 1.

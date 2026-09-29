@@ -408,6 +408,10 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
         ], false);
         self.llvm_module.add_function("__luna_panic", panic_type, None);
 
+        // Declare `__luna_panic_default() -> void`
+        let panic_default_type = void_type.fn_type(&[], false);
+        self.llvm_module.add_function("__luna_panic_default", panic_default_type, None);
+
         // Declare `__luna_startup(i32, ptr) -> void`
         let startup_type = void_type.fn_type(&[i32_type.into(), ptr_type.into()], false);
         self.llvm_module.add_function("__luna_startup", startup_type, None);
@@ -436,12 +440,35 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
 
             let raw_name = func.link_name.as_deref().unwrap_or(&func.name.name);
             let name = if raw_name == "main" { "__luna_user_main" } else { raw_name };
+
+            if let Some(existing_fn) = self.llvm_module.get_function(name) {
+                if !func.blocks.is_empty() && existing_fn.count_basic_blocks() == 0 {
+                    let linkage = if name.starts_with("__luna_drop_glue_") || name.contains('G') {
+                        Some(inkwell::module::Linkage::LinkOnceODR)
+                    } else {
+                        None
+                    };
+                    if let Some(l) = linkage {
+                        existing_fn.as_global_value().set_linkage(l);
+                        let comdat = self.llvm_module.get_or_insert_comdat(name);
+                        comdat.set_selection_kind(inkwell::comdat::ComdatSelectionKind::Any);
+                        existing_fn.as_global_value().set_comdat(comdat);
+                    }
+                }
+                continue;
+            }
+
             let linkage = if !func.blocks.is_empty() && (name.starts_with("__luna_drop_glue_") || name.contains('G')) {
                 Some(inkwell::module::Linkage::LinkOnceODR)
             } else {
                 None
             };
-            self.llvm_module.add_function(name, fn_type, linkage);
+            let llvm_func = self.llvm_module.add_function(name, fn_type, linkage);
+            if linkage == Some(inkwell::module::Linkage::LinkOnceODR) {
+                let comdat = self.llvm_module.get_or_insert_comdat(name);
+                comdat.set_selection_kind(inkwell::comdat::ComdatSelectionKind::Any);
+                llvm_func.as_global_value().set_comdat(comdat);
+            }
         }
         Ok(())
     }
@@ -532,8 +559,26 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let str_val = self.builder.build_global_string_ptr("Hello, error Rust Luna!", ".str").unwrap();
                     Ok(str_val.as_pointer_value().into())
                 } else {
-                    let parsed: i64 = n.parse().map_err(|_| BackendError::InvariantViolation(format!("Invalid number: {}", n)))?;
-                    Ok(self.context.i32_type().const_int(parsed as u64, false).into())
+                    let parsed_u64 = if let Ok(u) = n.parse::<u64>() {
+                        u
+                    } else if let Ok(i) = n.parse::<i64>() {
+                        i as u64
+                    } else {
+                        return Err(BackendError::InvariantViolation(format!("Invalid number: {}", n)));
+                    };
+                    Ok(self.context.i32_type().const_int(parsed_u64, false).into())
+                }
+            }
+            Operand::Float { text, ty } => {
+                match ty {
+                    luna_mvir::FloatType::F32 => {
+                        let parsed: f32 = text.parse().map_err(|_| BackendError::InvariantViolation(format!("Invalid f32: {}", text)))?;
+                        Ok(self.context.f32_type().const_float(parsed as f64).into())
+                    }
+                    luna_mvir::FloatType::F64 => {
+                        let parsed: f64 = text.parse().map_err(|_| BackendError::InvariantViolation(format!("Invalid f64: {}", text)))?;
+                        Ok(self.context.f64_type().const_float(parsed).into())
+                    }
                 }
             }
             Operand::Boolean(b) => {
@@ -570,7 +615,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::Assign(val_op) => {
                 self.generate_operand(val_op)
             }
-            Instruction::Store { ptr, value } => {
+            Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                 let llvm_ptr = self.generate_operand(ptr)?.into_pointer_value();
                 let llvm_val = self.generate_operand(value)?;
                 self.builder.build_store(llvm_ptr, llvm_val).unwrap();
@@ -588,10 +633,23 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 let load = self.builder.build_load(ty, llvm_ptr, &format!("v{}", id.0)).unwrap();
                 Ok(load)
             }
+            Instruction::Neg { value } => {
+                let val = self.generate_operand(value)?;
+                if val.is_float_value() {
+                    let res = self.builder.build_float_neg(val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                } else {
+                    let res = self.builder.build_int_neg(val.into_int_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                }
+            }
             Instruction::Add { left, right } => {
                 let l_val = self.generate_operand(left)?;
                 let r_val = self.generate_operand(right)?;
-                if l_val.is_pointer_value() {
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_add(l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                } else if l_val.is_pointer_value() {
                     let elem_ty = match self.semantic_ctx.types.get(data.ty) {
                         SemanticType::Pointer(_, elem) => self.map_type(*elem)?,
                         _ => self.context.i8_type().into(),
@@ -619,7 +677,10 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::Sub { left, right } => {
                 let l_val = self.generate_operand(left)?;
                 let r_val = self.generate_operand(right)?;
-                if l_val.is_pointer_value() && r_val.is_pointer_value() {
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_sub(l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                } else if l_val.is_pointer_value() && r_val.is_pointer_value() {
                     let elem_ty = match left {
                         Operand::Value(val) => {
                             let sem_ty = _func.values[val.0 as usize].ty;
@@ -650,63 +711,89 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 }
             }
             Instruction::Mul { left, right } => {
-                let l = self.generate_operand(left)?.into_int_value();
-                let r = self.generate_operand(right)?.into_int_value();
-                let res = self.builder.build_int_mul(l, r, &format!("v{}", id.0)).unwrap();
-                Ok(res.into())
+                let l_val = self.generate_operand(left)?;
+                let r_val = self.generate_operand(right)?;
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_mul(l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                } else {
+                    let l = l_val.into_int_value();
+                    let r = r_val.into_int_value();
+                    let res = self.builder.build_int_mul(l, r, &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                }
             }
             Instruction::Div { left, right } => {
-                let l = self.generate_operand(left)?.into_int_value();
-                let r = self.generate_operand(right)?.into_int_value();
-                let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
-                let res = if is_unsigned {
-                    self.builder.build_int_unsigned_div(l, r, &format!("v{}", id.0)).unwrap()
+                let l_val = self.generate_operand(left)?;
+                let r_val = self.generate_operand(right)?;
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_div(l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
                 } else {
-                    self.builder.build_int_signed_div(l, r, &format!("v{}", id.0)).unwrap()
-                };
-                Ok(res.into())
+                    let l = l_val.into_int_value();
+                    let r = r_val.into_int_value();
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let res = if is_unsigned {
+                        self.builder.build_int_unsigned_div(l, r, &format!("v{}", id.0)).unwrap()
+                    } else {
+                        self.builder.build_int_signed_div(l, r, &format!("v{}", id.0)).unwrap()
+                    };
+                    Ok(res.into())
+                }
             }
             Instruction::Rem { left, right } => {
-                let l = self.generate_operand(left)?.into_int_value();
-                let r = self.generate_operand(right)?.into_int_value();
-                let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
-                let res = if is_unsigned {
-                    self.builder.build_int_unsigned_rem(l, r, &format!("v{}", id.0)).unwrap()
+                let l_val = self.generate_operand(left)?;
+                let r_val = self.generate_operand(right)?;
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_rem(l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
                 } else {
-                    self.builder.build_int_signed_rem(l, r, &format!("v{}", id.0)).unwrap()
-                };
-                Ok(res.into())
+                    let l = l_val.into_int_value();
+                    let r = r_val.into_int_value();
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let res = if is_unsigned {
+                        self.builder.build_int_unsigned_rem(l, r, &format!("v{}", id.0)).unwrap()
+                    } else {
+                        self.builder.build_int_signed_rem(l, r, &format!("v{}", id.0)).unwrap()
+                    };
+                    Ok(res.into())
+                }
             }
             Instruction::Eq { left, right } => {
                 let l_val = self.generate_operand(left)?;
                 let r_val = self.generate_operand(right)?;
-                let (l, r) = if l_val.is_pointer_value() || r_val.is_pointer_value() {
-                    let l_int = if l_val.is_pointer_value() {
-                        self.builder.build_ptr_to_int(l_val.into_pointer_value(), self.context.i64_type(), &format!("l_ptr_cast_{}", id.0)).unwrap()
-                    } else {
-                        self.builder.build_int_cast(l_val.into_int_value(), self.context.i64_type(), &format!("l_int_cast_{}", id.0)).unwrap()
-                    };
-                    let r_int = if r_val.is_pointer_value() {
-                        self.builder.build_ptr_to_int(r_val.into_pointer_value(), self.context.i64_type(), &format!("r_ptr_cast_{}", id.0)).unwrap()
-                    } else {
-                        self.builder.build_int_cast(r_val.into_int_value(), self.context.i64_type(), &format!("r_int_cast_{}", id.0)).unwrap()
-                    };
-                    (l_int, r_int)
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_compare(inkwell::FloatPredicate::OEQ, l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
                 } else {
-                    let mut l_int = l_val.into_int_value();
-                    let mut r_int = r_val.into_int_value();
-                    if l_int.get_type() != r_int.get_type() {
-                        if l_int.get_type().get_bit_width() < r_int.get_type().get_bit_width() {
-                            l_int = self.builder.build_int_cast(l_int, r_int.get_type(), &format!("l_cast_{}", id.0)).unwrap();
+                    let (l, r) = if l_val.is_pointer_value() || r_val.is_pointer_value() {
+                        let l_int = if l_val.is_pointer_value() {
+                            self.builder.build_ptr_to_int(l_val.into_pointer_value(), self.context.i64_type(), &format!("l_ptr_cast_{}", id.0)).unwrap()
                         } else {
-                            r_int = self.builder.build_int_cast(r_int, l_int.get_type(), &format!("r_cast_{}", id.0)).unwrap();
+                            self.builder.build_int_cast(l_val.into_int_value(), self.context.i64_type(), &format!("l_int_cast_{}", id.0)).unwrap()
+                        };
+                        let r_int = if r_val.is_pointer_value() {
+                            self.builder.build_ptr_to_int(r_val.into_pointer_value(), self.context.i64_type(), &format!("r_ptr_cast_{}", id.0)).unwrap()
+                        } else {
+                            self.builder.build_int_cast(r_val.into_int_value(), self.context.i64_type(), &format!("r_int_cast_{}", id.0)).unwrap()
+                        };
+                        (l_int, r_int)
+                    } else {
+                        let mut l_int = l_val.into_int_value();
+                        let mut r_int = r_val.into_int_value();
+                        if l_int.get_type() != r_int.get_type() {
+                            if l_int.get_type().get_bit_width() < r_int.get_type().get_bit_width() {
+                                l_int = self.builder.build_int_cast(l_int, r_int.get_type(), &format!("l_cast_{}", id.0)).unwrap();
+                            } else {
+                                r_int = self.builder.build_int_cast(r_int, l_int.get_type(), &format!("r_cast_{}", id.0)).unwrap();
+                            }
                         }
-                    }
-                    (l_int, r_int)
-                };
-                let res = self.builder.build_int_compare(inkwell::IntPredicate::EQ, l, r, &format!("v{}", id.0)).unwrap();
-                // Ensure the result is correctly represented (e.g., bool)
-                Ok(res.into())
+                        (l_int, r_int)
+                    };
+                    let res = self.builder.build_int_compare(inkwell::IntPredicate::EQ, l, r, &format!("v{}", id.0)).unwrap();
+                    // Ensure the result is correctly represented (e.g., bool)
+                    Ok(res.into())
+                }
             }
             Instruction::BitAnd { left, right } => {
                 let l = self.generate_operand(left)?.into_int_value();
@@ -857,70 +944,95 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::NotEq { left, right } => {
                 let l_val = self.generate_operand(left)?;
                 let r_val = self.generate_operand(right)?;
-                let (l, r) = if l_val.is_pointer_value() || r_val.is_pointer_value() {
-                    let l_int = if l_val.is_pointer_value() {
-                        self.builder.build_ptr_to_int(l_val.into_pointer_value(), self.context.i64_type(), &format!("l_ptr_cast_{}", id.0)).unwrap()
-                    } else {
-                        self.builder.build_int_cast(l_val.into_int_value(), self.context.i64_type(), &format!("l_int_cast_{}", id.0)).unwrap()
-                    };
-                    let r_int = if r_val.is_pointer_value() {
-                        self.builder.build_ptr_to_int(r_val.into_pointer_value(), self.context.i64_type(), &format!("r_ptr_cast_{}", id.0)).unwrap()
-                    } else {
-                        self.builder.build_int_cast(r_val.into_int_value(), self.context.i64_type(), &format!("r_int_cast_{}", id.0)).unwrap()
-                    };
-                    (l_int, r_int)
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_compare(inkwell::FloatPredicate::UNE, l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
                 } else {
-                    let mut l_int = l_val.into_int_value();
-                    let mut r_int = r_val.into_int_value();
-                    if l_int.get_type() != r_int.get_type() {
-                        if l_int.get_type().get_bit_width() < r_int.get_type().get_bit_width() {
-                            l_int = self.builder.build_int_cast(l_int, r_int.get_type(), &format!("l_cast_{}", id.0)).unwrap();
+                    let (l, r) = if l_val.is_pointer_value() || r_val.is_pointer_value() {
+                        let l_int = if l_val.is_pointer_value() {
+                            self.builder.build_ptr_to_int(l_val.into_pointer_value(), self.context.i64_type(), &format!("l_ptr_cast_{}", id.0)).unwrap()
                         } else {
-                            r_int = self.builder.build_int_cast(r_int, l_int.get_type(), &format!("r_cast_{}", id.0)).unwrap();
+                            self.builder.build_int_cast(l_val.into_int_value(), self.context.i64_type(), &format!("l_int_cast_{}", id.0)).unwrap()
+                        };
+                        let r_int = if r_val.is_pointer_value() {
+                            self.builder.build_ptr_to_int(r_val.into_pointer_value(), self.context.i64_type(), &format!("r_ptr_cast_{}", id.0)).unwrap()
+                        } else {
+                            self.builder.build_int_cast(r_val.into_int_value(), self.context.i64_type(), &format!("r_int_cast_{}", id.0)).unwrap()
+                        };
+                        (l_int, r_int)
+                    } else {
+                        let mut l_int = l_val.into_int_value();
+                        let mut r_int = r_val.into_int_value();
+                        if l_int.get_type() != r_int.get_type() {
+                            if l_int.get_type().get_bit_width() < r_int.get_type().get_bit_width() {
+                                l_int = self.builder.build_int_cast(l_int, r_int.get_type(), &format!("l_cast_{}", id.0)).unwrap();
+                            } else {
+                                r_int = self.builder.build_int_cast(r_int, l_int.get_type(), &format!("r_cast_{}", id.0)).unwrap();
+                            }
                         }
-                    }
-                    (l_int, r_int)
-                };
-                let res = self.builder.build_int_compare(inkwell::IntPredicate::NE, l, r, &format!("v{}", id.0)).unwrap();
-                Ok(res.into())
+                        (l_int, r_int)
+                    };
+                    let res = self.builder.build_int_compare(inkwell::IntPredicate::NE, l, r, &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                }
             }
             Instruction::LessThan { left, right } => {
                 let l_val = self.generate_operand(left)?;
                 let r_val = self.generate_operand(right)?;
-                let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
-                let (l, r) = self.coerce_int_pair(l_val, r_val, is_unsigned, id.0)?;
-                let pred = if is_unsigned { inkwell::IntPredicate::ULT } else { inkwell::IntPredicate::SLT };
-                let res = self.builder.build_int_compare(pred, l, r, &format!("v{}", id.0)).unwrap();
-                Ok(res.into())
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                } else {
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let (l, r) = self.coerce_int_pair(l_val, r_val, is_unsigned, id.0)?;
+                    let pred = if is_unsigned { inkwell::IntPredicate::ULT } else { inkwell::IntPredicate::SLT };
+                    let res = self.builder.build_int_compare(pred, l, r, &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                }
             }
             Instruction::LessOrEq { left, right } => {
                 let l_val = self.generate_operand(left)?;
                 let r_val = self.generate_operand(right)?;
-                let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
-                let (l, r) = self.coerce_int_pair(l_val, r_val, is_unsigned, id.0)?;
-                let pred = if is_unsigned { inkwell::IntPredicate::ULE } else { inkwell::IntPredicate::SLE };
-                let res = self.builder.build_int_compare(pred, l, r, &format!("v{}", id.0)).unwrap();
-                Ok(res.into())
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_compare(inkwell::FloatPredicate::OLE, l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                } else {
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let (l, r) = self.coerce_int_pair(l_val, r_val, is_unsigned, id.0)?;
+                    let pred = if is_unsigned { inkwell::IntPredicate::ULE } else { inkwell::IntPredicate::SLE };
+                    let res = self.builder.build_int_compare(pred, l, r, &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                }
             }
             Instruction::GreaterThan { left, right } => {
                 let l_val = self.generate_operand(left)?;
                 let r_val = self.generate_operand(right)?;
-                let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
-                let (l, r) = self.coerce_int_pair(l_val, r_val, is_unsigned, id.0)?;
-                let pred = if is_unsigned { inkwell::IntPredicate::UGT } else { inkwell::IntPredicate::SGT };
-                let res = self.builder.build_int_compare(pred, l, r, &format!("v{}", id.0)).unwrap();
-                Ok(res.into())
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_compare(inkwell::FloatPredicate::OGT, l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                } else {
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let (l, r) = self.coerce_int_pair(l_val, r_val, is_unsigned, id.0)?;
+                    let pred = if is_unsigned { inkwell::IntPredicate::UGT } else { inkwell::IntPredicate::SGT };
+                    let res = self.builder.build_int_compare(pred, l, r, &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                }
             }
             Instruction::GreaterOrEq { left, right } => {
                 let l_val = self.generate_operand(left)?;
                 let r_val = self.generate_operand(right)?;
-                let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
-                let (l, r) = self.coerce_int_pair(l_val, r_val, is_unsigned, id.0)?;
-                let pred = if is_unsigned { inkwell::IntPredicate::UGE } else { inkwell::IntPredicate::SGE };
-                let res = self.builder.build_int_compare(pred, l, r, &format!("v{}", id.0)).unwrap();
-                Ok(res.into())
+                if l_val.is_float_value() && r_val.is_float_value() {
+                    let res = self.builder.build_float_compare(inkwell::FloatPredicate::OGE, l_val.into_float_value(), r_val.into_float_value(), &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                } else {
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let (l, r) = self.coerce_int_pair(l_val, r_val, is_unsigned, id.0)?;
+                    let pred = if is_unsigned { inkwell::IntPredicate::UGE } else { inkwell::IntPredicate::SGE };
+                    let res = self.builder.build_int_compare(pred, l, r, &format!("v{}", id.0)).unwrap();
+                    Ok(res.into())
+                }
             }
-            Instruction::FieldPtr { base, field_idx } => {
+            Instruction::FieldPtr { base, field_idx, .. } => {
                 let base_value = self.generate_operand(base)?;
                 let base_ptr = base_value.into_pointer_value();
                 let base_ty = match base {
@@ -1320,8 +1432,20 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 self.generate_operand(future)
             }
             Instruction::Cast { value, target_ty } => {
-                let llvm_val = self.generate_operand(value)?;
                 let llvm_ty = self.map_type(*target_ty)?;
+                if let Operand::Number(n) = value {
+                    if llvm_ty.is_int_type() {
+                        let parsed_u64 = if let Ok(u) = n.parse::<u64>() {
+                            u
+                        } else if let Ok(i) = n.parse::<i64>() {
+                            i as u64
+                        } else {
+                            return Err(BackendError::InvariantViolation(format!("Invalid number: {}", n)));
+                        };
+                        return Ok(llvm_ty.into_int_type().const_int(parsed_u64, false).into());
+                    }
+                }
+                let llvm_val = self.generate_operand(value)?;
                 
                 // Identity cast: source and target LLVM types are structurally identical.
                 // This handles representation-preserving casts like &dyn Foo → *dyn Foo
@@ -1364,6 +1488,124 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                         llvm_ty.into_float_type(),
                         &format!("cast_v{}", id.0)
                     ).unwrap();
+                    Ok(casted.into())
+                } else if llvm_val.is_int_value() && llvm_ty.is_float_type() {
+                    let is_unsigned = self.is_unsigned_operand(value, _func);
+                    let casted = if is_unsigned {
+                        self.builder.build_unsigned_int_to_float(
+                            llvm_val.into_int_value(),
+                            llvm_ty.into_float_type(),
+                            &format!("cast_v{}", id.0)
+                        ).unwrap()
+                    } else {
+                        self.builder.build_signed_int_to_float(
+                            llvm_val.into_int_value(),
+                            llvm_ty.into_float_type(),
+                            &format!("cast_v{}", id.0)
+                        ).unwrap()
+                    };
+                    Ok(casted.into())
+                } else if llvm_val.is_float_value() && llvm_ty.is_int_type() {
+                    let float_val = llvm_val.into_float_value();
+                    let is_f32 = float_val.get_type() == self.context.f32_type();
+                    let f_ty = float_val.get_type();
+                    let const_f = |val: f64| -> inkwell::values::FloatValue<'ctx> {
+                        f_ty.const_float(val)
+                    };
+
+                    let target_sem = self.semantic_ctx.types.get(self.semantic_ctx.types.resolve(*target_ty));
+                    let (lower_ok, upper_ok, is_unsigned) = match target_sem {
+                        SemanticType::Primitive(BuiltinType::I8) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGT, float_val, const_f(-129.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(128.0), "upper_ok").unwrap();
+                            (lower, upper, false)
+                        }
+                        SemanticType::Primitive(BuiltinType::U8) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGE, float_val, const_f(0.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(256.0), "upper_ok").unwrap();
+                            (lower, upper, true)
+                        }
+                        SemanticType::Primitive(BuiltinType::I16) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGT, float_val, const_f(-32769.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(32768.0), "upper_ok").unwrap();
+                            (lower, upper, false)
+                        }
+                        SemanticType::Primitive(BuiltinType::U16) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGE, float_val, const_f(0.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(65536.0), "upper_ok").unwrap();
+                            (lower, upper, true)
+                        }
+                        SemanticType::Primitive(BuiltinType::I32) => {
+                            let lower = if is_f32 {
+                                self.builder.build_float_compare(inkwell::FloatPredicate::OGE, float_val, const_f(-2147483648.0), "lower_ok").unwrap()
+                            } else {
+                                self.builder.build_float_compare(inkwell::FloatPredicate::OGT, float_val, const_f(-2147483649.0), "lower_ok").unwrap()
+                            };
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(2147483648.0), "upper_ok").unwrap();
+                            (lower, upper, false)
+                        }
+                        SemanticType::Primitive(BuiltinType::U32) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGE, float_val, const_f(0.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(4294967296.0), "upper_ok").unwrap();
+                            (lower, upper, true)
+                        }
+                        SemanticType::Primitive(BuiltinType::I64 | BuiltinType::Isize) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGE, float_val, const_f(-9223372036854775808.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(9223372036854775808.0), "upper_ok").unwrap();
+                            (lower, upper, false)
+                        }
+                        SemanticType::Primitive(BuiltinType::U64 | BuiltinType::Usize) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGE, float_val, const_f(0.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(18446744073709551616.0), "upper_ok").unwrap();
+                            (lower, upper, true)
+                        }
+                        SemanticType::Primitive(BuiltinType::I128) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGE, float_val, const_f(-170141183460469231731687303715884105728.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(170141183460469231731687303715884105728.0), "upper_ok").unwrap();
+                            (lower, upper, false)
+                        }
+                        SemanticType::Primitive(BuiltinType::U128) => {
+                            let lower = self.builder.build_float_compare(inkwell::FloatPredicate::OGE, float_val, const_f(0.0), "lower_ok").unwrap();
+                            let upper = self.builder.build_float_compare(inkwell::FloatPredicate::OLT, float_val, const_f(340282366920938463463374607431768211456.0), "upper_ok").unwrap();
+                            (lower, upper, true)
+                        }
+                        _ => {
+                            return Err(BackendError::InvariantViolation(format!(
+                                "Unsupported float-to-int cast target: {:?}",
+                                target_sem
+                            )));
+                        }
+                    };
+
+                    let is_valid = self.builder.build_and(lower_ok, upper_ok, "is_valid").unwrap();
+
+                    let current_fn = self.builder.get_insert_block().unwrap().get_parent().unwrap();
+                    let cont_bb = self.context.append_basic_block(current_fn, "cast_ok");
+                    let trap_bb = self.context.append_basic_block(current_fn, "cast_trap");
+
+                    self.builder.build_conditional_branch(is_valid, cont_bb, trap_bb).unwrap();
+
+                    self.builder.position_at_end(trap_bb);
+                    let panic_fn = self.get_function("__luna_panic_default")
+                        .ok_or_else(|| BackendError::InvariantViolation("__luna_panic_default declaration missing".into()))?;
+                    self.builder.build_call(panic_fn, &[], "").unwrap();
+                    self.builder.build_unreachable().unwrap();
+
+                    self.builder.position_at_end(cont_bb);
+
+                    let casted = if is_unsigned {
+                        self.builder.build_float_to_unsigned_int(
+                            float_val,
+                            llvm_ty.into_int_type(),
+                            &format!("cast_v{}", id.0)
+                        ).unwrap()
+                    } else {
+                        self.builder.build_float_to_signed_int(
+                            float_val,
+                            llvm_ty.into_int_type(),
+                            &format!("cast_v{}", id.0)
+                        ).unwrap()
+                    };
                     Ok(casted.into())
                 } else {
                     // G1 Vector 4: No silent fallback. If an unsupported cast reaches

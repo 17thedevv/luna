@@ -54,8 +54,8 @@ fn test_peekable_peek_does_not_consume() {
         import <iter_adapters>;
 
         fn main() -> i32 {
-            dec r = range(10, 13);
-            dec rw p = iter_peekable(r);
+            dec r = std::iter::range(10, 13);
+            dec rw p = std::iter::iter_peekable(r);
 
             // First peek returns Some(&10)
             dec pk1 = p.peek();
@@ -115,11 +115,11 @@ fn test_filter_map_and_take_while() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn halve_evens(x: i32) -> Option<i32> {
+        fn halve_evens(x: i32) -> std::Option<i32> {
             if x % 2 == 0 {
-                return Option::Some(x / 2);
+                return std::Option::Some(x / 2);
             }
-            return Option::None;
+            return std::Option::None;
         }
 
         fn less_than_five(x: &i32) -> bool {
@@ -133,13 +133,13 @@ fn test_filter_map_and_take_while() {
         fn main() -> i32 {
             // Range 0..10: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
             // halve_evens yields: 0, 1, 2, 3, 4
-            dec r = range(0, 10);
-            dec fm = iter_filter_map(r, halve_evens);
+            dec r = std::iter::range(0, 10);
+            dec fm = std::iter::iter_filter_map(r, halve_evens);
 
-            dec rw tw = iter_take_while(fm, less_than_five);
+            dec rw tw = std::iter::iter_take_while(fm, less_than_five);
             // tw should yield 0, 1, 2, 3, 4 then terminate
             dec mut_acc: i32 = 0;
-            dec sum = iter_fold(tw, mut_acc, add_pair);
+            dec sum = std::iter::iter_fold(tw, mut_acc, add_pair);
             // 0 + 1 + 2 + 3 + 4 = 10
             if sum != 10 { return 1; }
 
@@ -166,65 +166,65 @@ fn test_range_and_inclusive_boundaries() {
         fn main() -> i32 {
             // --- Part 1: All 10 integer types instantiate Range<T> ---
             // 1. u8
-            dec r_u8 = range(1 as u8, 4 as u8);
-            if iter_count(r_u8) != (3 as u64) { return 1; }
+            dec r_u8 = std::iter::range(1 as u8, 4 as u8);
+            if std::iter::iter_count(r_u8) != (3 as u64) { return 1; }
 
             // 2. u16
-            dec r_u16 = range(1 as u16, 4 as u16);
-            if iter_count(r_u16) != (3 as u64) { return 2; }
+            dec r_u16 = std::iter::range(1 as u16, 4 as u16);
+            if std::iter::iter_count(r_u16) != (3 as u64) { return 2; }
 
             // 3. u32
-            dec r_u32 = range(1 as u32, 4 as u32);
-            if iter_count(r_u32) != (3 as u64) { return 3; }
+            dec r_u32 = std::iter::range(1 as u32, 4 as u32);
+            if std::iter::iter_count(r_u32) != (3 as u64) { return 3; }
 
             // 4. u64
-            dec r_u64 = range(1 as u64, 4 as u64);
-            if iter_count(r_u64) != (3 as u64) { return 4; }
+            dec r_u64 = std::iter::range(1 as u64, 4 as u64);
+            if std::iter::iter_count(r_u64) != (3 as u64) { return 4; }
 
             // 5. usize
-            dec r_usize = range(1 as usize, 4 as usize);
-            if iter_count(r_usize) != (3 as u64) { return 5; }
+            dec r_usize = std::iter::range(1 as usize, 4 as usize);
+            if std::iter::iter_count(r_usize) != (3 as u64) { return 5; }
 
             // 6. i8
-            dec r_i8 = range(1 as i8, 4 as i8);
-            if iter_count(r_i8) != (3 as u64) { return 6; }
+            dec r_i8 = std::iter::range(1 as i8, 4 as i8);
+            if std::iter::iter_count(r_i8) != (3 as u64) { return 6; }
 
             // 7. i16
-            dec r_i16 = range(1 as i16, 4 as i16);
-            if iter_count(r_i16) != (3 as u64) { return 7; }
+            dec r_i16 = std::iter::range(1 as i16, 4 as i16);
+            if std::iter::iter_count(r_i16) != (3 as u64) { return 7; }
 
             // 8. i32
-            dec r_i32 = range(1, 4);
-            if iter_count(r_i32) != (3 as u64) { return 8; }
+            dec r_i32 = std::iter::range(1, 4);
+            if std::iter::iter_count(r_i32) != (3 as u64) { return 8; }
 
             // 9. i64
-            dec r_i64 = range(1 as i64, 4 as i64);
-            if iter_count(r_i64) != (3 as u64) { return 9; }
+            dec r_i64 = std::iter::range(1 as i64, 4 as i64);
+            if std::iter::iter_count(r_i64) != (3 as u64) { return 9; }
 
             // 10. isize
-            dec r_isize = range(1 as isize, 4 as isize);
-            if iter_count(r_isize) != (3 as u64) { return 10; }
+            dec r_isize = std::iter::range(1 as isize, 4 as isize);
+            if std::iter::iter_count(r_isize) != (3 as u64) { return 10; }
 
             // --- Part 2: Boundary behaviors and edge conditions ---
             // Empty range: 5..5 yields count 0
-            dec r_empty = range(5, 5);
-            if iter_count(r_empty) != (0 as u64) { return 11; }
+            dec r_empty = std::iter::range(5, 5);
+            if std::iter::iter_count(r_empty) != (0 as u64) { return 11; }
 
             // Single item inclusive: 5..=5 yields count 1
-            dec ri_single = range_inclusive(5, 5);
-            if iter_count(ri_single) != (1 as u64) { return 12; }
+            dec ri_single = std::iter::range_inclusive(5, 5);
+            if std::iter::iter_count(ri_single) != (1 as u64) { return 12; }
 
             // Inverted range: 5..1 yields count 0
-            dec r_inv = range(5, 1);
-            if iter_count(r_inv) != (0 as u64) { return 13; }
+            dec r_inv = std::iter::range(5, 1);
+            if std::iter::iter_count(r_inv) != (0 as u64) { return 13; }
 
             // Inverted inclusive: 5..=1 yields count 0
-            dec ri_inv = range_inclusive(5, 1);
-            if iter_count(ri_inv) != (0 as u64) { return 14; }
+            dec ri_inv = std::iter::range_inclusive(5, 1);
+            if std::iter::iter_count(ri_inv) != (0 as u64) { return 14; }
 
             // --- Part 3: MAX boundary stress on RangeInclusive ---
             // Boundary condition 1: u8 upper limit 254..=255 terminates cleanly without wrapping to 0!
-            dec rw ri_u8 = range_inclusive(254 as u8, 255 as u8);
+            dec rw ri_u8 = std::iter::range_inclusive(254 as u8, 255 as u8);
             dec v1 = ri_u8.next();
             if v1.is_none() { return 15; }
             if v1.unwrap() != (254 as u8) { return 16; }
@@ -239,7 +239,7 @@ fn test_range_and_inclusive_boundaries() {
             // Boundary condition 2: u64 upper limit (MAX-1)..=MAX terminates cleanly without overflow!
             dec u64_max = (0 as u64) - (1 as u64);
             dec u64_max_minus_1 = u64_max - (1 as u64);
-            dec rw ri_u64 = range_inclusive(u64_max_minus_1, u64_max);
+            dec rw ri_u64 = std::iter::range_inclusive(u64_max_minus_1, u64_max);
 
             dec u_v1 = ri_u64.next();
             if u_v1.is_none() { return 20; }
@@ -255,7 +255,7 @@ fn test_range_and_inclusive_boundaries() {
             // Boundary condition 3: i64 upper limit (MAX-1)..=MAX terminates cleanly without overflow!
             dec i64_max = (((0 as u64) - (1 as u64)) / (2 as u64)) as i64;
             dec i64_max_minus_1 = i64_max - (1 as i64);
-            dec rw ri_i64 = range_inclusive(i64_max_minus_1, i64_max);
+            dec rw ri_i64 = std::iter::range_inclusive(i64_max_minus_1, i64_max);
 
             dec i_v1 = ri_i64.next();
             if i_v1.is_none() { return 25; }
@@ -291,51 +291,51 @@ fn test_iter_sum_family() {
         fn main() -> i32 {
             // --- Part 1: All 10 integer types sum execution ---
             // 1. u8: 1..=10 = 55
-            dec r_u8 = range_inclusive(1 as u8, 10 as u8);
-            if iter_sum_u8(r_u8) != (55 as u8) { return 1; }
+            dec r_u8 = std::iter::range_inclusive(1 as u8, 10 as u8);
+            if std::iter::iter_sum_u8(r_u8) != (55 as u8) { return 1; }
 
             // 2. u16: 1..=10 = 55
-            dec r_u16 = range_inclusive(1 as u16, 10 as u16);
-            if iter_sum_u16(r_u16) != (55 as u16) { return 2; }
+            dec r_u16 = std::iter::range_inclusive(1 as u16, 10 as u16);
+            if std::iter::iter_sum_u16(r_u16) != (55 as u16) { return 2; }
 
             // 3. u32: 1..=10 = 55
-            dec r_u32 = range_inclusive(1 as u32, 10 as u32);
-            if iter_sum_u32(r_u32) != (55 as u32) { return 3; }
+            dec r_u32 = std::iter::range_inclusive(1 as u32, 10 as u32);
+            if std::iter::iter_sum_u32(r_u32) != (55 as u32) { return 3; }
 
             // 4. u64: 1..=100 = 5050
-            dec r_u64 = range_inclusive(1 as u64, 100 as u64);
-            if iter_sum_u64(r_u64) != (5050 as u64) { return 4; }
+            dec r_u64 = std::iter::range_inclusive(1 as u64, 100 as u64);
+            if std::iter::iter_sum_u64(r_u64) != (5050 as u64) { return 4; }
 
             // 5. usize: 1..=10 = 55
-            dec r_usize = range_inclusive(1 as usize, 10 as usize);
-            if iter_sum_usize(r_usize) != (55 as usize) { return 5; }
+            dec r_usize = std::iter::range_inclusive(1 as usize, 10 as usize);
+            if std::iter::iter_sum_usize(r_usize) != (55 as usize) { return 5; }
 
             // 6. i8: -5..=5 = 0
-            dec r_i8 = range_inclusive((0 as i8) - (5 as i8), 5 as i8);
-            if iter_sum_i8(r_i8) != (0 as i8) { return 6; }
+            dec r_i8 = std::iter::range_inclusive((0 as i8) - (5 as i8), 5 as i8);
+            if std::iter::iter_sum_i8(r_i8) != (0 as i8) { return 6; }
 
             // 7. i16: 1..=10 = 55
-            dec r_i16 = range_inclusive(1 as i16, 10 as i16);
-            if iter_sum_i16(r_i16) != (55 as i16) { return 7; }
+            dec r_i16 = std::iter::range_inclusive(1 as i16, 10 as i16);
+            if std::iter::iter_sum_i16(r_i16) != (55 as i16) { return 7; }
 
             // 8. i32: 1..11 = 55
-            dec r_i32 = range(1, 11);
-            if iter_sum_i32(r_i32) != 55 { return 8; }
+            dec r_i32 = std::iter::range(1, 11);
+            if std::iter::iter_sum_i32(r_i32) != 55 { return 8; }
 
             // 9. i64: -10..=10 = 0
-            dec r_i64 = range_inclusive((0 as i64) - (10 as i64), 10 as i64);
-            if iter_sum_i64(r_i64) != (0 as i64) { return 9; }
+            dec r_i64 = std::iter::range_inclusive((0 as i64) - (10 as i64), 10 as i64);
+            if std::iter::iter_sum_i64(r_i64) != (0 as i64) { return 9; }
 
             // 10. isize: 1..=10 = 55
-            dec r_isize = range_inclusive(1 as isize, 10 as isize);
-            if iter_sum_isize(r_isize) != (55 as isize) { return 10; }
+            dec r_isize = std::iter::range_inclusive(1 as isize, 10 as isize);
+            if std::iter::iter_sum_isize(r_isize) != (55 as isize) { return 10; }
 
             // --- Part 2: Empty iterator sums -> 0 ---
-            dec empty_u32 = range(10 as u32, 10 as u32);
-            if iter_sum_u32(empty_u32) != (0 as u32) { return 11; }
+            dec empty_u32 = std::iter::range(10 as u32, 10 as u32);
+            if std::iter::iter_sum_u32(empty_u32) != (0 as u32) { return 11; }
 
-            dec empty_i64 = range(100 as i64, 100 as i64);
-            if iter_sum_i64(empty_i64) != (0 as i64) { return 12; }
+            dec empty_i64 = std::iter::range(100 as i64, 100 as i64);
+            if std::iter::iter_sum_i64(empty_i64) != (0 as i64) { return 12; }
 
             return 0;
         }

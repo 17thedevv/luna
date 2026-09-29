@@ -1,0 +1,20 @@
+trait Supported {}
+
+impl Supported for i32 {}
+
+trait BoundMethod {
+    fn echo<U: Supported>(self: &Self, value: U) -> U;
+}
+
+struct Token {};
+
+impl BoundMethod for Token {
+    fn echo<V: Supported>(self: &Self, value: V) -> V {
+        return value;
+    }
+}
+
+fn main() -> u64 {
+    dec token = Token {};
+    return token.echo<u64>(42 as u64);
+}

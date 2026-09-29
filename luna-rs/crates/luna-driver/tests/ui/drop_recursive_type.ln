@@ -4,7 +4,7 @@ struct Node {
 };
 
 trait Drop { fn drop(self: &rw Self); }
-impl Drop for Node { fn drop(self: &rw Self) {} }
+impl std::Drop for Node { fn drop(self: &rw Self) {} }
 
 fn test_drop(n: Node) {
     // n will be dropped at the end of this function

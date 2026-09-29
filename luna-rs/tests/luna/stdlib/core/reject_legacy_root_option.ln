@@ -1,0 +1,5 @@
+import <result>;
+
+fn main() {
+    dec value: Option<i32> = Option::Some(1);
+}

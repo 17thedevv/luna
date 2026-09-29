@@ -1,0 +1,5 @@
+import <hashset>;
+
+fn main() {
+    dec set: HashSet<i32> = std::hashset_new<i32>();
+}

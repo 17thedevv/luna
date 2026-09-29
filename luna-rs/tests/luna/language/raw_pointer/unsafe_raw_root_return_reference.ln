@@ -1,0 +1,7 @@
+unsafe fn escape(pointer: *i32) -> &i32 life_from(pointer) {
+    unsafe {
+        return &*pointer;
+    }
+}
+
+fn main() {}

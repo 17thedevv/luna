@@ -99,7 +99,7 @@
 | **Semantic Closure** | MVIR hoàn toàn biệt lập với AST, không phụ thuộc ngược | ✅ |
 | **Structural Hashing** | Định danh hàm bằng FNV-1a Hash thay vì string tĩnh | ✅ |
 | **Deep Visibility** | Kiểm soát chặt chẽ `export`, ngăn rò rỉ cross-module | ✅ |
-| **Canonical Serialization** | Lưu file `.mlib` (Metadata/MVIR) theo chu kỳ đồ thị chuẩn hóa, hoàn toàn Deterministic (bit-identical) | ✅ |
+| **Canonical Serialization** | Lưu file `.llib` (Metadata/MVIR) theo chu kỳ đồ thị chuẩn hóa, hoàn toàn Deterministic (bit-identical) | ✅ |
 
 ## 🚀 Core Hardening Backlog (Đang xử lý)
 

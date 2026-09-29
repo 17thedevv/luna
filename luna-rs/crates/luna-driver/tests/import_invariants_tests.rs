@@ -2,6 +2,9 @@ use luna_driver::sysroot::Sysroot;
 use luna_driver::{check, compile, CompilerOptions};
 use std::fs;
 use std::path::PathBuf;
+use std::sync::OnceLock;
+
+static SOURCE_ONLY_ROOT: OnceLock<PathBuf> = OnceLock::new();
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
     let dir = std::env::temp_dir().join("luna_import_invariants_tests").join(test_name);
@@ -10,11 +13,42 @@ fn create_temp_dir(test_name: &str) -> PathBuf {
     dir
 }
 
+fn source_only_root() -> &'static PathBuf {
+    SOURCE_ONLY_ROOT.get_or_init(|| {
+        let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+        let root = create_temp_dir("source_only_sysroot");
+        copy_tree(sysroot.external_dir(), &root.join("libs").join("external"));
+        remove_artifacts(&root.join("libs").join("external"));
+        root
+    })
+}
+
+fn copy_tree(source: &std::path::Path, destination: &std::path::Path) {
+    fs::create_dir_all(destination).expect("create source-only sysroot directory");
+    for entry in fs::read_dir(source).expect("enumerate source sysroot") {
+        let entry = entry.expect("read source sysroot entry");
+        let from = entry.path();
+        let to = destination.join(entry.file_name());
+        if from.is_dir() { copy_tree(&from, &to); }
+        else { fs::copy(from, to).expect("copy source sysroot file"); }
+    }
+}
+
+fn remove_artifacts(root: &std::path::Path) {
+    for entry in fs::read_dir(root).expect("enumerate source-only sysroot") {
+        let path = entry.expect("read source-only sysroot entry").path();
+        if path.is_dir() { remove_artifacts(&path); }
+        else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale sysroot artifact");
+        }
+    }
+}
+
 /// IMPORT-3: Provider names never automatically create module namespaces.
-/// `import <result>; result::Result` must be rejected while bare `Result` succeeds.
+/// Core Result is exposed only through its canonical `std::` path.
 #[test]
 fn test_import_3_no_synthetic_modules() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let root = source_only_root();
     let dir = create_temp_dir("import_3_no_synthetic");
     let main_fail = dir.join("main_fail.ln");
     let src_fail = r#"
@@ -25,7 +59,7 @@ fn test_import_3_no_synthetic_modules() {
     "#;
     fs::write(&main_fail, src_fail).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
+        search_paths: vec![root.to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -37,17 +71,17 @@ fn test_import_3_no_synthetic_modules() {
         "Expected an unresolved synthetic provider namespace, got: {:?}", errs
     );
 
-    // Verify that the provider's exported root binding succeeds.
+    // Verify that the canonical logical path succeeds.
     let main_ok = dir.join("main_ok.ln");
     let src_ok = r#"
         import <result>;
         fn main() {
-            dec value: Result<i32, i32> = Result::Ok(1);
+            dec value: std::Result<i32, i32> = std::Result::Ok(1);
         }
     "#;
     fs::write(&main_ok, src_ok).unwrap();
     let res_ok = check(main_ok.to_str().unwrap(), src_ok.to_string(), &opts);
-    assert!(res_ok.is_ok(), "Bare Result<i32, i32> must succeed: {:?}", res_ok.err());
+    assert!(res_ok.is_ok(), "std::Result<i32, i32> must succeed: {:?}", res_ok.err());
 }
 
 /// IMPORT-2 & IMPORT-7: Explicit module namespaces are preserved.
@@ -74,7 +108,7 @@ fn test_import_2_and_7_hierarchy_preservation() {
     "#;
     fs::write(&main_ok, src_ok).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -120,7 +154,7 @@ fn test_import_6_visibility_enforcement() {
     "#;
     fs::write(&main_ok, src_ok).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -142,7 +176,7 @@ fn test_import_6_visibility_enforcement() {
 /// IMPORT-4: Repeated import of the same provider is strictly idempotent.
 #[test]
 fn test_import_4_idempotent_reimport() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let root = source_only_root();
     let dir = create_temp_dir("import_4_idempotent");
     let main_path = dir.join("main.ln");
     let src = r#"
@@ -181,15 +215,15 @@ import <vec>;
 import <string>;
 import <hashmap>;
 import <hashset>;
-import <iter_collect>;
+        import <iter_collect>;
         fn main() {
-            dec opt: Option<i32> = Option::None;
-            dec rw v: Vec<i32> = vec_new<i32>();
+            dec opt: std::Option<i32> = std::Option::None;
+            dec rw v: std::Vec<i32> = std::vec_new<i32>();
         }
     "#;
     fs::write(&main_path, src).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
+        search_paths: vec![root.to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -217,7 +251,7 @@ fn test_import_5_deterministic_collision() {
     "#;
     fs::write(&main_path, src).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -262,7 +296,7 @@ fn test_import_8_source_vs_binary_parity() {
     fs::write(&consumer_path, consumer_src).unwrap();
 
     let opts_src = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -275,6 +309,7 @@ fn test_import_8_source_vs_binary_parity() {
     let llib_path = dir.join("parity_lib.llib");
     let opts_build_lib = CompilerOptions {
         output_path: Some(llib_path.to_str().unwrap().to_string()),
+        search_paths: vec![source_only_root().to_string_lossy().to_string()],
         emit_mlib: true,
         no_link: true,
         quiet: true,

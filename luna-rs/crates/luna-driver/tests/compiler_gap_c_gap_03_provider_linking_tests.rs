@@ -339,7 +339,7 @@ fn test_c_gap_03_custom_drop_and_provider_state() {
             export status: i32,
         };
 
-        impl Drop for ManagedResource {
+        impl std::Drop for ManagedResource {
             export fn drop(self: &rw ManagedResource) {
                 self.status = 99;
             }

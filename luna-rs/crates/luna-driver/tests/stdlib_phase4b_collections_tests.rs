@@ -54,27 +54,27 @@ fn test_hashmap_insert_if_absent() {
         import <hashmap>;
 
         fn main() -> i32 {
-            dec rw m = hashmap_new<i32, i32>();
+            dec rw m = std::hashmap_new<i32, i32>();
             m.insert(1, 100);
 
             // key 1 exists, insert_if_absent must return false and not overwrite
             dec res1 = m.insert_if_absent(1, 999);
             if res1 { return 1; }
             match m.get(&1) {
-                Option::Some(v) -> {
+                std::Option::Some(v) -> {
                     if *v != 100 { return 2; }
                 },
-                Option::None -> { return 3; },
+                std::Option::None -> { return 3; },
             }
 
             // key 2 is absent, insert_if_absent must return true and insert
             dec res2 = m.insert_if_absent(2, 200);
             if res2 == false { return 4; }
             match m.get(&2) {
-                Option::Some(v) -> {
+                std::Option::Some(v) -> {
                     if *v != 200 { return 5; }
                 },
-                Option::None -> { return 6; },
+                std::Option::None -> { return 6; },
             }
 
             return 0;
@@ -97,7 +97,7 @@ fn test_hashmap_get_or_insert() {
         import <hashmap>;
 
         fn main() -> i32 {
-            dec rw m = hashmap_new<i32, i32>();
+            dec rw m = std::hashmap_new<i32, i32>();
 
             // key 10 absent -> inserts 500 and returns &rw
             dec rw ref1 = m.get_or_insert(10, 500);
@@ -112,10 +112,10 @@ fn test_hashmap_get_or_insert() {
 
             // verify in map directly
             match m.get(&10) {
-                Option::Some(v) -> {
+                std::Option::Some(v) -> {
                     if *v != 555 { return 3; }
                 },
-                Option::None -> { return 4; },
+                std::Option::None -> { return 4; },
             }
 
             return 0;
@@ -139,12 +139,12 @@ fn test_hashset_algebra_borrowed() {
         import <clone>;
 
         fn main() -> i32 {
-            dec rw s1 = hashset_new<i32>();
+            dec rw s1 = std::hashset_new<i32>();
             s1.insert(1);
             s1.insert(2);
             s1.insert(3);
 
-            dec rw s2 = hashset_new<i32>();
+            dec rw s2 = std::hashset_new<i32>();
             s2.insert(2);
             s2.insert(3);
             s2.insert(4);
@@ -178,8 +178,8 @@ fn test_hashset_algebra_borrowed() {
             if diff.contains(&1) == false { return 18; }
             if diff.contains(&2) { return 19; }
 
-            // free-function form: union_owned(&s1, &s2)
-            dec u2 = union_owned(&s1, &s2);
+            // free-function form: std::union_owned(&s1, &s2)
+            dec u2 = std::union_owned(&s1, &s2);
             if u2.len() != (4 as u64) { return 20; }
 
             return 0;

@@ -5,27 +5,27 @@ struct Tracker {
     count: *rw u64,
 };
 
-impl Drop for Tracker {
+impl std::Drop for Tracker {
     fn drop(self: &rw Self) {
         unsafe {
-            dec current = ptr::read(self.count as *u64);
-            ptr::write(self.count, current + (1 as u64));
+            dec current = std::ptr::read(self.count as *u64);
+            std::ptr::write(self.count, current + (1 as u64));
         }
     }
 }
 
-fn consume_one<I: Iterator<Tracker>>(iter: I) {
+fn consume_one<I: std::Iterator<Tracker>>(iter: I) {
     dec rw it = iter;
     match it.next() {
-        Option::Some(item) -> {},
-        Option::None -> {},
+        std::Option::Some(item) -> {},
+        std::Option::None -> {},
     }
 }
 
 fn main() -> i32 {
     dec rw drops = 0 as u64;
     {
-        dec rw tracked = vec_new<Tracker>();
+        dec rw tracked = std::vec_new<Tracker>();
         tracked.push(Tracker { count: &rw drops as *rw u64 });
         tracked.push(Tracker { count: &rw drops as *rw u64 });
         tracked.push(Tracker { count: &rw drops as *rw u64 });

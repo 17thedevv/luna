@@ -36,7 +36,7 @@ import <slice>;
 import <vec>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
     v.push(30);
@@ -45,20 +45,20 @@ fn main() -> i32 {
     dec rw it = s.iter();
 
     dec v1 = match it.next_ref() {
-        Option::Some(r) -> *r,
-        Option::None -> 0,
+        std::Option::Some(r) -> *r,
+        std::Option::None -> 0,
     };
     dec v2 = match it.next_ref() {
-        Option::Some(r) -> *r,
-        Option::None -> 0,
+        std::Option::Some(r) -> *r,
+        std::Option::None -> 0,
     };
     dec v3 = match it.next_ref() {
-        Option::Some(r) -> *r,
-        Option::None -> 0,
+        std::Option::Some(r) -> *r,
+        std::Option::None -> 0,
     };
     dec v4_is_none = match it.next_ref() {
-        Option::Some(_) -> false,
-        Option::None -> true,
+        std::Option::Some(_) -> false,
+        std::Option::None -> true,
     };
 
     if v1 == 10 && v2 == 20 && v3 == 30 && v4_is_none {
@@ -96,7 +96,7 @@ import <slice>;
 import <vec>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(100);
     v.push(200);
 
@@ -104,12 +104,12 @@ fn main() -> i32 {
     dec rw it = s.iter();
 
     dec item1 = match it.next() {
-        Option::Some(r) -> *r,
-        Option::None -> 0,
+        std::Option::Some(r) -> *r,
+        std::Option::None -> 0,
     };
     dec item2 = match it.next() {
-        Option::Some(r) -> *r,
-        Option::None -> 0,
+        std::Option::Some(r) -> *r,
+        std::Option::None -> 0,
     };
     dec item3_is_none = it.next().is_none();
 
@@ -148,7 +148,7 @@ import <slice>;
 import <vec>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
 
@@ -156,16 +156,16 @@ fn main() -> i32 {
     dec rw it = s.iter_mut();
 
     match it.next_mut() {
-        Option::Some(r) -> {
+        std::Option::Some(r) -> {
             *r = 15;
         }
-        Option::None -> {}
+        std::Option::None -> {}
     }
     match it.next_mut() {
-        Option::Some(r) -> {
+        std::Option::Some(r) -> {
             *r = 25;
         }
-        Option::None -> {}
+        std::Option::None -> {}
     }
 
     dec res_s = v.as_slice();
@@ -203,7 +203,7 @@ import <slice>;
 import <vec>;
 
 fn main() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     dec s = v.as_slice();
     dec rw it = s.iter();
@@ -235,7 +235,7 @@ import <slice>;
 import <vec>;
 
 fn main() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     {
         dec s = v.as_slice();
@@ -275,12 +275,12 @@ export fn count_positive(s: &[i32]) -> u64 {
     dec rw count: u64 = 0 as u64;
     while true {
         match it.next_ref() {
-            Option::Some(r) -> {
+            std::Option::Some(r) -> {
                 if *r > 0 {
                     count = count + (1 as u64);
                 }
             }
-            Option::None -> {
+            std::Option::None -> {
                 break;
             }
         }
@@ -307,7 +307,7 @@ import <vec>;
 import "iter_helper";
 
 fn main() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(-5);
     v.push(20);
@@ -348,16 +348,16 @@ fn inspect_ref(r: &i32) -> i32 {
 }
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(42);
     dec s = v.as_slice();
     dec rw it = s.iter();
 
-    // next() yields Option<&i32>, passing directly to inspect_ref proves Item == &T
+    // next() yields std::Option<&i32>, passing directly to inspect_ref proves Item == &T
     dec opt = it.next();
     dec val = match opt {
-        Option::Some(r) -> inspect_ref(r),
-        Option::None -> 0,
+        std::Option::Some(r) -> inspect_ref(r),
+        std::Option::None -> 0,
     };
 
     if val == 42 {
@@ -404,7 +404,7 @@ struct TrackedItem {
     counter: *rw DropCounter,
 };
 
-impl Drop for TrackedItem {
+impl std::Drop for TrackedItem {
     fn drop(self: &rw Self) {
         unsafe {
             (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -417,7 +417,7 @@ fn main() -> i32 {
     dec c_ptr = &rw counter as *rw DropCounter;
 
     {
-        dec rw v = vec_with_capacity<TrackedItem>(4 as u64);
+        dec rw v = std::vec_with_capacity<TrackedItem>(4 as u64);
         dec rw i: i32 = 0;
         while i < 4 {
             unsafe {
@@ -499,7 +499,7 @@ struct TrackedItem {
     counter: *rw DropCounter,
 };
 
-impl Drop for TrackedItem {
+impl std::Drop for TrackedItem {
     fn drop(self: &rw Self) {
         unsafe {
             (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -512,7 +512,7 @@ fn main() -> i32 {
     dec c_ptr = &rw counter as *rw DropCounter;
 
     {
-        dec rw v = vec_with_capacity<TrackedItem>(3 as u64);
+        dec rw v = std::vec_with_capacity<TrackedItem>(3 as u64);
         dec rw i: i32 = 1;
         while i <= 3 {
             unsafe {
@@ -528,7 +528,7 @@ fn main() -> i32 {
         while running {
             dec opt = it.next();
             match opt {
-                Option::Some(r) -> {
+                std::Option::Some(r) -> {
                     sum = sum + (*r).val;
                     // Invariant check during each step of iteration:
                     // Iterator itself does not increase dropped count!
@@ -536,7 +536,7 @@ fn main() -> i32 {
                         return 1;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     running = false;
                 },
             }
@@ -588,17 +588,17 @@ import <slice>;
 import <vec>;
 
 fn main() {
-    dec rw xs = vec_new<i32>();
+    dec rw xs = std::vec_new<i32>();
     xs.push(1);
     dec rw it = xs.iter();
     dec opt = it.next();
     match opt {
-        Option::Some(r) -> {
+        std::Option::Some(r) -> {
             // while r is alive:
             xs.push(2); // must be rejected: xs is borrowed by r
             dec use_r = *r;
         },
-        Option::None -> {},
+        std::Option::None -> {},
     }
 }
 "#;
@@ -623,16 +623,16 @@ import <slice>;
 import <vec>;
 
 fn main() -> i32 {
-    dec rw xs = vec_new<i32>();
+    dec rw xs = std::vec_new<i32>();
     xs.push(1);
     {
         dec rw it = xs.iter();
         dec opt = it.next();
         match opt {
-            Option::Some(r) -> {
+            std::Option::Some(r) -> {
                 dec use_r = *r;
             },
-            Option::None -> {},
+            std::Option::None -> {},
         }
     }
     // r dies here

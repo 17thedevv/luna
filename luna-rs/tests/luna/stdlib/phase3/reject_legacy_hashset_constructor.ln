@@ -1,0 +1,5 @@
+import <hashset>;
+
+fn main() {
+    dec set = hashset_new<i32>();
+}

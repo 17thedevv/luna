@@ -1,5 +1,7 @@
-#[lang("drop")]
-export trait Drop {
-    #[lang("drop_fn")]
-    fn drop(self: &rw Self);
+export module std {
+    #[lang("drop")]
+    export trait Drop {
+        #[lang("drop_fn")]
+        fn drop(self: &rw Self);
+    }
 }

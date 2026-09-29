@@ -23,6 +23,78 @@ use luna_semantic::{SemanticContext, Resolver, TypeChecker};
 use luna_mvir::{MvirGenerator, print_module};
 use luna_backend::{LLVMBackend, TargetConfig, link_objs_to_exe};
 
+fn seed_imported_raw_pointer_effects(
+    interproc: &mut luna_borrowck::interprocedural::InterproceduralContext<'_>,
+    module: &luna_mvir::Module,
+    registry: &registry::ModuleRegistry,
+    semantic_ctx: &SemanticContext,
+) {
+    use luna_borrowck::effect::{
+        CallEffectSummary, RawPointerAnchorReturnEffect, RawPointerAnchorSource,
+        RawPointerFieldReturnEffect, RawPointerReturnEffect,
+    };
+    use luna_llib::metadata::{
+        CanonicalRawPointerAnchor, CanonicalRawPointerAnchorSource,
+        CanonicalRawPointerOrigin,
+    };
+
+    let decode_effect = |effect: &luna_llib::metadata::CanonicalRawPointerEffect| {
+        let origin = match &effect.origin {
+            CanonicalRawPointerOrigin::Independent => RawPointerReturnEffect::Independent,
+            CanonicalRawPointerOrigin::FromParameters(params) => {
+                RawPointerReturnEffect::From(params.iter().map(|index| *index as usize).collect())
+            }
+            CanonicalRawPointerOrigin::Unknown => RawPointerReturnEffect::Unknown,
+        };
+        let anchor = match &effect.anchor {
+            CanonicalRawPointerAnchor::Independent => RawPointerAnchorReturnEffect::Independent,
+            CanonicalRawPointerAnchor::Unknown => RawPointerAnchorReturnEffect::Unknown,
+            CanonicalRawPointerAnchor::From(sources) => RawPointerAnchorReturnEffect::From(
+                sources.iter().map(|source| match source {
+                    CanonicalRawPointerAnchorSource::RawParameter(index) => {
+                        RawPointerAnchorSource::RawParam(*index as usize)
+                    }
+                    CanonicalRawPointerAnchorSource::OwnerField { parameter, field_name } => {
+                        RawPointerAnchorSource::OwnerField { param: *parameter as usize, field: field_name.clone() }
+                    }
+                    CanonicalRawPointerAnchorSource::Unknown => RawPointerAnchorSource::Unknown,
+                }).collect(),
+            ),
+        };
+        (origin, anchor)
+    };
+
+    for function in &module.functions {
+        for block in &function.blocks {
+            for &value_id in &block.insts {
+                let Some(value) = function.values.get(value_id.0 as usize) else { continue; };
+                let luna_mvir::Instruction::CallDirect { callee, args } = &value.inst else { continue; };
+                let Some(symbol_id) = callee.symbol_id else { continue; };
+                let symbol = semantic_ctx.symbol_table.get_symbol(symbol_id);
+                let Some(provider_id) = symbol.provider_id else { continue; };
+                let Some(provider) = registry.interfaces.get(&provider_id) else { continue; };
+                let path = semantic_ctx.symbol_table.get_full_logical_path(symbol_id).join("::");
+                let Some(canonical) = provider.raw_pointer_effects_by_path.get(&path) else { continue; };
+
+                // Preserve conservative non-raw call behavior: this artifact
+                // supplement only refines raw-pointer origin/anchor channels.
+                let mut summary = CallEffectSummary::worst_case(args.len());
+                let (origin, anchor) = decode_effect(&canonical.returned);
+                summary.raw_pointer_ret = origin;
+                summary.raw_pointer_anchor_ret = anchor;
+                for (field_name, effect) in &canonical.direct_fields {
+                    let (origin, anchor) = decode_effect(effect);
+                    summary.raw_pointer_field_ret.insert(
+                        field_name.clone(),
+                        RawPointerFieldReturnEffect { origin, anchor },
+                    );
+                }
+                interproc.seed_summary(callee.clone(), summary);
+            }
+        }
+    }
+}
+
 #[derive(Default, Clone, Debug)]
 pub struct CompilerOptions {
     pub output_path: Option<String>,
@@ -219,7 +291,7 @@ pub fn check(file_name: &str, input: String, options: &CompilerOptions) -> Resul
         max_depth: options.comptime_depth.unwrap_or(512),
     };
     TypeChecker::new_with_engine(&mut semantic_ctx, &arena, &session.source_manager, &comptime_engine).typecheck_items(&items);
-    
+
     let mut mono = luna_semantic::MonoCollector::new_with_source(&mut semantic_ctx, &arena, Some(&session.source_manager));
     mono.run(&items);
     let drop_glues = mono.drop_glues;
@@ -243,6 +315,7 @@ pub fn check(file_name: &str, input: String, options: &CompilerOptions) -> Resul
     }
     
     let mut interproc = luna_borrowck::interprocedural::InterproceduralContext::new(&semantic_ctx);
+    seed_imported_raw_pointer_effects(&mut interproc, &module, &registry, &semantic_ctx);
     interproc.compute_summaries(&module);
     
     for function in module.functions {
@@ -274,6 +347,14 @@ pub fn compile_and_render(file_name: &str, input: String, options: &CompilerOpti
 }
 
 pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
+    if (options.emit_llib || options.emit_mlib)
+        && options.output_path.as_ref().is_some_and(|path| path.ends_with(".mlib"))
+    {
+        return Err(vec![Diagnostic::error(
+            "The legacy .mlib artifact format is read-only; emit canonical .llib instead".to_string(),
+        )]);
+    }
+
     let file_id = session
         .source_manager
         .add_file(file_name.to_string(), input.clone());
@@ -422,12 +503,19 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 println!("----------------------\n");
             }
             if options.emit_mvir {
-                let base_name = std::path::Path::new(file_name)
-                    .file_stem()
-                    .and_then(|s| s.to_str())
-                    .unwrap_or("output");
-                let mvir_file = format!("{}.mvir", base_name);
-                let _ = std::fs::write(&mvir_file, format!("{:#?}", module)); // Actually you'd probably want a proper stringifier, but this is a placeholder
+                let mvir_base = options
+                    .output_path
+                    .as_deref()
+                    .map(std::path::Path::new)
+                    .unwrap_or_else(|| std::path::Path::new(file_name));
+                let mvir_file = mvir_base.with_extension("mvir");
+                std::fs::write(&mvir_file, format!("{:#?}", module)).map_err(|error| {
+                    vec![Diagnostic::error(format!(
+                        "Failed to write MVIR output '{}': {}",
+                        mvir_file.display(),
+                        error
+                    ))]
+                })?;
             }
             
             // Borrow Checking Phase
@@ -436,6 +524,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             }
             
             let mut interproc = luna_borrowck::interprocedural::InterproceduralContext::with_context(&semantic_ctx);
+            seed_imported_raw_pointer_effects(&mut interproc, &module, &registry, &semantic_ctx);
             interproc.compute_summaries(&module);
             let summaries = interproc.summaries;
             
@@ -507,10 +596,6 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             // Async Lowering Phase (target specific, runs after MLib)
             async_lowering::lower_async(&mut module, &mut semantic_ctx);
             
-            // DEBUG: Print the lowered module
-            println!("--- Lowered MVIR ---");
-            println!("{}", luna_mvir::printer::print_module(&module));
-            println!("--------------------");
             let llvm_context = inkwell::context::Context::create();
             let mut backend = LLVMBackend::new(&llvm_context, &module, &semantic_ctx, file_name);
             
@@ -576,28 +661,19 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 if !options.quiet { println!("Successfully wrote {}", obj_file); }
             }
 
-            // MLib / LLib generation phase with embedded ObjectCode
+            // Canonical .llib generation phase with embedded ObjectCode.
             if options.emit_llib || options.emit_mlib {
                 if !options.quiet {
-                    println!("\n--- Serializing MLib/LLib with ObjectCode ---");
+                    println!("\n--- Serializing canonical LLib with ObjectCode ---");
                 }
-                let mlib_file = if let Some(ref out_path) = options.output_path {
-                    if out_path.ends_with(".llib") || out_path.ends_with(".mlib") {
-                        out_path.clone()
-                    } else if options.emit_llib {
-                        format!("{}.llib", base_name)
-                    } else {
-                        format!("{}.mlib", base_name)
-                    }
-                } else if options.emit_llib {
-                    format!("{}.llib", base_name)
-                } else {
-                    format!("{}.mlib", base_name)
-                };
+                let llib_file = options.output_path.as_ref()
+                    .filter(|path| path.ends_with(".llib"))
+                    .cloned()
+                    .unwrap_or_else(|| format!("{}.llib", base_name));
 
                 // Write to memory buffer first, then atomically publish
                 // This prevents readers from observing partial/half-written artifacts
-                let mut mlib_buffer = Vec::new();
+                let mut llib_buffer = Vec::new();
                 let mut deps = vec![];
                 for (id, interface) in &registry.interfaces {
                     if interface.name != base_name {
@@ -644,21 +720,21 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     pats: 0..main_pat_end,
                 };
                 let interface = crate::registry::ModuleRegistry::extract_interface_from_ctx(base_name.to_string(), main_provider_id, &semantic_ctx, &ranges);
-                let builder = crate::metadata_builder::MetadataBuilder::new(&registry, &interface);
+                let builder = crate::metadata_builder::MetadataBuilder::new(&registry, &interface, &summaries);
                 let semantic_metadata = Some(builder.build());
 
                 let obj_bytes = std::fs::read(path_obj).ok();
 
-                match luna_llib::MlibWriter::write_module(&module, &arena, &items, &input, manifest, semantic_metadata.as_ref(), obj_bytes.as_deref(), &mut mlib_buffer) {
+                match luna_llib::LlibWriter::write_module(&module, &arena, &items, &input, manifest, semantic_metadata.as_ref(), obj_bytes.as_deref(), &mut llib_buffer) {
                     Ok(_) => {
                         // Atomically publish the complete artifact
                         // Use sibling temp file + rename pattern with RAII cleanup
-                        let canonical_path = std::path::Path::new(&mlib_file);
-                        let ext_suffix = if options.emit_llib { "llib" } else { "mlib" };
+                        let canonical_path = std::path::Path::new(&llib_file);
+                        let ext_suffix = "llib";
                         match create_sibling_temp(canonical_path, ext_suffix) {
                             Ok((mut tmp_file, tmp_path, mut guard)) => {
                                 use std::io::Write;
-                                if let Err(e) = tmp_file.write_all(&mlib_buffer) {
+                                if let Err(e) = tmp_file.write_all(&llib_buffer) {
                                     if !options.quiet { println!("Failed to write temp artifact: {}", e); }
                                 } else if let Err(e) = tmp_file.flush() {
                                     if !options.quiet { println!("Failed to flush temp artifact: {}", e); }
@@ -667,7 +743,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                                     match std::fs::rename(&tmp_path, canonical_path) {
                                         Ok(_) => {
                                             guard.disarm();
-                                            if !options.quiet { println!("Successfully wrote {}", mlib_file); }
+                                            if !options.quiet { println!("Successfully wrote {}", llib_file); }
                                         }
                                         Err(e) => {
                                             if !options.quiet { println!("Failed to publish artifact: {}", e); }

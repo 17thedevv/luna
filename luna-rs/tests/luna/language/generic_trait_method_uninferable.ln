@@ -1,0 +1,14 @@
+trait IgnoreGeneric {
+    fn ignore<U>(self: &Self);
+}
+
+struct Token {};
+
+impl IgnoreGeneric for Token {
+    fn ignore<V>(self: &Self) {}
+}
+
+fn main() {
+    dec token = Token {};
+    token.ignore();
+}

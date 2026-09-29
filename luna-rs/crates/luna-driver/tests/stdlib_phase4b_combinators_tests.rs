@@ -3,7 +3,6 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use luna_driver::{compile, CompilerOptions};
-use luna_driver::sysroot::Sysroot;
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
     let mut dir = std::env::temp_dir();
@@ -19,6 +18,42 @@ fn create_temp_dir(prefix: &str) -> PathBuf {
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).expect("Failed to create temp dir");
     dir
+}
+
+fn copy_dir_all(src: &Path, dst: &Path) {
+    fs::create_dir_all(dst).expect("create source sysroot directory");
+    for entry in fs::read_dir(src).expect("read external provider directory") {
+        let entry = entry.expect("read provider entry");
+        let target = dst.join(entry.file_name());
+        if entry.file_type().expect("provider entry type").is_dir() {
+            copy_dir_all(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).expect("copy provider file");
+        }
+    }
+}
+
+fn remove_artifacts(dir: &Path) {
+    for entry in fs::read_dir(dir).expect("read source sysroot directory") {
+        let path = entry.expect("read sysroot entry").path();
+        if path.is_dir() {
+            remove_artifacts(&path);
+        } else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale provider artifact");
+        }
+    }
+}
+
+fn source_sysroot() -> PathBuf {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let external_dir = manifest_dir
+        .parent().expect("crates directory")
+        .parent().expect("workspace root")
+        .join("libs").join("external");
+    let root = create_temp_dir("source_sysroot");
+    copy_dir_all(&external_dir, &root);
+    remove_artifacts(&root);
+    root
 }
 
 fn run_binary(dir: &Path, src: &str, opts: &CompilerOptions) -> Result<(i32, String, String), String> {
@@ -47,7 +82,7 @@ fn run_binary(dir: &Path, src: &str, opts: &CompilerOptions) -> Result<(i32, Str
 
 #[test]
 fn test_option_map_and_and_then() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("opt_map");
 
     let src = r#"
@@ -55,29 +90,29 @@ fn test_option_map_and_and_then() {
             return x * 2;
         }
 
-        fn checked_recip(x: i32) -> Option<i32> {
+        fn checked_recip(x: i32) -> std::Option<i32> {
             if x == 0 {
-                return Option::None;
+                return std::Option::None;
             }
-            return Option::Some(100 / x);
+            return std::Option::Some(100 / x);
         }
 
         fn main() -> i32 {
             // Test map
-            dec some_val1: Option<i32> = Option::Some(10);
+            dec some_val1: std::Option<i32> = std::Option::Some(10);
             dec m1 = some_val1.map<i32>(double_it);
             if m1.unwrap_or(0) != 20 { return 1; }
 
-            dec none_val1: Option<i32> = Option::None;
+            dec none_val1: std::Option<i32> = std::Option::None;
             dec m2 = none_val1.map<i32>(double_it);
             if m2.is_some() == true { return 2; }
 
             // Test and_then
-            dec some_val2: Option<i32> = Option::Some(10);
+            dec some_val2: std::Option<i32> = std::Option::Some(10);
             dec at1 = some_val2.and_then<i32>(checked_recip);
             if at1.unwrap_or(0) != 10 { return 3; }
 
-            dec zero_val: Option<i32> = Option::Some(0);
+            dec zero_val: std::Option<i32> = std::Option::Some(0);
             dec at2 = zero_val.and_then<i32>(checked_recip);
             if at2.is_some() == true { return 4; }
 
@@ -86,14 +121,14 @@ fn test_option_map_and_and_then() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
 
 #[test]
 fn test_option_unwrap_or_else_and_or_else() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("opt_or_else");
 
     let src = r#"
@@ -101,20 +136,20 @@ fn test_option_unwrap_or_else_and_or_else() {
             return 42;
         }
 
-        fn fallback_opt() -> Option<i32> {
-            return Option::Some(99);
+        fn fallback_opt() -> std::Option<i32> {
+            return std::Option::Some(99);
         }
 
         fn main() -> i32 {
             // unwrap_or_else
-            dec s1: Option<i32> = Option::Some(7);
-            dec n1: Option<i32> = Option::None;
+            dec s1: std::Option<i32> = std::Option::Some(7);
+            dec n1: std::Option<i32> = std::Option::None;
             if s1.unwrap_or_else(fallback_val) != 7 { return 1; }
             if n1.unwrap_or_else(fallback_val) != 42 { return 2; }
 
             // or_else
-            dec s2: Option<i32> = Option::Some(7);
-            dec n2: Option<i32> = Option::None;
+            dec s2: std::Option<i32> = std::Option::Some(7);
+            dec n2: std::Option<i32> = std::Option::None;
             dec o1 = s2.or_else(fallback_opt);
             if o1.unwrap_or(0) != 7 { return 3; }
 
@@ -126,14 +161,14 @@ fn test_option_unwrap_or_else_and_or_else() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
 
 #[test]
 fn test_option_filter() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("opt_filter");
 
     let src = r#"
@@ -142,9 +177,9 @@ fn test_option_filter() {
         }
 
         fn main() -> i32 {
-            dec even_val: Option<i32> = Option::Some(4);
-            dec odd_val: Option<i32> = Option::Some(7);
-            dec none_val: Option<i32> = Option::None;
+            dec even_val: std::Option<i32> = std::Option::Some(4);
+            dec odd_val: std::Option<i32> = std::Option::Some(7);
+            dec none_val: std::Option<i32> = std::Option::None;
 
             dec f1 = even_val.filter(is_even);
             if f1.is_some() == false { return 1; }
@@ -161,14 +196,14 @@ fn test_option_filter() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
 
 #[test]
 fn test_result_map_and_map_err() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("res_map");
 
     let src = r#"
@@ -184,8 +219,8 @@ fn test_result_map_and_map_err() {
 
         fn main() -> i32 {
             // map
-            dec ok_val1: Result<i32, i32> = Result::Ok(5);
-            dec err_val1: Result<i32, i32> = Result::Err(3);
+            dec ok_val1: std::Result<i32, i32> = std::Result::Ok(5);
+            dec err_val1: std::Result<i32, i32> = std::Result::Err(3);
 
             dec m_ok = ok_val1.map<i32>(add_ten);
             if m_ok.is_ok() == false { return 1; }
@@ -198,8 +233,8 @@ fn test_result_map_and_map_err() {
             if opt_err1.unwrap() != 3 { return 5; }
 
             // map_err
-            dec ok_val2: Result<i32, i32> = Result::Ok(5);
-            dec err_val2: Result<i32, i32> = Result::Err(3);
+            dec ok_val2: std::Result<i32, i32> = std::Result::Ok(5);
+            dec err_val2: std::Result<i32, i32> = std::Result::Err(3);
 
             dec me_ok = ok_val2.map_err<i32>(negate_err);
             if me_ok.is_ok() == false { return 6; }
@@ -216,24 +251,24 @@ fn test_result_map_and_map_err() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
 
 #[test]
 fn test_result_and_then_and_unwrap_or_else() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("res_and_then");
 
     let src = r#"
         import <result>;
 
-        fn parse_positive(x: i32) -> Result<i32, i32> {
+        fn parse_positive(x: i32) -> std::Result<i32, i32> {
             if x > 0 {
-                return Result::Ok(x * 2);
+                return std::Result::Ok(x * 2);
             }
-            return Result::Err(0 - 1);
+            return std::Result::Err(0 - 1);
         }
 
         fn handle_err(e: i32) -> i32 {
@@ -241,9 +276,9 @@ fn test_result_and_then_and_unwrap_or_else() {
         }
 
         fn main() -> i32 {
-            dec ok_val: Result<i32, i32> = Result::Ok(5);
-            dec zero_val: Result<i32, i32> = Result::Ok(0);
-            dec err_val: Result<i32, i32> = Result::Err(50);
+            dec ok_val: std::Result<i32, i32> = std::Result::Ok(5);
+            dec zero_val: std::Result<i32, i32> = std::Result::Ok(0);
+            dec err_val: std::Result<i32, i32> = std::Result::Err(50);
 
             // and_then Ok -> Ok
             dec at1 = ok_val.and_then<i32>(parse_positive);
@@ -263,8 +298,8 @@ fn test_result_and_then_and_unwrap_or_else() {
             if opt_err2.unwrap() != 50 { return 6; }
 
             // unwrap_or_else
-            dec ok_val2: Result<i32, i32> = Result::Ok(77);
-            dec err_val2: Result<i32, i32> = Result::Err(5);
+            dec ok_val2: std::Result<i32, i32> = std::Result::Ok(77);
+            dec err_val2: std::Result<i32, i32> = std::Result::Err(5);
             if ok_val2.unwrap_or_else(handle_err) != 77 { return 7; }
             if err_val2.unwrap_or_else(handle_err) != 105 { return 8; }
 
@@ -273,14 +308,14 @@ fn test_result_and_then_and_unwrap_or_else() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
 
 #[test]
 fn test_combinator_laziness_short_circuit() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("comb_laziness");
 
     let src = r#"
@@ -292,56 +327,56 @@ fn test_combinator_laziness_short_circuit() {
             return 999;
         }
 
-        fn must_not_be_called_opt() -> Option<i32> {
+        fn must_not_be_called_opt() -> std::Option<i32> {
             __luna_panic();
-            return Option::None;
+            return std::Option::None;
         }
 
-        fn must_not_be_called_res(e: i32) -> Result<i32, i32> {
+        fn must_not_be_called_res(e: i32) -> std::Result<i32, i32> {
             __luna_panic();
-            return Result::Err(e);
+            return std::Result::Err(e);
         }
 
         fn fallback_val() -> i32 {
             return 42;
         }
 
-        fn fallback_opt() -> Option<i32> {
-            return Option::Some(84);
+        fn fallback_opt() -> std::Option<i32> {
+            return std::Option::Some(84);
         }
 
-        fn fallback_res(e: i32) -> Result<i32, i32> {
-            return Result::Ok(e + 10);
+        fn fallback_res(e: i32) -> std::Result<i32, i32> {
+            return std::Result::Ok(e + 10);
         }
 
         fn main() -> i32 {
-            // 1. Option::unwrap_or_else on Some does NOT call callback (would panic)
-            dec some_opt: Option<i32> = Option::Some(100);
+            // 1. std::Option::unwrap_or_else on Some does NOT call callback (would panic)
+            dec some_opt: std::Option<i32> = std::Option::Some(100);
             dec v1 = some_opt.unwrap_or_else(must_not_be_called_val);
             if v1 != 100 { return 1; }
 
-            // Option::unwrap_or_else on None calls callback exactly once
-            dec none_opt: Option<i32> = Option::None;
+            // std::Option::unwrap_or_else on None calls callback exactly once
+            dec none_opt: std::Option<i32> = std::Option::None;
             dec v2 = none_opt.unwrap_or_else(fallback_val);
             if v2 != 42 { return 2; }
 
-            // 2. Option::or_else on Some does NOT call callback (would panic)
-            dec some_opt2: Option<i32> = Option::Some(200);
+            // 2. std::Option::or_else on Some does NOT call callback (would panic)
+            dec some_opt2: std::Option<i32> = std::Option::Some(200);
             dec o1 = some_opt2.or_else(must_not_be_called_opt);
             if o1.unwrap_or(0) != 200 { return 3; }
 
-            // Option::or_else on None calls callback exactly once
-            dec none_opt2: Option<i32> = Option::None;
+            // std::Option::or_else on None calls callback exactly once
+            dec none_opt2: std::Option<i32> = std::Option::None;
             dec o2 = none_opt2.or_else(fallback_opt);
             if o2.unwrap_or(0) != 84 { return 4; }
 
-            // 3. Result::or_else on Ok does NOT call callback (would panic)
-            dec ok_res: Result<i32, i32> = Result::Ok(300);
+            // 3. std::Result::or_else on Ok does NOT call callback (would panic)
+            dec ok_res: std::Result<i32, i32> = std::Result::Ok(300);
             dec r1 = ok_res.or_else<i32>(must_not_be_called_res);
             if r1.unwrap() != 300 { return 5; }
 
-            // Result::or_else on Err calls callback exactly once
-            dec err_res: Result<i32, i32> = Result::Err(5);
+            // std::Result::or_else on Err calls callback exactly once
+            dec err_res: std::Result<i32, i32> = std::Result::Err(5);
             dec r2 = err_res.or_else<i32>(fallback_res);
             if r2.unwrap() != 15 { return 6; }
 
@@ -350,47 +385,47 @@ fn test_combinator_laziness_short_circuit() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
 
 #[test]
 fn test_flatten_family() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("comb_flatten");
 
     let src = r#"
         import <result>;
 
         fn main() -> i32 {
-            // Option::option_flatten: Option<Option<T>> -> Option<T>
-            dec some_some: Option<Option<i32>> = Option::Some(Option::Some(42));
-            dec f1 = option_flatten<i32>(some_some);
+            // std::Option::option_flatten: std::Option<std::Option<T>> -> std::Option<T>
+            dec some_some: std::Option<std::Option<i32>> = std::Option::Some(std::Option::Some(42));
+            dec f1 = std::option_flatten<i32>(some_some);
             if f1.is_some() == false { return 1; }
             if f1.unwrap() != 42 { return 2; }
 
-            dec some_none: Option<Option<i32>> = Option::Some(Option::None);
-            dec f2 = option_flatten<i32>(some_none);
+            dec some_none: std::Option<std::Option<i32>> = std::Option::Some(std::Option::None);
+            dec f2 = std::option_flatten<i32>(some_none);
             if f2.is_some() == true { return 3; }
 
-            dec none_none: Option<Option<i32>> = Option::None;
-            dec f3 = option_flatten<i32>(none_none);
+            dec none_none: std::Option<std::Option<i32>> = std::Option::None;
+            dec f3 = std::option_flatten<i32>(none_none);
             if f3.is_some() == true { return 4; }
 
-            // Result::result_flatten: Result<Result<T, E>, E> -> Result<T, E>
-            dec ok_ok: Result<Result<i32, i32>, i32> = Result::Ok(Result::Ok(99));
-            dec rf1 = result_flatten<i32, i32>(ok_ok);
+            // std::Result::result_flatten: std::Result<std::Result<T, E>, E> -> std::Result<T, E>
+            dec ok_ok: std::Result<std::Result<i32, i32>, i32> = std::Result::Ok(std::Result::Ok(99));
+            dec rf1 = std::result_flatten<i32, i32>(ok_ok);
             if rf1.is_ok() == false { return 5; }
             if rf1.unwrap() != 99 { return 6; }
 
-            dec ok_err: Result<Result<i32, i32>, i32> = Result::Ok(Result::Err(7));
-            dec rf2 = result_flatten<i32, i32>(ok_err);
+            dec ok_err: std::Result<std::Result<i32, i32>, i32> = std::Result::Ok(std::Result::Err(7));
+            dec rf2 = std::result_flatten<i32, i32>(ok_err);
             if rf2.is_err() == false { return 7; }
             if rf2.err().unwrap() != 7 { return 8; }
 
-            dec err_outer: Result<Result<i32, i32>, i32> = Result::Err(13);
-            dec rf3 = result_flatten<i32, i32>(err_outer);
+            dec err_outer: std::Result<std::Result<i32, i32>, i32> = std::Result::Err(13);
+            dec rf3 = std::result_flatten<i32, i32>(err_outer);
             if rf3.is_err() == false { return 9; }
             if rf3.err().unwrap() != 13 { return 10; }
 
@@ -399,53 +434,53 @@ fn test_flatten_family() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
 
 #[test]
 fn test_transpose_family() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("comb_transpose");
 
     let src = r#"
         import <result>;
 
         fn main() -> i32 {
-            // Option::option_transpose: Option<Result<T, E>> -> Result<Option<T>, E>
-            dec opt_ok: Option<Result<i32, i32>> = Option::Some(Result::Ok(55));
-            dec t1 = option_transpose<i32, i32>(opt_ok);
+            // std::Option::option_transpose: std::Option<std::Result<T, E>> -> std::Result<std::Option<T>, E>
+            dec opt_ok: std::Option<std::Result<i32, i32>> = std::Option::Some(std::Result::Ok(55));
+            dec t1 = std::option_transpose<i32, i32>(opt_ok);
             if t1.is_ok() == false { return 1; }
             dec inner1 = t1.unwrap();
             if inner1.is_some() == false { return 2; }
             if inner1.unwrap() != 55 { return 3; }
 
-            dec opt_err: Option<Result<i32, i32>> = Option::Some(Result::Err(9));
-            dec t2 = option_transpose<i32, i32>(opt_err);
+            dec opt_err: std::Option<std::Result<i32, i32>> = std::Option::Some(std::Result::Err(9));
+            dec t2 = std::option_transpose<i32, i32>(opt_err);
             if t2.is_err() == false { return 4; }
             if t2.err().unwrap() != 9 { return 5; }
 
-            dec opt_none: Option<Result<i32, i32>> = Option::None;
-            dec t3 = option_transpose<i32, i32>(opt_none);
+            dec opt_none: std::Option<std::Result<i32, i32>> = std::Option::None;
+            dec t3 = std::option_transpose<i32, i32>(opt_none);
             if t3.is_ok() == false { return 6; }
             dec inner3 = t3.unwrap();
             if inner3.is_some() == true { return 7; }
 
-            // Result::result_transpose: Result<Option<T>, E> -> Option<Result<T, E>>
-            dec res_some: Result<Option<i32>, i32> = Result::Ok(Option::Some(77));
-            dec rt1 = result_transpose<i32, i32>(res_some);
+            // std::Result::result_transpose: std::Result<std::Option<T>, E> -> std::Option<std::Result<T, E>>
+            dec res_some: std::Result<std::Option<i32>, i32> = std::Result::Ok(std::Option::Some(77));
+            dec rt1 = std::result_transpose<i32, i32>(res_some);
             if rt1.is_some() == false { return 8; }
             dec inner_res1 = rt1.unwrap();
             if inner_res1.is_ok() == false { return 9; }
             if inner_res1.unwrap() != 77 { return 10; }
 
-            dec res_none: Result<Option<i32>, i32> = Result::Ok(Option::None);
-            dec rt2 = result_transpose<i32, i32>(res_none);
+            dec res_none: std::Result<std::Option<i32>, i32> = std::Result::Ok(std::Option::None);
+            dec rt2 = std::result_transpose<i32, i32>(res_none);
             if rt2.is_some() == true { return 11; }
 
-            dec res_err: Result<Option<i32>, i32> = Result::Err(15);
-            dec rt3 = result_transpose<i32, i32>(res_err);
+            dec res_err: std::Result<std::Option<i32>, i32> = std::Result::Err(15);
+            dec rt3 = std::result_transpose<i32, i32>(res_err);
             if rt3.is_some() == false { return 12; }
             dec inner_res3 = rt3.unwrap();
             if inner_res3.is_err() == false { return 13; }
@@ -456,48 +491,48 @@ fn test_transpose_family() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }
 
 #[test]
 fn test_result_or_else() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("res_or_else");
 
     let src = r#"
         import <result>;
         import <core/panic>;
 
-        fn must_not_run(e: i32) -> Result<i32, i32> {
+        fn must_not_run(e: i32) -> std::Result<i32, i32> {
             __luna_panic();
-            return Result::Err(999);
+            return std::Result::Err(999);
         }
 
-        fn recover_ok(e: i32) -> Result<i32, i32> {
-            return Result::Ok(e * 10);
+        fn recover_ok(e: i32) -> std::Result<i32, i32> {
+            return std::Result::Ok(e * 10);
         }
 
-        fn transform_err(e: i32) -> Result<i32, i32> {
-            return Result::Err(e + 500);
+        fn transform_err(e: i32) -> std::Result<i32, i32> {
+            return std::Result::Err(e + 500);
         }
 
         fn main() -> i32 {
             // Case 1: Ok(x).or_else(...) -> callback called 0 times (would panic if called), returns Ok(x)
-            dec ok_val: Result<i32, i32> = Result::Ok(42);
+            dec ok_val: std::Result<i32, i32> = std::Result::Ok(42);
             dec r1 = ok_val.or_else<i32>(must_not_run);
             if r1.is_ok() == false { return 1; }
             if r1.unwrap() != 42 { return 2; }
 
             // Case 2: Err(e).or_else(recover_ok) -> callback called exactly 1 time, recovers to Ok(e * 10)
-            dec err_val: Result<i32, i32> = Result::Err(7);
+            dec err_val: std::Result<i32, i32> = std::Result::Err(7);
             dec r2 = err_val.or_else<i32>(recover_ok);
             if r2.is_ok() == false { return 3; }
             if r2.unwrap() != 70 { return 4; }
 
             // Case 3: Err(e).or_else(transform_err) -> callback called exactly 1 time, yields new Err(e + 500)
-            dec err_val2: Result<i32, i32> = Result::Err(13);
+            dec err_val2: std::Result<i32, i32> = std::Result::Err(13);
             dec r3 = err_val2.or_else<i32>(transform_err);
             if r3.is_err() == false { return 5; }
             if r3.err().unwrap() != 513 { return 6; }
@@ -507,7 +542,7 @@ fn test_result_or_else() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
     let (code, _stdout, stderr) = run_binary(&dir, src, &opts).expect("execution should succeed");
     assert_eq!(code, 0, "stderr: {}", stderr);
 }

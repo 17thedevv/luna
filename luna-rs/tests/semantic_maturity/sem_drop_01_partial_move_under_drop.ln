@@ -7,7 +7,7 @@ struct Owner {
     token: Token,
 };
 
-impl Drop for Owner {
+impl std::Drop for Owner {
     fn drop(self: &rw Self) {}
 }
 

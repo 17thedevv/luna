@@ -108,40 +108,40 @@ import <iter_collect>;
 
         fn main() -> i32 {
             dec arr: [i32; 5] = [10, 20, 30, 40, 50];
-            dec it = slice_iter<i32>(&arr);
-            dec m_it = iter_map(it, deref_i32);
-            dec v = iter_collect_vec(m_it);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec m_it = std::iter::iter_map(it, deref_i32);
+            dec v = std::iter_collect_vec(m_it);
 
             if v.len() != (5 as u64) {
                 return 1;
             }
             match v.get(0 as u64) {
-                Option::Some(r) -> {
+                std::Option::Some(r) -> {
                     if *r != 10 {
                         return 2;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 20;
                 },
             }
             match v.get(2 as u64) {
-                Option::Some(r) -> {
+                std::Option::Some(r) -> {
                     if *r != 30 {
                         return 3;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 30;
                 },
             }
             match v.get(4 as u64) {
-                Option::Some(r) -> {
+                std::Option::Some(r) -> {
                     if *r != 50 {
                         return 4;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 40;
                 },
             }
@@ -186,9 +186,9 @@ import <iter_collect>;
 
         fn main() -> i32 {
             dec arr: [i32; 0] = [];
-            dec it = slice_iter<i32>(&arr);
-            dec m_it = iter_map(it, deref_i32);
-            dec v = iter_collect_vec(m_it);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec m_it = std::iter::iter_map(it, deref_i32);
+            dec v = std::iter_collect_vec(m_it);
 
             if v.len() != (0 as u64) {
                 return 1;
@@ -241,51 +241,51 @@ import <iter_collect>;
             max: i32,
         };
 
-        impl Iterator<Point> for PointGenerator {
-            fn next(self: &rw Self) -> Option<Point> {
+        impl std::Iterator<Point> for PointGenerator {
+            fn next(self: &rw Self) -> std::Option<Point> {
                 if self.count < self.max {
                     dec pt = Point { x: self.count * 10, y: self.count * 100 };
                     self.count = self.count + 1;
-                    return Option::Some(pt);
+                    return std::Option::Some(pt);
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
         fn main() -> i32 {
             dec gen = PointGenerator { count: 0, max: 3 };
-            dec v = iter_collect_vec(gen);
+            dec v = std::iter_collect_vec(gen);
 
             if v.len() != (3 as u64) {
                 return 1;
             }
             match v.get(0 as u64) {
-                Option::Some(p) -> {
+                std::Option::Some(p) -> {
                     if (*p).x != 0 || (*p).y != 0 {
                         return 2;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 20;
                 },
             }
             match v.get(1 as u64) {
-                Option::Some(p) -> {
+                std::Option::Some(p) -> {
                     if (*p).x != 10 || (*p).y != 100 {
                         return 3;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 30;
                 },
             }
             match v.get(2 as u64) {
-                Option::Some(p) -> {
+                std::Option::Some(p) -> {
                     if (*p).x != 20 || (*p).y != 200 {
                         return 4;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 40;
                 },
             }
@@ -334,7 +334,7 @@ import <iter_collect>;
             counter: *rw DropCounter,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -348,17 +348,17 @@ import <iter_collect>;
             counter: *rw DropCounter,
         };
 
-        impl Iterator<TrackedItem> for TrackedGenerator {
-            fn next(self: &rw Self) -> Option<TrackedItem> {
+        impl std::Iterator<TrackedItem> for TrackedGenerator {
+            fn next(self: &rw Self) -> std::Option<TrackedItem> {
                 if self.cur < self.max {
                     unsafe {
                         (*self.counter).created = (*self.counter).created + (1 as u64);
                     }
                     dec item = TrackedItem { val: self.cur, counter: self.counter };
                     self.cur = self.cur + 1;
-                    return Option::Some(item);
+                    return std::Option::Some(item);
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
@@ -368,7 +368,7 @@ import <iter_collect>;
 
             {
                 dec gen = TrackedGenerator { cur: 1, max: 6, counter: c_ptr };
-                dec v = iter_collect_vec(gen);
+                dec v = std::iter_collect_vec(gen);
 
                 if v.len() != (5 as u64) {
                     return 1;
@@ -428,9 +428,9 @@ import <iter_collect>;
 
         fn main() -> i32 {
             dec arr: [i32; 3] = [10, 20, 30];
-            dec it = slice_iter<i32>(&arr);
-            dec m_it = iter_map(it, deref_i32);
-            dec s = iter_collect_hashset(m_it);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec m_it = std::iter::iter_map(it, deref_i32);
+            dec s = std::iter_collect_hashset(m_it);
 
             if s.len() != (3 as u64) {
                 return 1;
@@ -492,9 +492,9 @@ import <iter_collect>;
 
         fn main() -> i32 {
             dec arr: [i32; 7] = [1, 2, 2, 3, 1, 4, 3];
-            dec it = slice_iter<i32>(&arr);
-            dec m_it = iter_map(it, deref_i32);
-            dec s = iter_collect_hashset(m_it);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec m_it = std::iter::iter_map(it, deref_i32);
+            dec s = std::iter_collect_hashset(m_it);
 
             // 7 items in stream, 4 unique: 1, 2, 3, 4
             if s.len() != (4 as u64) {
@@ -558,19 +558,19 @@ fn test_c7_collect_hashset_droptracker() {
             counter: *rw DropCounter,
         };
 
-        impl Hash for TrackedItem {
+        impl std::Hash for TrackedItem {
             fn hash(self: &Self) -> u64 {
                 return self.val.hash();
             }
         }
 
-        impl Eq for TrackedItem {
+        impl std::Eq for TrackedItem {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.val == other.val;
             }
         }
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 unsafe {
                     (*self.counter).dropped = (*self.counter).dropped + (1 as u64);
@@ -583,31 +583,31 @@ fn test_c7_collect_hashset_droptracker() {
             counter: *rw DropCounter,
         };
 
-        impl Iterator<TrackedItem> for DedupGenerator {
-            fn next(self: &rw Self) -> Option<TrackedItem> {
+        impl std::Iterator<TrackedItem> for DedupGenerator {
+            fn next(self: &rw Self) -> std::Option<TrackedItem> {
                 // Sequence: 10, 20, 10 (dup), 30, 20 (dup) -> 5 created, 3 unique
                 if self.step == 0 {
                     unsafe { (*self.counter).created = (*self.counter).created + (1 as u64); }
                     self.step = 1;
-                    return Option::Some(TrackedItem { val: 10, counter: self.counter });
+                    return std::Option::Some(TrackedItem { val: 10, counter: self.counter });
                 } else if self.step == 1 {
                     unsafe { (*self.counter).created = (*self.counter).created + (1 as u64); }
                     self.step = 2;
-                    return Option::Some(TrackedItem { val: 20, counter: self.counter });
+                    return std::Option::Some(TrackedItem { val: 20, counter: self.counter });
                 } else if self.step == 2 {
                     unsafe { (*self.counter).created = (*self.counter).created + (1 as u64); }
                     self.step = 3;
-                    return Option::Some(TrackedItem { val: 10, counter: self.counter });
+                    return std::Option::Some(TrackedItem { val: 10, counter: self.counter });
                 } else if self.step == 3 {
                     unsafe { (*self.counter).created = (*self.counter).created + (1 as u64); }
                     self.step = 4;
-                    return Option::Some(TrackedItem { val: 30, counter: self.counter });
+                    return std::Option::Some(TrackedItem { val: 30, counter: self.counter });
                 } else if self.step == 4 {
                     unsafe { (*self.counter).created = (*self.counter).created + (1 as u64); }
                     self.step = 5;
-                    return Option::Some(TrackedItem { val: 20, counter: self.counter });
+                    return std::Option::Some(TrackedItem { val: 20, counter: self.counter });
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
@@ -617,7 +617,7 @@ fn test_c7_collect_hashset_droptracker() {
 
             {
                 dec gen = DedupGenerator { step: 0, counter: c_ptr };
-                dec s = iter_collect_hashset(gen);
+                dec s = std::iter_collect_hashset(gen);
 
                 if s.len() != (3 as u64) {
                     return 1;
@@ -678,21 +678,21 @@ import <iter_collect>;
             max: i32,
         };
 
-        impl Iterator<(i32, i32)> for PairGenerator {
-            fn next(self: &rw Self) -> Option<(i32, i32)> {
+        impl std::Iterator<(i32, i32)> for PairGenerator {
+            fn next(self: &rw Self) -> std::Option<(i32, i32)> {
                 if self.cur < self.max {
                     dec k = self.cur;
                     dec v = self.cur * 10;
                     self.cur = self.cur + 1;
-                    return Option::Some((k, v));
+                    return std::Option::Some((k, v));
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
         fn main() -> i32 {
             dec gen = PairGenerator { cur: 1, max: 4 };
-            dec m = iter_collect_hashmap(gen);
+            dec m = std::iter_collect_hashmap(gen);
 
             if m.len() != (3 as u64) {
                 return 1;
@@ -700,8 +700,8 @@ import <iter_collect>;
 
             dec k1 = 1;
             dec v1 = match m.get(&k1) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v1 != 10 {
                 return 2;
@@ -709,8 +709,8 @@ import <iter_collect>;
 
             dec k2 = 2;
             dec v2 = match m.get(&k2) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v2 != 20 {
                 return 3;
@@ -718,8 +718,8 @@ import <iter_collect>;
 
             dec k3 = 3;
             dec v3 = match m.get(&k3) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v3 != 30 {
                 return 4;
@@ -764,26 +764,26 @@ import <iter_collect>;
             step: i32,
         };
 
-        impl Iterator<(i32, i32)> for DupPairGenerator {
-            fn next(self: &rw Self) -> Option<(i32, i32)> {
+        impl std::Iterator<(i32, i32)> for DupPairGenerator {
+            fn next(self: &rw Self) -> std::Option<(i32, i32)> {
                 // (1, 100), (2, 200), (1, 999) -> key 1 overwritten with 999
                 if self.step == 0 {
                     self.step = 1;
-                    return Option::Some((1, 100));
+                    return std::Option::Some((1, 100));
                 } else if self.step == 1 {
                     self.step = 2;
-                    return Option::Some((2, 200));
+                    return std::Option::Some((2, 200));
                 } else if self.step == 2 {
                     self.step = 3;
-                    return Option::Some((1, 999));
+                    return std::Option::Some((1, 999));
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
         fn main() -> i32 {
             dec gen = DupPairGenerator { step: 0 };
-            dec m = iter_collect_hashmap(gen);
+            dec m = std::iter_collect_hashmap(gen);
 
             if m.len() != (2 as u64) {
                 return 1;
@@ -791,8 +791,8 @@ import <iter_collect>;
 
             dec k1 = 1;
             dec v1 = match m.get(&k1) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v1 != 999 {
                 return 2;
@@ -800,8 +800,8 @@ import <iter_collect>;
 
             dec k2 = 2;
             dec v2 = match m.get(&k2) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v2 != 200 {
                 return 3;
@@ -855,19 +855,19 @@ fn test_c10_collect_hashmap_droptracker_identity() {
             counter: *rw Counter,
         };
 
-        impl Hash for TrackedKey {
+        impl std::Hash for TrackedKey {
             fn hash(self: &Self) -> u64 {
                 return self.id.hash();
             }
         }
 
-        impl Eq for TrackedKey {
+        impl std::Eq for TrackedKey {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.id == other.id;
             }
         }
 
-        impl Drop for TrackedKey {
+        impl std::Drop for TrackedKey {
             fn drop(self: &rw Self) {
                 if (self.counter as u64) != (0 as u64) {
                     unsafe {
@@ -883,7 +883,7 @@ fn test_c10_collect_hashmap_droptracker_identity() {
             counter: *rw Counter,
         };
 
-        impl Drop for TrackedVal {
+        impl std::Drop for TrackedVal {
             fn drop(self: &rw Self) {
                 if (self.counter as u64) != (0 as u64) {
                     unsafe {
@@ -899,8 +899,8 @@ fn test_c10_collect_hashmap_droptracker_identity() {
             v_counter: *rw Counter,
         };
 
-        impl Iterator<(TrackedKey, TrackedVal)> for PairGenerator {
-            fn next(self: &rw Self) -> Option<(TrackedKey, TrackedVal)> {
+        impl std::Iterator<(TrackedKey, TrackedVal)> for PairGenerator {
+            fn next(self: &rw Self) -> std::Option<(TrackedKey, TrackedVal)> {
                 // Pair 1: key(id=1, marker=10), val(id=1, marker=100)
                 // Pair 2: key(id=1, marker=20), val(id=1, marker=200) (duplicate key!)
                 if self.step == 0 {
@@ -909,7 +909,7 @@ fn test_c10_collect_hashmap_droptracker_identity() {
                         (*self.v_counter).created = (*self.v_counter).created + (1 as u64);
                     }
                     self.step = 1;
-                    return Option::Some((
+                    return std::Option::Some((
                         TrackedKey { id: 1, marker: 10, counter: self.k_counter },
                         TrackedVal { id: 1, marker: 100, counter: self.v_counter },
                     ));
@@ -919,12 +919,12 @@ fn test_c10_collect_hashmap_droptracker_identity() {
                         (*self.v_counter).created = (*self.v_counter).created + (1 as u64);
                     }
                     self.step = 2;
-                    return Option::Some((
+                    return std::Option::Some((
                         TrackedKey { id: 1, marker: 20, counter: self.k_counter },
                         TrackedVal { id: 1, marker: 200, counter: self.v_counter },
                     ));
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
@@ -936,7 +936,7 @@ fn test_c10_collect_hashmap_droptracker_identity() {
 
             {
                 dec gen = PairGenerator { step: 0, k_counter: k_ptr, v_counter: v_ptr };
-                dec m = iter_collect_hashmap(gen);
+                dec m = std::iter_collect_hashmap(gen);
 
                 if m.len() != (1 as u64) {
                     return 1;
@@ -947,8 +947,8 @@ fn test_c10_collect_hashmap_droptracker_identity() {
                 // Search key uses null counter so it doesn't affect tracking
                 dec search_key = TrackedKey { id: 1, marker: 0, counter: 0 as u64 as *rw Counter };
                 dec val_marker = match m.get(&search_key) {
-                    Option::Some(v) -> (*v).marker,
-                    Option::None -> 0,
+                    std::Option::Some(v) -> (*v).marker,
+                    std::Option::None -> 0,
                 };
                 if val_marker != 200 {
                     return 2; // Value was not replaced!
@@ -959,10 +959,10 @@ fn test_c10_collect_hashmap_droptracker_identity() {
                 {
                     dec rw k_iter = m.keys();
                     match k_iter.next() {
-                        Option::Some(k) -> {
+                        std::Option::Some(k) -> {
                             surviving_marker = (*k).marker;
                         },
-                        Option::None -> {},
+                        std::Option::None -> {},
                     }
                 }
                 if surviving_marker != 10 {
@@ -1031,11 +1031,11 @@ import <iter_collect>;
 
         fn main() -> i32 {
             dec arr: [i32; 10] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-            dec it = slice_iter<i32>(&arr);
-            dec f_it = iter_filter(it, is_even);
-            dec m_it = iter_map(f_it, square);
-            dec t_it = iter_take(m_it, 3 as u64);
-            dec v = iter_collect_vec(t_it);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec f_it = std::iter::iter_filter(it, is_even);
+            dec m_it = std::iter::iter_map(f_it, square);
+            dec t_it = std::iter::iter_take(m_it, 3 as u64);
+            dec v = std::iter_collect_vec(t_it);
 
             // Evens: 2, 4, 6, 8, 10
             // Squares: 4, 16, 36, 64, 100
@@ -1045,16 +1045,16 @@ import <iter_collect>;
             }
 
             match v.get(0 as u64) {
-                Option::Some(r) -> { if *r != 4 { return 2; } },
-                Option::None -> { return 20; },
+                std::Option::Some(r) -> { if *r != 4 { return 2; } },
+                std::Option::None -> { return 20; },
             }
             match v.get(1 as u64) {
-                Option::Some(r) -> { if *r != 16 { return 3; } },
-                Option::None -> { return 30; },
+                std::Option::Some(r) -> { if *r != 16 { return 3; } },
+                std::Option::None -> { return 30; },
             }
             match v.get(2 as u64) {
-                Option::Some(r) -> { if *r != 36 { return 4; } },
-                Option::None -> { return 40; },
+                std::Option::Some(r) -> { if *r != 36 { return 4; } },
+                std::Option::None -> { return 40; },
             }
             return 0;
         }
@@ -1123,30 +1123,30 @@ fn test_c12_collect_source_vs_llib_parity() {
             max: i32,
         };
 
-        impl Iterator<(i32, i32)> for PairGenerator {
-            fn next(self: &rw Self) -> Option<(i32, i32)> {
+        impl std::Iterator<(i32, i32)> for PairGenerator {
+            fn next(self: &rw Self) -> std::Option<(i32, i32)> {
                 if self.cur < self.max {
                     dec k = self.cur;
                     dec v = self.cur * 100;
                     self.cur = self.cur + 1;
-                    return Option::Some((k, v));
+                    return std::Option::Some((k, v));
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
         fn main() -> i32 {
             dec arr: [i32; 4] = [100, 200, 300, 400];
-            dec it = slice_iter<i32>(&arr);
-            dec m_it = iter_map(it, deref_i32);
-            dec v = iter_collect_vec(m_it);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec m_it = std::iter::iter_map(it, deref_i32);
+            dec v = std::iter_collect_vec(m_it);
 
             if v.len() != (4 as u64) {
                 return 1;
             }
 
             dec gen = PairGenerator { cur: 1, max: 3 };
-            dec m = iter_collect_hashmap(gen);
+            dec m = std::iter_collect_hashmap(gen);
 
             if m.len() != (2 as u64) {
                 return 2;
@@ -1154,12 +1154,12 @@ fn test_c12_collect_source_vs_llib_parity() {
 
             dec k1 = 1;
             match m.get(&k1) {
-                Option::Some(val) -> {
+                std::Option::Some(val) -> {
                     if *val != 100 {
                         return 3;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 30;
                 },
             }
@@ -1199,47 +1199,47 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-        fn to_boxed_i32(x: &i32) -> Box<i32> {
+        fn to_boxed_i32(x: &i32) -> std::Box<i32> {
             return std::box_new<i32>(*x);
         }
 
         fn main() -> i32 {
             dec arr: [i32; 3] = [111, 222, 333];
-            dec it = slice_iter<i32>(&arr);
-            dec m_it = iter_map(it, to_boxed_i32);
-            dec v = iter_collect_vec(m_it);
+            dec it = std::slice::slice_iter<i32>(&arr);
+            dec m_it = std::iter::iter_map(it, to_boxed_i32);
+            dec v = std::iter_collect_vec(m_it);
 
             if v.len() != (3 as u64) {
                 return 1;
             }
 
             match v.get(0 as u64) {
-                Option::Some(b) -> {
+                std::Option::Some(b) -> {
                     if *((*b).as_ref()) != 111 {
                         return 2;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 20;
                 },
             }
             match v.get(1 as u64) {
-                Option::Some(b) -> {
+                std::Option::Some(b) -> {
                     if *((*b).as_ref()) != 222 {
                         return 3;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 30;
                 },
             }
             match v.get(2 as u64) {
-                Option::Some(b) -> {
+                std::Option::Some(b) -> {
                     if *((*b).as_ref()) != 333 {
                         return 4;
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 40;
                 },
             }
@@ -1283,7 +1283,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw src = vec_with_capacity<i32>(4 as u64);
+            dec rw src = std::vec_with_capacity<i32>(4 as u64);
             src.push(10);
             src.push(20);
 
@@ -1293,8 +1293,8 @@ import <iter_collect>;
             src.push(30);
 
             match r {
-                Option::Some(x) -> { dec v = *x; },
-                Option::None -> {},
+                std::Option::Some(x) -> { dec v = *x; },
+                std::Option::None -> {},
             }
             return 0;
         }
@@ -1348,15 +1348,15 @@ import <iter_collect>;
         }
 
         fn main() -> i32 {
-            dec rw src = vec_with_capacity<i32>(4 as u64);
+            dec rw src = std::vec_with_capacity<i32>(4 as u64);
             src.push(10);
             src.push(20);
 
             // Scope containing borrow ends before mutation
             {
-                dec it = slice_iter<i32>(src.as_slice());
-                dec m_it = iter_map(it, deref_i32);
-                dec collected = iter_collect_vec(m_it);
+                dec it = std::slice::slice_iter<i32>(src.as_slice());
+                dec m_it = std::iter::iter_map(it, deref_i32);
+                dec collected = std::iter_collect_vec(m_it);
                 if collected.len() != (2 as u64) {
                     return 1;
                 }
@@ -1407,13 +1407,13 @@ fn test_c15_collect_hashset_duplicate_representative_semantics() {
             marker: i32,
         };
 
-        impl Hash for ItemWithIdentity {
+        impl std::Hash for ItemWithIdentity {
             fn hash(self: &Self) -> u64 {
                 return self.id.hash();
             }
         }
 
-        impl Eq for ItemWithIdentity {
+        impl std::Eq for ItemWithIdentity {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.id == other.id;
             }
@@ -1423,23 +1423,23 @@ fn test_c15_collect_hashset_duplicate_representative_semantics() {
             step: i32,
         };
 
-        impl Iterator<ItemWithIdentity> for IdentityGenerator {
-            fn next(self: &rw Self) -> Option<ItemWithIdentity> {
+        impl std::Iterator<ItemWithIdentity> for IdentityGenerator {
+            fn next(self: &rw Self) -> std::Option<ItemWithIdentity> {
                 // Yield two items with identical id=42, but distinct markers (100 vs 200)
                 if self.step == 0 {
                     self.step = 1;
-                    return Option::Some(ItemWithIdentity { id: 42, marker: 100 });
+                    return std::Option::Some(ItemWithIdentity { id: 42, marker: 100 });
                 } else if self.step == 1 {
                     self.step = 2;
-                    return Option::Some(ItemWithIdentity { id: 42, marker: 200 });
+                    return std::Option::Some(ItemWithIdentity { id: 42, marker: 200 });
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
         fn main() -> i32 {
             dec gen = IdentityGenerator { step: 0 };
-            dec s = iter_collect_hashset(gen);
+            dec s = std::iter_collect_hashset(gen);
 
             if s.len() != (1 as u64) {
                 return 1;
@@ -1450,12 +1450,12 @@ fn test_c15_collect_hashset_duplicate_representative_semantics() {
             // So marker MUST be 100!
             dec rw it = s.iter();
             match it.next() {
-                Option::Some(item) -> {
+                std::Option::Some(item) -> {
                     if (*item).marker != 100 {
                         return 2; // Incoming duplicate replaced existing item, violates HS-3!
                     }
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 20;
                 },
             }

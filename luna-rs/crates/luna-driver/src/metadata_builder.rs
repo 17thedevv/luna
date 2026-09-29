@@ -1,9 +1,13 @@
 use crate::registry::{CanonicalSymbolId, ExternalImplKey, ExternalSymbol, ExternalTraitImplEntry, ModuleRegistry, ProviderInterface};
 use luna_llib::metadata::{
-    CanonicalInterface, CanonicalLifetime, CanonicalType, ExportedSymbol, ImplHeader,
+    CanonicalInterface, CanonicalLifetime, CanonicalRawPointerAnchor, CanonicalRawPointerAnchorSource,
+    CanonicalRawPointerEffect, CanonicalRawPointerEffects, CanonicalRawPointerOrigin,
+    CanonicalType, ExportedSymbol, ImplHeader,
     SemanticMetadata, StableSymbolId, TraitDefinition,
 };
 use luna_semantic::ty::{SemanticType, SemanticTypeId, TypeContext};
+use luna_borrowck::effect::{CallEffectSummary, RawPointerAnchorReturnEffect, RawPointerAnchorSource, RawPointerReturnEffect};
+use luna_mvir::GlobalId;
 use std::collections::HashMap;
 
 pub struct MetadataBuilder<'a> {
@@ -11,15 +15,21 @@ pub struct MetadataBuilder<'a> {
     provider: &'a ProviderInterface,
     type_map: HashMap<SemanticTypeId, u32>,
     canonical_types: Vec<CanonicalType>,
+    raw_summaries: &'a HashMap<GlobalId, CallEffectSummary>,
 }
 
 impl<'a> MetadataBuilder<'a> {
-    pub fn new(registry: &'a ModuleRegistry, provider: &'a ProviderInterface) -> Self {
+    pub fn new(
+        registry: &'a ModuleRegistry,
+        provider: &'a ProviderInterface,
+        raw_summaries: &'a HashMap<GlobalId, CallEffectSummary>,
+    ) -> Self {
         Self {
             registry,
             provider,
             type_map: HashMap::new(),
             canonical_types: Vec::new(),
+            raw_summaries,
         }
     }
 
@@ -183,7 +193,7 @@ impl<'a> MetadataBuilder<'a> {
         };
 
         SemanticMetadata {
-            metadata_version: luna_llib::format::MLIB_FORMAT_VERSION,
+            metadata_version: luna_llib::format::SEMANTIC_METADATA_VERSION,
             language_version: luna_llib::format::MLIB_COMPILER_VERSION,
             target_triple: "unknown".to_string(), // Set by writer later
             interface_fingerprint: luna_llib::format::Fingerprint([0; 32]), // Set by writer later
@@ -217,15 +227,12 @@ impl<'a> MetadataBuilder<'a> {
         // Find its type if it exists: check sym.sym.id first, then merged_ids
         let mut ty_index = None;
         let sid = sym.sym.id;
-        if let Some(ty_id) = self.provider.symbol_types.get(&sid) {
-            ty_index = Some(self.convert_type_id(*ty_id));
+        let symbol_ty = self.provider.symbol_types.get(&sid)
+            .copied()
+            .or_else(|| sym.merged_ids.first().and_then(|(_, msid)| self.provider.symbol_types.get(msid).copied()));
+        if let Some(ty_id) = symbol_ty {
+            ty_index = Some(self.convert_type_id(ty_id));
             if sym.sym.name == "Ok" || sym.sym.name == "Result" {
-            }
-        } else if let Some((_, msid)) = sym.merged_ids.first() {
-            if let Some(ty_id) = self.provider.symbol_types.get(msid) {
-                ty_index = Some(self.convert_type_id(*ty_id));
-                if sym.sym.name == "Ok" || sym.sym.name == "Result" {
-                }
             }
         }
         if ty_index.is_none() && (sym.sym.name == "Ok" || sym.sym.name == "Result") {
@@ -263,9 +270,28 @@ impl<'a> MetadataBuilder<'a> {
         let mut children = std::collections::BTreeMap::new();
         let mut sorted_children: Vec<_> = sym.children.iter().collect();
         sorted_children.sort_by(|a, b| a.0.cmp(b.0));
+
+        // Struct field symbols are not always entered in `symbol_types`.
+        // Reconstruct each direct field's semantic type from the owner type
+        // and the canonical field-name table, so serialized contracts can be
+        // validated without making field ordinals portable identities.
+        let field_types_by_name: HashMap<String, SemanticTypeId> = symbol_ty
+            .and_then(|ty_id| match self.provider.types.get(self.provider.types.resolve(ty_id)) {
+                SemanticType::Struct(owner, _, field_types) => {
+                    self.provider.symbol_struct_field_names.get(owner).map(|names| {
+                        names.iter().cloned().zip(field_types.iter().copied()).collect()
+                    })
+                }
+                _ => None,
+            })
+            .unwrap_or_default();
         
         for (c_name, c_sym) in sorted_children {
-            children.insert(c_name.clone(), self.convert_exported_symbol(c_sym));
+            let mut child = self.convert_exported_symbol(c_sym);
+            if let Some(field_ty) = field_types_by_name.get(c_name) {
+                child.ty_index = Some(self.convert_type_id(*field_ty));
+            }
+            children.insert(c_name.clone(), child);
         }
 
         let lifetime_contract = self.provider.symbol_lifetime_contracts.get(&sid)
@@ -275,6 +301,42 @@ impl<'a> MetadataBuilder<'a> {
         let type_lifetime_contract = self.provider.symbol_type_lifetime_contracts.get(&sid)
             .or_else(|| sym.merged_ids.first().and_then(|(_, msid)| self.provider.symbol_type_lifetime_contracts.get(msid)))
             .cloned();
+
+        let raw_storage_anchor_contract = self.provider.symbol_raw_storage_anchor_contracts.get(&sid)
+            .or_else(|| sym.merged_ids.first().and_then(|(_, msid)| self.provider.symbol_raw_storage_anchor_contracts.get(msid)))
+            .cloned();
+
+        // Generic bodies are retained in AstInterface and reanalyzed by the
+        // consumer. Export a body-derived raw-pointer summary only for
+        // non-generic functions whose body is not present in the artifact.
+        // The serialized form below contains parameter indices and canonical
+        // field names only, never session-local compiler identities.
+        let raw_pointer_effects = if matches!(kind_str.as_str(), "Function" | "ExternFunction")
+            && generic_params.is_empty()
+        {
+            let candidate_ids = std::iter::once(sid)
+                .chain(sym.merged_ids.iter().map(|(_, merged)| *merged))
+                .collect::<std::collections::HashSet<_>>();
+            let matching: Vec<_> = self.raw_summaries.iter()
+                .filter(|(global, _)| global.symbol_id.is_some_and(|id| candidate_ids.contains(&id)))
+                .map(|(_, summary)| summary)
+                .collect();
+            if matching.len() == 1 {
+                let summary = matching[0];
+                let direct_fields = summary.raw_pointer_field_ret.iter()
+                    .map(|(name, field)| (name.clone(), canonical_raw_effect(&field.origin, &field.anchor)))
+                    .collect();
+                Some(CanonicalRawPointerEffects {
+                    returned: canonical_raw_effect(&summary.raw_pointer_ret, &summary.raw_pointer_anchor_ret),
+                    direct_fields,
+                })
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
 
         let is_unsafe = self.provider.unsafe_functions.contains(&sid)
             || sym.merged_ids.iter().any(|(_, msid)| self.provider.unsafe_functions.contains(msid));
@@ -300,6 +362,8 @@ impl<'a> MetadataBuilder<'a> {
             children: children.into_iter().collect(),
             lifetime_contract,
             type_lifetime_contract,
+            raw_storage_anchor_contract,
+            raw_pointer_effects,
             is_unsafe,
         }
     }
@@ -377,4 +441,38 @@ impl<'a> MetadataBuilder<'a> {
             }
         }
     }
+}
+
+fn canonical_raw_effect(
+    origin: &RawPointerReturnEffect,
+    anchor: &RawPointerAnchorReturnEffect,
+) -> CanonicalRawPointerEffect {
+    let origin = match origin {
+        RawPointerReturnEffect::Independent => CanonicalRawPointerOrigin::Independent,
+        RawPointerReturnEffect::From(params) => {
+            let converted = params.iter().map(|index| u32::try_from(*index)).collect::<Result<Vec<_>, _>>();
+            converted.map(CanonicalRawPointerOrigin::FromParameters)
+                .unwrap_or(CanonicalRawPointerOrigin::Unknown)
+        }
+        RawPointerReturnEffect::Unknown => CanonicalRawPointerOrigin::Unknown,
+    };
+    let anchor = match anchor {
+        RawPointerAnchorReturnEffect::Independent => CanonicalRawPointerAnchor::Independent,
+        RawPointerAnchorReturnEffect::Unknown => CanonicalRawPointerAnchor::Unknown,
+        RawPointerAnchorReturnEffect::From(sources) => {
+            let converted = sources.iter().map(|source| match source {
+                RawPointerAnchorSource::RawParam(index) => u32::try_from(*index)
+                    .map(CanonicalRawPointerAnchorSource::RawParameter).map_err(|_| ()),
+                RawPointerAnchorSource::OwnerField { param, field } => u32::try_from(*param)
+                    .map(|parameter| CanonicalRawPointerAnchorSource::OwnerField {
+                        parameter,
+                        field_name: field.clone(),
+                    }).map_err(|_| ()),
+                RawPointerAnchorSource::Unknown => Ok(CanonicalRawPointerAnchorSource::Unknown),
+            }).collect::<Result<Vec<_>, _>>();
+            converted.map(CanonicalRawPointerAnchor::From)
+                .unwrap_or(CanonicalRawPointerAnchor::Unknown)
+        }
+    };
+    CanonicalRawPointerEffect { origin, anchor }
 }
