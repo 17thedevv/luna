@@ -45,7 +45,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn test_slice_props() -> bool {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     dec s0 = v.as_slice();
     dec empty0 = s0.is_empty();
     dec len0 = s0.len();
@@ -95,7 +95,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn conflict() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(1);
     dec s = v.as_slice(); // shared borrow of v
     v.push(2);            // MUTATION while s is alive!
@@ -133,7 +133,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn nll_ok() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(1);
     dec s = v.as_slice();
     dec l = s.len(); // last use of s
@@ -176,7 +176,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn conflict_mut() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(1);
     dec rw s = v.as_mut_slice(); // exclusive mutable borrow of v
     dec l = v.len();             // read access to v while s is alive!
@@ -249,7 +249,7 @@ import <hashset>;
 import <iter_collect>;
 
 module my_provider {
-    export fn inspect_vec(v: &Vec<i32>) -> usize {
+    export fn inspect_vec(v: &std::Vec<i32>) -> usize {
         dec s = v.as_slice();
         return s.len();
     }
@@ -286,7 +286,7 @@ import <iter_collect>;
 import "my_provider";
 
 fn main() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     dec s = v.as_slice();
     v.push(20); // conflict: mutating while s is alive
@@ -330,7 +330,7 @@ import <iter_consumers>;
 
 fn escape_raw(p: *i32) -> &[i32] life_from(p) {
     unsafe {
-        return slice_from_raw_parts(p, 1 as u64);
+        return std::mem::slice_from_raw_parts(p, 1 as u64);
     }
 }
 "#;

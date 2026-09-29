@@ -168,6 +168,8 @@ The following table lists every stable `DiagnosticCode` recognized by Mellis v1.
 | `E3003` | 3003 | BorrowConflict | Borrowck | Aliasing violation (multiple mutable or mut/immut loans) |
 | `E3004` | 3004 | MissingReturnValue | Borrowck | Non-void function reaches end without returning value |
 | `E3005` | 3005 | LocalBorrowEscape | Borrowck | Reference to local variable escapes function scope |
+| `E3010` | 3010 | RawStorageAnchorMismatch | Borrowck | Store into an anchored raw-pointer field does not prove compatibility with the declared owner |
+| `E3011` | 3011 | RawStorageAnchorViolation | Borrowck | Raw-to-safe reference conversion lacks a unique valid anchor or compatible mutability |
 | `E4001` | 4001 | AsyncBorrowAcrossAwait | Async/Comptime | Borrow active across `.await` point in async function |
 | `E4002` | 4002 | ComptimeStepLimitExceeded | Async/Comptime | Comptime execution exceeded instruction step limit |
 | `E4003` | 4003 | ComptimeUnserializableEscape| Async/Comptime | Comptime value escaping to runtime cannot be serialized |

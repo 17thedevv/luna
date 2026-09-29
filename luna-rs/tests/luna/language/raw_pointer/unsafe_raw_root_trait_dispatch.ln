@@ -1,0 +1,18 @@
+import <cmp>;
+
+unsafe fn compare_unknown<T: std::Ord>(pointer: *T, other: &T) -> i32 {
+    unsafe {
+        dec local = &*pointer;
+        return local.cmp(other);
+    }
+}
+
+fn main() -> i32 {
+    dec left = 3;
+    dec right = 4;
+    unsafe {
+        dec pointer = &left as *i32;
+        if compare_unknown<i32>(pointer, &right) < 0 { return 0; }
+    }
+    return 1;
+}

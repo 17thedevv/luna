@@ -1,4 +1,5 @@
 import <hashmap>;
+import <default>;
 import <hash>;
 import <cmp>;
 import <clone>;
@@ -9,63 +10,69 @@ import <__lang_drop>;
 
 module std {
     export struct SetIntoIter<T> {
-        private map: MapIntoIter<T, ()>,
+        private map: std::MapIntoIter<T, ()>,
     };
 
     impl<T> SetIntoIter<T> {
-        export fn next(self: &rw Self) -> Option<T> {
+        export fn next(self: &rw Self) -> std::Option<T> {
             dec opt = self.map.next();
             match opt {
-                Option::Some(tup) -> {
-                    return Option::Some(tup.0);
+                std::Option::Some(tup) -> {
+                    return std::Option::Some(tup.0);
                 }
-                Option::None -> {
-                    return Option::None;
+                std::Option::None -> {
+                    return std::Option::None;
                 }
             }
         }
     }
 
-    impl<T> Iterator<T> for SetIntoIter<T> {
-        fn next(self: &rw Self) -> Option<T> {
+    impl<T> std::Iterator<T> for SetIntoIter<T> {
+        fn next(self: &rw Self) -> std::Option<T> life_from(self) {
             return self.next();
         }
     }
 
 
     export struct SetIter<T> {
-        private keys: Keys<T, ()>,
+        private keys: std::Keys<T, ()>,
     };
 
     impl<T> SetIter<T> {
-        export fn next(self: &rw Self) -> Option<&T> {
+        export fn next(self: &rw Self) -> std::Option<&T> {
             return self.keys.next();
         }
     }
 
-    impl<T> Iterator<&T> for SetIter<T> {
-        fn next(self: &rw Self) -> Option<&T> {
+    impl<T> std::Iterator<&T> for SetIter<T> {
+        fn next(self: &rw Self) -> std::Option<&T> life_from(self) {
             return self.keys.next();
         }
     }
 
     export struct HashSet<T> {
-        private map: HashMap<T, ()>,
+        private map: std::HashMap<T, ()>,
     };
 
     export fn hashset_new<T>() -> HashSet<T> {
         return HashSet {
-            map: hashmap_new<T, ()>(),
+            map: std::hashmap_new<T, ()>(),
         };
+    }
+
+    impl<T> std::Default for HashSet<T> {
+        fn default() -> Self {
+            return hashset_new<T>();
+        }
     }
 
     export fn hashset_with_capacity<T>(capacity: u64) -> HashSet<T> {
         return HashSet {
-            map: hashmap_with_capacity<T, ()>(capacity),
+            map: std::hashmap_with_capacity<T, ()>(capacity),
         };
     }
 
-    impl<T: Hash + Eq> HashSet<T> {
+    impl<T: std::Hash + std::Eq> HashSet<T> {
         export fn len(self: &Self) -> u64 {
             return self.map.len();
         }
@@ -94,7 +101,7 @@ module std {
             self.map.clear();
         }
 
-        export fn iter(self: &Self) -> SetIter<T> {
+        export fn iter(self: &Self) -> SetIter<T> life_from(self) {
             return SetIter<T> {
                 keys: self.map.keys(),
             };
@@ -107,27 +114,27 @@ module std {
         }
     }
 
-    impl<T: Clone + Hash + Eq> HashSet<T> {
+    impl<T: std::Clone + std::Hash + std::Eq> HashSet<T> {
         export fn union_owned(self: &Self, other: &Self) -> HashSet<T> {
             dec rw res = hashset_new<T>();
             dec rw it_a = self.iter();
             while true {
                 dec item = it_a.next();
                 match item {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         res.insert((*val).clone());
                     },
-                    Option::None -> { break; },
+                    std::Option::None -> { break; },
                 }
             }
             dec rw it_b = other.iter();
             while true {
                 dec item = it_b.next();
                 match item {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         res.insert((*val).clone());
                     },
-                    Option::None -> { break; },
+                    std::Option::None -> { break; },
                 }
             }
             return res;
@@ -139,12 +146,12 @@ module std {
             while true {
                 dec item = it_a.next();
                 match item {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         if other.contains(val) {
                             res.insert((*val).clone());
                         }
                     },
-                    Option::None -> { break; },
+                    std::Option::None -> { break; },
                 }
             }
             return res;
@@ -156,51 +163,33 @@ module std {
             while true {
                 dec item = it_a.next();
                 match item {
-                    Option::Some(val) -> {
+                    std::Option::Some(val) -> {
                         if other.contains(val) == false {
                             res.insert((*val).clone());
                         }
                     },
-                    Option::None -> { break; },
+                    std::Option::None -> { break; },
                 }
             }
             return res;
         }
     }
 
-    export fn union_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+    export fn union_owned<T: std::Clone + std::Hash + std::Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
         return a.union_owned(b);
     }
 
-    export fn intersection_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+    export fn intersection_owned<T: std::Clone + std::Hash + std::Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
         return a.intersection_owned(b);
     }
 
-    export fn difference_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+    export fn difference_owned<T: std::Clone + std::Hash + std::Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
         return a.difference_owned(b);
     }
 }
 
-export type SetIter<T> = std::SetIter<T>;
-export type SetIntoIter<T> = std::SetIntoIter<T>;
-export type HashSet<T> = std::HashSet<T>;
-export fn hashset_new<T>() -> HashSet<T> { return std::hashset_new<T>(); }
-export fn hashset_with_capacity<T>(capacity: u64) -> HashSet<T> { return std::hashset_with_capacity<T>(capacity); }
-
-export fn union_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
-    return std::union_owned<T>(a, b);
-}
-
-export fn intersection_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
-    return std::intersection_owned<T>(a, b);
-}
-
-export fn difference_owned<T: Clone + Hash + Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
-    return std::difference_owned<T>(a, b);
-}
-
-impl<T> IntoIterator<T, SetIntoIter<T>> for std::HashSet<T> {
-    fn into_iter(self: Self) -> SetIntoIter<T> {
+impl<T> std::IntoIterator<T, std::SetIntoIter<T>> for std::HashSet<T> {
+    fn into_iter(self: Self) -> std::SetIntoIter<T> {
         return self.into_iter();
     }
 }

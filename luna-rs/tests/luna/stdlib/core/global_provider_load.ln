@@ -1,0 +1,72 @@
+import <result>;
+import <ptr>;
+import <slice>;
+import <mem>;
+import <iter_adapters>;
+import <iter_consumers>;
+import <io>;
+import <default>;
+import <box>;
+import <vec>;
+import <string>;
+import <hashmap>;
+import <hashset>;
+import <iter_collect>;
+
+fn double(value: &i32) -> i32 { return *value * 2; }
+fn add(acc: i32, value: i32) -> i32 { return acc + value; }
+
+fn main() -> i32 {
+    dec result: std::Result<i32, i32> = std::Result::Ok(7);
+    match result {
+        std::Result::Ok(value) -> { if value != 7 { return 1; } },
+        std::Result::Err(_) -> { return 2; },
+    }
+
+    dec zero: i32 = std::Default::default();
+    if zero != 0 { return 3; }
+
+    dec rw values: std::Vec<i32> = std::vec_new<i32>();
+    values.push(5);
+    values.push(6);
+    dec rw boxed: std::Box<i32> = std::box_new<i32>(values.len() as i32);
+    if *boxed.as_ref() != 2 { return 4; }
+
+    dec rw text: std::String = std::string_from_str("Luna");
+    text.push_char('!');
+    if text.len() != (5 as u64) { return 5; }
+
+    dec rw map: std::HashMap<i32, i32> = std::hashmap_new<i32, i32>();
+    if map.insert(1, 10) == false { return 6; }
+    dec key: i32 = 1;
+    match map.get(&key) {
+        std::Option::Some(value) -> { if *value != 10 { return 7; } },
+        std::Option::None -> { return 8; },
+    }
+
+    dec rw set: std::HashSet<i32> = std::hashset_new<i32>();
+    if set.insert(8) == false || set.contains(&8) == false { return 9; }
+
+    dec rw pairs: std::Vec<(i32, i32)> = std::vec_new<(i32, i32)>();
+    pairs.push((2, 20));
+    pairs.push((3, 30));
+    dec collected = std::iter_collect_hashmap(pairs.into_iter());
+    if collected.len() != (2 as u64) { return 10; }
+
+    dec array: [i32; 3] = [1, 2, 3];
+    dec iter = std::slice::slice_iter<i32>(&array);
+    dec mapped = std::iter::iter_map(iter, double);
+    dec sum = std::iter::iter_fold(mapped, 0, add);
+    if sum != 12 || std::mem::size_of<i32>() != (4 as u64) { return 11; }
+
+    dec rw raw_value: i32 = 41;
+    unsafe {
+        dec raw = &rw raw_value as *rw i32;
+        std::ptr::write<i32>(raw, std::ptr::read<i32>(raw as *i32) + 1);
+    }
+    if raw_value != 42 { return 12; }
+
+    dec message: [u8; 15] = [103 as u8, 108 as u8, 111 as u8, 98 as u8, 97 as u8, 108 as u8, 32 as u8, 112 as u8, 114 as u8, 111 as u8, 118 as u8, 105 as u8, 100 as u8, 101 as u8, 114 as u8];
+    std::io::println(&message);
+    return 0;
+}

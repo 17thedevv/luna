@@ -1,3 +1,4 @@
+export module std {
 export trait Clone {
     fn clone(self: &Self) -> Self;
 }
@@ -14,3 +15,4 @@ impl Clone for i16 { fn clone(self: &Self) -> Self { return *self; } }
 impl Clone for i32 { fn clone(self: &Self) -> Self { return *self; } }
 impl Clone for i64 { fn clone(self: &Self) -> Self { return *self; } }
 impl Clone for isize { fn clone(self: &Self) -> Self { return *self; } }
+}

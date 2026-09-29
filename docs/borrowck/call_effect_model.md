@@ -23,7 +23,7 @@ Describes how the callee reads or writes the memory pointed to by an argument.
 *   **None** (Bottom - no access, e.g., passing a pointer just to cast it)
 
 ### 2.2. Escape Effect Lattice
-Describes whether a pointer/reference outlives the duration of the call.
+Describes whether a tracked safe-loan relationship outlives the duration of the call. It is not a proof about whether foreign code physically retains a raw address: raw-pointer FFI retention remains the caller's unsafe validity obligation and is not represented as persistent safe-loan liveness.
 *   **Unknown** (Top - worst case, assumed MayEscape)
 *   **MayEscape**: The callee might store the pointer in a global variable, another argument, or retain it indefinitely (common in C-ABI).
 *   **CallOnly**: The pointer is strictly used during the execution of the call and is forgotten before `return`.
@@ -84,7 +84,7 @@ The compiler acquires a `CallEffectSummary` from one of three sources:
 2.  **Declared (Signatures & Intrinsics):**
     Certain built-in intrinsics or explicitly annotated functions (future syntax: `effects { arg0: ReadWrite, noescape }`) bypass inference. The compiler blindly trusts the declared summary.
 3.  **Conservative (Opaque / FFI boundaries):**
-    When crossing into `extern "C"`, the compiler cannot see the body. Unless explicitly annotated, the compiler assumes the absolute worst-case scenario (the "Top" of the lattice) for every pointer argument: `ReadWrite`, `BorrowMut` (if mutable), and `MayEscape`.
+    When crossing into `extern "C"`, the compiler cannot see the body. For raw-pointer parameters the caller must assume the call may read through `*T` and may read/write through `*rw T`. These accesses are checked at the call against overlapping live safe loans, and mutable raw-pointer calls invalidate outdated facts for the pointed-to storage. Raw pointers do not create or extend a safe loan: whether foreign code retains the address is an unsafe caller-validity obligation, not an inferred `BorrowsFrom`/`MayEscapeFrom` relationship. Direct safe-reference parameters continue to use their explicit synchronous reference contract; safe-reference return contracts and aggregate FFI restrictions are unchanged.
 
 ---
 
@@ -145,25 +145,25 @@ fn get_field<'a>(s: &'a mut Struct) -> &'a mut Field
 
 ### Category B: C-ABI & FFI (Conservative / Declared)
 
-**8. Opaque FFI Mutation (Worst-case)**
+**8. Opaque FFI Mutation through a Raw Pointer**
 ```rust
 extern "C" fn process(p: *mut T);
 ```
-*   `arg0`: `Access: ReadWrite`, `Ownership: BorrowMut`, `Escape: MayEscape`
-*   *BorrowCK Action:* Caller must assume `p` is mutated and stored globally by C. The lifetime of `p` is essentially "leaked" to the C-world, requiring `unsafe` to ever trust exclusive access again.
+*   `arg0`: call-scoped `Access: ReadWrite`; no safe-loan escape is inferred from raw-pointer origin.
+*   *BorrowCK Action:* Check the pointee access against currently live safe loans at the call. After the call, invalidate stale value facts for written pointee storage. The caller remains responsible for any foreign retention/use beyond the call; the compiler does not model that as a safe borrow.
 
-**9. Opaque FFI Read-only**
+**9. Opaque FFI Read-only through a Raw Pointer**
 ```rust
 extern "C" fn print_c(p: *const T);
 ```
-*   `arg0`: `Access: Read`, `Ownership: BorrowShared`, `Escape: MayEscape`
-*   *BorrowCK Action:* C might store the read-only pointer. Shared borrows are cheap, so this just extends the shared NLL indefinitely unless proven otherwise.
+*   `arg0`: call-scoped `Access: Read`; no safe-loan escape is inferred from raw-pointer origin.
+*   *BorrowCK Action:* Check the pointee read against currently live mutable safe loans at the call. The caller remains responsible for any foreign retention/use beyond the call.
 
 **10. FFI Callback Registration (Explicit Escape)**
 ```rust
 extern "C" fn register_handler(p: *const Callback);
 ```
-*   `arg0`: `Access: Unknown`, `Ownership: BorrowShared`, `Escape: MayEscape`
+*   A raw pointer may physically be retained by foreign code, but this is not summarized as `MayEscape` safe-loan liveness. The caller must uphold validity for any such use; no safe loan is inferred from the raw argument.
 
 **11. FFI with Explicit Annotation (Future Feature)**
 ```rust
@@ -202,9 +202,9 @@ fn double_mut(x: &mut T, y: &mut T)
 ```rust
 extern "C" fn memcpy(dest: *mut u8, src: *const u8, n: usize);
 ```
-*   `dest`: `Access: Write`, `Ownership: BorrowMut`, `Escape: MayEscape`
-*   `src`: `Access: Read`, `Ownership: BorrowShared`, `Escape: MayEscape`
-*   *BorrowCK Action:* Ensures `dest` and `src` do not overlap natively (if passed as safe references that are cast to pointers).
+*   `dest`: call-scoped `Access: Write`; no safe-loan escape is inferred.
+*   `src`: call-scoped `Access: Read`; no safe-loan escape is inferred.
+*   *BorrowCK Action:* Check each known pointee access against overlapping safe loans live at the call. Calls with overlapping raw parameters are otherwise governed by the unsafe caller's aliasing obligation; safe references passed directly still retain their ordinary borrow contract.
 
 ---
 
@@ -213,5 +213,5 @@ extern "C" fn memcpy(dest: *mut u8, src: *const u8, n: usize);
 Once this model is merged, the Borrow Checker's `transfer_instruction` for `Instruction::Call` will be rewritten to:
 1. Lookup the `CallEffectSummary` for the callee.
 2. For each `ArgEffect`, apply the `AccessKind` (Read/Write) to the current `active_loans`.
-3. If `EscapeKind == MayEscape`, the loan's liveness is forcibly extended to infinity (or until the unsafe boundary is dropped).
+3. For safe-reference effects, apply the declared/inferred escape relationship. Raw-pointer FFI access is call-scoped and must not be converted into persistent safe-loan liveness; post-call writes invalidate affected value facts separately.
 4. For `ReturnEffect::BorrowsFrom`, mint a new SSA token that inherits the liveness dependencies of the specified arguments.

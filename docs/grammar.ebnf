@@ -1,0 +1,25 @@
+(* Canonical struct contract productions for Luna grammar.md.
+   The repository did not previously contain a standalone grammar.ebnf. *)
+
+struct_decl = { annotation }, [ "export" ], "struct", identifier,
+              [ generic_params ], "{", [ struct_field_list ], "}",
+              { struct_contract_clause }, ";" ;
+
+struct_field_list = struct_field, { ",", struct_field }, [ "," ] ;
+struct_field = [ "export" ], identifier, ":", type ;
+
+struct_contract_clause = "requires", lifetime_constraint_list
+                       | "requires", raw_storage_anchor ;
+lifetime_constraint_list = lifetime_constraint, { ",", lifetime_constraint } ;
+lifetime_constraint = life_target, ( ">=" | "<=" ), life_target ;
+
+(* RAW-STORAGE-ANCHOR-v1. The compiler validates that identifier names a
+   direct field of this struct and that the field type is *T or *rw T. The
+   contract identity is the canonical owner type plus canonical field name. *)
+raw_storage_anchor = "anchor", "(", identifier, ")", "=", "self" ;
+
+(* Trait methods use the same method-level generic parameter syntax as
+   function declarations. Such methods are statically dispatched and
+   monomorphized; object-safety rules separately prohibit them on dyn traits. *)
+trait_method = "fn", identifier, [ generic_params ], "(", [ parameters ], ")",
+               [ "->", type ], ";" ;

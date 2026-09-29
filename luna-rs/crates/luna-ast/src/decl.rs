@@ -99,6 +99,7 @@ pub enum Decl {
         generic_params: Vec<GenericParam>,
         fields: Vec<StructField>,
         lifetime_contract: Option<crate::StructLifetimeContractAst>,
+        raw_storage_anchor_contract: Option<crate::StructRawStorageAnchorContractAst>,
     },
     Enum {
         annotations: Vec<Annotation>,

@@ -1,0 +1,11 @@
+import <slice>;
+import <iter_adapters>;
+import <iter_consumers>;
+
+fn main() {
+    dec values: [i32; 1] = [1];
+    dec iter = std::slice::slice_iter<i32>(&values);
+    dec mapped = iter_map(iter, identity);
+}
+
+fn identity(value: &i32) -> i32 { return *value; }

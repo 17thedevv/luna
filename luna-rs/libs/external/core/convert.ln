@@ -1,0 +1,273 @@
+import <result>;
+
+export module std {
+export enum TryConvertError {
+    Overflow,
+    Underflow,
+    Invalid,
+}
+
+export trait Convert<Target> {
+    fn convert(self: Self) -> Target;
+}
+
+export trait TryConvert<Target, Error> {
+    fn try_convert(self: Self) -> std::Result<Target, Error>;
+}
+
+// Blanket reflexive Convert implementation
+impl<T> Convert<T> for T {
+    fn convert(self: Self) -> T {
+        return self;
+    }
+}
+
+// Lossless widening conversions for unsigned integers
+impl Convert<u16> for u8 { fn convert(self: Self) -> u16 { return self as u16; } }
+impl Convert<u32> for u8 { fn convert(self: Self) -> u32 { return self as u32; } }
+impl Convert<u64> for u8 { fn convert(self: Self) -> u64 { return self as u64; } }
+impl Convert<i16> for u8 { fn convert(self: Self) -> i16 { return self as i16; } }
+impl Convert<i32> for u8 { fn convert(self: Self) -> i32 { return self as i32; } }
+impl Convert<i64> for u8 { fn convert(self: Self) -> i64 { return self as i64; } }
+
+impl Convert<u32> for u16 { fn convert(self: Self) -> u32 { return self as u32; } }
+impl Convert<u64> for u16 { fn convert(self: Self) -> u64 { return self as u64; } }
+impl Convert<i32> for u16 { fn convert(self: Self) -> i32 { return self as i32; } }
+impl Convert<i64> for u16 { fn convert(self: Self) -> i64 { return self as i64; } }
+
+impl Convert<u64> for u32 { fn convert(self: Self) -> u64 { return self as u64; } }
+impl Convert<i64> for u32 { fn convert(self: Self) -> i64 { return self as i64; } }
+
+// Lossless widening conversions for signed integers
+impl Convert<i16> for i8 { fn convert(self: Self) -> i16 { return self as i16; } }
+impl Convert<i32> for i8 { fn convert(self: Self) -> i32 { return self as i32; } }
+impl Convert<i64> for i8 { fn convert(self: Self) -> i64 { return self as i64; } }
+
+impl Convert<i32> for i16 { fn convert(self: Self) -> i32 { return self as i32; } }
+impl Convert<i64> for i16 { fn convert(self: Self) -> i64 { return self as i64; } }
+
+impl Convert<i64> for i32 { fn convert(self: Self) -> i64 { return self as i64; } }
+
+// Lossless widening conversion for floats
+impl Convert<f64> for f32 { fn convert(self: Self) -> f64 { return self as f64; } }
+
+// Narrowing TryConvert implementations
+impl TryConvert<u8, TryConvertError> for u16 {
+    fn try_convert(self: Self) -> Result<u8, TryConvertError> {
+        if self <= (255 as u16) { return Result::Ok(self as u8); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<u8, TryConvertError> for u32 {
+    fn try_convert(self: Self) -> Result<u8, TryConvertError> {
+        if self <= (255 as u32) { return Result::Ok(self as u8); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<u16, TryConvertError> for u32 {
+    fn try_convert(self: Self) -> Result<u16, TryConvertError> {
+        if self <= (65535 as u32) { return Result::Ok(self as u16); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<u8, TryConvertError> for u64 {
+    fn try_convert(self: Self) -> Result<u8, TryConvertError> {
+        if self <= (255 as u64) { return Result::Ok(self as u8); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<u16, TryConvertError> for u64 {
+    fn try_convert(self: Self) -> Result<u16, TryConvertError> {
+        if self <= (65535 as u64) { return Result::Ok(self as u16); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<u32, TryConvertError> for u64 {
+    fn try_convert(self: Self) -> Result<u32, TryConvertError> {
+        if self <= (4294967295 as u64) { return Result::Ok(self as u32); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<i8, TryConvertError> for i16 {
+    fn try_convert(self: Self) -> Result<i8, TryConvertError> {
+        if (self >= ((0 as i16) - (128 as i16))) && (self <= (127 as i16)) { return Result::Ok(self as i8); }
+        if self < ((0 as i16) - (128 as i16)) { return Result::Err(TryConvertError::Underflow); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<i8, TryConvertError> for i32 {
+    fn try_convert(self: Self) -> Result<i8, TryConvertError> {
+        if (self >= (0 - 128)) && (self <= 127) { return Result::Ok(self as i8); }
+        if self < (0 - 128) { return Result::Err(TryConvertError::Underflow); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<i16, TryConvertError> for i32 {
+    fn try_convert(self: Self) -> Result<i16, TryConvertError> {
+        if (self >= (0 - 32768)) && (self <= 32767) { return Result::Ok(self as i16); }
+        if self < (0 - 32768) { return Result::Err(TryConvertError::Underflow); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<i8, TryConvertError> for i64 {
+    fn try_convert(self: Self) -> Result<i8, TryConvertError> {
+        if (self >= ((0 as i64) - (128 as i64))) && (self <= (127 as i64)) { return Result::Ok(self as i8); }
+        if self < ((0 as i64) - (128 as i64)) { return Result::Err(TryConvertError::Underflow); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<i16, TryConvertError> for i64 {
+    fn try_convert(self: Self) -> Result<i16, TryConvertError> {
+        if (self >= ((0 as i64) - (32768 as i64))) && (self <= (32767 as i64)) { return Result::Ok(self as i16); }
+        if self < ((0 as i64) - (32768 as i64)) { return Result::Err(TryConvertError::Underflow); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<i32, TryConvertError> for i64 {
+    fn try_convert(self: Self) -> Result<i32, TryConvertError> {
+        if (self >= ((0 as i64) - (2147483648 as i64))) && (self <= (2147483647 as i64)) { return Result::Ok(self as i32); }
+        if self < ((0 as i64) - (2147483648 as i64)) { return Result::Err(TryConvertError::Underflow); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+// Cross signed/unsigned conversions
+impl TryConvert<u8, TryConvertError> for i8 {
+    fn try_convert(self: Self) -> Result<u8, TryConvertError> {
+        if self >= (0 as i8) { return Result::Ok(self as u8); }
+        return Result::Err(TryConvertError::Underflow);
+    }
+}
+
+impl TryConvert<i8, TryConvertError> for u8 {
+    fn try_convert(self: Self) -> Result<i8, TryConvertError> {
+        if self <= (127 as u8) { return Result::Ok(self as i8); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<u16, TryConvertError> for i16 {
+    fn try_convert(self: Self) -> Result<u16, TryConvertError> {
+        if self >= (0 as i16) { return Result::Ok(self as u16); }
+        return Result::Err(TryConvertError::Underflow);
+    }
+}
+
+impl TryConvert<i16, TryConvertError> for u16 {
+    fn try_convert(self: Self) -> Result<i16, TryConvertError> {
+        if self <= (32767 as u16) { return Result::Ok(self as i16); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<u32, TryConvertError> for i32 {
+    fn try_convert(self: Self) -> Result<u32, TryConvertError> {
+        if self >= (0 as i32) { return Result::Ok(self as u32); }
+        return Result::Err(TryConvertError::Underflow);
+    }
+}
+
+impl TryConvert<i32, TryConvertError> for u32 {
+    fn try_convert(self: Self) -> Result<i32, TryConvertError> {
+        if self <= (2147483647 as u32) { return Result::Ok(self as i32); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<u64, TryConvertError> for i64 {
+    fn try_convert(self: Self) -> Result<u64, TryConvertError> {
+        if self >= (0 as i64) { return Result::Ok(self as u64); }
+        return Result::Err(TryConvertError::Underflow);
+    }
+}
+
+impl TryConvert<i64, TryConvertError> for u64 {
+    fn try_convert(self: Self) -> Result<i64, TryConvertError> {
+        if self <= (9223372036854775807 as u64) { return Result::Ok(self as i64); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+// Additional wide-to-signed conversion used by the fixed acceptance matrix.
+impl TryConvert<i32, TryConvertError> for u64 {
+    fn try_convert(self: Self) -> Result<i32, TryConvertError> {
+        if self <= (2147483647 as u64) { return Result::Ok(self as i32); }
+        return Result::Err(TryConvertError::Overflow);
+    }
+}
+
+impl TryConvert<i64, TryConvertError> for u32 {
+    fn try_convert(self: Self) -> Result<i64, TryConvertError> {
+        return Result::Ok(self as i64);
+    }
+}
+
+// Float-to-integer conversion validates the input before casting. In
+// particular, no invalid input reaches an `as` cast that may trap.
+impl TryConvert<i8, TryConvertError> for f32 {
+    fn try_convert(self: Self) -> Result<i8, TryConvertError> {
+        if self != self { return Result::Err(TryConvertError::Invalid); }
+        if self <= (-129.0 as f32) { return Result::Err(TryConvertError::Underflow); }
+        if self >= (128.0 as f32) { return Result::Err(TryConvertError::Overflow); }
+        return Result::Ok(self as i8);
+    }
+}
+
+impl TryConvert<i32, TryConvertError> for f32 {
+    fn try_convert(self: Self) -> Result<i32, TryConvertError> {
+        if self != self { return Result::Err(TryConvertError::Invalid); }
+        // f32 has no representable fractional values between i32::MIN and
+        // i32::MIN - 1, so use the exact inclusive minimum to preserve MIN.
+        if self < (-2147483648.0 as f32) { return Result::Err(TryConvertError::Underflow); }
+        if self >= (2147483648.0 as f32) { return Result::Err(TryConvertError::Overflow); }
+        return Result::Ok(self as i32);
+    }
+}
+
+impl TryConvert<u32, TryConvertError> for f32 {
+    fn try_convert(self: Self) -> Result<u32, TryConvertError> {
+        if self != self { return Result::Err(TryConvertError::Invalid); }
+        if self < (0.0 as f32) { return Result::Err(TryConvertError::Underflow); }
+        if self >= (4294967296.0 as f32) { return Result::Err(TryConvertError::Overflow); }
+        return Result::Ok(self as u32);
+    }
+}
+
+impl TryConvert<i8, TryConvertError> for f64 {
+    fn try_convert(self: Self) -> Result<i8, TryConvertError> {
+        if self != self { return Result::Err(TryConvertError::Invalid); }
+        if self <= (-129.0 as f64) { return Result::Err(TryConvertError::Underflow); }
+        if self >= (128.0 as f64) { return Result::Err(TryConvertError::Overflow); }
+        return Result::Ok(self as i8);
+    }
+}
+
+impl TryConvert<i32, TryConvertError> for f64 {
+    fn try_convert(self: Self) -> Result<i32, TryConvertError> {
+        if self != self { return Result::Err(TryConvertError::Invalid); }
+        if self <= (-2147483649.0 as f64) { return Result::Err(TryConvertError::Underflow); }
+        if self >= (2147483648.0 as f64) { return Result::Err(TryConvertError::Overflow); }
+        return Result::Ok(self as i32);
+    }
+}
+
+impl TryConvert<u32, TryConvertError> for f64 {
+    fn try_convert(self: Self) -> Result<u32, TryConvertError> {
+        if self != self { return Result::Err(TryConvertError::Invalid); }
+        if self < (0.0 as f64) { return Result::Err(TryConvertError::Underflow); }
+        if self >= (4294967296.0 as f64) { return Result::Err(TryConvertError::Overflow); }
+        return Result::Ok(self as u32);
+    }
+}
+}

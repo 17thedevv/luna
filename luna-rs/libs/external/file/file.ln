@@ -1,0 +1,185 @@
+import <result>;
+import <vec>;
+import <string>;
+import <ptr>;
+import <mem>;
+import <__alloc_global>;
+
+extern fn __luna_read_file(
+    path: *u8,
+    path_len: usize,
+    out_ptr: *rw *rw u8,
+    out_len: *rw usize,
+    out_cap: *rw usize
+) -> i32;
+extern fn __luna_write_file(
+    path: *u8,
+    path_len: usize,
+    data: *u8,
+    data_len: usize
+) -> i32;
+extern fn __luna_buffer_free(ptr: *rw u8, cap: usize);
+
+export module std {
+    export enum FileError {
+        NotFound,
+        PermissionDenied,
+        InvalidInput,
+        Io,
+    }
+
+    fn path_has_nul(path: &std::String) -> bool {
+        dec bytes = path.as_bytes();
+        dec rw i: usize = 0 as usize;
+        while i < bytes.len() {
+            if bytes[i] == (0 as u8) {
+                return true;
+            }
+            i = i + (1 as usize);
+        }
+        return false;
+    }
+
+    fn error_from_runtime_status(status: i32) -> FileError {
+        if status == (-1 as i32) {
+            return FileError::NotFound;
+        }
+        if status == (-2 as i32) {
+            return FileError::PermissionDenied;
+        }
+        // The stdlib detects embedded NUL before crossing the ABI boundary.
+        // Other runtime INVALID_ARGUMENT statuses remain conservatively Io.
+        return FileError::Io;
+    }
+
+    export fn read_file(path: &std::String) -> std::Result<std::Vec<u8>, FileError> {
+        if path_has_nul(path) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+
+        // C's out-parameter ABI may retain raw pointer arguments beyond the
+        // call from the borrow checker's point of view. Keep the temporary
+        // output cells in runtime-owned scratch memory and access them only
+        // through the raw-pointer unsafe boundary.
+        dec buffer_slot = __luna_alloc(
+            std::mem::size_of<*rw u8>() as u64,
+            std::mem::align_of<*rw u8>() as u64
+        ) as *rw *rw u8;
+        dec length_slot = __luna_alloc(
+            std::mem::size_of<usize>() as u64,
+            std::mem::align_of<usize>() as u64
+        ) as *rw usize;
+        dec capacity_slot = __luna_alloc(
+            std::mem::size_of<usize>() as u64,
+            std::mem::align_of<usize>() as u64
+        ) as *rw usize;
+        dec rw buffer: *rw u8 = 0 as u64 as *rw u8;
+        dec rw length: usize = 0 as usize;
+        dec rw capacity: usize = 0 as usize;
+        dec path_bytes = path.as_bytes();
+        dec rw status: i32 = 0 as i32;
+        unsafe {
+            *buffer_slot = 0 as u64 as *rw u8;
+            *length_slot = 0 as usize;
+            *capacity_slot = 0 as usize;
+            status = __luna_read_file(
+                path_bytes.data as *u8,
+                path_bytes.len() as usize,
+                buffer_slot,
+                length_slot,
+                capacity_slot
+            );
+            buffer = *buffer_slot;
+            length = *length_slot;
+            capacity = *capacity_slot;
+            __luna_dealloc(
+                buffer_slot as *rw u8,
+                std::mem::size_of<*rw u8>() as u64,
+                std::mem::align_of<*rw u8>() as u64
+            );
+            __luna_dealloc(
+                length_slot as *rw u8,
+                std::mem::size_of<usize>() as u64,
+                std::mem::align_of<usize>() as u64
+            );
+            __luna_dealloc(
+                capacity_slot as *rw u8,
+                std::mem::size_of<usize>() as u64,
+                std::mem::align_of<usize>() as u64
+            );
+        }
+
+        if status != (0 as i32) {
+            return std::Result::Err(error_from_runtime_status(status));
+        }
+
+        dec rw bytes = std::vec_new<u8>();
+        dec rw i: u64 = 0 as u64;
+        while i < (length as u64) {
+            unsafe {
+                bytes.push(std::ptr::read<u8>(std::ptr::add<u8>(buffer as *u8, i)));
+            }
+            i = i + (1 as u64);
+        }
+
+        // Runtime buffers are not Vec storage. Copy first, then free exactly
+        // once using the allocation capacity reported by the runtime.
+        unsafe {
+            __luna_buffer_free(buffer, capacity);
+        }
+        return std::Result::Ok(bytes);
+    }
+
+    export fn write_file(path: &std::String, bytes: &[u8]) -> std::Result<void, FileError> {
+        if path_has_nul(path) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+
+        dec path_bytes = path.as_bytes();
+        dec rw status: i32 = 0 as i32;
+        unsafe {
+            status = __luna_write_file(
+                path_bytes.data as *u8,
+                path_bytes.len() as usize,
+                bytes.data as *u8,
+                bytes.len() as usize
+            );
+        }
+        if status == (0 as i32) {
+            return std::Result::Ok;
+        }
+        return std::Result::Err(error_from_runtime_status(status));
+    }
+
+    fn paths_equal(lhs: &std::String, rhs: &std::String) -> bool {
+        if lhs.len() != rhs.len() {
+            return false;
+        }
+        dec lhs_bytes = lhs.as_bytes();
+        dec rhs_bytes = rhs.as_bytes();
+        dec rw i = 0 as u64;
+        while i < lhs.len() {
+            if lhs_bytes[i] != rhs_bytes[i] {
+                return false;
+            }
+            i = i + (1 as u64);
+        }
+        return true;
+    }
+
+    export fn copy_file(src: &std::String, dst: &std::String) -> std::Result<u64, FileError> {
+        if paths_equal(src, dst) || path_has_nul(src) || path_has_nul(dst) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+
+        match read_file(src) {
+            std::Result::Ok(bytes) -> {
+                match write_file(dst, bytes.as_slice()) {
+                    std::Result::Ok -> std::Result::Ok(bytes.len()),
+                    std::Result::Err(error) -> std::Result::Err(error),
+                }
+            },
+            std::Result::Err(error) -> std::Result::Err(error),
+        }
+    }
+}

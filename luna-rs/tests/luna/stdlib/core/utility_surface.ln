@@ -1,0 +1,38 @@
+import <ptr>;
+import <mem>;
+import <slice>;
+import <iter_adapters>;
+import <iter_consumers>;
+import <io>;
+
+fn double(value: &i32) -> i32 {
+    return *value * 2;
+}
+
+fn add(acc: i32, value: i32) -> i32 {
+    return acc + value;
+}
+
+fn main() -> i32 {
+    dec values: [i32; 3] = [1, 2, 3];
+    dec iter = std::slice::slice_iter<i32>(&values);
+    dec mapped = std::iter::iter_map(iter, double);
+    dec first_two = std::iter::iter_take(mapped, 2 as u64);
+    dec total = std::iter::iter_fold(first_two, 0, add);
+    if total != 6 {
+        return 1;
+    }
+
+    dec rw value: i32 = 41;
+    unsafe {
+        dec raw = &rw value as *rw i32;
+        std::ptr::write<i32>(raw, std::ptr::read<i32>(raw as *i32) + 1);
+    }
+    if value != 42 || std::mem::size_of<i32>() != (4 as u64) {
+        return 2;
+    }
+
+    dec message: [u8; 25] = [117 as u8, 116 as u8, 105 as u8, 108 as u8, 105 as u8, 116 as u8, 121 as u8, 32 as u8, 109 as u8, 111 as u8, 100 as u8, 117 as u8, 108 as u8, 101 as u8, 32 as u8, 97 as u8, 103 as u8, 103 as u8, 114 as u8, 101 as u8, 103 as u8, 97 as u8, 116 as u8, 105 as u8, 111 as u8];
+    std::io::println(&message);
+    return 0;
+}

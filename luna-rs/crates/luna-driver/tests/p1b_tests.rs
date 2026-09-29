@@ -266,7 +266,7 @@ fn test_case_09_suspended_future_drop_generation() {
             id: i32,
         };
 
-        impl Drop for Resource {
+        impl std::Drop for Resource {
             fn drop(self: &rw Self) {}
         }
 

@@ -1,0 +1,180 @@
+import <ptr>;
+import <panic>;
+
+export module std {
+// Bit-preserving IEEE-754 representation helpers.
+export fn f32_to_bits(val: f32) -> u32 {
+    dec rw x = val;
+    dec ptr_f = &rw x as *rw f32;
+    dec ptr_u = ptr_f as *u32;
+    unsafe { return *ptr_u; }
+}
+
+export fn f32_from_bits(bits: u32) -> f32 {
+    dec rw b = bits;
+    dec ptr_u = &rw b as *rw u32;
+    dec ptr_f = ptr_u as *f32;
+    unsafe { return *ptr_f; }
+}
+
+export fn f64_to_bits(val: f64) -> u64 {
+    dec rw x = val;
+    dec ptr_f = &rw x as *rw f64;
+    dec ptr_u = ptr_f as *u64;
+    unsafe { return *ptr_u; }
+}
+
+export fn f64_from_bits(bits: u64) -> f64 {
+    dec rw b = bits;
+    dec ptr_u = &rw b as *rw u64;
+    dec ptr_f = ptr_u as *f64;
+    unsafe { return *ptr_f; }
+}
+
+export fn f32_nan() -> f32 { return f32_from_bits(2143289344 as u32); }
+export fn f32_infinity() -> f32 { return f32_from_bits(2139095040 as u32); }
+export fn f32_neg_infinity() -> f32 { return f32_from_bits(4286578688 as u32); }
+export fn f64_nan() -> f64 { return f64_from_bits(9221120237041090560 as u64); }
+export fn f64_infinity() -> f64 { return f64_from_bits(9218868437227405312 as u64); }
+export fn f64_neg_infinity() -> f64 { return f64_from_bits(18442240474082164736 as u64); }
+
+export trait ToBits<Bits> {
+    fn to_bits(self: &Self) -> Bits;
+}
+
+export trait FromBits<Bits> {
+    fn from_bits(bits: Bits) -> Self;
+}
+
+// Ordinary standard-library trait dispatch; these are not compiler intrinsics
+// or primitive inherent methods.
+export trait FloatOps {
+    fn is_nan(self: &Self) -> bool;
+    fn is_infinite(self: &Self) -> bool;
+    fn is_finite(self: &Self) -> bool;
+    fn is_sign_positive(self: &Self) -> bool;
+    fn is_sign_negative(self: &Self) -> bool;
+    fn abs(self: Self) -> Self;
+    fn min(self: Self, other: Self) -> Self;
+    fn max(self: Self, other: Self) -> Self;
+    fn clamp(self: Self, min_val: Self, max_val: Self) -> Self;
+}
+
+impl ToBits<u32> for f32 {
+    fn to_bits(self: &Self) -> u32 {
+        dec ptr_u = (self as *Self) as *u32;
+        unsafe { return *ptr_u; }
+    }
+}
+
+impl FromBits<u32> for f32 {
+    fn from_bits(bits: u32) -> Self { return f32_from_bits(bits); }
+}
+
+impl ToBits<u64> for f64 {
+    fn to_bits(self: &Self) -> u64 {
+        dec ptr_u = (self as *Self) as *u64;
+        unsafe { return *ptr_u; }
+    }
+}
+
+impl FromBits<u64> for f64 {
+    fn from_bits(bits: u64) -> Self { return f64_from_bits(bits); }
+}
+
+impl FloatOps for f32 {
+    fn is_nan(self: &Self) -> bool { return *self != *self; }
+
+    fn is_infinite(self: &Self) -> bool {
+        dec b = f32_to_bits(*self);
+        return (b == (2139095040 as u32)) || (b == (4286578688 as u32));
+    }
+
+    fn is_finite(self: &Self) -> bool {
+        return (self.is_nan() == false) && (self.is_infinite() == false);
+    }
+
+    fn is_sign_positive(self: &Self) -> bool {
+        return (f32_to_bits(*self) & (2147483648 as u32)) == (0 as u32);
+    }
+
+    fn is_sign_negative(self: &Self) -> bool {
+        return (f32_to_bits(*self) & (2147483648 as u32)) != (0 as u32);
+    }
+
+    fn abs(self: Self) -> Self {
+        return f32_from_bits(f32_to_bits(self) & (2147483647 as u32));
+    }
+
+    fn min(self: Self, other: Self) -> Self {
+        if self.is_nan() { return other; }
+        if other.is_nan() { return self; }
+        if self < other { return self; }
+        return other;
+    }
+
+    fn max(self: Self, other: Self) -> Self {
+        if self.is_nan() { return other; }
+        if other.is_nan() { return self; }
+        if self > other { return self; }
+        return other;
+    }
+
+    fn clamp(self: Self, min_val: Self, max_val: Self) -> Self {
+        if self.is_nan() || min_val.is_nan() || max_val.is_nan() || (min_val > max_val) {
+            std::panic();
+        }
+        if self < min_val { return min_val; }
+        if self > max_val { return max_val; }
+        return self;
+    }
+}
+
+impl FloatOps for f64 {
+    fn is_nan(self: &Self) -> bool { return *self != *self; }
+
+    fn is_infinite(self: &Self) -> bool {
+        dec b = f64_to_bits(*self);
+        return (b == (9218868437227405312 as u64)) || (b == (18442240474082164736 as u64));
+    }
+
+    fn is_finite(self: &Self) -> bool {
+        return (self.is_nan() == false) && (self.is_infinite() == false);
+    }
+
+    fn is_sign_positive(self: &Self) -> bool {
+        return (f64_to_bits(*self) & (9223372036854775808 as u64)) == (0 as u64);
+    }
+
+    fn is_sign_negative(self: &Self) -> bool {
+        return (f64_to_bits(*self) & (9223372036854775808 as u64)) != (0 as u64);
+    }
+
+    fn abs(self: Self) -> Self {
+        return f64_from_bits(f64_to_bits(self) & (9223372036854775807 as u64));
+    }
+
+    fn min(self: Self, other: Self) -> Self {
+        if self.is_nan() { return other; }
+        if other.is_nan() { return self; }
+        if self < other { return self; }
+        return other;
+    }
+
+    fn max(self: Self, other: Self) -> Self {
+        if self.is_nan() { return other; }
+        if other.is_nan() { return self; }
+        if self > other { return self; }
+        return other;
+    }
+
+    fn clamp(self: Self, min_val: Self, max_val: Self) -> Self {
+        if self.is_nan() || min_val.is_nan() || max_val.is_nan() || (min_val > max_val) {
+            std::panic();
+        }
+        if self < min_val { return min_val; }
+        if self > max_val { return max_val; }
+        return self;
+    }
+}
+}

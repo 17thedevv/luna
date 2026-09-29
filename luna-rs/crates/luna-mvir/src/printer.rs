@@ -26,8 +26,9 @@ fn print_instruction(inst: &Instruction) -> String {
         Instruction::Alloca => "alloca".to_string(),
         Instruction::HeapAlloc => "heap_alloc".to_string(),
         Instruction::Assign(val) => format!("assign {}", print_operand(val)),
-        Instruction::Store { ptr, value } => format!("store {} -> {}", print_operand(value), print_operand(ptr)),
+        Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => format!("store{} {} -> {}", if matches!(inst, Instruction::StoreAnchored { .. }) { "[unsafe-anchor]" } else { "" }, print_operand(value), print_operand(ptr)),
         Instruction::Load { ptr } => format!("load {}", print_operand(ptr)),
+        Instruction::Neg { value } => format!("neg {}", print_operand(value)),
         Instruction::Add { left, right } => format!("add {}, {}", print_operand(left), print_operand(right)),
         Instruction::Sub { left, right } => format!("sub {}, {}", print_operand(left), print_operand(right)),
         Instruction::Mul { left, right } => format!("mul {}, {}", print_operand(left), print_operand(right)),
@@ -102,8 +103,9 @@ fn print_instruction(inst: &Instruction) -> String {
         Instruction::Extract { value, variant_idx, field_idx } => {
             format!("extract {}.{}.{}", print_operand(value), variant_idx, field_idx)
         }
-        Instruction::FieldPtr { base, field_idx } => {
-            format!("field_ptr {}, {}", print_operand(base), field_idx)
+        Instruction::FieldPtr { base, field_idx, field_name } => {
+            let name = field_name.as_ref().map(|name| format!(" ({name})")).unwrap_or_default();
+            format!("field_ptr {}, {}{}", print_operand(base), field_idx, name)
         }
         Instruction::MarkInit { value } => format!("mark_init {}", print_operand(value)),
         Instruction::HeapFree { value } => format!("heap_free {}", print_operand(value)),
@@ -148,6 +150,7 @@ fn print_operand(op: &Operand) -> String {
         Operand::Global(glb) => glb.name.clone(),
         Operand::Block(blk_id) => format!("block_{}", blk_id.0),
         Operand::Number(n) => n.clone(),
+        Operand::Float { text, ty } => format!("{}_{:?}", text, ty),
         Operand::Boolean(b) => b.to_string(),
         Operand::StringRef(s) => format!("\"{}\"", s),
         Operand::Char(c) => format!("'{}'", c),

@@ -1,7 +1,7 @@
 import <hashset>;
 
 fn main() -> i32 {
-    dec rw set = hashset_new<u64>();
+    dec rw set = std::hashset_new<u64>();
     set.insert(1 as u64);
     set.insert(2 as u64);
     set.insert(3 as u64);
@@ -11,11 +11,11 @@ fn main() -> i32 {
     dec rw running = true;
     while running {
         match iter.next() {
-            Option::Some(value) -> {
+            std::Option::Some(value) -> {
                 count = count + (1 as u64);
                 sum = sum + *value;
             },
-            Option::None -> { running = false; },
+            std::Option::None -> { running = false; },
         }
     }
     if count != (3 as u64) || sum != (6 as u64) {

@@ -1,0 +1,7 @@
+import <iter_collect>;
+import <vec>;
+
+fn main() {
+    dec rw values: std::Vec<i32> = std::vec_new<i32>();
+    dec result = iter_collect_vec(values.into_iter());
+}

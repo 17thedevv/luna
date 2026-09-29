@@ -4,18 +4,18 @@ struct CounterIter<T> {
     limit: i32,
 };
 
-impl<T> Iterator<i32> for CounterIter<T> {
-    fn next(self: &rw Self) -> Option<i32> {
+impl<T> std::Iterator<i32> for CounterIter<T> {
+    fn next(self: &rw Self) -> std::Option<i32> {
         if self.current < self.limit {
             dec value = self.current;
             self.current = self.current + 1;
-            return Option::Some(value);
+            return std::Option::Some(value);
         }
-        return Option::None;
+        return std::Option::None;
     }
 }
 
-impl<T> IntoIterator<i32, CounterIter<T>> for CounterIter<T> {
+impl<T> std::IntoIterator<i32, CounterIter<T>> for CounterIter<T> {
     fn into_iter(self: Self) -> CounterIter<T> {
         return self;
     }

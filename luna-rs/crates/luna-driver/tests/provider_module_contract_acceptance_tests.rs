@@ -2,6 +2,9 @@ use luna_driver::sysroot::Sysroot;
 use luna_driver::{check, compile, CompilerOptions};
 use std::fs;
 use std::path::PathBuf;
+use std::sync::OnceLock;
+
+static SOURCE_ONLY_ROOT: OnceLock<PathBuf> = OnceLock::new();
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
     let dir = std::env::temp_dir()
@@ -12,51 +15,82 @@ fn create_temp_dir(test_name: &str) -> PathBuf {
     dir
 }
 
+fn source_only_root() -> &'static PathBuf {
+    SOURCE_ONLY_ROOT.get_or_init(|| {
+        let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+        let root = create_temp_dir("source_only_sysroot");
+        copy_tree(sysroot.external_dir(), &root.join("libs").join("external"));
+        remove_artifacts(&root.join("libs").join("external"));
+        root
+    })
+}
+
+fn copy_tree(source: &std::path::Path, destination: &std::path::Path) {
+    fs::create_dir_all(destination).expect("create source-only sysroot directory");
+    for entry in fs::read_dir(source).expect("enumerate source sysroot") {
+        let entry = entry.expect("read source sysroot entry");
+        let from = entry.path();
+        let to = destination.join(entry.file_name());
+        if from.is_dir() { copy_tree(&from, &to); }
+        else { fs::copy(from, to).expect("copy source sysroot file"); }
+    }
+}
+
+fn remove_artifacts(root: &std::path::Path) {
+    for entry in fs::read_dir(root).expect("enumerate source-only sysroot") {
+        let path = entry.expect("read source-only sysroot entry").path();
+        if path.is_dir() { remove_artifacts(&path); }
+        else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale sysroot artifact");
+        }
+    }
+}
+
 // =============================================================================
 // CONTRACT 1: language contracts are auto-visible, ordinary providers are explicit,
 // and provider identities never synthesize source namespaces.
 // =============================================================================
 
 #[test]
-fn test_acceptance_core_root_bindings_pass() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+fn test_acceptance_core_canonical_bindings_pass() {
+    let root = source_only_root();
     let dir = create_temp_dir("accept_core_root_bindings_pass");
     let main_path = dir.join("main.ln");
     let src = r#"
         import <result>;
 
-        fn test_opt(x: Option<i32>) -> Option<i32> {
+        fn test_opt(x: std::Option<i32>) -> std::Option<i32> {
             return x;
         }
 
-        fn test_res<E>(x: Result<i32, E>) -> Result<i32, E> {
+        fn test_res<E>(x: std::Result<i32, E>) -> std::Result<i32, E> {
             return x;
         }
 
         fn main() {
-            dec opt: Option<i32> = Option::Some(42);
-            dec res: Result<i32, i32> = Result::Ok(100);
+            dec opt: std::Option<i32> = std::Option::Some(42);
+            dec res: std::Result<i32, i32> = std::Result::Ok(100);
             dec o = test_opt(opt);
             dec r = test_res(res);
         }
     "#;
     fs::write(&main_path, src).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
+        search_paths: vec![root.to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
     let res = check(main_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(
         res.is_ok(),
-        "Auto-visible Option and explicitly imported Result root bindings must succeed: {:?}",
+        "Canonical std::Option and std::Result bindings must succeed: {:?}",
         res.err()
     );
 }
 
 #[test]
 fn test_acceptance_provider_synthetic_namespace_fails() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let root = source_only_root();
     let dir = create_temp_dir("accept_core_synthetic_namespace_fails");
 
     // A logical provider identity does not create a source namespace.
@@ -69,7 +103,7 @@ fn test_acceptance_provider_synthetic_namespace_fails() {
     "#;
     fs::write(&main_opt, src_opt).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
+        search_paths: vec![root.to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -87,6 +121,17 @@ fn test_acceptance_provider_synthetic_namespace_fails() {
         errs_opt
     );
 
+    let main_bare = dir.join("main_bare.ln");
+    let src_bare = r#"
+        import <result>;
+        fn main() {
+            dec x: Result<i32, i32>;
+        }
+    "#;
+    fs::write(&main_bare, src_bare).unwrap();
+    let res_bare = check(main_bare.to_str().unwrap(), src_bare.to_string(), &opts);
+    assert!(res_bare.is_err(), "bare Result must not be retained as a compatibility alias");
+
     // Ordinary core APIs do not become implicitly visible merely because the
     // compiler bootstraps language contracts.
     let main_res = dir.join("main_res.ln");
@@ -99,7 +144,7 @@ fn test_acceptance_provider_synthetic_namespace_fails() {
     let res_res = check(main_res.to_str().unwrap(), src_res.to_string(), &opts);
     assert!(
         res_res.is_err(),
-        "Result<i32, i32> must fail without explicit import <result>"
+        "bare Result<i32, i32> must fail without canonical std:: qualification"
     );
 }
 
@@ -133,7 +178,7 @@ fn test_acceptance_provider_explicit_module_pass() {
     "#;
     fs::write(&main_path, src).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -170,7 +215,7 @@ fn test_acceptance_provider_prefix_fails() {
     "#;
     fs::write(&main_path, src).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -223,7 +268,7 @@ fn test_acceptance_same_provider_imported_twice_idempotent() {
     "#;
     fs::write(&main_path, src).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -274,7 +319,7 @@ fn test_acceptance_provider_collision_e1002() {
     "#;
     fs::write(&main_path, src).unwrap();
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -314,7 +359,7 @@ fn test_acceptance_private_export_inaccessible() {
     .unwrap();
 
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -414,7 +459,7 @@ fn test_acceptance_source_vs_llib_identical_namespace() {
     fs::write(&main_path, consumer_src).unwrap();
 
     let opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![dir.to_string_lossy().to_string(), source_only_root().to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
@@ -435,6 +480,7 @@ fn test_acceptance_source_vs_llib_identical_namespace() {
     let llib_path = dir.join("shapes.llib");
     let compile_opts = CompilerOptions {
         output_path: Some(llib_path.to_str().unwrap().to_string()),
+        search_paths: vec![source_only_root().to_string_lossy().to_string()],
         emit_mlib: true,
         no_link: true,
         quiet: true,

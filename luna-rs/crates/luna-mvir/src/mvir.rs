@@ -24,6 +24,12 @@ pub struct ValueId(pub u32);
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct BlockId(pub u32);
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub enum FloatType {
+    F32,
+    F64,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Operand {
     Value(ValueId),
@@ -33,6 +39,10 @@ pub enum Operand {
     Boolean(bool),
     StringRef(String),
     Char(String),
+    Float {
+        text: String,
+        ty: FloatType,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -54,8 +64,19 @@ pub enum Instruction {
         ptr: Operand,
         value: Operand,
     },
+    /// Store explicitly performed inside an unsafe block. Borrow analysis
+    /// may use this operation as the one-shot anchor establishment boundary
+    /// for a declared anchored raw-pointer field; code generation is identical
+    /// to `Store`.
+    StoreAnchored {
+        ptr: Operand,
+        value: Operand,
+    },
     Load {
         ptr: Operand,
+    },
+    Neg {
+        value: Operand,
     },
     Add {
         left: Operand,
@@ -184,6 +205,9 @@ pub enum Instruction {
     FieldPtr {
         base: Operand,
         field_idx: u32,
+        /// Canonical source field name, when this is a nominal struct field.
+        /// `field_idx` remains only the runtime layout offset.
+        field_name: Option<String>,
     },
     HeapFree {
         value: Operand,

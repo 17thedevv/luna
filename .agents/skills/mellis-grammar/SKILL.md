@@ -132,7 +132,21 @@ struct InternalBuffer {
 struct Holder {
     value: &i32,
 } requires life(value) >= life(self);
+
+// RAW-STORAGE-ANCHOR-v1: a direct raw-pointer field may carry an explicit
+// owner-relative storage invariant. This is not a lifetime relation.
+struct RawOwner {
+    private data: *rw u8,
+} requires anchor(data) = self;
 ```
+
+`requires anchor(field) = self` is valid only for a direct field whose type is
+`*T` or `*rw T`. The canonical identity is the owning type plus the field
+name, and the contract is preserved in `.llib` semantic metadata. Nested field
+paths and non-pointer fields are rejected. Establishing or re-establishing the
+per-value fact requires an explicit `unsafe` field construction/store boundary;
+ordinary stores cannot preserve it. See the RAW-STORAGE-ANCHOR-v1 contract for
+move, mutation, and raw-to-safe conversion rules.
 
 ### Imports & Module Architecture (Provider vs Namespace)
 Mellis strictly separates **artifact providers** from **module namespaces**:
@@ -219,6 +233,10 @@ impl Point {
     }
 }
 ```
+
+Trait methods may declare method-level type parameters using the same
+`generic_params` syntax as ordinary functions. Static calls are monomorphized;
+generic trait methods remain excluded from `dyn Trait` by object-safety rules.
 
 ### Async & Await
 Mellis strictly uses **postfix `.await`** (`expr.await`). Prefix `await expr` is strictly forbidden to eliminate operator precedence ambiguity and harmonize with the member-access family (`.field`, `.method()`, `[i]`, `.await`).

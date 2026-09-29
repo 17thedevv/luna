@@ -1319,6 +1319,35 @@ pub struct CanonicalTypeLifetimeContract {
     pub outlives_constraints: Vec<CanonicalTypeOutlivesConstraint>,
 }
 
+/// Versioned public invariant for direct raw-pointer fields anchored to the
+/// containing value. The owner identity is the stable identity of the
+/// `ExportedSymbol` carrying this contract; field names are canonical source
+/// identifiers, never session-local IDs or declaration ordinals.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+pub struct CanonicalRawStorageAnchorContract {
+    pub version: u32,
+    pub field_names: Vec<String>,
+}
+
+impl CanonicalRawStorageAnchorContract {
+    pub const CURRENT_VERSION: u32 = 1;
+
+    pub fn new(mut field_names: Vec<String>) -> Self {
+        field_names.sort_unstable();
+        field_names.dedup();
+        Self { version: Self::CURRENT_VERSION, field_names }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.field_names.is_empty()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+pub struct ResolvedRawStorageAnchorContract {
+    pub fields: Vec<SymbolId>,
+}
+
 impl CanonicalTypeLifetimeContract {
     pub const CURRENT_VERSION: u32 = 1;
 

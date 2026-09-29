@@ -1,0 +1,13 @@
+import <iter_adapters>;
+import <iter_consumers>;
+import <slice>;
+
+fn identity(value: &i32) -> i32 { return *value; }
+fn add(acc: i32, value: i32) -> i32 { return acc + value; }
+
+fn main() {
+    dec values: [i32; 1] = [1];
+    dec iter = std::slice::slice_iter<i32>(&values);
+    dec mapped = iter_adapters::iter_map(iter, identity);
+    dec folded = iter_consumers::iter_fold(mapped, 0, add);
+}

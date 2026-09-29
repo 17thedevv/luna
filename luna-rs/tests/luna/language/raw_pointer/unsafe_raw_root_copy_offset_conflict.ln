@@ -1,0 +1,14 @@
+import <ptr>;
+
+unsafe fn conflicting(pointer: *rw i32) {
+    unsafe {
+        dec copied = pointer;
+        dec shifted = std::ptr::add_mut<i32>(copied, 0 as u64);
+        dec rw first = &rw *pointer;
+        dec shared = &*shifted;
+        *first = 1;
+        *shared;
+    }
+}
+
+fn main() {}

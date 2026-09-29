@@ -124,15 +124,15 @@ fn test_cmp_min_max() {
         import <cmp>;
 
         fn main() -> i32 {
-            if min_i32(10, 20) != 10 { return 1; }
-            if min_i32(20, 10) != 10 { return 2; }
-            if max_i32(10, 20) != 20 { return 3; }
-            if max_i32(20, 10) != 20 { return 4; }
+            if std::min_i32(10, 20) != 10 { return 1; }
+            if std::min_i32(20, 10) != 10 { return 2; }
+            if std::max_i32(10, 20) != 20 { return 3; }
+            if std::max_i32(20, 10) != 20 { return 4; }
 
             dec u10 = 10 as u64;
             dec u20 = 20 as u64;
-            if min_u64(u10, u20) != u10 { return 5; }
-            if max_u64(u10, u20) != u20 { return 6; }
+            if std::min_u64(u10, u20) != u10 { return 5; }
+            if std::max_u64(u10, u20) != u20 { return 6; }
 
             return 0;
         }
@@ -154,17 +154,17 @@ fn test_cmp_clamp() {
 
         fn main() -> i32 {
             // within range
-            if clamp_i32(15, 10, 20) != 15 { return 1; }
+            if std::clamp_i32(15, 10, 20) != 15 { return 1; }
             // below range
-            if clamp_i32(5, 10, 20) != 10 { return 2; }
+            if std::clamp_i32(5, 10, 20) != 10 { return 2; }
             // above range
-            if clamp_i32(25, 10, 20) != 20 { return 3; }
+            if std::clamp_i32(25, 10, 20) != 20 { return 3; }
 
             dec lo = 10 as u64;
             dec hi = 20 as u64;
-            if clamp_u64(15 as u64, lo, hi) != (15 as u64) { return 4; }
-            if clamp_u64(5 as u64, lo, hi) != lo { return 5; }
-            if clamp_u64(25 as u64, lo, hi) != hi { return 6; }
+            if std::clamp_u64(15 as u64, lo, hi) != (15 as u64) { return 4; }
+            if std::clamp_u64(5 as u64, lo, hi) != lo { return 5; }
+            if std::clamp_u64(25 as u64, lo, hi) != hi { return 6; }
 
             return 0;
         }

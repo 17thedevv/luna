@@ -12,6 +12,41 @@ fn create_temp_dir(test_name: &str) -> PathBuf {
     dir
 }
 
+fn copy_dir_all(src: &std::path::Path, dst: &std::path::Path) {
+    fs::create_dir_all(dst).expect("create source sysroot directory");
+    for entry in fs::read_dir(src).expect("read external provider directory") {
+        let entry = entry.expect("read provider entry");
+        let target = dst.join(entry.file_name());
+        if entry.file_type().expect("provider entry type").is_dir() {
+            copy_dir_all(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).expect("copy provider file");
+        }
+    }
+}
+
+fn remove_artifacts(dir: &std::path::Path) {
+    for entry in fs::read_dir(dir).expect("read source sysroot directory") {
+        let path = entry.expect("read sysroot entry").path();
+        if path.is_dir() {
+            remove_artifacts(&path);
+        } else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale provider artifact");
+        }
+    }
+}
+
+fn source_sysroot() -> Sysroot {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let external_dir = manifest_dir.parent().expect("crates directory")
+        .parent().expect("workspace root").join("libs").join("external");
+    let root = create_temp_dir("source_sysroot");
+    let source_external = root.join("libs").join("external");
+    copy_dir_all(&external_dir, &source_external);
+    remove_artifacts(&source_external);
+    Sysroot::from_root(root).expect("source-only sysroot")
+}
+
 fn make_opts(test_sysroot: &Sysroot) -> CompilerOptions {
     CompilerOptions {
         search_paths: vec![test_sysroot.root().to_string_lossy().to_string()],
@@ -23,7 +58,7 @@ fn make_opts(test_sysroot: &Sysroot) -> CompilerOptions {
 /// 1. Option::ok_or with Some returns Ok(val)
 #[test]
 fn test_opt_ok_or_some() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("opt_ok_or_some");
     let opts = make_opts(&test_sysroot);
 
@@ -39,11 +74,11 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 fn main() -> i32 {
-    dec opt = Option::Some(42);
+    dec opt = std::Option::Some(42);
     dec res = opt.ok_or(0);
     return match res {
-        Result::Ok(val) -> val,
-        Result::Err(_) -> 0,
+        std::Result::Ok(val) -> val,
+        std::Result::Err(_) -> 0,
     };
 }
 "#;
@@ -56,7 +91,7 @@ fn main() -> i32 {
 /// 2. Option::ok_or with None returns Err(err)
 #[test]
 fn test_opt_ok_or_none() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("opt_ok_or_none");
     let opts = make_opts(&test_sysroot);
 
@@ -72,11 +107,11 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 fn main() -> i32 {
-    dec opt: Option<i32> = Option::None;
+    dec opt: std::Option<i32> = std::Option::None;
     dec res = opt.ok_or(99);
     return match res {
-        Result::Ok(_) -> 0,
-        Result::Err(e) -> e,
+        std::Result::Ok(_) -> 0,
+        std::Result::Err(e) -> e,
     };
 }
 "#;
@@ -89,7 +124,7 @@ fn main() -> i32 {
 /// 3. Result::ok converts Ok -> Some and Err -> None
 #[test]
 fn test_res_ok_from_ok_and_err() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("res_ok_from_ok_and_err");
     let opts = make_opts(&test_sysroot);
 
@@ -105,20 +140,20 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 fn test_ok() -> i32 {
-    dec r: Result<i32, i32> = Result::Ok(10);
+    dec r: std::Result<i32, i32> = std::Result::Ok(10);
     dec o = r.ok();
     return match o {
-        Option::Some(val) -> val,
-        Option::None -> 0,
+        std::Option::Some(val) -> val,
+        std::Option::None -> 0,
     };
 }
 
 fn test_err() -> i32 {
-    dec r: Result<i32, i32> = Result::Err(20);
+    dec r: std::Result<i32, i32> = std::Result::Err(20);
     dec o = r.ok();
     return match o {
-        Option::Some(_) -> 0,
-        Option::None -> 1,
+        std::Option::Some(_) -> 0,
+        std::Option::None -> 1,
     };
 }
 
@@ -135,7 +170,7 @@ fn main() -> i32 {
 /// 4. Result::err converts Err -> Some and Ok -> None
 #[test]
 fn test_res_err_from_err_and_ok() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("res_err_from_err_and_ok");
     let opts = make_opts(&test_sysroot);
 
@@ -151,20 +186,20 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 fn test_err() -> i32 {
-    dec r: Result<i32, i32> = Result::Err(55);
+    dec r: std::Result<i32, i32> = std::Result::Err(55);
     dec o = r.err();
     return match o {
-        Option::Some(e) -> e,
-        Option::None -> 0,
+        std::Option::Some(e) -> e,
+        std::Option::None -> 0,
     };
 }
 
 fn test_ok() -> i32 {
-    dec r: Result<i32, i32> = Result::Ok(66);
+    dec r: std::Result<i32, i32> = std::Result::Ok(66);
     dec o = r.err();
     return match o {
-        Option::Some(_) -> 0,
-        Option::None -> 1,
+        std::Option::Some(_) -> 0,
+        std::Option::None -> 1,
     };
 }
 
@@ -181,7 +216,7 @@ fn main() -> i32 {
 /// 5. Option::ok consuming identity
 #[test]
 fn test_opt_ok_identity() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("opt_ok_identity");
     let opts = make_opts(&test_sysroot);
 
@@ -197,11 +232,11 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 fn main() -> i32 {
-    dec o = Option::Some(99);
+    dec o = std::Option::Some(99);
     dec o2 = o.ok();
     return match o2 {
-        Option::Some(val) -> val,
-        Option::None -> 0,
+        std::Option::Some(val) -> val,
+        std::Option::None -> 0,
     };
 }
 "#;
@@ -214,7 +249,7 @@ fn main() -> i32 {
 /// 6. Consuming move invalidates receiver (Negative test)
 #[test]
 fn test_consuming_move_invalidates_source() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("consuming_move_invalidates");
     let opts = make_opts(&test_sysroot);
 
@@ -233,7 +268,7 @@ struct NoCopy { val: i32 };
 
 
 fn main() {
-    dec opt = Option::Some(NoCopy { val: 1 });
+    dec opt = std::Option::Some(NoCopy { val: 1 });
     dec res = opt.ok_or(0);
     dec _again = opt; // Error: use of moved value
 }
@@ -253,7 +288,7 @@ fn main() {
 /// 7. Result::ok consuming move invalidates receiver (Negative test)
 #[test]
 fn test_result_ok_consuming_move_invalidates_source() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("result_ok_consuming_move_invalidates");
     let opts = make_opts(&test_sysroot);
 
@@ -272,7 +307,7 @@ struct NoCopy { val: i32 };
 
 
 fn main() {
-    dec res: Result<NoCopy, i32> = Result::Ok(NoCopy { val: 1 });
+    dec res: std::Result<NoCopy, i32> = std::Result::Ok(NoCopy { val: 1 });
     dec opt = res.ok();
     dec _again = res; // Error: use of moved value
 }
@@ -292,7 +327,7 @@ fn main() {
 /// 8. Drop payload destruction cleanliness (no partial-move-under-drop)
 #[test]
 fn test_drop_payload_destruction_cleanliness() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("drop_payload_destruction");
     let opts = make_opts(&test_sysroot);
 
@@ -309,18 +344,18 @@ import <iter_consumers>;
 
 struct Droppable { id: i32 };
 
-impl Drop for Droppable {
+impl std::Drop for Droppable {
     fn drop(self: &rw Self) {}
 }
 
 fn test_opt_drop() -> i32 {
-    dec opt = Option::Some(Droppable { id: 1 });
+    dec opt = std::Option::Some(Droppable { id: 1 });
     dec res = opt.ok_or(99);
     return 0;
 }
 
 fn test_res_drop() -> i32 {
-    dec res: Result<Droppable, i32> = Result::Ok(Droppable { id: 2 });
+    dec res: std::Result<Droppable, i32> = std::Result::Ok(Droppable { id: 2 });
     dec opt = res.ok();
     return 0;
 }
@@ -340,7 +375,7 @@ fn main() -> i32 {
 /// 9. Generic error type inference on ok_or
 #[test]
 fn test_generic_error_inference() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("generic_error_inference");
     let opts = make_opts(&test_sysroot);
 
@@ -359,10 +394,10 @@ struct CustomError { code: i32 };
 
 
 fn main() -> i32 {
-    dec opt1 = Option::Some(10);
+    dec opt1 = std::Option::Some(10);
     dec res1 = opt1.ok_or(100);
 
-    dec opt2: Option<i32> = Option::None;
+    dec opt2: std::Option<i32> = std::Option::None;
     dec res2 = opt2.ok_or(CustomError { code: 404 });
 
     return 0;
@@ -377,7 +412,7 @@ fn main() -> i32 {
 /// 10. Source .ln vs .llib parity for conversions
 #[test]
 fn test_source_and_llib_conversions_parity() {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let dir = create_temp_dir("conversions_llib_parity");
     let lib_src_path = dir.join("conv_provider.ln");
     let lib_bin_path = dir.join("conv_provider.llib");
@@ -395,15 +430,15 @@ import <iter_adapters>;
 import <iter_consumers>;
 
 module conv_provider {
-    export fn to_res(opt: Option<i32>, default_err: i32) -> Result<i32, i32> {
+    export fn to_res(opt: std::Option<i32>, default_err: i32) -> std::Result<i32, i32> {
         return opt.ok_or(default_err);
     }
 
-    export fn to_opt(res: Result<i32, i32>) -> Option<i32> {
+    export fn to_opt(res: std::Result<i32, i32>) -> std::Option<i32> {
         return res.ok();
     }
 
-    export fn to_err_opt(res: Result<i32, i32>) -> Option<i32> {
+    export fn to_err_opt(res: std::Result<i32, i32>) -> std::Option<i32> {
         return res.err();
     }
 }
@@ -434,12 +469,12 @@ import <iter_consumers>;
 import "conv_provider";
 
 fn main() -> i32 {
-    dec opt = Option::Some(123);
+    dec opt = std::Option::Some(123);
     dec res = conv_provider::to_res(opt, 0);
     dec back_opt = conv_provider::to_opt(res);
     return match back_opt {
-        Option::Some(v) -> v,
-        Option::None -> 0,
+        std::Option::Some(v) -> v,
+        std::Option::None -> 0,
     };
 }
 "#;

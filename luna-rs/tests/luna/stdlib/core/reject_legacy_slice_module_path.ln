@@ -1,0 +1,6 @@
+import <slice>;
+
+fn main() {
+    dec values: [i32; 1] = [1];
+    dec iter = slice::slice_iter<i32>(&values);
+}

@@ -90,6 +90,7 @@ pub struct ProviderInterface {
     pub interface_fingerprint: luna_llib::format::Fingerprint,
     pub exported_symbols: HashMap<String, ExternalSymbol>,
     pub symbol_types: HashMap<luna_common::ids::SymbolId, luna_semantic::ty::SemanticTypeId>,
+    pub symbol_struct_field_names: HashMap<luna_common::ids::SymbolId, Vec<String>>,
     pub types: luna_semantic::ty::TypeContext,
     pub lang_items:
         std::collections::HashMap<luna_semantic::lang_item::LangItem, CanonicalSymbolId>,
@@ -119,11 +120,17 @@ pub struct ProviderInterface {
     pub raw_generic_param_symbols: HashMap<(luna_ast::DeclId, usize), luna_common::ids::SymbolId>,
     pub symbol_lifetime_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalLifetimeContract>,
     pub symbol_type_lifetime_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalTypeLifetimeContract>,
+    pub symbol_raw_storage_anchor_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalRawStorageAnchorContract>,
+    /// Canonical raw-pointer effects indexed by stable exported symbol path.
+    /// Artifact loading reconstructs these summaries for current-session call
+    /// sites; no session-local ID crosses the artifact boundary.
+    pub raw_pointer_effects_by_path: HashMap<String, luna_llib::metadata::CanonicalRawPointerEffects>,
     pub symbol_ffi_sync_noescape: HashMap<luna_common::ids::SymbolId, Vec<bool>>,
     pub trait_methods: HashMap<CanonicalSymbolId, Vec<CanonicalSymbolId>>,
     pub unsafe_functions: HashSet<luna_common::ids::SymbolId>,
     pub trait_bounds: HashMap<CanonicalSymbolId, Vec<ExternalTraitBound>>,
     pub assoc_type_bounds: HashMap<CanonicalSymbolId, Vec<ExternalAssocTypeBound>>,
+    pub method_to_impl_decl: HashMap<luna_ast::DeclId, luna_ast::DeclId>,
 }
 
 #[derive(Default)]
@@ -245,26 +252,9 @@ impl ModuleRegistry {
                     Some(global_scope),
                 );
                 
-                // Determine auto-visible symbols for this provider
-                let mut auto_visible = HashSet::new();
-                for entry in crate::lang_contracts::LangContractManifest::canonical().contracts {
-                    if entry.provider_id == prov_name {
-                        for sym_name in entry.auto_visible_symbols {
-                            auto_visible.insert(sym_name.to_string());
-                        }
-                    }
-                }
-
                 for root in prov_interface.exported_symbols.values() {
                     // Inject into provider scope for `import <name>;`
                     Self::inject_symbol(root, prov_scope, ctx, &mut provider_symbol_maps);
-
-                    // Inject into global scope if auto-visible
-                    // We only check root symbol name here. Methods like Option::unwrap are members,
-                    // so injecting Option handles them properly through member lookup on Option.
-                    if auto_visible.contains(&root.sym.name) {
-                        Self::inject_symbol(root, global_scope, ctx, &mut provider_symbol_maps);
-                    }
                 }
                 ctx.provider_scopes.insert(pid, prov_scope);
                 ctx.provider_lookup.insert(prov_name.clone(), pid);
@@ -272,6 +262,15 @@ impl ModuleRegistry {
                     .insert(prov_name.clone(), prov_scope);
             }
         }
+
+        // Resolve compiler language items and the deliberately small implicit
+        // `std::` surface by exact logical path. Provider identity is used only
+        // to acquire the provider; it does not select a root-level symbol.
+        Self::inject_canonical_language_items(
+            self,
+            ctx,
+            global_scope,
+        );
 
         for interface in self.interfaces.values() {
             for ext_sym in &interface.impl_method_symbols {
@@ -418,13 +417,6 @@ impl ModuleRegistry {
                 }
             }
 
-            // Inject lang items
-            for (item, canon) in &interface.lang_items {
-                if let Some(sym_id) = resolve_canonical(canon) {
-                    ctx.lang_items.inject_raw(*item, sym_id);
-                }
-            }
-
             // Inject lifetime contracts
             for (&old_sym_id, contract) in &interface.symbol_lifetime_contracts {
                 let new_sym_id = lookup_sym(old_sym_id);
@@ -436,6 +428,18 @@ impl ModuleRegistry {
                 let new_sym_id = lookup_sym(old_sym_id);
                 ctx.tables.type_lifetime_contracts.insert(new_sym_id, contract.clone());
             }
+
+            // The canonical owner is the stable exported type identity; the
+            // imported table is keyed only by a fresh session-local SymbolId.
+            for (&old_sym_id, contract) in &interface.symbol_raw_storage_anchor_contracts {
+                let new_sym_id = lookup_sym(old_sym_id);
+                ctx.tables.raw_storage_anchor_contracts.insert(new_sym_id, contract.clone());
+            }
+
+            for (&old_sym_id, names) in &interface.symbol_struct_field_names {
+                ctx.tables.struct_field_names.insert(lookup_sym(old_sym_id), names.clone());
+            }
+
 
             // Inject ffi_sync_noescape
             for (&old_sym_id, noescapes) in &interface.symbol_ffi_sync_noescape {
@@ -531,18 +535,18 @@ impl ModuleRegistry {
                             .clone_type_from(entry.self_type, &interface.types, &lookup_sym);
                     let new_gps: Vec<_> =
                         entry.generic_params.iter().filter_map(resolve_canonical).collect();
-                    let dummy_span = luna_common::Span::default();
-                    if ctx
-                        .check_impl_coherence(trait_sym, new_self_ty, &new_gps, dummy_span)
-                        .is_err()
-                    {
-                        continue;
-                    }
                     let new_trait_args: Vec<_> = entry
                         .trait_args
                         .iter()
                         .map(|&a| ctx.types.clone_type_from(a, &interface.types, &lookup_sym))
                         .collect();
+                    let dummy_span = luna_common::Span::default();
+                    if ctx
+                        .check_impl_coherence(trait_sym, new_self_ty, &new_gps, &new_trait_args, dummy_span)
+                        .is_err()
+                    {
+                        continue;
+                    }
                     ctx.tables
                         .trait_impl_entries
                         .push(luna_semantic::semantic_tables::TraitImplEntry {
@@ -596,7 +600,6 @@ impl ModuleRegistry {
                     if let Some(&first_sym) = new_sym_ids.first() {
                         let is_drop = new_trait_id.map_or(false, |ts| {
                             Some(ts) == ctx.lang_items.get(luna_semantic::lang_item::LangItem::Drop)
-                                || ((ts.0 as usize) < ctx.symbol_table.symbols.len() && ctx.symbol_table.symbols[ts.0 as usize].name == "Drop")
                         });
                         if is_drop {
                             if let luna_semantic::semantic_tables::ImplSelfTypeKey::Nominal(nom_sym) = new_self_type {
@@ -700,13 +703,6 @@ impl ModuleRegistry {
                 }
             }
 
-            // Inject lang items
-            for (lang_item, canon_id) in &interface.lang_items {
-                if let Some(new_sym_id) = resolve_canonical(canon_id) {
-                    ctx.lang_items.inject_raw(*lang_item, new_sym_id);
-                }
-            }
-
             // Inject AST tables for generic function monomorphization
             for (&decl_id, &old_sym_id) in &interface.decl_symbols {
                 let new_sym_id = lookup_sym(old_sym_id);
@@ -762,7 +758,130 @@ impl ModuleRegistry {
                 let new_gp = lookup_sym(old_gp);
                 ctx.tables.generic_param_symbols.insert((decl_id, idx), new_gp);
             }
+            for (&m_decl, &i_decl) in &interface.method_to_impl_decl {
+                ctx.tables.method_to_impl_decl.insert(m_decl, i_decl);
+                if let Some(&m_sym) = ctx.tables.decl_symbols.get(&m_decl) {
+                    ctx.tables.method_sym_to_impl_decl.insert(m_sym, i_decl);
+                }
+            }
         }
+    }
+
+    fn inject_canonical_language_items(
+        registry: &ModuleRegistry,
+        ctx: &mut luna_semantic::SemanticContext,
+        global_scope: luna_semantic::symbol::ScopeId,
+    ) {
+        let manifest = crate::lang_contracts::LangContractManifest::canonical();
+        let mut global_std_scope = None;
+
+        for entry in manifest.contracts {
+            let Some(&provider_id) = registry.providers.get(entry.provider_id) else {
+                continue;
+            };
+            let Some(&provider_scope) = ctx.provider_scopes.get(&provider_id) else {
+                continue;
+            };
+
+            for canonical_path in entry.auto_visible_paths {
+                let parts: Vec<_> = canonical_path.split("::").collect();
+                if parts.len() != 2 || parts[0] != "std" {
+                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
+                        "Invalid auto-visible stdlib path `{canonical_path}`; expected `std::Name`"
+                    )));
+                    continue;
+                }
+                let Some(symbol_id) = Self::resolve_logical_path(ctx, provider_scope, canonical_path)
+                else {
+                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
+                        "Provider `{}` is missing auto-visible canonical path `{canonical_path}`",
+                        entry.provider_id
+                    )));
+                    continue;
+                };
+
+                let std_scope = *global_std_scope.get_or_insert_with(|| {
+                    let std_symbol = if let Some(existing) =
+                        ctx.symbol_table.lookup_exact("std", global_scope)
+                    {
+                        existing
+                    } else {
+                        ctx.symbol_table.declare_symbol(
+                            "std".to_string(),
+                            SymbolKind::Module,
+                            global_scope,
+                            luna_common::Span::new(luna_common::ids::FileId(0), 0, 0),
+                            None,
+                            Visibility::Public,
+                            &mut ctx.diagnostics,
+                        )
+                    };
+                    if let Some(inner) = ctx.symbol_table.symbols[std_symbol.0 as usize].inner_scope {
+                        inner
+                    } else {
+                        let inner = ctx.symbol_table.create_scope(
+                            ScopeKind::Module,
+                            Some(global_scope),
+                        );
+                        ctx.symbol_table.set_inner_scope(std_symbol, inner);
+                        inner
+                    }
+                });
+
+                let imported = ctx.symbol_table.add_imported_symbol(
+                    parts[1].to_string(),
+                    symbol_id,
+                    std_scope,
+                );
+                if let luna_semantic::symbol::ImportSymbolResult::Conflict { existing } = imported {
+                    let existing_name = ctx.symbol_table.symbols[existing.0 as usize].name.clone();
+                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
+                        "Conflicting canonical stdlib export `{canonical_path}` (existing `{existing_name}`)"
+                    )));
+                }
+            }
+
+            for binding in entry.language_items {
+                let Some(item) = luna_semantic::lang_item::LangItem::from_name(binding.lang_item)
+                else {
+                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
+                        "Unknown language item `{}` in canonical stdlib manifest",
+                        binding.lang_item
+                    )));
+                    continue;
+                };
+                let Some(symbol_id) = Self::resolve_logical_path(ctx, provider_scope, binding.canonical_path)
+                else {
+                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
+                        "Provider `{}` is missing language-item path `{}` for `{}`",
+                        entry.provider_id, binding.canonical_path, binding.lang_item
+                    )));
+                    continue;
+                };
+                ctx.lang_items.inject_raw(item, symbol_id);
+            }
+        }
+    }
+
+    fn resolve_logical_path(
+        ctx: &luna_semantic::SemanticContext,
+        starting_scope: luna_semantic::symbol::ScopeId,
+        logical_path: &str,
+    ) -> Option<luna_common::ids::SymbolId> {
+        let parts: Vec<_> = logical_path.split("::").collect();
+        if parts.is_empty() {
+            return None;
+        }
+        let mut scope = starting_scope;
+        let mut resolved = None;
+        for (index, part) in parts.iter().enumerate() {
+            let symbol = ctx.symbol_table.lookup_exact(part, scope)?;
+            resolved = Some(symbol);
+            if index + 1 < parts.len() {
+                scope = ctx.symbol_table.symbols[symbol.0 as usize].inner_scope?;
+            }
+        }
+        resolved
     }
 
     fn merge_symbols(
@@ -1106,6 +1225,12 @@ impl ModuleRegistry {
                 decl_symbols.insert(id, sym);
             }
         }
+        let mut method_to_impl_decl = HashMap::new();
+        for (&m_decl, &i_decl) in &ctx.tables.method_to_impl_decl {
+            if ranges.decls.contains(&m_decl.0) {
+                method_to_impl_decl.insert(m_decl, i_decl);
+            }
+        }
         let mut expr_symbols = HashMap::new();
         for (&id, &sym) in &ctx.tables.expr_symbols {
             if ranges.exprs.contains(&id.0) {
@@ -1196,6 +1321,7 @@ impl ModuleRegistry {
             interface_fingerprint: luna_llib::format::Fingerprint::default(),
             exported_symbols,
             symbol_types,
+            symbol_struct_field_names: ctx.tables.struct_field_names.clone(),
             types: ctx.types.clone(),
             lang_items,
             generic_param_symbols: final_generic_param_symbols,
@@ -1223,11 +1349,14 @@ impl ModuleRegistry {
             raw_generic_param_symbols,
             symbol_lifetime_contracts: ctx.tables.fn_lifetime_contracts.clone(),
             symbol_type_lifetime_contracts: ctx.tables.type_lifetime_contracts.clone(),
+            symbol_raw_storage_anchor_contracts: ctx.tables.raw_storage_anchor_contracts.clone(),
+            raw_pointer_effects_by_path: HashMap::new(),
             symbol_ffi_sync_noescape: ctx.tables.ffi_sync_noescape.clone(),
             trait_methods,
             unsafe_functions: ctx.tables.unsafe_functions.clone(),
             trait_bounds,
             assoc_type_bounds,
+            method_to_impl_decl,
         }
     }
 

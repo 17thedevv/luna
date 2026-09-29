@@ -107,7 +107,7 @@ import <iter_collect>;
             value: i32,
         };
 
-        impl Drop for ManagedItem {
+        impl std::Drop for ManagedItem {
             fn drop(self: &rw Self) {
                 self.value = 0;
             }
@@ -191,7 +191,7 @@ import <iter_collect>;
             active: bool,
         };
 
-        impl Drop for Resource {
+        impl std::Drop for Resource {
             fn drop(self: &rw Self) {
                 self.active = false;
             }
@@ -320,7 +320,7 @@ import <iter_collect>;
             dec b = std::box_new<i32>(42);
             // b is live: b.ptr != 0
             dec val = std::box_into_inner<i32>(b);
-            // inside box_into_inner: b.ptr was disarmed to 0, destructor safely skipped
+            // inside std::box_into_inner: b.ptr was disarmed to 0, destructor safely skipped
             return val;
         }
     "#;
@@ -680,7 +680,7 @@ import <iter_collect>;
             is_active: bool,
         };
 
-        impl Drop for ManagedResource {
+        impl std::Drop for ManagedResource {
             fn drop(self: &rw Self) {
                 self.is_active = false;
             }
@@ -727,7 +727,7 @@ import <iter_collect>;
             val: i32,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 self.val = 0;
             }

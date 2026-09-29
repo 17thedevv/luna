@@ -50,7 +50,7 @@ fn test_p0b_whole_place_move() {
         import <iter_consumers>;
         struct HasDrop { val: i32 };
 
-        impl Drop for HasDrop {
+        impl std::Drop for HasDrop {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {
@@ -77,7 +77,7 @@ fn test_p0b_subplace_borrow() {
         import <iter_consumers>;
         struct HasDrop { val: i32 };
 
-        impl Drop for HasDrop {
+        impl std::Drop for HasDrop {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {
@@ -107,7 +107,7 @@ fn test_p0b_proper_subplace_move_field() {
 
         struct HasDrop { val: Inner };
 
-        impl Drop for HasDrop {
+        impl std::Drop for HasDrop {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {
@@ -138,7 +138,7 @@ fn test_p0b_proper_subplace_move_nested_field() {
 
         struct TopDrop { m: Middle };
 
-        impl Drop for TopDrop {
+        impl std::Drop for TopDrop {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {
@@ -167,7 +167,7 @@ fn test_p0b_proper_subplace_move_tuple_field() {
 
         struct TupleDrop { t: (Inner, i32) };
 
-        impl Drop for TupleDrop {
+        impl std::Drop for TupleDrop {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {
@@ -198,7 +198,7 @@ fn test_p0b_proper_subplace_move_enum_payload() {
             A(Inner),
             B
         }
-        impl Drop for DropEnum {
+        impl std::Drop for DropEnum {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {
@@ -230,7 +230,7 @@ fn test_p0b_proper_subplace_move_pattern_matching() {
 
         struct HasDrop { val: Inner };
 
-        impl Drop for HasDrop {
+        impl std::Drop for HasDrop {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {
@@ -242,7 +242,7 @@ fn test_p0b_proper_subplace_move_pattern_matching() {
             A(Inner),
             B
         }
-        impl Drop for DropEnum {
+        impl std::Drop for DropEnum {
             fn drop(self: &rw Self) {}
         }
     "#;
@@ -266,7 +266,7 @@ fn test_p0b_proper_subplace_move_function_argument() {
 
         struct HasDrop { val: Inner };
 
-        impl Drop for HasDrop {
+        impl std::Drop for HasDrop {
             fn drop(self: &rw Self) {}
         }
         fn consume(i: Inner) {}
@@ -296,7 +296,7 @@ fn test_p0b_generic_instantiated_drop_type() {
 
         struct Wrapper<T> { val: T };
 
-        impl<T> Drop for Wrapper<T> {
+        impl<T> std::Drop for Wrapper<T> {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {
@@ -325,7 +325,7 @@ fn test_p0b_field_reassignment() {
 
         struct HasDrop { val: Inner };
 
-        impl Drop for HasDrop {
+        impl std::Drop for HasDrop {
             fn drop(self: &rw Self) {}
         }
         fn main() -> i32 {

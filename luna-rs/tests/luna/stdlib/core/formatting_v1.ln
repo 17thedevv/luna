@@ -1,0 +1,75 @@
+import <fmt>;
+import <string>;
+import <io>;
+import <result>;
+
+struct Point {
+    x: i32,
+    y: i32,
+};
+
+impl std::fmt::Display for Point {
+    fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, std::fmt::FmtError> {
+        if self.x.fmt(writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if writer.write_char(',').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if self.y.fmt(writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        return std::Result::Ok;
+    }
+}
+
+struct FailingWriter {};
+
+impl std::fmt::Writer for FailingWriter {
+    fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+    }
+}
+
+fn append_display<T: std::fmt::Display>(value: T, output: &rw std::String) -> std::Result<void, std::fmt::FmtError> {
+    return value.fmt(output);
+}
+
+fn main() -> i32 {
+    dec rw output = std::string_new();
+    append_display(true, &rw output).unwrap();
+    output.push_char('|');
+    append_display(false, &rw output).unwrap();
+    output.push_char('|');
+    append_display(0 as u8, &rw output).unwrap();
+    output.push_char('|');
+    append_display(12345 as u16, &rw output).unwrap();
+    output.push_char('|');
+    append_display(123456789 as u32, &rw output).unwrap();
+    output.push_char('|');
+    append_display(18446744073709551615 as u64, &rw output).unwrap();
+    output.push_char('|');
+    append_display(123 as u128, &rw output).unwrap();
+    output.push_char('|');
+    append_display(12345 as usize, &rw output).unwrap();
+    output.push_char('|');
+    append_display(-128 as i8, &rw output).unwrap();
+    output.push_char('|');
+    append_display(-12345 as i16, &rw output).unwrap();
+    output.push_char('|');
+    append_display(-123456789 as i32, &rw output).unwrap();
+    output.push_char('|');
+    append_display(-123456789 as i64, &rw output).unwrap();
+    output.push_char('|');
+    append_display(-123 as i128, &rw output).unwrap();
+    output.push_char('|');
+    append_display(-12345 as isize, &rw output).unwrap();
+    output.push_char('|');
+    append_display('界', &rw output).unwrap();
+    output.push_char('|');
+    dec text = std::string_from_str("Việt");
+    append_display(text, &rw output).unwrap();
+    output.push_char('|');
+    append_display(Point { x: -12, y: 34 }, &rw output).unwrap();
+    std::io::println(output.as_bytes());
+    dec rw failing = FailingWriter {};
+    dec failed = true.fmt(&rw failing);
+    if failed.is_err() == false {
+        return 1;
+    }
+    return 0;
+}

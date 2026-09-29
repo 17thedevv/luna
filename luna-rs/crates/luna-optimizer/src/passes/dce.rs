@@ -33,7 +33,7 @@ impl Pass for DeadCodeElimination {
                 for inst_id in &block.insts {
                     let val = func.value(*inst_id);
                     match &val.inst {
-                        Instruction::Store { ptr, value } => {
+                        Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                             if let Operand::Value(v) = ptr { used_values.insert(v.0); }
                             if let Operand::Value(v) = value { used_values.insert(v.0); }
                         }
@@ -65,6 +65,9 @@ impl Pass for DeadCodeElimination {
                         }
                         Instruction::Borrow { base, .. } => {
                             if let Operand::Value(v) = base { used_values.insert(v.0); }
+                        }
+                        Instruction::Neg { value } => {
+                            if let Operand::Value(v) = value { used_values.insert(v.0); }
                         }
                         Instruction::Assign(Operand::Value(v)) => {
                             used_values.insert(v.0);
@@ -122,7 +125,7 @@ impl Pass for DeadCodeElimination {
                     let val = &func.values[inst_id.0 as usize];
                     // Keep instructions with side effects or used ones
                     // INVARIANT: mọi Call, HeapFree, Drop đều effectful trừ khi purity analysis chứng minh ngược lại (TRIPWIRE CẢNH BÁO).
-                    let has_side_effects = matches!(val.inst, Instruction::Store { .. } | Instruction::CallDirect { .. } | Instruction::CallIndirect { .. } | Instruction::CallClosure { .. } | Instruction::CallVirt { .. } | Instruction::CallIntrinsic { .. } | Instruction::MakeClosure { .. } | Instruction::HeapAlloc | Instruction::HeapFree { .. } | Instruction::Drop { .. } | Instruction::DropVirt { .. } | Instruction::BoundsCheck { .. });
+                    let has_side_effects = matches!(val.inst, Instruction::Store { .. } | Instruction::StoreAnchored { .. } | Instruction::CallDirect { .. } | Instruction::CallIndirect { .. } | Instruction::CallClosure { .. } | Instruction::CallVirt { .. } | Instruction::CallIntrinsic { .. } | Instruction::MakeClosure { .. } | Instruction::HeapAlloc | Instruction::HeapFree { .. } | Instruction::Drop { .. } | Instruction::DropVirt { .. } | Instruction::BoundsCheck { .. });
                     has_side_effects || used_values.contains(&inst_id.0) || (inst_id.0 < func.arg_count as u32)
                 });
                 if block.insts.len() != initial_len {

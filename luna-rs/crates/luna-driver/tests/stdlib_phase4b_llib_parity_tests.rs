@@ -2,6 +2,8 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+use luna_driver::sysroot::Sysroot;
+use luna_driver::sysroot_builder::SysrootBuilder;
 use luna_driver::{compile, CompilerOptions};
 
 fn copy_dir_all(src: &Path, dst: &Path) -> std::io::Result<()> {
@@ -59,6 +61,20 @@ fn locate_external_dir() -> PathBuf {
         .join("external")
 }
 
+fn fresh_external_artifacts() -> PathBuf {
+    static BUILT_EXTERNAL: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+    BUILT_EXTERNAL.get_or_init(|| {
+        let external_dir = locate_external_dir();
+        let artifact_root = create_temp_dir("fresh_artifacts");
+        let artifact_external = artifact_root.join("libs").join("external");
+        copy_dir_all(&external_dir, &artifact_external).expect("copy current provider sources");
+        SysrootBuilder::new(Sysroot::from_root(artifact_root.clone()).expect("fresh artifact sysroot"))
+            .build_all(true)
+            .expect("build fresh canonical provider artifacts from current sources");
+        artifact_external
+    }).clone()
+}
+
 struct ParityHarness {
     source_sysroot: PathBuf,
     llib_sysroot: PathBuf,
@@ -66,7 +82,7 @@ struct ParityHarness {
 
 impl ParityHarness {
     fn new(prefix: &str) -> Self {
-        let external_dir = locate_external_dir();
+        let external_dir = fresh_external_artifacts();
         assert!(external_dir.join("sysroot.toml").exists(), "sysroot.toml required");
 
         let base_dir = create_temp_dir(prefix);
@@ -158,7 +174,7 @@ fn test_parity_vec_and_slices() {
         import <cmp>;
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(40);
             v.push(10);
             v.push(30);
@@ -171,7 +187,7 @@ fn test_parity_vec_and_slices() {
             if v.len() != (4 as u64) { return 2; }
 
             // 2. slice_sort
-            slice_sort<i32>(v.as_mut_slice());
+            std::slice::slice_sort<i32>(v.as_mut_slice());
             dec s = v.as_slice();
             if s[0 as u64] != 10 { return 3; }
             if s[1 as u64] != 20 { return 4; }
@@ -179,7 +195,7 @@ fn test_parity_vec_and_slices() {
             if s[3 as u64] != 50 { return 6; }
 
             // 3. split_at
-            dec (left, right) = split_at<i32>(s, 2 as u64);
+            dec (left, right) = std::slice::split_at<i32>(s, 2 as u64);
             if (left.len as u64) != (2 as u64) { return 7; }
             if (right.len as u64) != (2 as u64) { return 8; }
             if left[0 as u64] != 10 || left[1 as u64] != 20 { return 9; }
@@ -208,7 +224,7 @@ fn test_parity_hashmap_and_hashset() {
 
         fn main() -> i32 {
             // 1. HashMap operations
-            dec rw map = hashmap_new<i32, i32>();
+            dec rw map = std::hashmap_new<i32, i32>();
             map.insert(1, 100);
             map.insert(2, 200);
 
@@ -227,7 +243,7 @@ fn test_parity_hashmap_and_hashset() {
             if map.len() != (4 as u64) { return 5; }
 
             // 2. HashSet operations
-            dec rw set = hashset_new<i32>();
+            dec rw set = std::hashset_new<i32>();
             set.insert(10);
             set.insert(20);
             set.insert(30);
@@ -261,32 +277,32 @@ fn test_parity_iter_range_combinators() {
             return *x % 2 == 0;
         }
 
-        fn extract_even_half(x: i32) -> Option<i32> {
+        fn extract_even_half(x: i32) -> std::Option<i32> {
             if x % 2 == 0 {
-                return Option::Some(x / 2);
+                return std::Option::Some(x / 2);
             }
-            return Option::None;
+            return std::Option::None;
         }
 
         fn main() -> i32 {
             // 1. Range sum
-            dec rw it = range(0, 5);
-            dec sum = iter_sum_i32(it);
+            dec rw it = std::iter::range(0, 5);
+            dec sum = std::iter::iter_sum_i32(it);
             // 0 + 1 + 2 + 3 + 4 = 10
             if sum != 10 { return 1; }
 
             // 2. Option & Result combinators
-            dec o1: Option<Option<i32>> = Option::Some(Option::Some(42));
-            dec o_flat = option_flatten<i32>(o1);
+            dec o1: std::Option<std::Option<i32>> = std::Option::Some(std::Option::Some(42));
+            dec o_flat = std::option_flatten<i32>(o1);
             if o_flat.unwrap() != 42 { return 2; }
 
-            dec r1: Result<Result<i32, i32>, i32> = Result::Ok(Result::Ok(99));
-            dec r_flat = result_flatten<i32, i32>(r1);
+            dec r1: std::Result<std::Result<i32, i32>, i32> = std::Result::Ok(std::Result::Ok(99));
+            dec r_flat = std::result_flatten<i32, i32>(r1);
             if r_flat.unwrap() != 99 { return 3; }
 
             // 3. Transpose
-            dec ot: Option<Result<i32, i32>> = Option::Some(Result::Ok(77));
-            dec res_trans = option_transpose<i32, i32>(ot);
+            dec ot: std::Option<std::Result<i32, i32>> = std::Option::Some(std::Result::Ok(77));
+            dec res_trans = std::option_transpose<i32, i32>(ot);
             if res_trans.is_ok() == false { return 4; }
 
             return 0;
@@ -306,31 +322,31 @@ fn test_parity_numerics_and_cmp() {
 
         fn main() -> i32 {
             // 1. Checked arithmetic
-            dec a1 = checked_add_i32(2147483647, 1);
+            dec a1 = std::checked_add_i32(2147483647, 1);
             if a1.is_some() { return 1; }
 
-            dec a2 = checked_div_i32(10, 0);
+            dec a2 = std::checked_div_i32(10, 0);
             if a2.is_some() { return 2; }
 
-            dec a3 = checked_div_i32((0 - 2147483647) - 1, 0 - 1);
+            dec a3 = std::checked_div_i32((0 - 2147483647) - 1, 0 - 1);
             if a3.is_some() { return 3; }
 
-            dec a4 = checked_abs_i32((0 - 2147483647) - 1);
+            dec a4 = std::checked_abs_i32((0 - 2147483647) - 1);
             if a4.is_some() { return 4; }
 
             // 2. Saturating arithmetic
-            dec s1 = saturating_add_i32(2147483647, 100);
+            dec s1 = std::saturating_add_i32(2147483647, 100);
             if s1 != 2147483647 { return 5; }
 
-            dec s2 = saturating_sub_u8(5 as u8, 10 as u8);
+            dec s2 = std::saturating_sub_u8(5 as u8, 10 as u8);
             if s2 != (0 as u8) { return 6; }
 
             // 3. Cmp min/max/clamp
-            if min<i32>(10, 20) != 10 { return 7; }
-            if max<i32>(10, 20) != 20 { return 8; }
-            if clamp<i32>(5, 10, 20) != 10 { return 9; }
-            if clamp<i32>(25, 10, 20) != 20 { return 10; }
-            if clamp<i32>(15, 10, 20) != 15 { return 11; }
+            if std::min<i32>(10, 20) != 10 { return 7; }
+            if std::max<i32>(10, 20) != 20 { return 8; }
+            if std::clamp<i32>(5, 10, 20) != 10 { return 9; }
+            if std::clamp<i32>(25, 10, 20) != 20 { return 10; }
+            if std::clamp<i32>(15, 10, 20) != 15 { return 11; }
 
             return 0;
         }
@@ -356,11 +372,11 @@ fn test_parity_memory_and_sorting() {
         };
 
         fn main() -> i32 {
-            // 1. mem::swap
+            // 1. std::mem::swap
             dec rw a: i32 = 100;
             dec rw b: i32 = 200;
             {
-                mem::swap<i32>(&rw a, &rw b);
+                std::mem::swap<i32>(&rw a, &rw b);
             }
             if a != 200 { return 1; }
             if b != 100 { return 2; }
@@ -368,39 +384,39 @@ fn test_parity_memory_and_sorting() {
             dec rw p1 = Point { x: 10, y: 20 };
             dec rw p2 = Point { x: 30, y: 40 };
             {
-                mem::swap<Point>(&rw p1, &rw p2);
+                std::mem::swap<Point>(&rw p1, &rw p2);
             }
             if p1.x != 30 || p1.y != 40 { return 3; }
             if p2.x != 10 || p2.y != 20 { return 4; }
 
-            // 2. mem::replace
+            // 2. std::mem::replace
             dec rw dest: i32 = 777;
-            dec old = mem::replace<i32>(&rw dest, 888);
+            dec old = std::mem::replace<i32>(&rw dest, 888);
             if old != 777 { return 5; }
             if dest != 888 { return 6; }
 
-            // 3. ptr::swap (distinct and identical)
+            // 3. std::ptr::swap (distinct and identical)
             unsafe {
                 dec pa = &rw a as *rw i32;
                 dec pb = &rw b as *rw i32;
-                ptr::swap<i32>(pa, pb);
+                std::ptr::swap<i32>(pa, pb);
                 // a should be 100, b should be 200 again
                 if *pa != 100 || *pb != 200 { return 7; }
 
                 // identical pointer is valid no-op
-                ptr::swap<i32>(pa, pa);
+                std::ptr::swap<i32>(pa, pa);
                 if *pa != 100 { return 8; }
             }
 
             // 4. slice_sort
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(50);
             v.push(10);
             v.push(40);
             v.push(20);
             v.push(30);
 
-            slice_sort<i32>(v.as_mut_slice());
+            std::slice::slice_sort<i32>(v.as_mut_slice());
             dec s = v.as_slice();
             if s[0 as u64] != 10 { return 9; }
             if s[1 as u64] != 20 { return 10; }

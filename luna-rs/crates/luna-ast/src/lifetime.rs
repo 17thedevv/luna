@@ -164,6 +164,23 @@ impl StructLifetimeContractAst {
     }
 }
 
+/// A declaration-level claim that a direct raw-pointer field is anchored to
+/// the lifetime of its containing value. The field is named here (rather than
+/// represented by a session-local symbol or field ordinal) so the contract is
+/// stable across provider artifacts.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
+pub struct RawStorageAnchorAst {
+    pub field_name: String,
+    pub span: Span,
+}
+
+/// Raw storage anchors declared on a struct. This is deliberately separate
+/// from reference lifetime/outlives contracts.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
+pub struct StructRawStorageAnchorContractAst {
+    pub anchors: Vec<RawStorageAnchorAst>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

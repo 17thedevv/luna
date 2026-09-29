@@ -10,8 +10,43 @@ fn create_temp_dir(name: &str) -> PathBuf {
     dir
 }
 
+fn copy_dir_all(src: &std::path::Path, dst: &std::path::Path) {
+    fs::create_dir_all(dst).expect("create source sysroot directory");
+    for entry in fs::read_dir(src).expect("read external provider directory") {
+        let entry = entry.expect("read provider entry");
+        let target = dst.join(entry.file_name());
+        if entry.file_type().expect("provider entry type").is_dir() {
+            copy_dir_all(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).expect("copy provider file");
+        }
+    }
+}
+
+fn remove_artifacts(dir: &std::path::Path) {
+    for entry in fs::read_dir(dir).expect("read source sysroot directory") {
+        let path = entry.expect("read sysroot entry").path();
+        if path.is_dir() {
+            remove_artifacts(&path);
+        } else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale provider artifact");
+        }
+    }
+}
+
+fn source_sysroot() -> Sysroot {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let external_dir = manifest_dir.parent().expect("crates directory")
+        .parent().expect("workspace root").join("libs").join("external");
+    let root = create_temp_dir("source_sysroot");
+    let source_external = root.join("libs").join("external");
+    copy_dir_all(&external_dir, &source_external);
+    remove_artifacts(&source_external);
+    Sysroot::from_root(root).expect("source-only sysroot")
+}
+
 fn run_compiler(name: &str, src: &str) -> (bool, Vec<luna_common::Diagnostic>) {
-    let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let test_sysroot = source_sysroot();
     let temp = create_temp_dir(name);
     let main_path = temp.join("main.ln");
     fs::write(&main_path, src).unwrap();
@@ -44,11 +79,11 @@ fn test_mutual_exclusivity_copy_drop() {
             x: i32,
         };
 
-        impl Drop for MyStruct {
+        impl std::Drop for MyStruct {
             fn drop(self: &rw Self) {}
         }
 
-        impl Copy for MyStruct {}
+        impl std::Copy for MyStruct {}
 
         fn main() -> i32 { return 0; }
     "#;
@@ -77,7 +112,7 @@ fn test_transitive_copy_drop_conflict() {
             x: i32,
         };
 
-        impl Drop for Inner {
+        impl std::Drop for Inner {
             fn drop(self: &rw Self) {}
         }
 
@@ -85,8 +120,8 @@ fn test_transitive_copy_drop_conflict() {
             inner: Inner,
         };
 
-        // Implementing Copy for Outer should fail because its field `inner` needs drop
-        impl Copy for Outer {}
+        // Implementing std::Copy for Outer should fail because its field `inner` needs drop
+        impl std::Copy for Outer {}
 
         fn main() -> i32 { return 0; }
     "#;
@@ -115,7 +150,7 @@ fn test_valid_copy() {
             x: i32,
         };
 
-        impl Copy for ValidStruct {}
+        impl std::Copy for ValidStruct {}
 
         fn main() -> i32 { return 0; }
     "#;
@@ -139,7 +174,7 @@ fn test_derive_copy_drop_conflict() {
             x: i32,
         };
 
-        impl Drop for Resource {
+        impl std::Drop for Resource {
             fn drop(self: &rw Self) {}
         }
 
@@ -175,7 +210,7 @@ fn test_generic_instantiation_copy_drop() {
             x: i32,
         };
 
-        impl Drop for Resource {
+        impl std::Drop for Resource {
             fn drop(self: &rw Self) {}
         }
 
@@ -183,7 +218,7 @@ fn test_generic_instantiation_copy_drop() {
             value: T,
         };
 
-        impl<T> Copy for Wrapper<T> {}
+        impl<T> std::Copy for Wrapper<T> {}
 
         fn main() -> i32 { 
             dec r = Resource { x: 42 };

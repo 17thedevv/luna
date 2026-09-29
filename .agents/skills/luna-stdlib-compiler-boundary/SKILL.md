@@ -60,11 +60,11 @@ An intrinsic is a deliberately specified compiler/runtime primitive whose semant
 Examples:
 
 ```text
-ptr::read
-ptr::write
-ptr::drop_in_place
-mem::size_of
-mem::align_of
+std::ptr::read
+std::ptr::write
+std::ptr::drop_in_place
+std::mem::size_of
+std::mem::align_of
 ```
 
 Intrinsics MUST be:

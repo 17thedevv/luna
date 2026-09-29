@@ -323,7 +323,7 @@ fn test_adv_08_explicit_drop_method_call_rejected() {
             id: i32,
         };
 
-        impl Drop for Resource {
+        impl std::Drop for Resource {
             fn drop(self: &rw Self) {}
         }
 
@@ -391,7 +391,7 @@ fn test_adv_10_dyn_core_drop_object_safety_rejected() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn consume(d: &rw dyn Drop) {
+        fn consume(d: &rw dyn std::Drop) {
         }
 
         fn main() -> i32 {
@@ -484,7 +484,7 @@ fn test_adv_13_future_cancellation_at_state_0_with_active_dyn_trait() {
             id: i32,
         };
 
-        impl Drop for Resource {
+        impl std::Drop for Resource {
             fn drop(self: &rw Self) {}
         }
 
@@ -532,7 +532,7 @@ fn test_adv_14_future_cancellation_at_suspended_state_with_dyn_trait() {
             id: i32,
         };
 
-        impl Drop for Resource {
+        impl std::Drop for Resource {
             fn drop(self: &rw Self) {}
         }
 

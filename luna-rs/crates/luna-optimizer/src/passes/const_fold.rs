@@ -1,4 +1,4 @@
-﻿use luna_mvir::{Function, Instruction, Operand, ValueId};
+use luna_mvir::{Function, Instruction, Operand, ValueId};
 use crate::pass::Pass;
 
 pub struct ConstantFolding;
@@ -17,6 +17,11 @@ impl Pass for ConstantFolding {
                 Instruction::Add { left, right } => {
                     if let (Some(l), Some(r)) = (Self::resolve_const(func, left), Self::resolve_const(func, right)) {
                         Some(Instruction::Assign(Operand::Number((l + r).to_string())))
+                    } else { None }
+                }
+                Instruction::Neg { value } => {
+                    if let Some(v) = Self::resolve_const(func, value) {
+                        Some(Instruction::Assign(Operand::Number((-v).to_string())))
                     } else { None }
                 }
                 Instruction::Sub { left, right } => {

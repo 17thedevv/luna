@@ -1,0 +1,238 @@
+import <file>;
+import <path>;
+import <result>;
+import <string>;
+import <vec>;
+
+fn is_payload(bytes: &[u8]) -> bool {
+    if bytes.len() != (8 as usize) {
+        return false;
+    }
+    return bytes[0] == (0 as u8)
+        && bytes[1] == (255 as u8)
+        && bytes[2] == (128 as u8)
+        && bytes[3] == (1 as u8)
+        && bytes[4] == (127 as u8)
+        && bytes[5] == (0 as u8)
+        && bytes[6] == (195 as u8)
+        && bytes[7] == (169 as u8);
+}
+
+fn is_text(bytes: &[u8]) -> bool {
+    return bytes.len() == (10 as usize)
+        && bytes[0] == (108 as u8)
+        && bytes[1] == (117 as u8)
+        && bytes[2] == (110 as u8)
+        && bytes[3] == (97 as u8)
+        && bytes[4] == (32 as u8)
+        && bytes[5] == (116 as u8)
+        && bytes[6] == (101 as u8)
+        && bytes[7] == (120 as u8)
+        && bytes[8] == (116 as u8)
+        && bytes[9] == (10 as u8);
+}
+
+fn check_read(path: &std::String, output: &std::String) -> i32 {
+    match std::read_file(path) {
+        std::Result::Ok(bytes) -> {
+            if is_payload(bytes.as_slice()) == false { return 11; }
+            bytes.push(68 as u8);
+            match std::write_file(output, bytes.as_slice()) {
+                std::Result::Ok -> { return 0; },
+                std::Result::Err(_) -> { return 18; },
+            }
+        },
+        std::Result::Err(_) -> { return 10; },
+    }
+}
+
+fn check_missing(path: &std::String) -> i32 {
+    match std::read_file(path) {
+        std::Result::Err(std::FileError::NotFound) -> { return 0; },
+        _ -> { return 12; },
+    }
+}
+
+fn check_text_read(path: &std::String) -> i32 {
+    match std::read_file(path) {
+        std::Result::Ok(bytes) -> {
+            if is_text(bytes.as_slice()) { return 0; }
+            return 31;
+        },
+        std::Result::Err(_) -> { return 32; },
+    }
+}
+
+fn check_copy(src: &std::String, dst: &std::String) -> i32 {
+    match std::copy_file(src, dst) {
+        std::Result::Ok(count) -> {
+            if count != (8 as u64) { return 13; }
+            match std::read_file(dst) {
+                std::Result::Ok(bytes) -> {
+                    if is_payload(bytes.as_slice()) { return 0; }
+                    return 16;
+                },
+                std::Result::Err(_) -> { return 15; },
+            }
+        },
+        std::Result::Err(_) -> { return 14; },
+    }
+}
+
+fn check_text_copy(src: &std::String, dst: &std::String) -> i32 {
+    match std::copy_file(src, dst) {
+        std::Result::Ok(count) -> {
+            if count != (10 as u64) { return 33; }
+            match std::read_file(dst) {
+                std::Result::Ok(bytes) -> {
+                    if is_text(bytes.as_slice()) { return 0; }
+                    return 34;
+                },
+                std::Result::Err(_) -> { return 35; },
+            }
+        },
+        std::Result::Err(_) -> { return 36; },
+    }
+}
+
+fn check_empty_copy(src: &std::String, dst: &std::String) -> i32 {
+    match std::copy_file(src, dst) {
+        std::Result::Ok(count) -> {
+            if count != (0 as u64) { return 37; }
+            match std::read_file(dst) {
+                std::Result::Ok(bytes) -> {
+                    if bytes.len() == (0 as u64) { return 0; }
+                    return 38;
+                },
+                std::Result::Err(_) -> { return 39; },
+            }
+        },
+        std::Result::Err(_) -> { return 40; },
+    }
+}
+
+fn check_large_copy(src: &std::String, dst: &std::String) -> i32 {
+    match std::copy_file(src, dst) {
+        std::Result::Ok(count) -> {
+            if count != (8193 as u64) { return 41; }
+            match std::read_file(dst) {
+                std::Result::Ok(bytes) -> {
+                    if bytes.len() == (8193 as u64) { return 0; }
+                    return 42;
+                },
+                std::Result::Err(_) -> { return 43; },
+            }
+        },
+        std::Result::Err(_) -> { return 44; },
+    }
+}
+
+fn check_write(path: &std::String, bytes: &[u8]) -> i32 {
+    match std::write_file(path, bytes) {
+        std::Result::Ok -> { return 0; },
+        std::Result::Err(_) -> { return 18; },
+    }
+}
+
+fn check_same_path(path: &std::String) -> i32 {
+    match std::copy_file(path, path) {
+        std::Result::Err(std::FileError::InvalidInput) -> { return 0; },
+        _ -> { return 19; },
+    }
+}
+
+fn check_empty_read(path: &std::String) -> i32 {
+    match std::read_file(path) {
+        std::Result::Ok(bytes) -> {
+            if bytes.len() == (0 as u64) { return 0; }
+            return 22;
+        },
+        std::Result::Err(_) -> { return 21; },
+    }
+}
+
+fn check_nul(path: &std::String, bytes: &[u8], dst: &std::String) -> i32 {
+    match std::read_file(path) {
+        std::Result::Err(std::FileError::InvalidInput) -> {},
+        _ -> { return 27; },
+    }
+    match std::write_file(path, bytes) {
+        std::Result::Err(std::FileError::InvalidInput) -> {},
+        _ -> { return 28; },
+    }
+    match std::copy_file(path, dst) {
+        std::Result::Err(std::FileError::InvalidInput) -> {},
+        _ -> { return 29; },
+    }
+    match std::copy_file(dst, path) {
+        std::Result::Err(std::FileError::InvalidInput) -> { return 0; },
+        _ -> { return 30; },
+    }
+}
+
+fn main(args: [str]) -> i32 {
+    dec src = std::string_from_str("source.bin");
+    dec dst = std::string_from_str("written.bin");
+    dec copied = std::string_from_str("copied.bin");
+    dec directory = std::string_from_str(".");
+    dec unicode_path = std::string_from_str("данные-✓.bin");
+    dec missing = std::string_from_str("missing.bin");
+    dec text_source_name = std::string_from_str("text-source.bin");
+    dec text_source = std::path::join(&directory, &text_source_name);
+    dec text_copy_name = std::string_from_str("text-copy.bin");
+    dec text_copy = std::path::join(&directory, &text_copy_name);
+    dec empty_source_name = std::string_from_str("empty-source.bin");
+    dec empty_source = std::path::join(&directory, &empty_source_name);
+    dec empty_copy_name = std::string_from_str("empty-copy.bin");
+    dec empty_copy = std::path::join(&directory, &empty_copy_name);
+    dec large_source_name = std::string_from_str("large-source.bin");
+    dec large_source = std::path::join(&directory, &large_source_name);
+    dec large_copy_name = std::string_from_str("large-copy.bin");
+    dec large_copy = std::path::join(&directory, &large_copy_name);
+
+    if check_read(&src, &dst) != 0 { return 10; }
+    if check_missing(&missing) != 0 { return 12; }
+    if check_copy(&src, &copied) != 0 { return 14; }
+    if check_same_path(&src) != 0 { return 19; }
+    if check_text_read(&text_source) != 0 { return 31; }
+    if check_text_copy(&text_source, &text_copy) != 0 { return 33; }
+    if check_empty_copy(&empty_source, &empty_copy) != 0 { return 37; }
+    if check_large_copy(&large_source, &large_copy) != 0 { return 41; }
+
+    dec empty_name = std::string_from_str("empty.bin");
+    dec empty_directory = std::string_from_str(".");
+    dec empty_path = std::path::join(&empty_directory, &empty_name);
+    dec empty = std::vec_new<u8>();
+    if check_write(&empty_path, empty.as_slice()) != 0 { return 20; }
+    dec empty_read_directory = std::string_from_str(".");
+    dec empty_read_name = std::string_from_str("empty.bin");
+    dec empty_read_path = std::path::join(&empty_read_directory, &empty_read_name);
+    if check_empty_read(&empty_read_path) != 0 { return 21; }
+
+    dec payload = std::vec_new<u8>();
+    payload.push(0 as u8); payload.push(255 as u8); payload.push(128 as u8); payload.push(1 as u8);
+    payload.push(127 as u8); payload.push(0 as u8); payload.push(195 as u8); payload.push(169 as u8);
+    if check_write(&unicode_path, payload.as_slice()) != 0 { return 23; }
+    dec text_bytes = std::vec_new<u8>();
+    text_bytes.push(108 as u8); text_bytes.push(117 as u8); text_bytes.push(110 as u8);
+    text_bytes.push(97 as u8); text_bytes.push(32 as u8); text_bytes.push(116 as u8);
+    text_bytes.push(101 as u8); text_bytes.push(120 as u8); text_bytes.push(116 as u8);
+    text_bytes.push(10 as u8);
+    dec text_output = std::string_from_str("text-written.bin");
+    if check_write(&text_output, text_bytes.as_slice()) != 0 { return 24; }
+
+    dec joined_name = std::string_from_str("joined.bin");
+    dec joined_directory = std::string_from_str(".");
+    dec joined_path = std::path::join(&joined_directory, &joined_name);
+    if check_write(&joined_path, payload.as_slice()) != 0 { return 24; }
+
+    dec rw nul_bytes = std::vec_new<u8>();
+    nul_bytes.push(97 as u8);
+    nul_bytes.push(0 as u8);
+    nul_bytes.push(98 as u8);
+    dec nul_path_option = std::string_from_bytes(nul_bytes.as_slice());
+    dec nul_path = nul_path_option.unwrap();
+    if check_nul(&nul_path, payload.as_slice(), &dst) != 0 { return 27; }
+
+    return 0;
+}

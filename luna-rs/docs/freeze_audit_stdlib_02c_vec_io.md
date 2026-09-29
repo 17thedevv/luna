@@ -136,3 +136,9 @@ Stdlib-02C Native E2E Verification
 Stdlib-03: String / UTF-8
     └── Built cleanly on top of verified Vec, Drop, and Provider Linking
 ```
+# Historical namespace contract notice
+
+This audit records the pre-STD-NAMESPACE-01 API shape. Its references to
+`io::...` and root-level Vec APIs are historical and are superseded by
+`docs/std_namespace_01_canonical_namespace.md`. Runtime and behavioral claims
+remain historical evidence; this file is not the canonical namespace contract.

@@ -1,0 +1,17 @@
+extern fn __test_ffi_write_two(first: *rw i32, second: *rw u64) -> i32;
+
+fn main() -> i32 {
+    dec rw first: i32 = 0 as i32;
+    dec rw second: u64 = 0 as u64;
+    dec rw status = 0 as i32;
+    unsafe {
+        status = __test_ffi_write_two(
+            &rw first as *rw i32,
+            &rw second as *rw u64
+        );
+    }
+    if status != (0 as i32) { return 1; }
+    if first != (42 as i32) { return 2; }
+    if second != (84 as u64) { return 3; }
+    return 0;
+}

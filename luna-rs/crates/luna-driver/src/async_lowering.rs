@@ -239,7 +239,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
     // env.state = 0
     let state_ptr_id = ValueId(kickoff.values.len() as u32);
     kickoff.values.push(ValueData {
-        inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx: 0 },
+        inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx: 0, field_name: None },
         ty: SemanticTypeId(3), // i32 ptr
         span: None,
         origin: ValueOrigin::Temporary,
@@ -258,7 +258,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
     // env.poll_status = 0 (Pending)
     let status_ptr_id = ValueId(kickoff.values.len() as u32);
     kickoff.values.push(ValueData {
-        inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx: 1 },
+        inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx: 1, field_name: None },
         ty: SemanticTypeId(3),
         span: None,
         origin: ValueOrigin::Temporary,
@@ -277,7 +277,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
     // env.child_future = null
     let child_ptr_id = ValueId(kickoff.values.len() as u32);
     kickoff.values.push(ValueData {
-        inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx: 2 },
+        inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx: 2, field_name: None },
         ty: void_ptr_ty,
         span: None,
         origin: ValueOrigin::Temporary,
@@ -310,7 +310,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
             
             let field_ptr_id = ValueId(kickoff.values.len() as u32);
             kickoff.values.push(ValueData {
-                inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx },
+                inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx, field_name: None },
                 ty: field_ty,
                 span: None,
                 origin: ValueOrigin::Temporary,
@@ -377,6 +377,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                     inst: Instruction::FieldPtr {
                         base: Operand::Value(env_arg_id),
                         field_idx,
+                        field_name: None,
                     },
                     ty: val.ty,
                     span: val.span.clone(),
@@ -422,7 +423,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                 let mapped_fut = map_op(future, &val_map);
                 let child_ptr_id = ValueId(resume.values.len() as u32);
                 resume.values.push(ValueData {
-                    inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 2 },
+                    inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 2, field_name: None },
                     ty: SemanticTypeId(0),
                     span: None,
                     origin: ValueOrigin::Temporary,
@@ -444,7 +445,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                 // 2. Store next state into env.state (field 0)
                 let state_ptr_id = ValueId(resume.values.len() as u32);
                 resume.values.push(ValueData {
-                    inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 0 },
+                    inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 0, field_name: None },
                     ty: SemanticTypeId(3),
                     span: None,
                     origin: ValueOrigin::Temporary,
@@ -466,7 +467,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                 // 3. Store poll_status = 0 (Pending) into env.poll_status (field 1)
                 let status_ptr_id = ValueId(resume.values.len() as u32);
                 resume.values.push(ValueData {
-                    inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 1 },
+                    inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 1, field_name: None },
                     ty: SemanticTypeId(3),
                     span: None,
                     origin: ValueOrigin::Temporary,
@@ -497,7 +498,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
 
                 let pending_ret_status_ptr = ValueId(resume.values.len() as u32);
                 resume.values.push(ValueData {
-                    inst: Instruction::FieldPtr { base: Operand::Value(pending_ret_alloc), field_idx: 0 },
+                    inst: Instruction::FieldPtr { base: Operand::Value(pending_ret_alloc), field_idx: 0, field_name: None },
                     ty: SemanticTypeId(3),
                     span: None,
                     origin: ValueOrigin::Temporary,
@@ -537,7 +538,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                 // Load child future from env
                 let child_fut_field_id = ValueId(resume.values.len() as u32);
                 resume.values.push(ValueData {
-                    inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 2 },
+                    inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 2, field_name: None },
                     ty: env_ty_id,
                     span: None,
                     origin: ValueOrigin::Temporary,
@@ -594,7 +595,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
             match &mut new_inst {
                 Instruction::Assign(op) => *op = map_op(op, &val_map),
                 Instruction::Nop => {}
-                Instruction::Store { ptr, value } => {
+                Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                     *ptr = map_op(ptr, &val_map);
                     *value = map_op(value, &val_map);
                 }
@@ -647,7 +648,8 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                 }
                 Instruction::Tag { value } | Instruction::Extract { value, .. } | Instruction::FieldPtr { base: value, .. } |
                 Instruction::Drop { value, .. } | Instruction::HeapFree { value } |
-                Instruction::MarkInit { value } | Instruction::Cast { value, .. } | Instruction::Await { future: value } => {
+                Instruction::MarkInit { value } | Instruction::Cast { value, .. } | Instruction::Await { future: value } |
+                Instruction::Neg { value } => {
                     *value = map_op(value, &val_map);
                 }
                 Instruction::PtrOffset { ptr, offset } => {
@@ -691,7 +693,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                     // Before Ret, mark state = FUTURE_STATE_COMPLETED (completed) and poll_status = 1 (Ready)
                     let state_ptr_id = ValueId(resume.values.len() as u32);
                     resume.values.push(ValueData {
-                        inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 0 },
+                        inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 0, field_name: None },
                         ty: SemanticTypeId(3),
                         span: None,
                         origin: ValueOrigin::Temporary,
@@ -712,7 +714,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
 
                     let status_ptr_id = ValueId(resume.values.len() as u32);
                     resume.values.push(ValueData {
-                        inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 1 },
+                        inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 1, field_name: None },
                         ty: SemanticTypeId(3),
                         span: None,
                         origin: ValueOrigin::Temporary,
@@ -743,7 +745,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
 
                     let ready_ret_status_ptr = ValueId(resume.values.len() as u32);
                     resume.values.push(ValueData {
-                        inst: Instruction::FieldPtr { base: Operand::Value(ready_ret_alloc), field_idx: 0 },
+                        inst: Instruction::FieldPtr { base: Operand::Value(ready_ret_alloc), field_idx: 0, field_name: None },
                         ty: SemanticTypeId(3),
                         span: None,
                         origin: ValueOrigin::Temporary,
@@ -762,7 +764,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                     if let Some(val) = value {
                         let ready_ret_val_ptr = ValueId(resume.values.len() as u32);
                         resume.values.push(ValueData {
-                            inst: Instruction::FieldPtr { base: Operand::Value(ready_ret_alloc), field_idx: 1 },
+                            inst: Instruction::FieldPtr { base: Operand::Value(ready_ret_alloc), field_idx: 1, field_name: None },
                             ty: SemanticTypeId(0), // Doesn't matter
                             span: None,
                             origin: ValueOrigin::Temporary,
@@ -831,7 +833,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         // Build dispatch chain
         let state_ptr_id = ValueId(resume.values.len() as u32);
         resume.values.push(ValueData {
-            inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 0 },
+            inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: 0, field_name: None },
             ty: SemanticTypeId(3),
             span: None,
             origin: ValueOrigin::Temporary,
@@ -957,7 +959,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
 
     let drop_state_ptr_id = ValueId(drop_fn.values.len() as u32);
     drop_fn.values.push(ValueData {
-        inst: Instruction::FieldPtr { base: Operand::Value(drop_env_arg_id), field_idx: 0 },
+        inst: Instruction::FieldPtr { base: Operand::Value(drop_env_arg_id), field_idx: 0, field_name: None },
         ty: SemanticTypeId(3),
         span: None,
         origin: ValueOrigin::Temporary,
@@ -1074,7 +1076,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
             // 1. Load child_future and null-check
             let child_future_field_ptr = ValueId(drop_fn.values.len() as u32);
             drop_fn.values.push(ValueData {
-                inst: Instruction::FieldPtr { base: Operand::Value(drop_env_arg_id), field_idx: 2 },
+                inst: Instruction::FieldPtr { base: Operand::Value(drop_env_arg_id), field_idx: 2, field_name: None },
                 ty: env_ty_id,
                 span: None,
                 origin: ValueOrigin::Temporary,
@@ -1250,6 +1252,7 @@ fn emit_drop_for_place(
             inst: Instruction::FieldPtr {
                 base: Operand::Value(drop_env_arg_id),
                 field_idx: env_field_idx as u32,
+                field_name: None,
             },
             ty: env_field_ty,
             span: None,
@@ -1278,6 +1281,7 @@ fn emit_drop_for_place(
                         inst: Instruction::FieldPtr {
                             base: Operand::Value(curr_ptr),
                             field_idx: *idx as u32,
+                            field_name: None,
                         },
                         ty: curr_ty,
                         span: None,

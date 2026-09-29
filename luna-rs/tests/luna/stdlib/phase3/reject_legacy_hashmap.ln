@@ -1,0 +1,5 @@
+import <hashmap>;
+
+fn main() {
+    dec map: HashMap<i32, i32> = std::hashmap_new<i32, i32>();
+}

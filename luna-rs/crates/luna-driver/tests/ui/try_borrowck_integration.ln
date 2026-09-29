@@ -18,7 +18,7 @@ struct Resource {
     id: i32,
 };
 
-impl Drop for Resource {
+impl std::Drop for Resource {
     fn drop(self: &rw Self) {
         // drop Resource
     }

@@ -1,0 +1,8 @@
+import <ptr>;
+
+fn main() {
+    dec value: i32 = 1;
+    unsafe {
+        dec loaded = ptr::read<i32>(&value as *i32);
+    }
+}

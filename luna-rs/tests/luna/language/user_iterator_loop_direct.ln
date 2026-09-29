@@ -3,14 +3,14 @@ struct UserIter {
     limit: i32,
 };
 
-impl Iterator<i32> for UserIter {
-    fn next(self: &rw Self) -> Option<i32> {
+impl std::Iterator<i32> for UserIter {
+    fn next(self: &rw Self) -> std::Option<i32> {
         if self.current < self.limit {
             dec value = self.current;
             self.current = self.current + 1;
-            return Option::Some(value);
+            return std::Option::Some(value);
         }
-        return Option::None;
+        return std::Option::None;
     }
 }
 
@@ -20,8 +20,8 @@ fn sum_direct(iter: UserIter) -> i32 {
     dec rw running = true;
     while running {
         match it.next() {
-            Option::Some(item) -> { sum = sum + item; },
-            Option::None -> { running = false; },
+            std::Option::Some(item) -> { sum = sum + item; },
+            std::Option::None -> { running = false; },
         }
     }
     return sum;

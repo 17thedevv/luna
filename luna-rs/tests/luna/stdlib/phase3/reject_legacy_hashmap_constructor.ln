@@ -1,0 +1,5 @@
+import <hashmap>;
+
+fn main() {
+    dec map = hashmap_new<i32, i32>();
+}

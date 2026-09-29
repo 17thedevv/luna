@@ -1,0 +1,15 @@
+extern fn __test_ffi_write_raw(value: *rw i32);
+
+fn main() -> i32 {
+    dec rw value: i32 = 1 as i32;
+    dec raw = &rw value as *rw i32;
+
+    unsafe { __test_ffi_write_raw(raw); }
+
+    // The raw pointer remains live and retains its raw origin, but it must not
+    // keep the temporary safe loan used to create it alive.
+    value = 2 as i32;
+
+    unsafe { *raw = 3 as i32; }
+    return value;
+}

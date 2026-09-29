@@ -426,8 +426,8 @@ fn test_vis_struct_1_same_module_internal_access() {
 }
 
 #[test]
-fn test_compiled_mlib_parity() {
-    let dir = setup_test_dir("mlib_parity");
+fn test_compiled_llib_parity() {
+    let dir = setup_test_dir("llib_parity");
     let prov = r#"
         export struct User {
             name: i32,
@@ -444,9 +444,9 @@ fn test_compiled_mlib_parity() {
     let prov_path = dir.join("auth_mod.ln");
     fs::write(&prov_path, prov).unwrap();
 
-    let mlib_path = dir.join("auth_mod.mlib");
+    let llib_path = dir.join("auth_mod.llib");
     let opts_prov = CompilerOptions {
-        output_path: Some(mlib_path.to_str().unwrap().to_string()),
+        output_path: Some(llib_path.to_str().unwrap().to_string()),
         emit_llvm: false,
         emit_mvir: false,
         emit_mlib: true,
@@ -456,10 +456,10 @@ fn test_compiled_mlib_parity() {
         ..Default::default()
     };
     let compile_prov = luna_driver::compile(prov_path.to_str().unwrap(), prov.to_string(), &opts_prov);
-    assert!(compile_prov.is_ok(), "Failed to compile auth_mod to mlib: {:?}", compile_prov.err());
-    assert!(mlib_path.exists(), "auth_mod.mlib was not generated");
+    assert!(compile_prov.is_ok(), "Failed to compile auth_mod to llib: {:?}", compile_prov.err());
+    assert!(llib_path.exists(), "auth_mod.llib was not generated");
 
-    // Remove the source file so consumer MUST resolve from .mlib!
+    // Remove the source file so consumer MUST resolve from .llib!
     let _ = fs::remove_file(&prov_path);
 
     // 1. Positive: Read public field from .mlib
@@ -472,7 +472,7 @@ fn test_compiled_mlib_parity() {
         }
     "#;
     let pass_res = check_source(&dir, "main_pass.ln", pass_src);
-    assert!(pass_res.is_ok(), "Expected reading public field from mlib to succeed, got: {:?}", pass_res.err());
+    assert!(pass_res.is_ok(), "Expected reading public field from llib to succeed, got: {:?}", pass_res.err());
 
     // 2. Negative: Read private field from .mlib
     let fail_src = r#"
@@ -484,10 +484,10 @@ fn test_compiled_mlib_parity() {
         }
     "#;
     let fail_res = check_source(&dir, "main_fail.ln", fail_src);
-    assert!(fail_res.is_err(), "Expected reading private field from mlib to fail");
+    assert!(fail_res.is_err(), "Expected reading private field from llib to fail");
     let diags = fail_res.err().unwrap();
     assert!(
         diags.iter().any(|d| d.message.contains("Field `password` of struct `User` is private")),
-        "Expected private field diagnostic from mlib, got: {:?}", diags
+        "Expected private field diagnostic from llib, got: {:?}", diags
     );
 }

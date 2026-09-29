@@ -116,9 +116,9 @@ fn test_source_and_canonical_llib_parity() {
     );
 }
 
-/// COMPAT-READ-01: legacy `.mlib` read compatibility. A `.mlib` produced by the
-/// current writer (it carries `AstInterface`) must still load and behave correctly
-/// when it is the only representation available.
+/// COMPAT-READ-01: legacy `.mlib` read compatibility. A canonical artifact
+/// relabeled as `.mlib` must still load and behave correctly when it is the only
+/// representation available.
 #[test]
 fn test_legacy_mlib_read_compatibility_end_to_end() {
     let sysroot = Sysroot::discover_for_test()
@@ -129,19 +129,22 @@ fn test_legacy_mlib_read_compatibility_end_to_end() {
 
     let dir = temp_dir("legacy_mlib");
     let prov_ln = dir.join("prov.ln");
+    let prov_llib = dir.join("prov.llib");
     let prov_mlib = dir.join("prov.mlib");
     fs::write(&prov_ln, PROVIDER).unwrap();
     let opts = CompilerOptions {
-        output_path: Some(prov_mlib.to_string_lossy().to_string()),
+        output_path: Some(prov_llib.to_string_lossy().to_string()),
+        emit_llib: true,
         search_paths: vec![dir.to_string_lossy().to_string(), sysroot.clone()],
-        emit_mlib: true,
         no_link: true,
         quiet: true,
         ..Default::default()
     };
     let res = compile(prov_ln.to_str().unwrap(), PROVIDER.to_string(), &opts);
-    assert!(res.is_ok(), "building prov.mlib failed: {:?}", res.err());
-    assert!(prov_mlib.exists(), "prov.mlib must exist");
+    assert!(res.is_ok(), "building prov.llib failed: {:?}", res.err());
+    assert!(prov_llib.exists(), "prov.llib must exist");
+    fs::copy(&prov_llib, &prov_mlib).unwrap();
+    fs::remove_file(&prov_llib).unwrap();
     fs::remove_file(&prov_ln).unwrap();
 
     let (ok, code) = run_consumer(&dir, &sysroot);

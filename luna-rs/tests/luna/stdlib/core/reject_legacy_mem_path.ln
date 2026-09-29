@@ -1,0 +1,5 @@
+import <mem>;
+
+fn main() {
+    dec size = mem::size_of<i32>();
+}

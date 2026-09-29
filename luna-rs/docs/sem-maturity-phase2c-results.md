@@ -107,7 +107,7 @@ Instruction::PtrOffset { ptr, .. } => {
     }
 }
 ```
-- Verified with Control 10 (`test_ctrl_cast_propagates_provenance`) and Control 11 (`test_ctrl_ptroffset_propagates_provenance`). Reverting either change causes immediate test failure.
+- The historical Control 10 (`test_ctrl_cast_propagates_provenance`) treated a safe-reference-to-raw-pointer cast as carrying a safe loan across the function boundary. That expectation is superseded by the frozen PTR-MEM-1 distinction between raw-pointer provenance and safe-loan liveness; its regression now asserts that such a raw pointer does not keep a safe loan alive. Control 11 remains valid because it returns a safe `&rw` reference and continues to test interprocedural loan propagation.
 
 ---
 
@@ -137,7 +137,20 @@ Instruction::PtrOffset { ptr, .. } => {
 
 ---
 
-## 7. Controls Verification Summary
+## 7. SEM-GAP-21: Type-Level Raw Storage Anchor Contract (Open)
+
+SEM-GAP-21 is tracked separately from the historical Phase 2C closures above.
+The current C-GAP-12 audit identified that removing an unsafe field-address
+fallback correctly restores conservative rejection, but leaves RawTable's
+valid raw-to-safe conversion without a type-level owner/field contract.
+RAW-STORAGE-ANCHOR-v1 is approved for implementation; it must preserve the
+distinction between field-slot place provenance and the raw pointer value
+stored in that slot. The gap remains open pending generic soundness tests,
+RawTable success for the correct reason, fresh source/.llib parity, and all
+required regressions. See `sem_gap_21_raw_storage_anchor_contract.md` and
+`raw_storage_anchor_v1.md`.
+
+## 8. Controls Verification Summary
 
 1. `test_ctrl_gap14_direct_deref_write_rejected` (INVALID: `*r = 10` for `r: &i32`): **PASS**
 2. `test_ctrl_gap14_nested_projection_rejected` (INVALID: `o.inner.y = 10` for `o: &Outer`): **PASS**
@@ -148,7 +161,7 @@ Instruction::PtrOffset { ptr, .. } => {
 7. `test_ctrl_prov_aggregate_carries_provenance` (INVALID: aggregate carrying ref retains loan): **PASS**
 8. `test_ctrl_prov_check_compile_agreement` (VALID: `check()` and `compile()` produce identical success): **PASS**
 9. `test_ctrl_zero_field_struct_no_provenance` (VALID: zero-field struct does not falsely carry loan): **PASS**
-10. `test_ctrl_cast_propagates_provenance` (INVALID: `Cast` retains borrow provenance across boundary): **PASS**
+10. `test_ctrl_cast_to_raw_pointer_does_not_keep_safe_loan` (VALID: a returned raw pointer does not keep a Luna safe loan alive): **PASS** (updated under PTR-MEM-1; replaces the historical expectation)
 11. `test_ctrl_ptroffset_propagates_provenance` (INVALID: `PtrOffset` retains borrow provenance across boundary): **PASS**
 
 ---

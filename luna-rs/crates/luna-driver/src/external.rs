@@ -22,7 +22,7 @@ impl ExternalComponentLoader {
             }
         })?;
 
-        let manifest = luna_llib::reader::MlibReader::read_manifest(&mut file).map_err(|e| {
+        let manifest = luna_llib::reader::LlibReader::read_manifest(&mut file).map_err(|e| {
             ExternalComponentError::ReadFailed {
                 path: descriptor.entry_file.clone(),
                 error: format!("Failed to read manifest: {:?}", e),
@@ -71,7 +71,7 @@ impl ExternalComponentLoader {
         // making generic function bodies available for monomorphization (Rule 7, IMPORT-8).
         // A corrupt AstInterface section is an invalid artifact, NOT a signal to fall back
         // to SemanticMetadata reconstruction.
-        let ast_interface = match luna_llib::reader::MlibReader::read_ast_interface(&mut file) {
+        let ast_interface = match luna_llib::reader::LlibReader::read_ast_interface(&mut file) {
             Ok(ast) => ast,
             Err(e) => {
                 return Err(ExternalComponentError::InvalidArtifact {
@@ -81,6 +81,42 @@ impl ExternalComponentLoader {
                 });
             }
         };
+
+        // Body-derived raw-pointer effects for non-generic functions are part
+        // of the versioned semantic interface. AstInterface intentionally
+        // strips those bodies, so preserve the stable parameter/field summary
+        // before reanalyzing the relocated declaration stubs below.
+        file.rewind().map_err(|e| ExternalComponentError::ReadFailed {
+            path: descriptor.entry_file.clone(),
+            error: format!("Failed to rewind for semantic metadata: {}", e),
+        })?;
+        let (_, _, _, semantic_metadata) = luna_llib::reader::LlibReader::read_module(&mut file)
+            .map_err(|e| ExternalComponentError::InvalidArtifact {
+                name: descriptor.name.clone(),
+                path: descriptor.entry_file.clone(),
+                reason: format!("Invalid semantic metadata: {:?}", e),
+            })?;
+        let mut raw_pointer_effects_by_path = std::collections::HashMap::new();
+        fn collect_raw_effects(
+            symbols: &std::collections::BTreeMap<String, luna_llib::metadata::ExportedSymbol>,
+            out: &mut std::collections::HashMap<String, luna_llib::metadata::CanonicalRawPointerEffects>,
+        ) {
+            for symbol in symbols.values() {
+                if let Some(effects) = &symbol.raw_pointer_effects {
+                    out.insert(symbol.symbol_id.symbol_path.clone(), effects.clone());
+                }
+                collect_raw_effects(&symbol.children, out);
+            }
+        }
+        if let Some(semantic_metadata) = semantic_metadata {
+            collect_raw_effects(&semantic_metadata.interface.exported_symbols, &mut raw_pointer_effects_by_path);
+        } else if descriptor.entry_file.extension().and_then(|ext| ext.to_str()).is_some_and(|ext| ext.eq_ignore_ascii_case("llib")) {
+            return Err(ExternalComponentError::InvalidArtifact {
+                name: descriptor.name.clone(),
+                path: descriptor.entry_file.clone(),
+                reason: "canonical .llib is missing required SemanticMetadata".to_string(),
+            });
+        }
 
         if let Some((mut provider_arena, provider_items, source)) = ast_interface {
             let file_id = driver_session
@@ -219,6 +255,7 @@ impl ExternalComponentLoader {
                 &semantic_ctx,
                 &ranges,
             );
+            interface.raw_pointer_effects_by_path = raw_pointer_effects_by_path;
             // Propagate the artifact's canonical interface fingerprint so downstream
             // dependency freshness validation compares against the real interface identity
             // rather than the default zero fingerprint.
@@ -233,7 +270,7 @@ impl ExternalComponentLoader {
             } else {
                 use std::io::Seek;
                 let _ = file.seek(std::io::SeekFrom::Start(0));
-                if let Ok(Some(obj_bytes)) = luna_llib::reader::MlibReader::read_object_code(&mut file) {
+                if let Ok(Some(obj_bytes)) = luna_llib::reader::LlibReader::read_object_code(&mut file) {
                     if !obj_bytes.is_empty() {
                         let extracted_obj = descriptor.entry_file.with_extension("obj");
                         if let Ok(_) = std::fs::write(&extracted_obj, &obj_bytes) {
@@ -293,7 +330,13 @@ impl ExternalComponentLoader {
             driver_session.registry.providers.clone(),
             manifest.provenance.interface_fingerprint,
         );
-        let mut provider_interface = decoder.decode();
+        let mut provider_interface = decoder.decode().map_err(|e| {
+            ExternalComponentError::InvalidLibraryInterface {
+                name: descriptor.name.clone(),
+                path: descriptor.entry_file.clone(),
+                reason: format!("Invalid LLIB semantic interface: {e:?}"),
+            }
+        })?;
         provider_interface.name = descriptor.name.clone();
 
         driver_session.registry.interfaces.insert(provider_id, provider_interface);

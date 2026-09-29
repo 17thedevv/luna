@@ -375,6 +375,14 @@ impl<'a> MvirInterpreter<'a> {
             Operand::Block(_) => Err(ComptimeError::UnsupportedOperation("block operand cannot be evaluated to value".to_string())),
             Operand::StringRef(_) => Err(ComptimeError::UnsupportedOperation("string literal evaluation not fully supported in comptime".to_string())),
             Operand::Char(_) => Err(ComptimeError::UnsupportedOperation("char literal evaluation not fully supported in comptime".to_string())),
+            Operand::Float { text, ty } => {
+                let width = match ty {
+                    FloatType::F32 => FloatWidth::F32,
+                    FloatType::F64 => FloatWidth::F64,
+                };
+                let f = text.parse::<f64>().map_err(|_| ComptimeError::Custom(format!("invalid float: {}", text)))?;
+                Ok(RuntimeValue::Float { val: f, width })
+            }
         }
     }
 
@@ -490,7 +498,7 @@ impl<'a> MvirInterpreter<'a> {
                     Instruction::Assign(op) => {
                         self.eval_operand(op)?
                     }
-                    Instruction::Store { ptr, value } => {
+                    Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                         let ptr_val = self.eval_operand(ptr)?;
                         let val = self.eval_operand(value)?;
                         match ptr_val {
@@ -518,7 +526,7 @@ impl<'a> MvirInterpreter<'a> {
                         let base_val = self.eval_operand(base)?;
                         base_val
                     }
-                    Instruction::FieldPtr { base, field_idx } => {
+                    Instruction::FieldPtr { base, field_idx, .. } => {
                         let base_val = self.eval_operand(base)?;
                         match base_val {
                             RuntimeValue::Pointer(Address::Stack { frame_idx, slot_idx, field_idx: _, offset }) => {
@@ -554,6 +562,18 @@ impl<'a> MvirInterpreter<'a> {
                                 return Err(ComptimeError::NullPointerDereference);
                             }
                             _ => return Err(ComptimeError::TypeMismatch("add operand mismatch".to_string())),
+                        }
+                    }
+                    Instruction::Neg { value } => {
+                        let v = self.eval_operand(value)?;
+                        match v {
+                            RuntimeValue::Int { val, width } => {
+                                self.eval_binary_op(0, val, width, "-")?
+                            }
+                            RuntimeValue::Float { val, width } => {
+                                RuntimeValue::Float { val: -val, width }
+                            }
+                            _ => return Err(ComptimeError::TypeMismatch("neg operand mismatch".to_string())),
                         }
                     }
                     Instruction::Sub { left, right } => {

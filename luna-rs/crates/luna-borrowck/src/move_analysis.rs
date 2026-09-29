@@ -344,7 +344,7 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                 self.check_operand(op, state, val_id);
                 self.mark_moved(op, state);
             }
-            Instruction::Store { ptr, value } => {
+            Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                 self.check_operand(value, state, val_id);
                 self.mark_moved(value, state);
                 self.mark_live(ptr, state);
@@ -475,7 +475,7 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                     self.mark_moved(arg, state);
                 }
             }
-            Instruction::Tag { value } => {
+            Instruction::Neg { value } | Instruction::Tag { value } => {
                 self.check_operand(value, state, val_id);
             }
             Instruction::Extract { value, field_idx, .. } => {

@@ -338,11 +338,7 @@ impl<'a> Parser<'a> {
             }
         }
         self.consume(TokenKind::RBrace, "Expected '}'")?;
-        let lifetime_contract = if self.check(TokenKind::KwRequires) {
-            Some(self.parse_struct_lifetime_contracts()?)
-        } else {
-            None
-        };
+        let (lifetime_contract, raw_storage_anchor_contract) = self.parse_struct_contracts()?;
         self.consume(TokenKind::Semi, "Expected ';' after struct declaration")?;
         Ok(self.arena.alloc_decl(Decl::Struct {
             annotations,
@@ -351,12 +347,33 @@ impl<'a> Parser<'a> {
             generic_params,
             fields,
             lifetime_contract,
+            raw_storage_anchor_contract,
         }))
     }
 
-    fn parse_struct_lifetime_contracts(&mut self) -> Result<luna_ast::StructLifetimeContractAst, ()> {
+    fn parse_struct_contracts(&mut self) -> Result<(
+        Option<luna_ast::StructLifetimeContractAst>,
+        Option<luna_ast::StructRawStorageAnchorContractAst>,
+    ), ()> {
         let mut constraints = Vec::new();
+        let mut anchors = Vec::new();
         while self.match_token(TokenKind::KwRequires) {
+            if self.check(TokenKind::Identifier)
+                && self.get_token_text(self.peek().span) == "anchor"
+            {
+                self.advance();
+                self.consume(TokenKind::LParen, "Expected '(' after 'anchor'")?;
+                let field = self.consume(TokenKind::Identifier, "Expected direct raw-pointer field name in 'anchor(...)'")?;
+                let field_name = self.get_token_text(field.span).to_string();
+                self.consume(TokenKind::RParen, "Expected ')' after anchored field name")?;
+                self.consume(TokenKind::Equal, "Expected '=' after 'anchor(field)'")?;
+                self.consume(TokenKind::KwSelfVal, "Expected 'self' after 'anchor(field) ='")?;
+                anchors.push(luna_ast::RawStorageAnchorAst {
+                    field_name,
+                    span: field.span,
+                });
+                continue;
+            }
             loop {
                 let start_span = self.peek().span;
                 let lhs = self.parse_lifetime_target()?;
@@ -390,7 +407,11 @@ impl<'a> Parser<'a> {
                 }
             }
         }
-        Ok(luna_ast::StructLifetimeContractAst::new(constraints))
+        let lifetime_contract = (!constraints.is_empty())
+            .then(|| luna_ast::StructLifetimeContractAst::new(constraints));
+        let raw_storage_anchor_contract = (!anchors.is_empty())
+            .then(|| luna_ast::StructRawStorageAnchorContractAst { anchors });
+        Ok((lifetime_contract, raw_storage_anchor_contract))
     }
 
     fn parse_generic_params(&mut self) -> Vec<GenericParam> {

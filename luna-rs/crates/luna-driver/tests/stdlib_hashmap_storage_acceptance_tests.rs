@@ -193,24 +193,24 @@ import <__raw_table>;
             dec v99 = table.get(&99);
 
             dec r1 = match v10 {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if r1 != 100 {
                 return 3;
             }
 
             dec r2 = match v20 {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if r2 != 200 {
                 return 4;
             }
 
             dec r3 = match v99 {
-                Option::Some(_) -> 1,
-                Option::None -> 0,
+                std::Option::Some(_) -> 1,
+                std::Option::None -> 0,
             };
             if r3 != 0 {
                 return 5;
@@ -267,18 +267,18 @@ import <__raw_table>;
 
             dec mut_opt = table.get_mut(&5);
             match mut_opt {
-                Option::Some(val_ref) -> {
+                std::Option::Some(val_ref) -> {
                     *val_ref = 500;
                 },
-                Option::None -> {
+                std::Option::None -> {
                     return 1;
                 },
             }
 
             dec read_opt = table.get(&5);
             dec final_val = match read_opt {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
 
             if final_val != 500 {
@@ -342,8 +342,8 @@ import <__raw_table>;
             }
 
             dec v = match table.get(&7) {
-                Option::Some(val) -> *val,
-                Option::None -> 0,
+                std::Option::Some(val) -> *val,
+                std::Option::None -> 0,
             };
             if v != 777 {
                 return 5;
@@ -399,13 +399,13 @@ import <__raw_table>;
             forced_hash: u64,
         };
 
-        impl Hash for CollidingKey {
+        impl std::Hash for CollidingKey {
             fn hash(self: &Self) -> u64 {
                 return self.forced_hash;
             }
         }
 
-        impl Eq for CollidingKey {
+        impl std::Eq for CollidingKey {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.id == other.id;
             }
@@ -446,8 +446,8 @@ import <__raw_table>;
             // It MUST NOT terminate or prematurely return Vacant(first_tombstone).
             dec q3 = CollidingKey { id: 3 as u64, forced_hash: 42 as u64 };
             dec v3 = match table.get(&q3) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v3 != 300 {
                 return 5; // Failed to find key located past a tombstone!
@@ -456,8 +456,8 @@ import <__raw_table>;
             // Verify k2 (between tombstone and k3) is also found
             dec q2 = CollidingKey { id: 2 as u64, forced_hash: 42 as u64 };
             dec v2 = match table.get(&q2) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v2 != 200 {
                 return 6;
@@ -489,16 +489,16 @@ import <__raw_table>;
             // Verify all 3 keys (k4 at reused slot, k2, k3) are intact
             dec q4 = CollidingKey { id: 4 as u64, forced_hash: 42 as u64 };
             dec v4 = match table.get(&q4) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v4 != 400 {
                 return 11;
             }
 
             dec v3_final = match table.get(&q3) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             if v3_final != 300 {
                 return 12;
@@ -566,8 +566,8 @@ import <__raw_table>;
             dec rw j: i32 = 1;
             while j <= 20 {
                 dec val = match table.get(&j) {
-                    Option::Some(v) -> *v,
-                    Option::None -> 0,
+                    std::Option::Some(v) -> *v,
+                    std::Option::None -> 0,
                 };
                 if val != (j * 10) {
                     return 4;
@@ -623,7 +623,7 @@ import <__raw_table>;
             drop_ptr: *rw i32,
         };
 
-        impl Drop for TrackedItem {
+        impl std::Drop for TrackedItem {
             fn drop(self: &rw Self) {
                 if (self.drop_ptr as u64) != (0 as u64) {
                     unsafe {
@@ -633,13 +633,13 @@ import <__raw_table>;
             }
         }
 
-        impl Hash for TrackedItem {
+        impl std::Hash for TrackedItem {
             fn hash(self: &Self) -> u64 {
                 return self.id as u64;
             }
         }
 
-        impl Eq for TrackedItem {
+        impl std::Eq for TrackedItem {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.id == other.id;
             }
@@ -769,12 +769,12 @@ import <__raw_table>;
             table.insert(200, 2000);
 
             dec v1 = match table.get(&100) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
             dec v2 = match table.get(&200) {
-                Option::Some(v) -> *v,
-                Option::None -> 0,
+                std::Option::Some(v) -> *v,
+                std::Option::None -> 0,
             };
 
             if v1 != 1000 || v2 != 2000 {

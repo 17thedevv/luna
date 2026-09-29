@@ -7,7 +7,7 @@ trait Drop {
 }
 
 
-impl Drop for MyStruct {
+impl std::Drop for MyStruct {
     fn drop(self: &rw Self) {}
 }
 

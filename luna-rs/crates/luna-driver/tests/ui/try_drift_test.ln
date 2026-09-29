@@ -1,8 +1,8 @@
 import "mock";
 import <try>;
 
-fn test_drift() -> ControlFlow<i32, i32> {
-    return ControlFlow::Continue(42);
+fn test_drift() -> std::ControlFlow<i32, i32> {
+    return std::ControlFlow::Continue(42);
 }
 
 fn main() -> i32 {

@@ -1,13 +1,13 @@
 use std::io::{Write, Cursor};
-use crate::format::{MlibHeader, SectionEntry, SectionType};
+use crate::format::{LlibHeader, SectionEntry, SectionType};
 use crate::ir::{MlibModule, MlibFunction, MlibValue, MlibBlock, MlibInstruction, MlibTerminator, MlibOperand, MlibTypeEntry};
 use luna_mvir::{Module, Function, ValueData, BasicBlock, CaptureInfo, Instruction, Terminator, Operand};
 use luna_semantic::CaptureMode;
 
-pub struct MlibWriter;
-pub type LlibWriter = MlibWriter;
+pub struct LlibWriter;
+pub type MlibWriter = LlibWriter;
 
-impl MlibWriter {
+impl LlibWriter {
     pub fn write_module<W: Write>(module: &Module, arena: &luna_ast::AstArena, items: &[luna_ast::Item], source: &str, mut manifest: crate::format::Manifest, semantic_metadata: Option<&crate::metadata::SemanticMetadata>, obj_bytes: Option<&[u8]>, writer: &mut W) -> std::io::Result<()> {
         let mlib_module = Self::convert_module(module);
         
@@ -80,7 +80,7 @@ impl MlibWriter {
             section_count += 1;
         }
 
-        let mut header = MlibHeader::new();
+        let mut header = LlibHeader::new();
         header.section_count = section_count;
         
         let header_size = 122;
@@ -220,7 +220,15 @@ impl MlibWriter {
             Instruction::Alloca => MlibInstruction::Alloca,
             Instruction::HeapAlloc => MlibInstruction::HeapAlloc,
             Instruction::Assign(val) => MlibInstruction::Assign(Self::convert_operand(val)),
+            Instruction::Neg { value } => MlibInstruction::Neg { value: Self::convert_operand(value) },
             Instruction::Store { ptr, value } => MlibInstruction::Store {
+                ptr: match ptr {
+                    Operand::Value(v) => v.0,
+                    _ => panic!("Store ptr must be a Value"),
+                },
+                value: Self::convert_operand(value),
+            },
+            Instruction::StoreAnchored { ptr, value } => MlibInstruction::StoreAnchored {
                 ptr: match ptr {
                     Operand::Value(v) => v.0,
                     _ => panic!("Store ptr must be a Value"),
@@ -388,9 +396,10 @@ impl MlibWriter {
                 variant_idx: *variant_idx,
                 field_idx: *field_idx,
             },
-            Instruction::FieldPtr { base, field_idx } => MlibInstruction::FieldPtr {
+            Instruction::FieldPtr { base, field_idx, field_name } => MlibInstruction::FieldPtr {
                 base: Self::convert_operand(base),
                 field_idx: *field_idx,
+                field_name: field_name.clone(),
             },
             Instruction::Await { future } => MlibInstruction::Await {
                 future: Self::convert_operand(future),
@@ -431,6 +440,13 @@ impl MlibWriter {
             Operand::Global(g) => MlibOperand::Global(g.name.clone()),
             Operand::StringRef(s) => MlibOperand::StringRef(s.clone()),
             Operand::Char(c) => MlibOperand::Char(c.clone()),
+            Operand::Float { text, ty } => MlibOperand::Float {
+                text: text.clone(),
+                ty: match ty {
+                    luna_mvir::FloatType::F32 => crate::ir::MlibFloatType::F32,
+                    luna_mvir::FloatType::F64 => crate::ir::MlibFloatType::F64,
+                },
+            },
         }
     }
 
@@ -471,6 +487,14 @@ impl MlibWriter {
                 w.write_all(&[6u8])?;
                 Self::write_string(w, c)?;
             }
+            MlibOperand::Float { text, ty } => {
+                w.write_all(&[7u8])?;
+                w.write_all(&[match ty {
+                    crate::ir::MlibFloatType::F32 => 0u8,
+                    crate::ir::MlibFloatType::F64 => 1u8,
+                }])?;
+                Self::write_string(w, text)?;
+            }
         }
         Ok(())
     }
@@ -492,9 +516,18 @@ impl MlibWriter {
                 w.write_all(&ptr.to_le_bytes())?;
                 Self::serialize_operand(w, value)?;
             }
+            MlibInstruction::StoreAnchored { ptr, value } => {
+                w.write_all(&[0x28u8])?;
+                w.write_all(&ptr.to_le_bytes())?;
+                Self::serialize_operand(w, value)?;
+            }
             MlibInstruction::Load { ptr } => {
                 w.write_all(&[3u8])?;
                 Self::serialize_operand(w, ptr)?;
+            }
+            MlibInstruction::Neg { value } => {
+                w.write_all(&[0x71u8])?;
+                Self::serialize_operand(w, value)?;
             }
             MlibInstruction::CallDirect { callee, args } => {
                 w.write_all(&[4u8])?;
@@ -663,10 +696,17 @@ impl MlibWriter {
                 w.write_all(&variant_idx.to_le_bytes())?;
                 w.write_all(&field_idx.to_le_bytes())?;
             }
-            MlibInstruction::FieldPtr { base, field_idx } => {
+            MlibInstruction::FieldPtr { base, field_idx, field_name } => {
                 w.write_all(&[27u8])?;
                 Self::serialize_operand(w, base)?;
                 w.write_all(&field_idx.to_le_bytes())?;
+                match field_name {
+                    Some(name) => {
+                        w.write_all(&[1u8])?;
+                        Self::write_string(w, name)?;
+                    }
+                    None => w.write_all(&[0u8])?,
+                }
             }
             MlibInstruction::Drop { value } => {
                 w.write_all(&[13u8])?;

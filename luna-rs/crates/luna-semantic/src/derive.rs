@@ -286,7 +286,7 @@ impl DeriveRegistry {
         // Register Copy derive
         let copy_derive = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, Diagnostic> {
             let type_name = &input.name;
-            let code = format!("impl Copy for {} {{}}", type_name);
+            let code = format!("impl std::Copy for {} {{}}", type_name);
             ctx.parse_and_append_item(&code)
                 .map_err(|_| Diagnostic::error(format!("failed to parse generated Copy for `{}`", type_name)).with_span(ctx.derive_span))
         });

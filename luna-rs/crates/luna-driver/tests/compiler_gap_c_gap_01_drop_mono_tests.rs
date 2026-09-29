@@ -58,7 +58,7 @@ struct Wrapper<T> {
     drop_counter: *rw i32,
 };
 
-impl<T> Drop for Wrapper<T> {
+impl<T> std::Drop for Wrapper<T> {
     fn drop(self: &rw Self) {
         unsafe {
             *self.drop_counter = *self.drop_counter + 1;
@@ -109,7 +109,7 @@ struct DropTracker {
     tracker_count: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.order_seq = *self.order_seq + 1;
@@ -126,7 +126,7 @@ struct Holder<T> {
     holder_count: *rw i32,
 };
 
-impl<T> Drop for Holder<T> {
+impl<T> std::Drop for Holder<T> {
     fn drop(self: &rw Self) {
         unsafe {
             *self.order_seq = *self.order_seq + 1;
@@ -206,7 +206,7 @@ struct DropTracker {
     count: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.order_seq = *self.order_seq + 1;
@@ -223,7 +223,7 @@ struct Inner<T> {
     count: *rw i32,
 };
 
-impl<T> Drop for Inner<T> {
+impl<T> std::Drop for Inner<T> {
     fn drop(self: &rw Self) {
         unsafe {
             *self.order_seq = *self.order_seq + 1;
@@ -240,7 +240,7 @@ struct Outer<T> {
     count: *rw i32,
 };
 
-impl<T> Drop for Outer<T> {
+impl<T> std::Drop for Outer<T> {
     fn drop(self: &rw Self) {
         unsafe {
             *self.order_seq = *self.order_seq + 1;
@@ -330,7 +330,7 @@ struct DropTracker {
     counter: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.counter = *self.counter + 1;
@@ -341,7 +341,7 @@ impl Drop for DropTracker {
 fn main() -> i32 {
     dec rw count: i32 = 0;
     {
-        dec rw v = vec_new<std::Box<DropTracker>>();
+        dec rw v = std::vec_new<std::Box<DropTracker>>();
         v.push(std::box_new<DropTracker>(DropTracker { id: 1, counter: &rw count as *rw i32 }));
         v.push(std::box_new<DropTracker>(DropTracker { id: 2, counter: &rw count as *rw i32 }));
         v.push(std::box_new<DropTracker>(DropTracker { id: 3, counter: &rw count as *rw i32 }));
@@ -383,7 +383,7 @@ struct DropTracker {
     counter: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.counter = *self.counter + 1;
@@ -394,7 +394,7 @@ impl Drop for DropTracker {
 fn main() -> i32 {
     dec rw count: i32 = 0;
     {
-        dec rw v = vec_new<std::Box<std::Box<DropTracker>>>();
+        dec rw v = std::vec_new<std::Box<std::Box<DropTracker>>>();
         v.push(std::box_new<std::Box<DropTracker>>(std::box_new<DropTracker>(DropTracker { id: 1, counter: &rw count as *rw i32 })));
         v.push(std::box_new<std::Box<DropTracker>>(std::box_new<DropTracker>(DropTracker { id: 2, counter: &rw count as *rw i32 })));
         v.push(std::box_new<std::Box<DropTracker>>(std::box_new<DropTracker>(DropTracker { id: 3, counter: &rw count as *rw i32 })));
@@ -434,7 +434,7 @@ struct PlainData<T> {
 
 fn main() -> i32 {
     dec p = PlainData<i32> { val: 12345 };
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     v.push(20);
     v.push(30);
@@ -476,7 +476,7 @@ struct DropTracker {
     counter: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.counter = *self.counter + 1;
@@ -487,7 +487,7 @@ impl Drop for DropTracker {
 fn main() -> i32 {
     dec rw count: i32 = 0;
     {
-        dec rw v = vec_new<std::Box<DropTracker>>();
+        dec rw v = std::vec_new<std::Box<DropTracker>>();
         v.push(std::box_new<DropTracker>(DropTracker { id: 10, counter: &rw count as *rw i32 }));
         v.push(std::box_new<DropTracker>(DropTracker { id: 20, counter: &rw count as *rw i32 }));
     }

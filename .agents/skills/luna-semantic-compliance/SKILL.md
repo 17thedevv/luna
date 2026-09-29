@@ -201,30 +201,28 @@ Key Regression Matrix:
 
 # 4.2 Core Pointer & Memory Invariants (PTR-MEM)
 
-Provider `<core>` exports low-level raw pointer and memory manipulation primitives under two distinct module namespaces: `module ptr` and `module mem`.
-Consumer usage strictly follows Rule 7 (Provider ≠ Namespace):
-`import <core>;` brings provider `<core>` into the compilation context; symbols are accessed via `ptr::*` and `mem::*`. `core::ptr::*` is invalid and rejected.
+The standard library exposes low-level raw pointer and memory manipulation primitives under the canonical logical paths `std::ptr` and `std::mem`. Provider identity remains separate from these namespaces: consumers import the physical providers (for example, `import <ptr>; import <mem>;`) and use `std::ptr::*` or `std::mem::*`. Provider-derived paths such as `ptr::*`, `mem::*`, and `core::ptr::*` are invalid.
 
 The 5 semantic contracts are strictly frozen:
 
 - **PTR-MEM-1 (No Automatic Lifetime Inference & Unsafe Boundary)**:
-  Raw pointer operations are explicit `unsafe` escape hatches. Calling `ptr::read` or dereferencing a raw pointer does NOT synthesize or infer a safe lifetime relation (`life_from`). Returned values are owned; raw pointers never masquerade as borrowed references.
+  Raw pointer operations are explicit `unsafe` escape hatches. Calling `std::ptr::read` or dereferencing a raw pointer does NOT synthesize or infer a safe lifetime relation (`life_from`). Returned values are owned; raw pointers never masquerade as borrowed references.
   *Rule*: `unsafe` removes the obligation to prove raw-memory safety at that operation boundary; it does not remove lifetime/provenance requirements from safe references produced afterward (see Section 7.1).
 - **PTR-MEM-2 (Semantic Pointer Arithmetic & Allocation Provenance)**:
-  Pointer arithmetic (`ptr::add`, `ptr::add_mut`, `ptr::offset`, `ptr::offset_mut`, `ptr::diff`) is defined at the language semantic level over $T$-sized elements (not defined as source-level integer casts).
-  - `ptr::diff(a, b)` computes signed element distance $((a - b) / \text{sizeof}(T))$.
+  Pointer arithmetic (`std::ptr::add`, `std::ptr::add_mut`, `std::ptr::offset`, `std::ptr::offset_mut`, `std::ptr::diff`) is defined at the language semantic level over $T$-sized elements (not defined as source-level integer casts).
+  - `std::ptr::diff(a, b)` computes signed element distance $((a - b) / \text{sizeof}(T))$.
   - **Allocation/Provenance Constraint**: Both `a` and `b` MUST point within the same allocated object or one-past-the-end. Cross-allocation or cross-provenance pointer difference is undefined behavior at the semantic level.
 - **PTR-MEM-3 (MVIR Memory Lifecycle / Move / Drop Compliance)**:
   Raw pointer writes and reads interact directly with MVIR lifecycle rules:
-  - `ptr::read<T>(src: *T) -> T`: Semantically executes a `MoveOut` of $T$ out of raw memory. Ownership of $T$ transfers to the caller, which assumes standard drop obligations. If $T$ is non-`Copy`, the source memory slot is conceptually left uninitialized. Subsequent reads without re-initialization yield undefined behavior / double-free hazards.
-  - `ptr::write<T>(dst: *rw T, val: T)`: Semantically executes an `Initialize` on destination raw memory without invoking `DropInPlace` on any previous value in that cell. Overwriting an already-initialized $T$ that owns resources causes those resources to leak unless the caller explicitly destructs them first.
+  - `std::ptr::read<T>(src: *T) -> T`: Semantically executes a `MoveOut` of $T$ out of raw memory. Ownership of $T$ transfers to the caller, which assumes standard drop obligations. If $T$ is non-`Copy`, the source memory slot is conceptually left uninitialized. Subsequent reads without re-initialization yield undefined behavior / double-free hazards.
+  - `std::ptr::write<T>(dst: *rw T, val: T)`: Semantically executes an `Initialize` on destination raw memory without invoking `DropInPlace` on any previous value in that cell. Overwriting an already-initialized $T$ that owns resources causes those resources to leak unless the caller explicitly destructs them first.
 - **PTR-MEM-4 (Explicit Count Units)**:
   Units for count parameters are explicitly bifurcated:
-  - `ptr::*` functions operate strictly on **typed element counts** ($N$ elements of type $T$).
-  - `mem::*` block functions operate strictly on **raw byte counts** (`bytes: u64`).
-  - Typed block copy `ptr::copy<T>(src: *T, dst: *rw T, count: u64)` operates on **element counts** ($N \times \text{sizeof}(T)$ bytes).
+  - `std::ptr::*` functions operate strictly on **typed element counts** ($N$ elements of type $T$).
+  - `std::mem::*` block functions operate strictly on **raw byte counts** (`bytes: u64`).
+  - Typed block copy `std::ptr::copy<T>(src: *T, dst: *rw T, count: u64)` operates on **element counts** ($N \times \text{sizeof}(T)$ bytes).
 - **PTR-MEM-5 (Source & .llib Parity)**:
-  Module definitions, symbol visibility, and parameter signatures in `core.ln` and precompiled `core.llib` are strictly identical across binary boundaries.
+  Module definitions, symbol visibility, and parameter signatures in the `ptr` and `mem` providers and their precompiled artifacts are strictly identical across binary boundaries.
 
 ---
 

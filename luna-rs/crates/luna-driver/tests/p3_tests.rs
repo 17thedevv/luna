@@ -492,7 +492,7 @@ fn test_case_18_vtable_layout_drop_glue_concrete_called() {
         struct Resource {
             id: i32,
         };
-        impl Drop for Resource {
+        impl std::Drop for Resource {
             fn drop(self: &rw Self) {
                 self.id = 0;
             }

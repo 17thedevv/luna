@@ -1,0 +1,9 @@
+extern fn __test_ffi_write_raw(value: *rw i32);
+
+fn main() -> i32 {
+    dec rw value: i32 = 1 as i32;
+    dec raw = &rw value as *rw i32;
+    dec shared = &value;
+    unsafe { __test_ffi_write_raw(raw); }
+    return *shared;
+}

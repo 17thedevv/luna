@@ -1,0 +1,99 @@
+import <box>;
+import <default>;
+import <hashmap>;
+import <hashset>;
+import <iter_collect>;
+import <ptr>;
+import <string>;
+import <vec>;
+
+struct DropProbe {
+    counter: *rw i32,
+};
+
+impl std::Drop for DropProbe {
+    fn drop(self: &rw Self) {
+        unsafe {
+            *self.counter = *self.counter + 1;
+        }
+    }
+}
+
+struct NoHash {};
+struct NoHashValue {};
+
+fn main() -> i32 {
+    // Empty construction remains available without Hash/Eq bounds.
+    dec empty_map: std::HashMap<NoHash, NoHashValue> = std::Default::default();
+    dec empty_set: std::HashSet<NoHash> = std::Default::default();
+
+    dec rw map: std::HashMap<i32, i32> = std::hashmap_new<i32, i32>();
+    if map.insert(1, 10) == false || map.insert(1, 20) != false {
+        return 2;
+    }
+    dec key_one: i32 = 1;
+    match map.get(&key_one) {
+        std::Option::Some(value) -> { if *value != 20 { return 3; } },
+        std::Option::None -> { return 4; },
+    }
+    if map.len() != (1 as u64) || map.contains_key(&key_one) == false {
+        return 5;
+    }
+    dec rw map_iter = map.iter();
+    match map_iter.next() {
+        std::Option::Some(entry) -> { if *entry.0 != 1 || *entry.1 != 20 { return 6; } },
+        std::Option::None -> { return 7; },
+    }
+
+    dec rw set: std::HashSet<i32> = std::hashset_new<i32>();
+    dec value_eight: i32 = 8;
+    if set.insert(value_eight) == false || set.insert(value_eight) != false || set.contains(&value_eight) == false {
+        return 8;
+    }
+    dec rw set_iter = set.iter();
+    match set_iter.next() {
+        std::Option::Some(value) -> { if *value != 8 { return 9; } },
+        std::Option::None -> { return 10; },
+    }
+
+    dec rw pairs: std::Vec<(i32, i32)> = std::vec_new<(i32, i32)>();
+    pairs.push((2, 20));
+    pairs.push((3, 30));
+    dec collected_map = std::iter_collect_hashmap(pairs.into_iter());
+    if collected_map.len() != (2 as u64) {
+        return 11;
+    }
+
+    dec rw values: std::Vec<i32> = std::vec_new<i32>();
+    values.push(5);
+    values.push(5);
+    values.push(6);
+    dec collected_set = std::iter_collect_hashset(values.into_iter());
+    if collected_set.len() != (2 as u64) {
+        return 12;
+    }
+
+    dec rw nested: std::HashMap<i32, std::Vec<i32>> = std::Default::default();
+    dec rw payload: std::Vec<i32> = std::vec_new<i32>();
+    payload.push(42);
+    nested.insert(1, payload);
+    dec nested_key: i32 = 1;
+    match nested.get(&nested_key) {
+        std::Option::Some(items) -> {
+            if items.len() != (1 as u64) || *items.get(0 as u64).unwrap() != 42 { return 13; }
+        },
+        std::Option::None -> { return 14; },
+    }
+
+    dec rw drops: i32 = 0;
+    {
+        dec rw owned: std::HashMap<i32, std::Box<DropProbe>> = std::Default::default();
+        owned.insert(7, std::box_new<DropProbe>(DropProbe { counter: &rw drops as *rw i32 }));
+        if owned.len() != (1 as u64) { return 15; }
+    }
+    if drops != 1 {
+        return 16;
+    }
+
+    return 0;
+}

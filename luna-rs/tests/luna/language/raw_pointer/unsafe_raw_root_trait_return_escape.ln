@@ -1,0 +1,24 @@
+trait BorrowEcho {
+    fn echo(self: &Self, value: &i32) -> &i32 life_from(value);
+}
+
+impl BorrowEcho for i32 {
+    fn echo(self: &Self, value: &i32) -> &i32 life_from(value) {
+        return value;
+    }
+}
+
+fn escape_through_trait<T: BorrowEcho>(pointer: *i32, receiver: &T) -> &i32 life_from(receiver) {
+    unsafe {
+        dec local = &*pointer;
+        return receiver.echo(local);
+    }
+}
+
+fn main() {
+    dec owner = 7;
+    unsafe {
+        dec pointer = &owner as *i32;
+        escape_through_trait<i32>(pointer, &owner);
+    }
+}

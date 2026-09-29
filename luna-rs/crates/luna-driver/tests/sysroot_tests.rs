@@ -204,10 +204,11 @@ fn test_external_component_identity_stable() {
     assert_eq!(interface.name, "__lang_drop");
     assert_eq!(interface.id, core_id);
 
-    // Verify Drop symbol exists and has provider_id == core_id
+    // Verify the canonical std::Drop path exists and keeps this provider identity.
     let drop_sym = interface
         .exported_symbols
-        .get("Drop")
-        .expect("Drop contract provider must export Drop");
+        .get("std")
+        .and_then(|std| std.children.get("Drop"))
+        .expect("Drop contract provider must export std::Drop");
     assert_eq!(drop_sym.sym.provider_id, Some(core_id));
 }

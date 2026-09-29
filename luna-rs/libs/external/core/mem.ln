@@ -1,6 +1,7 @@
 import <ptr>;
 
-module mem {
+export module std {
+    export module mem {
     // NOTE: `slice_from_raw_parts` and `slice_from_raw_parts_mut` are unsafe intrinsic boundaries
     // bridging raw pointers to fat-pointer slices. They must NOT be treated as a precedent for safe
     // reference construction without explicit lifetime provenance contracts.
@@ -39,11 +40,11 @@ module mem {
     }
 
     /// Swaps the values of two mutable references without invalidating either.
-    /// Safe wrapper around `ptr::swap`: compiler borrowck guarantees `a` and `b`
+    /// Safe wrapper around `std::ptr::swap`: compiler borrowck guarantees `a` and `b`
     /// cannot alias simultaneously as mutable references.
     export fn swap<T>(a: &rw T, b: &rw T) {
         unsafe {
-            ptr::swap<T>(a as *rw T, b as *rw T);
+            std::ptr::swap<T>(a as *rw T, b as *rw T);
         }
     }
 
@@ -51,23 +52,10 @@ module mem {
     /// Move semantics: transfers ownership without drop.
     export fn replace<T>(dest: &rw T, src: T) -> T {
         unsafe {
-            dec old = ptr::read<T>(dest as *T);
-            ptr::write<T>(dest as *rw T, src);
+            dec old = std::ptr::read<T>(dest as *T);
+            std::ptr::write<T>(dest as *rw T, src);
             return old;
         }
     }
 }
-
-// NOTE: `slice_from_raw_parts` and `slice_from_raw_parts_mut` are unsafe intrinsic boundaries
-// bridging raw pointers to fat-pointer slices. They must NOT be treated as a precedent for safe
-// reference construction without explicit lifetime provenance contracts.
-export unsafe fn slice_from_raw_parts<T>(ptr: *T, len: u64) -> &[T];
-export unsafe fn slice_from_raw_parts_mut<T>(ptr: *rw T, len: u64) -> &rw [T];
-
-export fn mem_swap<T>(a: &rw T, b: &rw T) {
-    mem::swap<T>(a, b);
-}
-
-export fn mem_replace<T>(dest: &rw T, src: T) -> T {
-    return mem::replace<T>(dest, src);
 }

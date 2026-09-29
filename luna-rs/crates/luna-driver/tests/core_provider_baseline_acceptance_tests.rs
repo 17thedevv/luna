@@ -4,6 +4,9 @@ use luna_driver::{check, compile, CompilerOptions};
 use luna_llib::MlibReader;
 use std::fs;
 use std::path::PathBuf;
+use std::sync::OnceLock;
+
+static SOURCE_ONLY_ROOT: OnceLock<PathBuf> = OnceLock::new();
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
     let dir = std::env::temp_dir()
@@ -25,16 +28,51 @@ fn canonical_manifest() -> SysrootManifest {
 }
 
 fn check_source(test_name: &str, source: &str) -> Result<(), Vec<luna_common::Diagnostic>> {
-    let sysroot = canonical_sysroot();
+    let root = source_only_root();
     let dir = create_temp_dir(test_name);
     let path = dir.join("main.ln");
     fs::write(&path, source).unwrap();
     let options = CompilerOptions {
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
+        search_paths: vec![root.to_string_lossy().to_string()],
         quiet: true,
         ..Default::default()
     };
     check(path.to_str().unwrap(), source.to_string(), &options)
+}
+
+fn source_only_root() -> &'static PathBuf {
+    SOURCE_ONLY_ROOT.get_or_init(|| {
+        let sysroot = canonical_sysroot();
+        let root = create_temp_dir("source_only_sysroot");
+        copy_tree(sysroot.external_dir(), &root.join("libs").join("external"));
+        remove_artifacts(&root.join("libs").join("external"));
+        root
+    })
+}
+
+fn copy_tree(source: &std::path::Path, destination: &std::path::Path) {
+    fs::create_dir_all(destination).expect("create source-only sysroot directory");
+    for entry in fs::read_dir(source).expect("enumerate source sysroot") {
+        let entry = entry.expect("read source sysroot entry");
+        let from = entry.path();
+        let to = destination.join(entry.file_name());
+        if from.is_dir() {
+            copy_tree(&from, &to);
+        } else {
+            fs::copy(from, to).expect("copy source sysroot file");
+        }
+    }
+}
+
+fn remove_artifacts(root: &std::path::Path) {
+    for entry in fs::read_dir(root).expect("enumerate source-only sysroot") {
+        let path = entry.expect("read source-only sysroot entry").path();
+        if path.is_dir() {
+            remove_artifacts(&path);
+        } else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale sysroot artifact");
+        }
+    }
 }
 
 #[test]
@@ -88,21 +126,21 @@ fn language_contracts_are_auto_loaded_for_user_types() {
     let source = r#"
         struct UserIter { current: i32 };
 
-        impl Iterator<i32> for UserIter {
-            fn next(self: &rw Self) -> Option<i32> {
+        impl std::Iterator<i32> for UserIter {
+            fn next(self: &rw Self) -> std::Option<i32> {
                 if self.current == 0 {
                     self.current = 1;
-                    return Option::Some(7);
+                    return std::Option::Some(7);
                 }
-                return Option::None;
+                return std::Option::None;
             }
         }
 
         fn main() -> i32 {
             dec rw iter = UserIter { current: 0 };
             match iter.next() {
-                Option::Some(value) -> { return value - 7; },
-                Option::None -> { return 1; },
+                std::Option::Some(value) -> { return value - 7; },
+                std::Option::None -> { return 1; },
             }
         }
     "#;
@@ -116,7 +154,7 @@ fn ordinary_core_api_remains_explicit() {
 
     let with_import = r#"
         import <result>;
-        fn consume(value: Result<i32, i32>) {}
+        fn consume(value: std::Result<i32, i32>) {}
         fn main() -> i32 { return 0; }
     "#;
     assert!(check_source("result_with_import", with_import).is_ok());
@@ -130,18 +168,18 @@ fn internal_language_provider_rejects_user_import() {
 
 #[test]
 fn result_component_survives_the_full_pipeline() {
-    let sysroot = canonical_sysroot();
+    let sysroot_root = source_only_root();
     let dir = create_temp_dir("result_full_pipeline");
     let path = dir.join("main.ln");
     let source = r#"
         import <result>;
 
-        fn pass(value: Result<i32, i32>) -> Result<i32, i32> {
+        fn pass(value: std::Result<i32, i32>) -> std::Result<i32, i32> {
             return value;
         }
 
         fn main() -> i32 {
-            dec value = pass(Result::Ok(7));
+            dec value = pass(std::Result::Ok(7));
             return 0;
         }
     "#;
@@ -149,7 +187,7 @@ fn result_component_survives_the_full_pipeline() {
     let output = dir.join("main.obj");
     let options = CompilerOptions {
         output_path: Some(output.to_string_lossy().to_string()),
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
+        search_paths: vec![sysroot_root.to_string_lossy().to_string()],
         emit_llvm: true,
         no_link: true,
         quiet: true,

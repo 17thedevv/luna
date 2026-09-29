@@ -6,7 +6,7 @@ trait Drop {
     fn drop(self: &rw Self);
 }
 
-impl Drop for File {
+impl std::Drop for File {
     fn drop(self: &rw Self) {}
 }
 

@@ -858,6 +858,7 @@ fn shadow_07_aggregate_field_carrier() {
         inst: Instruction::FieldPtr {
             base: Operand::Value(ValueId(3)),
             field_idx: 0,
+            field_name: None,
         },
         ty,
     });

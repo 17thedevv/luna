@@ -15,6 +15,8 @@ pub struct ProviderEntry {
     pub path: String,
     pub visibility: ProviderVisibility,
     pub lang_contract: Option<String>,
+    #[serde(default)]
+    pub aliases: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -24,6 +26,7 @@ struct SysrootManifestToml {
 
 #[derive(Debug)]
 pub struct SysrootManifest {
+    canonical_entries: Vec<ProviderEntry>,
     providers_by_name: HashMap<String, ProviderEntry>,
     providers_by_contract: HashMap<String, String>, // contract -> name
 }
@@ -36,6 +39,7 @@ impl SysrootManifest {
         let toml_data: SysrootManifestToml = toml::from_str(&content)
             .map_err(|e| format!("Failed to parse sysroot manifest {}: {}", path.display(), e))?;
 
+        let mut canonical_entries = Vec::new();
         let mut providers_by_name = HashMap::new();
         let mut providers_by_contract = HashMap::new();
         let mut physical_paths = HashSet::new();
@@ -62,10 +66,19 @@ impl SysrootManifest {
                 providers_by_contract.insert(contract.clone(), entry.name.clone());
             }
 
-            providers_by_name.insert(entry.name.clone(), entry);
+            for alias in &entry.aliases {
+                if providers_by_name.contains_key(alias) {
+                    return Err(format!("Duplicate alias in manifest: {}", alias));
+                }
+                providers_by_name.insert(alias.clone(), entry.clone());
+            }
+
+            providers_by_name.insert(entry.name.clone(), entry.clone());
+            canonical_entries.push(entry);
         }
 
         Ok(Self {
+            canonical_entries,
             providers_by_name,
             providers_by_contract,
         })
@@ -81,13 +94,14 @@ impl SysrootManifest {
     }
 
     pub fn providers(&self) -> impl Iterator<Item = &ProviderEntry> {
-        self.providers_by_name.values()
+        self.canonical_entries.iter()
     }
 }
 
 impl Default for SysrootManifest {
     fn default() -> Self {
         Self {
+            canonical_entries: Vec::new(),
             providers_by_name: std::collections::HashMap::new(),
             providers_by_contract: std::collections::HashMap::new(),
         }

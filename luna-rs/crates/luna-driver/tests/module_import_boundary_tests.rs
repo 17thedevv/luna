@@ -554,7 +554,7 @@ fn test_negative_invariant_no_artifact_on_error() {
 
     let out_exe = dir.join("output.exe");
     let out_obj = dir.join("output.obj");
-    let out_mlib = dir.join("output.mlib");
+    let out_llib = dir.join("output.llib");
 
     let opts = CompilerOptions {
         output_path: Some(out_exe.to_string_lossy().to_string()),
@@ -572,7 +572,7 @@ fn test_negative_invariant_no_artifact_on_error() {
         "Object artifact must NOT exist upon diagnostic error"
     );
     assert!(
-        !out_mlib.exists(),
-        "Mlib artifact must NOT exist upon diagnostic error"
+        !out_llib.exists(),
+        "LLib artifact must NOT exist upon diagnostic error"
     );
 }

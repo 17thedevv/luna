@@ -44,7 +44,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn run_vec_boxes() {
-    dec rw v = vec_new<std::Box<i32>>();
+    dec rw v = std::vec_new<std::Box<i32>>();
     v.push(std::box_new<i32>(100));
     v.push(std::box_new<i32>(200));
     v.push(std::box_new<i32>(300));
@@ -97,7 +97,7 @@ struct DropTracker {
     last_dropped: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.counter = *self.counter + 1;
@@ -110,7 +110,7 @@ fn main() -> i32 {
     dec rw count: i32 = 0;
     dec rw last_id: i32 = 0;
     {
-        dec rw v = vec_new<DropTracker>();
+        dec rw v = std::vec_new<DropTracker>();
         v.push(DropTracker { id: 1, counter: &rw count as *rw i32, last_dropped: &rw last_id as *rw i32 });
         v.push(DropTracker { id: 2, counter: &rw count as *rw i32, last_dropped: &rw last_id as *rw i32 });
         v.push(DropTracker { id: 3, counter: &rw count as *rw i32, last_dropped: &rw last_id as *rw i32 });
@@ -162,7 +162,7 @@ struct DropTracker {
     counter: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.counter = *self.counter + 1;
@@ -172,7 +172,7 @@ impl Drop for DropTracker {
 
 fn main() -> i32 {
     dec rw count: i32 = 0;
-    dec rw v = vec_new<DropTracker>();
+    dec rw v = std::vec_new<DropTracker>();
     v.push(DropTracker { counter: &rw count as *rw i32 });
     v.push(DropTracker { counter: &rw count as *rw i32 });
     v.push(DropTracker { counter: &rw count as *rw i32 });
@@ -232,7 +232,7 @@ struct DropTracker {
     counter: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.counter = *self.counter + 1;
@@ -242,7 +242,7 @@ impl Drop for DropTracker {
 
 fn main() -> i32 {
     dec rw count: i32 = 0;
-    dec rw v = vec_new<DropTracker>();
+    dec rw v = std::vec_new<DropTracker>();
     v.push(DropTracker { id: 1, counter: &rw count as *rw i32 });
     v.push(DropTracker { id: 2, counter: &rw count as *rw i32 });
     v.push(DropTracker { id: 3, counter: &rw count as *rw i32 });
@@ -307,7 +307,7 @@ struct DropTracker {
     counter: *rw i32,
 };
 
-impl Drop for DropTracker {
+impl std::Drop for DropTracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.counter = *self.counter + 1;
@@ -319,7 +319,7 @@ fn main() -> i32 {
     dec rw drop_count: i32 = 0;
     dec ptr_drop_count = &rw drop_count as *rw i32;
     {
-        dec rw v = vec_new<std::Box<DropTracker>>();
+        dec rw v = std::vec_new<std::Box<DropTracker>>();
         // Push 10 elements: capacity starts at 0 -> 4 -> 8 -> 16 (3 grows)
         dec rw i: i32 = 0;
         while i < 10 {
@@ -335,7 +335,7 @@ fn main() -> i32 {
             return 1;
         }
     }
-    // Now Vec has dropped out of scope: all 10 Box<DropTracker> destructors must have executed
+    // Now Vec has dropped out of scope: all 10 std::Box<DropTracker> destructors must have executed
     if drop_count == 10 {
         return 0;
     }
@@ -380,7 +380,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn run_primitives() {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(1);
     v.push(2);
     v.push(3);
@@ -434,7 +434,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     if v.is_empty() == false {
         return 1;
     }
@@ -490,12 +490,12 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
 
     // Empty vector returns None
     dec empty_last = match v.last() {
-        Option::Some(_) -> false,
-        Option::None -> true,
+        std::Option::Some(_) -> false,
+        std::Option::None -> true,
     };
     if empty_last == false {
         return 1;
@@ -507,8 +507,8 @@ fn main() -> i32 {
 
     // Read last
     dec l_val = match v.last() {
-        Option::Some(r) -> *r,
-        Option::None -> 0,
+        std::Option::Some(r) -> *r,
+        std::Option::None -> 0,
     };
     if l_val != 30 {
         return 2;
@@ -516,16 +516,16 @@ fn main() -> i32 {
 
     // Mutate via last_mut
     match v.last_mut() {
-        Option::Some(r) -> {
+        std::Option::Some(r) -> {
             *r = 99;
         }
-        Option::None -> {}
+        std::Option::None -> {}
     }
 
     // Verify mutation
     dec new_l_val = match v.last() {
-        Option::Some(r) -> *r,
-        Option::None -> 0,
+        std::Option::Some(r) -> *r,
+        std::Option::None -> 0,
     };
     if new_l_val != 99 {
         return 3;
@@ -574,11 +574,11 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() -> i32 {
-    dec rw v = vec_new<i32>();
+    dec rw v = std::vec_new<i32>();
     v.push(10);
     dec last_ref = match v.last() {
-        Option::Some(r) -> r,
-        Option::None -> &0,
+        std::Option::Some(r) -> r,
+        std::Option::None -> &0,
     };
     v.push(20); // Borrow conflict: mutating vector while reference from last() is alive
     dec val = *last_ref;
@@ -626,7 +626,7 @@ struct Tracker {
     counter: *rw i32,
 };
 
-impl Drop for Tracker {
+impl std::Drop for Tracker {
     fn drop(self: &rw Self) {
         unsafe {
             *self.counter = *self.counter + 1;
@@ -637,7 +637,7 @@ impl Drop for Tracker {
 fn main() -> i32 {
     dec rw count: i32 = 0;
     {
-        dec rw v = vec_new<Tracker>();
+        dec rw v = std::vec_new<Tracker>();
         v.push(Tracker { counter: &rw count as *rw i32 });
         v.push(Tracker { counter: &rw count as *rw i32 });
         v.truncate(1 as u64);

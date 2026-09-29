@@ -103,7 +103,10 @@ pub struct SemanticTables {
     pub expr_substs: HashMap<ExprId, crate::ty::Substitution>,
     pub expr_trait_resolutions: HashMap<ExprId, TraitResolution>,
     pub try_branch_methods: HashMap<ExprId, luna_ast::DeclId>,
+    pub try_branch_substs: HashMap<ExprId, crate::ty::Substitution>,
+    pub try_branch_return_types: HashMap<ExprId, SemanticTypeId>,
     pub try_from_residual_methods: HashMap<ExprId, luna_ast::DeclId>,
+    pub try_from_residual_substs: HashMap<ExprId, crate::ty::Substitution>,
     pub intrinsic_types: HashMap<ExprId, SemanticTypeId>,
     pub expr_intrinsics: HashMap<ExprId, IntrinsicKind>,
     pub expr_member_indices: HashMap<ExprId, u32>,
@@ -145,6 +148,10 @@ pub struct SemanticTables {
     
     // Maps a function's SymbolId to a boolean vector indicating which parameters are @sync_noescape
     pub ffi_sync_noescape: HashMap<SymbolId, Vec<bool>>,
+    /// Function symbols declared inside an `extern` item. Kept distinct from
+    /// `SymbolKind` because safe-reference FFI calls have their own safe,
+    /// synchronous contract while raw-pointer FFI accesses are call-scoped.
+    pub extern_functions: HashSet<SymbolId>,
     
     // Maps a (DeclId, param_index) to the SymbolId of the generic parameter
     pub generic_param_symbols: HashMap<(DeclId, usize), SymbolId>,
@@ -160,6 +167,9 @@ pub struct SemanticTables {
     
     // Maps a Struct's SymbolId to its field SymbolIds
     pub struct_fields: HashMap<SymbolId, Vec<SymbolId>>,
+    /// Canonical declaration-order field names. Unlike `struct_fields`, this
+    /// remains usable for imported types whose field SymbolIds are relocated.
+    pub struct_field_names: HashMap<SymbolId, Vec<String>>,
     
     // Maps a GenericParam's SymbolId to its TraitBounds
     pub trait_bounds: HashMap<SymbolId, Vec<TraitBound>>,
@@ -172,6 +182,8 @@ pub struct SemanticTables {
     
     // Maps a method SymbolId to its parent impl block DeclId
     pub method_impls: HashMap<SymbolId, ImplKey>,
+    pub method_to_impl_decl: HashMap<DeclId, DeclId>,
+    pub method_sym_to_impl_decl: HashMap<SymbolId, DeclId>,
     
     // Maps a Trait's SymbolId to its declared associated type SymbolIds
     pub trait_associated_types: HashMap<SymbolId, Vec<SymbolId>>,
@@ -198,6 +210,8 @@ pub struct SemanticTables {
     pub fn_lifetime_contracts: HashMap<SymbolId, crate::CanonicalLifetimeContract>,
     pub type_lifetime_contracts: HashMap<SymbolId, crate::CanonicalTypeLifetimeContract>,
     pub resolved_type_lifetime_contracts: HashMap<SymbolId, crate::ResolvedTypeLifetimeContract>,
+    pub raw_storage_anchor_contracts: HashMap<SymbolId, crate::CanonicalRawStorageAnchorContract>,
+    pub resolved_raw_storage_anchor_contracts: HashMap<SymbolId, crate::ResolvedRawStorageAnchorContract>,
 }
 
 impl SemanticTables {
@@ -241,7 +255,10 @@ impl SemanticTables {
             expr_substs: HashMap::new(),
             expr_trait_resolutions: HashMap::new(),
             try_branch_methods: HashMap::new(),
+            try_branch_substs: HashMap::new(),
+            try_branch_return_types: HashMap::new(),
             try_from_residual_methods: HashMap::new(),
+            try_from_residual_substs: HashMap::new(),
             intrinsic_types: HashMap::new(),
             expr_intrinsics: HashMap::new(),
             expr_member_indices: HashMap::new(),
@@ -269,15 +286,19 @@ impl SemanticTables {
             type_scopes: HashMap::new(),
             decl_scopes: HashMap::new(),
             ffi_sync_noescape: HashMap::new(),
+            extern_functions: HashSet::new(),
             drop_impls: HashMap::new(),
             generic_param_symbols: HashMap::new(),
             trait_impls: HashMap::new(),
             trait_methods: HashMap::new(),
             struct_fields: HashMap::new(),
+            struct_field_names: HashMap::new(),
             trait_bounds: HashMap::new(),
             trait_generic_params: HashMap::new(),
             impl_methods: HashMap::new(),
             method_impls: HashMap::new(),
+            method_to_impl_decl: HashMap::new(),
+            method_sym_to_impl_decl: HashMap::new(),
             trait_associated_types: HashMap::new(),
             assoc_type_traits: HashMap::new(),
             impl_associated_types: HashMap::new(),
@@ -295,6 +316,8 @@ impl SemanticTables {
             fn_lifetime_contracts: HashMap::new(),
             type_lifetime_contracts: HashMap::new(),
             resolved_type_lifetime_contracts: HashMap::new(),
+            raw_storage_anchor_contracts: HashMap::new(),
+            resolved_raw_storage_anchor_contracts: HashMap::new(),
         }
     }
 }

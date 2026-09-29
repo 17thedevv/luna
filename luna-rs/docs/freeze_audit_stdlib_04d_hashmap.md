@@ -1,5 +1,10 @@
 # Freeze Audit: Stdlib-04.4 HashMap<K, V> Public API
 
+> Historical API-path note: this 2026-09-14 report records the pre-STD-NAMESPACE-01
+> provider/root spellings. Its behavior and semantic contracts remain historical
+> evidence; public names are superseded by the collection surface migration in
+> `docs/std_namespace_01_canonical_namespace.md` (`std::HashMap` only).
+
 **Status:** PASS — READY TO FREEZE  
 **Phase:** Stdlib-04.4  
 **Date:** 2026-09-14  

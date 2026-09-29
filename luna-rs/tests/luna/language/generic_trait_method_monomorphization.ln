@@ -1,0 +1,91 @@
+trait IdentityMethod {
+    fn echo<U>(self: &Self, value: U) -> U;
+}
+
+struct Token {};
+
+impl IdentityMethod for Token {
+    fn echo<V>(self: &Self, value: V) -> V {
+        return value;
+    }
+}
+
+trait Keyed<K> {
+    fn choose<U>(self: &Self, key: K, value: U) -> U;
+}
+
+struct Holder<T> {
+    marker: T,
+};
+
+impl<T> Keyed<T> for Holder<T> {
+    fn choose<U>(self: &Self, key: T, value: U) -> U {
+        return value;
+    }
+}
+
+trait MutableMethod {
+    fn bump<U>(self: &rw Self, marker: U);
+}
+
+struct Counter {
+    value: i32,
+};
+
+impl MutableMethod for Counter {
+    fn bump<V>(self: &rw Self, marker: V) {
+        self.value = self.value + 1;
+    }
+}
+
+fn dispatch_identity<T: IdentityMethod>(value: &T) -> i32 {
+    return value.echo<i32>(37 as i32) - (37 as i32);
+}
+
+fn dispatch_keyed<T: Keyed<i16>>(value: &T) -> u64 {
+    return value.choose<u64>(3 as i16, 41 as u64) - (41 as u64);
+}
+
+fn dispatch_mutable<T: MutableMethod>(value: &rw T) {
+    value.bump<u64>(9 as u64);
+}
+
+fn main() -> i32 {
+    dec token = Token {};
+    if dispatch_identity(&token) != 0 {
+        return 1;
+    }
+
+    // Multiple method-level substitutions must produce distinct callable instances.
+    if token.echo<i32>(19 as i32) != (19 as i32) {
+        return 2;
+    }
+    if token.echo<u64>(23 as u64) != (23 as u64) {
+        return 3;
+    }
+    if token.echo(29 as i32) != (29 as i32) {
+        return 4;
+    }
+
+    dec holder = Holder<i16> { marker: 7 as i16 };
+    if dispatch_keyed(&holder) != 0 as u64 {
+        return 5;
+    }
+    if holder.choose<i32>(8 as i16, 31 as i32) != (31 as i32) {
+        return 6;
+    }
+    if holder.choose<u64>(8 as i16, 47 as u64) != (47 as u64) {
+        return 7;
+    }
+    dec holder_wide = Holder<u32> { marker: 17 as u32 };
+    if holder_wide.choose<u16>(19 as u32, 53 as u16) != (53 as u16) {
+        return 9;
+    }
+
+    dec rw counter = Counter { value: 0 };
+    dispatch_mutable(&rw counter);
+    if counter.value != 1 {
+        return 8;
+    }
+    return 0;
+}

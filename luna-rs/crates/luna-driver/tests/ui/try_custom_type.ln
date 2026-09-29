@@ -1,4 +1,4 @@
-
+import <try>;
 
 enum MyFlow<T, E> {
     Continue(T),
@@ -6,7 +6,7 @@ enum MyFlow<T, E> {
 }
 
 // Residual is MyFlow<Never, E>
-impl<T, E> FromResidual<MyFlow<Never, E> > for MyFlow<T, E> {
+impl<T, E> std::FromResidual<MyFlow<Never, E> > for MyFlow<T, E> {
     fn from_residual(residual: MyFlow<Never, E>) -> Self {
         return match residual {
             MyFlow::Break(e) -> MyFlow::Break(e),
@@ -14,7 +14,7 @@ impl<T, E> FromResidual<MyFlow<Never, E> > for MyFlow<T, E> {
     }
 }
 
-impl<T, E> Try for MyFlow<T, E> {
+impl<T, E> std::Try for MyFlow<T, E> {
     type Output = T;
     type Residual = MyFlow<Never, E>;
     
@@ -22,10 +22,10 @@ impl<T, E> Try for MyFlow<T, E> {
         return MyFlow::Continue(v);
     }
     
-    fn branch(self: Self) -> ControlFlow<MyFlow<Never, E>, T> {
+    fn branch(self: Self) -> std::ControlFlow<MyFlow<Never, E>, T> {
         return match self {
-            MyFlow::Continue(v) -> ControlFlow::Continue(v),
-            MyFlow::Break(e) -> ControlFlow::Break(MyFlow::Break(e)),
+            MyFlow::Continue(v) -> std::ControlFlow::Continue(v),
+            MyFlow::Break(e) -> std::ControlFlow::Break(MyFlow::Break(e)),
         };
     }
 }

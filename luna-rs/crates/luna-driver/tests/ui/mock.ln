@@ -9,7 +9,7 @@ export struct MyResidual<E> {
     err: E,
 };
 
-impl<T, E> Try for MyResult<T, E> {
+impl<T, E> std::Try for MyResult<T, E> {
     type Output = T;
     type Residual = MyResidual<E>;
 
@@ -17,15 +17,15 @@ impl<T, E> Try for MyResult<T, E> {
         return MyResult::MyOk(x);
     }
 
-    fn branch(self: Self) -> ControlFlow<MyResidual<E>, T> {
+    fn branch(self: Self) -> std::ControlFlow<MyResidual<E>, T> {
         return match self {
-            MyResult::MyOk(t) -> ControlFlow::Continue(t),
-            MyResult::MyErr(e) -> ControlFlow::Break(MyResidual { err: e }),
+            MyResult::MyOk(t) -> std::ControlFlow::Continue(t),
+            MyResult::MyErr(e) -> std::ControlFlow::Break(MyResidual { err: e }),
         };
     }
 }
 
-impl<T, E> FromResidual<MyResidual<E> > for MyResult<T, E> {
+impl<T, E> std::FromResidual<MyResidual<E> > for MyResult<T, E> {
     fn from_residual(r: MyResidual<E>) -> Self {
         return MyResult::MyErr(r.err);
     }

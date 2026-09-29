@@ -4,6 +4,9 @@ use luna_driver::sysroot::Sysroot;
 use luna_driver::{check, CompilerOptions};
 use std::fs;
 use std::path::PathBuf;
+use std::sync::OnceLock;
+
+static SOURCE_ONLY_ROOT: OnceLock<PathBuf> = OnceLock::new();
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
     let dir = std::env::temp_dir()
@@ -14,8 +17,40 @@ fn create_temp_dir(test_name: &str) -> PathBuf {
     dir
 }
 
+fn source_only_sysroot() -> Sysroot {
+    let root = SOURCE_ONLY_ROOT.get_or_init(|| {
+        let canonical = Sysroot::discover_for_test().expect("test sysroot required");
+        let root = create_temp_dir("source_only_sysroot");
+        copy_tree(canonical.external_dir(), &root.join("libs").join("external"));
+        remove_artifacts(&root.join("libs").join("external"));
+        root
+    });
+    Sysroot::from_root(root.clone()).expect("source-only test sysroot")
+}
+
+fn copy_tree(source: &std::path::Path, destination: &std::path::Path) {
+    fs::create_dir_all(destination).expect("create source-only sysroot directory");
+    for entry in fs::read_dir(source).expect("enumerate source sysroot") {
+        let entry = entry.expect("read source sysroot entry");
+        let from = entry.path();
+        let to = destination.join(entry.file_name());
+        if from.is_dir() { copy_tree(&from, &to); }
+        else { fs::copy(from, to).expect("copy source sysroot file"); }
+    }
+}
+
+fn remove_artifacts(root: &std::path::Path) {
+    for entry in fs::read_dir(root).expect("enumerate source-only sysroot") {
+        let path = entry.expect("read source-only sysroot entry").path();
+        if path.is_dir() { remove_artifacts(&path); }
+        else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale sysroot artifact");
+        }
+    }
+}
+
 fn check_with_sysroot(test_name: &str, source: &str) -> Result<(), Vec<luna_common::Diagnostic>> {
-    let sysroot = Sysroot::discover_for_test().expect("test sysroot required");
+    let sysroot = source_only_sysroot();
     let dir = create_temp_dir(test_name);
     let path = dir.join("main.ln");
     fs::write(&path, source).unwrap();
@@ -32,11 +67,11 @@ fn check_with_sysroot(test_name: &str, source: &str) -> Result<(), Vec<luna_comm
 #[test]
 fn test_language_contract_visibility_is_controlled() {
     let contracts = r#"
-        fn accepts_drop<T: Drop>(value: &T) {}
-        fn accepts_iterator<I: Iterator>(value: &I) {}
-        fn accepts_into_iterator<I: IntoIterator>(value: &I) {}
+        fn accepts_drop<T: std::Drop>(value: &T) {}
+        fn accepts_iterator<I: std::Iterator>(value: &I) {}
+        fn accepts_into_iterator<I: std::IntoIterator>(value: &I) {}
         fn main() {
-            dec value: Option<i32> = Option::Some(1);
+            dec value: std::Option<i32> = std::Option::Some(1);
         }
     "#;
     assert!(
@@ -52,10 +87,10 @@ fn test_language_contract_visibility_is_controlled() {
 }
 
 #[test]
-fn test_explicit_result_provider_exposes_root_binding_only() {
+fn test_explicit_result_provider_exposes_canonical_path_only() {
     let good = r#"
         import <result>;
-        fn main() { dec value: Result<i32, i32> = Result::Ok(42); }
+        fn main() { dec value: std::Result<i32, i32> = std::Result::Ok(42); }
     "#;
     assert!(check_with_sysroot("explicit_result", good).is_ok());
 
@@ -75,10 +110,10 @@ fn test_try_operator_works_through_explicit_try_contract_provider() {
         import <result>;
         import <try>;
 
-        fn step1() -> Result<i32, i32> { return Result::Ok(10); }
-        fn step2() -> Result<i32, i32> {
+        fn step1() -> std::Result<i32, i32> { return std::Result::Ok(10); }
+        fn step2() -> std::Result<i32, i32> {
             dec value = step1()?;
-            return Result::Ok(value + 5);
+            return std::Result::Ok(value + 5);
         }
         fn main() {}
     "#;
@@ -93,7 +128,7 @@ fn test_drop_contract_is_available_without_ordinary_core_imports() {
     let source = r#"
         struct Handle { id: i32, };
 
-        impl Drop for Handle {
+        impl std::Drop for Handle {
             fn drop(self: &rw Handle) {}
         }
         fn main() { dec handle = Handle { id: 1 }; }
@@ -105,7 +140,7 @@ fn test_drop_contract_is_available_without_ordinary_core_imports() {
 fn test_lang_item_registry_uses_component_provider_declarations() {
     use luna_semantic::lang_item::LangItem;
 
-    let sysroot = Sysroot::discover_for_test().expect("test sysroot required");
+    let sysroot = source_only_sysroot();
     let mut compiler_session = CompilerSession::new();
     let mut driver_session =
         luna_driver::session::DriverSession::new(sysroot, &mut compiler_session, &[]);
@@ -142,16 +177,17 @@ fn test_lang_item_registry_uses_component_provider_declarations() {
 }
 
 #[test]
-fn test_option_ext_method_available_without_import_result() {
+fn test_option_ext_method_available_with_explicit_result_import() {
     let src = r#"
+        import <result>;
         fn main() {
-            dec opt = Option::Some(10);
+            dec opt = std::Option::Some(10);
             dec r = opt.ok_or(0);
         }
     "#;
     assert!(
         check_with_sysroot("option_ext_ok_or_available", src).is_ok(),
-        "OptionExt method ok_or must be available through controlled standard prelude without importing <result>"
+        "OptionExt method ok_or must be available after importing its provider"
     );
 }
 
@@ -173,7 +209,7 @@ fn test_result_type_resolved_with_explicit_import_result() {
     let src = r#"
         import <result>;
         fn main() {
-            dec r: Result<i32, i32> = Result::Ok(42);
+            dec r: std::Result<i32, i32> = std::Result::Ok(42);
         }
     "#;
     assert!(
@@ -221,31 +257,31 @@ fn test_explicit_standard_providers_negative_matrix() {
             name: "vec",
             provider: "vec",
             bad_snippet: "fn main() { dec v = vec_new<i32>(); }",
-            good_snippet: "import <vec>; fn main() { dec v = vec_new<i32>(); }",
+            good_snippet: "import <vec>; fn main() { dec v: std::Vec<i32> = std::vec_new<i32>(); }",
         },
         Case {
             name: "string",
             provider: "string",
             bad_snippet: "fn main() { dec s = string_new(); }",
-            good_snippet: "import <string>; fn main() { dec s = string_new(); }",
+            good_snippet: "import <string>; fn main() { dec s: std::String = std::string_new(); }",
         },
         Case {
             name: "hashmap",
             provider: "hashmap",
             bad_snippet: "fn main() { dec m = hashmap_new<i32, i32>(); }",
-            good_snippet: "import <hashmap>; fn main() { dec m = hashmap_new<i32, i32>(); }",
+            good_snippet: "import <hashmap>; fn main() { dec m = std::hashmap_new<i32, i32>(); }",
         },
         Case {
             name: "hashset",
             provider: "hashset",
             bad_snippet: "fn main() { dec s = hashset_new<i32>(); }",
-            good_snippet: "import <hashset>; fn main() { dec s = hashset_new<i32>(); }",
+            good_snippet: "import <hashset>; fn main() { dec s = std::hashset_new<i32>(); }",
         },
         Case {
             name: "io",
             provider: "io",
-            bad_snippet: "fn main() { dec msg: [u8; 1] = [65 as u8]; io::println(&msg); }",
-            good_snippet: "import <io>; fn main() { dec msg: [u8; 1] = [65 as u8]; io::println(&msg); }",
+            bad_snippet: "fn main() { dec msg: [u8; 1] = [65 as u8]; std::io::println(&msg); }",
+            good_snippet: "import <io>; fn main() { dec msg: [u8; 1] = [65 as u8]; std::io::println(&msg); }",
         },
     ];
 

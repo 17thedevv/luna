@@ -55,38 +55,38 @@ fn test_slice_len_and_get() {
         import <slice>;
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(20);
             v.push(30);
 
             // 1. slice_len
-            if slice_len<i32>(v.as_slice()) != (3 as u64) { return 1; }
+            if std::slice::slice_len<i32>(v.as_slice()) != (3 as u64) { return 1; }
 
             // 2. slice_get within bounds
-            match slice_get<i32>(v.as_slice(), 0 as u64) {
-                Option::Some(x) -> { if *x != 10 { return 2; } },
-                Option::None -> { return 3; },
+            match std::slice::slice_get<i32>(v.as_slice(), 0 as u64) {
+                std::Option::Some(x) -> { if *x != 10 { return 2; } },
+                std::Option::None -> { return 3; },
             }
-            match slice_get<i32>(v.as_slice(), 2 as u64) {
-                Option::Some(x) -> { if *x != 30 { return 4; } },
-                Option::None -> { return 5; },
+            match std::slice::slice_get<i32>(v.as_slice(), 2 as u64) {
+                std::Option::Some(x) -> { if *x != 30 { return 4; } },
+                std::Option::None -> { return 5; },
             }
 
             // 3. slice_get out of bounds
-            match slice_get<i32>(v.as_slice(), 3 as u64) {
-                Option::Some(_) -> { return 6; },
-                Option::None -> {},
+            match std::slice::slice_get<i32>(v.as_slice(), 3 as u64) {
+                std::Option::Some(_) -> { return 6; },
+                std::Option::None -> {},
             }
 
             // 4. slice_get_mut and mutate in-place
-            match slice_get_mut<i32>(v.as_mut_slice(), 1 as u64) {
-                Option::Some(x) -> { *x = 99; },
-                Option::None -> { return 7; },
+            match std::slice::slice_get_mut<i32>(v.as_mut_slice(), 1 as u64) {
+                std::Option::Some(x) -> { *x = 99; },
+                std::Option::None -> { return 7; },
             }
-            match slice_get<i32>(v.as_slice(), 1 as u64) {
-                Option::Some(x) -> { if *x != 99 { return 8; } },
-                Option::None -> { return 9; },
+            match std::slice::slice_get<i32>(v.as_slice(), 1 as u64) {
+                std::Option::Some(x) -> { if *x != 99 { return 8; } },
+                std::Option::None -> { return 9; },
             }
 
             return 0;
@@ -111,57 +111,57 @@ fn test_slice_reverse() {
 
         fn main() -> i32 {
             // Odd length: [1, 2, 3, 4, 5] -> [5, 4, 3, 2, 1]
-            dec rw v1 = vec_new<i32>();
+            dec rw v1 = std::vec_new<i32>();
             v1.push(1);
             v1.push(2);
             v1.push(3);
             v1.push(4);
             v1.push(5);
 
-            slice_reverse<i32>(v1.as_mut_slice());
-            match slice_get<i32>(v1.as_slice(), 0 as u64) {
-                Option::Some(x) -> { if *x != 5 { return 1; } },
-                Option::None -> { return 2; },
+            std::slice::slice_reverse<i32>(v1.as_mut_slice());
+            match std::slice::slice_get<i32>(v1.as_slice(), 0 as u64) {
+                std::Option::Some(x) -> { if *x != 5 { return 1; } },
+                std::Option::None -> { return 2; },
             }
-            match slice_get<i32>(v1.as_slice(), 1 as u64) {
-                Option::Some(x) -> { if *x != 4 { return 3; } },
-                Option::None -> { return 4; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 1 as u64) {
+                std::Option::Some(x) -> { if *x != 4 { return 3; } },
+                std::Option::None -> { return 4; },
             }
-            match slice_get<i32>(v1.as_slice(), 2 as u64) {
-                Option::Some(x) -> { if *x != 3 { return 5; } },
-                Option::None -> { return 6; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 2 as u64) {
+                std::Option::Some(x) -> { if *x != 3 { return 5; } },
+                std::Option::None -> { return 6; },
             }
-            match slice_get<i32>(v1.as_slice(), 3 as u64) {
-                Option::Some(x) -> { if *x != 2 { return 7; } },
-                Option::None -> { return 8; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 3 as u64) {
+                std::Option::Some(x) -> { if *x != 2 { return 7; } },
+                std::Option::None -> { return 8; },
             }
-            match slice_get<i32>(v1.as_slice(), 4 as u64) {
-                Option::Some(x) -> { if *x != 1 { return 9; } },
-                Option::None -> { return 10; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 4 as u64) {
+                std::Option::Some(x) -> { if *x != 1 { return 9; } },
+                std::Option::None -> { return 10; },
             }
 
             // Even length: [10, 20] -> [20, 10]
-            dec rw v2 = vec_new<i32>();
+            dec rw v2 = std::vec_new<i32>();
             v2.push(10);
             v2.push(20);
 
-            slice_reverse<i32>(v2.as_mut_slice());
-            match slice_get<i32>(v2.as_slice(), 0 as u64) {
-                Option::Some(x) -> { if *x != 20 { return 11; } },
-                Option::None -> { return 12; },
+            std::slice::slice_reverse<i32>(v2.as_mut_slice());
+            match std::slice::slice_get<i32>(v2.as_slice(), 0 as u64) {
+                std::Option::Some(x) -> { if *x != 20 { return 11; } },
+                std::Option::None -> { return 12; },
             }
-            match slice_get<i32>(v2.as_slice(), 1 as u64) {
-                Option::Some(x) -> { if *x != 10 { return 13; } },
-                Option::None -> { return 14; },
+            match std::slice::slice_get<i32>(v2.as_slice(), 1 as u64) {
+                std::Option::Some(x) -> { if *x != 10 { return 13; } },
+                std::Option::None -> { return 14; },
             }
 
             // Single element: [42] -> [42]
-            dec rw v3 = vec_new<i32>();
+            dec rw v3 = std::vec_new<i32>();
             v3.push(42);
-            slice_reverse<i32>(v3.as_mut_slice());
-            match slice_get<i32>(v3.as_slice(), 0 as u64) {
-                Option::Some(x) -> { if *x != 42 { return 15; } },
-                Option::None -> { return 16; },
+            std::slice::slice_reverse<i32>(v3.as_mut_slice());
+            match std::slice::slice_get<i32>(v3.as_slice(), 0 as u64) {
+                std::Option::Some(x) -> { if *x != 42 { return 15; } },
+                std::Option::None -> { return 16; },
             }
 
             return 0;
@@ -185,7 +185,7 @@ fn test_slice_contains_and_binary_search() {
         import <slice>;
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(20);
             v.push(30);
@@ -193,34 +193,34 @@ fn test_slice_contains_and_binary_search() {
             v.push(50);
 
             // 1. slice_contains_i32
-            if slice_contains_i32(v.as_slice(), 30) == false { return 1; }
-            if slice_contains_i32(v.as_slice(), 10) == false { return 2; }
-            if slice_contains_i32(v.as_slice(), 50) == false { return 3; }
-            if slice_contains_i32(v.as_slice(), 99) { return 4; }
+            if std::slice::slice_contains_i32(v.as_slice(), 30) == false { return 1; }
+            if std::slice::slice_contains_i32(v.as_slice(), 10) == false { return 2; }
+            if std::slice::slice_contains_i32(v.as_slice(), 50) == false { return 3; }
+            if std::slice::slice_contains_i32(v.as_slice(), 99) { return 4; }
 
             // 2. slice_binary_search_i32
-            match slice_binary_search_i32(v.as_slice(), 10) {
-                Option::Some(idx) -> { if idx != (0 as u64) { return 5; } },
-                Option::None -> { return 6; },
+            match std::slice::slice_binary_search_i32(v.as_slice(), 10) {
+                std::Option::Some(idx) -> { if idx != (0 as u64) { return 5; } },
+                std::Option::None -> { return 6; },
             }
-            match slice_binary_search_i32(v.as_slice(), 30) {
-                Option::Some(idx) -> { if idx != (2 as u64) { return 7; } },
-                Option::None -> { return 8; },
+            match std::slice::slice_binary_search_i32(v.as_slice(), 30) {
+                std::Option::Some(idx) -> { if idx != (2 as u64) { return 7; } },
+                std::Option::None -> { return 8; },
             }
-            match slice_binary_search_i32(v.as_slice(), 50) {
-                Option::Some(idx) -> { if idx != (4 as u64) { return 9; } },
-                Option::None -> { return 10; },
+            match std::slice::slice_binary_search_i32(v.as_slice(), 50) {
+                std::Option::Some(idx) -> { if idx != (4 as u64) { return 9; } },
+                std::Option::None -> { return 10; },
             }
-            match slice_binary_search_i32(v.as_slice(), 25) {
-                Option::Some(_) -> { return 11; },
-                Option::None -> {},
+            match std::slice::slice_binary_search_i32(v.as_slice(), 25) {
+                std::Option::Some(_) -> { return 11; },
+                std::Option::None -> {},
             }
 
             // 3. Binary search on empty slice
-            dec rw v_empty = vec_new<i32>();
-            match slice_binary_search_i32(v_empty.as_slice(), 10) {
-                Option::Some(_) -> { return 12; },
-                Option::None -> {},
+            dec rw v_empty = std::vec_new<i32>();
+            match std::slice::slice_binary_search_i32(v_empty.as_slice(), 10) {
+                std::Option::Some(_) -> { return 12; },
+                std::Option::None -> {},
             }
 
             return 0;
@@ -251,7 +251,7 @@ fn test_slice_sort() {
 
         fn main() -> i32 {
             // 1. Small slice sort_i32 (<= 16 elements): [5, 2, 8, 1, 9, 3] -> [1, 2, 3, 5, 8, 9]
-            dec rw v1 = vec_new<i32>();
+            dec rw v1 = std::vec_new<i32>();
             v1.push(5);
             v1.push(2);
             v1.push(8);
@@ -259,70 +259,70 @@ fn test_slice_sort() {
             v1.push(9);
             v1.push(3);
 
-            slice_sort_i32(v1.as_mut_slice());
-            match slice_get<i32>(v1.as_slice(), 0 as u64) {
-                Option::Some(x) -> { if *x != 1 { return 1; } },
-                Option::None -> { return 2; },
+            std::slice::slice_sort_i32(v1.as_mut_slice());
+            match std::slice::slice_get<i32>(v1.as_slice(), 0 as u64) {
+                std::Option::Some(x) -> { if *x != 1 { return 1; } },
+                std::Option::None -> { return 2; },
             }
-            match slice_get<i32>(v1.as_slice(), 1 as u64) {
-                Option::Some(x) -> { if *x != 2 { return 3; } },
-                Option::None -> { return 4; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 1 as u64) {
+                std::Option::Some(x) -> { if *x != 2 { return 3; } },
+                std::Option::None -> { return 4; },
             }
-            match slice_get<i32>(v1.as_slice(), 2 as u64) {
-                Option::Some(x) -> { if *x != 3 { return 5; } },
-                Option::None -> { return 6; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 2 as u64) {
+                std::Option::Some(x) -> { if *x != 3 { return 5; } },
+                std::Option::None -> { return 6; },
             }
-            match slice_get<i32>(v1.as_slice(), 3 as u64) {
-                Option::Some(x) -> { if *x != 5 { return 7; } },
-                Option::None -> { return 8; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 3 as u64) {
+                std::Option::Some(x) -> { if *x != 5 { return 7; } },
+                std::Option::None -> { return 8; },
             }
-            match slice_get<i32>(v1.as_slice(), 4 as u64) {
-                Option::Some(x) -> { if *x != 8 { return 9; } },
-                Option::None -> { return 10; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 4 as u64) {
+                std::Option::Some(x) -> { if *x != 8 { return 9; } },
+                std::Option::None -> { return 10; },
             }
-            match slice_get<i32>(v1.as_slice(), 5 as u64) {
-                Option::Some(x) -> { if *x != 9 { return 11; } },
-                Option::None -> { return 12; },
+            match std::slice::slice_get<i32>(v1.as_slice(), 5 as u64) {
+                std::Option::Some(x) -> { if *x != 9 { return 11; } },
+                std::Option::None -> { return 12; },
             }
 
             // 2. Larger slice (> 16 elements to exercise introsort partition & recursion)
-            dec rw v2 = vec_new<i32>();
+            dec rw v2 = std::vec_new<i32>();
             dec rw cur: i32 = 20;
             while cur > 0 {
                 v2.push(cur);
                 cur = cur - 1;
             }
             // v2 is [20, 19, 18, ..., 1] of len 20
-            slice_sort_i32(v2.as_mut_slice());
+            std::slice::slice_sort_i32(v2.as_mut_slice());
             dec rw check_idx: u64 = 0 as u64;
             while check_idx < (20 as u64) {
-                match slice_get<i32>(v2.as_slice(), check_idx) {
-                    Option::Some(x) -> {
+                match std::slice::slice_get<i32>(v2.as_slice(), check_idx) {
+                    std::Option::Some(x) -> {
                         dec expected = (check_idx + (1 as u64)) as i32;
                         if *x != expected { return 13; }
                     },
-                    Option::None -> { return 14; },
+                    std::Option::None -> { return 14; },
                 }
                 check_idx = check_idx + (1 as u64);
             }
 
             // 3. Custom descending sort with slice_sort_by
-            dec rw v3 = vec_new<i32>();
+            dec rw v3 = std::vec_new<i32>();
             v3.push(10);
             v3.push(50);
             v3.push(30);
-            slice_sort_by<i32>(v3.as_mut_slice(), cmp_desc);
-            match slice_get<i32>(v3.as_slice(), 0 as u64) {
-                Option::Some(x) -> { if *x != 50 { return 15; } },
-                Option::None -> { return 16; },
+            std::slice::slice_sort_by<i32>(v3.as_mut_slice(), cmp_desc);
+            match std::slice::slice_get<i32>(v3.as_slice(), 0 as u64) {
+                std::Option::Some(x) -> { if *x != 50 { return 15; } },
+                std::Option::None -> { return 16; },
             }
-            match slice_get<i32>(v3.as_slice(), 1 as u64) {
-                Option::Some(x) -> { if *x != 30 { return 17; } },
-                Option::None -> { return 18; },
+            match std::slice::slice_get<i32>(v3.as_slice(), 1 as u64) {
+                std::Option::Some(x) -> { if *x != 30 { return 17; } },
+                std::Option::None -> { return 18; },
             }
-            match slice_get<i32>(v3.as_slice(), 2 as u64) {
-                Option::Some(x) -> { if *x != 10 { return 19; } },
-                Option::None -> { return 20; },
+            match std::slice::slice_get<i32>(v3.as_slice(), 2 as u64) {
+                std::Option::Some(x) -> { if *x != 10 { return 19; } },
+                std::Option::None -> { return 20; },
             }
 
             return 0;
@@ -347,48 +347,48 @@ fn test_slice_copy_and_fill() {
 
         fn main() -> i32 {
             // 1. slice_fill_i32
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(1);
             v.push(2);
             v.push(3);
 
-            slice_fill_i32(v.as_mut_slice(), 77);
-            match slice_get<i32>(v.as_slice(), 0 as u64) {
-                Option::Some(x) -> { if *x != 77 { return 1; } },
-                Option::None -> { return 2; },
+            std::slice::slice_fill_i32(v.as_mut_slice(), 77);
+            match std::slice::slice_get<i32>(v.as_slice(), 0 as u64) {
+                std::Option::Some(x) -> { if *x != 77 { return 1; } },
+                std::Option::None -> { return 2; },
             }
-            match slice_get<i32>(v.as_slice(), 1 as u64) {
-                Option::Some(x) -> { if *x != 77 { return 3; } },
-                Option::None -> { return 4; },
+            match std::slice::slice_get<i32>(v.as_slice(), 1 as u64) {
+                std::Option::Some(x) -> { if *x != 77 { return 3; } },
+                std::Option::None -> { return 4; },
             }
-            match slice_get<i32>(v.as_slice(), 2 as u64) {
-                Option::Some(x) -> { if *x != 77 { return 5; } },
-                Option::None -> { return 6; },
+            match std::slice::slice_get<i32>(v.as_slice(), 2 as u64) {
+                std::Option::Some(x) -> { if *x != 77 { return 5; } },
+                std::Option::None -> { return 6; },
             }
 
             // 2. slice_copy_i32
-            dec rw src_vec = vec_new<i32>();
+            dec rw src_vec = std::vec_new<i32>();
             src_vec.push(100);
             src_vec.push(200);
             src_vec.push(300);
 
-            dec rw dst_vec = vec_new<i32>();
+            dec rw dst_vec = std::vec_new<i32>();
             dst_vec.push(0);
             dst_vec.push(0);
             dst_vec.push(0);
 
-            slice_copy_i32(dst_vec.as_mut_slice(), src_vec.as_slice());
-            match slice_get<i32>(dst_vec.as_slice(), 0 as u64) {
-                Option::Some(x) -> { if *x != 100 { return 7; } },
-                Option::None -> { return 8; },
+            std::slice::slice_copy_i32(dst_vec.as_mut_slice(), src_vec.as_slice());
+            match std::slice::slice_get<i32>(dst_vec.as_slice(), 0 as u64) {
+                std::Option::Some(x) -> { if *x != 100 { return 7; } },
+                std::Option::None -> { return 8; },
             }
-            match slice_get<i32>(dst_vec.as_slice(), 1 as u64) {
-                Option::Some(x) -> { if *x != 200 { return 9; } },
-                Option::None -> { return 10; },
+            match std::slice::slice_get<i32>(dst_vec.as_slice(), 1 as u64) {
+                std::Option::Some(x) -> { if *x != 200 { return 9; } },
+                std::Option::None -> { return 10; },
             }
-            match slice_get<i32>(dst_vec.as_slice(), 2 as u64) {
-                Option::Some(x) -> { if *x != 300 { return 11; } },
-                Option::None -> { return 12; },
+            match std::slice::slice_get<i32>(dst_vec.as_slice(), 2 as u64) {
+                std::Option::Some(x) -> { if *x != 300 { return 11; } },
+                std::Option::None -> { return 12; },
             }
 
             return 0;
@@ -412,14 +412,14 @@ fn test_slice_split_at_and_split_at_mut() {
         import <slice>;
 
         fn main() -> i32 {
-            dec rw v = vec_new<i32>();
+            dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(20);
             v.push(30);
             v.push(40);
 
             // 1. Immutable split_at at mid = 2
-            dec tuple_imm = split_at<i32>(v.as_slice(), 2 as u64);
+            dec tuple_imm = std::slice::split_at<i32>(v.as_slice(), 2 as u64);
             dec left_imm = tuple_imm.0;
             dec right_imm = tuple_imm.1;
             if left_imm.len != (2 as usize) { return 1; }
@@ -430,7 +430,7 @@ fn test_slice_split_at_and_split_at_mut() {
             if right_imm[1] != 40 { return 6; }
 
             // 2. Mutable split_at_mut at mid = 2
-            dec tuple_mut = split_at_mut<i32>(v.as_mut_slice(), 2 as u64);
+            dec tuple_mut = std::slice::split_at_mut<i32>(v.as_mut_slice(), 2 as u64);
             dec left_mut = tuple_mut.0;
             dec right_mut = tuple_mut.1;
             left_mut[0] = 100;
@@ -442,11 +442,11 @@ fn test_slice_split_at_and_split_at_mut() {
             if v.as_slice()[3] != 400 { return 10; }
 
             // 3. Boundary split at 0 and at len
-            dec tuple_zero = split_at<i32>(v.as_slice(), 0 as u64);
+            dec tuple_zero = std::slice::split_at<i32>(v.as_slice(), 0 as u64);
             if tuple_zero.0.len != (0 as usize) { return 11; }
             if tuple_zero.1.len != (4 as usize) { return 12; }
 
-            dec tuple_full = split_at<i32>(v.as_slice(), 4 as u64);
+            dec tuple_full = std::slice::split_at<i32>(v.as_slice(), 4 as u64);
             if tuple_full.0.len != (4 as usize) { return 13; }
             if tuple_full.1.len != (0 as usize) { return 14; }
 
@@ -472,8 +472,8 @@ fn test_generic_slice_sort_ord() {
         import <cmp>;
 
         fn main() -> i32 {
-            // Test slice_sort<T: Ord> directly with i32
-            dec rw v = vec_new<i32>();
+            // Test std::slice::slice_sort<T: std::Ord> directly with i32
+            dec rw v = std::vec_new<i32>();
             v.push(99);
             v.push(12);
             v.push(54);
@@ -481,7 +481,7 @@ fn test_generic_slice_sort_ord() {
             v.push(77);
             v.push(33);
 
-            slice_sort<i32>(v.as_mut_slice());
+            std::slice::slice_sort<i32>(v.as_mut_slice());
 
             dec s = v.as_slice();
             if s[0] != 1 { return 1; }
@@ -492,20 +492,20 @@ fn test_generic_slice_sort_ord() {
             if s[5] != 99 { return 6; }
 
             // Test generic slice_fill and slice_copy_from_slice
-            dec rw v2 = vec_new<i32>();
+            dec rw v2 = std::vec_new<i32>();
             v2.push(0);
             v2.push(0);
             v2.push(0);
-            slice_fill<i32>(v2.as_mut_slice(), 42);
+            std::slice::slice_fill<i32>(v2.as_mut_slice(), 42);
             if v2.as_slice()[0] != 42 { return 7; }
             if v2.as_slice()[1] != 42 { return 8; }
             if v2.as_slice()[2] != 42 { return 9; }
 
-            dec rw v3 = vec_new<i32>();
+            dec rw v3 = std::vec_new<i32>();
             v3.push(0);
             v3.push(0);
             v3.push(0);
-            slice_copy_from_slice<i32>(v3.as_mut_slice(), v2.as_slice());
+            std::slice::slice_copy_from_slice<i32>(v3.as_mut_slice(), v2.as_slice());
             if v3.as_slice()[0] != 42 { return 10; }
             if v3.as_slice()[1] != 42 { return 11; }
             if v3.as_slice()[2] != 42 { return 12; }

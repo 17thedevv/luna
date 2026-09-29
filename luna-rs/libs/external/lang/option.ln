@@ -1,5 +1,6 @@
 import <core/panic>;
 
+export module std {
 #[lang("option")]
 export enum Option<T> {
     #[lang("some")]
@@ -8,106 +9,107 @@ export enum Option<T> {
     None,
 }
 
-impl<T> Option<T> {
+impl<T> std::Option<T> {
     export fn is_some(self: &Self) -> bool {
         match *self {
-            Option::Some(_) -> true,
-            Option::None -> false,
+            std::Option::Some(_) -> true,
+            std::Option::None -> false,
         }
     }
 
     export fn is_none(self: &Self) -> bool {
         match *self {
-            Option::Some(_) -> false,
-            Option::None -> true,
+            std::Option::Some(_) -> false,
+            std::Option::None -> true,
         }
     }
 
-    export fn as_ref(self: &Self) -> Option<&T> life_from(self) {
+    export fn as_ref(self: &Self) -> std::Option<&T> life_from(self) {
         if self.is_some() {
             unsafe {
-                return Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *T));
+                return std::Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *T));
             }
         }
-        return Option::None;
+        return std::Option::None;
     }
 
-    export fn as_mut(self: &rw Self) -> Option<&rw T> life_from(self) {
+    export fn as_mut(self: &rw Self) -> std::Option<&rw T> life_from(self) {
         if self.is_some() {
             unsafe {
-                return Option::Some(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw T));
+                return std::Option::Some(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw T));
             }
         }
-        return Option::None;
+        return std::Option::None;
     }
 
-    export fn ok(self: Self) -> Option<T> {
+    export fn ok(self: Self) -> std::Option<T> {
         return self;
     }
 
     export fn unwrap(self: Self) -> T {
         match self {
-            Option::Some(val) -> val,
-            Option::None -> __luna_panic(),
+            std::Option::Some(val) -> val,
+            std::Option::None -> __luna_panic(),
         }
     }
 
     export fn unwrap_or(self: Self, default: T) -> T {
         match self {
-            Option::Some(val) -> val,
-            Option::None -> default,
+            std::Option::Some(val) -> val,
+            std::Option::None -> default,
         }
     }
 
-    export fn map<U>(self: Self, f: fn(T) -> U) -> Option<U> {
+    export fn map<U>(self: Self, f: fn(T) -> U) -> std::Option<U> {
         match self {
-            Option::Some(val) -> Option::Some(f(val)),
-            Option::None -> Option::None,
+            std::Option::Some(val) -> std::Option::Some(f(val)),
+            std::Option::None -> std::Option::None,
         }
     }
 
-    export fn and_then<U>(self: Self, f: fn(T) -> Option<U>) -> Option<U> {
+    export fn and_then<U>(self: Self, f: fn(T) -> std::Option<U>) -> std::Option<U> {
         return match self {
-            Option::Some(val) -> f(val),
-            Option::None -> Option::None,
+            std::Option::Some(val) -> f(val),
+            std::Option::None -> std::Option::None,
         };
     }
 
     export fn unwrap_or_else(self: Self, f: fn() -> T) -> T {
         return match self {
-            Option::Some(val) -> val,
-            Option::None -> f(),
+            std::Option::Some(val) -> val,
+            std::Option::None -> f(),
         };
     }
 
-    export fn or_else(self: Self, f: fn() -> Option<T>) -> Option<T> {
+    export fn or_else(self: Self, f: fn() -> std::Option<T>) -> std::Option<T> {
         return match self {
-            Option::Some(val) -> Option::Some(val),
-            Option::None -> f(),
+            std::Option::Some(val) -> std::Option::Some(val),
+            std::Option::None -> f(),
         };
     }
 
-    export fn filter(self: Self, pred: fn(&T) -> bool) -> Option<T> {
+    export fn filter(self: Self, pred: fn(&T) -> bool) -> std::Option<T> {
         match self {
-            Option::Some(val) -> {
+            std::Option::Some(val) -> {
                 dec p_fn = pred;
                 if p_fn(&val) {
-                    return Option::Some(val);
+                    return std::Option::Some(val);
                 }
-                return Option::None;
+                return std::Option::None;
             },
-            Option::None -> {
-                return Option::None;
+            std::Option::None -> {
+                return std::Option::None;
             },
         }
     }
 }
 
-export fn option_flatten<T>(opt: Option<Option<T>>) -> Option<T> {
+export fn option_flatten<T>(opt: std::Option<std::Option<T>>) -> std::Option<T> {
     return match opt {
-        Option::Some(inner) -> inner,
-        Option::None -> Option::None,
+        std::Option::Some(inner) -> inner,
+        std::Option::None -> std::Option::None,
     };
+}
 }
 
 

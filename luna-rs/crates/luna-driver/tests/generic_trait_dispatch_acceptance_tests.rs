@@ -3,7 +3,6 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use luna_driver::{check, compile, CompilerOptions};
-use luna_driver::sysroot::Sysroot;
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
     let mut dir = std::env::temp_dir();
@@ -19,6 +18,40 @@ fn create_temp_dir(prefix: &str) -> PathBuf {
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).expect("Failed to create temp dir");
     dir
+}
+
+fn copy_dir_all(src: &Path, dst: &Path) {
+    fs::create_dir_all(dst).expect("create source sysroot directory");
+    for entry in fs::read_dir(src).expect("read external provider directory") {
+        let entry = entry.expect("read provider entry");
+        let target = dst.join(entry.file_name());
+        if entry.file_type().expect("provider entry type").is_dir() {
+            copy_dir_all(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).expect("copy provider file");
+        }
+    }
+}
+
+fn remove_artifacts(dir: &Path) {
+    for entry in fs::read_dir(dir).expect("read source sysroot directory") {
+        let path = entry.expect("read sysroot entry").path();
+        if path.is_dir() {
+            remove_artifacts(&path);
+        } else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale provider artifact");
+        }
+    }
+}
+
+fn source_sysroot() -> PathBuf {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let external_dir = manifest_dir.parent().expect("crates directory")
+        .parent().expect("workspace root").join("libs").join("external");
+    let root = create_temp_dir("source_sysroot");
+    copy_dir_all(&external_dir, &root);
+    remove_artifacts(&root);
+    root
 }
 
 fn run_binary_with_output(
@@ -52,7 +85,7 @@ fn run_binary_with_output(
 /// 1. Primitive Trait Dispatch: Calling `fn hash_val<T: Hash>(x: T) -> u64` with primitives
 #[test]
 fn test_generic_trait_dispatch_hash_primitives() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("hash_primitives");
 
     let src = r#"
@@ -67,7 +100,7 @@ fn test_generic_trait_dispatch_hash_primitives() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn hash_val<T: Hash>(x: T) -> u64 {
+        fn hash_val<T: std::Hash>(x: T) -> u64 {
             return x.hash();
         }
 
@@ -99,7 +132,7 @@ fn test_generic_trait_dispatch_hash_primitives() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
 
     let (code, _stdout, stderr) = run_binary_with_output(&dir, src, &opts)
         .expect("Execution must succeed");
@@ -110,7 +143,7 @@ fn test_generic_trait_dispatch_hash_primitives() {
 /// 2. Custom Nominal Struct Dispatch: Calling `fn hash_val<T: Hash>` with user-defined struct
 #[test]
 fn test_generic_trait_dispatch_hash_custom_struct() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("hash_custom_struct");
 
     let src = r#"
@@ -130,13 +163,13 @@ fn test_generic_trait_dispatch_hash_custom_struct() {
             y: u64,
         };
 
-        impl Hash for Point {
+        impl std::Hash for Point {
             fn hash(self: &Self) -> u64 {
                 return self.x + self.y * (31 as u64);
             }
         }
 
-        fn hash_val<T: Hash>(x: T) -> u64 {
+        fn hash_val<T: std::Hash>(x: T) -> u64 {
             return x.hash();
         }
 
@@ -154,7 +187,7 @@ fn test_generic_trait_dispatch_hash_custom_struct() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
 
     let (code, _stdout, stderr) = run_binary_with_output(&dir, src, &opts)
         .expect("Execution must succeed");
@@ -165,7 +198,7 @@ fn test_generic_trait_dispatch_hash_custom_struct() {
 /// 3. Eq Trait Dispatch: Calling `fn check_eq<T: Eq>(a: &T, b: &T) -> bool` with primitives & custom struct
 #[test]
 fn test_generic_trait_dispatch_eq() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("eq_dispatch");
 
     let src = r#"
@@ -186,13 +219,13 @@ fn test_generic_trait_dispatch_eq() {
             b: u8,
         };
 
-        impl Eq for Color {
+        impl std::Eq for Color {
             fn eq(self: &Self, other: &Self) -> bool {
                 return self.r == other.r && self.g == other.g && self.b == other.b;
             }
         }
 
-        fn check_eq<T: Eq>(a: &T, b: &T) -> bool {
+        fn check_eq<T: std::Eq>(a: &T, b: &T) -> bool {
             return a.eq(b);
         }
 
@@ -224,7 +257,7 @@ fn test_generic_trait_dispatch_eq() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
 
     let (code, _stdout, stderr) = run_binary_with_output(&dir, src, &opts)
         .expect("Execution must succeed");
@@ -235,7 +268,7 @@ fn test_generic_trait_dispatch_eq() {
 /// 4. Clone Trait Dispatch: Calling `fn duplicate<T: Clone>(x: &T) -> T`
 #[test]
 fn test_generic_trait_dispatch_clone() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("clone_dispatch");
 
     let src = r#"
@@ -255,13 +288,13 @@ fn test_generic_trait_dispatch_clone() {
             y: i32,
         };
 
-        impl Clone for Vector2 {
+        impl std::Clone for Vector2 {
             fn clone(self: &Self) -> Self {
                 return Vector2 { x: self.x, y: self.y };
             }
         }
 
-        fn duplicate<T: Clone>(x: &T) -> T {
+        fn duplicate<T: std::Clone>(x: &T) -> T {
             return x.clone();
         }
 
@@ -283,7 +316,7 @@ fn test_generic_trait_dispatch_clone() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
 
     let (code, _stdout, stderr) = run_binary_with_output(&dir, src, &opts)
         .expect("Execution must succeed");
@@ -294,7 +327,7 @@ fn test_generic_trait_dispatch_clone() {
 /// 5. Negative Test: Calling `hash_val<T>` on a type that does NOT implement `Hash` must fail typechecking
 #[test]
 fn test_generic_trait_dispatch_negative_unhashable_rejected() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("negative_unhashable");
     let src_path = dir.join("main.ln");
 
@@ -314,7 +347,7 @@ fn test_generic_trait_dispatch_negative_unhashable_rejected() {
             val: i32,
         };
 
-        fn hash_val<T: Hash>(x: T) -> u64 {
+        fn hash_val<T: std::Hash>(x: T) -> u64 {
             return x.hash();
         }
 
@@ -326,7 +359,7 @@ fn test_generic_trait_dispatch_negative_unhashable_rejected() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
 
     let check_res = check(src_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(check_res.is_err(), "Typechecking unhashable generic call must fail");
@@ -335,7 +368,7 @@ fn test_generic_trait_dispatch_negative_unhashable_rejected() {
 /// 6. Negative Test: `f64` does not implement `Eq` in v1 (Eq-1 invariant: NaN != NaN)
 #[test]
 fn test_generic_trait_dispatch_negative_f64_not_eq() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("negative_f64_eq");
     let src_path = dir.join("main.ln");
 
@@ -351,7 +384,7 @@ fn test_generic_trait_dispatch_negative_f64_not_eq() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn check_eq<T: Eq>(a: &T, b: &T) -> bool {
+        fn check_eq<T: std::Eq>(a: &T, b: &T) -> bool {
             return a.eq(b);
         }
 
@@ -364,7 +397,7 @@ fn test_generic_trait_dispatch_negative_f64_not_eq() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
 
     let check_res = check(src_path.to_str().unwrap(), src.to_string(), &opts);
     assert!(check_res.is_err(), "Typechecking f64: Eq must fail because f64 does not implement Eq");
@@ -373,7 +406,7 @@ fn test_generic_trait_dispatch_negative_f64_not_eq() {
 /// 7. Monomorphization Distinct Symbols: Calling `hash_val<u64>` and `hash_val<i32>` produces separate specialized instances
 #[test]
 fn test_generic_trait_dispatch_distinct_monomorphization() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("distinct_mono");
 
     let src = r#"
@@ -388,7 +421,7 @@ fn test_generic_trait_dispatch_distinct_monomorphization() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn hash_val<T: Hash>(x: T) -> u64 {
+        fn hash_val<T: std::Hash>(x: T) -> u64 {
             return x.hash();
         }
 
@@ -400,7 +433,7 @@ fn test_generic_trait_dispatch_distinct_monomorphization() {
     "#;
 
     let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+    opts.search_paths = vec![sysroot.to_string_lossy().to_string()];
 
     let (code, _stdout, stderr) = run_binary_with_output(&dir, src, &opts)
         .expect("Compilation and execution must succeed");

@@ -1,7 +1,7 @@
 import <string>;
 
 fn main() -> i32 {
-    dec original = string_from_str("Luna");
+    dec original = std::string_from_str("Luna");
     dec copy = original.clone();
     if original.eq(&copy) == false {
         return 1;

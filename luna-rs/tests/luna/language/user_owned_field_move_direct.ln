@@ -4,11 +4,11 @@ struct Tracker {
     drops: *rw u64,
 };
 
-impl Drop for Tracker {
+impl std::Drop for Tracker {
     fn drop(self: &rw Self) {
         unsafe {
-            dec current = ptr::read(self.drops as *u64);
-            ptr::write(self.drops, current + (1 as u64));
+            dec current = std::ptr::read(self.drops as *u64);
+            std::ptr::write(self.drops, current + (1 as u64));
         }
     }
 }

@@ -1,0 +1,181 @@
+import <vec>;
+import <string>;
+
+export module std {
+    export module path {
+    // std::Copy a byte range from a valid UTF-8 String into an owned byte vector.
+    // All ranges selected by this module begin/end at ASCII separators or
+    // string boundaries, and therefore remain UTF-8 boundaries.
+    fn append_range(input: &std::String, start: u64, end: u64, output: &rw std::Vec<u8>) {
+        dec bytes = input.as_bytes();
+        dec rw i = start;
+        while i < end {
+            output.push(bytes[i]);
+            i = i + (1 as u64);
+        }
+    }
+
+    fn make_string(input: &std::String, start: u64, end: u64) -> std::String {
+        dec rw bytes = std::vec_new<u8>();
+        append_range(input, start, end, &rw bytes);
+        dec value = std::string_from_bytes(bytes.as_slice());
+        return value.unwrap();
+    }
+
+    export fn join(lhs: &std::String, rhs: &std::String) -> std::String {
+        dec lhs_bytes = lhs.as_bytes();
+        dec rhs_bytes = rhs.as_bytes();
+        dec lhs_len = lhs.len();
+        dec rhs_len = rhs.len();
+
+        // A slash-rooted right operand replaces the left operand. This is a
+        // lexical rule only; drive letters and UNC paths have no special role.
+        if rhs_len > (0 as u64) && rhs_bytes[0] == (47 as u8) {
+            return make_string(rhs, 0 as u64, rhs_len);
+        }
+
+        // Empty operands are identities and preserve the non-empty operand's
+        // exact spelling, including any trailing slash.
+        if lhs_len == (0 as u64) {
+            return make_string(rhs, 0 as u64, rhs_len);
+        }
+        if rhs_len == (0 as u64) {
+            return make_string(lhs, 0 as u64, lhs_len);
+        }
+
+        // Remove trailing lexical separators from the left boundary, then add
+        // exactly one '/'. Internal separators and dot components are kept.
+        dec rw lhs_end = lhs_len;
+        while lhs_end > (0 as u64) && lhs_bytes[lhs_end - (1 as u64)] == (47 as u8) {
+            lhs_end = lhs_end - (1 as u64);
+        }
+
+        dec rw output = std::vec_new<u8>();
+        if lhs_end == (0 as u64) {
+            // A non-empty left side consisting only of slashes remains rooted.
+            if lhs_bytes[0] == (47 as u8) {
+                output.push(47 as u8);
+            }
+        } else {
+            append_range(lhs, 0 as u64, lhs_end, &rw output);
+            output.push(47 as u8);
+        }
+        append_range(rhs, 0 as u64, rhs_len, &rw output);
+
+        dec value = std::string_from_bytes(output.as_slice());
+        return value.unwrap();
+    }
+
+    export fn parent(input: &std::String) -> std::Option<std::String> {
+        dec bytes = input.as_bytes();
+        dec len = input.len();
+        if len == (0 as u64) {
+            return std::Option::None;
+        }
+
+        // A trailing slash denotes a directory boundary; parent removes that
+        // final boundary but does not resolve or normalize the path.
+        if bytes[len - (1 as u64)] == (47 as u8) {
+            if len == (1 as u64) {
+                return std::Option::None;
+            }
+            return std::Option::Some(make_string(input, 0 as u64, len - (1 as u64)));
+        }
+
+        dec rw i = len;
+        while i > (0 as u64) {
+            i = i - (1 as u64);
+            if bytes[i] == (47 as u8) {
+                if i == (0 as u64) {
+                    return std::Option::Some(make_string(input, 0 as u64, 1 as u64));
+                }
+                return std::Option::Some(make_string(input, 0 as u64, i));
+            }
+        }
+        return std::Option::None;
+    }
+
+    export fn file_name(input: &std::String) -> std::Option<std::String> {
+        dec bytes = input.as_bytes();
+        dec len = input.len();
+        if len == (0 as u64) {
+            return std::Option::None;
+        }
+        if bytes[len - (1 as u64)] == (47 as u8) {
+            return std::Option::None;
+        }
+
+        dec rw start: u64 = 0 as u64;
+        dec rw i = len;
+        while i > (0 as u64) {
+            i = i - (1 as u64);
+            if bytes[i] == (47 as u8) {
+                start = i + (1 as u64);
+                break;
+            }
+        }
+
+        dec name_len = len - start;
+        if name_len == (1 as u64) && bytes[start] == (46 as u8) {
+            return std::Option::None;
+        }
+        if name_len == (2 as u64)
+            && bytes[start] == (46 as u8)
+            && bytes[start + (1 as u64)] == (46 as u8)
+        {
+            return std::Option::None;
+        }
+
+        return std::Option::Some(make_string(input, start, len));
+    }
+
+    export fn extension(input: &std::String) -> std::Option<std::String> {
+        dec bytes = input.as_bytes();
+        dec len = input.len();
+        if len == (0 as u64) {
+            return std::Option::None;
+        }
+        if bytes[len - (1 as u64)] == (47 as u8) {
+            return std::Option::None;
+        }
+
+        dec rw start: u64 = 0 as u64;
+        dec rw i = len;
+        while i > (0 as u64) {
+            i = i - (1 as u64);
+            if bytes[i] == (47 as u8) {
+                start = i + (1 as u64);
+                break;
+            }
+        }
+
+        dec name_len = len - start;
+        if name_len == (1 as u64) && bytes[start] == (46 as u8) {
+            return std::Option::None;
+        }
+        if name_len == (2 as u64)
+            && bytes[start] == (46 as u8)
+            && bytes[start + (1 as u64)] == (46 as u8)
+        {
+            return std::Option::None;
+        }
+
+        dec rw dot = len;
+        dec rw j = len;
+        while j > start {
+            j = j - (1 as u64);
+            if bytes[j] == (46 as u8) {
+                dot = j;
+                break;
+            }
+        }
+
+        // The first byte of a dotfile is not an extension separator. A later
+        // dot still is, e.g. '.config.json' has extension 'json'.
+        if dot <= start || dot + (1 as u64) >= len {
+            return std::Option::None;
+        }
+        return std::Option::Some(make_string(input, dot + (1 as u64), len));
+    }
+}
+}

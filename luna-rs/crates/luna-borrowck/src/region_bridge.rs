@@ -681,7 +681,7 @@ impl<'a> RegionBorrowBridge<'a> {
 
     /// Computes the canonical `PlaceDesc` for an operand using the context's MVIR function values and alias map.
     pub fn compute_place_desc(&self, op: &Operand) -> crate::borrow_analysis::PlaceDesc {
-        crate::borrow_analysis::compute_place_desc(op, &self.context.func_values, Some(&self.aliases))
+        crate::borrow_analysis::compute_place_desc(op, &self.context.func_values, Some(&self.aliases), None)
     }
 
     /// Evaluates whether a live carrier holding provenance `provenance` is legally valid

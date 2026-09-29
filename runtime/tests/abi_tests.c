@@ -9,6 +9,7 @@
 #include "luna/runtime/panic.h"
 #include "luna/runtime/io.h"
 #include "luna/runtime/process.h"
+#include "../src/io/io_read_all_internal.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -253,6 +254,144 @@ static int test_file_io_roundtrip(void) {
     return 0;
 }
 
+typedef struct ReadAllTestContext {
+    const uint8_t* bytes;
+    size_t len;
+    size_t position;
+    size_t max_chunk;
+    int interrupt_once;
+    int fail_after_data;
+} ReadAllTestContext;
+
+static LunaRtReadResult test_read_all_next(
+    void* raw_context,
+    uint8_t* destination,
+    size_t capacity,
+    size_t* out_bytes
+) {
+    ReadAllTestContext* context = (ReadAllTestContext*)raw_context;
+    if (context->interrupt_once) {
+        context->interrupt_once = 0;
+        return LUNA_RT_READ_INTERRUPTED;
+    }
+    if (context->position == context->len) {
+        return context->fail_after_data ? LUNA_RT_READ_ERROR : LUNA_RT_READ_EOF;
+    }
+    size_t remaining = context->len - context->position;
+    size_t amount = remaining < capacity ? remaining : capacity;
+    if (amount > context->max_chunk) amount = context->max_chunk;
+    memcpy(destination, context->bytes + context->position, amount);
+    context->position += amount;
+    *out_bytes = amount;
+    return LUNA_RT_READ_DATA;
+}
+
+static int test_internal_read_all_growth_and_error(void) {
+    printf("[RUN] test_internal_read_all_growth_and_error\n");
+    uint8_t expected[257];
+    for (size_t i = 0; i < sizeof(expected); i++) {
+        expected[i] = (uint8_t)((i * 73u + 0x80u) & 0xffu);
+    }
+    expected[0] = 0;
+    expected[1] = 0xff;
+
+    ReadAllTestContext context = {
+        expected, sizeof(expected), 0, 7, 1, 0
+    };
+    uint8_t* out = NULL;
+    size_t len = 0;
+    size_t cap = 0;
+    int32_t status = luna_rt_read_all(
+        test_read_all_next, &context, 3, &out, &len, &cap
+    );
+    if (status != LUNA_STATUS_OK || len != sizeof(expected) || len > cap ||
+        memcmp(out, expected, sizeof(expected)) != 0 || cap < sizeof(expected)) {
+        fprintf(stderr, "FAIL: read-all did not retry/grow/preserve bytes (status=%d len=%zu cap=%zu)\n", status, len, cap);
+        if (out) __luna_buffer_free(out, cap);
+        return 1;
+    }
+    __luna_buffer_free(out, cap);
+
+    context.position = 0;
+    context.interrupt_once = 0;
+    context.fail_after_data = 1;
+    out = NULL;
+    len = 99;
+    cap = 99;
+    status = luna_rt_read_all(
+        test_read_all_next, &context, 3, &out, &len, &cap
+    );
+    if (status != LUNA_STATUS_IO_ERROR || out != NULL || len != 0 || cap != 0) {
+        fprintf(stderr, "FAIL: read-all exposed partial bytes after error (status=%d ptr=%p len=%zu cap=%zu)\n", status, (void*)out, len, cap);
+        if (out) __luna_buffer_free(out, cap);
+        return 1;
+    }
+    printf("[PASS] test_internal_read_all_growth_and_error\n");
+    return 0;
+}
+
+static int test_file_one_byte_and_large_binary(void) {
+    printf("[RUN] test_file_one_byte_and_large_binary\n");
+    const uint8_t one_path[] = "luna_abi_one_byte.bin";
+    const uint8_t one_byte[] = { 0xFE };
+    if (__luna_write_file(one_path, sizeof(one_path) - 1, one_byte, sizeof(one_byte)) != LUNA_STATUS_OK) {
+        fprintf(stderr, "FAIL: could not create one-byte fixture\n");
+        return 1;
+    }
+    uint8_t* out = NULL;
+    size_t len = 0;
+    size_t cap = 0;
+    int32_t status = __luna_read_file(one_path, sizeof(one_path) - 1, &out, &len, &cap);
+    int failed = status != LUNA_STATUS_OK || len != 1 || out[0] != one_byte[0] || len > cap;
+    if (out) __luna_buffer_free(out, cap);
+#if defined(_WIN32)
+    DeleteFileA((const char*)one_path);
+#else
+    unlink((const char*)one_path);
+#endif
+    if (failed) {
+        fprintf(stderr, "FAIL: one-byte read mismatch (status=%d len=%zu)\n", status, len);
+        return 1;
+    }
+
+    const uint8_t large_path[] = "luna_abi_large_binary.bin";
+    const size_t large_len = 1024 * 1024 + 137;
+    uint8_t* expected = (uint8_t*)malloc(large_len);
+    if (!expected) {
+        fprintf(stderr, "FAIL: could not allocate large test fixture\n");
+        return 1;
+    }
+    for (size_t i = 0; i < large_len; i++) {
+        expected[i] = (uint8_t)((i * 29u + (i >> 7) + 0x80u) & 0xffu);
+    }
+    expected[0] = 0;
+    expected[1] = 0xff;
+    expected[large_len - 1] = 0;
+    if (__luna_write_file(large_path, sizeof(large_path) - 1, expected, large_len) != LUNA_STATUS_OK) {
+        free(expected);
+        fprintf(stderr, "FAIL: could not create large binary fixture\n");
+        return 1;
+    }
+    out = NULL;
+    len = 0;
+    cap = 0;
+    status = __luna_read_file(large_path, sizeof(large_path) - 1, &out, &len, &cap);
+    failed = status != LUNA_STATUS_OK || len != large_len || len > cap || memcmp(out, expected, large_len) != 0;
+    if (out) __luna_buffer_free(out, cap);
+    free(expected);
+#if defined(_WIN32)
+    DeleteFileA((const char*)large_path);
+#else
+    unlink((const char*)large_path);
+#endif
+    if (failed) {
+        fprintf(stderr, "FAIL: large binary read mismatch (status=%d len=%zu expected=%zu cap=%zu)\n", status, len, large_len, cap);
+        return 1;
+    }
+    printf("[PASS] test_file_one_byte_and_large_binary\n");
+    return 0;
+}
+
 static int test_file_nul_defense(void) {
     printf("[RUN] test_file_nul_defense\n");
     const uint8_t malicious_path[] = "valid_prefix\0evil_suffix.txt";
@@ -487,6 +626,11 @@ int main(int argc, char** argv) {
     __luna_startup(argc, argv);
 
     if (argc >= 3 && strcmp(argv[1], "--run-terminal") == 0) {
+#if defined(_WIN32) && defined(_MSC_VER)
+        // These child processes intentionally call abort(). Disable MSVC's
+        // post-mortem report hook so conformance runs remain non-interactive.
+        _set_abort_behavior(0, _CALL_REPORTFAULT);
+#endif
         run_terminal_target(argv[2]);
         return 0;
     }
@@ -505,6 +649,8 @@ int main(int argc, char** argv) {
     failures += test_stdio_exact_bytes();
     failures += test_process_args();
     failures += test_file_io_roundtrip();
+    failures += test_internal_read_all_growth_and_error();
+    failures += test_file_one_byte_and_large_binary();
     failures += test_file_nul_defense();
     failures += test_file_not_found();
     failures += test_empty_file_io();

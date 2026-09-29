@@ -13,9 +13,44 @@ fn create_temp_dir(name: &str) -> PathBuf {
     dir
 }
 
+fn copy_dir_all(src: &std::path::Path, dst: &std::path::Path) {
+    fs::create_dir_all(dst).expect("create source sysroot directory");
+    for entry in fs::read_dir(src).expect("read external provider directory") {
+        let entry = entry.expect("read provider entry");
+        let target = dst.join(entry.file_name());
+        if entry.file_type().expect("provider entry type").is_dir() {
+            copy_dir_all(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).expect("copy provider file");
+        }
+    }
+}
+
+fn remove_artifacts(dir: &std::path::Path) {
+    for entry in fs::read_dir(dir).expect("read source sysroot directory") {
+        let path = entry.expect("read sysroot entry").path();
+        if path.is_dir() {
+            remove_artifacts(&path);
+        } else if matches!(path.extension().and_then(|ext| ext.to_str()), Some("llib" | "obj")) {
+            fs::remove_file(path).expect("remove stale provider artifact");
+        }
+    }
+}
+
+fn source_sysroot() -> Sysroot {
+    let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let external_dir = manifest_dir.parent().expect("crates directory")
+        .parent().expect("workspace root").join("libs").join("external");
+    let root = create_temp_dir("source_sysroot");
+    let source_external = root.join("libs").join("external");
+    copy_dir_all(&external_dir, &source_external);
+    remove_artifacts(&source_external);
+    Sysroot::from_root(root).expect("source-only sysroot")
+}
+
 #[test]
 fn test_discovery_rejects_internal_provider_in_user_context() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let manifest = sysroot.manifest();
     let ext_dir = sysroot.external_dir();
 
@@ -57,7 +92,7 @@ fn test_discovery_rejects_internal_provider_in_user_context() {
 
 #[test]
 fn test_user_cannot_directly_import_alloc_global() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("user_import_alloc_global");
     let src_path = dir.join("main.ln");
 
@@ -89,7 +124,7 @@ fn test_user_cannot_directly_import_alloc_global() {
 
 #[test]
 fn test_user_cannot_directly_import_raw_table() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("user_import_raw_table");
     let src_path = dir.join("main.ln");
 
@@ -121,7 +156,7 @@ fn test_user_cannot_directly_import_raw_table() {
 
 #[test]
 fn test_transitive_access_to_internal_providers_succeeds() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let dir = create_temp_dir("transitive_internal_access");
     let src_path = dir.join("main.ln");
     let exe_path = dir.join(if cfg!(windows) { "main.exe" } else { "main" });
@@ -134,20 +169,20 @@ fn test_transitive_access_to_internal_providers_succeeds() {
 
         fn main() -> i32 {
             dec b = std::box_new<i32>(42);
-            dec rw v = vec_new<i32>();
+            dec rw v: std::Vec<i32> = std::vec_new<i32>();
             v.push(std::box_into_inner(b));
 
-            dec rw map = hashmap_with_capacity<i32, i32>(4 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(4 as u64);
             map.insert(1, 42);
 
             dec val = map.get(&1);
             match val {
-                Option::Some(x) -> {
+                std::Option::Some(x) -> {
                     if *x == 42 {
                         return 0;
                     }
                 },
-                Option::None -> {},
+                std::Option::None -> {},
             }
             return 1;
         }
@@ -173,7 +208,7 @@ fn test_transitive_access_to_internal_providers_succeeds() {
 
 #[test]
 fn test_user_cannot_directly_import_internal_lang_contracts() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let contracts = [
         "__lang_drop",
         "__lang_option",
@@ -215,7 +250,7 @@ fn test_same_session_cached_internal_provenance_regression() {
     use luna_common::CompilerSession;
     use luna_driver::session::DriverSession;
 
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let sysroot = source_sysroot();
     let mut compiler_session = CompilerSession::new();
     let mut driver_session = DriverSession::new(sysroot, &mut compiler_session, &[]);
     let mut arena = luna_ast::AstArena::new();

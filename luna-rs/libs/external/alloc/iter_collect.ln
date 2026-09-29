@@ -6,17 +6,18 @@ import <cmp>;
 import <__lang_iterator>;
 import <__lang_option>;
 
-export fn iter_collect_vec<I: Iterator<Item>, Item>(iter: I) -> Vec<Item> {
-    dec rw vec = vec_new<Item>();
+module std {
+export fn iter_collect_vec<I: std::Iterator<Item>, Item>(iter: I) -> std::Vec<Item> {
+    dec rw vec = std::vec_new<Item>();
     dec rw it = iter;
     dec rw running = true;
     while running {
         dec opt = it.next();
         match opt {
-            Option::Some(x) -> {
+            std::Option::Some(x) -> {
                 vec.push(x);
             },
-            Option::None -> {
+            std::Option::None -> {
                 running = false;
             },
         }
@@ -24,17 +25,17 @@ export fn iter_collect_vec<I: Iterator<Item>, Item>(iter: I) -> Vec<Item> {
     return vec;
 }
 
-export fn iter_collect_hashset<I: Iterator<Item>, Item: Hash + Eq>(iter: I) -> HashSet<Item> {
-    dec rw set = hashset_new<Item>();
+export fn iter_collect_hashset<I: std::Iterator<Item>, Item: std::Hash + std::Eq>(iter: I) -> std::HashSet<Item> {
+    dec rw set = std::hashset_new<Item>();
     dec rw it = iter;
     dec rw running = true;
     while running {
         dec opt = it.next();
         match opt {
-            Option::Some(x) -> {
+            std::Option::Some(x) -> {
                 set.insert(x);
             },
-            Option::None -> {
+            std::Option::None -> {
                 running = false;
             },
         }
@@ -42,21 +43,23 @@ export fn iter_collect_hashset<I: Iterator<Item>, Item: Hash + Eq>(iter: I) -> H
     return set;
 }
 
-export fn iter_collect_hashmap<I: Iterator<(K, V)>, K: Hash + Eq, V>(iter: I) -> HashMap<K, V> {
-    dec rw map = hashmap_new<K, V>();
+export fn iter_collect_hashmap<I: std::Iterator<(K, V)>, K: std::Hash + std::Eq, V>(iter: I) -> std::HashMap<K, V> {
+    dec rw map = std::hashmap_new<K, V>();
     dec rw it = iter;
     dec rw running = true;
     while running {
         dec opt = it.next();
         match opt {
-            Option::Some((k, v)) -> {
+            std::Option::Some((k, v)) -> {
                 map.insert(k, v);
             },
-            Option::None -> {
+            std::Option::None -> {
                 running = false;
             },
         }
     }
     return map;
+}
+
 }
 

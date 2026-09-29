@@ -23,6 +23,7 @@ pub struct MvirGenerator<'a> {
     loop_continue_targets: Vec<LabelId>,
     current_span: Option<luna_common::Span>,
     current_async_future: Option<ValueId>,
+    unsafe_depth: usize,
     pub diagnostics: Vec<luna_common::Diagnostic>,
     
     // The current monomorphic instance being generated
@@ -52,6 +53,7 @@ impl<'a> MvirGenerator<'a> {
             loop_continue_targets: Vec::new(),
             current_span: None,
             current_async_future: None,
+            unsafe_depth: 0,
             diagnostics: Vec::new(),
             current_instance: None,
         }
@@ -78,6 +80,7 @@ impl<'a> MvirGenerator<'a> {
             symbol_types: std::collections::HashMap::new(),
             pat_types: std::collections::HashMap::new(),
             mono_calls: std::collections::HashMap::new(),
+            try_calls: std::collections::HashMap::new(),
             mono_for_loops: std::collections::HashMap::new(),
             closure_capture_bindings: Vec::new(),
             closure_env_type: None,
@@ -114,6 +117,14 @@ impl<'a> MvirGenerator<'a> {
             }
         }
         self.ctx.tables.expr_types.get(expr_id).copied().unwrap_or(luna_semantic::SemanticTypeId(0))
+    }
+
+    fn get_try_calls(&self, expr_id: &luna_ast::ExprId) -> Option<&luna_semantic::mono::MonoTryCalls> {
+        self.current_instance.and_then(|inst_ptr| {
+            // SAFETY: current_instance points into the caller-owned instantiated_functions
+            // vector for the duration of this function's lowering.
+            unsafe { (&*inst_ptr).try_calls.get(expr_id) }
+        })
     }
 
     /// Resolve the canonical monomorphized name for a function call at `expr_id`.
@@ -458,6 +469,7 @@ impl<'a> MvirGenerator<'a> {
                     let field_ptr = self.push_inst(Instruction::FieldPtr {
                         base: Operand::Value(obj_ptr),
                         field_idx: idx as u32,
+                        field_name: None,
                     }, field_ptr_ty);
                     
                     let field_callee = self.get_drop_glue_global_id(field_ty);
@@ -475,6 +487,7 @@ impl<'a> MvirGenerator<'a> {
                     let elem_ptr = self.push_inst(Instruction::FieldPtr {
                         base: Operand::Value(obj_ptr),
                         field_idx: idx as u32,
+                        field_name: None,
                     }, elem_ptr_ty);
                     
                     let elem_callee = self.get_drop_glue_global_id(elem_ty);
@@ -837,6 +850,7 @@ impl<'a> MvirGenerator<'a> {
                 let field_ptr_val = self.push_inst(Instruction::FieldPtr {
                     base: base_op,
                     field_idx,
+                    field_name: struct_sym_opt.map(|_| self.get_span_text(*member).to_string()),
                 }, field_ty);
                 Operand::Value(field_ptr_val)
             }
@@ -868,6 +882,7 @@ impl<'a> MvirGenerator<'a> {
                 let field_ptr_val = self.push_inst(Instruction::FieldPtr {
                     base: base_op,
                     field_idx: *index,
+                    field_name: None,
                 }, field_ty);
                 Operand::Value(field_ptr_val)
             }
@@ -906,6 +921,7 @@ impl<'a> MvirGenerator<'a> {
                         let ptr_field = self.push_inst(Instruction::FieldPtr {
                             base: base_ptr.clone(),
                             field_idx: 0,
+                            field_name: None,
                         }, ptr_ptr_ty);
                         let data_ptr = self.push_inst(Instruction::Load {
                             ptr: Operand::Value(ptr_field),
@@ -915,6 +931,7 @@ impl<'a> MvirGenerator<'a> {
                         let len_field = self.push_inst(Instruction::FieldPtr {
                             base: base_ptr,
                             field_idx: 1,
+                            field_name: None,
                         }, u64_ty);
                         let len_val = self.push_inst(Instruction::Load {
                             ptr: Operand::Value(len_field),
@@ -1060,6 +1077,7 @@ impl<'a> MvirGenerator<'a> {
                     let field_ptr = self.push_inst(Instruction::FieldPtr {
                         base: Operand::Value(env_param),
                         field_idx: binding.env_field,
+                        field_name: None,
                     }, binding.env_ty);
                     let val = match binding.mode {
                         luna_semantic::semantic_tables::CaptureMode::SharedBorrow |
@@ -1276,6 +1294,7 @@ impl<'a> MvirGenerator<'a> {
                 let state_ptr = self.push_inst(Instruction::FieldPtr {
                     base: Operand::Value(future_alloca),
                     field_idx: 0,
+                    field_name: None,
                 }, i32_ty);
                 self.push_inst(Instruction::Store {
                     ptr: Operand::Value(state_ptr),
@@ -1335,7 +1354,9 @@ impl<'a> MvirGenerator<'a> {
                 self.pop_scope_and_drop(None);
             }
             Stmt::Unsafe { body } => {
+                self.unsafe_depth += 1;
                 self.generate_fn_body(body, ret_ty_id);
+                self.unsafe_depth -= 1;
                 return;
             }
             Stmt::Expr { expr, .. } => {
@@ -1371,6 +1392,7 @@ impl<'a> MvirGenerator<'a> {
                     let state_ptr = self.push_inst(Instruction::FieldPtr {
                         base: Operand::Value(fut_alloca),
                         field_idx: 0,
+                        field_name: None,
                     }, i32_ty);
                     self.push_inst(Instruction::Store {
                         ptr: Operand::Value(state_ptr),
@@ -1417,6 +1439,7 @@ impl<'a> MvirGenerator<'a> {
                         let val_ptr = self.push_inst(Instruction::FieldPtr {
                             base: Operand::Value(fut_alloca),
                             field_idx: 1,
+                            field_name: None,
                         }, ret_ty);
                         self.push_inst(Instruction::Store {
                             ptr: Operand::Value(val_ptr),
@@ -1426,6 +1449,7 @@ impl<'a> MvirGenerator<'a> {
                     let state_ptr = self.push_inst(Instruction::FieldPtr {
                         base: Operand::Value(fut_alloca),
                         field_idx: 0,
+                        field_name: None,
                     }, i32_ty);
                     self.push_inst(Instruction::Store {
                         ptr: Operand::Value(state_ptr),
@@ -1527,7 +1551,9 @@ impl<'a> MvirGenerator<'a> {
                 self.start_block(end_label.clone());
             }
             Stmt::Unsafe { body } => {
+                self.unsafe_depth += 1;
                 self.generate_stmt(body);
+                self.unsafe_depth -= 1;
             }
             Stmt::For { kind, init, cond, step, body, pattern, iterable, .. } => {
                 use luna_ast::stmt::ForKind;
@@ -1941,9 +1967,17 @@ impl<'a> MvirGenerator<'a> {
         match expr {
             Expr::Literal(tok, text) => {
                 match tok.kind {
-                    luna_lexer::TokenKind::IntegerLiteral | luna_lexer::TokenKind::FloatLiteral => {
-                        
+                    luna_lexer::TokenKind::IntegerLiteral => {
                         Operand::Number(text.clone())
+                    }
+                    luna_lexer::TokenKind::FloatLiteral => {
+                        let ty = self.ctx.types.get(ty_id);
+                        let float_ty = match ty {
+                            luna_semantic::SemanticType::Primitive(luna_semantic::BuiltinType::F32) => FloatType::F32,
+                            _ => FloatType::F64,
+                        };
+                        let clean_text = text.trim_end_matches("f32").trim_end_matches("f64").to_string();
+                        Operand::Float { text: clean_text, ty: float_ty }
                     }
                     luna_lexer::TokenKind::StringLiteral => {
                         
@@ -2325,6 +2359,7 @@ impl<'a> MvirGenerator<'a> {
                             let ptr = self.push_inst(Instruction::FieldPtr {
                                 base: Operand::Value(struct_alloca),
                                 field_idx,
+                                field_name: Some(self.get_span_text(field.name).to_string()),
                             }, ty_id);
                             
                             self.push_inst(Instruction::Store {
@@ -2349,6 +2384,7 @@ impl<'a> MvirGenerator<'a> {
                         let ptr = self.push_inst(Instruction::FieldPtr {
                             base: Operand::Value(tuple_alloca),
                             field_idx: i as u32,
+                            field_name: None,
                         }, ty_id);
                         
                         self.push_inst(Instruction::Store {
@@ -2372,6 +2408,7 @@ impl<'a> MvirGenerator<'a> {
                         let ptr = self.push_inst(Instruction::FieldPtr {
                             base: Operand::Value(array_alloca),
                             field_idx: i as u32,
+                            field_name: None,
                         }, ty_id);
                         
                         self.push_inst(Instruction::Store {
@@ -2416,6 +2453,7 @@ impl<'a> MvirGenerator<'a> {
                         let len_ptr = self.push_inst(Instruction::FieldPtr {
                             base: lval.clone(),
                             field_idx: 1,
+                            field_name: None,
                         }, usize_ty);
                         let len_val = self.push_inst(Instruction::Load {
                             ptr: Operand::Value(len_ptr),
@@ -2441,6 +2479,7 @@ impl<'a> MvirGenerator<'a> {
                             let ptr_field = self.push_inst(Instruction::FieldPtr {
                                 base: lval,
                                 field_idx: 0,
+                                field_name: None,
                             }, elem_ptr_ty);
                             let ptr_val = self.push_inst(Instruction::Load {
                                 ptr: Operand::Value(ptr_field),
@@ -2453,6 +2492,7 @@ impl<'a> MvirGenerator<'a> {
                             let out_ptr_field = self.push_inst(Instruction::FieldPtr {
                                 base: Operand::Value(struct_alloca),
                                 field_idx: 0,
+                                field_name: None,
                             }, elem_ptr_ty);
                             self.push_inst(Instruction::Store {
                                 ptr: Operand::Value(out_ptr_field),
@@ -2461,6 +2501,7 @@ impl<'a> MvirGenerator<'a> {
                             let out_end_field = self.push_inst(Instruction::FieldPtr {
                                 base: Operand::Value(struct_alloca),
                                 field_idx: 1,
+                                field_name: None,
                             }, elem_ptr_ty);
                             self.push_inst(Instruction::Store {
                                 ptr: Operand::Value(out_end_field),
@@ -2742,22 +2783,31 @@ impl<'a> MvirGenerator<'a> {
             }
             Expr::Try { expr: inner, .. } => {
                 let inner_op = self.generate_expr(inner);
-                let inner_ty_id = self.ctx.tables.expr_types.get(inner).copied().unwrap_or(luna_semantic::SemanticTypeId(0));
                 
                 // 1. Get the branch method
-                let branch_decl = self.ctx.tables.try_branch_methods.get(expr_id).copied().unwrap();
-                let branch_ret_ty = if let Some(luna_semantic::SemanticType::Function { return_type, .. }) = self.ctx.tables.symbol_types.get(&self.ctx.tables.decl_symbols.get(&branch_decl).copied().unwrap()).map(|&t| self.ctx.types.get(t).clone()) {
-                    return_type
-                } else {
-                    luna_semantic::SemanticTypeId(0)
-                };
+                let branch_instance = self.get_try_calls(expr_id).and_then(|calls| calls.branch.clone());
+                let branch_decl = branch_instance.as_ref().map(|call| call.decl_id)
+                    .or_else(|| self.ctx.tables.try_branch_methods.get(expr_id).copied()).unwrap();
+                let branch_sym = self.ctx.tables.decl_symbols.get(&branch_decl).copied().unwrap();
+                let branch_ret_ty = self.get_try_calls(expr_id).and_then(|calls| calls.branch_return_type)
+                    .or_else(|| self.ctx.tables.try_branch_return_types.get(expr_id).copied()).or_else(|| {
+                    self.ctx.tables.symbol_types.get(&branch_sym).and_then(|&ty| {
+                        match self.ctx.types.get(ty) {
+                            luna_semantic::SemanticType::Function { return_type, .. } => Some(*return_type),
+                            _ => None,
+                        }
+                    })
+                }).unwrap_or(luna_semantic::SemanticTypeId(0));
                 
                 // Call `branch`
-                let branch_sym = self.ctx.tables.decl_symbols.get(&branch_decl).copied().unwrap();
                 let branch_base_name = self.ctx.symbol_table.get_symbol(branch_sym).name.clone();
                 let canonical_branch_id = luna_semantic::CanonicalInstanceIdentity {
                     kind: luna_semantic::CanonicalInstanceKind::Decl(branch_decl),
-                    subst: Vec::new(),
+                    subst: branch_instance.map(|call| call.subst).unwrap_or_else(|| {
+                        self.ctx.tables.try_branch_substs.get(expr_id)
+                            .map(|subst| subst.map.iter().map(|(&sym, &ty)| (sym, ty)).collect())
+                            .unwrap_or_default()
+                    }),
                 };
                 let branch_fn_name = canonical_branch_id.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, &branch_base_name);
                 let flow_val = self.push_inst(Instruction::CallDirect {
@@ -2818,12 +2868,18 @@ impl<'a> MvirGenerator<'a> {
                 }, residual_ty);
                 
                 // Call `FromResidual::from_residual`
-                let from_residual_decl = self.ctx.tables.try_from_residual_methods.get(expr_id).copied().unwrap();
+                let from_residual_instance = self.get_try_calls(expr_id).and_then(|calls| calls.from_residual.clone());
+                let from_residual_decl = from_residual_instance.as_ref().map(|call| call.decl_id)
+                    .or_else(|| self.ctx.tables.try_from_residual_methods.get(expr_id).copied()).unwrap();
                 let from_residual_sym = self.ctx.tables.decl_symbols.get(&from_residual_decl).copied().unwrap();
                 let from_residual_base_name = self.ctx.symbol_table.get_symbol(from_residual_sym).name.clone();
                 let canonical_fr_id = luna_semantic::CanonicalInstanceIdentity {
                     kind: luna_semantic::CanonicalInstanceKind::Decl(from_residual_decl),
-                    subst: Vec::new(),
+                    subst: from_residual_instance.map(|call| call.subst).unwrap_or_else(|| {
+                        self.ctx.tables.try_from_residual_substs.get(expr_id)
+                            .map(|subst| subst.map.iter().map(|(&sym, &ty)| (sym, ty)).collect())
+                            .unwrap_or_default()
+                    }),
                 };
                 let from_residual_fn_name = canonical_fr_id.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, &from_residual_base_name);
                 let expected_ret_ty = self.current_function.as_ref().unwrap().ret_ty;
@@ -2890,7 +2946,7 @@ impl<'a> MvirGenerator<'a> {
                     }
                     UnaryOp::Neg => {
                         let val_op = self.generate_expr(operand);
-                        let val = self.push_inst(Instruction::Sub { left: Operand::Number("0".to_string()), right: val_op }, ty_id);
+                        let val = self.push_inst(Instruction::Neg { value: val_op }, ty_id);
                         Operand::Value(val)
                     }
                     _ => self.generate_expr(operand),
@@ -2956,6 +3012,7 @@ impl<'a> MvirGenerator<'a> {
                     let ptr = self.push_inst(Instruction::FieldPtr {
                         base: Operand::Value(alloca_val),
                         field_idx: i as u32,
+                        field_name: None,
                     }, elem_ty);
                     self.push_inst(Instruction::Store {
                         ptr: Operand::Value(ptr),
@@ -2975,6 +3032,7 @@ impl<'a> MvirGenerator<'a> {
                     let ptr = self.push_inst(Instruction::FieldPtr {
                         base: Operand::Value(alloca_val),
                         field_idx: i as u32,
+                        field_name: None,
                     }, e_ty);
                     self.push_inst(Instruction::Store {
                         ptr: Operand::Value(ptr),
@@ -2994,6 +3052,7 @@ impl<'a> MvirGenerator<'a> {
                     let ptr = self.push_inst(Instruction::FieldPtr {
                         base: Operand::Value(alloca_val),
                         field_idx: i as u32,
+                        field_name: None,
                     }, f_ty);
                     self.push_inst(Instruction::Store {
                         ptr: Operand::Value(ptr),
@@ -3066,6 +3125,10 @@ impl<'a> MvirGenerator<'a> {
     }
 
     fn push_inst_span(&mut self, inst: Instruction, ty: luna_semantic::SemanticTypeId, span: Option<luna_common::Span>) -> ValueId {
+        let inst = match (self.unsafe_depth > 0, inst) {
+            (true, Instruction::Store { ptr, value }) => Instruction::StoreAnchored { ptr, value },
+            (_, other) => other,
+        };
         let func = self.current_function.as_mut().expect("Must be in a function");
         let val_id = ValueId(func.values.len() as u32);
         let origin = match &inst {
