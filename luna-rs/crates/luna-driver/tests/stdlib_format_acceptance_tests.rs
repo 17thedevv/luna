@@ -1,6 +1,6 @@
 use luna_driver::sysroot::Sysroot;
 use luna_driver::sysroot_builder::SysrootBuilder;
-use luna_driver::{CompilerOptions, compile};
+use luna_driver::{CompilerOptions, check_semantic_only};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -101,20 +101,18 @@ fn compile_diagnostics(root: &Path, fixture: &str, tag: &str) -> Vec<String> {
     let work = temp_root(tag);
     fs::create_dir_all(&work).unwrap();
     let source = work.join("negative.ln");
-    let executable = work.join("negative.exe");
     fs::write(&source, fixture).unwrap();
     let options = CompilerOptions {
-        output_path: Some(executable.to_string_lossy().into_owned()),
         search_paths: vec![root.to_string_lossy().into_owned()],
         quiet: true,
         ..Default::default()
     };
-    match compile(&source.to_string_lossy(), fixture.to_string(), &options) {
+    match check_semantic_only(&source.to_string_lossy(), fixture.to_string(), &options) {
         Err(diagnostics) => diagnostics
             .into_iter()
             .map(|diagnostic| diagnostic.message)
             .collect(),
-        Ok(_) => panic!("invalid formatting fixture was accepted: {tag}"),
+        Ok(()) => panic!("invalid formatting fixture passed semantic analysis: {tag}"),
     }
 }
 
