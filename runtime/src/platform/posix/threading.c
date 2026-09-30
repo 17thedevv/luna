@@ -1,11 +1,12 @@
 // =============================================================================
-// runtime/src/platform/linux/threading.c
+// runtime/src/platform/posix/threading.c
 //
-// Luna Runtime — Thread ABI (Linux/POSIX Platform Implementation)
+// Luna Runtime — Thread ABI (POSIX Platform Implementation)
 // =============================================================================
 
 #include "luna/runtime/threading.h"
 #include <pthread.h>
+#include <sched.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>

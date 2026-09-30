@@ -1,7 +1,7 @@
 // =============================================================================
-// runtime/src/platform/linux/sync.c
+// runtime/src/platform/posix/sync.c
 //
-// Luna Runtime — Sync ABI (Linux/POSIX Platform Implementation)
+// Luna Runtime — Sync ABI (POSIX Platform Implementation)
 // =============================================================================
 
 #include "luna/runtime/sync.h"

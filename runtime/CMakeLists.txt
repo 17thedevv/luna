@@ -17,12 +17,16 @@ include_directories(${LUNA_RUNTIME_INCLUDE_DIR})
 # ── Platform detection ────────────────────────────────────────────────────────
 if(WIN32)
     set(LUNA_PLATFORM "windows")
+    set(LUNA_PLATFORM_SOURCE "windows")
 elseif(UNIX AND APPLE)
     set(LUNA_PLATFORM "macos")
+    set(LUNA_PLATFORM_SOURCE "posix")
 elseif(UNIX)
     set(LUNA_PLATFORM "linux")
+    set(LUNA_PLATFORM_SOURCE "posix")
 else()
     set(LUNA_PLATFORM "freestanding")
+    set(LUNA_PLATFORM_SOURCE "freestanding")
 endif()
 
 message(STATUS "Luna Runtime: building for platform '${LUNA_PLATFORM}'")
@@ -36,8 +40,8 @@ set(RUNTIME_CORE_SRC
 )
 
 set(RUNTIME_PLATFORM_SRC
-    src/platform/${LUNA_PLATFORM}/threading.c
-    src/platform/${LUNA_PLATFORM}/sync.c
+    src/platform/${LUNA_PLATFORM_SOURCE}/threading.c
+    src/platform/${LUNA_PLATFORM_SOURCE}/sync.c
 )
 
 # ── Static library target ─────────────────────────────────────────────────────
