@@ -74,8 +74,9 @@ representative integer values, integer boundaries, `u128::MAX`, all `FileError`
 variants, and writer failure after a prefix. The prior acceptance matrix was
 narrower than the complete v1 contract: it did not cover every integer edge,
 multiple failure positions, or fresh source/artifact behavior for all negative
-cases. Those gaps are being closed by the expanded fixtures and harnesses in
-the current worktree; the new gates are **not yet behaviorally verified**.
+cases. The expanded fixtures and harnesses now cover those gaps on Windows;
+native Linux/macOS execution and final full-workspace verification remain
+pending.
 
 The updated positive matrix now includes seven fixture programs in both
 source-only and freshly built artifact-only sysroots, including all integer
@@ -83,8 +84,24 @@ types at zero/positive/minimum/maximum boundaries, Unicode scalar-width
 boundaries and embedded NUL, a second generic Writer implementation, writer
 failure at first/middle/final positions, and all proposed `FileError` texts.
 Four negative fixtures are checked in both provider modes. The CLI harness also
-executes all seven positive fixtures. These describe worktree coverage; they
-become evidence only after the native CI workflow passes.
+executes all seven positive fixtures.
+
+Windows focused evidence on the current worktree:
+
+- Generic trait-bound validation (`Supported` implemented for `i32`, absent
+  for `[u8; 1]`): **1/1 passed**.
+- Integer cast signedness regression: **1/1 passed**.
+- Enum tag/codegen regression: **1/1 passed**.
+- Expanded formatting source/fresh-artifact acceptance: **2/2 passed**.
+- Sysroot invariants: **5/5 passed**.
+- Phase 5 whole-file I/O regressions: **3/3 passed**.
+- Public CLI formatting E2E, after rebuilding current sysroot artifacts:
+  **1/1 passed**.
+
+These are local Windows results only. The full command
+`cargo test --workspace -- --test-threads=1` has since completed on Windows
+with exit code 0 on the current worktree. Native Linux/macOS workflow evidence
+for the final commit is still required.
 
 Earlier evidence collected 2026-09-30 on Windows (for the then-current,
 narrower matrix):
@@ -139,11 +156,23 @@ fixture covers four fieldless variants and one payload variant in
 and not specific to `FileError` or formatting. No C-GAP ID was assigned; the
 repository still has no canonical compiler-gap registry.
 
-The expanded integer edge acceptance then exposed a second generic backend
+The expanded integer edge acceptance also exposed a generic backend
 defect: LLVM's signless integer cast helper sign-extended unsigned values when
 an explicit `as` conversion widened them (for example, `255 as u8 as u64`
 became `u64::MAX`). Integer-to-integer cast lowering now supplies the source
 type's signedness explicitly, and the permanent independent regression is
-`tests/luna/compiler/integer_cast_signedness.ln`. Harnesses compile, but native
-execution of this repair and the updated formatting matrix is still pending
-the current Linux/macOS CI run. The Phase 6 status remains IN PROGRESS.
+`tests/luna/compiler/integer_cast_signedness.ln`. The generic executable
+regression passes on Windows; native Linux/macOS execution and final workspace
+verification remain pending.
+
+The expanded negative matrix exposed a generic typechecker defect as well:
+`check_bounds_for_call` skipped trait obligations for concrete semantic types
+without a primitive/nominal impl key. The independent `Supported` trait case
+showed an array without an impl incorrectly passed. Bound checking now also
+examines applicable trait-impl patterns when no such key exists. The permanent
+reproducer and positive primitive control are
+`tests/luna/compiler/generic_trait_bound_array_rejects.ln` and
+`generic_trait_bound_primitive_accepts.ln`; both the compiler regression and
+formatting negatives pass on Windows. Diagnostic parity normalizes session-
+local `SemanticTypeId` numbers only, while still requiring the expected
+semantic error category. The Phase 6 status remains IN PROGRESS.

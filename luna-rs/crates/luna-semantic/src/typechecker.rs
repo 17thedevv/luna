@@ -2275,60 +2275,64 @@ impl<'a> TypeChecker<'a> {
                         }
                         _ => None,
                     };
-                    if let Some(concrete_key) = concrete_self_key {
-                        if let Some(bounds) = self.ctx.tables.trait_bounds.get(&gp_sym).cloned() {
-                            for bound in &bounds {
+                    if let Some(bounds) = self.ctx.tables.trait_bounds.get(&gp_sym).cloned() {
+                        for bound in &bounds {
+                            let has_concrete_impl = concrete_self_key.is_some_and(|concrete_key| {
                                 let impl_key = crate::semantic_tables::ImplKey {
                                     trait_id: Some(bound.trait_id),
                                     self_type_def: concrete_key,
                                 };
-                                let has_concrete_impl = self.ctx.tables.trait_impls.contains_key(&impl_key);
-                                let mut matched_entry = None;
-                                if !has_concrete_impl || !bound.trait_args.is_empty() {
-                                    for entry in &self.ctx.tables.trait_impl_entries {
-                                        if entry.trait_id != bound.trait_id {
-                                            continue;
-                                        }
-                                        let mut test_subst = crate::ty::Substitution::new();
-                                        let matched = self.ctx.matches_impl_pattern(entry.self_type, resolved_ty, &entry.generic_params, &mut test_subst)
-                                            || match self.ctx.types.get(resolved_ty) {
-                                                SemanticType::Reference(_, _, inner) | SemanticType::Pointer(_, inner) => {
-                                                    self.ctx.matches_impl_pattern(entry.self_type, *inner, &entry.generic_params, &mut test_subst)
-                                                }
-                                                _ => false,
-                                            };
-                                        if matched {
-                                            matched_entry = Some((entry.clone(), test_subst));
-                                            break;
-                                        }
+                                self.ctx.tables.trait_impls.contains_key(&impl_key)
+                            });
+                            let mut matched_entry = None;
+                            if !has_concrete_impl || !bound.trait_args.is_empty() {
+                                for entry in &self.ctx.tables.trait_impl_entries {
+                                    if entry.trait_id != bound.trait_id {
+                                        continue;
+                                    }
+                                    let mut test_subst = crate::ty::Substitution::new();
+                                    let matched = self.ctx.matches_impl_pattern(entry.self_type, resolved_ty, &entry.generic_params, &mut test_subst)
+                                        || match self.ctx.types.get(resolved_ty) {
+                                            SemanticType::Reference(_, _, inner) | SemanticType::Pointer(_, inner) => {
+                                                self.ctx.matches_impl_pattern(entry.self_type, *inner, &entry.generic_params, &mut test_subst)
+                                            }
+                                            _ => false,
+                                        };
+                                    if matched {
+                                        matched_entry = Some((entry.clone(), test_subst));
+                                        break;
                                     }
                                 }
-                                if !has_concrete_impl && matched_entry.is_none() {
-                                    let trait_name = self.ctx.symbol_table.get_symbol(bound.trait_id).name.clone();
-                                    let type_name = match concrete_key {
-                                        crate::semantic_tables::ImplSelfTypeKey::Nominal(s) => self.ctx.symbol_table.get_symbol(s).name.clone(),
-                                        crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => format!("{:?}", b).to_lowercase(),
-                                    };
-                                    let gp_name = self.ctx.symbol_table.get_symbol(gp_sym).name.clone();
-                                    self.ctx.diagnostics.push(
-                                        Diagnostic::error(format!(
-                                            "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`)",
-                                            type_name, trait_name, gp_name
-                                        )).with_span(span)
-                                    );
-                                } else if let Some((entry, test_subst)) = matched_entry {
-                                    if !bound.trait_args.is_empty() {
-                                        for (arg_idx, &b_arg) in bound.trait_args.iter().enumerate() {
-                                            if let Some(&impl_arg) = entry.trait_args.get(arg_idx) {
-                                                let concrete_impl_arg = self.ctx.types.subst(impl_arg, &test_subst);
-                                                let expected_b_arg = self.ctx.types.subst(b_arg, subst);
-                                                let _ = self.unify(expected_b_arg, concrete_impl_arg);
-                                            }
+                            }
+                            if !has_concrete_impl && matched_entry.is_none() {
+                                let trait_name = self.ctx.symbol_table.get_symbol(bound.trait_id).name.clone();
+                                let type_name = concrete_self_key.map(|concrete_key| match concrete_key {
+                                    crate::semantic_tables::ImplSelfTypeKey::Nominal(s) => self.ctx.symbol_table.get_symbol(s).name.clone(),
+                                    crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => format!("{:?}", b).to_lowercase(),
+                                }).unwrap_or_else(|| {
+                                    crate::comptime::reflect::ComptimeReflection::type_name(resolved_ty, &self.ctx)
+                                });
+                                let gp_name = self.ctx.symbol_table.get_symbol(gp_sym).name.clone();
+                                self.ctx.diagnostics.push(
+                                    Diagnostic::error(format!(
+                                        "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`)",
+                                        type_name, trait_name, gp_name
+                                    )).with_span(span)
+                                );
+                            } else if let Some((entry, test_subst)) = matched_entry {
+                                if !bound.trait_args.is_empty() {
+                                    for (arg_idx, &b_arg) in bound.trait_args.iter().enumerate() {
+                                        if let Some(&impl_arg) = entry.trait_args.get(arg_idx) {
+                                            let concrete_impl_arg = self.ctx.types.subst(impl_arg, &test_subst);
+                                            let expected_b_arg = self.ctx.types.subst(b_arg, subst);
+                                            let _ = self.unify(expected_b_arg, concrete_impl_arg);
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    if let Some(concrete_key) = concrete_self_key {
                         if let Some(assoc_bounds) = self.ctx.tables.assoc_type_bounds.get(&gp_sym).cloned() {
                             for (trait_sym, assoc_sym, expected_ty) in assoc_bounds {
                                 let norm_ty = self.normalize_projection(resolved_ty, trait_sym, assoc_sym, span);

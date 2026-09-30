@@ -116,6 +116,28 @@ fn compile_diagnostics(root: &Path, fixture: &str, tag: &str) -> Vec<String> {
     }
 }
 
+fn normalize_session_local_type_ids(message: &str) -> String {
+    let mut normalized = String::with_capacity(message.len());
+    let mut remaining = message;
+    while let Some(start) = remaining.find("SemanticTypeId(") {
+        normalized.push_str(&remaining[..start]);
+        let id_start = start + "SemanticTypeId(".len();
+        let Some(id_end_relative) = remaining[id_start..].find(')') else {
+            normalized.push_str(&remaining[start..]);
+            return normalized;
+        };
+        let id_end = id_start + id_end_relative;
+        if !remaining[id_start..id_end].bytes().all(|byte| byte.is_ascii_digit()) {
+            normalized.push_str(&remaining[start..=id_end]);
+        } else {
+            normalized.push_str("SemanticTypeId(<session-local>)");
+        }
+        remaining = &remaining[id_end + 1..];
+    }
+    normalized.push_str(remaining);
+    normalized
+}
+
 #[test]
 fn formatting_v1_matches_source_and_fresh_artifact_sysroots() {
     let fixtures = [
@@ -206,6 +228,14 @@ fn formatting_v1_negative_cases_reject_for_the_expected_reason() {
             compile_diagnostics(&source_only, fixture, &format!("source_{name}"));
         let mut artifact_diagnostics =
             compile_diagnostics(&artifact_only, fixture, &format!("artifact_{name}"));
+        source_diagnostics = source_diagnostics
+            .iter()
+            .map(|message| normalize_session_local_type_ids(message))
+            .collect();
+        artifact_diagnostics = artifact_diagnostics
+            .iter()
+            .map(|message| normalize_session_local_type_ids(message))
+            .collect();
         source_diagnostics.sort();
         artifact_diagnostics.sort();
         assert!(
