@@ -99,11 +99,12 @@ Windows focused evidence on the current worktree:
 
 The full command
 `cargo test --workspace -- --test-threads=1` has since completed on Windows
-with exit code 0. Phase 6 CI run
+with exit code 0. At the time of this audit, Phase 6 CI run
 [36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
-passed formatting acceptance on Ubuntu 24.04 and macOS 15 Intel and passed the
-full Ubuntu workspace regression. These checks ran against commit
-`dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
+was still **in progress**: the Ubuntu 24.04 and macOS 15 Intel formatting jobs
+had completed, while the full Ubuntu workspace job had not reported a final
+result. Do not count the CI workspace gate as passed until the run concludes.
+The workflow targets commit `dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
 
 Earlier evidence collected 2026-09-30 on Windows (for the then-current,
 narrower matrix):
@@ -142,8 +143,8 @@ lowering blocker was fixed and merged to `main`; see the
 [re-audit and resolution record](phase5_reaudit_2026_09_30.md). Phase 5 remains
 NOT FROZEN pending design-authority review.
 
-Phase 6 remains NOT FROZEN pending design-authority review and the updated
-acceptance, source/artifact parity, and regression results below.
+Phase 6 remains NOT FROZEN pending design-authority review and final
+confirmation of the in-progress CI workspace gate.
 
 ## Generic compiler defect found during Phase 6 validation
 
@@ -177,5 +178,6 @@ reproducer and positive primitive control are
 `generic_trait_bound_primitive_accepts.ln`; both the compiler regression and
 formatting negatives pass on Windows. Diagnostic parity normalizes session-
 local `SemanticTypeId` numbers only, while still requiring the expected
-semantic error category. The Phase 6 status is IMPLEMENTATION COMPLETE — READY
-FOR DESIGN/FREEZE REVIEW — NOT FROZEN.
+semantic error category. The Phase 6 implementation is complete and locally
+verified; it is READY FOR DESIGN/FREEZE REVIEW — NOT FROZEN, with the native
+CI workspace result still pending.
