@@ -1,0 +1,140 @@
+name: Phase 5 platform verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+    paths:
+      - '.github/workflows/phase5-platform.yml'
+      - 'CMakeLists.txt'
+      - 'runtime/**'
+      - 'luna-rs/Cargo.toml'
+      - 'luna-rs/Cargo.lock'
+      - 'luna-rs/crates/**'
+      - 'luna-rs/libs/**'
+      - 'luna-rs/tests/**'
+      - 'luna-rs/crates/luna-backend/**'
+      - 'luna-rs/crates/luna-driver/build.rs'
+      - 'luna-rs/crates/luna-driver/tests/whole_file_io_v1_acceptance_tests.rs'
+      - 'luna-rs/libs/external/file/**'
+      - 'luna-rs/tests/luna/stdlib/file/**'
+  pull_request:
+    paths:
+      - '.github/workflows/phase5-platform.yml'
+      - 'CMakeLists.txt'
+      - 'runtime/**'
+      - 'luna-rs/Cargo.toml'
+      - 'luna-rs/Cargo.lock'
+      - 'luna-rs/crates/**'
+      - 'luna-rs/libs/**'
+      - 'luna-rs/tests/**'
+      - 'luna-rs/crates/luna-backend/**'
+      - 'luna-rs/crates/luna-driver/build.rs'
+      - 'luna-rs/crates/luna-driver/tests/whole_file_io_v1_acceptance_tests.rs'
+      - 'luna-rs/libs/external/file/**'
+      - 'luna-rs/tests/luna/stdlib/file/**'
+
+permissions:
+  contents: read
+
+jobs:
+  runtime-abi:
+    name: RuntimeAbiTests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15-intel]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure native runtime
+        run: cmake -S runtime -B build/runtime -DCMAKE_BUILD_TYPE=Release
+      - name: Build runtime and ABI tests
+        run: cmake --build build/runtime --parallel
+      - name: Run RuntimeAbiTests
+        run: ctest --test-dir build/runtime -R '^RuntimeAbiTests$' --output-on-failure --no-tests=error
+
+  whole-file-io:
+    name: Whole-File I/O parity (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15-intel]
+    env:
+      CARGO_TERM_COLOR: always
+      LUNA_RUNTIME_LIB: ${{ github.workspace }}/build/runtime/libluna-runtime.a
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake clang-18 llvm-18-dev libclang-18-dev
+          echo "LLVM_SYS_180_PREFIX=/usr/lib/llvm-18" >> "$GITHUB_ENV"
+          echo "LLVM_CONFIG_PATH=/usr/lib/llvm-18/bin/llvm-config" >> "$GITHUB_ENV"
+          echo "LLVM_HOME=/usr/lib/llvm-18" >> "$GITHUB_ENV"
+      - name: Install macOS build dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install llvm@18
+          LLVM_PREFIX="$(brew --prefix llvm@18)"
+          echo "$LLVM_PREFIX/bin" >> "$GITHUB_PATH"
+          echo "LLVM_SYS_180_PREFIX=$LLVM_PREFIX" >> "$GITHUB_ENV"
+          echo "LLVM_CONFIG_PATH=$LLVM_PREFIX/bin/llvm-config" >> "$GITHUB_ENV"
+          echo "LLVM_HOME=$LLVM_PREFIX" >> "$GITHUB_ENV"
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Build native runtime
+        run: |
+          cmake -S runtime -B build/runtime -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/runtime --parallel
+      - name: Run Whole-File I/O source and artifact parity
+        working-directory: luna-rs
+        run: cargo test -p luna-driver --test whole_file_io_v1_acceptance_tests -- --test-threads=1
+
+  linux-runtime-asan:
+    name: Runtime partial-read cleanup (Ubuntu + ASan)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure runtime with AddressSanitizer
+        run: >-
+          cmake -S runtime -B build/runtime-asan -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_C_FLAGS="-fsanitize=address -fno-omit-frame-pointer"
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address"
+      - name: Build sanitized runtime tests
+        run: cmake --build build/runtime-asan --parallel
+      - name: Run RuntimeAbiTests with leak detection
+        run: ctest --test-dir build/runtime-asan -R '^RuntimeAbiTests$' --output-on-failure --no-tests=error
+
+  linux-workspace:
+    name: Full workspace regression (Ubuntu)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      CARGO_TERM_COLOR: always
+      LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
+      LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
+      LLVM_HOME: /usr/lib/llvm-18
+      LUNA_RUNTIME_LIB: ${{ github.workspace }}/build/runtime/libluna-runtime.a
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake clang-18 llvm-18-dev libclang-18-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Build native runtime
+        run: |
+          cmake -S runtime -B build/runtime -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/runtime --parallel
+      - name: Run full workspace regression
+        working-directory: luna-rs
+        run: cargo test --workspace -- --test-threads=1
+      - name: Check patch whitespace
+        run: git diff --check
