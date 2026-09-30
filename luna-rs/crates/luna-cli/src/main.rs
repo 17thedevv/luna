@@ -77,6 +77,12 @@ enum Commands {
         /// The .llib file to inspect
         file: PathBuf,
     },
+    /// Build canonical .llib artifacts for every provider in the sysroot
+    BuildSysroot {
+        /// Suppress per-provider build output
+        #[arg(short, long)]
+        quiet: bool,
+    },
 }
 
 fn parse_emit(emit_opt: &Option<String>) -> (bool, bool, bool) {
@@ -126,6 +132,17 @@ fn main() {
                     eprintln!("Failed to read manifest: {:?}", e);
                     process::exit(1);
                 }
+            }
+        }
+        Commands::BuildSysroot { quiet } => {
+            let sysroot = luna_driver::sysroot::Sysroot::discover(None).unwrap_or_else(|err| {
+                eprintln!("Failed to locate Luna sysroot: {err:?}");
+                process::exit(1);
+            });
+            let builder = luna_driver::sysroot_builder::SysrootBuilder::new(sysroot);
+            if let Err(err) = builder.build_all(*quiet) {
+                eprintln!("Failed to build Luna sysroot: {err}");
+                process::exit(1);
             }
         }
         Commands::Build { file, output, emit, quiet, lib, search_paths } => {

@@ -139,6 +139,9 @@ jobs:
         run: |
           cmake -S runtime -B build/runtime -DCMAKE_BUILD_TYPE=Release
           cmake --build build/runtime --parallel
+      - name: Build canonical sysroot artifacts
+        working-directory: luna-rs
+        run: cargo run -p luna-cli -- build-sysroot --quiet
       - name: Run full workspace regression
         working-directory: luna-rs
         run: cargo test --workspace -- --test-threads=1
