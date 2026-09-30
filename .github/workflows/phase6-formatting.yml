@@ -69,6 +69,9 @@ jobs:
       - name: Build canonical sysroot artifacts from current sources
         working-directory: luna-rs
         run: cargo run -p luna-cli -- build-sysroot --quiet
+      - name: Run generic integer cast signedness regression
+        working-directory: luna-rs
+        run: cargo test -p luna-driver --test integer_cast_signedness_tests -- --test-threads=1
       - name: Run source and fresh-artifact formatting parity
         working-directory: luna-rs
         shell: bash

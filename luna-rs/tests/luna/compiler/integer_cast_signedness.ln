@@ -1,0 +1,48 @@
+fn widen_u8(value: u8) -> u64 {
+    return value as u64;
+}
+
+fn widen_u16(value: u16) -> u64 {
+    return value as u64;
+}
+
+fn widen_u32(value: u32) -> u64 {
+    return value as u64;
+}
+
+fn widen_u64(value: u64) -> u128 {
+    return value as u128;
+}
+
+fn widen_i8(value: i8) -> i64 {
+    return value as i64;
+}
+
+fn widen_i16(value: i16) -> i64 {
+    return value as i64;
+}
+
+fn widen_i32(value: i32) -> i64 {
+    return value as i64;
+}
+
+fn widen_i64(value: i64) -> i128 {
+    return value as i128;
+}
+
+fn main() -> i32 {
+    dec u128_max = (((1 as u128) << (127 as u128)) - (1 as u128)) * (2 as u128) + (1 as u128);
+    if widen_u8(255 as u8) != (255 as u64) { return 1; }
+    if widen_u8(128 as u8) != (128 as u64) { return 2; }
+    if widen_u16(65535 as u16) != (65535 as u64) { return 3; }
+    if widen_u32(4294967295 as u32) != (4294967295 as u64) { return 4; }
+    if widen_u64(18446744073709551615 as u64) != u128_max { return 5; }
+
+    if widen_i8(-128 as i8) != (-128 as i64) { return 6; }
+    if widen_i16(-32768 as i16) != (-32768 as i64) { return 7; }
+    if widen_i32(-2147483648 as i32) != (-2147483648 as i64) { return 8; }
+    dec i64_min = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec i128_min = -((1 as i128) << (126 as i128)) - ((1 as i128) << (126 as i128));
+    if widen_i64(i64_min) != i128_min { return 9; }
+    return 0;
+}

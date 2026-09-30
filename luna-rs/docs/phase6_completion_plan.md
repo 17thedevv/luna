@@ -87,6 +87,14 @@ hide a compiler defect by relaxing formatter output expectations. Any decision
 to carry a separate known literal defect into Phase 6 freeze needs explicit
 maintainer approval.
 
+During the expanded integer edge run, a distinct generic backend issue was
+observed: widening casts such as `255 as u8 as u64` sign-extended instead of
+zero-extending. The backend repair uses the source type's semantic signedness,
+with an independent compiler fixture at
+`tests/luna/compiler/integer_cast_signedness.ln`. This is not the separate
+`-9223372036854775808` literal-parsing issue; the repair still needs native
+execution and full regression evidence before it can be counted closed.
+
 ## 3. Complete the formatting acceptance matrix
 
 Reuse the existing implementation and four positive fixtures, then fill gaps:
@@ -135,8 +143,8 @@ changes. Audit any generated output before deciding it belongs in a commit.
 
 Suggested independent commits:
 
-1. Generic enum repair + independent regressions + Phase 5 error closure.
-2. Generic numeric-literal repair, if required and semantics are established.
+1. Phase 5 generic enum repair + independent regressions + error closure.
+2. Phase 6 generic integer-cast signedness repair + compiler regression.
 3. Phase 6 stdlib extension + canonical contract changes.
 4. Formatting CLI/parity/adversarial acceptance and final evidence.
 

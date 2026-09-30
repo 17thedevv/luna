@@ -1496,9 +1496,14 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     ).unwrap();
                     Ok(casted.into())
                 } else if llvm_val.is_int_value() && llvm_ty.is_int_type() {
-                    let casted = self.builder.build_int_cast(
+                    // LLVM integer types are signless. Preserve Luna's source
+                    // integer signedness explicitly when widening; the
+                    // convenience cast otherwise sign-extends unsigned values
+                    // whose high bit is set (for example, `255 as u8 as u64`).
+                    let casted = self.builder.build_int_cast_sign_flag(
                         llvm_val.into_int_value(),
                         llvm_ty.into_int_type(),
+                        !self.is_unsigned_operand(value, _func),
                         &format!("cast_v{}", id.0)
                     ).unwrap();
                     Ok(casted.into())
@@ -1665,7 +1670,12 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                         }
                     } else if let Ok(expected_ty) = self.map_type(_func.ret_ty) {
                         if val.is_int_value() && expected_ty.is_int_type() && val.get_type() != expected_ty {
-                            let casted = self.builder.build_int_cast(val.into_int_value(), expected_ty.into_int_type(), "ret_cast").unwrap();
+                            let casted = self.builder.build_int_cast_sign_flag(
+                                val.into_int_value(),
+                                expected_ty.into_int_type(),
+                                !self.is_unsigned_operand(val_op, _func),
+                                "ret_cast",
+                            ).unwrap();
                             val = casted.into();
                         }
                     }
