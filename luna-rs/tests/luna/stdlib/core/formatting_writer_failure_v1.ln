@@ -1,0 +1,66 @@
+import <fmt>;
+import <result>;
+
+struct FailAt {
+    attempts: u8,
+    accepted: u8,
+    fail_on: u8,
+    first: char,
+    second: char,
+    third: char,
+};
+
+impl std::fmt::Writer for FailAt {
+    fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+        self.attempts = self.attempts + (1 as u8);
+        if self.attempts == self.fail_on {
+            return std::Result::Err(std::fmt::FmtError::WriteFailed);
+        }
+        if self.accepted == (0 as u8) {
+            self.first = value;
+        } else if self.accepted == (1 as u8) {
+            self.second = value;
+        } else {
+            self.third = value;
+        }
+        self.accepted = self.accepted + (1 as u8);
+        return std::Result::Ok;
+    }
+}
+
+fn fails_at(
+    fail_on: u8,
+    expected_attempts: u8,
+    expected_accepted: u8,
+    expected_first: char,
+    expected_second: char,
+    expected_third: char
+) -> bool {
+    dec rw writer = FailAt {
+        attempts: 0 as u8,
+        accepted: 0 as u8,
+        fail_on: fail_on,
+        first: '\0',
+        second: '\0',
+        third: '\0',
+    };
+    dec result = true.fmt(&rw writer);
+    dec failed_as_expected = match result {
+        std::Result::Err(std::fmt::FmtError::WriteFailed) -> true,
+        _ -> false,
+    };
+    if failed_as_expected == false { return false; }
+    if writer.attempts != expected_attempts { return false; }
+    if writer.accepted != expected_accepted { return false; }
+    if writer.first != expected_first { return false; }
+    if writer.second != expected_second { return false; }
+    if writer.third != expected_third { return false; }
+    return true;
+}
+
+fn main() -> i32 {
+    if fails_at(1 as u8, 1 as u8, 0 as u8, '\0', '\0', '\0') == false { return 1; }
+    if fails_at(3 as u8, 3 as u8, 2 as u8, 't', 'r', '\0') == false { return 2; }
+    if fails_at(4 as u8, 4 as u8, 3 as u8, 't', 'r', 'u') == false { return 3; }
+    return 0;
+}

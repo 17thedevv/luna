@@ -1,7 +1,7 @@
 //! Phase 4D: Sysroot Build Infrastructure Tests
 //!
 //! These tests verify:
-//! - Canonical dependency DAG integrity (read-only against canonical sysroot; 32 providers, 90 direct edges)
+//! - Canonical dependency DAG integrity (read-only against canonical sysroot; 32 providers, 91 direct edges)
 //! - Persistent canonical .obj and .llib sidecar invariant (32 providers, 32 .ln, 32 .llib, 32 .obj)
 //! - Absence of orphan/monolithic legacy artifacts
 //! - External builder execution and lock mutual exclusion strictly within ISOLATED test sysroots
@@ -96,7 +96,11 @@ fn test_canonical_dag_integrity() {
         }
     }
 
-    assert_eq!(all_edges.len(), 90, "Expected exactly 90 dependency edges in canonical DAG");
+    assert_eq!(
+        all_edges.len(),
+        91,
+        "Expected exactly 91 dependency edges in canonical DAG"
+    );
 }
 
 /// Helper: extract provider imports from source content

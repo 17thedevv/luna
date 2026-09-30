@@ -1,0 +1,39 @@
+import <fmt>;
+
+struct CaptureWriter {
+    count: u8,
+    first: char,
+    last: char,
+};
+
+impl std::fmt::Writer for CaptureWriter {
+    fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+        if self.count == (0 as u8) {
+            self.first = value;
+        }
+        self.last = value;
+        self.count = self.count + (1 as u8);
+        return std::Result::Ok;
+    }
+}
+
+fn format_into<T: std::fmt::Display, W: std::fmt::Writer>(
+    value: &T,
+    writer: &rw W
+) -> std::Result<void, std::fmt::FmtError> {
+    return value.fmt(writer);
+}
+
+fn main() -> i32 {
+    dec rw writer = CaptureWriter {
+        count: 0 as u8,
+        first: '\0',
+        last: '\0',
+    };
+    if format_into(&(42 as i32), &rw writer).is_err() { return 1; }
+    if format_into(&'界', &rw writer).is_err() { return 2; }
+    if writer.count != (3 as u8) { return 3; }
+    if writer.first != '4' { return 4; }
+    if writer.last != '界' { return 5; }
+    return 0;
+}

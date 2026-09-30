@@ -1,0 +1,21 @@
+import <fmt>;
+import <string>;
+import <io>;
+import <file>;
+
+fn append_display<T: std::fmt::Display>(value: T, output: &rw std::String) -> std::Result<void, std::fmt::FmtError> {
+    return value.fmt(output);
+}
+
+fn main() -> i32 {
+    dec rw output = std::string_new();
+    append_display(std::FileError::NotFound, &rw output).unwrap();
+    output.push_char('|');
+    append_display(std::FileError::PermissionDenied, &rw output).unwrap();
+    output.push_char('|');
+    append_display(std::FileError::InvalidInput, &rw output).unwrap();
+    output.push_char('|');
+    append_display(std::FileError::Io, &rw output).unwrap();
+    std::io::println(output.as_bytes());
+    return 0;
+}

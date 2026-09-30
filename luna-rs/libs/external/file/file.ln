@@ -4,6 +4,7 @@ import <string>;
 import <ptr>;
 import <mem>;
 import <__alloc_global>;
+import <fmt>;
 
 extern fn __luna_read_file(
     path: *u8,
@@ -26,6 +27,29 @@ export module std {
         PermissionDenied,
         InvalidInput,
         Io,
+    }
+
+    fn write_error_text<W: std::fmt::Writer>(
+        text: str,
+        writer: &rw W
+    ) -> std::Result<void, std::fmt::FmtError> {
+        dec rendered = std::string_from_str(text);
+        return rendered.fmt(writer);
+    }
+
+    impl std::fmt::Display for FileError {
+        fn fmt<W: std::fmt::Writer>(
+            self: &Self,
+            writer: &rw W
+        ) -> std::Result<void, std::fmt::FmtError> {
+            dec text = match *self {
+                FileError::NotFound -> "file not found",
+                FileError::PermissionDenied -> "permission denied",
+                FileError::InvalidInput -> "invalid input",
+                FileError::Io -> "I/O error",
+            };
+            return write_error_text(text, writer);
+        }
     }
 
     fn path_has_nul(path: &std::String) -> bool {
