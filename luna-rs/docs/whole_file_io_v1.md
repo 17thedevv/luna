@@ -83,3 +83,25 @@ metadata, permissions APIs, symlink operations, path canonicalization, rename,
 remove, mkdir, environment, time, threads, async I/O, `OsString`/`OsPath`,
 zero-copy Vec adoption, recoverable OOM, atomic writes, locking, or snapshot
 semantics.
+
+## Native platform verification status
+
+Native POSIX evidence passed for commit `bb84ae2b9a0ad540d9552029b251b502752e15b3`
+in [GitHub Actions run 36661193516](https://github.com/17thedevv/luna/actions/runs/36661193516):
+
+- Ubuntu 24.04 and macOS 15 Intel runtime builds succeeded; `RuntimeAbiTests`
+  passed 1/1 on each platform.
+- Whole-File I/O source/fresh-artifact parity passed 2/2 on both platforms.
+- Ubuntu AddressSanitizer runtime ABI suite passed 1/1, including partial-read
+  cleanup coverage.
+- `cargo test --workspace -- --test-threads=1` completed with **exit code 0**;
+  the following `git diff --check` step also succeeded. The workflow run
+  concluded `success`.
+- The clean-checkout workspace setup builds canonical provider artifacts with
+  `cargo run -p luna-cli -- build-sysroot --quiet` before the workspace suite;
+  those generated artifacts are not committed.
+
+The CI result establishes native Linux and macOS build/runtime evidence in
+addition to the existing Windows verification. Phase 5 remains **NOT FROZEN**;
+implementation is **CROSS-PLATFORM VERIFIED** and **READY FOR DESIGN/FREEZE
+REVIEW**.
