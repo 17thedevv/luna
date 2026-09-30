@@ -1,4 +1,5 @@
 import <fmt>;
+import <result>;
 
 struct ChecksumWriter {
     count: u64,
