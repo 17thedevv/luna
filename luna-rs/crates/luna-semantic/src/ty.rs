@@ -120,6 +120,7 @@ impl TypeContext {
         ctx.intern(SemanticType::Primitive(BuiltinType::F64));
         ctx.intern(SemanticType::Primitive(BuiltinType::String));
         ctx.intern(SemanticType::Primitive(BuiltinType::Usize));
+        ctx.intern(SemanticType::Primitive(BuiltinType::U32));
         ctx
     }
 
@@ -138,6 +139,13 @@ impl TypeContext {
             .get(&SemanticType::Primitive(BuiltinType::Bool))
             .copied()
             .expect("Bool primitive must be pre-populated")
+    }
+
+    pub fn u32_id(&self) -> SemanticTypeId {
+        self.type_interner
+            .get(&SemanticType::Primitive(BuiltinType::U32))
+            .copied()
+            .expect("U32 primitive must be pre-populated")
     }
 
     pub fn usize_id(&self) -> SemanticTypeId {

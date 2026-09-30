@@ -723,19 +723,9 @@ impl<'a> MvirGenerator<'a> {
                     self.bind_pattern(elem, extract_op);
                 }
             }
-            luna_ast::Pattern::Enum { fields: elements, path } => {
-                let mut variant_idx = 0;
-                if let Some(name_span) = path.last() {
-                    let name_str = self.get_span_text(*name_span);
-                    for symbol in &self.ctx.symbol_table.symbols {
-                        if let luna_semantic::SymbolKind::EnumVariant(idx) = symbol.kind {
-                            if symbol.name.ends_with(name_str) {
-                                variant_idx = idx;
-                                break;
-                            }
-                        }
-                    }
-                }
+            luna_ast::Pattern::Enum { fields: elements, .. } => {
+                let variant_idx = self.resolved_pattern_variant_index(pat_id)
+                    .unwrap_or_else(|| panic!("MVIR invariant: enum pattern has no resolved enum variant symbol"));
                 
                 for (field_idx, elem) in elements.iter().enumerate() {
                     let field_ty = self.get_pat_type(elem).unwrap_or(luna_semantic::SemanticTypeId(0));
@@ -1782,11 +1772,12 @@ impl<'a> MvirGenerator<'a> {
                                 },
                                 mono_loop.option_type,
                             );
+                            let tag_ty = self.ctx.types.u32_id();
                             let tag = self.push_inst(
                                 Instruction::Tag {
                                     value: Operand::Value(next_value),
                                 },
-                                self.ctx.types.bool_id(),
+                                tag_ty,
                             );
                             let is_some = self.push_inst(
                                 Instruction::Eq {
@@ -2836,9 +2827,10 @@ impl<'a> MvirGenerator<'a> {
                 let failure_label = self.new_label("try_failure");
                 
                 // Tag of the flow_val
+                let tag_ty = self.ctx.types.u32_id();
                 let tag_val = self.push_inst(Instruction::Tag {
                     value: Operand::Value(flow_val),
-                }, self.ctx.types.bool_id());
+                }, tag_ty);
                 
                 let is_failure = self.push_inst(Instruction::Eq {
                     left: Operand::Value(tag_val),
@@ -3158,30 +3150,50 @@ impl<'a> MvirGenerator<'a> {
         }
     }
     
+    /// Return the tag of a pattern only when semantic resolution has identified
+    /// it as an enum variant. Never infer variant identity from its source name:
+    /// distinct enums may legitimately declare variants with the same name.
+    fn resolved_pattern_variant_index(&self, pat: &luna_ast::PatId) -> Option<u32> {
+        let symbol = self.ctx.tables.pat_symbols.get(pat).copied()?;
+        match self.ctx.symbol_table.get_symbol(symbol).kind {
+            luna_semantic::SymbolKind::EnumVariant(index) => Some(index),
+            _ => None,
+        }
+    }
+
     fn generate_pat_match(&mut self, pat: &luna_ast::PatId, subject: &Operand) -> Operand {
         use luna_ast::Pattern;
         let pattern = &self.arena.pats[pat.0 as usize];
         match pattern {
-            Pattern::Wildcard | Pattern::Identifier { .. } => {
+            Pattern::Wildcard => Operand::Boolean(true),
+            Pattern::Identifier { .. } => {
+                if let Some(variant_idx) = self.resolved_pattern_variant_index(pat) {
+                    let tag_ty = self.ctx.types.u32_id();
+                    let tag_val = self.push_inst(
+                        Instruction::Tag {
+                            value: subject.clone(),
+                        },
+                        tag_ty,
+                    );
+                    let eq_val = self.push_inst(
+                        Instruction::Eq {
+                            left: Operand::Value(tag_val),
+                            right: Operand::Number(variant_idx.to_string()),
+                        },
+                        self.ctx.types.bool_id(),
+                    );
+                    return Operand::Value(eq_val);
+                }
                 Operand::Boolean(true)
             }
-            Pattern::Enum { path, fields } => {
-                let mut variant_idx = 0;
-                if let Some(name_span) = path.last() {
-                    let name_str = self.get_span_text(*name_span);
-                    for symbol in &self.ctx.symbol_table.symbols {
-                        if let luna_semantic::SymbolKind::EnumVariant(idx) = symbol.kind {
-                            if symbol.name.ends_with(name_str) {
-                                variant_idx = idx;
-                                break;
-                            }
-                        }
-                    }
-                }
+            Pattern::Enum { fields, .. } => {
+                let variant_idx = self.resolved_pattern_variant_index(pat)
+                    .unwrap_or_else(|| panic!("MVIR invariant: enum pattern has no resolved enum variant symbol"));
                 
+                let tag_ty = self.ctx.types.u32_id();
                 let tag_val = self.push_inst(Instruction::Tag {
                     value: subject.clone(),
-                }, self.ctx.types.bool_id());
+                }, tag_ty);
                 
                 let expected_tag = Operand::Number(variant_idx.to_string());
                 
@@ -3193,7 +3205,10 @@ impl<'a> MvirGenerator<'a> {
                 let mut current_res = Operand::Value(eq_val);
                 
                 for (field_idx, field_pat) in fields.iter().enumerate() {
-                    if matches!(&self.arena.pats[field_pat.0 as usize], Pattern::Wildcard | Pattern::Identifier { .. }) {
+                    let child = &self.arena.pats[field_pat.0 as usize];
+                    let is_binding = matches!(child, Pattern::Identifier { .. })
+                        && self.resolved_pattern_variant_index(field_pat).is_none();
+                    if matches!(child, Pattern::Wildcard) || is_binding {
                         continue;
                     }
                     let field_ty = self.get_pat_type(field_pat).unwrap_or(self.ctx.types.bool_id());
@@ -3321,19 +3336,9 @@ impl<'a> MvirGenerator<'a> {
                     }
                 }
             }
-            Pattern::Enum { fields, path } => {
-                let mut variant_idx = 0;
-                if let Some(name_span) = path.last() {
-                    let name_str = self.get_span_text(*name_span);
-                    for symbol in &self.ctx.symbol_table.symbols {
-                        if let luna_semantic::SymbolKind::EnumVariant(idx) = symbol.kind {
-                            if symbol.name.ends_with(name_str) {
-                                variant_idx = idx;
-                                break;
-                            }
-                        }
-                    }
-                }
+            Pattern::Enum { fields, .. } => {
+                let variant_idx = self.resolved_pattern_variant_index(pat)
+                    .unwrap_or_else(|| panic!("MVIR invariant: enum pattern has no resolved enum variant symbol"));
                 
                 if fields.is_empty() {
                     self.push_inst(Instruction::Assign(subject.clone()), luna_semantic::SemanticTypeId(0));

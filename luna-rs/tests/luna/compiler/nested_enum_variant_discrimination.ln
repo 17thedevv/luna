@@ -1,0 +1,24 @@
+// Nested fieldless variants must be tested, not treated as bindings.
+enum AuditError {
+    Missing,
+    Invalid,
+}
+
+enum AuditResult {
+    Success(i32),
+    Failure(AuditError),
+}
+
+fn is_missing(value: AuditResult) -> bool {
+    return match value {
+        AuditResult::Failure(AuditError::Missing) -> true,
+        _ -> false,
+    };
+}
+
+fn main() -> i32 {
+    if is_missing(AuditResult::Failure(AuditError::Invalid)) { return 1; }
+    if is_missing(AuditResult::Failure(AuditError::Missing)) == false { return 2; }
+    if is_missing(AuditResult::Success(7)) { return 3; }
+    return 0;
+}
