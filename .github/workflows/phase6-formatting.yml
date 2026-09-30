@@ -71,7 +71,20 @@ jobs:
         run: cargo run -p luna-cli -- build-sysroot --quiet
       - name: Run generic integer cast signedness regression
         working-directory: luna-rs
-        run: cargo test -p luna-driver --test integer_cast_signedness_tests -- --test-threads=1
+        shell: bash
+        run: |
+          log="$RUNNER_TEMP/integer-cast-regression.log"
+          set +e
+          cargo test -p luna-driver --test integer_cast_signedness_tests -- --test-threads=1 --nocapture >"$log" 2>&1
+          status=$?
+          cat "$log"
+          if [ "$status" -ne 0 ]; then
+            summary="$(tail -n 70 "$log" | tr '\n' ' ' | sed 's/%/%25/g; s/::/%3A%3A/g')"
+            echo "### Integer cast regression failure" >> "$GITHUB_STEP_SUMMARY"
+            echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Integer cast regression diagnostics::$summary"
+          fi
+          exit "$status"
       - name: Run source and fresh-artifact formatting parity
         working-directory: luna-rs
         shell: bash
