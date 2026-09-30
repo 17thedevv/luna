@@ -1,6 +1,7 @@
 # Stage 7 — Phase 6 completion plan
 
-Date: 2026-09-30. This is a plan, not implementation or freeze approval.
+Date: 2026-09-30. Implementation evidence is recorded below; this is not
+freeze approval.
 
 ## Ground truth and ordering
 
@@ -16,8 +17,8 @@ Native Linux/macOS Phase 5 CI and the full Ubuntu workspace gate are green on
 [Phase 5 re-audit](phase5_reaudit_2026_09_30.md) records the enum-lowering
 defect and its closure. Phase 5 is implementation-complete and
 cross-platform-verified, but remains NOT FROZEN pending design-authority
-review. The local Phase 6 worktree still contains uncommitted formatting work;
-preserve it and keep its eventual commits separate from the Phase 5 repair.
+review. Phase 6 work is committed separately on
+`codex/phase6-formatting-closure`.
 
 ## 0. Close Phase 5 error behavior — COMPLETE
 
@@ -92,10 +93,9 @@ observed: widening casts such as `255 as u8 as u64` sign-extended instead of
 zero-extending. The backend repair uses the source type's semantic signedness,
 with an independent compiler fixture at
 `tests/luna/compiler/integer_cast_signedness.ln`. This is not the separate
-`-9223372036854775808` literal-parsing issue; the repair still needs native
-Linux/macOS execution and full-workspace evidence before it can be counted
-closed. The focused Windows executable regression now passes; the full Windows
-workspace regression also completed with exit code 0 on the current worktree.
+`-9223372036854775808` literal-parsing issue. The focused Windows regression,
+native Ubuntu/macOS formatting acceptance, and Ubuntu full-workspace gate all
+pass on Phase 6 commit `dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
 
 The expanded negative matrix also exposed a generic typechecker gap: call-site
 trait bounds were checked only when the concrete argument had a primitive or
@@ -115,8 +115,11 @@ failure reason and identical normalized diagnostics.
 
 The complete Windows workspace command
 `cargo test --workspace -- --test-threads=1` completed with exit code 0 after
-the generic trait-bound repair. Native Linux/macOS workflow evidence is still
-required before Phase 6 can be presented for freeze review.
+the generic trait-bound repair. Phase 6 workflow run
+[36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
+passed its Ubuntu 24.04 and macOS 15 Intel formatting acceptance jobs and the
+full Ubuntu workspace regression. These checks ran against commit
+`dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
 
 ## 3. Complete the formatting acceptance matrix
 
@@ -176,7 +179,10 @@ Every evidence record names its commit, platform, command and exit status.
 Do not reuse an earlier workspace run to certify later compiler changes.
 
 Completion report: **PHASE 6 IMPLEMENTATION COMPLETE — READY FOR
-DESIGN/FREEZE REVIEW — NOT FROZEN**, only when the selected gates actually pass.
+DESIGN/FREEZE REVIEW — NOT FROZEN**. Acceptance, native workflow, Windows
+workspace, and CI workspace gates now pass. Design authority must still review
+the separately documented negative-i64-literal compiler issue and proposed
+FileError display text.
 
 ## Non-goals and stop conditions
 

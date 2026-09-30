@@ -1,6 +1,6 @@
 # Stage 7 — Phase 6: Core Formatting Foundation v1
 
-Status: IMPLEMENTATION IN PROGRESS — NOT FROZEN
+Status: IMPLEMENTATION COMPLETE — READY FOR DESIGN/FREEZE REVIEW — NOT FROZEN
 
 ## Boundary
 
@@ -74,9 +74,8 @@ representative integer values, integer boundaries, `u128::MAX`, all `FileError`
 variants, and writer failure after a prefix. The prior acceptance matrix was
 narrower than the complete v1 contract: it did not cover every integer edge,
 multiple failure positions, or fresh source/artifact behavior for all negative
-cases. The expanded fixtures and harnesses now cover those gaps on Windows;
-native Linux/macOS execution and final full-workspace verification remain
-pending.
+cases. The expanded fixtures and harnesses cover those gaps on Windows,
+Ubuntu, and macOS as recorded below.
 
 The updated positive matrix now includes seven fixture programs in both
 source-only and freshly built artifact-only sysroots, including all integer
@@ -98,10 +97,13 @@ Windows focused evidence on the current worktree:
 - Public CLI formatting E2E, after rebuilding current sysroot artifacts:
   **1/1 passed**.
 
-These are local Windows results only. The full command
+The full command
 `cargo test --workspace -- --test-threads=1` has since completed on Windows
-with exit code 0 on the current worktree. Native Linux/macOS workflow evidence
-for the final commit is still required.
+with exit code 0. Phase 6 CI run
+[36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
+passed formatting acceptance on Ubuntu 24.04 and macOS 15 Intel and passed the
+full Ubuntu workspace regression. These checks ran against commit
+`dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
 
 Earlier evidence collected 2026-09-30 on Windows (for the then-current,
 narrower matrix):
@@ -162,8 +164,8 @@ an explicit `as` conversion widened them (for example, `255 as u8 as u64`
 became `u64::MAX`). Integer-to-integer cast lowering now supplies the source
 type's signedness explicitly, and the permanent independent regression is
 `tests/luna/compiler/integer_cast_signedness.ln`. The generic executable
-regression passes on Windows; native Linux/macOS execution and final workspace
-verification remain pending.
+regression passes on Windows and the native CI acceptance matrix. The
+independent negative-i64-literal issue remains outside this repair.
 
 The expanded negative matrix exposed a generic typechecker defect as well:
 `check_bounds_for_call` skipped trait obligations for concrete semantic types
@@ -175,4 +177,5 @@ reproducer and positive primitive control are
 `generic_trait_bound_primitive_accepts.ln`; both the compiler regression and
 formatting negatives pass on Windows. Diagnostic parity normalizes session-
 local `SemanticTypeId` numbers only, while still requiring the expected
-semantic error category. The Phase 6 status remains IN PROGRESS.
+semantic error category. The Phase 6 status is IMPLEMENTATION COMPLETE — READY
+FOR DESIGN/FREEZE REVIEW — NOT FROZEN.
