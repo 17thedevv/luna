@@ -254,6 +254,19 @@ static int test_file_io_roundtrip(void) {
     return 0;
 }
 
+static int test_minimum_nonzero_alignment(void) {
+    printf("[RUN] test_minimum_nonzero_alignment\n");
+    void* ptr = __luna_alloc(64, 1);
+    if (!ptr) {
+        fprintf(stderr, "FAIL: __luna_alloc(64, 1) returned NULL\n");
+        return 1;
+    }
+    memset(ptr, 0x5A, 64);
+    __luna_dealloc(ptr, 64, 1);
+    printf("[PASS] test_minimum_nonzero_alignment\n");
+    return 0;
+}
+
 typedef struct ReadAllTestContext {
     const uint8_t* bytes;
     size_t len;
@@ -646,6 +659,7 @@ int main(int argc, char** argv) {
     failures += test_sentinel_identity();
     failures += test_realloc_transitions();
     failures += test_align_boundary_4096();
+    failures += test_minimum_nonzero_alignment();
     failures += test_stdio_exact_bytes();
     failures += test_process_args();
     failures += test_file_io_roundtrip();
