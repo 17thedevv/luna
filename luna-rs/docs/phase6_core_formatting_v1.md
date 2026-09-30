@@ -138,3 +138,12 @@ fixture covers four fieldless variants and one payload variant in
 `tests/luna/compiler/enum_tag_match_codegen.ln`. This compiler change is generic
 and not specific to `FileError` or formatting. No C-GAP ID was assigned; the
 repository still has no canonical compiler-gap registry.
+
+The expanded integer edge acceptance then exposed a second generic backend
+defect: LLVM's signless integer cast helper sign-extended unsigned values when
+an explicit `as` conversion widened them (for example, `255 as u8 as u64`
+became `u64::MAX`). Integer-to-integer cast lowering now supplies the source
+type's signedness explicitly, and the permanent independent regression is
+`tests/luna/compiler/integer_cast_signedness.ln`. Harnesses compile, but native
+execution of this repair and the updated formatting matrix is still pending
+the current Linux/macOS CI run. The Phase 6 status remains IN PROGRESS.
