@@ -1,0 +1,53 @@
+enum Shade {
+    Red,
+    Green,
+    Blue,
+    White,
+    Value(i32),
+}
+
+enum InnerError {
+    Missing,
+    Invalid,
+}
+
+enum OuterError {
+    Other,
+    Missing,
+    Nested(InnerError),
+}
+
+enum Envelope {
+    Error(OuterError),
+    Value(i32),
+}
+
+fn color_code(value: Shade) -> i32 {
+    return match value {
+        Shade::Red -> 10,
+        Shade::Green -> 20,
+        Shade::Blue -> 30,
+        Shade::White -> 40,
+        Shade::Value(value) -> 50 + value,
+    };
+}
+
+fn is_nested_missing(value: Envelope) -> bool {
+    return match value {
+        Envelope::Error(OuterError::Nested(InnerError::Missing)) -> true,
+        _ -> false,
+    };
+}
+
+fn main() -> i32 {
+    if color_code(Shade::Red) != 10 { return 1; }
+    if color_code(Shade::Green) != 20 { return 2; }
+    if color_code(Shade::Blue) != 30 { return 3; }
+    if color_code(Shade::White) != 40 { return 4; }
+    if color_code(Shade::Value(5)) != 55 { return 5; }
+    if is_nested_missing(Envelope::Error(OuterError::Nested(InnerError::Invalid))) { return 6; }
+    if is_nested_missing(Envelope::Error(OuterError::Missing)) { return 7; }
+    if is_nested_missing(Envelope::Value(1)) { return 8; }
+    if is_nested_missing(Envelope::Error(OuterError::Nested(InnerError::Missing))) == false { return 9; }
+    return 0;
+}

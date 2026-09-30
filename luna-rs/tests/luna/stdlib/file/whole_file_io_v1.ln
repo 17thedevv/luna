@@ -79,6 +79,19 @@ fn check_copy(src: &std::String, dst: &std::String) -> i32 {
     }
 }
 
+fn check_copy_write_failure(src: &std::String, directory: &std::String) -> i32 {
+    dec bytes = std::vec_new<u8>();
+    bytes.push(65 as u8);
+    match std::write_file(directory, bytes.as_slice()) {
+        std::Result::Err(_) -> {},
+        _ -> { return 70; },
+    }
+    match std::copy_file(src, directory) {
+        std::Result::Err(_) -> { return 0; },
+        std::Result::Ok(_) -> { return 71; },
+    }
+}
+
 fn check_text_copy(src: &std::String, dst: &std::String) -> i32 {
     match std::copy_file(src, dst) {
         std::Result::Ok(count) -> {
@@ -191,6 +204,7 @@ fn main(args: [str]) -> i32 {
     dec large_copy = std::path::join(&directory, &large_copy_name);
 
     if check_read(&src, &dst) != 0 { return 10; }
+    if check_copy_write_failure(&src, &directory) != 0 { return 70; }
     if check_missing(&missing) != 0 { return 12; }
     if check_copy(&src, &copied) != 0 { return 14; }
     if check_same_path(&src) != 0 { return 19; }
