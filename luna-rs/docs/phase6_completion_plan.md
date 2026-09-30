@@ -93,7 +93,30 @@ zero-extending. The backend repair uses the source type's semantic signedness,
 with an independent compiler fixture at
 `tests/luna/compiler/integer_cast_signedness.ln`. This is not the separate
 `-9223372036854775808` literal-parsing issue; the repair still needs native
-execution and full regression evidence before it can be counted closed.
+Linux/macOS execution and full-workspace evidence before it can be counted
+closed. The focused Windows executable regression now passes; the full Windows
+workspace regression also completed with exit code 0 on the current worktree.
+
+The expanded negative matrix also exposed a generic typechecker gap: call-site
+trait bounds were checked only when the concrete argument had a primitive or
+nominal `ImplSelfTypeKey`. Other concrete semantic types, including fixed-size
+arrays, skipped the bound check. A user-defined `Supported` trait reproducer
+confirmed that `i32` with an impl passed and `[u8; 1]` without an impl also
+passed. The checker now validates trait-impl patterns even when no such key is
+available. Its permanent compiler regression is
+`tests/luna/compiler/generic_trait_bound_array_rejects.ln`, with a positive
+primitive control in `generic_trait_bound_primitive_accepts.ln`. No formatter,
+provider, type-name, or trait-name special case was added.
+
+Source/artifact negative diagnostics can contain session-local
+`SemanticTypeId` values. The parity harness normalizes only these ephemeral
+numeric IDs before comparing messages; it still asserts the expected semantic
+failure reason and identical normalized diagnostics.
+
+The complete Windows workspace command
+`cargo test --workspace -- --test-threads=1` completed with exit code 0 after
+the generic trait-bound repair. Native Linux/macOS workflow evidence is still
+required before Phase 6 can be presented for freeze review.
 
 ## 3. Complete the formatting acceptance matrix
 
@@ -132,8 +155,9 @@ positive fixtures through `luna build` and executable output verification.
 
 ## 5. Regression, review, and commit boundaries
 
-Run in this order: compiler regressions; formatting CLI; formatting
-source/artifact matrix; Phase 5 regression; namespace/sysroot invariants;
+Run in this order: compiler regressions (integer casts, generic trait bounds,
+enum patterns); formatting CLI; formatting source/artifact matrix; Phase 5
+regression; namespace/sysroot invariants;
 `cargo test --workspace -- --test-threads=1`; `git diff --check`.
 
 Do not rerun runtime ABI merely because formatting changed; retain native
