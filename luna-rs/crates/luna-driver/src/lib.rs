@@ -596,8 +596,9 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             // Async Lowering Phase (target specific, runs after MLib)
             async_lowering::lower_async(&mut module, &mut semantic_ctx);
             
+            let config = TargetConfig::default();
             let llvm_context = inkwell::context::Context::create();
-            let mut backend = LLVMBackend::new(&llvm_context, &module, &semantic_ctx, file_name);
+            let mut backend = LLVMBackend::new(&llvm_context, &module, &semantic_ctx, file_name, &config);
             
             if let Err(e) = backend.compile() {
                 if !options.quiet { println!("Backend Error: {}", e); }
@@ -639,7 +640,6 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 let _ = std::fs::remove_file(path_ll);
             }
             
-            let config = TargetConfig::default();
             if !options.quiet { println!("Target Triple: '{}'", config.triple); }
             
             // Emit .obj atomically using sibling temp + rename pattern

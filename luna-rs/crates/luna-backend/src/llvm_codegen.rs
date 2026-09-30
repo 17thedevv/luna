@@ -63,6 +63,12 @@ impl Default for TargetConfig {
     }
 }
 
+impl TargetConfig {
+    fn supports_comdat(&self) -> bool {
+        !self.triple.contains("apple") && !self.triple.contains("darwin")
+    }
+}
+
 pub struct LLVMBackend<'a, 'ctx> {
     context: &'ctx Context,
     module: &'a MvirModule,
@@ -74,10 +80,17 @@ pub struct LLVMBackend<'a, 'ctx> {
     block_map: HashMap<LabelId, InkwellBasicBlock<'ctx>>,
     function_map: HashMap<String, inkwell::values::FunctionValue<'ctx>>,
     link_name_map: HashMap<String, String>,
+    supports_comdat: bool,
 }
 
 impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
-    pub fn new(context: &'ctx Context, module: &'a MvirModule, semantic_ctx: &'a SemanticContext, module_name: &str) -> Self {
+    pub fn new(
+        context: &'ctx Context,
+        module: &'a MvirModule,
+        semantic_ctx: &'a SemanticContext,
+        module_name: &str,
+        target_config: &TargetConfig,
+    ) -> Self {
         Self {
             context,
             module,
@@ -88,6 +101,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             block_map: HashMap::new(),
             function_map: HashMap::new(),
             link_name_map: HashMap::new(),
+            supports_comdat: target_config.supports_comdat(),
         }
     }
     
@@ -107,7 +121,11 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 &config.cpu,
                 &config.features,
                 config.optimization,
-                RelocMode::Default,
+                if config.triple.contains("windows") {
+                    RelocMode::Default
+                } else {
+                    RelocMode::PIC
+                },
                 CodeModel::Default,
             )
             .ok_or_else(|| BackendError::TargetInitFailed("Failed to create target machine".to_string()))?;
@@ -450,9 +468,11 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     };
                     if let Some(l) = linkage {
                         existing_fn.as_global_value().set_linkage(l);
-                        let comdat = self.llvm_module.get_or_insert_comdat(name);
-                        comdat.set_selection_kind(inkwell::comdat::ComdatSelectionKind::Any);
-                        existing_fn.as_global_value().set_comdat(comdat);
+                        if self.supports_comdat {
+                            let comdat = self.llvm_module.get_or_insert_comdat(name);
+                            comdat.set_selection_kind(inkwell::comdat::ComdatSelectionKind::Any);
+                            existing_fn.as_global_value().set_comdat(comdat);
+                        }
                     }
                 }
                 continue;
@@ -464,7 +484,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 None
             };
             let llvm_func = self.llvm_module.add_function(name, fn_type, linkage);
-            if linkage == Some(inkwell::module::Linkage::LinkOnceODR) {
+            if linkage == Some(inkwell::module::Linkage::LinkOnceODR) && self.supports_comdat {
                 let comdat = self.llvm_module.get_or_insert_comdat(name);
                 comdat.set_selection_kind(inkwell::comdat::ComdatSelectionKind::Any);
                 llvm_func.as_global_value().set_comdat(comdat);
