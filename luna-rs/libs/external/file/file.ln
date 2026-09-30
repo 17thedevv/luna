@@ -4,6 +4,7 @@ import <string>;
 import <ptr>;
 import <mem>;
 import <__alloc_global>;
+import <fmt>;
 
 extern fn __luna_read_file(
     path: *u8,
@@ -26,6 +27,82 @@ export module std {
         PermissionDenied,
         InvalidInput,
         Io,
+    }
+
+    impl std::fmt::Display for FileError {
+        fn fmt<W: std::fmt::Writer>(
+            self: &Self,
+            writer: &rw W
+        ) -> std::Result<void, std::fmt::FmtError> {
+            dec kind = match *self {
+                FileError::NotFound -> 0 as u8,
+                FileError::PermissionDenied -> 1 as u8,
+                FileError::InvalidInput -> 2 as u8,
+                FileError::Io -> 3 as u8,
+            };
+            if kind == (0 as u8) {
+                    if writer.write_char('f').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('l').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('o').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('t').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('f').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('o').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('u').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('d');
+            }
+            if kind == (1 as u8) {
+                    if writer.write_char('p').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('m').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('s').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('s').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('o').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('d').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('d');
+            }
+            if kind == (2 as u8) {
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('v').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('a').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('l').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('d').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('p').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('u').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('t');
+            }
+            if kind == (3 as u8) {
+                    if writer.write_char('I').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('/').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('O').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('o').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('r');
+            }
+            return std::Result::Err(std::fmt::FmtError::WriteFailed);
+        }
     }
 
     fn path_has_nul(path: &std::String) -> bool {

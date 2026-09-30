@@ -1,0 +1,30 @@
+import <fmt>;
+
+struct ChecksumWriter {
+    count: u64,
+    checksum: u64,
+};
+
+impl std::fmt::Writer for ChecksumWriter {
+    fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+        self.count = self.count + (1 as u64);
+        self.checksum = self.checksum * (31 as u64) + (value as u32 as u64);
+        return std::Result::Ok;
+    }
+}
+
+fn format_into<T: std::fmt::Display, W: std::fmt::Writer>(
+    value: &T,
+    writer: &rw W
+) -> std::Result<void, std::fmt::FmtError> {
+    return value.fmt(writer);
+}
+
+fn main() -> i32 {
+    dec rw writer = ChecksumWriter { count: 0 as u64, checksum: 0 as u64 };
+    dec value = 123 as u32;
+    if format_into(&value, &rw writer).is_err() { return 1; }
+    if writer.count != (3 as u64) { return 2; }
+    if writer.checksum != (48690 as u64) { return 3; }
+    return 0;
+}

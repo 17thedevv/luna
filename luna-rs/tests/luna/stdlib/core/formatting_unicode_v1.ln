@@ -1,0 +1,30 @@
+import <fmt>;
+import <string>;
+import <io>;
+
+fn main() -> i32 {
+    dec rw output = std::string_from_str("prefix:");
+    dec empty = std::string_new();
+    empty.fmt(&rw output).unwrap();
+
+    dec lower = 'é';
+    dec two_byte_max = '߿';
+    dec three_byte_min = 'ࠀ';
+    dec private_use = '';
+    dec four_byte_min = '𐀀';
+    dec unicode_max = '􏿿';
+    dec nul = '\0';
+
+    lower.fmt(&rw output).unwrap();
+    two_byte_max.fmt(&rw output).unwrap();
+    three_byte_min.fmt(&rw output).unwrap();
+    private_use.fmt(&rw output).unwrap();
+    four_byte_min.fmt(&rw output).unwrap();
+    unicode_max.fmt(&rw output).unwrap();
+    nul.fmt(&rw output).unwrap();
+
+    dec text = std::string_from_str("多字");
+    text.fmt(&rw output).unwrap();
+    std::io::println(output.as_bytes());
+    return 0;
+}
