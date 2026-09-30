@@ -160,8 +160,14 @@ pub fn runtime_library() -> Result<PathBuf, String> {
 pub fn compile_ll_to_exe(ll_file: &str, obj_file: &str, exe_file: &str) -> Result<(), String> {
     // Emit a native object using LLVM's llc.
     let llc_name = if cfg!(windows) { "llc.exe" } else { "llc" };
-    let llc_status = Command::new(tool(llc_name))
-        .arg("-filetype=obj")
+    let mut llc_command = Command::new(tool(llc_name));
+    llc_command.arg("-filetype=obj");
+    if !cfg!(windows) {
+        // POSIX toolchains commonly default to PIE executables. PIC objects
+        // link correctly under both PIE and non-PIE host defaults.
+        llc_command.arg("-relocation-model=pic");
+    }
+    let llc_status = llc_command
         .arg("-o")
         .arg(obj_file)
         .arg(ll_file)
