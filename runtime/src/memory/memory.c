@@ -6,6 +6,7 @@
 
 #include "luna/runtime/memory.h"
 #include "luna/runtime/panic.h"
+#include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -44,12 +45,25 @@ void* __luna_alloc(size_t size, size_t align) {
 
     void* ptr = NULL;
 #if defined(_WIN32)
-    ptr = _aligned_malloc(size, align);
+    if (align <= _Alignof(max_align_t)) {
+        ptr = malloc(size);
+    } else {
+        ptr = _aligned_malloc(size, align);
+    }
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-    size_t aligned_size = (size + align - 1) & ~(align - 1);
-    ptr = aligned_alloc(align, aligned_size);
+    // malloc already satisfies every fundamental alignment. In particular,
+    // aligned_alloc(1, size) is rejected by some POSIX C libraries (including
+    // macOS), although align=1 is a valid Luna allocation request.
+    if (align <= _Alignof(max_align_t)) {
+        ptr = malloc(size);
+    } else {
+        size_t aligned_size = (size + align - 1) & ~(align - 1);
+        ptr = aligned_alloc(align, aligned_size);
+    }
 #else
-    if (posix_memalign(&ptr, align, size) != 0) {
+    if (align <= sizeof(void*)) {
+        ptr = malloc(size);
+    } else if (posix_memalign(&ptr, align, size) != 0) {
         ptr = NULL;
     }
 #endif
@@ -76,7 +90,11 @@ void __luna_dealloc(void* ptr, size_t size, size_t align) {
     }
 
 #if defined(_WIN32)
-    _aligned_free(ptr);
+    if (align <= _Alignof(max_align_t)) {
+        free(ptr);
+    } else {
+        _aligned_free(ptr);
+    }
 #else
     free(ptr);
 #endif

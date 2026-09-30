@@ -529,7 +529,6 @@ impl<'a> Iterator for Lexer<'a> {
                     TokenKind::Error
                 }
             }
-            b'$' => TokenKind::Dollar,
             b';' => TokenKind::Semi,
             b',' => TokenKind::Comma,
             b'(' => TokenKind::LParen,
