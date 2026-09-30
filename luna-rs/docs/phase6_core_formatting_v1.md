@@ -46,10 +46,9 @@ integer types: `i8`, `i16`, `i32`, `i64`, `i128`, `isize`, `u8`, `u16`, `u32`,
 `u64`, `u128`, and `usize`, plus the existing `std::FileError` enum. Integer
 formatting is decimal. Signed formatting uses a minimum-safe magnitude
 calculation rather than directly negating the minimum value. The algorithm is
-allocation-free in `core/fmt` and writes digits in order. The current optional
-`FileError` implementation proposes the messages `file not found`,
-`permission denied`, `invalid input`, and `I/O error` for its four variants.
-These exact strings are not frozen and remain subject to design/freeze review.
+allocation-free in `core/fmt` and writes digits in order. Design authority
+approved these exact public `FileError` messages on 2026-09-30: `file not
+found`, `permission denied`, `invalid input`, and `I/O error`.
 
 String formatting decodes the String's already-valid UTF-8 into Unicode scalar
 values and sends those to the writer. It does not reinterpret each UTF-8 byte
@@ -81,7 +80,8 @@ The updated positive matrix now includes seven fixture programs in both
 source-only and freshly built artifact-only sysroots, including all integer
 types at zero/positive/minimum/maximum boundaries, Unicode scalar-width
 boundaries and embedded NUL, a second generic Writer implementation, writer
-failure at first/middle/final positions, and all proposed `FileError` texts.
+failure at first/middle/final positions, and all four approved `FileError`
+texts.
 Four negative fixtures are checked in both provider modes. The CLI harness also
 executes all seven positive fixtures.
 
@@ -99,10 +99,10 @@ Windows focused evidence on the current worktree:
 
 The full command
 `cargo test --workspace -- --test-threads=1` has since completed on Windows
-with exit code 0. At the time of this audit, Phase 6 CI run
+with exit code 0. Phase 6 CI run
 [36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
-was still **in progress**: the Ubuntu 24.04 and macOS 15 Intel formatting jobs
-had completed, while the full Ubuntu workspace job had not reported a final
+is still **in progress**: the Ubuntu 24.04 and macOS 15 Intel formatting jobs
+have completed, while the full Ubuntu workspace job has not reported a final
 result. Do not count the CI workspace gate as passed until the run concludes.
 The workflow targets commit `dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
 
@@ -126,9 +126,10 @@ the same `i64::MIN` value with in-range arithmetic works. The minimal source
 reproducer is `../tests/luna/compiler/numeric_negative_i64_min_literal.ln`.
 This discrepancy is outside the formatter implementation; its exact integer
 literal contract needs compiler-language review before any compiler change.
-The formatter boundary acceptance therefore uses the valid arithmetic
-construction and does not treat the incorrect literal result as expected
-behavior.
+Design authority decided on 2026-09-30 to track it outside Phase 6, so it does
+not block formatting review. The formatter boundary acceptance uses the valid
+arithmetic construction and does not treat the incorrect literal result as
+expected behavior.
 
 ## Phase status dependencies
 
@@ -143,8 +144,8 @@ lowering blocker was fixed and merged to `main`; see the
 [re-audit and resolution record](phase5_reaudit_2026_09_30.md). Phase 5 remains
 NOT FROZEN pending design-authority review.
 
-Phase 6 remains NOT FROZEN pending design-authority review and final
-confirmation of the in-progress CI workspace gate.
+Phase 6 remains NOT FROZEN pending the final result of the in-progress CI
+workspace gate. Design-authority review decisions are recorded above.
 
 ## Generic compiler defect found during Phase 6 validation
 

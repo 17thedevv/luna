@@ -41,15 +41,16 @@ NOT FROZEN pending design-authority review. No Phase 5 merge remains to do.
   `alloc/string` supplies Writer and Display for String.
 - Failure is non-transactional: accepted prefix remains; stop at first error;
   no later writes. No rollback or recoverable-OOM promise.
-- The `FileError` Display implementation is present and covered; design
-  authority still needs to approve whether its four exact messages are public
-  API contract or implementation text.
+- The `FileError` Display implementation is present and covered. Design
+  authority approved the four exact messages as public API text on
+  2026-09-30: `file not found`, `permission denied`, `invalid input`, and
+  `I/O error`.
 
 The canonical contract and implementation evidence are recorded in
-`phase6_core_formatting_v1.md`; only the explicit design decisions listed in
-section 5 remain open.
+`phase6_core_formatting_v1.md`; design-authority choices are recorded below.
+The remaining closure gate is the native Ubuntu full-workspace CI result.
 
-## 2. Separate numeric-literal issue — design decision required
+## 2. Separate numeric-literal issue — tracked outside Phase 6
 
 The expression `-9223372036854775808 as i64` currently compiles to zero, while
 the same minimum value constructed using in-range arithmetic is verified by
@@ -61,15 +62,16 @@ has a weak oracle that returns success when the value is zero, so it is
 diagnostic evidence only, not a passing semantic regression.
 
 Do not silently repair or freeze this behavior as part of formatting. Design
-authority must decide whether to define and repair signed-minimum literal
-semantics now, or explicitly carry this independent compiler issue outside
-the Phase 6 contract. If a repair is approved, first create a valid assertion
-for `i64::MIN` and compile-fail controls for out-of-range positive literals.
+authority decided on 2026-09-30 to track this independent compiler issue
+outside the Phase 6 contract. It does not block Phase 6 review. If the literal
+semantics are addressed later, first define the contract and create a valid
+assertion for `i64::MIN` plus compile-fail controls for out-of-range positive
+literals.
 
 Keep integer formatting tests on independently verified input values. Do not
-hide a compiler defect by relaxing formatter output expectations. Any decision
-to carry a separate known literal defect into Phase 6 freeze needs explicit
-maintainer approval.
+hide a compiler defect by relaxing formatter output expectations. The explicit
+maintainer decision to carry this separate issue outside Phase 6 is recorded
+above.
 
 During the expanded integer edge run, a distinct generic backend issue was
 observed: widening casts such as `255 as u8 as u64` sign-extended instead of
@@ -143,23 +145,25 @@ Evidence is recorded for Phase 6 implementation commit
 `dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c` and documentation follow-up
 `70568be7cde3d795c327c08b53c8c757b342919d`. Workflow run
 [36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
-passed Ubuntu/macOS formatting acceptance and the full Ubuntu workspace.
-Windows focused suites, public CLI acceptance, sysroot invariants, Phase 5
-acceptance, and Windows full workspace passed; the native CI workspace result
-remains pending. Detailed local counts are in `phase6_core_formatting_v1.md`.
+has completed Ubuntu/macOS formatting acceptance, but its full Ubuntu
+workspace job is still in progress; do not count the workspace gate as passed
+until the run concludes. Windows focused suites, public CLI acceptance,
+sysroot invariants, Phase 5 acceptance, and Windows full workspace passed.
+Detailed local counts are in `phase6_core_formatting_v1.md`.
 
-Before freeze review, design authority must resolve two documented questions:
-whether the unrelated signed-minimum literal defect is carried or fixed, and
-whether the four proposed `FileError` display strings become public contract.
-No runtime ABI rerun is needed unless runtime/ABI code changes. Repository-wide
-formatting is known to report broad baseline differences and must not be
-claimed clean; do not reformat unrelated files. Preserve the generated
-`test_model.mvir` and untracked `luna-web/` worktree items.
+Design-authority decisions are recorded: the four `FileError` display strings
+are frozen public text, and the unrelated signed-minimum literal defect is
+tracked outside Phase 6. The remaining freeze gate is the final result of the
+native Ubuntu full-workspace CI job. No runtime ABI rerun is needed unless
+runtime/ABI code changes. Repository-wide formatting is known to report broad
+baseline differences and must not be claimed clean; do not reformat unrelated
+files. Preserve the generated `test_model.mvir` and untracked `luna-web/`
+worktree items.
 
 Completion report: **PHASE 6 IMPLEMENTATION COMPLETE — READY FOR
 DESIGN/FREEZE REVIEW — NOT FROZEN**. Local acceptance and Windows workspace
-gates pass; native formatting jobs completed, but the CI workspace gate and
-the maintainer contract decisions remain pending.
+gates pass; native formatting jobs completed; the full-workspace CI gate is
+still pending. Maintainer contract decisions are recorded above.
 
 ## Non-goals and stop conditions
 
