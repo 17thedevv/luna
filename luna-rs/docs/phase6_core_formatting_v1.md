@@ -98,13 +98,13 @@ Windows focused evidence on the current worktree:
   **1/1 passed**.
 
 The full command
-`cargo test --workspace -- --test-threads=1` has since completed on Windows
-with exit code 0. Phase 6 CI run
+`cargo test --workspace -- --test-threads=1` completed on Windows with exit
+code 0. Phase 6 CI run
 [36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
-is still **in progress**: the Ubuntu 24.04 and macOS 15 Intel formatting jobs
-have completed, while the full Ubuntu workspace job has not reported a final
-result. Do not count the CI workspace gate as passed until the run concludes.
-The workflow targets commit `dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
+completed successfully on 2026-09-30: Ubuntu 24.04 formatting acceptance,
+macOS 15 Intel formatting acceptance, and the full Ubuntu workspace regression
+all concluded with success. The workflow targets commit
+`dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
 
 Earlier evidence collected 2026-09-30 on Windows (for the then-current,
 narrower matrix):
@@ -144,8 +144,9 @@ lowering blocker was fixed and merged to `main`; see the
 [re-audit and resolution record](phase5_reaudit_2026_09_30.md). Phase 5 remains
 NOT FROZEN pending design-authority review.
 
-Phase 6 remains NOT FROZEN pending the final result of the in-progress CI
-workspace gate. Design-authority review decisions are recorded above.
+Phase 6 remains NOT FROZEN pending design-authority review. Its Windows and
+native Ubuntu/macOS acceptance plus the full Ubuntu workspace gate have all
+passed. Design-authority review decisions are recorded above.
 
 ## Generic compiler defect found during Phase 6 validation
 
@@ -179,6 +180,6 @@ reproducer and positive primitive control are
 `generic_trait_bound_primitive_accepts.ln`; both the compiler regression and
 formatting negatives pass on Windows. Diagnostic parity normalizes session-
 local `SemanticTypeId` numbers only, while still requiring the expected
-semantic error category. The Phase 6 implementation is complete and locally
-verified; it is READY FOR DESIGN/FREEZE REVIEW — NOT FROZEN, with the native
-CI workspace result still pending.
+semantic error category. The Phase 6 implementation is complete and verified
+on Windows, Ubuntu, and macOS; it is READY FOR DESIGN/FREEZE REVIEW — NOT
+FROZEN.

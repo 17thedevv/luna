@@ -100,12 +100,11 @@ failure reason and identical normalized diagnostics.
 
 The complete Windows workspace command
 `cargo test --workspace -- --test-threads=1` completed with exit code 0 after
-the generic trait-bound repair. At the time of this audit, Phase 6 workflow
-run [36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
-was still **in progress**: its Ubuntu/macOS formatting jobs had completed,
-but the full Ubuntu workspace job had not yet reported a final result. Do not
-count this run as a passed workspace gate until its conclusion is confirmed.
-It targets commit `dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
+the generic trait-bound repair. Phase 6 workflow run
+[36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
+completed successfully: both Ubuntu/macOS formatting acceptance jobs and the
+full Ubuntu workspace regression concluded with success. It targets commit
+`dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`.
 
 ## 3. Formatting acceptance matrix — COMPLETE
 
@@ -145,11 +144,10 @@ Evidence is recorded for Phase 6 implementation commit
 `dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c` and documentation follow-up
 `70568be7cde3d795c327c08b53c8c757b342919d`. Workflow run
 [36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
-has completed Ubuntu/macOS formatting acceptance, but its full Ubuntu
-workspace job is still in progress; do not count the workspace gate as passed
-until the run concludes. Windows focused suites, public CLI acceptance,
-sysroot invariants, Phase 5 acceptance, and Windows full workspace passed.
-Detailed local counts are in `phase6_core_formatting_v1.md`.
+passed Ubuntu/macOS formatting acceptance and the full Ubuntu workspace
+regression. Windows focused suites, public CLI acceptance, sysroot invariants,
+Phase 5 acceptance, and Windows full workspace passed. Detailed local counts
+are in `phase6_core_formatting_v1.md`.
 
 Design-authority decisions are recorded: the four `FileError` display strings
 are frozen public text, and the unrelated signed-minimum literal defect is
@@ -161,9 +159,9 @@ files. Preserve the generated `test_model.mvir` and untracked `luna-web/`
 worktree items.
 
 Completion report: **PHASE 6 IMPLEMENTATION COMPLETE — READY FOR
-DESIGN/FREEZE REVIEW — NOT FROZEN**. Local acceptance and Windows workspace
-gates pass; native formatting jobs completed; the full-workspace CI gate is
-still pending. Maintainer contract decisions are recorded above.
+DESIGN/FREEZE REVIEW — NOT FROZEN**. Local acceptance, Windows workspace,
+native Ubuntu/macOS acceptance, and Ubuntu full-workspace gates pass.
+Maintainer contract decisions are recorded above.
 
 ## Non-goals and stop conditions
 
