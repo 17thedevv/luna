@@ -22,10 +22,12 @@ std::copy_file(src: &std::String, dst: &std::String) -> std::Result<u64, std::Fi
 `InvalidInput`, and `Io`. There is no `std::fs` module and no root/provider-name
 aliases.
 
-The current Phase 6 formatting extension implements `std::fmt::Display` for
-`std::FileError` with the exact messages `file not found`, `permission denied`,
-`invalid input`, and `I/O error`, respectively. This adds no I/O behavior and
-remains pending the Phase 6 design/freeze review.
+The Phase 6 formatting extension implements `std::fmt::Display` for
+`std::FileError` with the public messages `file not found`, `permission
+denied`, `invalid input`, and `I/O error`, respectively. Design authority
+approved these exact strings on 2026-09-30. This adds no I/O behavior; the
+broader Phase 6 implementation remains pending its final CI gate and freeze
+review.
 
 ## Error mapping
 
