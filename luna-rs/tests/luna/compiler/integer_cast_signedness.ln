@@ -43,6 +43,10 @@ fn main() -> i32 {
     if widen_i32(-2147483648 as i32) != (-2147483648 as i64) { return 8; }
     dec i64_min = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
     dec i128_min = -((1 as i128) << (126 as i128)) - ((1 as i128) << (126 as i128));
-    if widen_i64(i64_min) != i128_min { return 9; }
+    dec widened_i64_min = widen_i64(i64_min);
+    dec expected_i128_min = (0 as i128) - (9223372036854775807 as i128) - (1 as i128);
+    if widened_i64_min >= (0 as i128) { return 9; }
+    if widened_i64_min != expected_i128_min { return 10; }
+    if expected_i128_min != i128_min { return 11; }
     return 0;
 }
