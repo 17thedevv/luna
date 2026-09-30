@@ -31,12 +31,12 @@ fn widen_i64(value: i64) -> i128 {
 }
 
 fn main() -> i32 {
-    dec u128_max = (((1 as u128) << (127 as u128)) - (1 as u128)) * (2 as u128) + (1 as u128);
     if widen_u8(255 as u8) != (255 as u64) { return 1; }
     if widen_u8(128 as u8) != (128 as u64) { return 2; }
     if widen_u16(65535 as u16) != (65535 as u64) { return 3; }
     if widen_u32(4294967295 as u32) != (4294967295 as u64) { return 4; }
-    if widen_u64(18446744073709551615 as u64) != u128_max { return 5; }
+    dec u64_max_as_u128 = ((1 as u128) << (64 as u128)) - (1 as u128);
+    if widen_u64(18446744073709551615 as u64) != u64_max_as_u128 { return 5; }
 
     if widen_i8(-128 as i8) != (-128 as i64) { return 6; }
     if widen_i16(-32768 as i16) != (-32768 as i64) { return 7; }
