@@ -1,0 +1,31 @@
+import <fmt>;
+import <string>;
+import <io>;
+
+fn append<T: std::fmt::Display>(value: T, output: &rw std::String) {
+    value.fmt(output).unwrap();
+    output.push_char('|');
+}
+
+fn main() -> i32 {
+    dec rw output = std::string_new();
+    append((127 as u32) as char, &rw output);
+    append((128 as u32) as char, &rw output);
+    append((2047 as u32) as char, &rw output);
+    append((2048 as u32) as char, &rw output);
+    append((65535 as u32) as char, &rw output);
+    append((65536 as u32) as char, &rw output);
+    append((1114111 as u32) as char, &rw output);
+    append((0 as u32) as char, &rw output);
+
+    dec rw embedded_nul = std::string_new();
+    embedded_nul.push_char('A');
+    embedded_nul.push_char((0 as u32) as char);
+    embedded_nul.push_char('B');
+    append(embedded_nul, &rw output);
+
+    dec empty = std::string_new();
+    append(empty, &rw output);
+    std::io::println(output.as_bytes());
+    return 0;
+}

@@ -1,6 +1,6 @@
 # Stage 7 — Phase 6: Core Formatting Foundation v1
 
-Status: IMPLEMENTATION COMPLETE — READY FOR DESIGN/FREEZE REVIEW — NOT FROZEN
+Status: IMPLEMENTATION IN PROGRESS — NOT FROZEN
 
 ## Boundary
 
@@ -45,6 +45,11 @@ uses a minimum-safe magnitude calculation rather than directly negating the
 minimum value. The algorithm is allocation-free in `core/fmt` and writes
 digits in order.
 
+The current working change proposes `Display for std::FileError` using the
+messages `file not found`, `permission denied`, `invalid input`, and `I/O
+error`. This is an optional Phase 6 extension; the exact text remains subject
+to design-authority review and is not a frozen compatibility promise.
+
 String formatting decodes the String's already-valid UTF-8 into Unicode scalar
 values and sends those to the writer. It does not reinterpret each UTF-8 byte
 as a character and does not accept arbitrary byte vectors.
@@ -62,38 +67,65 @@ as a character and does not accept arbitrary byte vectors.
 
 ## Acceptance evidence
 
-The permanent Luna fixture exercises a custom structured `Display` impl,
-generic formatting into `String`, bools, chars, Unicode String contents, and
-representative values for every integer type. A negative fixture confirms that
-arbitrary byte arrays and floats do not accidentally implement `Display`.
-The same full-codegen fixture runs with source-only providers and freshly built
-artifact-only providers; exit code and stdout must match exactly.
+The permanent Luna fixtures cover structured `Display`, generic formatting
+into both `String` and a user-defined successful writer, all integer widths,
+integer boundaries, Unicode scalar encoding, embedded NUL text, empty strings,
+writer failures at first/middle/final positions, and all `FileError` variants.
+Negative cases cover arbitrary byte arrays, both float widths, and the legacy
+root `Display` spelling. Current changes are still being validated; the
+coverage list is not itself evidence that those tests pass.
 
-Evidence collected 2026-09-29 on Windows:
+Previously recorded baseline evidence collected 2026-09-29 on Windows, before
+the current expanded acceptance changes:
 
-- `stdlib_format_acceptance_tests`: 2/2 pass, including exact expected output,
-  error propagation, negative byte/float trait-selection checks, and source/
-  fresh-artifact parity.
+- `stdlib_format_acceptance_tests`: 2/2 pass for the original formatting
+  fixture, error propagation, negative byte/float trait-selection checks, and
+  source/fresh-artifact parity.
 - Sysroot invariants: 5/5 pass; canonical baseline is 32 providers / 90 direct
   dependency edges.
 - `cargo test --workspace -- --test-threads=1`: exit code 0, including
   doc-tests.
 
-The current compiler's numeric literal/backend support limits direct testing of
-the full `u128` numeric range. The formatter implementation handles the type,
-but an acceptance claim for extreme `u128` values remains pending a separately
-supported literal/construction path.
+This baseline does not verify the new FileError implementation or the expanded
+acceptance matrix below. Do not reuse it as closure evidence for the current
+worktree.
 
 ## Phase status dependencies
 
 Adding the `fmt` provider changes the active sysroot baseline to 32 providers
-and 90 direct dependency edges. Both values are asserted by the sysroot DAG
-invariant test.
+and 90 direct dependency edges. The proposed `file -> fmt` dependency for the
+FileError implementation adds one direct edge, so the current intended
+baseline is 32 providers and 91 direct edges. Both counts must be re-derived
+and asserted after rebuilding the canonical artifacts.
 
-Phase 5 Whole-File I/O remains implementation-complete but not frozen while
-native POSIX build/runtime evidence is unavailable. Phase 6 formatting does
-not consume the POSIX file-I/O contract and does not change its status.
+Phase 5 Whole-File I/O has native Linux/macOS build/runtime, source/artifact,
+ASan cleanup, and full Ubuntu workspace evidence on commit
+`3dac3ac0e85204411bd80fac15b3294dd812e1be`, merged to `main`. It is
+implementation-complete and cross-platform-verified, but remains NOT FROZEN
+pending design-authority review. The Phase 5 re-audit and its resolution are
+recorded in `phase5_reaudit_2026_09_30.md`.
 
-Phase 6 remains NOT FROZEN pending design-authority review. The full workspace
-and source versus fresh `.llib` gates currently pass; extreme `u128` boundary
-formatting remains an explicit test limitation described above.
+The expression `-9223372036854775808 as i64` has a known incorrect result in the
+current compiler. Existing code defaults unsuffixed integer literals to `i32`,
+but the language contract for the minimum signed literal is not explicit. No
+compiler semantics have been changed. Phase 6 acceptance uses independently
+constructed values; carrying this separate literal issue into a future freeze
+requires design-authority acceptance or a generic compiler repair under an
+established contract.
+
+Phase 6 remains NOT FROZEN. The expanded source/fresh-artifact and public CLI
+tests, current provider graph, and full regression still need to pass on the
+final implementation commit before reporting implementation completion.
+
+## Current branch evidence — 2026-09-30
+
+The expanded Rust acceptance harnesses compile on Windows with
+`cargo test -p luna-driver --test stdlib_format_acceptance_tests --no-run`
+and `cargo test -p luna-cli --test stdlib_format_cli_acceptance --no-run`
+(both exit 0). Executing them is currently unavailable on this host:
+the driver test process exits with Windows status `0xC0000135`
+(`STATUS_DLL_NOT_FOUND`), and the CLI harness's child compiler fails the same
+way because `LLVM-C.dll` is not installed. Scoped `rustfmt --check` for the
+formatting harnesses and `git diff --check` pass. A dedicated native Ubuntu /
+macOS formatting workflow has been added but has not run yet; these compile
+checks are not behavioral or cross-platform evidence.

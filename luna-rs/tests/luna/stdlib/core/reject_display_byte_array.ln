@@ -1,0 +1,13 @@
+import <fmt>;
+import <string>;
+import <result>;
+
+fn format_value<T: std::fmt::Display>(value: &T, output: &rw std::String) -> std::Result<void, std::fmt::FmtError> {
+    return value.fmt(output);
+}
+
+fn main() {
+    dec bytes: [u8; 1] = [65 as u8];
+    dec rw output = std::string_new();
+    format_value(&bytes, &rw output);
+}
