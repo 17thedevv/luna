@@ -1,0 +1,138 @@
+name: Phase 6 formatting verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['**']
+    paths:
+      - '.github/workflows/phase6-formatting.yml'
+      - 'CMakeLists.txt'
+      - 'runtime/**'
+      - 'luna-rs/Cargo.toml'
+      - 'luna-rs/Cargo.lock'
+      - 'luna-rs/crates/**'
+      - 'luna-rs/libs/**'
+      - 'luna-rs/tests/**'
+  pull_request:
+    paths:
+      - '.github/workflows/phase6-formatting.yml'
+      - 'CMakeLists.txt'
+      - 'runtime/**'
+      - 'luna-rs/Cargo.toml'
+      - 'luna-rs/Cargo.lock'
+      - 'luna-rs/crates/**'
+      - 'luna-rs/libs/**'
+      - 'luna-rs/tests/**'
+
+permissions:
+  contents: read
+
+jobs:
+  formatting:
+    name: Formatting acceptance (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15-intel]
+    env:
+      CARGO_TERM_COLOR: always
+      LUNA_RUNTIME_LIB: ${{ github.workspace }}/build/runtime/libluna-runtime.a
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake clang-18 llvm-18-dev libclang-18-dev
+          echo "LLVM_SYS_180_PREFIX=/usr/lib/llvm-18" >> "$GITHUB_ENV"
+          echo "LLVM_CONFIG_PATH=/usr/lib/llvm-18/bin/llvm-config" >> "$GITHUB_ENV"
+          echo "LLVM_HOME=/usr/lib/llvm-18" >> "$GITHUB_ENV"
+      - name: Install macOS build dependencies
+        if: runner.os == 'macOS'
+        run: |
+          brew install llvm@18
+          LLVM_PREFIX="$(brew --prefix llvm@18)"
+          echo "$LLVM_PREFIX/bin" >> "$GITHUB_PATH"
+          echo "LLVM_SYS_180_PREFIX=$LLVM_PREFIX" >> "$GITHUB_ENV"
+          echo "LLVM_CONFIG_PATH=$LLVM_PREFIX/bin/llvm-config" >> "$GITHUB_ENV"
+          echo "LLVM_HOME=$LLVM_PREFIX" >> "$GITHUB_ENV"
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Build native runtime for executable acceptance
+        run: |
+          cmake -S runtime -B build/runtime -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/runtime --parallel
+      - name: Build canonical sysroot artifacts from current sources
+        working-directory: luna-rs
+        run: cargo run -p luna-cli -- build-sysroot --quiet
+      - name: Run source and fresh-artifact formatting parity
+        working-directory: luna-rs
+        shell: bash
+        run: |
+          log="$RUNNER_TEMP/phase6-driver-acceptance.log"
+          set +e
+          cargo test -p luna-driver --test stdlib_format_acceptance_tests -- --test-threads=1 --nocapture >"$log" 2>&1
+          status=$?
+          cat "$log"
+          if [ "$status" -ne 0 ]; then
+            summary="$(tail -n 70 "$log" | tr '\n' ' ' | sed 's/%/%25/g; s/::/%3A%3A/g')"
+            echo "### Phase 6 driver acceptance failure" >> "$GITHUB_STEP_SUMMARY"
+            echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Phase 6 driver acceptance diagnostics::$summary"
+          fi
+          exit "$status"
+      - name: Run public CLI formatting acceptance
+        working-directory: luna-rs
+        shell: bash
+        run: |
+          log="$RUNNER_TEMP/phase6-cli-acceptance.log"
+          set +e
+          cargo test -p luna-cli --test stdlib_format_cli_acceptance -- --test-threads=1 --nocapture >"$log" 2>&1
+          status=$?
+          cat "$log"
+          if [ "$status" -ne 0 ]; then
+            summary="$(tail -n 70 "$log" | tr '\n' ' ' | sed 's/%/%25/g; s/::/%3A%3A/g')"
+            echo "### Phase 6 CLI acceptance failure" >> "$GITHUB_STEP_SUMMARY"
+            echo "$summary" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error title=Phase 6 CLI acceptance diagnostics::$summary"
+          fi
+          exit "$status"
+      - name: Check patch whitespace
+        run: git diff --check
+
+  workspace:
+    name: Full workspace regression (Ubuntu)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      CARGO_TERM_COLOR: always
+      LUNA_RUNTIME_LIB: ${{ github.workspace }}/build/runtime/libluna-runtime.a
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake clang-18 llvm-18-dev libclang-18-dev
+          echo "LLVM_SYS_180_PREFIX=/usr/lib/llvm-18" >> "$GITHUB_ENV"
+          echo "LLVM_CONFIG_PATH=/usr/lib/llvm-18/bin/llvm-config" >> "$GITHUB_ENV"
+          echo "LLVM_HOME=/usr/lib/llvm-18" >> "$GITHUB_ENV"
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Build native runtime
+        run: |
+          cmake -S runtime -B build/runtime -DCMAKE_BUILD_TYPE=Release
+          cmake --build build/runtime --parallel
+      - name: Build canonical sysroot artifacts from current sources
+        working-directory: luna-rs
+        run: cargo run -p luna-cli -- build-sysroot --quiet
+      - name: Run full workspace regression
+        working-directory: luna-rs
+        run: cargo test --workspace -- --test-threads=1
+      - name: Check patch whitespace
+        run: git diff --check

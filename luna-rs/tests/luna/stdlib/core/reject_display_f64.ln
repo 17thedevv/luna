@@ -1,0 +1,12 @@
+import <fmt>;
+import <string>;
+import <result>;
+
+fn format_value<T: std::fmt::Display>(value: &T, output: &rw std::String) -> std::Result<void, std::fmt::FmtError> {
+    return value.fmt(output);
+}
+
+fn main() {
+    dec rw output = std::string_new();
+    format_value(&(1.5 as f64), &rw output);
+}

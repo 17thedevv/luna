@@ -1,0 +1,42 @@
+import <fmt>;
+import <result>;
+
+struct FailAt {
+    limit: u8,
+    attempts: u8,
+    accepted: u8,
+    checksum: u64,
+};
+
+impl std::fmt::Writer for FailAt {
+    fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+        self.attempts = self.attempts + (1 as u8);
+        if self.accepted >= self.limit {
+            return std::Result::Err(std::fmt::FmtError::WriteFailed);
+        }
+        self.accepted = self.accepted + (1 as u8);
+        self.checksum = self.checksum * (31 as u64) + (value as u32 as u64);
+        return std::Result::Ok;
+    }
+}
+
+fn render(value: &bool, writer: &rw FailAt) -> std::Result<void, std::fmt::FmtError> {
+    return value.fmt(writer);
+}
+
+fn main() -> i32 {
+    dec value = true;
+
+    dec rw first = FailAt { limit: 0 as u8, attempts: 0 as u8, accepted: 0 as u8, checksum: 0 as u64 };
+    if render(&value, &rw first).is_err() == false { return 1; }
+    if first.attempts != (1 as u8) || first.accepted != (0 as u8) || first.checksum != (0 as u64) { return 2; }
+
+    dec rw middle = FailAt { limit: 2 as u8, attempts: 0 as u8, accepted: 0 as u8, checksum: 0 as u64 };
+    if render(&value, &rw middle).is_err() == false { return 3; }
+    if middle.attempts != (3 as u8) || middle.accepted != (2 as u8) || middle.checksum != (3710 as u64) { return 4; }
+
+    dec rw final = FailAt { limit: 3 as u8, attempts: 0 as u8, accepted: 0 as u8, checksum: 0 as u64 };
+    if render(&value, &rw final).is_err() == false { return 5; }
+    if final.attempts != (4 as u8) || final.accepted != (3 as u8) || final.checksum != (115127 as u64) { return 6; }
+    return 0;
+}

@@ -1,6 +1,6 @@
 use luna_driver::sysroot::Sysroot;
 use luna_driver::sysroot_builder::SysrootBuilder;
-use luna_driver::{check_semantic_only, CompilerOptions};
+use luna_driver::{CompilerOptions, compile};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -49,6 +49,31 @@ fn remove_extension_recursively(root: &Path, extension: &str) {
     }
 }
 
+fn fresh_provider_modes(tag: &str) -> (PathBuf, PathBuf) {
+    let artifacts = temp_root(&format!("{tag}_fresh_artifacts"));
+    copy_tree(&canonical_external(), &artifacts.join("libs/external"));
+    SysrootBuilder::new(Sysroot::from_root(artifacts.clone()).unwrap())
+        .build_all(true)
+        .expect("fresh .llib/.obj providers must build from current source");
+
+    let source_only = temp_root(&format!("{tag}_source_only"));
+    copy_tree(
+        &artifacts.join("libs/external"),
+        &source_only.join("libs/external"),
+    );
+    remove_extension_recursively(&source_only, "llib");
+    remove_extension_recursively(&source_only, "obj");
+
+    let artifact_only = temp_root(&format!("{tag}_artifact_only"));
+    copy_tree(
+        &artifacts.join("libs/external"),
+        &artifact_only.join("libs/external"),
+    );
+    remove_extension_recursively(&artifact_only, "ln");
+
+    (source_only, artifact_only)
+}
+
 fn run_fixture(root: &Path, fixture: &str, tag: &str) -> (i32, String, String) {
     let work = temp_root(tag);
     fs::create_dir_all(&work).unwrap();
@@ -72,65 +97,128 @@ fn run_fixture(root: &Path, fixture: &str, tag: &str) -> (i32, String, String) {
     )
 }
 
-#[test]
-fn formatting_v1_matches_source_and_fresh_artifact_sysroots() {
-    let fixture = include_str!("../../../tests/luna/stdlib/core/formatting_v1.ln");
-    let artifacts = temp_root("fresh_artifacts");
-    copy_tree(&canonical_external(), &artifacts.join("libs/external"));
-    SysrootBuilder::new(Sysroot::from_root(artifacts.clone()).unwrap())
-        .build_all(true)
-        .expect("fresh .llib/.obj providers must build from current source");
-
-    let source_only = temp_root("source_only");
-    copy_tree(
-        &artifacts.join("libs/external"),
-        &source_only.join("libs/external"),
-    );
-    remove_extension_recursively(&source_only, "llib");
-    remove_extension_recursively(&source_only, "obj");
-
-    let artifact_only = temp_root("artifact_only");
-    copy_tree(
-        &artifacts.join("libs/external"),
-        &artifact_only.join("libs/external"),
-    );
-    remove_extension_recursively(&artifact_only, "ln");
-
-    let source_result = run_fixture(&source_only, fixture, "source_only");
-    let artifact_result = run_fixture(&artifact_only, fixture, "artifact_only");
-    assert_eq!(
-        source_result, artifact_result,
-        "source and .llib output must agree"
-    );
-    assert_eq!(source_result.0, 0, "format run failed: {source_result:?}");
-    assert_eq!(source_result.1.replace("\r\n", "\n"), "true|false|0|12345|123456789|18446744073709551615|123|12345|-128|-12345|-123456789|-123456789|-123|-12345|界|Việt|-12,34\n");
-    assert!(source_result.2.is_empty());
-}
-
-#[test]
-fn formatting_v1_does_not_claim_display_for_bytes_or_floats() {
-    let sysroot = Sysroot::discover_for_test().unwrap();
-    let work = temp_root("negative");
+fn compile_diagnostics(root: &Path, fixture: &str, tag: &str) -> Vec<String> {
+    let work = temp_root(tag);
     fs::create_dir_all(&work).unwrap();
     let source = work.join("negative.ln");
-    let fixture = r#"
-import <fmt>;
-fn require_display<T: std::fmt::Display>(value: &T) {}
-fn main() {
-    dec bytes: [u8; 1] = [65 as u8];
-    require_display(&bytes);
-    require_display(1.5 as f64);
-}
-"#;
+    let executable = work.join("negative.exe");
     fs::write(&source, fixture).unwrap();
     let options = CompilerOptions {
-        search_paths: vec![sysroot.root().to_string_lossy().into_owned()],
+        output_path: Some(executable.to_string_lossy().into_owned()),
+        search_paths: vec![root.to_string_lossy().into_owned()],
         quiet: true,
         ..Default::default()
     };
-    let result = check_semantic_only(&source.to_string_lossy(), fixture.to_string(), &options);
-    assert!(
-        result.is_err(),
-        "arbitrary bytes and floats are outside Display v1"
-    );
+    match compile(&source.to_string_lossy(), fixture.to_string(), &options) {
+        Err(diagnostics) => diagnostics
+            .into_iter()
+            .map(|diagnostic| diagnostic.message)
+            .collect(),
+        Ok(_) => panic!("invalid formatting fixture was accepted: {tag}"),
+    }
+}
+
+#[test]
+fn formatting_v1_matches_source_and_fresh_artifact_sysroots() {
+    let fixtures = [
+        (
+            "formatting_v1.ln",
+            include_str!("../../../tests/luna/stdlib/core/formatting_v1.ln"),
+            "true|false|0|12345|123456789|18446744073709551615|123|12345|-128|-12345|-123456789|-123456789|-123|-12345|界|Việt|-12,34\n",
+        ),
+        (
+            "formatting_integer_boundaries_v1.ln",
+            include_str!("../../../tests/luna/stdlib/core/formatting_integer_boundaries_v1.ln"),
+            "127|-128|32767|-32768|2147483647|-2147483648|9223372036854775807|-9223372036854775808|18446744073709551615|340282366920938463463374607431768211455|-170141183460469231731687303715884105728|170141183460469231731687303715884105727|18446744073709551615|-9223372036854775808|\n",
+        ),
+        (
+            "formatting_integer_all_edges_v1.ln",
+            include_str!("../../../tests/luna/stdlib/core/formatting_integer_all_edges_v1.ln"),
+            "0|255|0|65535|0|4294967295|0|18446744073709551615|0|340282366920938463463374607431768211455|0|18446744073709551615|-128|127|-32768|32767|-2147483648|2147483647|-9223372036854775808|9223372036854775807|-170141183460469231731687303715884105728|170141183460469231731687303715884105727|-9223372036854775808|9223372036854775807|9|10|11|99|100|101|999|1000|1001|0|1|255|0|1|65535|0|1|4294967295|0|1|18446744073709551615|0|1|340282366920938463463374607431768211455|0|1|18446744073709551615|-128|-1|0|1|127|-32768|-1|0|1|32767|-2147483648|-1|0|1|2147483647|-9223372036854775808|-1|0|1|9223372036854775807|-170141183460469231731687303715884105728|-1|0|1|170141183460469231731687303715884105727|-9223372036854775808|-1|0|1|9223372036854775807|\n",
+        ),
+        (
+            "formatting_unicode_v1.ln",
+            include_str!("../../../tests/luna/stdlib/core/formatting_unicode_v1.ln"),
+            "prefix:é߿ࠀ𐀀􏿿\0多字\n",
+        ),
+        (
+            "formatting_custom_writer_v1.ln",
+            include_str!("../../../tests/luna/stdlib/core/formatting_custom_writer_v1.ln"),
+            "",
+        ),
+        (
+            "formatting_writer_failure_v1.ln",
+            include_str!("../../../tests/luna/stdlib/core/formatting_writer_failure_v1.ln"),
+            "",
+        ),
+        (
+            "formatting_file_error_v1.ln",
+            include_str!("../../../tests/luna/stdlib/core/formatting_file_error_v1.ln"),
+            "file not found|permission denied|invalid input|I/O error\n",
+        ),
+    ];
+    let (source_only, artifact_only) = fresh_provider_modes("positive");
+
+    for (name, fixture, expected_stdout) in fixtures {
+        let source_result = run_fixture(&source_only, fixture, &format!("source_{name}"));
+        let artifact_result = run_fixture(&artifact_only, fixture, &format!("artifact_{name}"));
+        assert_eq!(
+            source_result, artifact_result,
+            "source and fresh .llib behavior must agree for {name}"
+        );
+        assert_eq!(source_result.0, 0, "{name} failed: {source_result:?}");
+        assert_eq!(
+            source_result.1.replace("\r\n", "\n"),
+            expected_stdout,
+            "unexpected stdout for {name}"
+        );
+        assert!(source_result.2.is_empty(), "unexpected stderr for {name}");
+    }
+}
+
+#[test]
+fn formatting_v1_negative_cases_reject_for_the_expected_reason() {
+    let (source_only, artifact_only) = fresh_provider_modes("negative");
+
+    let cases = [
+        (
+            "byte_array",
+            include_str!("../../../tests/luna/stdlib/core/reject_display_byte_array.ln"),
+            "Display",
+        ),
+        (
+            "f32",
+            include_str!("../../../tests/luna/stdlib/core/reject_display_f32.ln"),
+            "Display",
+        ),
+        (
+            "f64",
+            include_str!("../../../tests/luna/stdlib/core/reject_display_f64.ln"),
+            "Display",
+        ),
+        (
+            "legacy_root_trait",
+            include_str!("../../../tests/luna/stdlib/core/reject_legacy_root_display.ln"),
+            "fmt",
+        ),
+    ];
+
+    for (name, fixture, expected_diagnostic) in cases {
+        let mut source_diagnostics =
+            compile_diagnostics(&source_only, fixture, &format!("source_{name}"));
+        let mut artifact_diagnostics =
+            compile_diagnostics(&artifact_only, fixture, &format!("artifact_{name}"));
+        source_diagnostics.sort();
+        artifact_diagnostics.sort();
+        assert!(
+            source_diagnostics.iter().any(|message| message
+                .to_lowercase()
+                .contains(&expected_diagnostic.to_lowercase())),
+            "{name} source must fail for {expected_diagnostic}, got: {source_diagnostics:#?}"
+        );
+        assert_eq!(
+            source_diagnostics, artifact_diagnostics,
+            "source and artifact diagnostics must agree for {name}"
+        );
+    }
 }
