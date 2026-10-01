@@ -1,6 +1,8 @@
-# Stage 7 — Phase 6 closure / design-review plan
+# Stage 7 — Phase 6 closure / freeze record
 
-Updated: 2026-10-01. NOT FROZEN; freeze authority remains with the maintainer.
+Updated: 2026-10-01. RESOLVED & FROZEN by the human maintainer's explicit
+approval: "Phê duyệt freeze Phase 6 trên baseline 0394776".
+Verified implementation: `039477650b8cd0b39d058c153c96e3253f02fc75`.
 
 ## Scope and decisions
 
@@ -57,7 +59,7 @@ that public harness and the independent char-operator suite.
 
 ## Final gates
 
-Current operator/CLI follow-up verification is in progress:
+All operator/CLI follow-up gates below pass on the pinned implementation:
 
 - CLI formatting parity: eight positive, four negative fixtures in each mode.
 - Char operators: 32 negative fixtures, check + build in each mode; controls.
@@ -65,14 +67,42 @@ Current operator/CLI follow-up verification is in progress:
   fixtures in each mode.
 - Generic trait-bound, integer cast signedness, enum tag/codegen regressions.
 - Sysroot invariants: 32 providers / 91 direct DAG edges.
-- Phase 5 whole-file regressions as a frozen-contract dependency.
+- Phase 5 whole-file regressions as an implementation dependency; this does not
+  declare Phase 5 frozen.
 - Windows full workspace, actual exit code.
 - Native Ubuntu/macOS formatting + full Ubuntu workspace on the exact follow-up
   implementation commit.
 - `git diff --check`.
 
-Runtime and ABI are untouched. Do not rerun ABI merely to imply a broader
-runtime change. Repository-wide formatting is not clean; do not claim it is.
+### Current exact-commit evidence
+
+Implementation commit: `039477650b8cd0b39d058c153c96e3253f02fc75`.
+Parallel, uncommitted stdlib work is excluded from this review baseline.
+
+| Gate | Result |
+| --- | --- |
+| Windows isolated formatting / char-scalar / char-operator CLI | 2/2, 1/1, 2/2; exit 0 |
+| Windows operator / trait-bound / integer-cast / enum-tag regression | 1/1 each; exit 0 |
+| Windows isolated sysroot / whole-file regression | 5/5, 3/3; exit 0 |
+| Windows isolated full workspace | exit 0; 1,222 passed, 0 failed, 1 pre-existing ignored |
+| Ubuntu and macOS native formatting / scalar / operator CLI | 2/2, 1/1, 2/2 on each platform; success |
+| Ubuntu native full workspace | exit 0; 1,222 passed, 0 failed, 1 pre-existing ignored |
+| Native job whitespace checks | all three jobs passed |
+| Windows isolated / Phase 6 documentation whitespace checks | exit 0 |
+
+Native evidence is
+[36814704447](https://github.com/17thedevv/luna/actions/runs/36814704447),
+with every job targeting exactly 0394776. No macOS full-workspace claim is made.
+Windows verification uses a separate managed checkout, Cargo target and fresh
+sysroot. Its full run completed with actual exit code 0 on 2026-10-01. The
+earlier main-worktree run exited 101 during concurrent source/artifact changes
+and is not counted as a passing gate. All 16 String acceptance tests now pass
+on the isolated commit. See the canonical record for details.
+
+Runtime and ABI are untouched by this pinned Phase 6 implementation. Do not
+rerun ABI merely to imply a broader runtime change. Parallel runtime additions
+are outside this freeze. Existing compiler warnings and repository-wide
+formatting debt remain; do not claim warning-free or globally clean status.
 
 ## Separate known compiler issues
 
@@ -82,17 +112,25 @@ signed-minimum literal issue; it is not a passing semantic regression.
 `numeric_compound_assignment_diagnostic.ln` documents a newly observed
 pre-existing lowering defect: MVIR ignores AssignOp and treats compound
 assignment as ordinary assignment. Its correct oracle currently exits 1.
-Formatting v1 does not use compound assignment. Do not endorse this behavior,
-change the formatting contract, or silently fix it as part of Phase 6.
+Formatting v1 does not use compound assignment. The maintainer explicitly
+approved retaining both recorded numeric defects outside the freeze scope.
+Do not endorse their behavior, change the formatting contract, or silently fix
+them as part of Phase 6.
 
 ## Handoff
 
-When all gates above pass, report:
+All gates above passed. Current handoff status:
 
 PHASE 6 IMPLEMENTATION COMPLETE
-READY FOR DESIGN/FREEZE REVIEW
-NOT FROZEN
+CORE FORMATTING FOUNDATION v1
+RESOLVED & FROZEN
+2026-10-01 — implementation baseline 0394776
 
-Do not merge main, self-freeze, start another phase, or broaden the public API.
+The freeze is maintainer-authorized, not agent self-certification. Do not merge
+main, start another phase or broaden the public API under this authorization.
 The canonical contract and exact evidence are in
 [phase6_core_formatting_v1.md](phase6_core_formatting_v1.md).
+
+The maintainer's requested review of Antigravity's subsequent stdlib additions
+remains separate; those parallel changes are not included in this closure.
+SKILL IMPACT: none; the existing public CLI/parity workflow remains applicable.

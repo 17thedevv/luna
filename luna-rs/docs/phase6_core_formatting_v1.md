@@ -1,6 +1,19 @@
 # Stage 7 — Phase 6: Core Formatting Foundation v1
 
-Status: IMPLEMENTED — FINAL VERIFICATION IN PROGRESS — NOT FROZEN
+Status: RESOLVED & FROZEN
+
+Freeze date: 2026-10-01.
+Freeze authority: human maintainer, by explicit approval in the task conversation:
+"Phê duyệt freeze Phase 6 trên baseline 0394776".
+Verified implementation: `039477650b8cd0b39d058c153c96e3253f02fc75`.
+
+This freeze applies to Core Formatting Foundation v1 and its required generic
+compiler repairs at that exact implementation baseline. It does not freeze the
+entire current working tree, parallel Antigravity additions, a new phase, or the
+two independent numeric defects documented below. It does not authorize a
+main-branch merge. The normative contracts and explicit non-goals below are
+frozen; particular formatting algorithms and test-harness mechanics are evidence
+and implementation strategy, not additional public APIs.
 
 ## Boundary
 
@@ -138,10 +151,60 @@ integer arithmetic/casts, and generic integer/float operations. Existing
 Unicode cast checks remain: two positive, ten compile-negative and six
 runtime-abort fixtures in each mode.
 
-Final Windows workspace and native Ubuntu/macOS evidence for this follow-up
-is still being collected. Earlier CI runs below are historical, not evidence
-for the current operator/CLI changes. Runtime/ABI code is unchanged, so no ABI
-rerun is required. Sysroot baseline remains 32 providers / 91 direct edges.
+### Exact-commit verification boundary
+
+The verified frozen implementation is
+`039477650b8cd0b39d058c153c96e3253f02fc75`. It includes the char-operator repair
+and public CLI parity matrix (`cacc59f`), followed by a test-harness portability
+repair: executable outputs live in a dedicated directory, not at a POSIX path
+already occupied by the source-only sysroot. The initial native run on cacc59f
+failed on that directory/output-name collision; it was not accepted as evidence.
+
+Fresh native run
+[36814704447](https://github.com/17thedevv/luna/actions/runs/36814704447)
+targets exactly 0394776. Ubuntu 24.04 and macOS 15 Intel both pass formatting
+CLI 2/2, char-scalar CLI 1/1, char-operator CLI 2/2, trait-bound 1/1 and integer
+cast 1/1. The separate Ubuntu full-workspace job completes
+`cargo test --workspace -- --test-threads=1` with exit 0: 1,222 tests passed,
+zero failed and one pre-existing ignored test
+(`mutable_references::sem_mutref_06_invalid_fixture`). All three native jobs
+also pass `git diff --check`. No macOS full-workspace result is claimed.
+
+Windows verification uses an independent checkout pinned to 0394776, an
+independent Cargo target directory and fresh canonical sysroot artifacts.
+Concurrent, uncommitted stdlib/runtime additions in the main working tree are
+excluded. On this checkout the focused formatting 2/2, char-scalar 1/1,
+char-operator 2/2, operator unit 1/1, generic trait-bound 1/1, integer cast 1/1,
+enum tag/codegen 1/1, sysroot invariants 5/5 and Phase 5 whole-file I/O 3/3
+all pass with exit 0. The independent Windows full command
+`cargo test --workspace -- --test-threads=1` completed on 2026-10-01 with
+**exit 0**: 1,222 passed, zero failed and the same one pre-existing ignored
+test as Ubuntu. All 163 unit/integration/doc-test binary results were captured;
+none reports a failure. `git diff --check` on the isolated checkout also exits 0.
+The verification log is `D:/luna-phase6-verification-20261001/isolated-workspace.log`.
+
+The previous Windows full run on the concurrently changing main worktree
+exited 101 with five String acceptance failures reporting strict dependency
+fingerprint mismatches. It is not a passing gate and does not establish a
+Phase 6 defect on the isolated commit; the independent full run replaces that
+contaminated verification attempt. In particular, all 16 String acceptance
+tests pass on the isolated commit, including all five previously failing cases.
+
+Earlier CI runs below are historical, not evidence for the current changes.
+Runtime/ABI source is unchanged in this Phase 6 implementation, so no ABI rerun
+is required. The isolated baseline remains 32 providers / 91 direct edges; it
+does not certify later providers contributed in parallel. The main working
+tree's unrelated whitespace/formatting debt is not declared clean; the Phase 6
+documentation patch passes its own scoped `git diff --check`.
+
+All Phase 6 closure gates are complete for this implementation commit. No
+additional compiler, runtime or stdlib behavior was changed during the final
+isolated verification. After reviewing this evidence, the human maintainer
+explicitly approved the Phase 6 freeze on 2026-10-01. No main-branch merge is
+included. Review of the concurrently added stdlib capabilities is a separate
+subsequent task. Existing compiler warnings, the one pre-existing ignored test
+and repository-wide formatting debt are recorded limitations, not claims of a
+warning-free or globally clean repository.
 
 An independent pre-existing defect was discovered by an integer control:
 MVIR assignment lowering ignores `AssignOp`, so `value += 34` acts as ordinary
@@ -150,7 +213,9 @@ sum and currently exits 1; it is diagnostic evidence, not a passing regression.
 Formatting v1 does not use compound assignment. This defect is recorded
 outside the formatting implementation and is not repaired or endorsed here.
 The separately approved signed-minimum literal issue also remains outside
-Phase 6. No gap ID is invented for either finding.
+Phase 6. The maintainer's freeze approval explicitly retains both defects
+outside Phase 6; neither incorrect behavior is approved or frozen. No gap ID is
+invented for either finding.
 
 ## Historical implementation evidence — through 765b910
 
@@ -272,20 +337,22 @@ expected behavior.
 
 ## Phase status dependencies
 
-The `fmt` provider and its initial `String` sink changed the active sysroot
-baseline to 32 providers and 90 direct dependency edges. `file` now depends on
-`fmt` for `FileError` formatting, bringing the current baseline to 32
-providers / 91 direct edges. Both values are asserted by the sysroot DAG
-invariant test.
+The `fmt` provider and its initial `String` sink changed the Phase 6 sysroot
+baseline to 32 providers and 90 direct dependency edges. At the frozen
+implementation baseline, `file` depends on `fmt` for `FileError` formatting,
+bringing the baseline to 32 providers / 91 direct edges. Both values are
+asserted by the sysroot DAG invariant test at 0394776, not by an inventory of
+the concurrently expanded working tree.
 
 Phase 5 has native Linux/macOS build/runtime evidence. Its generic enum-pattern
 lowering blocker was fixed and merged to `main`; see the
 [re-audit and resolution record](phase5_reaudit_2026_09_30.md). Phase 5 remains
 NOT FROZEN pending design-authority review.
 
-Phase 6 remains NOT FROZEN pending design-authority review. The results below
-and above within this historical record apply to their explicitly named
-commits. Current follow-up evidence is recorded in the 2026-10-01 section.
+Phase 6 is RESOLVED & FROZEN by maintainer approval on 2026-10-01, for the
+0394776 implementation baseline only. Historical results in this record apply
+to their explicitly named commits and do not replace the final exact-commit
+verification in the 2026-10-01 section.
 
 ## Generic compiler defect found during Phase 6 validation
 
@@ -320,5 +387,6 @@ reproducer and positive primitive control are
 formatting negatives pass on Windows. Diagnostic parity normalizes session-
 local `SemanticTypeId` numbers only, while still requiring the expected
 semantic error category. The Phase 6 implementation is complete and verified
-on Windows, Ubuntu, and macOS; it is READY FOR DESIGN/FREEZE REVIEW — NOT
-FROZEN.
+on Windows, Ubuntu, and macOS at the scopes recorded above, and is RESOLVED &
+FROZEN by the maintainer's explicit approval. Subsequent changes must preserve
+this contract and rerun the affected CLI/fresh-artifact regression gates.
