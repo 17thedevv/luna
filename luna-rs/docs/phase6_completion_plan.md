@@ -169,39 +169,46 @@ Latest focused Windows evidence for this follow-up:
 - Public formatting CLI E2E: **1/1 passed**.
 - Sysroot DAG invariants: **5/5 passed** (32 providers / 91 direct edges).
 - Phase 5 whole-file I/O regression: **3/3 passed**.
-- The full workspace ran through the test binaries and doc-tests without a
-  reported failing test; the process exit code was not captured in this run.
+- A full Windows workspace attempt exited 1 in String source/.llib parity
+  because the system C: drive had no free space (`LLVM ERROR: IO failure on
+  output stream: no space on device`). This is an environment-limited attempt,
+  not a Windows full-workspace pass. The current full Ubuntu result is recorded
+  below.
 
-The follow-up adds a native Ubuntu/macOS CI matrix for the scalar conversion
-contract. Until CI runs against this follow-up, the earlier native evidence
-must not be presented as verifying these new compiler changes.
+Workflow run [36800606504](https://github.com/17thedevv/luna/actions/runs/36800606504)
+on commit `765b9101be47ac91abb00bc596f5292e52e6e201` passed both native
+formatting acceptance jobs (Ubuntu 24.04 and macOS 15 Intel) and the complete
+Ubuntu workspace regression. The workspace command
+`cargo test --workspace -- --test-threads=1` and the post-job `git diff
+--check` completed successfully.
 
 ## 6. Regression evidence and review actions
 
-Evidence is recorded for Phase 6 implementation commit
-`dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c` and documentation follow-up
-`70568be7cde3d795c327c08b53c8c757b342919d`. Workflow run
-[36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
-passed Ubuntu/macOS formatting acceptance and the full Ubuntu workspace
-regression. Windows focused suites, public CLI acceptance, sysroot invariants,
-Phase 5 acceptance, and Windows full workspace passed. Detailed local counts
-are in `phase6_core_formatting_v1.md`.
+Evidence covers the original Phase 6 implementation and the Unicode scalar
+follow-up. Current native evidence is workflow run
+[36800606504](https://github.com/17thedevv/luna/actions/runs/36800606504) on
+`765b9101be47ac91abb00bc596f5292e52e6e201`: Ubuntu/macOS formatting
+acceptance and the full Ubuntu workspace all passed. Windows focused suites,
+public CLI acceptance, sysroot invariants, and Phase 5 acceptance passed. The
+Windows full-workspace attempt on this commit exited 1 solely after the system
+drive ran out of space during a parity test; it is not counted as a pass.
+Detailed acceptance counts are in `phase6_core_formatting_v1.md`.
 
 Design-authority decisions are recorded: the four `FileError` display strings
 are frozen public text, and the unrelated signed-minimum literal defect is
-tracked outside Phase 6. The remaining verification gate is native CI for the
-Unicode scalar follow-up and its full-workspace result. No runtime ABI rerun is needed unless
-runtime/ABI code changes. Repository-wide formatting is known to report broad
-baseline differences and must not be claimed clean; do not reformat unrelated
-files. Preserve the generated `test_model.mvir` and untracked `luna-web/`
-worktree items.
+tracked outside Phase 6. All planned Phase 6 implementation and verification
+gates are complete. No runtime ABI rerun was needed because runtime/ABI code
+did not change. Repository-wide formatting is known to report broad baseline
+differences and must not be claimed clean; do not reformat unrelated files.
+Preserve the generated `test_model.mvir` and unrelated untracked worktree
+items.
 
 Completion report: **PHASE 6 IMPLEMENTATION COMPLETE — READY FOR
-DESIGN/FREEZE REVIEW — NOT FROZEN**, subject to rerunning the full workspace
-with an explicitly captured exit status and obtaining native Ubuntu/macOS CI
-for the Unicode scalar follow-up. Phase 5 remains separately NOT FROZEN until
-design-authority review; Phase 6 does not claim to close its historical POSIX
-evidence gate again.
+DESIGN/FREEZE REVIEW — NOT FROZEN**. Current native Ubuntu/macOS acceptance and
+the full Ubuntu workspace have passed. The Windows full-workspace attempt was
+limited by a full system drive and is recorded transparently; it does not
+override the successful native Ubuntu gate. Phase 5 remains separately NOT
+FROZEN pending design-authority review.
 Maintainer contract decisions are recorded above.
 
 ## Non-goals and stop conditions
