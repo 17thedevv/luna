@@ -1,0 +1,59 @@
+import <fmt>;
+import <string>;
+import <io>;
+
+const VALID_COMPTIME_SCALAR: char = 127 as char;
+
+fn scalar(value: u32) -> char {
+    return value as char;
+}
+
+fn from_i8(value: i8) -> char { return value as char; }
+fn from_u8(value: u8) -> char { return value as char; }
+fn from_i16(value: i16) -> char { return value as char; }
+fn from_u16(value: u16) -> char { return value as char; }
+fn from_i32(value: i32) -> char { return value as char; }
+fn from_i64(value: i64) -> char { return value as char; }
+fn from_u64(value: u64) -> char { return value as char; }
+fn from_i128(value: i128) -> char { return value as char; }
+fn from_u128(value: u128) -> char { return value as char; }
+fn from_isize(value: isize) -> char { return value as char; }
+fn from_usize(value: usize) -> char { return value as char; }
+fn identity(value: char) -> char { return value as char; }
+
+fn main() -> i32 {
+    dec rw output = std::string_new();
+    dec nul = scalar(0 as u32);
+    dec ascii_max = scalar(127 as u32);
+    dec two_byte_min = scalar(128 as u32);
+    dec before_surrogates = scalar(55295 as u32);
+    dec after_surrogates = scalar(57344 as u32);
+    dec unicode_max = scalar(1114111 as u32);
+    dec direct_valid = 57344 as char;
+    dec wrapped_u8 = -1 as u8 as char;
+
+    if direct_valid != after_surrogates { return 1; }
+    if (VALID_COMPTIME_SCALAR as u32) != (127 as u32) { return 2; }
+    if (wrapped_u8 as u32) != (255 as u32) { return 3; }
+    if (from_i8(127 as i8) as u32) != (127 as u32) { return 4; }
+    if (from_u8(255 as u8) as u32) != (255 as u32) { return 5; }
+    if (from_i16(32767 as i16) as u32) != (32767 as u32) { return 6; }
+    if (from_u16(65535 as u16) as u32) != (65535 as u32) { return 7; }
+    if (from_i32(1114111 as i32) as u32) != (1114111 as u32) { return 8; }
+    if (from_i64(1114111 as i64) as u32) != (1114111 as u32) { return 9; }
+    if (from_u64(1114111 as u64) as u32) != (1114111 as u32) { return 10; }
+    if (from_i128(1114111 as i128) as u32) != (1114111 as u32) { return 11; }
+    if (from_u128(1114111 as u128) as u32) != (1114111 as u32) { return 12; }
+    if (from_isize(1114111 as isize) as u32) != (1114111 as u32) { return 13; }
+    if (from_usize(1114111 as usize) as u32) != (1114111 as u32) { return 14; }
+    if identity(unicode_max) != unicode_max { return 15; }
+
+    nul.fmt(&rw output).unwrap();
+    ascii_max.fmt(&rw output).unwrap();
+    two_byte_min.fmt(&rw output).unwrap();
+    before_surrogates.fmt(&rw output).unwrap();
+    after_surrogates.fmt(&rw output).unwrap();
+    unicode_max.fmt(&rw output).unwrap();
+    std::io::println(output.as_bytes());
+    return 0;
+}

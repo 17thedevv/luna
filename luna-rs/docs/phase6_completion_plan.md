@@ -48,7 +48,12 @@ NOT FROZEN pending design-authority review. No Phase 5 merge remains to do.
 
 The canonical contract and implementation evidence are recorded in
 `phase6_core_formatting_v1.md`; design-authority choices are recorded below.
-The remaining closure gate is the native Ubuntu full-workspace CI result.
+The previously recorded native Ubuntu/macOS Phase 6 CI applies to commit
+`dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c`. A later correctness audit found
+that `char` could represent a surrogate or an out-of-range integer, allowing
+the String encoder to emit invalid UTF-8. The follow-up implementation is in
+the current worktree and therefore still needs fresh native Ubuntu/macOS CI
+before final closure.
 
 ## 2. Separate numeric-literal issue — tracked outside Phase 6
 
@@ -138,7 +143,40 @@ compiler hook or portable session ID was added.
 Windows and native Ubuntu/macOS formatting E2E, including 128-bit formatting
 and generic trait codegen, passed as recorded below and in the core contract.
 
-## 5. Regression evidence and review actions
+## 5. Late correctness closure — Unicode scalar validity
+
+The expanded formatting review found a mismatch in the assumption that Luna
+`char` is always a valid Unicode scalar. Static integer-to-char casts could
+accept invalid values, dynamic casts could construct them, and the UTF-8
+encoder could then emit invalid sequences. The follow-up closes this at the
+typechecker/comptime boundary for known values and at runtime before backend
+construction for dynamic values. It rejects non-integer/non-char cast sources
+and preserves the distinction between String text and arbitrary `Vec<u8>`.
+
+Permanent regressions cover statically known surrogate endpoints, values above
+U+10FFFF, negative integers (including signed widening), u32/u128 maximum,
+runtime aborts, float/bool/pointer-source rejection, all 12 integer source
+types, char identity, and valid scalar boundary formatting.
+The CLI harness rebuilds fresh providers and verifies both source-only and
+artifact-only roots, including no-source-fallback checks.
+
+Latest focused Windows evidence for this follow-up:
+
+- Unicode scalar cast/formatting source-artifact CLI matrix: **1/1 passed**,
+  explicit exit 0 on 2026-10-01 (two positive, ten compile-time negative,
+  six runtime-abort fixtures in each provider mode).
+- Core formatting source/artifact acceptance: **2/2 passed**.
+- Public formatting CLI E2E: **1/1 passed**.
+- Sysroot DAG invariants: **5/5 passed** (32 providers / 91 direct edges).
+- Phase 5 whole-file I/O regression: **3/3 passed**.
+- The full workspace ran through the test binaries and doc-tests without a
+  reported failing test; the process exit code was not captured in this run.
+
+The follow-up adds a native Ubuntu/macOS CI matrix for the scalar conversion
+contract. Until CI runs against this follow-up, the earlier native evidence
+must not be presented as verifying these new compiler changes.
+
+## 6. Regression evidence and review actions
 
 Evidence is recorded for Phase 6 implementation commit
 `dc123dfb0bd8748b0dcb259fc779b3d2f9da3c7c` and documentation follow-up
@@ -151,16 +189,19 @@ are in `phase6_core_formatting_v1.md`.
 
 Design-authority decisions are recorded: the four `FileError` display strings
 are frozen public text, and the unrelated signed-minimum literal defect is
-tracked outside Phase 6. The remaining freeze gate is the final result of the
-native Ubuntu full-workspace CI job. No runtime ABI rerun is needed unless
+tracked outside Phase 6. The remaining verification gate is native CI for the
+Unicode scalar follow-up and its full-workspace result. No runtime ABI rerun is needed unless
 runtime/ABI code changes. Repository-wide formatting is known to report broad
 baseline differences and must not be claimed clean; do not reformat unrelated
 files. Preserve the generated `test_model.mvir` and untracked `luna-web/`
 worktree items.
 
 Completion report: **PHASE 6 IMPLEMENTATION COMPLETE — READY FOR
-DESIGN/FREEZE REVIEW — NOT FROZEN**. Local acceptance, Windows workspace,
-native Ubuntu/macOS acceptance, and Ubuntu full-workspace gates pass.
+DESIGN/FREEZE REVIEW — NOT FROZEN**, subject to rerunning the full workspace
+with an explicitly captured exit status and obtaining native Ubuntu/macOS CI
+for the Unicode scalar follow-up. Phase 5 remains separately NOT FROZEN until
+design-authority review; Phase 6 does not claim to close its historical POSIX
+evidence gate again.
 Maintainer contract decisions are recorded above.
 
 ## Non-goals and stop conditions

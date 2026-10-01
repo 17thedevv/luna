@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use luna_common::ids::{SymbolId, Span};
 use luna_semantic::{
     ComptimeValue, ComptimeError, IntWidth, FloatWidth,
-    SemanticContext, SemanticTypeId, SemanticType,
+    SemanticContext, SemanticTypeId, SemanticType, BuiltinType,
     effect::Effect,
 };
 use crate::mvir::*;
@@ -147,6 +147,37 @@ impl RuntimeValue {
             }
             _ => RuntimeValue::Unit,
         }
+    }
+}
+
+fn integer_mask(width: IntWidth) -> u128 {
+    let bits = width.bit_width();
+    if bits == 128 {
+        u128::MAX
+    } else {
+        (1u128 << bits) - 1
+    }
+}
+
+fn cast_integer_value(value: i128, source: IntWidth, target: IntWidth) -> i128 {
+    let source_mask = integer_mask(source);
+    let source_bits = (value as u128) & source_mask;
+    let extended_bits = if source.is_signed() && value < 0 {
+        source_bits | !source_mask
+    } else {
+        source_bits
+    };
+    let target_bits = extended_bits & integer_mask(target);
+    if target.is_signed() {
+        let bits = target.bit_width();
+        let sign_bit = 1u128 << (bits - 1);
+        if target_bits & sign_bit != 0 && bits < 128 {
+            (target_bits as i128) - (1i128 << bits)
+        } else {
+            target_bits as i128
+        }
+    } else {
+        target_bits as i128
     }
 }
 
@@ -358,6 +389,8 @@ impl<'a> MvirInterpreter<'a> {
                 }
                 if let Ok(i) = s.parse::<i128>() {
                     Ok(RuntimeValue::Int { val: i, width: IntWidth::I32 })
+                } else if let Ok(u) = s.parse::<u128>() {
+                    Ok(RuntimeValue::Int { val: u as i128, width: IntWidth::U128 })
                 } else if let Ok(f) = s.parse::<f64>() {
                     Ok(RuntimeValue::Float { val: f, width: FloatWidth::F64 })
                 } else {
@@ -889,9 +922,47 @@ impl<'a> MvirInterpreter<'a> {
                                     _ => val,
                                 }
                             }
+                            SemanticType::Primitive(BuiltinType::Char) => {
+                                match val {
+                                    RuntimeValue::Int { val, width } => {
+                                        let numeric = if width.is_signed() {
+                                            if val < 0 {
+                                                return Err(ComptimeError::Custom(
+                                                    "invalid integer-to-char cast: value is not a Unicode scalar".to_string(),
+                                                ));
+                                            }
+                                            val as u128
+                                        } else {
+                                            (val as u128) & integer_mask(width)
+                                        };
+                                        if numeric > 0x10_FFFF
+                                            || (0xD800..=0xDFFF).contains(&numeric)
+                                        {
+                                            return Err(ComptimeError::Custom(
+                                                "invalid integer-to-char cast: value is not a Unicode scalar".to_string(),
+                                            ));
+                                        }
+                                        RuntimeValue::Int {
+                                            val: numeric as i128,
+                                            width: IntWidth::U32,
+                                        }
+                                    }
+                                    _ => {
+                                        return Err(ComptimeError::TypeMismatch(
+                                            "integer-to-char cast expected an integer value".to_string(),
+                                        ));
+                                    }
+                                }
+                            }
                             SemanticType::Primitive(b) if b.is_integer() => {
                                 match val {
-                                    RuntimeValue::Int { val: v, .. } => RuntimeValue::Int { val: v, width: IntWidth::from_builtin(*b) },
+                                    RuntimeValue::Int { val: v, width } => {
+                                        let target_width = IntWidth::from_builtin(*b);
+                                        RuntimeValue::Int {
+                                            val: cast_integer_value(v, width, target_width),
+                                            width: target_width,
+                                        }
+                                    }
                                     RuntimeValue::Pointer(_) => val,
                                     RuntimeValue::NullPointer => RuntimeValue::Int { val: 0, width: IntWidth::from_builtin(*b) },
                                     _ => val,
