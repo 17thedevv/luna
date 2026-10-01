@@ -1,6 +1,6 @@
 # Stage 7 — Phase 6: Core Formatting Foundation v1
 
-Status: IMPLEMENTED — UNICODE FOLLOW-UP VERIFICATION IN PROGRESS — NOT FROZEN
+Status: IMPLEMENTATION COMPLETE — READY FOR DESIGN/FREEZE REVIEW — NOT FROZEN
 
 ## Boundary
 
@@ -136,12 +136,21 @@ fixtures, ten compile-time rejection fixtures, and six runtime-abort fixtures
 are verified in each provider mode. Runtime controls require an abort status,
 not merely any unsuccessful execution.
 
-These follow-up compiler changes still require fresh native Ubuntu/macOS CI.
-The previously recorded CI run applies to the earlier Phase 6 commit, not to
-this later char-validation implementation. A full workspace run on this
-worktree reached all test binaries and doc-tests without reporting a failed
-test, but its exact process exit code was not captured; it must be rerun with
-an explicit exit-status record before calling the workspace gate verified.
+The Unicode follow-up has fresh native Ubuntu/macOS evidence on commit
+`765b9101be47ac91abb00bc596f5292e52e6e201`. Workflow run
+[36800606504](https://github.com/17thedevv/luna/actions/runs/36800606504)
+passed Ubuntu and macOS formatting acceptance and the complete Ubuntu
+workspace regression. The full workspace job ran
+`cargo test --workspace -- --test-threads=1` and completed successfully; its
+post-job whitespace check also passed.
+
+A Windows full-workspace attempt on the same commit exited 1 during
+`stdlib_string_acceptance_tests::test_s14_string_source_and_llib_parity` with
+`LLVM ERROR: IO failure on output stream: no space on device`. The system C:
+drive had zero free bytes. Earlier Windows focused formatting, Unicode
+source/artifact, and sysroot suites passed. This local full-run is recorded as
+environment-limited, not as a product test failure or a successful Windows
+workspace run; native Ubuntu is the completed full-workspace gate.
 
 Compiler Change
     Capability: Unicode scalar validity at integer-to-char construction.
@@ -152,9 +161,9 @@ Compiler Change
     New intrinsic/lang_item?: NO.
     Stdlib-specific branch?: NO.
 
-The full command
+The earlier full command
 `cargo test --workspace -- --test-threads=1` completed on Windows with exit
-code 0. Phase 6 CI run
+code 0 for the earlier implementation commit. Phase 6 CI run
 [36694791949](https://github.com/17thedevv/luna/actions/runs/36694791949)
 completed successfully on 2026-09-30: Ubuntu 24.04 formatting acceptance,
 macOS 15 Intel formatting acceptance, and the full Ubuntu workspace regression
@@ -199,9 +208,11 @@ lowering blocker was fixed and merged to `main`; see the
 [re-audit and resolution record](phase5_reaudit_2026_09_30.md). Phase 5 remains
 NOT FROZEN pending design-authority review.
 
-Phase 6 remains NOT FROZEN pending design-authority review. Its Windows and
-native Ubuntu/macOS acceptance plus the full Ubuntu workspace gate have all
-passed. Design-authority review decisions are recorded above.
+Phase 6 remains NOT FROZEN pending design-authority review. Windows focused
+acceptance and native Ubuntu/macOS acceptance passed on the current commit;
+the current full Ubuntu workspace gate passed. The Windows full-workspace
+attempt on this commit was limited by a full system drive as recorded above.
+Design-authority decisions are recorded above.
 
 ## Generic compiler defect found during Phase 6 validation
 
