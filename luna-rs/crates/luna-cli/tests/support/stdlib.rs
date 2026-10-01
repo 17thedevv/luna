@@ -72,6 +72,9 @@ impl ProviderModes {
             artifact: work.join("artifact"),
             work,
         };
+        // POSIX executable names have no suffix; keep them separate from roots
+        // named `source` / `artifact`, rather than relying on Windows `.exe`.
+        fs::create_dir(modes.work.join("executables")).unwrap();
         let built = modes.work.join("built");
         // Do not copy any pre-existing .llib/.obj or build cache.
         copy_selected(
@@ -116,6 +119,7 @@ impl ProviderModes {
         assert!(!tag.contains('/') && !tag.contains('\\'));
         let executable = self
             .work
+            .join("executables")
             .join(tag)
             .with_extension(std::env::consts::EXE_EXTENSION);
         let output = Command::new(env!("CARGO_BIN_EXE_luna"))
