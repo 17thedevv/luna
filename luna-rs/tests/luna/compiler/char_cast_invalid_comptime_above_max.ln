@@ -1,0 +1,5 @@
+const INVALID: char = 1114112 as char;
+
+fn main() -> i32 {
+    return 0;
+}

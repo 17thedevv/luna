@@ -1453,6 +1453,8 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             }
             Instruction::Cast { value, target_ty } => {
                 let llvm_ty = self.map_type(*target_ty)?;
+                let resolved_target = self.semantic_ctx.types.resolve(*target_ty);
+                let target_sem = self.semantic_ctx.types.get(resolved_target);
                 if let Operand::Number(n) = value {
                     if llvm_ty.is_int_type() {
                         let parsed_u64 = if let Ok(u) = n.parse::<u64>() {
@@ -1466,6 +1468,136 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     }
                 }
                 let llvm_val = self.generate_operand(value)?;
+
+                // A Luna char is a Unicode scalar, although LLVM represents it
+                // as i32. Validate dynamic integer casts before producing that
+                // representation; the LLVM type match below is not semantic
+                // proof (notably for u32 -> char).
+                if matches!(target_sem, SemanticType::Primitive(BuiltinType::Char)) {
+                    let source_sem = match value {
+                        Operand::Value(source_id) if (source_id.0 as usize) < _func.values.len() => {
+                            let source_ty = _func.values[source_id.0 as usize].ty;
+                            self.semantic_ctx.types.get(self.semantic_ctx.types.resolve(source_ty))
+                        }
+                        Operand::Char(_) => {
+                            return Ok(llvm_val);
+                        }
+                        _ => {
+                            return Err(BackendError::InvariantViolation(
+                                "integer-to-char cast has no semantic source type".into(),
+                            ));
+                        }
+                    };
+
+                    match source_sem {
+                        SemanticType::Primitive(BuiltinType::Char) => return Ok(llvm_val),
+                        SemanticType::Primitive(source_builtin) if source_builtin.is_integer() => {
+                            if !llvm_val.is_int_value() {
+                                return Err(BackendError::InvariantViolation(
+                                    "integer-to-char cast did not lower to an integer value".into(),
+                                ));
+                            }
+
+                            let source = llvm_val.into_int_value();
+                            let zero = source.get_type().const_zero();
+                            let source_width = match source_builtin {
+                                BuiltinType::I8 | BuiltinType::U8 => 8,
+                                BuiltinType::I16 | BuiltinType::U16 => 16,
+                                BuiltinType::I32 | BuiltinType::U32 => 32,
+                                BuiltinType::I64 | BuiltinType::U64 | BuiltinType::Isize | BuiltinType::Usize => 64,
+                                BuiltinType::I128 | BuiltinType::U128 => 128,
+                                _ => unreachable!("integer source type was checked above"),
+                            };
+                            let source_is_signed = matches!(
+                                source_builtin,
+                                BuiltinType::I8
+                                    | BuiltinType::I16
+                                    | BuiltinType::I32
+                                    | BuiltinType::I64
+                                    | BuiltinType::I128
+                                    | BuiltinType::Isize
+                            );
+                            let nonnegative = if source_is_signed {
+                                self.builder.build_int_compare(
+                                    inkwell::IntPredicate::SGE,
+                                    source,
+                                    zero,
+                                    &format!("char_nonnegative_{}", id.0),
+                                ).unwrap()
+                            } else {
+                                self.context.bool_type().const_int(1, false)
+                            };
+                            let upper_valid = if source_width >= 32 {
+                                self.builder.build_int_compare(
+                                    inkwell::IntPredicate::ULE,
+                                    source,
+                                    source.get_type().const_int(0x10_FFFF, false),
+                                    &format!("char_upper_valid_{}", id.0),
+                                ).unwrap()
+                            } else {
+                                self.context.bool_type().const_int(1, false)
+                            };
+                            let outside_surrogates = if source_width >= 32
+                                || matches!(source_builtin, BuiltinType::U16)
+                            {
+                                let below_surrogates = self.builder.build_int_compare(
+                                    inkwell::IntPredicate::ULT,
+                                    source,
+                                    source.get_type().const_int(0xD800, false),
+                                    &format!("char_below_surrogates_{}", id.0),
+                                ).unwrap();
+                                let above_surrogates = self.builder.build_int_compare(
+                                    inkwell::IntPredicate::UGT,
+                                    source,
+                                    source.get_type().const_int(0xDFFF, false),
+                                    &format!("char_above_surrogates_{}", id.0),
+                                ).unwrap();
+                                self.builder.build_or(
+                                    below_surrogates,
+                                    above_surrogates,
+                                    &format!("char_outside_surrogates_{}", id.0),
+                                ).unwrap()
+                            } else {
+                                self.context.bool_type().const_int(1, false)
+                            };
+                            let scalar_valid = self.builder.build_and(
+                                upper_valid,
+                                nonnegative,
+                                &format!("char_range_valid_{}", id.0),
+                            ).unwrap();
+                            let scalar_valid = self.builder.build_and(
+                                scalar_valid,
+                                outside_surrogates,
+                                &format!("char_scalar_valid_{}", id.0),
+                            ).unwrap();
+
+                            let current_fn = self.builder.get_insert_block().unwrap().get_parent().unwrap();
+                            let cont_bb = self.context.append_basic_block(current_fn, "char_cast_ok");
+                            let trap_bb = self.context.append_basic_block(current_fn, "char_cast_trap");
+                            self.builder.build_conditional_branch(scalar_valid, cont_bb, trap_bb).unwrap();
+
+                            self.builder.position_at_end(trap_bb);
+                            let panic_fn = self.get_function("__luna_panic_default")
+                                .ok_or_else(|| BackendError::InvariantViolation("__luna_panic_default declaration missing".into()))?;
+                            self.builder.build_call(panic_fn, &[], "").unwrap();
+                            self.builder.build_unreachable().unwrap();
+
+                            self.builder.position_at_end(cont_bb);
+                            let casted = self.builder.build_int_cast_sign_flag(
+                                source,
+                                llvm_ty.into_int_type(),
+                                false,
+                                &format!("cast_char_{}", id.0),
+                            ).unwrap();
+                            return Ok(casted.into());
+                        }
+                        _ => {
+                            return Err(BackendError::InvariantViolation(
+                                "typechecker allowed a non-integer cast to char".into(),
+                            ));
+                        }
+                    }
+                }
                 
                 // Identity cast: source and target LLVM types are structurally identical.
                 // This handles representation-preserving casts like &dyn Foo → *dyn Foo

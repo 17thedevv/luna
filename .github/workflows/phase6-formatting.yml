@@ -120,6 +120,9 @@ jobs:
             echo "::error title=Phase 6 CLI acceptance diagnostics::$summary"
           fi
           exit "$status"
+      - name: Run Unicode scalar and source/artifact CLI parity
+        working-directory: luna-rs
+        run: cargo test -p luna-cli --test char_scalar_cli_parity -- --test-threads=1
       - name: Check patch whitespace
         run: git diff --check
 

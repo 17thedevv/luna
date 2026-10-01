@@ -5350,6 +5350,44 @@ impl<'a> TypeChecker<'a> {
                 let source_ty = self.ctx.types.get(source_ty_id).clone();
                 let target_ty = self.ctx.types.get(target_ty_id).clone();
 
+                // Luna `char` denotes a Unicode scalar value, not an arbitrary
+                // 32-bit integer. Keep that semantic invariant in the frontend
+                // so known-invalid values never reach code generation.
+                if matches!(target_ty, SemanticType::Primitive(BuiltinType::Char)) {
+                    let source_is_char = matches!(source_ty, SemanticType::Primitive(BuiltinType::Char));
+                    let source_is_integer = matches!(source_ty, SemanticType::Primitive(b) if b.is_integer());
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+
+                    if source_is_integer {
+                        if crate::const_eval::is_const_evaluable(
+                            self.arena,
+                            self.ctx,
+                            self.source_manager,
+                            *e,
+                        )
+                        .is_ok()
+                        {
+                            if let Ok(crate::ComptimeValue::Int { val, .. }) = self.eval_comptime_expr(*e) {
+                                if !Self::is_unicode_scalar(val) {
+                                    self.ctx.diagnostics.push(
+                                        Diagnostic::error(
+                                            "invalid integer-to-char cast: value is not a Unicode scalar",
+                                        )
+                                        .with_span(span),
+                                    );
+                                }
+                            }
+                        }
+                    } else if !source_is_char {
+                        self.ctx.diagnostics.push(
+                            Diagnostic::error(
+                                "invalid cast to char: source must be an integer or char",
+                            )
+                            .with_span(span),
+                        );
+                    }
+                }
+
                 // Diagnose statically-known float-to-integer overflow before lowering.
                 // This keeps comptime casts out of the backend's runtime trap path and
                 // prevents malformed/unsupported numeric literals from reaching codegen.
@@ -5907,6 +5945,10 @@ impl<'a> TypeChecker<'a> {
             }
             _ => None,
         }
+    }
+
+    fn is_unicode_scalar(value: i128) -> bool {
+        (0..=0x10_FFFF).contains(&value) && !(0xD800..=0xDFFF).contains(&value)
     }
 
     fn impl_method_substitution(

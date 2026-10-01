@@ -1,6 +1,6 @@
 # Stage 7 — Phase 6: Core Formatting Foundation v1
 
-Status: IMPLEMENTATION COMPLETE — READY FOR DESIGN/FREEZE REVIEW — NOT FROZEN
+Status: IMPLEMENTED — UNICODE FOLLOW-UP VERIFICATION IN PROGRESS — NOT FROZEN
 
 ## Boundary
 
@@ -34,6 +34,18 @@ transactional: if a writer accepts some characters and later fails, those
 accepted characters remain written, and the formatter stops at the first
 failure. The `String` sink appends characters through its existing UTF-8
 encoder.
+
+## Unicode scalar validity
+
+Luna `char` values are Unicode scalar values: `U+0000..U+D7FF` and
+`U+E000..U+10FFFF`. Surrogates and values above `U+10FFFF` are not `char`
+values, even though the backend represents `char` as a 32-bit integer.
+Integer-to-`char` casts accept only integer source types. A statically known
+invalid value is a compile-time diagnostic; a runtime-dependent invalid value
+traps before a `char` is produced. Float, boolean, and pointer casts to `char`
+are rejected. Safe formatter and String APIs therefore receive valid scalar
+values; raw/foreign access remains subject to Luna's existing unsafe
+obligations.
 
 `Display::fmt` is a generic trait method over `W: std::fmt::Writer`. Structured
 user types can implement it using ordinary Luna trait syntax and write their
@@ -96,6 +108,49 @@ Windows focused evidence on the current worktree:
 - Phase 5 whole-file I/O regressions: **3/3 passed**.
 - Public CLI formatting E2E, after rebuilding current sysroot artifacts:
   **1/1 passed**.
+
+### Follow-up correctness closure: Unicode scalar validity
+
+A subsequent audit found that representing `char` as i32 was not enough to
+guarantee Unicode scalar validity. Integer-to-char casts now validate the
+Unicode scalar range: statically known invalid values diagnose during
+typechecking/comptime, and runtime-dependent invalid values trap before a
+`char` is constructed. Float, bool, and pointer sources are rejected. This
+keeps String UTF-8 encoding valid without changing the representation of
+arbitrary byte vectors.
+
+Permanent Luna compiler fixtures cover invalid surrogate endpoints, values
+above U+10FFFF, negative values and signed widening, u32/u128 maximum,
+float/bool/pointer cast rejection, and runtime invalid values. Dynamic positive
+controls cover all 12 integer types and char identity. Narrow u16 surrogate,
+i8 negative, and u128 high-bit runtime controls check the width-specific
+guards. A public CLI test rebuilds fresh
+sysroot artifacts and checks valid and invalid behavior with both source-only
+and artifact-only provider roots; it asserts that source fallback is absent.
+On the current Windows worktree, the scalar matrix passes **1/1**, the
+formatting source/artifact acceptance passes **2/2**, public CLI formatting
+passes **1/1**, sysroot invariants pass **5/5** (32 providers / 91 edges), and
+the Phase 5 whole-file I/O regression passes **3/3**. The expanded char CLI
+matrix completed on 2026-10-01 with `CHAR_SCALAR_EXIT_CODE=0`: two positive
+fixtures, ten compile-time rejection fixtures, and six runtime-abort fixtures
+are verified in each provider mode. Runtime controls require an abort status,
+not merely any unsuccessful execution.
+
+These follow-up compiler changes still require fresh native Ubuntu/macOS CI.
+The previously recorded CI run applies to the earlier Phase 6 commit, not to
+this later char-validation implementation. A full workspace run on this
+worktree reached all test binaries and doc-tests without reporting a failed
+test, but its exact process exit code was not captured; it must be rerun with
+an explicit exit-status record before calling the workspace gate verified.
+
+Compiler Change
+    Capability: Unicode scalar validity at integer-to-char construction.
+    Why stdlib exposed it: String's safe UTF-8 encoder accepted char values.
+    Why it is generic: the checks apply to Luna's primitive semantic char type.
+    User-defined type benefiting: any ordinary user API or aggregate containing char.
+    Tests: standalone char_cast_*.ln fixtures and fresh source/artifact CLI parity.
+    New intrinsic/lang_item?: NO.
+    Stdlib-specific branch?: NO.
 
 The full command
 `cargo test --workspace -- --test-threads=1` completed on Windows with exit
