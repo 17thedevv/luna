@@ -1,0 +1,6 @@
+fn add<T>(left: T, right: T) -> T { return left + right; }
+fn main() -> i32 {
+    dec integer = add(1 as i32, 2 as i32);
+    dec invalid = add(55295 as u32 as char, 1 as u32 as char);
+    return integer;
+}

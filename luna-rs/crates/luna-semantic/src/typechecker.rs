@@ -3970,6 +3970,14 @@ impl<'a> TypeChecker<'a> {
                                     self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
                                 } 
                 
+                if let Some(message) = crate::operators::PrimitiveOperator::Binary(*op)
+                    .error_for_type(&self.ctx.types, l_ty)
+                {
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    return self.ctx.types.error_id();
+                }
+
                 use luna_ast::expr::BinaryOp;
                 match op {
                     BinaryOp::Eq | BinaryOp::Ne | BinaryOp::Lt | BinaryOp::Le | BinaryOp::Gt | BinaryOp::Ge | BinaryOp::LogicAnd | BinaryOp::LogicOr => {
@@ -4205,7 +4213,7 @@ impl<'a> TypeChecker<'a> {
 
                 ret_ty_id
             }
-            Expr::Assign { lvalue, value, .. } => {
+            Expr::Assign { op, lvalue, value } => {
                 let lvalue_expr = &self.arena.exprs[lvalue.0 as usize];
                 if !Self::is_place(lvalue_expr) {
                     let span = self.get_expr_span_for_diag(lvalue).unwrap_or_else(|| self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
@@ -4240,6 +4248,13 @@ impl<'a> TypeChecker<'a> {
                 let l_ty = self.typecheck_expr(lvalue);
                 let r_ty = self.typecheck_expr(value);
                 self.enforce_mutability(lvalue);
+                if let Some(message) = crate::operators::PrimitiveOperator::Assignment(*op)
+                    .error_for_type(&self.ctx.types, l_ty)
+                {
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    return self.ctx.types.error_id();
+                }
                 if !self.try_coerce(*value, r_ty, l_ty) {
                     if let Err(e) = self.unify(l_ty, r_ty) {
                                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
@@ -5846,6 +5861,13 @@ impl<'a> TypeChecker<'a> {
             }
             Expr::Unary { op, operand } => {
                 let inner_ty = self.typecheck_expr(operand);
+                if let Some(message) = crate::operators::PrimitiveOperator::Unary(*op)
+                    .error_for_type(&self.ctx.types, inner_ty)
+                {
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    return self.ctx.types.error_id();
+                }
 
                 use luna_ast::expr::UnaryOp;
                 match op {

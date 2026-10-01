@@ -1,0 +1,8 @@
+// Independent diagnostic reproducer, outside the formatting contract.
+// Correct += semantics would return 0; current lowering returns 1.
+fn main() -> i32 {
+    dec rw value = 12 as i32;
+    value += 34;
+    if value != 46 { return 1; }
+    return 0;
+}

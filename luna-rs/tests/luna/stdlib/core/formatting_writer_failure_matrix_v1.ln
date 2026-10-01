@@ -1,0 +1,111 @@
+import <fmt>;
+import <result>;
+import <string>;
+import <file>;
+
+struct PrefixWriter {
+    limit: usize,
+    attempts: usize,
+    accepted: usize,
+    checksum: u64,
+};
+
+impl std::fmt::Writer for PrefixWriter {
+    fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+        self.attempts = self.attempts + (1 as usize);
+        if self.accepted >= self.limit { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        self.accepted = self.accepted + (1 as usize);
+        self.checksum = self.checksum * (31 as u64) + (value as u32 as u64);
+        return std::Result::Ok;
+    }
+}
+
+// Fail at every character boundary, including first/final; allow exact success.
+// The independent expected prefix checks nontransactional retention and proves
+// that Display stops immediately after the first failed sink write.
+fn verify<T: std::fmt::Display>(value: &T, expected: &[char]) -> bool {
+    dec rw limit = 0 as usize;
+    dec rw checksum = 0 as u64;
+    while limit <= expected.length {
+        dec rw writer = PrefixWriter {
+            limit: limit, attempts: 0 as usize, accepted: 0 as usize, checksum: 0 as u64
+        };
+        dec result = value.fmt(&rw writer);
+        if writer.accepted != limit || writer.checksum != checksum { return false; }
+        if limit < expected.length {
+            if result.is_err() == false || writer.attempts != limit + (1 as usize) { return false; }
+            checksum = checksum * (31 as u64) + (expected[limit] as u32 as u64);
+        } else {
+            if result.is_err() || writer.attempts != limit { return false; }
+        }
+        limit = limit + (1 as usize);
+    }
+    return true;
+}
+
+fn main() -> i32 {
+    dec value_0 = true;
+    dec expected_0: [char; 4] = ['t', 'r', 'u', 'e'];
+    if verify(&value_0, &expected_0) == false { return 1; }
+    dec value_1 = false;
+    dec expected_1: [char; 5] = ['f', 'a', 'l', 's', 'e'];
+    if verify(&value_1, &expected_1) == false { return 2; }
+    dec value_2 = -128 as i8;
+    dec expected_2: [char; 4] = ['-', '1', '2', '8'];
+    if verify(&value_2, &expected_2) == false { return 3; }
+    dec value_3 = -32768 as i16;
+    dec expected_3: [char; 6] = ['-', '3', '2', '7', '6', '8'];
+    if verify(&value_3, &expected_3) == false { return 4; }
+    dec value_4 = (0 as i32) - (2147483647 as i32) - (1 as i32);
+    dec expected_4: [char; 11] = ['-', '2', '1', '4', '7', '4', '8', '3', '6', '4', '8'];
+    if verify(&value_4, &expected_4) == false { return 5; }
+    dec value_5 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec expected_5: [char; 20] = ['-', '9', '2', '2', '3', '3', '7', '2', '0', '3', '6', '8', '5', '4', '7', '7', '5', '8', '0', '8'];
+    if verify(&value_5, &expected_5) == false { return 6; }
+    dec value_6 = -((1 as i128) << (126 as i128)) - ((1 as i128) << (126 as i128));
+    dec expected_6: [char; 40] = ['-', '1', '7', '0', '1', '4', '1', '1', '8', '3', '4', '6', '0', '4', '6', '9', '2', '3', '1', '7', '3', '1', '6', '8', '7', '3', '0', '3', '7', '1', '5', '8', '8', '4', '1', '0', '5', '7', '2', '8'];
+    if verify(&value_6, &expected_6) == false { return 7; }
+    dec value_7 = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec expected_7: [char; 20] = ['-', '9', '2', '2', '3', '3', '7', '2', '0', '3', '6', '8', '5', '4', '7', '7', '5', '8', '0', '8'];
+    if verify(&value_7, &expected_7) == false { return 8; }
+    dec value_8 = 255 as u8;
+    dec expected_8: [char; 3] = ['2', '5', '5'];
+    if verify(&value_8, &expected_8) == false { return 9; }
+    dec value_9 = 65535 as u16;
+    dec expected_9: [char; 5] = ['6', '5', '5', '3', '5'];
+    if verify(&value_9, &expected_9) == false { return 10; }
+    dec value_10 = 4294967295 as u32;
+    dec expected_10: [char; 10] = ['4', '2', '9', '4', '9', '6', '7', '2', '9', '5'];
+    if verify(&value_10, &expected_10) == false { return 11; }
+    dec value_11 = 18446744073709551615 as u64;
+    dec expected_11: [char; 20] = ['1', '8', '4', '4', '6', '7', '4', '4', '0', '7', '3', '7', '0', '9', '5', '5', '1', '6', '1', '5'];
+    if verify(&value_11, &expected_11) == false { return 12; }
+    dec value_12 = (((1 as u128) << (127 as u128)) - (1 as u128)) * (2 as u128) + (1 as u128);
+    dec expected_12: [char; 39] = ['3', '4', '0', '2', '8', '2', '3', '6', '6', '9', '2', '0', '9', '3', '8', '4', '6', '3', '4', '6', '3', '3', '7', '4', '6', '0', '7', '4', '3', '1', '7', '6', '8', '2', '1', '1', '4', '5', '5'];
+    if verify(&value_12, &expected_12) == false { return 13; }
+    dec value_13 = 18446744073709551615 as usize;
+    dec expected_13: [char; 20] = ['1', '8', '4', '4', '6', '7', '4', '4', '0', '7', '3', '7', '0', '9', '5', '5', '1', '6', '1', '5'];
+    if verify(&value_13, &expected_13) == false { return 14; }
+    dec value_14 = '界';
+    dec expected_14: [char; 1] = ['界'];
+    if verify(&value_14, &expected_14) == false { return 15; }
+    dec value_15 = std::string_from_str("é界𐀀");
+    dec expected_15: [char; 3] = ['é', '界', '𐀀'];
+    if verify(&value_15, &expected_15) == false { return 16; }
+    dec value_16 = std::string_new();
+    dec expected_16: [char; 0] = [];
+    if verify(&value_16, &expected_16) == false { return 17; }
+    dec value_17 = std::FileError::NotFound;
+    dec expected_17: [char; 14] = ['f', 'i', 'l', 'e', ' ', 'n', 'o', 't', ' ', 'f', 'o', 'u', 'n', 'd'];
+    if verify(&value_17, &expected_17) == false { return 18; }
+    dec value_18 = std::FileError::PermissionDenied;
+    dec expected_18: [char; 17] = ['p', 'e', 'r', 'm', 'i', 's', 's', 'i', 'o', 'n', ' ', 'd', 'e', 'n', 'i', 'e', 'd'];
+    if verify(&value_18, &expected_18) == false { return 19; }
+    dec value_19 = std::FileError::InvalidInput;
+    dec expected_19: [char; 13] = ['i', 'n', 'v', 'a', 'l', 'i', 'd', ' ', 'i', 'n', 'p', 'u', 't'];
+    if verify(&value_19, &expected_19) == false { return 20; }
+    dec value_20 = std::FileError::Io;
+    dec expected_20: [char; 9] = ['I', '/', 'O', ' ', 'e', 'r', 'r', 'o', 'r'];
+    if verify(&value_20, &expected_20) == false { return 21; }
+    return 0;
+}

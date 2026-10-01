@@ -54,6 +54,13 @@ void
 &rw T     // mutable reference
 ```
 
+`char` là Unicode scalar: U+0000..U+D7FF hoặc U+E000..U+10FFFF,
+không bao gồm surrogate. Không hỗ trợ arithmetic, bitwise, shift hoặc
+compound assignment trên `char`, kể cả sau generic instantiation. Comparison
+và phép gán thường vẫn hợp lệ. Khi cần tính toán, cast tường minh sang integer;
+cast ngược sang `char` phải kiểm tra Unicode scalar (diagnostic cho giá trị
+invalid đã biết, deterministic trap cho giá trị invalid ở runtime).
+
 ---
 
 ## 2. Khai báo biến

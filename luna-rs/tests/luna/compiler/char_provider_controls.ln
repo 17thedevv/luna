@@ -1,0 +1,7 @@
+import "char_operators";
+fn main() -> i32 {
+    if user_math::add(12 as i32, 34 as i32) != 46 { return 1; }
+    if user_math::shift(12 as i32, 1 as i32) != 24 { return 3; }
+    if user_math::negate(12 as i32) != -12 { return 4; }
+    return 0;
+}

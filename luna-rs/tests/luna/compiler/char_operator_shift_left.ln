@@ -1,0 +1,6 @@
+fn main() -> i32 {
+    dec left: char = 'a';
+    dec right: char = 'b';
+    dec result = left << right;
+    return 0;
+}
