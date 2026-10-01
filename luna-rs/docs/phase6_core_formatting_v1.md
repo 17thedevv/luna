@@ -1,6 +1,6 @@
 # Stage 7 — Phase 6: Core Formatting Foundation v1
 
-Status: IMPLEMENTATION COMPLETE — READY FOR DESIGN/FREEZE REVIEW — NOT FROZEN
+Status: IMPLEMENTED — FINAL VERIFICATION IN PROGRESS — NOT FROZEN
 
 ## Boundary
 
@@ -47,6 +47,13 @@ are rejected. Safe formatter and String APIs therefore receive valid scalar
 values; raw/foreign access remains subject to Luna's existing unsafe
 obligations.
 
+Design authority approved the operator contract on 2026-10-01: arithmetic,
+bitwise, shift, unary negation and compound assignment on `char` are rejected.
+Comparisons, ordinary assignment and explicit integer casts remain available.
+The restriction also applies after generic instantiation; it is not an encoder
+workaround. Integer arithmetic followed by a checked integer-to-char cast is
+the explicit way to construct another scalar.
+
 `Display::fmt` is a generic trait method over `W: std::fmt::Writer`. Structured
 user types can implement it using ordinary Luna trait syntax and write their
 fields and separators to the provided sink.
@@ -77,7 +84,75 @@ as a character and does not accept arbitrary byte vectors.
 - logging
 - compiler special-cases or runtime formatting support
 
-## Existing implementation and previously recorded evidence
+## 2026-10-01 final operator and CLI closure — current record
+
+A safe program could previously add U+D7FF and U+0001 as `char`, producing
+U+D800. Both source and artifact modes emitted the invalid UTF-8 bytes
+`ED A0 80`. Cast validation alone did not cover primitive operator results.
+
+`luna-semantic/src/operators.rs` now owns the shared primitive restriction.
+Type checking applies it to concrete operands; `MonoCollector` reapplies it
+to substituted generic operands before MVIR/backend generation. This includes
+generic bodies loaded from a fresh user-provider artifact, aliases and user
+aggregate fields. No formatter, String, provider or method-name branch was
+added; no runtime, backend representation or artifact metadata change was
+needed for this repair.
+
+Compiler Change
+    Capability: preserve Unicode scalar validity across primitive operators.
+    Why stdlib exposed it: valid char inputs could produce invalid String UTF-8.
+    Why it is generic: one primitive semantic contract, including substituted generic bodies.
+    User-defined type benefiting: UserValue { scalar: char }, user_math generic provider.
+    Tests: char_operator_cli_parity, standalone char_operator/assignment/provider fixtures.
+    New intrinsic/lang_item?: NO.
+    Stdlib-specific branch?: NO.
+
+Formatting acceptance now belongs entirely to the public CLI harness, not
+internal driver helpers. `support/stdlib.rs` copies only current `.ln` sources
+and the manifest into a clean sysroot, invokes `luna build-sysroot`, and then
+constructs source-only and `.llib/.obj`-only roots. It asserts that the artifact
+root contains no provider source and the source root contains no artifacts.
+Each compile uses an explicit sysroot. The harness owns and cleans only its
+unique temporary directory. User-provider artifacts are built against the
+fresh canonical dependency artifacts whose interface fingerprints they record.
+
+The matrix contains eight formatting executables and four compile-negative
+fixtures in each mode. Negative programs run through both CLI `check` and
+CLI `build`; semantic messages are compared, excluding presentation-only
+source snippets and normalizing session-local type IDs. Positive output must
+decode as **strict** UTF-8, match the exact text oracle (only platform newline
+normalization), and have identical raw stdout, stderr and exit status between
+provider modes.
+
+The new failing-writer matrix exercises all 12 integers, both bools, a Unicode
+char, nonempty Unicode String, empty String and all four FileError variants.
+It tests every character boundary, including exact success: 21 values and 285
+sink scenarios per mode. Each case checks accepted prefix checksum/count,
+first-failure propagation and absence of subsequent writes.
+
+The char-operator matrix contains 28 direct/generic consumer negatives and
+four negatives instantiated from an ordinary user-provider artifact. Every
+case must fail before codegen with `E_INVALID_CHAR_OPERATOR` in both modes and
+both CLI commands. Positive controls execute comparisons, assignment,
+integer arithmetic/casts, and generic integer/float operations. Existing
+Unicode cast checks remain: two positive, ten compile-negative and six
+runtime-abort fixtures in each mode.
+
+Final Windows workspace and native Ubuntu/macOS evidence for this follow-up
+is still being collected. Earlier CI runs below are historical, not evidence
+for the current operator/CLI changes. Runtime/ABI code is unchanged, so no ABI
+rerun is required. Sysroot baseline remains 32 providers / 91 direct edges.
+
+An independent pre-existing defect was discovered by an integer control:
+MVIR assignment lowering ignores `AssignOp`, so `value += 34` acts as ordinary
+assignment. `numeric_compound_assignment_diagnostic.ln` expects the correct
+sum and currently exits 1; it is diagnostic evidence, not a passing regression.
+Formatting v1 does not use compound assignment. This defect is recorded
+outside the formatting implementation and is not repaired or endorsed here.
+The separately approved signed-minimum literal issue also remains outside
+Phase 6. No gap ID is invented for either finding.
+
+## Historical implementation evidence — through 765b910
 
 The pre-existing permanent Luna fixtures exercise custom structured `Display`,
 generic formatting into `String`, bools, chars, Unicode String contents,
@@ -97,7 +172,7 @@ texts.
 Four negative fixtures are checked in both provider modes. The CLI harness also
 executes all seven positive fixtures.
 
-Windows focused evidence on the current worktree:
+Historical Windows focused evidence:
 
 - Generic trait-bound validation (`Supported` implemented for `i32`, absent
   for `[u8; 1]`): **1/1 passed**.
@@ -208,11 +283,9 @@ lowering blocker was fixed and merged to `main`; see the
 [re-audit and resolution record](phase5_reaudit_2026_09_30.md). Phase 5 remains
 NOT FROZEN pending design-authority review.
 
-Phase 6 remains NOT FROZEN pending design-authority review. Windows focused
-acceptance and native Ubuntu/macOS acceptance passed on the current commit;
-the current full Ubuntu workspace gate passed. The Windows full-workspace
-attempt on this commit was limited by a full system drive as recorded above.
-Design-authority decisions are recorded above.
+Phase 6 remains NOT FROZEN pending design-authority review. The results below
+and above within this historical record apply to their explicitly named
+commits. Current follow-up evidence is recorded in the 2026-10-01 section.
 
 ## Generic compiler defect found during Phase 6 validation
 

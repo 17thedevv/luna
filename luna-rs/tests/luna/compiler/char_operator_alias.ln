@@ -1,0 +1,6 @@
+type Scalar = char;
+fn main() -> i32 {
+    dec left: Scalar = 'a';
+    dec result = left + 'b';
+    return 0;
+}

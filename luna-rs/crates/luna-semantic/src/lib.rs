@@ -14,6 +14,7 @@ pub mod lang_item;
 pub mod coherence;
 pub mod const_eval;
 pub mod coercion;
+mod operators;
 
 pub mod mangler;
 pub mod region;

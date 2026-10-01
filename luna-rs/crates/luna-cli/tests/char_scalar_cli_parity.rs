@@ -1,5 +1,5 @@
-use luna_driver::sysroot::Sysroot;
-use luna_driver::sysroot_builder::SysrootBuilder;
+#[path = "support/stdlib.rs"]
+mod stdlib;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output, Stdio};
@@ -39,105 +39,17 @@ fn workspace_root() -> PathBuf {
         .to_path_buf()
 }
 
-fn unique_temp(name: &str) -> PathBuf {
-    std::env::temp_dir().join(format!(
-        "luna_char_{name}_{}_{}",
-        std::process::id(),
-        std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos()
-    ))
-}
-
-fn copy_tree(source: &Path, destination: &Path) {
-    fs::create_dir_all(destination).unwrap();
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let target = destination.join(entry.file_name());
-        if entry.path().is_dir() {
-            copy_tree(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), target).unwrap();
-        }
-    }
-}
-
-fn remove_extension_recursively(root: &Path, extension: &str) {
-    for entry in fs::read_dir(root).unwrap() {
-        let path = entry.unwrap().path();
-        if path.is_dir() {
-            remove_extension_recursively(&path, extension);
-        } else if path.extension().and_then(|value| value.to_str()) == Some(extension) {
-            fs::remove_file(path).unwrap();
-        }
-    }
-}
-
-fn count_extension_recursively(root: &Path, extension: &str) -> usize {
-    fs::read_dir(root)
-        .unwrap()
-        .map(|entry| {
-            let path = entry.unwrap().path();
-            if path.is_dir() {
-                count_extension_recursively(&path, extension)
-            } else if path.extension().and_then(|value| value.to_str()) == Some(extension) {
-                1
-            } else {
-                0
-            }
-        })
-        .sum()
-}
-
-fn fresh_provider_modes() -> (PathBuf, PathBuf) {
-    let root = workspace_root();
-    let source_external = root.join("libs/external");
-    let built_root = unique_temp("fresh_build");
-    copy_tree(&source_external, &built_root.join("libs/external"));
-    SysrootBuilder::new(Sysroot::from_root(built_root.clone()).unwrap())
-        .build_all(true)
-        .expect("fresh provider artifacts must build from current source");
-
-    let source_only = unique_temp("source_only");
-    copy_tree(
-        &built_root.join("libs/external"),
-        &source_only.join("libs/external"),
-    );
-    remove_extension_recursively(&source_only, "llib");
-    remove_extension_recursively(&source_only, "obj");
-    assert_eq!(count_extension_recursively(&source_only, "llib"), 0);
-    assert_eq!(count_extension_recursively(&source_only, "obj"), 0);
-
-    let artifact_only = unique_temp("artifact_only");
-    copy_tree(
-        &built_root.join("libs/external"),
-        &artifact_only.join("libs/external"),
-    );
-    remove_extension_recursively(&artifact_only, "ln");
-    assert_eq!(count_extension_recursively(&artifact_only, "ln"), 0);
-
-    (source_only, artifact_only)
-}
-
 fn fixture_path(relative: &str) -> PathBuf {
     workspace_root().join("tests/luna").join(relative)
 }
 
-fn build_with_cli(root: &Path, fixture: &Path, tag: &str) -> (PathBuf, Output) {
-    let safe_tag = tag.replace('/', "_").replace('\\', "_");
-    let executable = unique_temp(&safe_tag).with_extension(std::env::consts::EXE_EXTENSION);
-    let output = Command::new(env!("CARGO_BIN_EXE_luna"))
-        .arg("build")
-        .arg(fixture)
-        .arg("-o")
-        .arg(&executable)
-        .arg("--quiet")
-        .arg("-I")
-        .arg(root)
-        .output()
-        .expect("public luna build command must start");
-    (executable, output)
+fn build_with_cli(
+    modes: &stdlib::ProviderModes,
+    root: &Path,
+    fixture: &Path,
+    tag: &str,
+) -> (PathBuf, Output) {
+    modes.build(root, fixture, &tag.replace('/', "_").replace('\\', "_"))
 }
 
 fn compile_diagnostics(root: &Path, fixture: &Path) -> Output {
@@ -147,6 +59,7 @@ fn compile_diagnostics(root: &Path, fixture: &Path) -> Output {
         .arg("--quiet")
         .arg("-I")
         .arg(root)
+        .env("LUNA_SYSROOT", root)
         .output()
         .expect("public luna check command must start")
 }
@@ -164,12 +77,14 @@ fn char_scalar_contract_and_formatting_match_fresh_source_and_artifacts() {
     #[cfg(windows)]
     let _error_mode = WindowsErrorModeGuard::suppress_crash_dialogs();
 
-    let (source_only, artifact_only) = fresh_provider_modes();
+    let modes = stdlib::ProviderModes::fresh();
+    let source_only = &modes.source;
+    let artifact_only = &modes.artifact;
 
     let valid = fixture_path("stdlib/core/formatting_char_cast_boundaries_v1.ln");
     let mut results = Vec::new();
     for (tag, root) in [("source", &source_only), ("artifact", &artifact_only)] {
-        let (executable, build) = build_with_cli(root, &valid, tag);
+        let (executable, build) = build_with_cli(&modes, root, &valid, tag);
         assert!(
             build.status.success(),
             "{tag} build failed: {}",
@@ -205,7 +120,7 @@ fn char_scalar_contract_and_formatting_match_fresh_source_and_artifacts() {
         ("source_unicode", &source_only),
         ("artifact_unicode", &artifact_only),
     ] {
-        let (executable, build) = build_with_cli(root, &existing_unicode, tag);
+        let (executable, build) = build_with_cli(&modes, root, &existing_unicode, tag);
         assert!(
             build.status.success(),
             "{tag} build failed: {}",
@@ -298,7 +213,8 @@ fn char_scalar_contract_and_formatting_match_fresh_source_and_artifacts() {
         let path = fixture_path(relative);
         let mut outcomes = Vec::new();
         for (tag, root) in [("source", &source_only), ("artifact", &artifact_only)] {
-            let (executable, build) = build_with_cli(root, &path, &format!("{tag}_{relative}"));
+            let (executable, build) =
+                build_with_cli(&modes, root, &path, &format!("{tag}_{relative}"));
             assert!(
                 build.status.success(),
                 "{tag} must compile dynamic cast: {}",
