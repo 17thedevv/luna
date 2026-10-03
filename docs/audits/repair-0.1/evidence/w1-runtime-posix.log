@@ -1,0 +1,20 @@
+=== W1 Native Runtime Build and ABI Tests (Windows GNU Host) ===
+Host: Windows 11 x86_64
+Compiler: MinGW-W64 GCC 12.1.0, C11 standard
+Build directory: build/runtime-win
+CMake target: Release
+Static Library: build/runtime-win/libluna-runtime.a
+
+Changes:
+- runtime/src/io/io.c: added <sys/wait.h> and <signal.h> in POSIX branch for kill, waitpid, SIGKILL
+- runtime/src/platform/posix/net.c: added <netdb.h> for struct addrinfo, getaddrinfo, freeaddrinfo
+- runtime/CMakeLists.txt: added target_compile_definitions for UNIX (_POSIX_C_SOURCE=200809L, _DEFAULT_SOURCE) and APPLE (_DARWIN_C_SOURCE)
+
+Test Run:
+Test project D:/fdlang/build/runtime-win
+    Start 1: RuntimeAbiTests
+1/1 Test #1: RuntimeAbiTests ..................   Passed    9.44 sec
+
+100% tests passed out of 1
+Total Test time (real) = 9.45 sec
+Verdict: PASS on Windows; POSIX headers and definitions restored for Ubuntu/macOS CI runners.
