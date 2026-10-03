@@ -1,0 +1,38 @@
+[
+  {
+    "mode": "source",
+    "fixture": "baseline.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\baseline.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_2mhg61ni\\source\\baseline.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 5.910287100006826,
+    "run_exit": 0,
+    "run_seconds": 0.08524869999382645,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "baseline.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\baseline.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_2mhg61ni\\artifact\\baseline.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 2.927020300005097,
+    "run_exit": 0,
+    "run_seconds": 0.0840135999605991,
+    "stdout": "",
+    "stderr": ""
+  }
+]
