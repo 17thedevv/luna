@@ -113,6 +113,16 @@ constructed values; carrying this separate literal issue into a future freeze
 requires design-authority acceptance or a generic compiler repair under an
 established contract.
 
+Source tracing narrows the likely mechanism: the parser consumes unary `-`
+inside `parse_unary` before the trailing `as` cast is built; type checking
+assigns the positive integer token `i32`; MVIR preserves the token's decimal
+text; and backend lowering materializes ordinary numeric operands as `i32`.
+The backend has a separate direct-literal cast path, but this expression's
+outer cast applies after unary negation. That matches the reported truncation
+shape, but does not decide whether the language should accept this spelling or
+reject the out-of-range default-`i32` operand. The compiler behavior therefore
+remains unmodified pending contract/design review.
+
 Phase 6 remains NOT FROZEN. The expanded source/fresh-artifact and public CLI
 tests, current provider graph, and full regression still need to pass on the
 final implementation commit before reporting implementation completion.
