@@ -42,6 +42,9 @@ set(RUNTIME_CORE_SRC
 set(RUNTIME_PLATFORM_SRC
     src/platform/${LUNA_PLATFORM_SOURCE}/threading.c
     src/platform/${LUNA_PLATFORM_SOURCE}/sync.c
+    src/platform/${LUNA_PLATFORM_SOURCE}/time.c
+    src/platform/${LUNA_PLATFORM_SOURCE}/net.c
+    src/platform/${LUNA_PLATFORM_SOURCE}/random.c
 )
 
 # ── Static library target ─────────────────────────────────────────────────────
@@ -54,9 +57,12 @@ target_include_directories(luna-runtime PUBLIC
     ${LUNA_RUNTIME_INCLUDE_DIR}
 )
 
-# Link pthreads on POSIX
+# Link pthreads on POSIX and ws2_32/bcrypt on Windows
 if(UNIX)
     target_link_libraries(luna-runtime PRIVATE pthread)
+endif()
+if(WIN32)
+    target_link_libraries(luna-runtime PRIVATE ws2_32 bcrypt)
 endif()
 
 # ── Install ───────────────────────────────────────────────────────────────────

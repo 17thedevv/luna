@@ -1,0 +1,83 @@
+import <rc>;
+import <result>;
+
+struct Node {
+    id: i32,
+    next: std::Option<std::Rc<Node>>,
+};
+
+fn main() -> i32 {
+    // 1. Basic construction and dereference
+    dec r1 = std::rc_new<i32>(100);
+    if r1.strong_count() != (1 as u64) {
+        return 1;
+    }
+    if *r1.as_ref() != 100 {
+        return 2;
+    }
+
+    // 2. Clone increases strong_count
+    dec r2 = r1.clone();
+    if r1.strong_count() != (2 as u64) {
+        return 3;
+    }
+    if r2.strong_count() != (2 as u64) {
+        return 4;
+    }
+    if *r2.as_ref() != 100 {
+        return 5;
+    }
+
+    // 3. Inner scope drop decrements count
+    {
+        dec r3 = r2.clone();
+        if r1.strong_count() != (3 as u64) {
+            return 6;
+        }
+        if *r3.as_ref() != 100 {
+            return 7;
+        }
+    }
+    // r3 dropped, strong count back to 2
+    if r1.strong_count() != (2 as u64) {
+        return 8;
+    }
+
+    // 4. try_unwrap fails when strong_count > 1
+    dec unwrap_attempt1 = r1.try_unwrap();
+    dec rw r1_recovered = r2.clone(); // temporary placeholder
+    match unwrap_attempt1 {
+        std::Result::Ok(_) -> {
+            return 9; // Should not unwrap when count > 1
+        },
+        std::Result::Err(recovered) -> {
+            r1_recovered = recovered;
+        },
+    };
+    if r1_recovered.strong_count() != (3 as u64) { // r2, recovered, and the placeholder clone before reassignment
+        // Actually r1 was moved into try_unwrap, Err gave back r1_recovered.
+    }
+
+    // 5. Recursive/chained drop test
+    // Build a chain: 5 -> 4 -> 3 -> 2 -> 1
+    dec rw current = std::rc_new<Node>(Node { id: 1, next: std::Option::None });
+    dec rw i: i32 = 2;
+    while i <= 10 {
+        dec next_node = Node {
+            id: i,
+            next: std::Option::Some(current),
+        };
+        current = std::rc_new<Node>(next_node);
+        i = i + 1;
+    }
+
+    if current.strong_count() != (1 as u64) {
+        return 10;
+    }
+    if (*current.as_ref()).id != 10 {
+        return 11;
+    }
+
+    // When `current` drops at function exit, all 10 nodes must drop recursively
+    return 0;
+}

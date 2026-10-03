@@ -160,8 +160,8 @@ fn whole_file_io_source_and_fresh_artifact_parity() {
         0,
         "artifact-only mode must have no source fallback"
     );
-    assert_eq!(count_extension(&artifact_external, "llib"), 32);
-    assert_eq!(count_extension(&artifact_external, "obj"), 32);
+    assert_eq!(count_extension(&artifact_external, "llib"), 36);
+    assert_eq!(count_extension(&artifact_external, "obj"), 36);
 
     let payload = [0x00, 0xff, 0x80, 0x01, 0x7f, 0x00, 0xc3, 0xa9];
     let source_run = root.join("run_source");
@@ -228,8 +228,8 @@ fn copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_m
     copy_tree(&build_external, &artifact_external);
     assert!(remove_extension(&artifact_external, "ln") > 0);
     assert_eq!(count_extension(&artifact_external, "ln"), 0);
-    assert_eq!(count_extension(&artifact_external, "llib"), 32);
-    assert_eq!(count_extension(&artifact_external, "obj"), 32);
+    assert_eq!(count_extension(&artifact_external, "llib"), 36);
+    assert_eq!(count_extension(&artifact_external, "obj"), 36);
 
     let fixture = include_str!("../../../tests/luna/stdlib/file/copy_file_write_failure.ln");
     let mut outputs = Vec::new();

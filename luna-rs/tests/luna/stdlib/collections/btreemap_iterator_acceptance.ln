@@ -1,0 +1,123 @@
+import <btreemap>;
+import <btreeset>;
+import <string>;
+import <vec>;
+
+fn test_btreemap_iter() -> bool {
+    dec rw map = std::btreemap_new<i32, i32>();
+    map.insert(50, 500);
+    map.insert(20, 200);
+    map.insert(80, 800);
+    map.insert(10, 100);
+    map.insert(30, 300);
+    map.insert(70, 700);
+    map.insert(90, 900);
+
+    // 1. In-order iteration
+    dec rw it = map.iter();
+    dec rw count: i32 = 0;
+    dec rw last_k: i32 = -1;
+
+    while true {
+        dec opt = it.next();
+        match opt {
+            std::Option::Some(pair) -> {
+                if *pair.0 <= last_k { return false; }
+                if *pair.1 != (*pair.0 * 10) { return false; }
+                last_k = *pair.0;
+                count = count + 1;
+            },
+            std::Option::None -> { break; },
+        }
+    }
+    if count != 7 { return false; }
+
+    // 2. keys()
+    dec rw kit = map.keys();
+    dec k1 = kit.next().unwrap();
+    if *k1 != 10 { return false; }
+    dec k2 = kit.next().unwrap();
+    if *k2 != 20 { return false; }
+
+    // 3. values()
+    dec rw vit = map.values();
+    dec v1 = vit.next().unwrap();
+    if *v1 != 100 { return false; }
+    dec v2 = vit.next().unwrap();
+    if *v2 != 200 { return false; }
+
+    // 4. range(&25, &75) -> [30, 50, 70]
+    dec min_k = 25;
+    dec max_k = 75;
+    dec r = map.range(&min_k, &max_k);
+    if r.len() != (3 as u64) { return false; }
+    dec s = r.as_slice();
+    if *s[0].0 != 30 || *s[1].0 != 50 || *s[2].0 != 70 { return false; }
+
+    // 5. into_iter()
+    dec rw into_it = map.into_iter();
+    dec rw into_count: i32 = 0;
+    while true {
+        dec opt = into_it.next();
+        match opt {
+            std::Option::Some(_) -> { into_count = into_count + 1; },
+            std::Option::None -> { break; },
+        }
+    }
+    if into_count != 7 { return false; }
+
+    return true;
+}
+
+fn test_btreeset_iter() -> bool {
+    dec rw set = std::btreeset_new<i32>();
+    set.insert(40);
+    set.insert(10);
+    set.insert(30);
+    set.insert(20);
+
+    // 1. iter()
+    dec rw it = set.iter();
+    dec rw last: i32 = -1;
+    dec rw count: i32 = 0;
+    while true {
+        dec opt = it.next();
+        match opt {
+            std::Option::Some(val) -> {
+                if *val <= last { return false; }
+                last = *val;
+                count = count + 1;
+            },
+            std::Option::None -> { break; },
+        }
+    }
+    if count != 4 { return false; }
+
+    // 2. range(&15, &35) -> [20, 30]
+    dec min_v = 15;
+    dec max_v = 35;
+    dec r = set.range(&min_v, &max_v);
+    if r.len() != (2 as u64) { return false; }
+    dec s = r.as_slice();
+    if *s[0] != 20 || *s[1] != 30 { return false; }
+
+    // 3. into_iter()
+    dec rw into_it = set.into_iter();
+    dec rw into_count: i32 = 0;
+    while true {
+        dec opt = into_it.next();
+        match opt {
+            std::Option::Some(_) -> { into_count = into_count + 1; },
+            std::Option::None -> { break; },
+        }
+    }
+    if into_count != 4 { return false; }
+
+    return true;
+}
+
+fn main() -> i32 {
+    if test_btreemap_iter() == false { return 1; }
+    if test_btreeset_iter() == false { return 2; }
+    return 0;
+}

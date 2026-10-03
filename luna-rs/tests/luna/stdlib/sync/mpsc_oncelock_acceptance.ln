@@ -1,0 +1,82 @@
+import <sync>;
+import <panic>;
+
+fn assert_true(cond: bool) {
+    if cond == false {
+        std::panic();
+    }
+}
+
+fn assert_eq_i32(a: i32, b: i32) {
+    if a != b {
+        std::panic();
+    }
+}
+
+fn init_forty_two() -> i32 {
+    return 42 as i32;
+}
+
+fn main() {
+    // =========================================================================
+    // 1. OnceLock Tests
+    // =========================================================================
+    dec lock = std::oncelock_new<i32>();
+    assert_true(lock.get().is_none());
+
+    // First set succeeds (returns None)
+    dec res1 = lock.set(42 as i32);
+    assert_true(res1.is_none());
+
+    // Subsequent set fails (returns Some(rejected_value))
+    dec res2 = lock.set(99 as i32);
+    assert_true(res2.is_some());
+    assert_eq_i32(res2.unwrap(), 99 as i32);
+
+    // Value remains 42
+    dec opt_val = lock.get();
+    assert_true(opt_val.is_some());
+    assert_eq_i32(*opt_val.unwrap(), 42 as i32);
+
+    // Test get_or_init on a new lock
+    dec lazy_lock = std::oncelock_new<i32>();
+    assert_true(lazy_lock.get().is_none());
+    dec val_ref = lazy_lock.get_or_init(init_forty_two);
+    assert_true(val_ref.is_some());
+    assert_eq_i32(*val_ref.unwrap(), 42 as i32);
+
+    // =========================================================================
+    // 2. MPSC Channel Tests
+    // =========================================================================
+    dec pair = std::channel<i32>();
+    dec tx = pair.tx;
+    dec rx = pair.rx;
+
+    // Single send and recv
+    dec sent1 = tx.send(10 as i32);
+    assert_true(sent1);
+    dec recv1 = rx.recv();
+    assert_true(recv1.is_some());
+    assert_eq_i32(recv1.unwrap(), 10 as i32);
+
+    // FIFO order test
+    tx.send(1 as i32);
+    tx.send(2 as i32);
+    tx.send(3 as i32);
+
+    assert_eq_i32(rx.recv().unwrap(), 1 as i32);
+    assert_eq_i32(rx.recv().unwrap(), 2 as i32);
+    assert_eq_i32(rx.recv().unwrap(), 3 as i32);
+
+    // try_recv on empty channel
+    dec empty_try = rx.try_recv();
+    assert_true(empty_try.is_none());
+
+    // Multi-producer (clone)
+    dec tx2 = tx.clone();
+    tx.send(100 as i32);
+    tx2.send(200 as i32);
+
+    assert_eq_i32(rx.recv().unwrap(), 100 as i32);
+    assert_eq_i32(rx.recv().unwrap(), 200 as i32);
+}

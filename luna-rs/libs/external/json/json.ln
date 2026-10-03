@@ -1,0 +1,827 @@
+import <vec>;
+import <string>;
+import <result>;
+import <__lang_option>;
+
+export module std {
+    export module json {
+
+        export enum JsonValue {
+            Null,
+            Bool(bool),
+            Number(f64),
+            String(std::String),
+            Array(std::Vec<JsonValue>),
+            Object(std::Vec<JsonKeyValue>),
+        }
+
+        export struct JsonKeyValue {
+            key: std::String,
+            value: JsonValue,
+        };
+
+        export enum JsonError {
+            UnexpectedEnd,
+            UnexpectedChar(u8),
+            InvalidNumber,
+            InvalidString,
+            ExpectedColon,
+            ExpectedCommaOrBracket,
+            ExpectedCommaOrBrace,
+        }
+
+        impl std::Error for JsonError {
+            fn description(self: &Self) -> str {
+                return match *self {
+                    JsonError::UnexpectedEnd -> "unexpected end of input",
+                    JsonError::UnexpectedChar(_) -> "unexpected character",
+                    JsonError::InvalidNumber -> "invalid number format",
+                    JsonError::InvalidString -> "invalid string escape",
+                    JsonError::ExpectedColon -> "expected ':'",
+                    JsonError::ExpectedCommaOrBracket -> "expected ',' or ']'",
+                    JsonError::ExpectedCommaOrBrace -> "expected ',' or '}'",
+                };
+            }
+        }
+
+        impl JsonValue {
+            export fn is_null(self: &Self) -> bool {
+                return match *self {
+                    JsonValue::Null -> true,
+                    _ -> false,
+                };
+            }
+
+            export fn is_bool(self: &Self) -> bool {
+                return match *self {
+                    JsonValue::Bool(_) -> true,
+                    _ -> false,
+                };
+            }
+
+            export fn is_number(self: &Self) -> bool {
+                return match *self {
+                    JsonValue::Number(_) -> true,
+                    _ -> false,
+                };
+            }
+
+            export fn is_string(self: &Self) -> bool {
+                return match *self {
+                    JsonValue::String(_) -> true,
+                    _ -> false,
+                };
+            }
+
+            export fn is_array(self: &Self) -> bool {
+                return match *self {
+                    JsonValue::Array(_) -> true,
+                    _ -> false,
+                };
+            }
+
+            export fn is_object(self: &Self) -> bool {
+                return match *self {
+                    JsonValue::Object(_) -> true,
+                    _ -> false,
+                };
+            }
+
+            export fn as_bool(self: &Self) -> std::Option<bool> {
+                return match *self {
+                    JsonValue::Bool(b) -> std::Option::Some(b),
+                    _ -> std::Option::None,
+                };
+            }
+
+            export fn as_number(self: &Self) -> std::Option<f64> {
+                return match *self {
+                    JsonValue::Number(n) -> std::Option::Some(n),
+                    _ -> std::Option::None,
+                };
+            }
+
+            export fn as_string(self: &Self) -> std::Option<&std::String> life_from(self) {
+                if self.is_string() {
+                    unsafe {
+                        return std::Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *std::String));
+                    }
+                }
+                return std::Option::None;
+            }
+
+            export fn as_array(self: &Self) -> std::Option<&std::Vec<JsonValue>> life_from(self) {
+                if self.is_array() {
+                    unsafe {
+                        return std::Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *std::Vec<JsonValue>));
+                    }
+                }
+                return std::Option::None;
+            }
+
+            export fn as_array_mut(self: &rw Self) -> std::Option<&rw std::Vec<JsonValue>> life_from(self) {
+                if self.is_array() {
+                    unsafe {
+                        return std::Option::Some(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw std::Vec<JsonValue>));
+                    }
+                }
+                return std::Option::None;
+            }
+
+            export fn as_object(self: &Self) -> std::Option<&std::Vec<JsonKeyValue>> life_from(self) {
+                if self.is_object() {
+                    unsafe {
+                        return std::Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *std::Vec<JsonKeyValue>));
+                    }
+                }
+                return std::Option::None;
+            }
+
+            export fn as_object_mut(self: &rw Self) -> std::Option<&rw std::Vec<JsonKeyValue>> life_from(self) {
+                if self.is_object() {
+                    unsafe {
+                        return std::Option::Some(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw std::Vec<JsonKeyValue>));
+                    }
+                }
+                return std::Option::None;
+            }
+
+        }
+
+        fn entry_to_value(opt: std::Option<&JsonKeyValue>) -> std::Option<&JsonValue> life_from(opt) {
+            return match opt {
+                std::Option::Some(entry) -> std::Option::Some(&entry.value),
+                std::Option::None -> std::Option::None,
+            };
+        }
+
+        impl JsonValue {
+            export fn get(self: &Self, key: &[u8]) -> std::Option<&JsonValue> life_from(self) {
+                dec obj_opt = self.as_object();
+                match obj_opt {
+                    std::Option::Some(entries) -> {
+                        dec len = entries.len();
+                        dec rw i: u64 = 0 as u64;
+                        while i < len {
+                            dec opt_entry = entries.get(i);
+                            match opt_entry {
+                                std::Option::Some(entry) -> {
+                                    dec k_bytes = entry.key.as_bytes();
+                                    if k_bytes.len == key.len {
+                                        dec rw matched = true;
+                                        dec rw j: usize = 0 as usize;
+                                        while j < key.len {
+                                            if k_bytes[j] != key[j] {
+                                                matched = false;
+                                                break;
+                                            }
+                                            j = j + (1 as usize);
+                                        }
+                                        if matched {
+                                            return entry_to_value(entries.get(i));
+                                        }
+                                    }
+                                },
+                                std::Option::None -> {},
+                            }
+                            i = i + (1 as u64);
+                        }
+                    },
+                    std::Option::None -> {},
+                }
+                return std::Option::None;
+            }
+
+            export fn get_index(self: &Self, index: usize) -> std::Option<&JsonValue> life_from(self) {
+                if self.is_array() {
+                    unsafe {
+                        dec arr = &*(((self as *Self as u64) + (8 as u64)) as *std::Vec<JsonValue>);
+                        return arr.get(index as u64);
+                    }
+                }
+                return std::Option::None;
+            }
+        }
+
+        // =====================================================================
+        // PARSER IMPLEMENTATION
+        // =====================================================================
+
+        struct ParserState {
+            data: &[u8],
+            pos: usize,
+        };
+
+        fn skip_ws(p: &rw ParserState) {
+            while p.pos < p.data.len {
+                dec b = p.data[p.pos];
+                if b == (32 as u8) || b == (9 as u8) || b == (10 as u8) || b == (13 as u8) {
+                    p.pos = p.pos + (1 as usize);
+                } else {
+                    break;
+                }
+            }
+        }
+
+        fn parse_string_raw(p: &rw ParserState) -> std::Result<std::String, JsonError> {
+            p.pos = p.pos + (1 as usize); // skip leading '"'
+            dec rw s = std::string_new();
+
+            while p.pos < p.data.len {
+                dec b = p.data[p.pos];
+                if b == (34 as u8) { // '"'
+                    p.pos = p.pos + (1 as usize);
+                    return std::Result::Ok(s);
+                }
+                if b == (92 as u8) { // '\'
+                    p.pos = p.pos + (1 as usize);
+                    if p.pos >= p.data.len {
+                        return std::Result::Err(JsonError::UnexpectedEnd);
+                    }
+                    dec esc = p.data[p.pos];
+                    p.pos = p.pos + (1 as usize);
+                    if esc == (34 as u8) {
+                        s.push_char('"');
+                    } else if esc == (92 as u8) {
+                        s.push_char('\\');
+                    } else if esc == (47 as u8) {
+                        s.push_char('/');
+                    } else if esc == (98 as u8) {
+                        s.push_char('\x08');
+                    } else if esc == (102 as u8) {
+                        s.push_char('\x0c');
+                    } else if esc == (110 as u8) {
+                        s.push_char('\n');
+                    } else if esc == (114 as u8) {
+                        s.push_char('\r');
+                    } else if esc == (116 as u8) {
+                        s.push_char('\t');
+                    } else {
+                        return std::Result::Err(JsonError::InvalidString);
+                    }
+                } else {
+                    s.push_char(b as char);
+                    p.pos = p.pos + (1 as usize);
+                }
+            }
+
+            return std::Result::Err(JsonError::UnexpectedEnd);
+        }
+
+        fn parse_number_raw(p: &rw ParserState) -> std::Result<f64, JsonError> {
+            dec rw is_neg = false;
+            if p.pos < p.data.len && p.data[p.pos] == (45 as u8) { // '-'
+                is_neg = true;
+                p.pos = p.pos + (1 as usize);
+            }
+
+            dec rw int_val: f64 = 0.0;
+            dec rw has_digits = false;
+            while p.pos < p.data.len && p.data[p.pos] >= (48 as u8) && p.data[p.pos] <= (57 as u8) {
+                int_val = int_val * 10.0 + ((p.data[p.pos] - (48 as u8)) as f64);
+                has_digits = true;
+                p.pos = p.pos + (1 as usize);
+            }
+
+            if has_digits == false {
+                return std::Result::Err(JsonError::InvalidNumber);
+            }
+
+            dec rw frac_val: f64 = 0.0;
+            if p.pos < p.data.len && p.data[p.pos] == (46 as u8) { // '.'
+                p.pos = p.pos + (1 as usize);
+                dec rw factor: f64 = 0.1;
+                dec rw has_frac_digits = false;
+                while p.pos < p.data.len && p.data[p.pos] >= (48 as u8) && p.data[p.pos] <= (57 as u8) {
+                    frac_val = frac_val + (((p.data[p.pos] - (48 as u8)) as f64) * factor);
+                    factor = factor * 0.1;
+                    has_frac_digits = true;
+                    p.pos = p.pos + (1 as usize);
+                }
+                if has_frac_digits == false {
+                    return std::Result::Err(JsonError::InvalidNumber);
+                }
+            }
+
+            dec rw has_exp = false;
+            dec rw exp_neg = false;
+            dec rw exp_val: i32 = 0;
+            if p.pos < p.data.len && (p.data[p.pos] == (101 as u8) || p.data[p.pos] == (69 as u8)) { // 'e' or 'E'
+                p.pos = p.pos + (1 as usize);
+                has_exp = true;
+                if p.pos < p.data.len && p.data[p.pos] == (43 as u8) { // '+'
+                    p.pos = p.pos + (1 as usize);
+                } else if p.pos < p.data.len && p.data[p.pos] == (45 as u8) { // '-'
+                    exp_neg = true;
+                    p.pos = p.pos + (1 as usize);
+                }
+
+                dec rw has_exp_digits = false;
+                while p.pos < p.data.len && p.data[p.pos] >= (48 as u8) && p.data[p.pos] <= (57 as u8) {
+                    exp_val = exp_val * (10 as i32) + ((p.data[p.pos] - (48 as u8)) as i32);
+                    has_exp_digits = true;
+                    p.pos = p.pos + (1 as usize);
+                }
+                if has_exp_digits == false {
+                    return std::Result::Err(JsonError::InvalidNumber);
+                }
+            }
+
+            dec rw total: f64 = int_val + frac_val;
+            if has_exp {
+                dec rw mult: f64 = 1.0;
+                dec rw e: i32 = 0 as i32;
+                while e < exp_val {
+                    mult = mult * 10.0;
+                    e = e + (1 as i32);
+                }
+                if exp_neg {
+                    total = total / mult;
+                } else {
+                    total = total * mult;
+                }
+            }
+
+            if is_neg {
+                total = 0.0 - total;
+            }
+
+            return std::Result::Ok(total);
+        }
+
+        fn parse_value(p: &rw ParserState) -> std::Result<JsonValue, JsonError> {
+            skip_ws(p);
+            if p.pos >= p.data.len {
+                return std::Result::Err(JsonError::UnexpectedEnd);
+            }
+
+            dec b = p.data[p.pos];
+
+            // 1. Null: "null"
+            if b == (110 as u8) { // 'n'
+                if (p.pos + (4 as usize)) <= p.data.len
+                    && p.data[p.pos + (1 as usize)] == (117 as u8)
+                    && p.data[p.pos + (2 as usize)] == (108 as u8)
+                    && p.data[p.pos + (3 as usize)] == (108 as u8)
+                {
+                    p.pos = p.pos + (4 as usize);
+                    return std::Result::Ok(JsonValue::Null);
+                }
+                return std::Result::Err(JsonError::UnexpectedChar(b));
+            }
+
+            // 2. Bool: "true" or "false"
+            if b == (116 as u8) { // 't'
+                if (p.pos + (4 as usize)) <= p.data.len
+                    && p.data[p.pos + (1 as usize)] == (114 as u8)
+                    && p.data[p.pos + (2 as usize)] == (117 as u8)
+                    && p.data[p.pos + (3 as usize)] == (101 as u8)
+                {
+                    p.pos = p.pos + (4 as usize);
+                    return std::Result::Ok(JsonValue::Bool(true));
+                }
+                return std::Result::Err(JsonError::UnexpectedChar(b));
+            }
+
+            if b == (102 as u8) { // 'f'
+                if (p.pos + (5 as usize)) <= p.data.len
+                    && p.data[p.pos + (1 as usize)] == (97 as u8)
+                    && p.data[p.pos + (2 as usize)] == (108 as u8)
+                    && p.data[p.pos + (3 as usize)] == (115 as u8)
+                    && p.data[p.pos + (4 as usize)] == (101 as u8)
+                {
+                    p.pos = p.pos + (5 as usize);
+                    return std::Result::Ok(JsonValue::Bool(false));
+                }
+                return std::Result::Err(JsonError::UnexpectedChar(b));
+            }
+
+            // 3. String: "..."
+            if b == (34 as u8) { // '"'
+                dec s_res = parse_string_raw(p);
+                if s_res.is_err() {
+                    match s_res {
+                        std::Result::Err(e) -> { return std::Result::Err(e); },
+                        _ -> {},
+                    }
+                }
+                return std::Result::Ok(JsonValue::String(s_res.ok().unwrap()));
+            }
+
+            // 4. Number: -?[0-9]+...
+            if b == (45 as u8) || (b >= (48 as u8) && b <= (57 as u8)) {
+                dec n_res = parse_number_raw(p);
+                if n_res.is_err() {
+                    match n_res {
+                        std::Result::Err(e) -> { return std::Result::Err(e); },
+                        _ -> {},
+                    }
+                }
+                return std::Result::Ok(JsonValue::Number(n_res.ok().unwrap()));
+            }
+
+            // 5. Array: [...]
+            if b == (91 as u8) { // '['
+                p.pos = p.pos + (1 as usize);
+                skip_ws(p);
+                dec rw arr: std::Vec<JsonValue> = std::vec_new<JsonValue>();
+
+                if p.pos < p.data.len && p.data[p.pos] == (93 as u8) { // ']'
+                    p.pos = p.pos + (1 as usize);
+                    return std::Result::Ok(JsonValue::Array(arr));
+                }
+
+                while p.pos < p.data.len {
+                    dec item_res = parse_value(p);
+                    if item_res.is_err() {
+                        return item_res;
+                    }
+                    dec item = item_res.ok().unwrap();
+                    arr.push(item);
+
+                    skip_ws(p);
+                    if p.pos >= p.data.len {
+                        return std::Result::Err(JsonError::UnexpectedEnd);
+                    }
+
+                    dec next_ch = p.data[p.pos];
+                    if next_ch == (93 as u8) { // ']'
+                        p.pos = p.pos + (1 as usize);
+                        return std::Result::Ok(JsonValue::Array(arr));
+                    }
+                    if next_ch == (44 as u8) { // ','
+                        p.pos = p.pos + (1 as usize);
+                    } else {
+                        return std::Result::Err(JsonError::ExpectedCommaOrBracket);
+                    }
+                }
+
+                return std::Result::Err(JsonError::UnexpectedEnd);
+            }
+
+            // 6. Object: {...}
+            if b == (123 as u8) { // '{'
+                p.pos = p.pos + (1 as usize);
+                skip_ws(p);
+                dec rw entries: std::Vec<JsonKeyValue> = std::vec_new<JsonKeyValue>();
+
+                if p.pos < p.data.len && p.data[p.pos] == (125 as u8) { // '}'
+                    p.pos = p.pos + (1 as usize);
+                    return std::Result::Ok(JsonValue::Object(entries));
+                }
+
+                while p.pos < p.data.len {
+                    skip_ws(p);
+                    if p.pos >= p.data.len {
+                        return std::Result::Err(JsonError::UnexpectedEnd);
+                    }
+
+                    if p.data[p.pos] != (34 as u8) { // '"'
+                        return std::Result::Err(JsonError::UnexpectedChar(p.data[p.pos]));
+                    }
+
+                    dec key_res = parse_string_raw(p);
+                    if key_res.is_err() {
+                        match key_res {
+                            std::Result::Err(e) -> { return std::Result::Err(e); },
+                            _ -> {},
+                        }
+                    }
+                    dec key = key_res.ok().unwrap();
+
+                    skip_ws(p);
+                    if p.pos >= p.data.len {
+                        return std::Result::Err(JsonError::UnexpectedEnd);
+                    }
+
+                    if p.data[p.pos] != (58 as u8) { // ':'
+                        return std::Result::Err(JsonError::ExpectedColon);
+                    }
+                    p.pos = p.pos + (1 as usize); // skip ':'
+
+                    dec val_res = parse_value(p);
+                    if val_res.is_err() {
+                        return val_res;
+                    }
+                    dec val = val_res.ok().unwrap();
+
+                    entries.push(JsonKeyValue { key: key, value: val });
+
+                    skip_ws(p);
+                    if p.pos >= p.data.len {
+                        return std::Result::Err(JsonError::UnexpectedEnd);
+                    }
+
+                    dec next_ch = p.data[p.pos];
+                    if next_ch == (125 as u8) { // '}'
+                        p.pos = p.pos + (1 as usize);
+                        return std::Result::Ok(JsonValue::Object(entries));
+                    }
+                    if next_ch == (44 as u8) { // ','
+                        p.pos = p.pos + (1 as usize);
+                    } else {
+                        return std::Result::Err(JsonError::ExpectedCommaOrBrace);
+                    }
+                }
+
+                return std::Result::Err(JsonError::UnexpectedEnd);
+            }
+
+            return std::Result::Err(JsonError::UnexpectedChar(b));
+        }
+
+        export fn parse(bytes: &[u8]) -> std::Result<JsonValue, JsonError> {
+            dec rw p = ParserState { data: bytes, pos: 0 as usize };
+            dec res = parse_value(&rw p);
+            if res.is_ok() {
+                skip_ws(&rw p);
+            }
+            return res;
+        }
+
+        export fn parse_str(s: &std::String) -> std::Result<JsonValue, JsonError> {
+            return parse(s.as_bytes());
+        }
+
+        // =====================================================================
+        // SERIALIZER IMPLEMENTATION
+        // =====================================================================
+
+        fn format_i64_into(val: i64, out: &rw std::String) {
+            if val == (0 as i64) {
+                out.push_char('0');
+                return;
+            }
+
+            dec rw n = val;
+            if n < (0 as i64) {
+                out.push_char('-');
+                n = 0 as i64 - n;
+            }
+
+            dec rw digits: [u8; 32] = [
+                0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+                0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+                0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+                0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8
+            ];
+            dec rw count: usize = 0 as usize;
+            while n > (0 as i64) {
+                dec rem = (n % (10 as i64)) as u8;
+                digits[count] = (48 as u8) + rem;
+                count = count + (1 as usize);
+                n = n / (10 as i64);
+            }
+
+            while count > (0 as usize) {
+                count = count - (1 as usize);
+                out.push_char(digits[count] as char);
+            }
+        }
+
+        fn format_f64_into(val: f64, out: &rw std::String) {
+            dec int_part = val as i64;
+            dec diff = val - (int_part as f64);
+            if diff == 0.0 {
+                format_i64_into(int_part, out);
+                return;
+            }
+
+            dec rw v = val;
+            if v < 0.0 {
+                out.push_char('-');
+                v = 0.0 - v;
+            }
+
+            dec ip = v as i64;
+            format_i64_into(ip, out);
+            out.push_char('.');
+
+            dec rw frac = v - (ip as f64);
+            dec rw precision: usize = 0 as usize;
+            while precision < (6 as usize) && frac > 0.0000001 {
+                frac = frac * 10.0;
+                dec d = frac as i64;
+                out.push_char(((48 as u8) + (d as u8)) as char);
+                frac = frac - (d as f64);
+                precision = precision + (1 as usize);
+            }
+            if precision == (0 as usize) {
+                out.push_char('0');
+            }
+        }
+
+        fn escape_str_into(s: &[u8], out: &rw std::String) {
+            out.push_char('"');
+            dec len = s.len;
+            dec rw i: usize = 0 as usize;
+            while i < len {
+                dec b = s[i];
+                if b == (34 as u8) { // '"'
+                    out.push_char('\\');
+                    out.push_char('"');
+                } else if b == (92 as u8) { // '\'
+                    out.push_char('\\');
+                    out.push_char('\\');
+                } else if b == (10 as u8) { // '\n'
+                    out.push_char('\\');
+                    out.push_char('n');
+                } else if b == (13 as u8) { // '\r'
+                    out.push_char('\\');
+                    out.push_char('r');
+                } else if b == (9 as u8) { // '\t'
+                    out.push_char('\\');
+                    out.push_char('t');
+                } else {
+                    out.push_char(b as char);
+                }
+                i = i + (1 as usize);
+            }
+            out.push_char('"');
+        }
+
+        fn stringify_into(val: &JsonValue, out: &rw std::String) {
+            if val.is_null() {
+                out.push_char('n');
+                out.push_char('u');
+                out.push_char('l');
+                out.push_char('l');
+            } else if val.is_bool() {
+                if val.as_bool().unwrap() {
+                    out.push_char('t');
+                    out.push_char('r');
+                    out.push_char('u');
+                    out.push_char('e');
+                } else {
+                    out.push_char('f');
+                    out.push_char('a');
+                    out.push_char('l');
+                    out.push_char('s');
+                    out.push_char('e');
+                }
+            } else if val.is_number() {
+                format_f64_into(val.as_number().unwrap(), out);
+            } else if val.is_string() {
+                escape_str_into(val.as_string().unwrap().as_bytes(), out);
+            } else if val.is_array() {
+                out.push_char('[');
+                dec arr = val.as_array().unwrap();
+                dec slice = arr.as_slice();
+                dec len = slice.len;
+                dec rw i: usize = 0 as usize;
+                while i < len {
+                    if i > (0 as usize) {
+                        out.push_char(',');
+                    }
+                    stringify_into(&slice[i], out);
+                    i = i + (1 as usize);
+                }
+                out.push_char(']');
+            } else if val.is_object() {
+                out.push_char('{');
+                dec entries = val.as_object().unwrap();
+                dec slice = entries.as_slice();
+                dec len = slice.len;
+                dec rw i: usize = 0 as usize;
+                while i < len {
+                    if i > (0 as usize) {
+                        out.push_char(',');
+                    }
+                    dec entry = &slice[i];
+                    escape_str_into(entry.key.as_bytes(), out);
+                    out.push_char(':');
+                    stringify_into(&entry.value, out);
+                    i = i + (1 as usize);
+                }
+                out.push_char('}');
+            }
+        }
+
+        export fn stringify(val: &JsonValue) -> std::String {
+            dec rw out = std::string_new();
+            stringify_into(val, &rw out);
+            return out;
+        }
+
+        fn indent_into(level: usize, indent_size: usize, out: &rw std::String) {
+            dec total = level * indent_size;
+            dec rw i: usize = 0 as usize;
+            while i < total {
+                out.push_char(' ');
+                i = i + (1 as usize);
+            }
+        }
+
+        fn pretty_into(val: &JsonValue, level: usize, indent_size: usize, out: &rw std::String) {
+            if val.is_null() {
+                out.push_char('n');
+                out.push_char('u');
+                out.push_char('l');
+                out.push_char('l');
+            } else if val.is_bool() {
+                if val.as_bool().unwrap() {
+                    out.push_char('t');
+                    out.push_char('r');
+                    out.push_char('u');
+                    out.push_char('e');
+                } else {
+                    out.push_char('f');
+                    out.push_char('a');
+                    out.push_char('l');
+                    out.push_char('s');
+                    out.push_char('e');
+                }
+            } else if val.is_number() {
+                format_f64_into(val.as_number().unwrap(), out);
+            } else if val.is_string() {
+                escape_str_into(val.as_string().unwrap().as_bytes(), out);
+            } else if val.is_array() {
+                dec arr = val.as_array().unwrap();
+                dec slice = arr.as_slice();
+                dec len = slice.len;
+                if len == (0 as usize) {
+                    out.push_char('[');
+                    out.push_char(']');
+                    return;
+                }
+                out.push_char('[');
+                out.push_char('\n');
+                dec rw i: usize = 0 as usize;
+                while i < len {
+                    indent_into(level + (1 as usize), indent_size, out);
+                    pretty_into(&slice[i], level + (1 as usize), indent_size, out);
+                    if (i + (1 as usize)) < len {
+                        out.push_char(',');
+                    }
+                    out.push_char('\n');
+                    i = i + (1 as usize);
+                }
+                indent_into(level, indent_size, out);
+                out.push_char(']');
+            } else if val.is_object() {
+                dec entries = val.as_object().unwrap();
+                dec slice = entries.as_slice();
+                dec len = slice.len;
+                if len == (0 as usize) {
+                    out.push_char('{');
+                    out.push_char('}');
+                    return;
+                }
+                out.push_char('{');
+                out.push_char('\n');
+                dec rw i: usize = 0 as usize;
+                while i < len {
+                    indent_into(level + (1 as usize), indent_size, out);
+                    dec entry = &slice[i];
+                    escape_str_into(entry.key.as_bytes(), out);
+                    out.push_char(':');
+                    out.push_char(' ');
+                    pretty_into(&entry.value, level + (1 as usize), indent_size, out);
+                    if (i + (1 as usize)) < len {
+                        out.push_char(',');
+                    }
+                    out.push_char('\n');
+                    i = i + (1 as usize);
+                }
+                indent_into(level, indent_size, out);
+                out.push_char('}');
+            }
+        }
+
+        export fn pretty_print(val: &JsonValue, indent_size: usize) -> std::String {
+            dec rw out = std::string_new();
+            pretty_into(val, 0 as usize, indent_size, &rw out);
+            return out;
+        }
+
+        // =====================================================================
+        // FACTORY CONVENIENCE HELPERS
+        // =====================================================================
+
+        export fn json_null() -> JsonValue {
+            return JsonValue::Null;
+        }
+
+        export fn json_bool(b: bool) -> JsonValue {
+            return JsonValue::Bool(b);
+        }
+
+        export fn json_number(n: f64) -> JsonValue {
+            return JsonValue::Number(n);
+        }
+
+        export fn json_string(s: str) -> JsonValue {
+            return JsonValue::String(std::string_from_str(s));
+        }
+
+        export fn json_array() -> JsonValue {
+            dec arr: std::Vec<JsonValue> = std::vec_new<JsonValue>();
+            return JsonValue::Array(arr);
+        }
+
+        export fn json_object() -> JsonValue {
+            dec obj: std::Vec<JsonKeyValue> = std::vec_new<JsonKeyValue>();
+            return JsonValue::Object(obj);
+        }
+    }
+}

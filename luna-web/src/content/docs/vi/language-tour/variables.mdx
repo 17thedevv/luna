@@ -1,0 +1,68 @@
+---
+title: Biến & Kiểu dữ liệu
+description: Cách khai báo biến và tìm hiểu hệ thống kiểu dữ liệu trong Luna.
+---
+
+## Khai báo biến
+
+Luna sử dụng từ khóa `dec` để khai báo biến:
+
+```luna
+// Mặc định là bất biến (immutable)
+dec x = 10;
+dec name = "Luna";
+
+// Khả ghi với từ khóa 'rw' (rewritable)
+dec rw counter = 0;
+counter = counter + 1;
+
+// Tham chiếu khả ghi
+dec rw ref_c: &rw i32 = &rw counter;
+*ref_c = 42;
+```
+
+## Hằng số (Constants)
+
+Hằng số được đánh giá và tính toán ngay tại compile-time:
+
+```luna
+const PI: f64 = 3.14159;
+const MAX_SIZE: i32 = 1000;
+```
+
+## Kiểu dữ liệu nguyên thủy
+
+```luna
+// Kiểu số nguyên có dấu và không dấu
+i8, i16, i32, i64, i128, isize    // có dấu (signed)
+u8, u16, u32, u64, u128, usize    // không dấu (unsigned)
+
+// Số thực dấu phẩy động
+f32, f64
+
+// Kiểu nguyên thủy khác
+bool, char, str
+void        // dành cho hàm không trả về giá trị
+```
+
+## Chú giải kiểu (Type Annotations)
+
+```luna
+dec x: i32 = 42;
+dec name: str = "Luna";
+dec data: &[u8] = &[1, 2, 3, 4];
+
+fn add(a: i32, b: i32) -> i32 {
+    return a + b;
+}
+```
+
+## Mảng và Slice
+
+```luna
+// Mảng có kích thước cố định (Array)
+dec arr = [1, 2, 3, 4, 5];
+
+// Slice (khung nhìn mượn)
+dec slice: &[i32] = &arr;
+```

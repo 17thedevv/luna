@@ -1,0 +1,86 @@
+---
+title: I/O (Nhập / Xuất)
+description: Các thao tác vào ra dữ liệu terminal và hệ thống tập tin trong Luna.
+---
+
+## Xuất dữ liệu (In ra màn hình)
+
+```luna
+import std::io;
+
+// In có xuống dòng
+std::io::println("Xin chào, Luna!");
+
+// In không xuống dòng
+std::io::print("Nhập tên của bạn: ");
+
+// In có định dạng nhiều giá trị
+std::io::println("Các giá trị: {}, {}", 1, 2, 3);
+
+dec name = "Luna";
+dec age = 2024;
+std::io::println("{} được {} tuổi", name, age);
+```
+
+## Chỉ định định dạng (Format Specifiers)
+
+```luna
+// Số nguyên
+std::io::println("{:d}", 42);           // 42
+std::io::println("{:x}", 255);          // ff
+std::io::println("{:b}", 10);           // 1010
+std::io::println("{:o}", 8);            // 10
+
+// Số thực
+std::io::println("{:.2f}", 3.14159);     // 3.14
+
+// Chuỗi
+std::io::println("{:s}", "hello");       // hello
+std::io::println("{:>10}", "hi");        //         hi
+std::io::println("{:.<10}", "hi");       // hi........
+```
+
+## Đọc dữ liệu từ bàn phím
+
+```luna
+import <io>;
+
+// Đọc một dòng ký tự
+dec line = std::io::read_line();
+match line {
+    Option::Some(input) -> {
+        std::io::println("Bạn vừa nhập: {}", input);
+    },
+    Option::None -> {
+        std::io::println("Dữ liệu nhập rỗng");
+    }
+}
+```
+
+## Đọc và Ghi tập tin
+
+```luna
+import <io>;
+
+// Đọc toàn bộ nội dung tệp
+dec content = std::io::read_file("data.txt");
+match content {
+    Result::Ok(text) -> {
+        std::io::println("{}", text);
+    },
+    Result::Err(e) -> {
+        std::io::println("Lỗi: {}", e);
+    }
+}
+
+// Ghi dữ liệu vào tệp
+dec result = std::io::write_file("output.txt", "Xin chào!");
+match result {
+    Result::Ok(()) -> {
+        std::io::println("Ghi tệp thành công");
+    },
+    Result::Err(e) -> {
+        std::io::println("Lỗi: {}", e);
+    }
+}
+```

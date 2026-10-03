@@ -1,0 +1,39 @@
+import <result>;
+import <try>;
+
+fn get_val(x: bool) -> std::Option<i32> {
+    if x {
+        return std::Option::Some(100);
+    }
+    return std::Option::None;
+}
+
+fn add_options(a: bool, b: bool) -> std::Option<i32> {
+    dec val_a = get_val(a)?;
+    dec val_b = get_val(b)?;
+    return std::Option::Some(val_a + val_b);
+}
+
+fn main() -> i32 {
+    // Both Some -> Some(200)
+    match add_options(true, true) {
+        std::Option::Some(sum) -> {
+            if sum != 200 { return 1; }
+        },
+        std::Option::None -> { return 2; },
+    }
+
+    // First None -> early returns None
+    match add_options(false, true) {
+        std::Option::Some(_) -> { return 3; },
+        std::Option::None -> {},
+    }
+
+    // Second None -> early returns None
+    match add_options(true, false) {
+        std::Option::Some(_) -> { return 4; },
+        std::Option::None -> {},
+    }
+
+    return 0;
+}

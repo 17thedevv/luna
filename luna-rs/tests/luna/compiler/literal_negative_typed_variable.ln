@@ -1,0 +1,1 @@
+fn main() -> i32 { dec old: i32 = 72; dec value: u8 = old; return 0; }

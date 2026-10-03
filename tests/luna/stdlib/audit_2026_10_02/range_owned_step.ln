@@ -1,0 +1,21 @@
+import <iter_adapters>;
+
+struct Counter { value: i32 };
+
+impl std::Drop for Counter {
+    fn drop(self: &rw Self) {}
+}
+
+impl std::iter::Step for Counter {
+    fn step_forward(self: &Self) -> Self { return Counter { value: self.value + 1 }; }
+    fn step_less(self: &Self, other: &Self) -> bool { return self.value < other.value; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return self.value == other.value; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return self.value > other.value; }
+}
+
+fn main() -> i32 {
+    dec rw values = std::iter::range(Counter { value: 1 }, Counter { value: 3 });
+    dec first = values.next().unwrap();
+    if first.value != 1 { return 1; }
+    return 0;
+}

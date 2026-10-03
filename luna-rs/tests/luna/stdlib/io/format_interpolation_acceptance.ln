@@ -1,0 +1,47 @@
+import <io>;
+
+fn main() -> i32 {
+    dec a: i32 = 42;
+    dec b: i32 = 100;
+    dec name: str = "Luna";
+    dec is_ok: bool = true;
+
+    // 1. Variable capture: {var}
+    outln!("a = {a}");
+    outln!("name: {name}, ok: {is_ok}");
+
+    // 2. Positional interpolation: {}
+    outln!("x = {}, y = {}", a, b);
+
+    // 3. Expressions inside braces: {expr}
+    outln!("sum: {a + b}");
+    outln!("arithmetic: {a * 2 + b / 2}");
+
+    // 4. Escaped braces: {{ and }}
+    outln!("escaped: {{curly}} and val = {a}");
+
+    // 5. Sequential without braces: backward compatibility
+    outln!("raw sequence: ", a, ", ", b);
+
+    // 6. Non-newline macro: out!
+    out!("inline: {a} ");
+    outln!("finished");
+
+    // 7. Error macros: err! and errln!
+    errln!("error_code: {b}");
+    err!("stderr inline: {name}\n");
+
+    // 8. Alias macros: println!, print!, eprintln!, eprint!
+    println!("println alias: {a}");
+    print!("print positional: {}, {}\n", a, b);
+    eprintln!("eprintln alias: {is_ok}");
+
+    // 9. Standard module path: std::outln!, std::println!
+    std::outln!("std::outln: {name}");
+    std::println!("std::println: {a}");
+
+    // 10. Empty newline
+    outln!();
+
+    return 0;
+}

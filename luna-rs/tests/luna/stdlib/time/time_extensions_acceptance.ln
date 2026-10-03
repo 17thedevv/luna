@@ -1,0 +1,105 @@
+import <time>;
+
+fn main() -> i32 {
+    // 1. Duration math
+    dec d1 = std::duration_from_secs(10 as u64);
+    dec d2 = std::duration_from_secs(5 as u64);
+
+    // checked_add
+    dec opt_add = d1.checked_add(&d2);
+    match opt_add {
+        std::Option::Some(res) -> {
+            if res.as_secs() != (15 as u64) { return 1; }
+        },
+        std::Option::None -> { return 2; },
+    }
+
+    // checked_sub
+    dec opt_sub = d1.checked_sub(&d2);
+    match opt_sub {
+        std::Option::Some(res) -> {
+            if res.as_secs() != (5 as u64) { return 3; }
+        },
+        std::Option::None -> { return 4; },
+    }
+
+    // checked_sub underflow
+    dec opt_underflow = d2.checked_sub(&d1);
+    match opt_underflow {
+        std::Option::Some(res) -> { return 5; },
+        std::Option::None -> {},
+    }
+
+    // saturating_add and saturating_sub
+    dec sat_sub = d2.saturating_sub(&d1);
+    if sat_sub.as_secs() != (0 as u64) { return 6; }
+
+    dec sat_add = d1.saturating_add(&d2);
+    if sat_add.as_secs() != (15 as u64) { return 7; }
+
+    // checked_mul
+    dec opt_mul = d1.checked_mul(3 as u32);
+    match opt_mul {
+        std::Option::Some(res) -> {
+            if res.as_secs() != (30 as u64) { return 8; }
+        },
+        std::Option::None -> { return 9; },
+    }
+
+    // saturating_mul
+    dec sat_mul = d1.saturating_mul(2 as u32);
+    if sat_mul.as_secs() != (20 as u64) { return 10; }
+
+    // checked_div
+    dec opt_div = d1.checked_div(2 as u32);
+    match opt_div {
+        std::Option::Some(res) -> {
+            if res.as_secs() != (5 as u64) { return 11; }
+        },
+        std::Option::None -> { return 12; },
+    }
+
+    // checked_div by zero -> None
+    dec opt_div_zero = d1.checked_div(0 as u32);
+    match opt_div_zero {
+        std::Option::Some(res) -> { return 13; },
+        std::Option::None -> {},
+    }
+
+    // 2. Instant checked_add & checked_sub
+    dec now = std::instant_now();
+    dec offset = std::duration_from_millis(500 as u64);
+    dec opt_inst_add = now.checked_add(&offset);
+    match opt_inst_add {
+        std::Option::Some(fut) -> {
+            dec dur_diff = fut.duration_since(&now);
+            if dur_diff.as_millis() != (500 as u64) { return 14; }
+        },
+        std::Option::None -> { return 15; },
+    }
+
+    // 3. SystemTime checked_add & checked_sub
+    dec epoch = std::system_time_unix_epoch();
+    dec ten_secs = std::duration_from_secs(10 as u64);
+    dec opt_st_add = epoch.checked_add(&ten_secs);
+    match opt_st_add {
+        std::Option::Some(future_st) -> {
+            dec diff_res = future_st.duration_since(&epoch);
+            if diff_res.is_err() { return 16; }
+            dec dur = diff_res.unwrap();
+            if dur.as_secs() != (10 as u64) { return 17; }
+
+            // checked_sub
+            dec opt_st_sub = future_st.checked_sub(&ten_secs);
+            match opt_st_sub {
+                std::Option::Some(past_st) -> {
+                    if past_st.eq(&epoch) == false { return 18; }
+                },
+                std::Option::None -> { return 19; },
+            }
+        },
+        std::Option::None -> { return 20; },
+    }
+
+    return 0;
+}

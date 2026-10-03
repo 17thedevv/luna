@@ -1,0 +1,6 @@
+struct Owner {
+    data: *rw u8,
+    count: u64,
+} requires anchor(data) = self, anchor(count) = self;
+
+fn main() {}

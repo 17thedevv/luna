@@ -1,0 +1,111 @@
+import <vec>;
+import <slice>;
+import <iter_adapters>;
+import <iter_consumers>;
+
+fn is_less_than_30(x: &i32) -> bool {
+    return *x < 30;
+}
+
+fn compare_i32(a: &i32, b: &i32) -> i32 {
+    if *a < *b { return -1; }
+    if *a > *b { return 1; }
+    return 0;
+}
+
+fn double_if_gt_20(x: &i32) -> std::Option<i32> {
+    if *x > 20 {
+        return std::Option::Some(*x * 2);
+    }
+    return std::Option::None;
+}
+
+fn test_skip_while() -> bool {
+    dec rw v = std::vec_new<i32>();
+    v.push(10);
+    v.push(20);
+    v.push(30);
+    v.push(15);
+    v.push(40);
+
+    // SkipWhile (< 30) should drop 10 and 20, yielding &30, &15, &40
+    dec rw it = std::iter::iter_skip_while<std::slice::SliceIter<i32>, &i32>(v.iter(), is_less_than_30);
+    dec v1 = it.next().unwrap();
+    if *v1 != 30 { return false; }
+    dec v2 = it.next().unwrap();
+    if *v2 != 15 { return false; }
+    dec v3 = it.next().unwrap();
+    if *v3 != 40 { return false; }
+    if it.next().is_some() { return false; }
+    return true;
+}
+
+fn test_cycle() -> bool {
+    dec rw v = std::vec_new<i32>();
+    v.push(1);
+    v.push(2);
+
+    // Cycle over 1, 2
+    dec rw it = std::iter::iter_cycle<std::slice::SliceIter<i32>, &i32>(v.iter());
+    if *it.next().unwrap() != 1 { return false; }
+    if *it.next().unwrap() != 2 { return false; }
+    if *it.next().unwrap() != 1 { return false; }
+    if *it.next().unwrap() != 2 { return false; }
+    if *it.next().unwrap() != 1 { return false; }
+    return true;
+}
+
+fn test_consumers() -> bool {
+    dec rw v = std::vec_new<i32>();
+    v.push(10);
+    v.push(50);
+    v.push(25);
+    v.push(5);
+
+    // iter_find_map: first > 20 is 50 -> returns 100
+    dec fm = std::iter::iter_find_map<std::slice::SliceIter<i32>, &i32, i32>(v.iter(), double_if_gt_20);
+    if fm.unwrap() != 100 { return false; }
+
+    // iter_min_by on into_iter()
+    dec min_val = std::iter::iter_min_by<std::VecIntoIter<i32>, i32>(v.clone().into_iter(), compare_i32);
+    if min_val.unwrap() != 5 { return false; }
+
+    // iter_max_by on into_iter()
+    dec max_val = std::iter::iter_max_by<std::VecIntoIter<i32>, i32>(v.into_iter(), compare_i32);
+    if max_val.unwrap() != 50 { return false; }
+
+    return true;
+}
+
+fn make_sub_range(x: i32) -> std::iter::Range<i32> {
+    return std::iter::Range<i32> {
+        current: x * 10,
+        end: (x * 10) + 2,
+    };
+}
+
+fn test_flat_map() -> bool {
+    dec rw v = std::vec_new<i32>();
+    v.push(1);
+    v.push(2);
+
+    // flat_map over 1, 2: produces 10, 11, 20, 21
+    dec rw it = std::iter::iter_flat_map<std::VecIntoIter<i32>, i32, std::iter::Range<i32>, i32>(
+        v.into_iter(),
+        make_sub_range
+    );
+    if it.next().unwrap() != 10 { return false; }
+    if it.next().unwrap() != 11 { return false; }
+    if it.next().unwrap() != 20 { return false; }
+    if it.next().unwrap() != 21 { return false; }
+    if it.next().is_some() { return false; }
+    return true;
+}
+
+fn main() -> i32 {
+    if test_skip_while() == false { return 1; }
+    if test_cycle() == false { return 2; }
+    if test_consumers() == false { return 3; }
+    if test_flat_map() == false { return 4; }
+    return 0;
+}

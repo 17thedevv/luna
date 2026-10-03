@@ -35,8 +35,8 @@ fn test_canonical_dag_integrity() {
 
     let provider_count = canonical_providers.len();
     assert_eq!(
-        provider_count, 32,
-        "Expected exactly 32 canonical providers, got {}",
+        provider_count, 49,
+        "Expected exactly 49 canonical providers, got {}",
         provider_count
     );
 
@@ -88,7 +88,7 @@ fn test_canonical_dag_integrity() {
         }
     }
 
-    assert_eq!(graph.len(), 32, "Expected 32 graph nodes");
+    assert_eq!(graph.len(), 49, "Expected 49 graph nodes");
 
     for (provider, deps) in &graph {
         for dep in deps {
@@ -96,7 +96,8 @@ fn test_canonical_dag_integrity() {
         }
     }
 
-    assert_eq!(all_edges.len(), 91, "Expected exactly 91 dependency edges in canonical DAG");
+    // 209 edges (49 providers; includes io -> fmt for format string streaming)
+    assert_eq!(all_edges.len(), 209, "Expected exactly 209 dependency edges in canonical DAG");
 }
 
 /// Helper: extract provider imports from source content
@@ -176,7 +177,7 @@ fn test_canonical_persistent_obj_and_llib_sidecars() {
         );
     }
 
-    assert_eq!(canonical_count, 32, "Expected 32 canonical providers");
+    assert_eq!(canonical_count, 49, "Expected 49 canonical providers");
 
     // Obsolete monolithic artifacts must NOT exist
     let legacy_monolithic = [
@@ -230,8 +231,8 @@ fn test_no_orphan_obj_sidecars() {
     }
 
     assert_eq!(
-        found_obj_files.len(), 32,
-        "Expected exactly 32 canonical .obj files in sysroot"
+        found_obj_files.len(), 49,
+        "Expected exactly 49 canonical .obj files in sysroot"
     );
 }
 
@@ -341,3 +342,31 @@ fn test_sysroot_builder_lock_mutual_exclusion_isolated() {
 
     let _ = fs::remove_dir_all(&temp_dir);
 }
+
+#[test]
+fn test_build_json_provider() {
+    let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let external_dir = sysroot.external_dir();
+    let json_ln = external_dir.join("json/json.ln");
+    let json_llib = external_dir.join("json/json.llib");
+    let content = fs::read_to_string(&json_ln).expect("Failed to read json.ln");
+    let options = luna_driver::CompilerOptions {
+        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
+        quiet: false,
+        emit_llib: true,
+        no_link: true,
+        output_path: Some(json_llib.to_string_lossy().to_string()),
+        is_sysroot_build: true,
+        ..Default::default()
+    };
+    println!("Starting compile of json.ln...");
+    let res = luna_driver::compile(json_ln.to_str().unwrap(), content, &options);
+    println!("Finished compile of json.ln: {:?}", res.is_ok());
+    if let Err(diags) = &res {
+        for d in diags {
+            eprintln!("{:?}", d);
+        }
+    }
+    assert!(res.is_ok(), "Compiling json.ln to json.llib must succeed");
+}
+

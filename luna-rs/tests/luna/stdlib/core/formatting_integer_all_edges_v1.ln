@@ -15,14 +15,14 @@ fn main() -> i32 {
     append(0 as u16, &rw output);
     append(65535 as u16, &rw output);
     append(0 as u32, &rw output);
-    append(4294967295 as u32, &rw output);
+    append(4294967295u32, &rw output);
     append(0 as u64, &rw output);
-    append(18446744073709551615 as u64, &rw output);
+    append(18446744073709551615u64, &rw output);
     append(0 as u128, &rw output);
     dec u128_max = (((1 as u128) << (127 as u128)) - (1 as u128)) * (2 as u128) + (1 as u128);
     append(u128_max, &rw output);
     append(0 as usize, &rw output);
-    append(18446744073709551615 as usize, &rw output);
+    append(18446744073709551615usize, &rw output);
 
     append(-127 as i8 - (1 as i8), &rw output);
     append(127 as i8, &rw output);
@@ -30,14 +30,14 @@ fn main() -> i32 {
     append(32767 as i16, &rw output);
     append(-2147483647 as i32 - (1 as i32), &rw output);
     append(2147483647 as i32, &rw output);
-    append((0 as i64) - (9223372036854775807 as i64) - (1 as i64), &rw output);
-    append(9223372036854775807 as i64, &rw output);
+    append((0 as i64) - (9223372036854775807i64) - (1 as i64), &rw output);
+    append(9223372036854775807i64, &rw output);
     dec i128_min = -((1 as i128) << (126 as i128)) - ((1 as i128) << (126 as i128));
     dec i128_max = ((1 as i128) << (126 as i128)) + ((1 as i128) << (126 as i128)) - (1 as i128);
     append(i128_min, &rw output);
     append(i128_max, &rw output);
-    append((0 as isize) - (9223372036854775807 as isize) - (1 as isize), &rw output);
-    append(9223372036854775807 as isize, &rw output);
+    append((0 as isize) - (9223372036854775807isize) - (1 as isize), &rw output);
+    append(9223372036854775807isize, &rw output);
 
     append(9 as u128, &rw output);
     append(10 as u128, &rw output);
@@ -59,16 +59,16 @@ fn main() -> i32 {
     append(65535 as u16, &rw output);
     append(0 as u32, &rw output);
     append(1 as u32, &rw output);
-    append(4294967295 as u32, &rw output);
+    append(4294967295u32, &rw output);
     append(0 as u64, &rw output);
     append(1 as u64, &rw output);
-    append(18446744073709551615 as u64, &rw output);
+    append(18446744073709551615u64, &rw output);
     append(0 as u128, &rw output);
     append(1 as u128, &rw output);
     append(u128_max, &rw output);
     append(0 as usize, &rw output);
     append(1 as usize, &rw output);
-    append(18446744073709551615 as usize, &rw output);
+    append(18446744073709551615usize, &rw output);
 
     append(-127 as i8 - (1 as i8), &rw output);
     append(-1 as i8, &rw output);
@@ -85,23 +85,23 @@ fn main() -> i32 {
     append(0 as i32, &rw output);
     append(1 as i32, &rw output);
     append(2147483647 as i32, &rw output);
-    dec i64_min = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec i64_min = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     append(i64_min, &rw output);
     append(-1 as i64, &rw output);
     append(0 as i64, &rw output);
     append(1 as i64, &rw output);
-    append(9223372036854775807 as i64, &rw output);
+    append(9223372036854775807i64, &rw output);
     append(i128_min, &rw output);
     append(-1 as i128, &rw output);
     append(0 as i128, &rw output);
     append(1 as i128, &rw output);
     append(i128_max, &rw output);
-    dec isize_min = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec isize_min = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     append(isize_min, &rw output);
     append(-1 as isize, &rw output);
     append(0 as isize, &rw output);
     append(1 as isize, &rw output);
-    append(9223372036854775807 as isize, &rw output);
+    append(9223372036854775807isize, &rw output);
 
     std::io::println(output.as_bytes());
     return 0;

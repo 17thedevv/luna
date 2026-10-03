@@ -1,0 +1,131 @@
+import <btreemap>;
+import <vec>;
+import <cmp>;
+import <clone>;
+import <default>;
+import <__lang_drop>;
+import <__lang_option>;
+import <__lang_iterator>;
+import <__lang_into_iterator>;
+
+module std {
+
+export struct BTreeSetIter<T> {
+    private keys: BTreeKeys<T, bool>,
+};
+
+impl<T> BTreeSetIter<T> {
+    export fn next(self: &rw Self) -> std::Option<&T> life_from(self) {
+        return self.keys.next();
+    }
+}
+
+impl<T> std::Iterator<&T> for BTreeSetIter<T> {
+    fn next(self: &rw Self) -> std::Option<&T> life_from(self) {
+        return self.keys.next();
+    }
+}
+
+export struct BTreeSetIntoIter<T> {
+    private map_iter: BTreeMapIntoIter<T, bool>,
+};
+
+impl<T> BTreeSetIntoIter<T> {
+    export fn next(self: &rw Self) -> std::Option<T> {
+        dec opt = self.map_iter.next();
+        match opt {
+            std::Option::Some(pair) -> { return std::Option::Some(pair.0); },
+            std::Option::None -> { return std::Option::None; },
+        }
+    }
+}
+
+impl<T> std::Iterator<T> for BTreeSetIntoIter<T> {
+    fn next(self: &rw Self) -> std::Option<T> life_from(self) {
+        return self.next();
+    }
+}
+
+export struct BTreeSet<T> {
+    private map: BTreeMap<T, bool>,
+};
+
+export fn btreeset_new<T>() -> BTreeSet<T> {
+    return BTreeSet<T> {
+        map: std::btreemap_new<T, bool>(),
+    };
+}
+
+impl<T> std::Default for BTreeSet<T> {
+    fn default() -> Self {
+        return btreeset_new<T>();
+    }
+}
+
+impl<T> BTreeSet<T> {
+    export fn len(self: &Self) -> u64 {
+        return self.map.len();
+    }
+
+    export fn is_empty(self: &Self) -> bool {
+        return self.map.is_empty();
+    }
+
+    export fn clear(self: &rw Self) {
+        self.map.clear();
+    }
+
+    export fn first(self: &Self) -> std::Option<&T> life_from(self) {
+        return self.map.first_key();
+    }
+
+    export fn last(self: &Self) -> std::Option<&T> life_from(self) {
+        return self.map.last_key();
+    }
+
+    export fn iter(self: &Self) -> BTreeSetIter<T> life_from(self) {
+        return BTreeSetIter<T> {
+            keys: self.map.keys(),
+        };
+    }
+
+    export fn into_iter(self: Self) -> BTreeSetIntoIter<T> {
+        return BTreeSetIntoIter<T> {
+            map_iter: self.map.into_iter(),
+        };
+    }
+}
+
+impl<T: std::Ord> BTreeSet<T> {
+    export fn insert(self: &rw Self, value: T) -> bool {
+        dec res = self.map.insert(value, true);
+        match res {
+            std::Option::Some(_) -> { return false; },
+            std::Option::None -> { return true; },
+        }
+    }
+
+    export fn contains(self: &Self, value: &T) -> bool {
+        return self.map.contains_key(value);
+    }
+
+    export fn range(self: &Self, min_val: &T, max_val: &T) -> std::Vec<&T> life_from(self) {
+        return self.map.range_keys(min_val, max_val);
+    }
+}
+
+impl<T: std::Clone> std::Clone for BTreeSet<T> {
+    export fn clone(self: &Self) -> Self {
+        return BTreeSet<T> {
+            map: self.map.clone(),
+        };
+    }
+}
+
+}
+
+impl<T> std::IntoIterator<T, std::BTreeSetIntoIter<T>> for std::BTreeSet<T> {
+    fn into_iter(self: Self) -> std::BTreeSetIntoIter<T> {
+        return self.into_iter();
+    }
+}

@@ -1,0 +1,353 @@
+import <ptr>;
+import <mem>;
+
+export extern fn __luna_atomic_load_u64(ptr: *u64) -> u64;
+export extern fn __luna_atomic_store_u64(ptr: *rw u64, val: u64);
+export extern fn __luna_atomic_add_u64(ptr: *rw u64, val: u64) -> u64;
+export extern fn __luna_atomic_sub_u64(ptr: *rw u64, val: u64) -> u64;
+export extern fn __luna_atomic_cas_u64(ptr: *rw u64, expected: u64, desired: u64) -> u64;
+export extern fn __luna_atomic_swap_u64(ptr: *rw u64, val: u64) -> u64;
+
+export extern fn __luna_atomic_load_u32(ptr: *u32) -> u32;
+export extern fn __luna_atomic_store_u32(ptr: *rw u32, val: u32);
+export extern fn __luna_atomic_add_u32(ptr: *rw u32, val: u32) -> u32;
+export extern fn __luna_atomic_sub_u32(ptr: *rw u32, val: u32) -> u32;
+export extern fn __luna_atomic_cas_u32(ptr: *rw u32, expected: u32, desired: u32) -> u32;
+export extern fn __luna_atomic_swap_u32(ptr: *rw u32, val: u32) -> u32;
+
+export module std {
+    export enum Ordering {
+        Relaxed,
+        Acquire,
+        Release,
+        AcqRel,
+        SeqCst,
+    }
+
+    // =========================================================================
+    // AtomicBool
+    // =========================================================================
+    export struct AtomicBool {
+        private value: u32,
+    };
+
+    export fn atomic_bool_new(val: bool) -> AtomicBool {
+        dec rw raw: u32 = 0 as u32;
+        if val {
+            raw = 1 as u32;
+        }
+        return AtomicBool { value: raw };
+    }
+
+    impl AtomicBool {
+        export fn new(val: bool) -> AtomicBool {
+            return atomic_bool_new(val);
+        }
+
+        export fn load(self: &Self) -> bool {
+            dec p = &self.value as *u32;
+            unsafe {
+                dec v = __luna_atomic_load_u32(p);
+                return v != (0 as u32);
+            }
+        }
+
+        export fn store(self: &Self, val: bool) {
+            dec p_imm = &self.value as *u32;
+            dec p_mut = p_imm as *rw u32;
+            dec rw raw: u32 = 0 as u32;
+            if val {
+                raw = 1 as u32;
+            }
+            unsafe {
+                __luna_atomic_store_u32(p_mut, raw);
+            }
+        }
+
+        export fn swap(self: &Self, val: bool) -> bool {
+            dec p_imm = &self.value as *u32;
+            dec p_mut = p_imm as *rw u32;
+            dec rw raw: u32 = 0 as u32;
+            if val {
+                raw = 1 as u32;
+            }
+            unsafe {
+                dec old = __luna_atomic_swap_u32(p_mut, raw);
+                return old != (0 as u32);
+            }
+        }
+
+        export fn compare_exchange(self: &Self, expected: bool, desired: bool) -> bool {
+            dec p_imm = &self.value as *u32;
+            dec p_mut = p_imm as *rw u32;
+            dec rw exp: u32 = 0 as u32;
+            if expected {
+                exp = 1 as u32;
+            }
+            dec rw des: u32 = 0 as u32;
+            if desired {
+                des = 1 as u32;
+            }
+            unsafe {
+                dec prev = __luna_atomic_cas_u32(p_mut, exp, des);
+                return prev != (0 as u32);
+            }
+        }
+    }
+
+    // =========================================================================
+    // AtomicU32
+    // =========================================================================
+    export struct AtomicU32 {
+        private value: u32,
+    };
+
+    export fn atomic_u32_new(val: u32) -> AtomicU32 {
+        return AtomicU32 { value: val };
+    }
+
+    impl AtomicU32 {
+        export fn new(val: u32) -> AtomicU32 {
+            return AtomicU32 { value: val };
+        }
+
+        export fn load(self: &Self) -> u32 {
+            dec p = &self.value as *u32;
+            unsafe {
+                return __luna_atomic_load_u32(p);
+            }
+        }
+
+        export fn store(self: &Self, val: u32) {
+            dec p_imm = &self.value as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                __luna_atomic_store_u32(p_mut, val);
+            }
+        }
+
+        export fn fetch_add(self: &Self, val: u32) -> u32 {
+            dec p_imm = &self.value as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                return __luna_atomic_add_u32(p_mut, val);
+            }
+        }
+
+        export fn fetch_sub(self: &Self, val: u32) -> u32 {
+            dec p_imm = &self.value as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                return __luna_atomic_sub_u32(p_mut, val);
+            }
+        }
+
+        export fn swap(self: &Self, val: u32) -> u32 {
+            dec p_imm = &self.value as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                return __luna_atomic_swap_u32(p_mut, val);
+            }
+        }
+
+        export fn compare_exchange(self: &Self, expected: u32, desired: u32) -> u32 {
+            dec p_imm = &self.value as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                return __luna_atomic_cas_u32(p_mut, expected, desired);
+            }
+        }
+    }
+
+    // =========================================================================
+    // AtomicI32
+    // =========================================================================
+    export struct AtomicI32 {
+        private value: i32,
+    };
+
+    export fn atomic_i32_new(val: i32) -> AtomicI32 {
+        return AtomicI32 { value: val };
+    }
+
+    impl AtomicI32 {
+        export fn new(val: i32) -> AtomicI32 {
+            return AtomicI32 { value: val };
+        }
+
+        export fn load(self: &Self) -> i32 {
+            dec p = &self.value as *i32 as *u32;
+            unsafe {
+                return __luna_atomic_load_u32(p) as i32;
+            }
+        }
+
+        export fn store(self: &Self, val: i32) {
+            dec p_imm = &self.value as *i32 as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                __luna_atomic_store_u32(p_mut, val as u32);
+            }
+        }
+
+        export fn fetch_add(self: &Self, val: i32) -> i32 {
+            dec p_imm = &self.value as *i32 as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                return __luna_atomic_add_u32(p_mut, val as u32) as i32;
+            }
+        }
+
+        export fn fetch_sub(self: &Self, val: i32) -> i32 {
+            dec p_imm = &self.value as *i32 as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                return __luna_atomic_sub_u32(p_mut, val as u32) as i32;
+            }
+        }
+
+        export fn swap(self: &Self, val: i32) -> i32 {
+            dec p_imm = &self.value as *i32 as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                return __luna_atomic_swap_u32(p_mut, val as u32) as i32;
+            }
+        }
+
+        export fn compare_exchange(self: &Self, expected: i32, desired: i32) -> i32 {
+            dec p_imm = &self.value as *i32 as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                return __luna_atomic_cas_u32(p_mut, expected as u32, desired as u32) as i32;
+            }
+        }
+    }
+
+    // =========================================================================
+    // AtomicU64
+    // =========================================================================
+    export struct AtomicU64 {
+        private value: u64,
+    };
+
+    export fn atomic_u64_new(val: u64) -> AtomicU64 {
+        return AtomicU64 { value: val };
+    }
+
+    impl AtomicU64 {
+        export fn new(val: u64) -> AtomicU64 {
+            return AtomicU64 { value: val };
+        }
+
+        export fn load(self: &Self) -> u64 {
+            dec p = &self.value as *u64;
+            unsafe {
+                return __luna_atomic_load_u64(p);
+            }
+        }
+
+        export fn store(self: &Self, val: u64) {
+            dec p_imm = &self.value as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                __luna_atomic_store_u64(p_mut, val);
+            }
+        }
+
+        export fn fetch_add(self: &Self, val: u64) -> u64 {
+            dec p_imm = &self.value as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                return __luna_atomic_add_u64(p_mut, val);
+            }
+        }
+
+        export fn fetch_sub(self: &Self, val: u64) -> u64 {
+            dec p_imm = &self.value as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                return __luna_atomic_sub_u64(p_mut, val);
+            }
+        }
+
+        export fn swap(self: &Self, val: u64) -> u64 {
+            dec p_imm = &self.value as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                return __luna_atomic_swap_u64(p_mut, val);
+            }
+        }
+
+        export fn compare_exchange(self: &Self, expected: u64, desired: u64) -> u64 {
+            dec p_imm = &self.value as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                return __luna_atomic_cas_u64(p_mut, expected, desired);
+            }
+        }
+    }
+
+    // =========================================================================
+    // AtomicI64
+    // =========================================================================
+    export struct AtomicI64 {
+        private value: i64,
+    };
+
+    export fn atomic_i64_new(val: i64) -> AtomicI64 {
+        return AtomicI64 { value: val };
+    }
+
+    impl AtomicI64 {
+        export fn new(val: i64) -> AtomicI64 {
+            return AtomicI64 { value: val };
+        }
+
+        export fn load(self: &Self) -> i64 {
+            dec p = &self.value as *i64 as *u64;
+            unsafe {
+                return __luna_atomic_load_u64(p) as i64;
+            }
+        }
+
+        export fn store(self: &Self, val: i64) {
+            dec p_imm = &self.value as *i64 as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                __luna_atomic_store_u64(p_mut, val as u64);
+            }
+        }
+
+        export fn fetch_add(self: &Self, val: i64) -> i64 {
+            dec p_imm = &self.value as *i64 as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                return __luna_atomic_add_u64(p_mut, val as u64) as i64;
+            }
+        }
+
+        export fn fetch_sub(self: &Self, val: i64) -> i64 {
+            dec p_imm = &self.value as *i64 as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                return __luna_atomic_sub_u64(p_mut, val as u64) as i64;
+            }
+        }
+
+        export fn swap(self: &Self, val: i64) -> i64 {
+            dec p_imm = &self.value as *i64 as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                return __luna_atomic_swap_u64(p_mut, val as u64) as i64;
+            }
+        }
+
+        export fn compare_exchange(self: &Self, expected: i64, desired: i64) -> i64 {
+            dec p_imm = &self.value as *i64 as *u64;
+            dec p_mut = p_imm as *rw u64;
+            unsafe {
+                return __luna_atomic_cas_u64(p_mut, expected as u64, desired as u64) as i64;
+            }
+        }
+    }
+}

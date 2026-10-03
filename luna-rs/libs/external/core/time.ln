@@ -1,0 +1,551 @@
+import <__lang_option>;
+import <result>;
+import <cmp>;
+import <clone>;
+import <copy>;
+import <default>;
+
+extern fn __luna_time_monotonic_nanos() -> u64;
+extern fn __luna_time_system_epoch(out_secs: *rw u64, out_nanos: *rw u32);
+extern fn __luna_thread_sleep(nanoseconds: u64);
+
+export module std {
+
+// =============================================================================
+// Duration — A span of time with nanosecond precision
+// =============================================================================
+
+export struct Duration {
+    secs: u64,
+    nanos: u32,
+};
+
+export fn duration_new(secs: u64, nanos: u32) -> Duration {
+    dec extra_secs = (nanos as u64) / (1000000000 as u64);
+    dec rem_nanos = (nanos as u64) % (1000000000 as u64);
+    return Duration {
+        secs: secs + extra_secs,
+        nanos: rem_nanos as u32,
+    };
+}
+
+export fn duration_zero() -> Duration {
+    return Duration {
+        secs: 0 as u64,
+        nanos: 0 as u32,
+    };
+}
+
+export fn duration_from_secs(secs: u64) -> Duration {
+    return Duration {
+        secs: secs,
+        nanos: 0 as u32,
+    };
+}
+
+export fn duration_from_millis(millis: u64) -> Duration {
+    dec secs = millis / (1000 as u64);
+    dec nanos = ((millis % (1000 as u64)) * (1000000 as u64)) as u32;
+    return Duration {
+        secs: secs,
+        nanos: nanos,
+    };
+}
+
+export fn duration_from_micros(micros: u64) -> Duration {
+    dec secs = micros / (1000000 as u64);
+    dec nanos = ((micros % (1000000 as u64)) * (1000 as u64)) as u32;
+    return Duration {
+        secs: secs,
+        nanos: nanos,
+    };
+}
+
+export fn duration_from_nanos(nanos: u64) -> Duration {
+    dec secs = nanos / (1000000000 as u64);
+    dec rem_nanos = (nanos % (1000000000 as u64)) as u32;
+    return Duration {
+        secs: secs,
+        nanos: rem_nanos,
+    };
+}
+
+impl Duration {
+    export fn as_secs(self: &Self) -> u64 {
+        return self.secs;
+    }
+
+    export fn subsec_nanos(self: &Self) -> u32 {
+        return self.nanos;
+    }
+
+    export fn subsec_millis(self: &Self) -> u32 {
+        return self.nanos / (1000000 as u32);
+    }
+
+    export fn subsec_micros(self: &Self) -> u32 {
+        return self.nanos / (1000 as u32);
+    }
+
+    export fn as_millis(self: &Self) -> u64 {
+        return (self.secs * (1000 as u64)) + ((self.nanos as u64) / (1000000 as u64));
+    }
+
+    export fn as_micros(self: &Self) -> u64 {
+        return (self.secs * (1000000 as u64)) + ((self.nanos as u64) / (1000 as u64));
+    }
+
+    export fn as_nanos(self: &Self) -> u64 {
+        return (self.secs * (1000000000 as u64)) + (self.nanos as u64);
+    }
+
+    export fn is_zero(self: &Self) -> bool {
+        return self.secs == (0 as u64) && self.nanos == (0 as u32);
+    }
+
+    export fn checked_add(self: &Self, rhs: &Duration) -> std::Option<Duration> {
+        dec total_nanos = (self.nanos as u64) + (rhs.nanos as u64);
+        dec carry = total_nanos / (1000000000 as u64);
+        dec rem_nanos = (total_nanos % (1000000000 as u64)) as u32;
+        dec max_u64: u64 = 18446744073709551615u64;
+        if max_u64 - self.secs < rhs.secs + carry {
+            return std::Option::None;
+        }
+        return std::Option::Some(Duration {
+            secs: self.secs + rhs.secs + carry,
+            nanos: rem_nanos,
+        });
+    }
+
+    export fn saturating_add(self: &Self, rhs: &Duration) -> Duration {
+        dec opt = self.checked_add(rhs);
+        if opt.is_some() {
+            return opt.unwrap();
+        }
+        dec max_u64: u64 = 18446744073709551615u64;
+        return Duration {
+            secs: max_u64,
+            nanos: 999999999 as u32,
+        };
+    }
+
+    export fn add(self: &Self, rhs: &Duration) -> Duration {
+        dec total_nanos = (self.nanos as u64) + (rhs.nanos as u64);
+        dec carry = total_nanos / (1000000000 as u64);
+        dec rem_nanos = (total_nanos % (1000000000 as u64)) as u32;
+        return Duration {
+            secs: self.secs + rhs.secs + carry,
+            nanos: rem_nanos,
+        };
+    }
+
+    export fn checked_sub(self: &Self, rhs: &Duration) -> std::Option<Duration> {
+        if self.cmp(rhs) < 0 {
+            return std::Option::None;
+        }
+        dec rw rem_nanos: u32 = 0 as u32;
+        dec rw borrow: u64 = 0 as u64;
+        if self.nanos >= rhs.nanos {
+            rem_nanos = self.nanos - rhs.nanos;
+        } else {
+            rem_nanos = (self.nanos + (1000000000 as u32)) - rhs.nanos;
+            borrow = 1 as u64;
+        }
+        return std::Option::Some(Duration {
+            secs: self.secs - rhs.secs - borrow,
+            nanos: rem_nanos,
+        });
+    }
+
+    export fn saturating_sub(self: &Self, rhs: &Duration) -> Duration {
+        dec opt = self.checked_sub(rhs);
+        if opt.is_some() {
+            return opt.unwrap();
+        }
+        return duration_zero();
+    }
+
+    export fn sub(self: &Self, rhs: &Duration) -> Duration {
+        return self.saturating_sub(rhs);
+    }
+
+    export fn mul_u32(self: &Self, rhs: u32) -> Duration {
+        dec total_nanos = (self.nanos as u64) * (rhs as u64);
+        dec extra_secs = total_nanos / (1000000000 as u64);
+        dec rem_nanos = (total_nanos % (1000000000 as u64)) as u32;
+        return Duration {
+            secs: (self.secs * (rhs as u64)) + extra_secs,
+            nanos: rem_nanos,
+        };
+    }
+
+    export fn checked_mul(self: &Self, rhs: u32) -> std::Option<Duration> {
+        if rhs == (0 as u32) {
+            return std::Option::Some(duration_zero());
+        }
+        dec r = rhs as u64;
+        dec total_nanos = (self.nanos as u64) * r;
+        dec extra_secs = total_nanos / (1000000000 as u64);
+        dec rem_nanos = (total_nanos % (1000000000 as u64)) as u32;
+
+        dec max_u64: u64 = 18446744073709551615u64;
+        if (max_u64 / r) < self.secs {
+            return std::Option::None;
+        }
+        dec prod_secs = self.secs * r;
+        if (max_u64 - prod_secs) < extra_secs {
+            return std::Option::None;
+        }
+        return std::Option::Some(Duration {
+            secs: prod_secs + extra_secs,
+            nanos: rem_nanos,
+        });
+    }
+
+    export fn saturating_mul(self: &Self, rhs: u32) -> Duration {
+        dec opt = self.checked_mul(rhs);
+        if opt.is_some() {
+            return opt.unwrap();
+        }
+        dec max_u64: u64 = 18446744073709551615u64;
+        return Duration {
+            secs: max_u64,
+            nanos: 999999999 as u32,
+        };
+    }
+
+    export fn div_u32(self: &Self, rhs: u32) -> Duration {
+        if rhs == (0 as u32) {
+            return duration_zero();
+        }
+        dec r = rhs as u64;
+        dec secs = self.secs / r;
+        dec rem_secs = self.secs % r;
+        dec total_nanos = (rem_secs * (1000000000 as u64) + (self.nanos as u64)) / r;
+        return duration_new(secs, total_nanos as u32);
+    }
+
+    export fn checked_div(self: &Self, rhs: u32) -> std::Option<Duration> {
+        if rhs == (0 as u32) {
+            return std::Option::None;
+        }
+        dec r = rhs as u64;
+        dec secs = self.secs / r;
+        dec rem_secs = self.secs % r;
+        dec total_nanos = (rem_secs * (1000000000 as u64) + (self.nanos as u64)) / r;
+        return std::Option::Some(duration_new(secs, total_nanos as u32));
+    }
+
+    export fn cmp(self: &Self, other: &Self) -> i32 {
+        if self.secs < other.secs { return 0 - 1; }
+        if self.secs > other.secs { return 1; }
+        if self.nanos < other.nanos { return 0 - 1; }
+        if self.nanos > other.nanos { return 1; }
+        return 0;
+    }
+
+    export fn eq(self: &Self, other: &Self) -> bool {
+        return self.secs == other.secs && self.nanos == other.nanos;
+    }
+}
+
+impl Clone for Duration {
+    fn clone(self: &Self) -> Self {
+        return *self;
+    }
+}
+
+impl Copy for Duration {}
+
+impl Default for Duration {
+    fn default() -> Self {
+        return duration_zero();
+    }
+}
+
+impl Eq for Duration {
+    fn eq(self: &Self, other: &Self) -> bool {
+        return self.eq(other);
+    }
+}
+
+impl Ord for Duration {
+    fn cmp(self: &Self, other: &Self) -> i32 {
+        return self.cmp(other);
+    }
+}
+
+
+// =============================================================================
+// Instant — Monotonically non-decreasing measurement of a point in time
+// =============================================================================
+
+export struct Instant {
+    nanos: u64,
+};
+
+export fn instant_now() -> Instant {
+    dec n = __luna_time_monotonic_nanos();
+    return Instant { nanos: n };
+}
+
+impl Instant {
+    export fn duration_since(self: &Self, earlier: &Instant) -> Duration {
+        if self.nanos >= earlier.nanos {
+            return duration_from_nanos(self.nanos - earlier.nanos);
+        }
+        return duration_zero();
+    }
+
+    export fn elapsed(self: &Self) -> Duration {
+        dec current = instant_now();
+        return current.duration_since(self);
+    }
+
+    export fn checked_add_duration(self: &Self, dur: &Duration) -> Instant {
+        return Instant {
+            nanos: self.nanos + dur.as_nanos(),
+        };
+    }
+
+    export fn checked_sub_duration(self: &Self, dur: &Duration) -> Instant {
+        dec dur_nanos = dur.as_nanos();
+        if self.nanos >= dur_nanos {
+            return Instant {
+                nanos: self.nanos - dur_nanos,
+            };
+        }
+        return Instant {
+            nanos: 0 as u64,
+        };
+    }
+
+    export fn checked_add(self: &Self, dur: &Duration) -> std::Option<Instant> {
+        dec dur_nanos = dur.as_nanos();
+        dec max_u64: u64 = 18446744073709551615u64;
+        if max_u64 - self.nanos < dur_nanos {
+            return std::Option::None;
+        }
+        return std::Option::Some(Instant {
+            nanos: self.nanos + dur_nanos,
+        });
+    }
+
+    export fn checked_sub(self: &Self, dur: &Duration) -> std::Option<Instant> {
+        dec dur_nanos = dur.as_nanos();
+        if self.nanos < dur_nanos {
+            return std::Option::None;
+        }
+        return std::Option::Some(Instant {
+            nanos: self.nanos - dur_nanos,
+        });
+    }
+
+    export fn cmp(self: &Self, other: &Self) -> i32 {
+        if self.nanos < other.nanos { return 0 - 1; }
+        if self.nanos > other.nanos { return 1; }
+        return 0;
+    }
+
+    export fn eq(self: &Self, other: &Self) -> bool {
+        return self.nanos == other.nanos;
+    }
+}
+
+impl Clone for Instant {
+    fn clone(self: &Self) -> Self {
+        return *self;
+    }
+}
+
+impl Copy for Instant {}
+
+impl Default for Instant {
+    fn default() -> Self {
+        return Instant { nanos: 0 as u64 };
+    }
+}
+
+impl Eq for Instant {
+    fn eq(self: &Self, other: &Self) -> bool {
+        return self.eq(other);
+    }
+}
+
+impl Ord for Instant {
+    fn cmp(self: &Self, other: &Self) -> i32 {
+        return self.cmp(other);
+    }
+}
+
+
+// =============================================================================
+// SystemTime & SystemTimeError — Wall clock time with Unix Epoch origin
+// =============================================================================
+
+export struct SystemTimeError {
+    duration: Duration,
+};
+
+impl SystemTimeError {
+    export fn duration_error(self: &Self) -> Duration {
+        return self.duration;
+    }
+}
+
+impl std::Error for SystemTimeError {
+    fn description(self: &Self) -> str {
+        return "second time provided was earlier than first time";
+    }
+}
+
+export struct SystemTime {
+    secs: u64,
+    nanos: u32,
+};
+
+export fn system_time_now() -> SystemTime {
+    dec rw s: u64 = 0 as u64;
+    dec rw ns: u32 = 0 as u32;
+    unsafe {
+        __luna_time_system_epoch(&rw s as *rw u64, &rw ns as *rw u32);
+    }
+    return SystemTime {
+        secs: s,
+        nanos: ns,
+    };
+}
+
+export fn system_time_unix_epoch() -> SystemTime {
+    return SystemTime {
+        secs: 0 as u64,
+        nanos: 0 as u32,
+    };
+}
+
+impl SystemTime {
+    export fn duration_since(self: &Self, earlier: &SystemTime) -> std::Result<Duration, SystemTimeError> {
+        if self.secs > earlier.secs || (self.secs == earlier.secs && self.nanos >= earlier.nanos) {
+            dec rw rem_nanos: u32 = 0 as u32;
+            dec rw borrow: u64 = 0 as u64;
+            if self.nanos >= earlier.nanos {
+                rem_nanos = self.nanos - earlier.nanos;
+            } else {
+                rem_nanos = (self.nanos + (1000000000 as u32)) - earlier.nanos;
+                borrow = 1 as u64;
+            }
+            dec diff_secs = self.secs - earlier.secs - borrow;
+            return std::Result::Ok(Duration {
+                secs: diff_secs,
+                nanos: rem_nanos,
+            });
+        }
+        // earlier is in the future
+        dec rw rem_nanos: u32 = 0 as u32;
+        dec rw borrow: u64 = 0 as u64;
+        if earlier.nanos >= self.nanos {
+            rem_nanos = earlier.nanos - self.nanos;
+        } else {
+            rem_nanos = (earlier.nanos + (1000000000 as u32)) - self.nanos;
+            borrow = 1 as u64;
+        }
+        dec diff_secs = earlier.secs - self.secs - borrow;
+        return std::Result::Err(SystemTimeError {
+            duration: Duration {
+                secs: diff_secs,
+                nanos: rem_nanos,
+            },
+        });
+    }
+
+    export fn elapsed(self: &Self) -> std::Result<Duration, SystemTimeError> {
+        dec current = system_time_now();
+        return current.duration_since(self);
+    }
+
+    export fn checked_add(self: &Self, dur: &Duration) -> std::Option<SystemTime> {
+        dec total_nanos = (self.nanos as u64) + (dur.nanos as u64);
+        dec carry = total_nanos / (1000000000 as u64);
+        dec rem_nanos = (total_nanos % (1000000000 as u64)) as u32;
+        dec max_u64: u64 = 18446744073709551615u64;
+        if max_u64 - self.secs < dur.secs + carry {
+            return std::Option::None;
+        }
+        return std::Option::Some(SystemTime {
+            secs: self.secs + dur.secs + carry,
+            nanos: rem_nanos,
+        });
+    }
+
+    export fn checked_sub(self: &Self, dur: &Duration) -> std::Option<SystemTime> {
+        dec dur_st = SystemTime {
+            secs: dur.secs,
+            nanos: dur.nanos,
+        };
+        if self.cmp(&dur_st) < 0 {
+            return std::Option::None;
+        }
+        dec rw rem_nanos: u32 = 0 as u32;
+        dec rw borrow: u64 = 0 as u64;
+        if self.nanos >= dur.nanos {
+            rem_nanos = self.nanos - dur.nanos;
+        } else {
+            rem_nanos = (self.nanos + (1000000000 as u32)) - dur.nanos;
+            borrow = 1 as u64;
+        }
+        return std::Option::Some(SystemTime {
+            secs: self.secs - dur.secs - borrow,
+            nanos: rem_nanos,
+        });
+    }
+
+    export fn cmp(self: &Self, other: &Self) -> i32 {
+        if self.secs < other.secs { return 0 - 1; }
+        if self.secs > other.secs { return 1; }
+        if self.nanos < other.nanos { return 0 - 1; }
+        if self.nanos > other.nanos { return 1; }
+        return 0;
+    }
+
+    export fn eq(self: &Self, other: &Self) -> bool {
+        return self.secs == other.secs && self.nanos == other.nanos;
+    }
+}
+
+impl Clone for SystemTime {
+    fn clone(self: &Self) -> Self {
+        return *self;
+    }
+}
+
+impl Copy for SystemTime {}
+
+impl Default for SystemTime {
+    fn default() -> Self {
+        return system_time_unix_epoch();
+    }
+}
+
+impl Eq for SystemTime {
+    fn eq(self: &Self, other: &Self) -> bool {
+        return self.eq(other);
+    }
+}
+
+impl Ord for SystemTime {
+    fn cmp(self: &Self, other: &Self) -> i32 {
+        return self.cmp(other);
+    }
+}
+
+
+// =============================================================================
+// sleep — Puts the current thread to sleep for at least `dur`
+// =============================================================================
+
+export fn sleep(dur: &Duration) -> void {
+    dec total_nanos = (dur.secs * (1000000000 as u64)) + (dur.nanos as u64);
+    __luna_thread_sleep(total_nanos);
+}
+
+}

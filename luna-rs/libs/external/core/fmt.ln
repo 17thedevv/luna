@@ -17,6 +17,13 @@ export module std {
             ) -> std::Result<void, FmtError>;
         }
 
+        export trait Debug {
+            fn fmt<W: std::fmt::Writer>(
+                self: &Self,
+                writer: &rw W
+            ) -> std::Result<void, FmtError>;
+        }
+
         fn write_u64<W: std::fmt::Writer>(value: u64, writer: &rw W) -> std::Result<void, FmtError> {
             if value >= (10 as u64) {
                 if write_u64(value / (10 as u64), writer).is_err() {
@@ -87,6 +94,22 @@ export module std {
         impl Display for char {
             fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
                 return writer.write_char(*self);
+            }
+        }
+
+        impl Display for str {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                dec rw p = (*self) as *u8;
+                unsafe {
+                    while (*p) != (0 as u8) {
+                        dec ch = (*p) as char;
+                        if writer.write_char(ch).is_err() {
+                            return std::Result::Err(FmtError::WriteFailed);
+                        }
+                        p = p + 1;
+                    }
+                }
+                return std::Result::Ok;
             }
         }
 
@@ -161,5 +184,67 @@ export module std {
                 return write_i64(*self as i64, writer);
             }
         }
+
+        impl Debug for bool {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                if *self {
+                    if writer.write_char('t').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('u').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                } else {
+                    if writer.write_char('f').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('a').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('l').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('s').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                }
+                return std::Result::Ok;
+            }
+        }
+
+        impl Debug for char {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                if writer.write_char('\'').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                if writer.write_char(*self).is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                if writer.write_char('\'').is_err() { return std::Result::Err(FmtError::WriteFailed); }
+                return std::Result::Ok;
+            }
+        }
+
+        impl Debug for str {
+            fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> {
+                if writer.write_char('"').is_err() {
+                    return std::Result::Err(FmtError::WriteFailed);
+                }
+                dec rw p = (*self) as *u8;
+                unsafe {
+                    while (*p) != (0 as u8) {
+                        dec ch = (*p) as char;
+                        if writer.write_char(ch).is_err() {
+                            return std::Result::Err(FmtError::WriteFailed);
+                        }
+                        p = p + 1;
+                    }
+                }
+                if writer.write_char('"').is_err() {
+                    return std::Result::Err(FmtError::WriteFailed);
+                }
+                return std::Result::Ok;
+            }
+        }
+
+        impl Debug for u8 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_u64(*self as u64, writer); } }
+        impl Debug for u16 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_u64(*self as u64, writer); } }
+        impl Debug for u32 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_u64(*self as u64, writer); } }
+        impl Debug for u64 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_u64(*self, writer); } }
+        impl Debug for u128 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_u128(*self, writer); } }
+        impl Debug for usize { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_u64(*self as u64, writer); } }
+        impl Debug for i8 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_i64(*self as i64, writer); } }
+        impl Debug for i16 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_i64(*self as i64, writer); } }
+        impl Debug for i32 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_i64(*self as i64, writer); } }
+        impl Debug for i64 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_i64(*self, writer); } }
+        impl Debug for i128 { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_i128(*self, writer); } }
+        impl Debug for isize { fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, FmtError> { return write_i64(*self as i64, writer); } }
     }
 }

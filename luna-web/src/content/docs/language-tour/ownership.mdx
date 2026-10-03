@@ -1,0 +1,87 @@
+---
+title: Ownership & Borrowing
+description: Luna's approach to memory safety through ownership and borrowing.
+---
+
+## The Problem of Memory Safety
+
+Traditional systems languages give you full control but let you easily create bugs:
+- Use-after-free
+- Double-free
+- Data races
+- Memory leaks
+
+Luna solves these at compile-time through **ownership rules**.
+
+## Ownership Rules
+
+Every value in Luna has exactly one **owner**:
+
+```luna
+fn main() -> i32 {
+    dec s1 = std::String::new("hello");
+    dec s2 = s1;  // Ownership moves to s2
+
+    // s1 is no longer valid here
+    std::io::println(s2);  // OK: s2 owns the string
+    return 0;
+}
+```
+
+## Move Semantics
+
+When you assign a value or pass it to a function, ownership **moves**:
+
+```luna
+fn take_ownership(s: std::String) {
+    std::io::println(s);
+}
+
+fn main() -> i32 {
+    dec s = std::String::new("Luna");
+    take_ownership(s);
+    // s is no longer valid here
+    return 0;
+}
+```
+
+## Borrowing
+
+Instead of moving, you can **borrow** a reference:
+
+```luna
+fn calculate_length(s: &str) -> u64 {
+    return s.len() as u64;
+}
+
+fn main() -> i32 {
+    dec s = std::String::new("hello");
+    dec len = calculate_length(&s);
+    std::io::println("Length: {}", len);
+    std::io::println(s);  // s is still valid
+    return 0;
+}
+```
+
+## Mutable References
+
+When you need to modify borrowed data:
+
+```luna
+fn append_world(s: &rw std::String) {
+    s.push_str(" world");
+}
+```
+
+## Borrow Checker Rules
+
+1. **Multiple shared references**: You can have many `&T` references at once
+2. **Single mutable reference**: You can have ONE `&rw T` reference, or many `&T`, but never both
+3. **Reference lifetime**: References cannot outlive the data they reference
+
+## Why This Matters
+
+- **No garbage collector** → Predictable performance
+- **No runtime overhead** → Zero-cost abstractions
+- **Compile-time safety** → No segfaults, no data races
+- **Explicit control** → Unsafe blocks available when needed

@@ -191,7 +191,7 @@ pub fn diagnostic_messages(output: &Output) -> Vec<String> {
     let mut messages: Vec<_> = std::str::from_utf8(&output.stderr)
         .unwrap()
         .lines()
-        .filter(|line| line.starts_with("error:"))
+        .filter(|line| line.starts_with("error:") || line.starts_with("error["))
         .map(normalize_type_ids)
         .collect();
     assert!(!messages.is_empty(), "{}", render(output));

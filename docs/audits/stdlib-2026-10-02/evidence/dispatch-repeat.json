@@ -1,0 +1,146 @@
+[
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 0,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 1,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 2,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 3,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 4,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 5,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 6,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 7,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 0,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 1,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 2,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 3,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 4,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 5,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 6,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 7,
+    "compile_exit": 0,
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

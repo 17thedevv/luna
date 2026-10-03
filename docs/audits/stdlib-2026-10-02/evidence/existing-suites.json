@@ -1,0 +1,138 @@
+[
+  {
+    "suite": "stdlib_box_ownership_acceptance_tests-ae8bad6a967e0ed9",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_format_acceptance_tests-eb7aa5711a51fa23",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_collection_iterators_acceptance_tests-c5d4f2381f513332",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_hashmap_acceptance_tests-59f45f5f86777475",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_io_acceptance_tests-5f6a570692e03b12",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_hashset_acceptance_tests-02395451687aed81",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_option_result_borrow_acceptance_tests-83c2def795ed4110",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_path_acceptance_tests-b21c0173989dc6d3",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_collections_tests-c0dd4dccb30e511c",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_combinators_tests-8cf954193a99da77",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_iter_range_tests-46f7c3f99c781338",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_iter_tests-e1d98ee36329adc9",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_ownership_stress_tests-6e55d43650e17fe0",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_sorting_tests-5469670800b78eec",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_vec_depth_tests-f7086742f6c57ae4",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4c_llib_parity_tests-4c4c5705610fea8e",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4c_numerics-2f02333bea50e246",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_iterator_collect_acceptance_tests-9f861554981e3a4d",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_slice_iterator_acceptance_tests-a222c978cfb4ea7a",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_slice_index_acceptance_tests-9b3f923e8296103e",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_hashmap_storage_acceptance_tests-b36ddea839d41b3a",
+    "timeout": true
+  },
+  {
+    "suite": "stdlib_core_ptr_mem_acceptance_tests-23076ca9fa1e1305",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_option_result_conversions_acceptance_tests-cf1e6d0f0a97cd83",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_cmp_tests-04a9a1893f9615b7",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_llib_parity_tests-e70567c223592886",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_memory_tests-af535c40f2acd283",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_num_tests-581bab206f572f4c",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_phase4b_slice_tests-513170b6d4f56ce4",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_iterator_adapters_acceptance_tests-39677dfe13fa26c3",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_iterator_terminal_consumers_acceptance_tests-a454398a73c34318",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_slice_borrow_acceptance_tests-2bc5f67f60fc67d9",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_vec_element_drop_acceptance_tests-990d6cbee8c1d209",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_string_acceptance_tests-4e15b69d90c9923b",
+    "exit": 0
+  },
+  {
+    "suite": "stdlib_visibility_migration_tests-ec2a4f3a5051c84f",
+    "exit": 0
+  }
+]

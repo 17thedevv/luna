@@ -197,8 +197,10 @@ enum_variant ::= IDENTIFIER ("(" parameters ")")?
 struct_decl ::= annotation* "export"? KW_STRUCT IDENTIFIER generic_params? "{" struct_field_list? "}" struct_contract_clause* ";"
 struct_field_list ::= struct_field ("," struct_field)* ","?
 struct_field::= "export"? IDENTIFIER ":" type
-struct_contract_clause ::= "requires" lifetime_constraint_list
-                         | "requires" raw_storage_anchor
+// Canonical spelling: one requires with comma-separated entries.
+// Existing repeated requires groups remain accepted.
+struct_contract_clause ::= "requires" struct_contract_entry ("," struct_contract_entry)*
+struct_contract_entry ::= lifetime_constraint | raw_storage_anchor
 lifetime_constraint_list ::= lifetime_constraint ("," lifetime_constraint)*
 lifetime_constraint ::= life_target (">=" | "<=") life_target
 raw_storage_anchor ::= "anchor" "(" IDENTIFIER ")" "=" "self"

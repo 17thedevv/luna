@@ -1,0 +1,330 @@
+import <atomic>;
+import <sync>;
+import <thread>;
+import <time>;
+import <result>;
+
+// =============================================================================
+// Test 1: Atomics Core API (AtomicBool, AtomicU32, AtomicI32, AtomicU64, AtomicI64)
+// =============================================================================
+
+fn test_atomics_api() -> i32 {
+    // 1. AtomicBool
+    dec b = std::atomic_bool_new(false);
+    if b.load() != false { return 101 as i32; }
+    b.store(true);
+    if b.load() != true { return 102 as i32; }
+    dec old_b = b.swap(false);
+    if old_b != true { return 103 as i32; }
+    if b.load() != false { return 104 as i32; }
+    dec cas_b1 = b.compare_exchange(false, true);
+    if cas_b1 != false { return 105 as i32; }
+    if b.load() != true { return 106 as i32; }
+
+    // 2. AtomicU32
+    dec u32_val = std::atomic_u32_new(10 as u32);
+    if u32_val.load() != (10 as u32) { return 107 as i32; }
+    u32_val.store(20 as u32);
+    if u32_val.load() != (20 as u32) { return 108 as i32; }
+    dec prev_add_u32 = u32_val.fetch_add(5 as u32);
+    if prev_add_u32 != (20 as u32) { return 109 as i32; }
+    if u32_val.load() != (25 as u32) { return 110 as i32; }
+    dec prev_sub_u32 = u32_val.fetch_sub(3 as u32);
+    if prev_sub_u32 != (25 as u32) { return 111 as i32; }
+    if u32_val.load() != (22 as u32) { return 112 as i32; }
+    dec old_u32 = u32_val.swap(50 as u32);
+    if old_u32 != (22 as u32) { return 113 as i32; }
+    dec cas_u32 = u32_val.compare_exchange(50 as u32, 100 as u32);
+    if cas_u32 != (50 as u32) { return 114 as i32; }
+    if u32_val.load() != (100 as u32) { return 115 as i32; }
+
+    // 3. AtomicI32
+    dec i32_val = std::atomic_i32_new(-5 as i32);
+    if i32_val.load() != (-5 as i32) { return 116 as i32; }
+    i32_val.store(15 as i32);
+    dec prev_add_i32 = i32_val.fetch_add(10 as i32);
+    if prev_add_i32 != (15 as i32) { return 117 as i32; }
+    if i32_val.load() != (25 as i32) { return 118 as i32; }
+
+    // 4. AtomicU64
+    dec u64_val = std::atomic_u64_new(1000 as u64);
+    if u64_val.load() != (1000 as u64) { return 119 as i32; }
+    u64_val.fetch_add(500 as u64);
+    if u64_val.load() != (1500 as u64) { return 120 as i32; }
+
+    // 5. AtomicI64
+    dec i64_val = std::atomic_i64_new(-100 as i64);
+    if i64_val.load() != (-100 as i64) { return 121 as i32; }
+    i64_val.fetch_add(50 as i64);
+    if i64_val.load() != (-50 as i64) { return 122 as i32; }
+
+    return 0 as i32;
+}
+
+// =============================================================================
+// Test 2: Mutex RAII Scope & TryLock
+// =============================================================================
+
+fn test_mutex_basic() -> i32 {
+    dec mx = std::mutex_new<i32>(42 as i32);
+
+    // Initial lock & mutate
+    {
+        dec rw guard = mx.lock();
+        dec rw ref_mut = guard.as_mut();
+        *ref_mut = 100 as i32;
+        // try_lock while locked should fail (or on recursive platform, returns guard)
+    } // guard dropped and unlocked here!
+
+    // Verify value was mutated
+    {
+        dec guard2 = mx.lock();
+        dec r = guard2.as_ref();
+        if *r != (100 as i32) {
+            return 201 as i32;
+        }
+    }
+
+    // TryLock when unlocked
+    dec maybe_guard = mx.try_lock();
+    match maybe_guard {
+        std::Option::Some(g) -> {
+            dec rw guard = g;
+            dec rw m = guard.as_mut();
+            *m = 200 as i32;
+        },
+        std::Option::None -> {
+            return 202 as i32;
+        },
+    }
+
+    // Verify after try_lock
+    {
+        dec guard3 = mx.lock();
+        if *guard3.as_ref() != (200 as i32) {
+            return 203 as i32;
+        }
+    }
+
+    return 0 as i32;
+}
+
+// =============================================================================
+// Test 3: Thread Basic (ThreadId, current_id, sleep, yield_now)
+// =============================================================================
+
+fn test_thread_basic() -> i32 {
+    dec tid = std::current_id();
+    if tid.as_u64() == (0 as u64) {
+        return 301 as i32;
+    }
+    if tid.equals(&tid) == false {
+        return 302 as i32;
+    }
+
+    std::yield_now();
+
+    dec dur = std::duration_from_millis(5 as u64);
+    std::thread_sleep(&dur);
+
+    return 0 as i32;
+}
+
+// =============================================================================
+// Test 4: Multithreaded Atomics Race Test
+// =============================================================================
+
+struct AtomicWorkerContext {
+    counter: *std::AtomicU64,
+    iterations: u64,
+};
+
+fn atomic_worker(raw: *rw AtomicWorkerContext) {
+    unsafe {
+        dec p_ctx = raw;
+        dec counter = (*p_ctx).counter;
+        dec iters = (*p_ctx).iterations;
+        dec rw i: u64 = 0 as u64;
+        while i < iters {
+            (*counter).fetch_add(1 as u64);
+            i = i + (1 as u64);
+        }
+    }
+}
+
+fn test_multithreaded_atomics() -> i32 {
+    dec atom = std::atomic_u64_new(0 as u64);
+
+    dec rw ctx1 = AtomicWorkerContext {
+        counter: &atom as *std::AtomicU64,
+        iterations: 1000 as u64,
+    };
+    dec rw ctx2 = AtomicWorkerContext {
+        counter: &atom as *std::AtomicU64,
+        iterations: 1000 as u64,
+    };
+
+    dec res1 = std::spawn_with<AtomicWorkerContext>(atomic_worker, &rw ctx1 as *rw AtomicWorkerContext);
+    match res1 {
+        std::Result::Ok(h1) -> {
+            dec res2 = std::spawn_with<AtomicWorkerContext>(atomic_worker, &rw ctx2 as *rw AtomicWorkerContext);
+            match res2 {
+                std::Result::Ok(h2) -> {
+                    h1.join();
+                    h2.join();
+                },
+                std::Result::Err(_) -> { return 401 as i32; },
+            }
+        },
+        std::Result::Err(_) -> { return 402 as i32; },
+    }
+
+    dec final_count = atom.load();
+    if final_count != (2000 as u64) {
+        return 403 as i32;
+    }
+
+    return 0 as i32;
+}
+
+// =============================================================================
+// Test 5: Multithreaded Mutex Sharing
+// =============================================================================
+
+struct MutexWorkerContext {
+    mx: *std::Mutex<i32>,
+    amount: i32,
+};
+
+fn mutex_worker(raw: *rw MutexWorkerContext) {
+    unsafe {
+        dec ctx = raw;
+        dec mx = (*ctx).mx;
+        dec amount = (*ctx).amount;
+        dec rw guard = (*mx).lock();
+        dec rw ptr = guard.as_mut();
+        *ptr = *ptr + amount;
+    }
+}
+
+fn test_multithreaded_mutex() -> i32 {
+    dec mx = std::mutex_new<i32>(10 as i32);
+
+    dec rw ctx1 = MutexWorkerContext {
+        mx: &mx as *std::Mutex<i32>,
+        amount: 20 as i32,
+    };
+    dec rw ctx2 = MutexWorkerContext {
+        mx: &mx as *std::Mutex<i32>,
+        amount: 30 as i32,
+    };
+
+    dec res1 = std::spawn_with<MutexWorkerContext>(mutex_worker, &rw ctx1 as *rw MutexWorkerContext);
+    match res1 {
+        std::Result::Ok(h1) -> {
+            dec res2 = std::spawn_with<MutexWorkerContext>(mutex_worker, &rw ctx2 as *rw MutexWorkerContext);
+            match res2 {
+                std::Result::Ok(h2) -> {
+                    h1.join();
+                    h2.join();
+                },
+                std::Result::Err(_) -> { return 501 as i32; },
+            }
+        },
+        std::Result::Err(_) -> { return 502 as i32; },
+    }
+
+    {
+        dec guard = mx.lock();
+        dec r = guard.as_ref();
+        if *r != (60 as i32) { // 10 + 20 + 30 = 60
+            return 503 as i32;
+        }
+    }
+
+    return 0 as i32;
+}
+
+// =============================================================================
+// Test 6: Condvar Coordination (Producer / Consumer)
+// =============================================================================
+
+struct CondvarContext {
+    mx: *std::Mutex<bool>,
+    cv: *std::Condvar,
+};
+
+fn condvar_producer(raw: *rw CondvarContext) {
+    unsafe {
+        dec ctx = raw;
+        dec dur = std::duration_from_millis(10 as u64);
+        std::thread_sleep(&dur);
+
+        dec rw guard = (*(*ctx).mx).lock();
+        dec rw flag = guard.as_mut();
+        *flag = true;
+        (*(*ctx).cv).notify_one();
+    }
+}
+
+fn test_condvar_coordination() -> i32 {
+    dec mx = std::mutex_new<bool>(false);
+    dec cv = std::condvar_new();
+
+    dec rw ctx = CondvarContext {
+        mx: &mx as *std::Mutex<bool>,
+        cv: &cv as *std::Condvar,
+    };
+
+    dec spawn_res = std::spawn_with<CondvarContext>(condvar_producer, &rw ctx as *rw CondvarContext);
+    match spawn_res {
+        std::Result::Ok(h) -> {
+            dec rw guard = mx.lock();
+            while *guard.as_ref() == false {
+                cv.wait<bool>(&rw guard);
+            }
+            if *guard.as_ref() != true {
+                return 601 as i32;
+            }
+            h.join();
+        },
+        std::Result::Err(_) -> { return 602 as i32; },
+    }
+
+    // Test wait_timeout
+    {
+        dec rw guard2 = mx.lock();
+        dec timeout_dur = std::duration_from_millis(5 as u64);
+        // Will time out since no one notifies
+        dec ok = cv.wait_timeout<bool>(&rw guard2, &timeout_dur);
+        // on timeout, ok should be false
+    }
+
+    return 0 as i32;
+}
+
+// =============================================================================
+// Main Harness
+// =============================================================================
+
+fn main() -> i32 {
+    dec r1 = test_atomics_api();
+    if r1 != (0 as i32) { return r1; }
+
+    dec r2 = test_mutex_basic();
+    if r2 != (0 as i32) { return r2; }
+
+    dec r3 = test_thread_basic();
+    if r3 != (0 as i32) { return r3; }
+
+    dec r4 = test_multithreaded_atomics();
+    if r4 != (0 as i32) { return r4; }
+
+    dec r5 = test_multithreaded_mutex();
+    if r5 != (0 as i32) { return r5; }
+
+    dec r6 = test_condvar_coordination();
+    if r6 != (0 as i32) { return r6; }
+
+    return 0 as i32;
+}

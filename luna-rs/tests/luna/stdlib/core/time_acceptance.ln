@@ -1,0 +1,132 @@
+import <time>;
+
+module main {
+
+fn assert_true(cond: bool) -> void {
+    if cond == false {
+        dec p: *u8 = 0 as u64 as *u8;
+        unsafe {
+            dec _v = *p; // trap on failure
+        }
+    }
+}
+
+fn test_duration_constructors() -> void {
+    dec d_zero = std::duration_zero();
+    assert_true(d_zero.is_zero());
+    assert_true(d_zero.as_secs() == (0 as u64));
+    assert_true(d_zero.subsec_nanos() == (0 as u32));
+
+    dec d_secs = std::duration_from_secs(42 as u64);
+    assert_true(d_secs.as_secs() == (42 as u64));
+    assert_true(d_secs.subsec_nanos() == (0 as u32));
+    assert_true(d_secs.as_millis() == (42000 as u64));
+
+    dec d_millis = std::duration_from_millis(2500 as u64);
+    assert_true(d_millis.as_secs() == (2 as u64));
+    assert_true(d_millis.subsec_millis() == (500 as u32));
+    assert_true(d_millis.subsec_nanos() == (500000000 as u32));
+    assert_true(d_millis.as_millis() == (2500 as u64));
+
+    dec d_micros = std::duration_from_micros(1500000 as u64);
+    assert_true(d_micros.as_secs() == (1 as u64));
+    assert_true(d_micros.subsec_micros() == (500000 as u32));
+    assert_true(d_micros.as_micros() == (1500000 as u64));
+
+    dec d_nanos = std::duration_from_nanos(1234567890 as u64);
+    assert_true(d_nanos.as_secs() == (1 as u64));
+    assert_true(d_nanos.subsec_nanos() == (234567890 as u32));
+    assert_true(d_nanos.as_nanos() == (1234567890 as u64));
+
+    // Normalization in duration_new
+    dec d_norm = std::duration_new(3 as u64, 2500000000u32);
+    assert_true(d_norm.as_secs() == (5 as u64));
+    assert_true(d_norm.subsec_nanos() == (500000000 as u32));
+}
+
+fn test_duration_arithmetic() -> void {
+    dec a = std::duration_from_millis(1500 as u64);
+    dec b = std::duration_from_millis(800 as u64);
+
+    // Add
+    dec sum = a.add(&b);
+    assert_true(sum.as_millis() == (2300 as u64));
+    assert_true(sum.as_secs() == (2 as u64));
+    assert_true(sum.subsec_millis() == (300 as u32));
+
+    // Sub
+    dec diff = a.sub(&b);
+    assert_true(diff.as_millis() == (700 as u64));
+    assert_true(diff.as_secs() == (0 as u64));
+    assert_true(diff.subsec_millis() == (700 as u32));
+
+    // Underflow check
+    dec under = b.saturating_sub(&a);
+    assert_true(under.is_zero());
+
+    // Mul
+    dec prod = b.mul_u32(3 as u32);
+    assert_true(prod.as_millis() == (2400 as u64));
+
+    // Div
+    dec div = prod.div_u32(4 as u32);
+    assert_true(div.as_millis() == (600 as u64));
+}
+
+fn test_duration_comparison() -> void {
+    dec small = std::duration_from_millis(100 as u64);
+    dec large = std::duration_from_millis(200 as u64);
+    dec equal = std::duration_from_millis(100 as u64);
+
+    assert_true(small.cmp(&large) < 0);
+    assert_true(large.cmp(&small) > 0);
+    assert_true(small.cmp(&equal) == 0);
+    assert_true(small.eq(&equal));
+    assert_true(small.eq(&large) == false);
+}
+
+fn test_instant_and_sleep() -> void {
+    dec start = std::instant_now();
+    assert_true(start.nanos > (0 as u64));
+
+    // Sleep for 15 milliseconds
+    dec sleep_dur = std::duration_from_millis(15 as u64);
+    std::sleep(&sleep_dur);
+
+    dec elapsed = start.elapsed();
+    // At least 10ms should have elapsed (tolerating timer granularity)
+    assert_true(elapsed.as_millis() >= (10 as u64));
+
+    // Duration arithmetic on Instant
+    dec dur5 = std::duration_from_secs(5 as u64);
+    dec future = start.checked_add_duration(&dur5);
+    assert_true(future.duration_since(&start).as_secs() == (5 as u64));
+}
+
+fn test_system_time() -> void {
+    dec now = std::system_time_now();
+    assert_true(now.secs > (1700000000 as u64)); // Past year 2023
+
+    dec epoch = std::system_time_unix_epoch();
+    dec since_epoch_res = now.duration_since(&epoch);
+    assert_true(since_epoch_res.is_ok());
+
+    dec since_epoch = since_epoch_res.unwrap();
+    assert_true(since_epoch.as_secs() == now.secs);
+
+    // Negative duration should return SystemTimeError
+    dec future = std::SystemTime { secs: now.secs + (100 as u64), nanos: now.nanos };
+    dec neg_res = now.duration_since(&future);
+    assert_true(neg_res.is_err());
+}
+
+fn main() -> i32 {
+    test_duration_constructors();
+    test_duration_arithmetic();
+    test_duration_comparison();
+    test_instant_and_sleep();
+    test_system_time();
+    return 0;
+}
+
+}

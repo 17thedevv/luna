@@ -1,0 +1,18 @@
+import <vec>;
+import <string>;
+import <hashmap>;
+import <num>;
+fn main() -> i32 {
+    dec rw v = std::vec_new<i32>();
+    v.push(4);
+    v.push(9);
+    if v.pop().unwrap() != 9 { return 1; }
+    if *v.get(0 as u64).unwrap() != 4 { return 2; }
+    dec s = std::string_from_str("Luna");
+    if s.len() != (4 as u64) { return 3; }
+    dec rw m = std::hashmap_new<i32, i32>();
+    m.insert(1, 17);
+    if *m.get(&1).unwrap() != 17 { return 4; }
+    if std::checked_add_u8(255 as u8, 1 as u8).is_some() { return 5; }
+    return 0;
+}

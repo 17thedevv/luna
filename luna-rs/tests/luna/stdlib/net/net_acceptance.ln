@@ -1,0 +1,369 @@
+import <net>;
+import <result>;
+import <slice>;
+import <vec>;
+
+fn test_ipv4() -> i32 {
+    dec ip = std::ipv4_new(127 as u8, 0 as u8, 0 as u8, 1 as u8);
+    dec octets = ip.octets();
+    if octets[0] != (127 as u8) || octets[1] != (0 as u8) || octets[2] != (0 as u8) || octets[3] != (1 as u8) {
+        return 1;
+    }
+
+    dec local = std::ipv4_localhost();
+    if local.is_loopback() == false {
+        return 2;
+    }
+    if local.is_unspecified() {
+        return 3;
+    }
+
+    dec any_ip = std::ipv4_any();
+    if any_ip.is_unspecified() == false {
+        return 4;
+    }
+
+    dec raw = ip.to_u32();
+    dec recovered = std::ipv4_from_u32(raw);
+    dec rec_oct = recovered.octets();
+    if rec_oct[0] != (127 as u8) || rec_oct[3] != (1 as u8) {
+        return 5;
+    }
+
+    dec sa = std::socket_addr_v4_new(ip, 8080 as u16);
+    if sa.port() != (8080 as u16) {
+        return 6;
+    }
+
+    return 0;
+}
+
+fn test_udp() -> i32 {
+    dec addr_a = std::socket_addr_v4_new(std::ipv4_localhost(), 29101 as u16);
+    dec addr_b = std::socket_addr_v4_new(std::ipv4_localhost(), 29102 as u16);
+
+    dec sock_a_res = std::udp_socket_bind_addr(&addr_a);
+    match sock_a_res {
+        std::Result::Err(_) -> { return 10; },
+        std::Result::Ok(sock_a) -> {
+            dec sock_b_res = std::udp_socket_bind_addr(&addr_b);
+            match sock_b_res {
+                std::Result::Err(_) -> {
+                    sock_a.close();
+                    return 11;
+                },
+                std::Result::Ok(sock_b) -> {
+                    // Send from sock_a to sock_b
+                    dec rw send_buf = std::vec_new<u8>();
+                    send_buf.push(76 as u8); // 'L'
+                    send_buf.push(85 as u8); // 'U'
+                    send_buf.push(78 as u8); // 'N'
+                    send_buf.push(65 as u8); // 'A'
+
+                    dec send_res = sock_a.send_to_addr(send_buf.as_slice(), &addr_b);
+                    match send_res {
+                        std::Result::Err(_) -> {
+                            sock_a.close();
+                            sock_b.close();
+                            return 12;
+                        },
+                        std::Result::Ok(n) -> {
+                            if n != (4 as usize) {
+                                sock_a.close();
+                                sock_b.close();
+                                return 13;
+                            }
+                        },
+                    }
+
+                    // Recv at sock_b
+                    dec rw recv_vec = std::vec_with_capacity<u8>(16 as u64);
+                    dec rw i: u64 = 0 as u64;
+                    while i < (16 as u64) {
+                        recv_vec.push(0 as u8);
+                        i = i + (1 as u64);
+                    }
+
+                    dec recv_res = sock_b.recv_from_addr(recv_vec.as_mut_slice());
+                    match recv_res {
+                        std::Result::Err(_) -> {
+                            sock_a.close();
+                            sock_b.close();
+                            return 14;
+                        },
+                        std::Result::Ok(info) -> {
+                            if info.bytes_read != (4 as usize) {
+                                sock_a.close();
+                                sock_b.close();
+                                return 15;
+                            }
+                            dec slice = recv_vec.as_slice();
+                            if slice[0] != (76 as u8) || slice[1] != (85 as u8) || slice[2] != (78 as u8) || slice[3] != (65 as u8) {
+                                sock_a.close();
+                                sock_b.close();
+                                return 16;
+                            }
+                            if info.sender.port != (29101 as u16) {
+                                sock_a.close();
+                                sock_b.close();
+                                return 17;
+                            }
+                        },
+                    }
+
+                    sock_a.close();
+                    sock_b.close();
+                    return 0;
+                },
+            }
+        },
+    }
+}
+
+fn test_tcp() -> i32 {
+    dec srv_addr = std::socket_addr_v4_new(std::ipv4_localhost(), 29103 as u16);
+    dec listener_res = std::tcp_listener_bind_addr(&srv_addr);
+
+    match listener_res {
+        std::Result::Err(_) -> { return 20; },
+        std::Result::Ok(listener) -> {
+            dec bound_addr_res = listener.local_addr();
+            match bound_addr_res {
+                std::Result::Err(_) -> {
+                    listener.close();
+                    return 21;
+                },
+                std::Result::Ok(bound_addr) -> {
+                    if bound_addr.port != (29103 as u16) {
+                        listener.close();
+                        return 22;
+                    }
+                },
+            }
+
+            // Client connects to listener
+            dec client_res = std::tcp_stream_connect_addr(&srv_addr);
+            match client_res {
+                std::Result::Err(_) -> {
+                    listener.close();
+                    return 23;
+                },
+                std::Result::Ok(client) -> {
+                    // Set client nodelay
+                    dec nodelay_res = client.set_nodelay(true);
+                    match nodelay_res {
+                        std::Result::Err(_) -> {
+                            client.close();
+                            listener.close();
+                            return 24;
+                        },
+                        std::Result::Ok -> {},
+                    }
+
+                    // Client writes "PING"
+                    dec rw ping_vec = std::vec_new<u8>();
+                    ping_vec.push(80 as u8); // 'P'
+                    ping_vec.push(73 as u8); // 'I'
+                    ping_vec.push(78 as u8); // 'N'
+                    ping_vec.push(71 as u8); // 'G'
+
+                    dec write_res = client.write_all(ping_vec.as_slice());
+                    match write_res {
+                        std::Result::Err(_) -> {
+                            client.close();
+                            listener.close();
+                            return 25;
+                        },
+                        std::Result::Ok -> {},
+                    }
+
+                    // Server accepts connection
+                    dec accept_res = listener.accept();
+                    match accept_res {
+                        std::Result::Err(_) -> {
+                            client.close();
+                            listener.close();
+                            return 26;
+                        },
+                        std::Result::Ok(srv_stream) -> {
+                            dec peer_res = srv_stream.peer_addr();
+                            match peer_res {
+                                std::Result::Err(_) -> {
+                                    srv_stream.close();
+                                    client.close();
+                                    listener.close();
+                                    return 27;
+                                },
+                                std::Result::Ok(peer_addr) -> {
+                                    if peer_addr.port == (0 as u16) {
+                                        srv_stream.close();
+                                        client.close();
+                                        listener.close();
+                                        return 27;
+                                    }
+                                },
+                            }
+
+                            // Server reads "PING"
+                            dec rw srv_recv_vec = std::vec_with_capacity<u8>(8 as u64);
+                            dec rw i1: u64 = 0 as u64;
+                            while i1 < (8 as u64) {
+                                srv_recv_vec.push(0 as u8);
+                                i1 = i1 + (1 as u64);
+                            }
+
+                            dec read_res = srv_stream.read(srv_recv_vec.as_mut_slice());
+                            match read_res {
+                                std::Result::Err(_) -> {
+                                    srv_stream.close();
+                                    client.close();
+                                    listener.close();
+                                    return 28;
+                                },
+                                std::Result::Ok(n) -> {
+                                    if n != (4 as usize) {
+                                        srv_stream.close();
+                                        client.close();
+                                        listener.close();
+                                        return 29;
+                                    }
+                                    dec srv_slice = srv_recv_vec.as_slice();
+                                    if srv_slice[0] != (80 as u8) || srv_slice[1] != (73 as u8) || srv_slice[2] != (78 as u8) || srv_slice[3] != (71 as u8) {
+                                        srv_stream.close();
+                                        client.close();
+                                        listener.close();
+                                        return 30;
+                                    }
+                                },
+                            }
+
+                            // Server replies "PONG"
+                            dec rw pong_vec = std::vec_new<u8>();
+                            pong_vec.push(80 as u8); // 'P'
+                            pong_vec.push(79 as u8); // 'O'
+                            pong_vec.push(78 as u8); // 'N'
+                            pong_vec.push(71 as u8); // 'G'
+
+                            dec srv_write_res = srv_stream.write_all(pong_vec.as_slice());
+                            match srv_write_res {
+                                std::Result::Err(_) -> {
+                                    srv_stream.close();
+                                    client.close();
+                                    listener.close();
+                                    return 31;
+                                },
+                                std::Result::Ok -> {},
+                            }
+
+                            // Client reads "PONG"
+                            dec rw cli_recv_vec = std::vec_with_capacity<u8>(8 as u64);
+                            dec rw i2: u64 = 0 as u64;
+                            while i2 < (8 as u64) {
+                                cli_recv_vec.push(0 as u8);
+                                i2 = i2 + (1 as u64);
+                            }
+
+                            dec cli_read_res = client.read(cli_recv_vec.as_mut_slice());
+                            match cli_read_res {
+                                std::Result::Err(_) -> {
+                                    srv_stream.close();
+                                    client.close();
+                                    listener.close();
+                                    return 32;
+                                },
+                                std::Result::Ok(n) -> {
+                                    if n != (4 as usize) {
+                                        srv_stream.close();
+                                        client.close();
+                                        listener.close();
+                                        return 33;
+                                    }
+                                    dec cli_slice = cli_recv_vec.as_slice();
+                                    if cli_slice[0] != (80 as u8) || cli_slice[1] != (79 as u8) || cli_slice[2] != (78 as u8) || cli_slice[3] != (71 as u8) {
+                                        srv_stream.close();
+                                        client.close();
+                                        listener.close();
+                                        return 34;
+                                    }
+                                },
+                            }
+
+                            // Client shutdown
+                            dec shut_res = client.shutdown(std::Shutdown::Both);
+                            match shut_res {
+                                std::Result::Err(_) -> {
+                                    srv_stream.close();
+                                    client.close();
+                                    listener.close();
+                                    return 35;
+                                },
+                                std::Result::Ok -> {},
+                            }
+
+                            srv_stream.close();
+                            client.close();
+                            listener.close();
+                            return 0;
+                        },
+                    }
+                },
+            }
+        },
+    }
+}
+
+fn test_nonblocking() -> i32 {
+    dec srv_addr = std::socket_addr_v4_new(std::ipv4_localhost(), 29104 as u16);
+    dec listener_res = std::tcp_listener_bind_addr(&srv_addr);
+
+    match listener_res {
+        std::Result::Err(_) -> { return 40; },
+        std::Result::Ok(listener) -> {
+            dec nb_res = listener.set_nonblocking(true);
+            match nb_res {
+                std::Result::Err(_) -> {
+                    listener.close();
+                    return 41;
+                },
+                std::Result::Ok -> {},
+            }
+
+            dec accept_res = listener.accept();
+            match accept_res {
+                std::Result::Ok(stream) -> {
+                    stream.close();
+                    listener.close();
+                    return 42;
+                },
+                std::Result::Err(e) -> {
+                    match e {
+                        std::NetError::WouldBlock -> {
+                            listener.close();
+                            return 0;
+                        },
+                        _ -> {
+                            listener.close();
+                            return 43;
+                        },
+                    }
+                },
+            }
+        },
+    }
+}
+
+export fn main() -> i32 {
+    dec r1 = test_ipv4();
+    if r1 != 0 { return r1; }
+
+    dec r2 = test_udp();
+    if r2 != 0 { return r2; }
+
+    dec r3 = test_tcp();
+    if r3 != 0 { return r3; }
+
+    dec r4 = test_nonblocking();
+    if r4 != 0 { return r4; }
+
+    return 0;
+}

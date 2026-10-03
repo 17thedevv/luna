@@ -1,0 +1,16 @@
+module owner_api {
+    export struct Owner<T, U> {
+        export first: *rw T,
+        export second: *rw U,
+    } requires anchor(first) = self, anchor(second) = self;
+
+    export unsafe fn first<T, U>(owner: &rw Owner<T, U>) -> &rw T life_from(owner) {
+        dec raw = owner.first;
+        return &rw *raw;
+    }
+
+    export unsafe fn second<T, U>(owner: &rw Owner<T, U>) -> &rw U life_from(owner) {
+        dec raw = owner.second;
+        return &rw *raw;
+    }
+}

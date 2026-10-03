@@ -1,0 +1,719 @@
+import <__alloc_global>;
+import <vec>;
+import <ptr>;
+import <mem>;
+import <cmp>;
+import <clone>;
+import <default>;
+import <__lang_drop>;
+import <__lang_option>;
+import <__lang_iterator>;
+import <__lang_into_iterator>;
+
+module std {
+
+export struct BTreeMapIter<K, V> {
+    private keys: *K,
+    private values: *V,
+    private lefts: *u64,
+    private rights: *u64,
+    private stack: std::Vec<u64>,
+} requires anchor(keys) = self,
+           anchor(values) = self,
+           anchor(lefts) = self,
+           anchor(rights) = self;
+
+impl<K, V> BTreeMapIter<K, V> {
+    export fn next(self: &rw Self) -> std::Option<(&K, &V)> life_from(self) {
+        if self.stack.is_empty() {
+            return std::Option::None;
+        }
+        dec node_id = self.stack.pop().unwrap();
+        dec idx = node_id - (1 as u64);
+        unsafe {
+            dec rw curr = *std::ptr::add<u64>(self.rights, idx);
+            while curr > (0 as u64) {
+                self.stack.push(curr);
+                curr = *std::ptr::add<u64>(self.lefts, curr - (1 as u64));
+            }
+            dec pk = std::ptr::add<K>(self.keys, idx);
+            dec pv = std::ptr::add<V>(self.values, idx);
+            return std::Option::Some((&*pk, &*pv));
+        }
+    }
+}
+
+impl<K, V> std::Iterator<(&K, &V)> for BTreeMapIter<K, V> {
+    fn next(self: &rw Self) -> std::Option<(&K, &V)> life_from(self) {
+        return self.next();
+    }
+}
+
+export struct BTreeKeys<K, V> {
+    private iter: BTreeMapIter<K, V>,
+};
+
+impl<K, V> BTreeKeys<K, V> {
+    export fn next(self: &rw Self) -> std::Option<&K> life_from(self) {
+        dec opt = self.iter.next();
+        match opt {
+            std::Option::Some(pair) -> { return std::Option::Some(pair.0); },
+            std::Option::None -> { return std::Option::None; },
+        }
+    }
+}
+
+impl<K, V> std::Iterator<&K> for BTreeKeys<K, V> {
+    fn next(self: &rw Self) -> std::Option<&K> life_from(self) {
+        return self.next();
+    }
+}
+
+export struct BTreeValues<K, V> {
+    private iter: BTreeMapIter<K, V>,
+};
+
+impl<K, V> BTreeValues<K, V> {
+    export fn next(self: &rw Self) -> std::Option<&V> life_from(self) {
+        dec opt = self.iter.next();
+        match opt {
+            std::Option::Some(pair) -> { return std::Option::Some(pair.1); },
+            std::Option::None -> { return std::Option::None; },
+        }
+    }
+}
+
+impl<K, V> std::Iterator<&V> for BTreeValues<K, V> {
+    fn next(self: &rw Self) -> std::Option<&V> life_from(self) {
+        return self.next();
+    }
+}
+
+export struct BTreeMapIntoIter<K, V> {
+    private vec_iter: std::VecIntoIter<(K, V)>,
+};
+
+impl<K, V> BTreeMapIntoIter<K, V> {
+    export fn next(self: &rw Self) -> std::Option<(K, V)> {
+        return self.vec_iter.next();
+    }
+}
+
+impl<K, V> std::Iterator<(K, V)> for BTreeMapIntoIter<K, V> {
+    fn next(self: &rw Self) -> std::Option<(K, V)> life_from(self) {
+        return self.vec_iter.next();
+    }
+}
+
+export struct BTreeMap<K, V> {
+    private keys: *rw K,
+    private values: *rw V,
+    private lefts: *rw u64,
+    private rights: *rw u64,
+    private heights: *rw i32,
+    private cap: u64,
+    private len: u64,
+    private root: u64,
+} requires anchor(keys) = self,
+           anchor(values) = self,
+           anchor(lefts) = self,
+           anchor(rights) = self,
+           anchor(heights) = self;
+
+export fn btreemap_new<K, V>() -> BTreeMap<K, V> {
+    unsafe {
+        return BTreeMap<K, V> {
+            keys: 0 as u64 as *rw K,
+            values: 0 as u64 as *rw V,
+            lefts: 0 as u64 as *rw u64,
+            rights: 0 as u64 as *rw u64,
+            heights: 0 as u64 as *rw i32,
+            cap: 0 as u64,
+            len: 0 as u64,
+            root: 0 as u64,
+        };
+    }
+}
+
+impl<K, V> std::Default for BTreeMap<K, V> {
+    fn default() -> Self {
+        return btreemap_new<K, V>();
+    }
+}
+
+impl<K, V> BTreeMap<K, V> {
+    export fn len(self: &Self) -> u64 {
+        return self.len;
+    }
+
+    export fn is_empty(self: &Self) -> bool {
+        return self.len == (0 as u64);
+    }
+
+    export fn iter(self: &Self) -> BTreeMapIter<K, V> life_from(self) {
+        dec rw st = std::vec_new<u64>();
+        dec rw curr = self.root;
+        while curr > (0 as u64) {
+            st.push(curr);
+            unsafe {
+                curr = *std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64));
+            }
+        }
+        unsafe {
+            return BTreeMapIter<K, V> {
+                keys: self.keys as *K,
+                values: self.values as *V,
+                lefts: self.lefts as *u64,
+                rights: self.rights as *u64,
+                stack: st,
+            };
+        }
+    }
+
+    export fn keys(self: &Self) -> BTreeKeys<K, V> life_from(self) {
+        return BTreeKeys<K, V> {
+            iter: self.iter(),
+        };
+    }
+
+    export fn values(self: &Self) -> BTreeValues<K, V> life_from(self) {
+        return BTreeValues<K, V> {
+            iter: self.iter(),
+        };
+    }
+
+    export fn into_iter(self: Self) -> BTreeMapIntoIter<K, V> {
+        dec rw out = std::vec_with_capacity<(K, V)>(self.len);
+        dec rw st = std::vec_new<u64>();
+        dec rw curr = self.root;
+        while curr > (0 as u64) {
+            st.push(curr);
+            unsafe {
+                curr = *std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64));
+            }
+        }
+        while st.is_empty() == false {
+            dec node_id = st.pop().unwrap();
+            dec idx = node_id - (1 as u64);
+            unsafe {
+                dec rw right_curr = *std::ptr::add<u64>(self.rights as *u64, idx);
+                while right_curr > (0 as u64) {
+                    st.push(right_curr);
+                    right_curr = *std::ptr::add<u64>(self.lefts as *u64, right_curr - (1 as u64));
+                }
+                dec pk = std::ptr::add<K>(self.keys as *K, idx);
+                dec pv = std::ptr::add<V>(self.values as *V, idx);
+                dec k = std::ptr::read<K>(pk);
+                dec v = std::ptr::read<V>(pv);
+                out.push((k, v));
+            }
+        }
+        dec rw tree = self;
+        tree.len = 0 as u64;
+        return BTreeMapIntoIter<K, V> {
+            vec_iter: out.into_iter(),
+        };
+    }
+
+    fn grow(self: &rw Self) {
+        dec rw new_cap: u64 = 4 as u64;
+        if self.cap > (0 as u64) {
+            new_cap = self.cap * (2 as u64);
+        }
+        dec k_size = new_cap * (std::mem::size_of<K>() as u64);
+        dec k_align = std::mem::align_of<K>() as u64;
+        dec v_size = new_cap * (std::mem::size_of<V>() as u64);
+        dec v_align = std::mem::align_of<V>() as u64;
+        dec u64_size = new_cap * (8 as u64);
+        dec i32_size = new_cap * (4 as u64);
+
+        unsafe {
+            dec new_keys = __luna_alloc(k_size, k_align) as *rw K;
+            dec new_vals = __luna_alloc(v_size, v_align) as *rw V;
+            dec new_lefts = __luna_alloc(u64_size, 8 as u64) as *rw u64;
+            dec new_rights = __luna_alloc(u64_size, 8 as u64) as *rw u64;
+            dec new_heights = __luna_alloc(i32_size, 4 as u64) as *rw i32;
+
+            if (new_keys as u64 == (0 as u64)) || (new_vals as u64 == (0 as u64)) {
+                __luna_panic_default();
+            }
+
+            if self.len > (0 as u64) {
+                std::ptr::copy<K>(self.keys as *K, new_keys, self.len);
+                std::ptr::copy<V>(self.values as *V, new_vals, self.len);
+                std::ptr::copy<u64>(self.lefts as *u64, new_lefts, self.len);
+                std::ptr::copy<u64>(self.rights as *u64, new_rights, self.len);
+                std::ptr::copy<i32>(self.heights as *i32, new_heights, self.len);
+            }
+
+            if self.cap > (0 as u64) {
+                dec old_k_size = self.cap * (std::mem::size_of<K>() as u64);
+                dec old_v_size = self.cap * (std::mem::size_of<V>() as u64);
+                __luna_dealloc(self.keys as *rw u8, old_k_size, k_align);
+                __luna_dealloc(self.values as *rw u8, old_v_size, v_align);
+                __luna_dealloc(self.lefts as *rw u8, self.cap * (8 as u64), 8 as u64);
+                __luna_dealloc(self.rights as *rw u8, self.cap * (8 as u64), 8 as u64);
+                __luna_dealloc(self.heights as *rw u8, self.cap * (4 as u64), 4 as u64);
+            }
+
+            self.keys = new_keys;
+            self.values = new_vals;
+            self.lefts = new_lefts;
+            self.rights = new_rights;
+            self.heights = new_heights;
+            self.cap = new_cap;
+        }
+    }
+
+    fn push_node(self: &rw Self, k: K, v: V) -> u64 {
+        if self.len == self.cap {
+            self.grow();
+        }
+        dec idx = self.len;
+        unsafe {
+            dec pk = std::ptr::add_mut<K>(self.keys, idx);
+            std::ptr::write<K>(pk, k);
+            dec pv = std::ptr::add_mut<V>(self.values, idx);
+            std::ptr::write<V>(pv, v);
+            dec pl = std::ptr::add_mut<u64>(self.lefts, idx);
+            std::ptr::write<u64>(pl, 0 as u64);
+            dec pr = std::ptr::add_mut<u64>(self.rights, idx);
+            std::ptr::write<u64>(pr, 0 as u64);
+            dec ph = std::ptr::add_mut<i32>(self.heights, idx);
+            std::ptr::write<i32>(ph, 1);
+        }
+        self.len = self.len + (1 as u64);
+        return self.len;
+    }
+
+    export fn clear(self: &rw Self) {
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            unsafe {
+                dec pk = std::ptr::add_mut<K>(self.keys, i);
+                std::ptr::drop_in_place<K>(pk);
+                dec pv = std::ptr::add_mut<V>(self.values, i);
+                std::ptr::drop_in_place<V>(pv);
+            }
+            i = i + (1 as u64);
+        }
+        self.len = 0 as u64;
+        self.root = 0 as u64;
+    }
+
+    export fn first_key(self: &Self) -> std::Option<&K> life_from(self) {
+        if self.root == (0 as u64) {
+            return std::Option::None;
+        }
+        dec rw curr = self.root;
+        while true {
+            unsafe {
+                dec left_id = *(std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64)));
+                if left_id == (0 as u64) {
+                    dec kp = std::ptr::add<K>(self.keys as *K, curr - (1 as u64));
+                    return std::Option::Some(&*kp);
+                }
+                curr = left_id;
+            }
+        }
+        return std::Option::None;
+    }
+
+    export fn last_key(self: &Self) -> std::Option<&K> life_from(self) {
+        if self.root == (0 as u64) {
+            return std::Option::None;
+        }
+        dec rw curr = self.root;
+        while true {
+            unsafe {
+                dec right_id = *(std::ptr::add<u64>(self.rights as *u64, curr - (1 as u64)));
+                if right_id == (0 as u64) {
+                    dec kp = std::ptr::add<K>(self.keys as *K, curr - (1 as u64));
+                    return std::Option::Some(&*kp);
+                }
+                curr = right_id;
+            }
+        }
+        return std::Option::None;
+    }
+
+    export fn first_value(self: &Self) -> std::Option<&V> life_from(self) {
+        if self.root == (0 as u64) {
+            return std::Option::None;
+        }
+        dec rw curr = self.root;
+        while true {
+            unsafe {
+                dec left_id = *(std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64)));
+                if left_id == (0 as u64) {
+                    dec vp = std::ptr::add<V>(self.values as *V, curr - (1 as u64));
+                    return std::Option::Some(&*vp);
+                }
+                curr = left_id;
+            }
+        }
+        return std::Option::None;
+    }
+
+    export fn last_value(self: &Self) -> std::Option<&V> life_from(self) {
+        if self.root == (0 as u64) {
+            return std::Option::None;
+        }
+        dec rw curr = self.root;
+        while true {
+            unsafe {
+                dec right_id = *(std::ptr::add<u64>(self.rights as *u64, curr - (1 as u64)));
+                if right_id == (0 as u64) {
+                    dec vp = std::ptr::add<V>(self.values as *V, curr - (1 as u64));
+                    return std::Option::Some(&*vp);
+                }
+                curr = right_id;
+            }
+        }
+        return std::Option::None;
+    }
+
+    fn avl_node_h(self: &Self, id: u64) -> i32 {
+        if id == (0 as u64) { return 0; }
+        unsafe {
+            return *(std::ptr::add<i32>(self.heights as *i32, id - (1 as u64)));
+        }
+    }
+
+    fn avl_update_h(self: &rw Self, id: u64) {
+        unsafe {
+            dec lid = *(std::ptr::add<u64>(self.lefts as *u64, id - (1 as u64)));
+            dec rid = *(std::ptr::add<u64>(self.rights as *u64, id - (1 as u64)));
+            dec lh = self.avl_node_h(lid);
+            dec rh = self.avl_node_h(rid);
+            dec rw m = lh;
+            if rh > lh { m = rh; }
+            dec ph = std::ptr::add_mut<i32>(self.heights, id - (1 as u64));
+            *ph = m + 1;
+        }
+    }
+
+    fn avl_balance_f(self: &Self, id: u64) -> i32 {
+        if id == (0 as u64) { return 0; }
+        unsafe {
+            dec lid = *(std::ptr::add<u64>(self.lefts as *u64, id - (1 as u64)));
+            dec rid = *(std::ptr::add<u64>(self.rights as *u64, id - (1 as u64)));
+            return self.avl_node_h(lid) - self.avl_node_h(rid);
+        }
+    }
+
+    fn avl_rot_right(self: &rw Self, y: u64) -> u64 {
+        unsafe {
+            dec x = *(std::ptr::add<u64>(self.lefts as *u64, y - (1 as u64)));
+            dec t2 = *(std::ptr::add<u64>(self.rights as *u64, x - (1 as u64)));
+            dec px_r = std::ptr::add_mut<u64>(self.rights, x - (1 as u64));
+            *px_r = y;
+            dec py_l = std::ptr::add_mut<u64>(self.lefts, y - (1 as u64));
+            *py_l = t2;
+            self.avl_update_h(y);
+            self.avl_update_h(x);
+            return x;
+        }
+    }
+
+    fn avl_rot_left(self: &rw Self, x: u64) -> u64 {
+        unsafe {
+            dec y = *(std::ptr::add<u64>(self.rights as *u64, x - (1 as u64)));
+            dec t2 = *(std::ptr::add<u64>(self.lefts as *u64, y - (1 as u64)));
+            dec py_l = std::ptr::add_mut<u64>(self.lefts, y - (1 as u64));
+            *py_l = x;
+            dec px_r = std::ptr::add_mut<u64>(self.rights, x - (1 as u64));
+            *px_r = t2;
+            self.avl_update_h(x);
+            self.avl_update_h(y);
+            return y;
+        }
+    }
+
+    fn avl_rebalance(self: &rw Self, node_id: u64) -> u64 {
+        self.avl_update_h(node_id);
+        dec bf = self.avl_balance_f(node_id);
+        if bf > 1 {
+            unsafe {
+                dec lid = *(std::ptr::add<u64>(self.lefts as *u64, node_id - (1 as u64)));
+                if self.avl_balance_f(lid) < 0 {
+                    dec new_l = self.avl_rot_left(lid);
+                    dec pl = std::ptr::add_mut<u64>(self.lefts, node_id - (1 as u64));
+                    *pl = new_l;
+                }
+                return self.avl_rot_right(node_id);
+            }
+        }
+        if bf < -1 {
+            unsafe {
+                dec rid = *(std::ptr::add<u64>(self.rights as *u64, node_id - (1 as u64)));
+                if self.avl_balance_f(rid) > 0 {
+                    dec new_r = self.avl_rot_right(rid);
+                    dec pr = std::ptr::add_mut<u64>(self.rights, node_id - (1 as u64));
+                    *pr = new_r;
+                }
+                return self.avl_rot_left(node_id);
+            }
+        }
+        return node_id;
+    }
+}
+
+impl<K: std::Ord, V> BTreeMap<K, V> {
+    export fn contains_key(self: &Self, key: &K) -> bool {
+        dec rw curr = self.root;
+        while curr > (0 as u64) {
+            unsafe {
+                dec kp = std::ptr::add<K>(self.keys as *K, curr - (1 as u64));
+                dec cmp_res = key.cmp(&*kp);
+                if cmp_res == 0 {
+                    return true;
+                } else if cmp_res < 0 {
+                    curr = *(std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64)));
+                } else {
+                    curr = *(std::ptr::add<u64>(self.rights as *u64, curr - (1 as u64)));
+                }
+            }
+        }
+        return false;
+    }
+
+    export fn get(self: &Self, key: &K) -> std::Option<&V> life_from(self) {
+        dec rw curr = self.root;
+        while curr > (0 as u64) {
+            unsafe {
+                dec kp = std::ptr::add<K>(self.keys as *K, curr - (1 as u64));
+                dec cmp_res = key.cmp(&*kp);
+                if cmp_res == 0 {
+                    dec vp = std::ptr::add<V>(self.values as *V, curr - (1 as u64));
+                    return std::Option::Some(&*vp);
+                } else if cmp_res < 0 {
+                    curr = *(std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64)));
+                } else {
+                    curr = *(std::ptr::add<u64>(self.rights as *u64, curr - (1 as u64)));
+                }
+            }
+        }
+        return std::Option::None;
+    }
+
+    export fn get_mut(self: &rw Self, key: &K) -> std::Option<&rw V> life_from(self) {
+        dec rw curr = self.root;
+        while curr > (0 as u64) {
+            unsafe {
+                dec kp = std::ptr::add<K>(self.keys as *K, curr - (1 as u64));
+                dec cmp_res = key.cmp(&*kp);
+                if cmp_res == 0 {
+                    dec vp = std::ptr::add_mut<V>(self.values, curr - (1 as u64));
+                    return std::Option::Some(&rw *vp);
+                } else if cmp_res < 0 {
+                    curr = *(std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64)));
+                } else {
+                    curr = *(std::ptr::add<u64>(self.rights as *u64, curr - (1 as u64)));
+                }
+            }
+        }
+        return std::Option::None;
+    }
+
+    export fn insert(self: &rw Self, key: K, val: V) -> std::Option<V> {
+        if self.root == (0 as u64) {
+            dec new_id = self.push_node(key, val);
+            self.root = new_id;
+            return std::Option::None;
+        }
+
+        dec rw path: std::Vec<u64> = std::vec_new<u64>();
+        dec rw curr = self.root;
+        dec rw inserted = false;
+
+        while curr > (0 as u64) {
+            path.push(curr);
+            unsafe {
+                dec kp = std::ptr::add<K>(self.keys as *K, curr - (1 as u64));
+                dec cmp_res = key.cmp(&*kp);
+
+                if cmp_res == 0 {
+                    dec vp = std::ptr::add_mut<V>(self.values, curr - (1 as u64));
+                    dec old_val = std::ptr::read<V>(vp as *V);
+                    std::ptr::write<V>(vp, val);
+                    return std::Option::Some(old_val);
+                } else if cmp_res < 0 {
+                    dec lid = *(std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64)));
+                    if lid == (0 as u64) {
+                        dec new_id = self.push_node(key, val);
+                        dec pl = std::ptr::add_mut<u64>(self.lefts, curr - (1 as u64));
+                        *pl = new_id;
+                        inserted = true;
+                        break;
+                    } else {
+                        curr = lid;
+                    }
+                } else {
+                    dec rid = *(std::ptr::add<u64>(self.rights as *u64, curr - (1 as u64)));
+                    if rid == (0 as u64) {
+                        dec new_id = self.push_node(key, val);
+                        dec pr = std::ptr::add_mut<u64>(self.rights, curr - (1 as u64));
+                        *pr = new_id;
+                        inserted = true;
+                        break;
+                    } else {
+                        curr = rid;
+                    }
+                }
+            }
+        }
+
+        if inserted {
+            dec rw k = path.len();
+            while k > (0 as u64) {
+                k = k - (1 as u64);
+                dec path_slice = path.as_slice();
+                dec node_id = path_slice[k];
+                dec rw parent_id: u64 = 0 as u64;
+                if k > (0 as u64) {
+                    parent_id = path_slice[k - (1 as u64)];
+                }
+
+                dec new_sub_root = self.avl_rebalance(node_id);
+
+                if parent_id == (0 as u64) {
+                    self.root = new_sub_root;
+                } else {
+                    unsafe {
+                        dec pl = std::ptr::add_mut<u64>(self.lefts, parent_id - (1 as u64));
+                        if *pl == node_id {
+                            *pl = new_sub_root;
+                        } else {
+                            dec pr = std::ptr::add_mut<u64>(self.rights, parent_id - (1 as u64));
+                            *pr = new_sub_root;
+                        }
+                    }
+                }
+            }
+        }
+
+        return std::Option::None;
+    }
+}
+
+extern fn __luna_panic_default();
+
+impl<K, V> std::Drop for BTreeMap<K, V> {
+    fn drop(self: &rw Self) {
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            unsafe {
+                dec pk = std::ptr::add_mut<K>(self.keys, i);
+                std::ptr::drop_in_place<K>(pk);
+                dec pv = std::ptr::add_mut<V>(self.values, i);
+                std::ptr::drop_in_place<V>(pv);
+            }
+            i = i + (1 as u64);
+        }
+        if self.cap > (0 as u64) {
+            dec k_size = self.cap * (std::mem::size_of<K>() as u64);
+            dec k_align = std::mem::align_of<K>() as u64;
+            dec v_size = self.cap * (std::mem::size_of<V>() as u64);
+            dec v_align = std::mem::align_of<V>() as u64;
+            unsafe {
+                __luna_dealloc(self.keys as *rw u8, k_size, k_align);
+                __luna_dealloc(self.values as *rw u8, v_size, v_align);
+                __luna_dealloc(self.lefts as *rw u8, self.cap * (8 as u64), 8 as u64);
+                __luna_dealloc(self.rights as *rw u8, self.cap * (8 as u64), 8 as u64);
+                __luna_dealloc(self.heights as *rw u8, self.cap * (4 as u64), 4 as u64);
+            }
+        }
+    }
+}
+
+impl<K: std::Clone, V: std::Clone> std::Clone for BTreeMap<K, V> {
+    export fn clone(self: &Self) -> Self {
+        dec rw res: BTreeMap<K, V> = btreemap_new<K, V>();
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            unsafe {
+                dec pk = std::ptr::add<K>(self.keys as *K, i);
+                dec pv = std::ptr::add<V>(self.values as *V, i);
+                res.push_node((*pk).clone(), (*pv).clone());
+            }
+            i = i + (1 as u64);
+        }
+        if self.len > (0 as u64) {
+            unsafe {
+                std::ptr::copy<u64>(self.lefts as *u64, res.lefts, self.len);
+                std::ptr::copy<u64>(self.rights as *u64, res.rights, self.len);
+                std::ptr::copy<i32>(self.heights as *i32, res.heights, self.len);
+            }
+        }
+        res.root = self.root;
+        return res;
+    }
+}
+
+impl<K: std::Ord, V> BTreeMap<K, V> {
+    export fn range(self: &Self, min_k: &K, max_k: &K) -> std::Vec<(&K, &V)> life_from(self) {
+        dec rw res = std::vec_new<(&K, &V)>();
+        dec rw st = std::vec_new<u64>();
+        dec rw curr = self.root;
+        while curr > (0 as u64) {
+            st.push(curr);
+            unsafe {
+                curr = *std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64));
+            }
+        }
+        while st.is_empty() == false {
+            dec node_id = st.pop().unwrap();
+            dec idx = node_id - (1 as u64);
+            unsafe {
+                dec rw right_curr = *std::ptr::add<u64>(self.rights as *u64, idx);
+                while right_curr > (0 as u64) {
+                    st.push(right_curr);
+                    right_curr = *std::ptr::add<u64>(self.lefts as *u64, right_curr - (1 as u64));
+                }
+                dec pk = std::ptr::add<K>(self.keys as *K, idx);
+                dec pv = std::ptr::add<V>(self.values as *V, idx);
+                if (*pk).cmp(min_k) >= 0 && (*pk).cmp(max_k) <= 0 {
+                    res.push((&*pk, &*pv));
+                }
+            }
+        }
+        return res;
+    }
+
+    export fn range_keys(self: &Self, min_k: &K, max_k: &K) -> std::Vec<&K> life_from(self) {
+        dec rw res = std::vec_new<&K>();
+        dec rw st = std::vec_new<u64>();
+        dec rw curr = self.root;
+        while curr > (0 as u64) {
+            st.push(curr);
+            unsafe {
+                curr = *std::ptr::add<u64>(self.lefts as *u64, curr - (1 as u64));
+            }
+        }
+        while st.is_empty() == false {
+            dec node_id = st.pop().unwrap();
+            dec idx = node_id - (1 as u64);
+            unsafe {
+                dec rw right_curr = *std::ptr::add<u64>(self.rights as *u64, idx);
+                while right_curr > (0 as u64) {
+                    st.push(right_curr);
+                    right_curr = *std::ptr::add<u64>(self.lefts as *u64, right_curr - (1 as u64));
+                }
+                dec pk = std::ptr::add<K>(self.keys as *K, idx);
+                if (*pk).cmp(min_k) >= 0 && (*pk).cmp(max_k) <= 0 {
+                    res.push(&*pk);
+                }
+            }
+        }
+        return res;
+    }
+}
+
+}
+
+impl<K, V> std::IntoIterator<(K, V), std::BTreeMapIntoIter<K, V>> for std::BTreeMap<K, V> {
+    fn into_iter(self: Self) -> std::BTreeMapIntoIter<K, V> {
+        return self.into_iter();
+    }
+}

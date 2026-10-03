@@ -1,0 +1,122 @@
+import <vecdeque>;
+import <binaryheap>;
+import <vec>;
+
+fn keep_20_40(x: &i32) -> bool {
+    return *x == 20 || *x == 40;
+}
+
+fn keep_gte_30(x: &i32) -> bool {
+    return *x >= 30;
+}
+
+fn test_vecdeque() -> bool {
+    dec rw dq = std::vecdeque_new<i32>();
+    // Push elements to cause wrapping
+    dq.push_back(30);
+    dq.push_back(40);
+    dq.push_back(50);
+    dq.push_front(20);
+    dq.push_front(10);
+    // Elements in logical order: 10, 20, 30, 40, 50
+
+    // 1. iter()
+    dec rw it = dq.iter();
+    dec rw expected = 10;
+    while true {
+        dec opt = it.next();
+        match opt {
+            std::Option::Some(val) -> {
+                if *val != expected { return false; }
+                expected = expected + 10;
+            },
+            std::Option::None -> { break; },
+        }
+    }
+    if expected != 60 { return false; }
+
+    // 2. as_slices()
+    dec slices = dq.as_slices();
+    dec s1 = slices.0;
+    dec s2 = slices.1;
+    if s1.len() + s2.len() != (5 as usize) { return false; }
+
+    // 3. make_contiguous()
+    dec rw contig = dq.make_contiguous();
+    if contig.len() != (5 as usize) { return false; }
+    if contig[0] != 10 || contig[1] != 20 || contig[2] != 30 || contig[3] != 40 || contig[4] != 50 {
+        return false;
+    }
+
+    // 4. retain()
+    dq.retain(keep_20_40);
+    if dq.len() != (2 as u64) { return false; }
+    if *dq.get(0 as u64).unwrap() != 20 { return false; }
+    if *dq.get(1 as u64).unwrap() != 40 { return false; }
+
+    // 5. into_iter()
+    dec rw into_it = dq.into_iter();
+    dec v1 = into_it.next().unwrap();
+    if v1 != 20 { return false; }
+    dec v2 = into_it.next().unwrap();
+    if v2 != 40 { return false; }
+    if into_it.next().is_some() { return false; }
+
+    return true;
+}
+
+fn test_binaryheap() -> bool {
+    dec rw heap = std::binaryheap_new<i32>();
+    heap.push(10);
+    heap.push(50);
+    heap.push(30);
+    heap.push(20);
+    heap.push(40);
+
+    // 1. iter()
+    dec rw it = heap.iter();
+    dec rw count: u64 = 0 as u64;
+    while true {
+        dec opt = it.next();
+        match opt {
+            std::Option::Some(_) -> { count = count + (1 as u64); },
+            std::Option::None -> { break; },
+        }
+    }
+    if count != (5 as u64) { return false; }
+
+    // 2. retain()
+    heap.retain(keep_gte_30);
+    if heap.len() != (3 as u64) { return false; }
+    // Max element must still be at top (50)
+    if *heap.peek().unwrap() != 50 { return false; }
+
+    // 3. into_sorted_vec()
+    dec sorted = heap.into_sorted_vec();
+    dec s = sorted.as_slice();
+    if s.len() != (3 as usize) { return false; }
+    if s[0] != 30 || s[1] != 40 || s[2] != 50 { return false; }
+
+    // 4. into_iter()
+    dec rw heap2 = std::binaryheap_new<i32>();
+    heap2.push(100);
+    heap2.push(200);
+    dec rw into_it = heap2.into_iter();
+    dec rw count2: u64 = 0 as u64;
+    while true {
+        dec opt = into_it.next();
+        match opt {
+            std::Option::Some(_) -> { count2 = count2 + (1 as u64); },
+            std::Option::None -> { break; },
+        }
+    }
+    if count2 != (2 as u64) { return false; }
+
+    return true;
+}
+
+fn main() -> i32 {
+    if test_vecdeque() == false { return 1; }
+    if test_binaryheap() == false { return 2; }
+    return 0;
+}

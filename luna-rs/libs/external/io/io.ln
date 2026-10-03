@@ -1,25 +1,1203 @@
+import <result>;
+import <vec>;
+import <ptr>;
+import <mem>;
+import <fmt>;
+
 extern fn __luna_print(p: *u8, len: usize);
 extern fn __luna_println(p: *u8, len: usize);
 extern fn __luna_eprintln(p: *u8, len: usize);
+extern fn __luna_read_line(out_ptr: *rw *rw u8, out_len: *rw usize, out_cap: *rw usize) -> i32;
+extern fn __luna_buffer_free(ptr: *rw u8, cap: usize);
+extern fn __luna_stdin_read(buf: *rw u8, len: usize) -> i64;
+extern fn __luna_stdout_write(buf: *u8, len: usize) -> i64;
+extern fn __luna_stdout_flush() -> i32;
+extern fn __luna_stderr_write(buf: *u8, len: usize) -> i64;
+extern fn __luna_stderr_flush() -> i32;
 
 export module std {
     export module io {
         export fn print(bytes: &[u8]) {
             unsafe {
-                __luna_print(bytes.data as *u8, bytes.len());
+                __luna_print(bytes.data as *u8, bytes.len);
             }
         }
 
         export fn println(bytes: &[u8]) {
             unsafe {
-                __luna_println(bytes.data as *u8, bytes.len());
+                __luna_println(bytes.data as *u8, bytes.len);
             }
         }
 
         export fn eprintln(bytes: &[u8]) {
             unsafe {
-                __luna_eprintln(bytes.data as *u8, bytes.len());
+                __luna_eprintln(bytes.data as *u8, bytes.len);
+            }
+        }
+
+        export fn eprint(bytes: &[u8]) {
+            unsafe {
+                __luna_stderr_write(bytes.data as *u8, bytes.len);
+                __luna_stderr_flush();
+            }
+        }
+
+        export fn print_str(s: str) {
+            unsafe {
+                dec p = s as *u8;
+                dec rw len: usize = 0 as usize;
+                while (*std::ptr::add<u8>(p, len as u64)) != (0 as u8) {
+                    len = len + (1 as usize);
+                }
+                __luna_print(p, len);
+            }
+        }
+
+        export fn println_str(s: str) {
+            unsafe {
+                dec p = s as *u8;
+                dec rw len: usize = 0 as usize;
+                while (*std::ptr::add<u8>(p, len as u64)) != (0 as u8) {
+                    len = len + (1 as usize);
+                }
+                __luna_println(p, len);
+            }
+        }
+
+        export fn eprint_str(s: str) {
+            unsafe {
+                dec p = s as *u8;
+                dec rw len: usize = 0 as usize;
+                while (*std::ptr::add<u8>(p, len as u64)) != (0 as u8) {
+                    len = len + (1 as usize);
+                }
+                __luna_stderr_write(p, len);
+                __luna_stderr_flush();
+            }
+        }
+
+        export fn eprintln_str(s: str) {
+            unsafe {
+                dec p = s as *u8;
+                dec rw len: usize = 0 as usize;
+                while (*std::ptr::add<u8>(p, len as u64)) != (0 as u8) {
+                    len = len + (1 as usize);
+                }
+                __luna_eprintln(p, len);
+            }
+        }
+
+        export fn read_line(buf: &rw std::Vec<u8>) -> std::Result<usize, std::io::IoError> {
+            dec rw s = stdin();
+            return s.read_line(buf);
+        }
+
+        export enum IoError {
+            NotFound,
+            PermissionDenied,
+            ConnectionRefused,
+            ConnectionReset,
+            BrokenPipe,
+            AlreadyExists,
+            WouldBlock,
+            InvalidInput,
+            InvalidData,
+            TimedOut,
+            WriteZero,
+            UnexpectedEof,
+            Other,
+        }
+
+        impl std::Error for IoError {
+            fn description(self: &Self) -> str {
+                return match *self {
+                    IoError::NotFound -> "entity not found",
+                    IoError::PermissionDenied -> "permission denied",
+                    IoError::ConnectionRefused -> "connection refused",
+                    IoError::ConnectionReset -> "connection reset",
+                    IoError::BrokenPipe -> "broken pipe",
+                    IoError::AlreadyExists -> "entity already exists",
+                    IoError::WouldBlock -> "operation would block",
+                    IoError::InvalidInput -> "invalid input parameter",
+                    IoError::InvalidData -> "invalid data",
+                    IoError::TimedOut -> "timed out",
+                    IoError::WriteZero -> "write zero",
+                    IoError::UnexpectedEof -> "unexpected end of file",
+                    IoError::Other -> "other error",
+                };
+            }
+        }
+
+        export enum SeekFrom {
+            Start(u64),
+            End(i64),
+            Current(i64),
+        }
+
+        export trait Read {
+            fn read(self: &rw Self, buf: &rw [u8]) -> std::Result<usize, std::io::IoError>;
+        }
+
+        export trait Write {
+            fn write(self: &rw Self, buf: &[u8]) -> std::Result<usize, std::io::IoError>;
+            fn flush(self: &rw Self) -> std::Result<void, std::io::IoError>;
+        }
+
+        export trait Seek {
+            fn seek(self: &rw Self, pos: SeekFrom) -> std::Result<u64, std::io::IoError>;
+        }
+
+        export fn read_to_end<R: Read>(reader: &rw R, buf: &rw std::Vec<u8>) -> std::Result<usize, std::io::IoError> {
+            dec rw total: usize = 0 as usize;
+            dec rw chunk = std::vec_with_capacity<u8>(512 as u64);
+            dec rw ci: usize = 0 as usize;
+            while ci < (512 as usize) {
+                chunk.push(0 as u8);
+                ci = ci + (1 as usize);
+            }
+            while true {
+                dec res = reader.read(chunk.as_mut_slice());
+                match res {
+                    std::Result::Ok(n) -> {
+                        if n == (0 as usize) {
+                            return std::Result::Ok(total);
+                        }
+                        dec chunk_slice = chunk.as_slice();
+                        dec rw i: usize = 0 as usize;
+                        while i < n {
+                            buf.push(chunk_slice[i]);
+                            i = i + (1 as usize);
+                        }
+                        total = total + n;
+                    },
+                    std::Result::Err(e) -> {
+                        return std::Result::Err(e);
+                    },
+                }
+            }
+            return std::Result::Ok(total);
+        }
+
+        export fn read_exact<R: Read>(reader: &rw R, buf: &rw [u8]) -> std::Result<void, std::io::IoError> {
+            dec rw offset: usize = 0 as usize;
+            dec target = buf.len;
+            while offset < target {
+                dec rw n_read: usize = 0 as usize;
+                dec rw has_err = false;
+                dec rw err = IoError::Other;
+                unsafe {
+                    dec p = std::ptr::add_mut<u8>(buf.data as *rw u8, offset as u64);
+                    dec rem = std::mem::slice_from_raw_parts_mut<u8>(p, (target - offset) as u64);
+                    dec res = reader.read(rem);
+                    match res {
+                        std::Result::Ok(n) -> {
+                            n_read = n;
+                        },
+                        std::Result::Err(e) -> {
+                            has_err = true;
+                            err = e;
+                        },
+                    }
+                }
+                if has_err {
+                    return std::Result::Err(err);
+                }
+                if n_read == (0 as usize) {
+                    return std::Result::Err(IoError::UnexpectedEof);
+                }
+                offset = offset + n_read;
+            }
+            return std::Result::Ok;
+        }
+
+        export fn write_all<W: Write>(writer: &rw W, buf: &[u8]) -> std::Result<void, std::io::IoError> {
+            dec rw offset: usize = 0 as usize;
+            dec target = buf.len;
+            while offset < target {
+                dec rw n_written: usize = 0 as usize;
+                dec rw has_err = false;
+                dec rw err = IoError::Other;
+                unsafe {
+                    dec p = std::ptr::add<u8>(buf.data as *u8, offset as u64);
+                    dec rem = std::mem::slice_from_raw_parts<u8>(p, (target - offset) as u64);
+                    dec res = writer.write(rem);
+                    match res {
+                        std::Result::Ok(n) -> {
+                            n_written = n;
+                        },
+                        std::Result::Err(e) -> {
+                            has_err = true;
+                            err = e;
+                        },
+                    }
+                }
+                if has_err {
+                    return std::Result::Err(err);
+                }
+                if n_written == (0 as usize) {
+                    return std::Result::Err(IoError::WriteZero);
+                }
+                offset = offset + n_written;
+            }
+            return std::Result::Ok;
+        }
+
+        export fn copy<R: Read, W: Write>(reader: &rw R, writer: &rw W) -> std::Result<u64, std::io::IoError> {
+            dec rw total: u64 = 0 as u64;
+            dec rw chunk = std::vec_with_capacity<u8>(512 as u64);
+            dec rw ci: usize = 0 as usize;
+            while ci < (512 as usize) {
+                chunk.push(0 as u8);
+                ci = ci + (1 as usize);
+            }
+            while true {
+                dec res = reader.read(chunk.as_mut_slice());
+                match res {
+                    std::Result::Ok(n) -> {
+                        if n == (0 as usize) {
+                            return std::Result::Ok(total);
+                        }
+                        dec rw w_ok = true;
+                        dec rw w_err = IoError::Other;
+                        unsafe {
+                            dec p = chunk.as_slice().data as *u8;
+                            dec sub = std::mem::slice_from_raw_parts<u8>(p, n as u64);
+                            dec w_res = write_all<W>(writer, sub);
+                            match w_res {
+                                std::Result::Ok -> {},
+                                std::Result::Err(e) -> {
+                                    w_ok = false;
+                                    w_err = e;
+                                },
+                            }
+                        }
+                        if w_ok == false {
+                            return std::Result::Err(w_err);
+                        }
+                        total = total + (n as u64);
+                    },
+                    std::Result::Err(e) -> {
+                        return std::Result::Err(e);
+                    },
+                }
+            }
+            return std::Result::Ok(total);
+        }
+
+        export struct Cursor<T> {
+            private inner: T,
+            private pos: u64,
+        };
+
+        export fn cursor_new<T>(inner: T) -> Cursor<T> {
+            return Cursor<T> {
+                inner: inner,
+                pos: 0 as u64,
+            };
+        }
+
+        impl<T> Cursor<T> {
+            export fn position(self: &Self) -> u64 {
+                return self.pos;
+            }
+
+            export fn set_position(self: &rw Self, pos: u64) {
+                self.pos = pos;
+            }
+
+            export fn get_ref(self: &Self) -> &T life_from(self) {
+                return &self.inner;
+            }
+
+            export fn get_mut(self: &rw Self) -> &rw T life_from(self) {
+                return &rw self.inner;
+            }
+
+            export fn into_inner(self: Self) -> T {
+                return self.inner;
+            }
+        }
+
+        impl Read for Cursor<std::Vec<u8>> {
+            fn read(self: &rw Self, buf: &rw [u8]) -> std::Result<usize, std::io::IoError> {
+                dec total_len = self.inner.len();
+                if self.pos >= total_len {
+                    return std::Result::Ok(0 as usize);
+                }
+                dec avail = (total_len - self.pos) as usize;
+                dec rw to_read = buf.len;
+                if to_read > avail {
+                    to_read = avail;
+                }
+                dec inner_slice = self.inner.as_slice();
+                dec rw i: usize = 0 as usize;
+                while i < to_read {
+                    buf[i] = inner_slice[(self.pos as usize) + i];
+                    i = i + (1 as usize);
+                }
+                self.pos = self.pos + (to_read as u64);
+                return std::Result::Ok(to_read);
+            }
+        }
+
+        impl Write for Cursor<std::Vec<u8>> {
+            fn write(self: &rw Self, buf: &[u8]) -> std::Result<usize, std::io::IoError> {
+                dec count = buf.len;
+                dec rw i: usize = 0 as usize;
+                while i < count {
+                    dec cur_idx = self.pos as u64;
+                    if cur_idx < self.inner.len() {
+                        unsafe {
+                            dec data_ptr = self.inner.as_mut_slice().data;
+                            *std::ptr::add_mut<u8>(data_ptr, cur_idx) = buf[i];
+                        }
+                    } else {
+                        self.inner.push(buf[i]);
+                    }
+                    self.pos = self.pos + (1 as u64);
+                    i = i + (1 as usize);
+                }
+                return std::Result::Ok(count);
+            }
+
+            fn flush(self: &rw Self) -> std::Result<void, std::io::IoError> {
+                return std::Result::Ok;
+            }
+        }
+
+        impl Seek for Cursor<std::Vec<u8>> {
+            fn seek(self: &rw Self, pos: SeekFrom) -> std::Result<u64, std::io::IoError> {
+                dec total_len = self.inner.len() as i64;
+                dec rw new_pos: i64 = 0 as i64;
+                match pos {
+                    SeekFrom::Start(n) -> {
+                        new_pos = n as i64;
+                    },
+                    SeekFrom::End(n) -> {
+                        new_pos = total_len + n;
+                    },
+                    SeekFrom::Current(n) -> {
+                        new_pos = (self.pos as i64) + n;
+                    },
+                }
+                if new_pos < (0 as i64) {
+                    return std::Result::Err(IoError::InvalidInput);
+                }
+                self.pos = new_pos as u64;
+                return std::Result::Ok(self.pos);
+            }
+        }
+
+        export struct BufReader<R> {
+            private inner: R,
+            private buf: std::Vec<u8>,
+            private pos: usize,
+            private cap: usize,
+        };
+
+        export fn buf_reader_new<R>(inner: R) -> BufReader<R> {
+            return buf_reader_with_capacity<R>(inner, 512 as usize);
+        }
+
+        export fn buf_reader_with_capacity<R>(inner: R, cap: usize) -> BufReader<R> {
+            dec rw b = std::vec_with_capacity<u8>(cap as u64);
+            dec rw i: usize = 0 as usize;
+            while i < cap {
+                b.push(0 as u8);
+                i = i + (1 as usize);
+            }
+            return BufReader<R> {
+                inner: inner,
+                buf: b,
+                pos: 0 as usize,
+                cap: 0 as usize,
+            };
+        }
+
+        impl<R> BufReader<R> {
+            export fn get_ref(self: &Self) -> &R life_from(self) {
+                return &self.inner;
+            }
+
+            export fn get_mut(self: &rw Self) -> &rw R life_from(self) {
+                return &rw self.inner;
+            }
+
+            export fn into_inner(self: Self) -> R {
+                return self.inner;
+            }
+
+            export fn buffer(self: &Self) -> &[u8] life_from(self) {
+                if self.pos >= self.cap {
+                    unsafe {
+                        return std::mem::slice_from_raw_parts<u8>(self.buf.as_slice().data as *u8, 0 as u64);
+                    }
+                }
+                unsafe {
+                    dec p = std::ptr::add<u8>(self.buf.as_slice().data as *u8, self.pos as u64);
+                    return std::mem::slice_from_raw_parts<u8>(p, (self.cap - self.pos) as u64);
+                }
+            }
+        }
+
+        impl<R: Read> Read for BufReader<R> {
+            fn read(self: &rw Self, buf: &rw [u8]) -> std::Result<usize, std::io::IoError> {
+                if self.pos >= self.cap {
+                    dec rw read_n: usize = 0 as usize;
+                    dec rw has_err = false;
+                    dec rw err = IoError::Other;
+                    unsafe {
+                        dec p = self.buf.as_mut_slice().data;
+                        dec sl = std::mem::slice_from_raw_parts_mut<u8>(p, self.buf.len());
+                        dec res = self.inner.read(sl);
+                        match res {
+                            std::Result::Ok(n) -> {
+                                read_n = n;
+                            },
+                            std::Result::Err(e) -> {
+                                has_err = true;
+                                err = e;
+                            },
+                        }
+                    }
+                    if has_err {
+                        return std::Result::Err(err);
+                    }
+                    self.pos = 0 as usize;
+                    self.cap = read_n;
+                    if read_n == (0 as usize) {
+                        return std::Result::Ok(0 as usize);
+                    }
+                }
+
+                dec avail = self.cap - self.pos;
+                dec rw to_copy = buf.len;
+                if to_copy > avail {
+                    to_copy = avail;
+                }
+                dec b_slice = self.buf.as_slice();
+                dec rw i: usize = 0 as usize;
+                while i < to_copy {
+                    buf[i] = b_slice[self.pos + i];
+                    i = i + (1 as usize);
+                }
+                self.pos = self.pos + to_copy;
+                return std::Result::Ok(to_copy);
+            }
+        }
+
+        export struct BufWriter<W> {
+            private inner: W,
+            private buf: std::Vec<u8>,
+            private capacity: usize,
+        };
+
+        export fn buf_writer_new<W>(inner: W) -> BufWriter<W> {
+            return buf_writer_with_capacity<W>(inner, 512 as usize);
+        }
+
+        export fn buf_writer_with_capacity<W>(inner: W, cap: usize) -> BufWriter<W> {
+            return BufWriter<W> {
+                inner: inner,
+                buf: std::vec_with_capacity<u8>(cap as u64),
+                capacity: cap,
+            };
+        }
+
+        impl<W> BufWriter<W> {
+            export fn get_ref(self: &Self) -> &W life_from(self) {
+                return &self.inner;
+            }
+
+            export fn get_mut(self: &rw Self) -> &rw W life_from(self) {
+                return &rw self.inner;
+            }
+
+            export fn into_inner(self: Self) -> W {
+                return self.inner;
+            }
+
+            export fn buffer(self: &Self) -> &[u8] life_from(self) {
+                return self.buf.as_slice();
+            }
+        }
+
+        impl<W: Write> Write for BufWriter<W> {
+            fn write(self: &rw Self, buf: &[u8]) -> std::Result<usize, std::io::IoError> {
+                if (self.buf.len() as usize) + buf.len > self.capacity {
+                    dec f_res = self.flush();
+                    match f_res {
+                        std::Result::Ok -> {},
+                        std::Result::Err(e) -> { return std::Result::Err(e); },
+                    }
+                }
+                if buf.len >= self.capacity {
+                    return self.inner.write(buf);
+                }
+                dec rw i: usize = 0 as usize;
+                while i < buf.len {
+                    self.buf.push(buf[i]);
+                    i = i + (1 as usize);
+                }
+                return std::Result::Ok(buf.len);
+            }
+
+            fn flush(self: &rw Self) -> std::Result<void, std::io::IoError> {
+                if self.buf.len() > (0 as u64) {
+                    dec rw w_ok = true;
+                    dec rw w_err = IoError::Other;
+                    unsafe {
+                        dec p = self.buf.as_slice().data as *u8;
+                        dec sl = std::mem::slice_from_raw_parts<u8>(p, self.buf.len());
+                        dec w_res = write_all<W>(&rw self.inner, sl);
+                        match w_res {
+                            std::Result::Ok -> {},
+                            std::Result::Err(e) -> {
+                                w_ok = false;
+                                w_err = e;
+                            },
+                        }
+                    }
+                    if w_ok == false {
+                        return std::Result::Err(w_err);
+                    }
+                    self.buf.clear();
+                }
+                return self.inner.flush();
+            }
+        }
+
+        export struct Stdin {};
+        export struct Stdout {};
+        export struct Stderr {};
+
+        export fn stdin() -> Stdin {
+            return Stdin {};
+        }
+
+        export fn stdout() -> Stdout {
+            return Stdout {};
+        }
+
+        export fn stderr() -> Stderr {
+            return Stderr {};
+        }
+
+        impl Stdin {
+            export fn read_line(self: &rw Self, buf: &rw std::Vec<u8>) -> std::Result<usize, std::io::IoError> {
+                unsafe {
+                    dec rw out_ptr: *rw u8 = 0 as u64 as *rw u8;
+                    dec rw out_len: usize = 0 as usize;
+                    dec rw out_cap: usize = 0 as usize;
+                    dec status = __luna_read_line(&rw out_ptr as *rw *rw u8, &rw out_len as *rw usize, &rw out_cap as *rw usize);
+                    if status != (0 as i32) {
+                        if status == (1 as i32) || status == (-3 as i32) {
+                            return std::Result::Ok(0 as usize);
+                        }
+                        return std::Result::Err(IoError::Other);
+                    }
+                    dec rw i: usize = 0 as usize;
+                    while i < out_len {
+                        dec b = std::ptr::read<u8>(std::ptr::add<u8>(out_ptr as *u8, i as u64));
+                        buf.push(b);
+                        i = i + (1 as usize);
+                    }
+                    __luna_buffer_free(out_ptr, out_cap);
+                    return std::Result::Ok(out_len);
+                }
+            }
+        }
+
+        impl Read for Stdin {
+            fn read(self: &rw Self, buf: &rw [u8]) -> std::Result<usize, std::io::IoError> {
+                dec len = buf.len;
+                if len == (0 as usize) {
+                    return std::Result::Ok(0 as usize);
+                }
+                dec ptr = buf.data as *rw u8;
+                unsafe {
+                    dec n = __luna_stdin_read(ptr, len);
+                    if n < (0 as i64) {
+                        return std::Result::Err(IoError::Other);
+                    }
+                    return std::Result::Ok(n as usize);
+                }
+            }
+        }
+
+        impl Write for Stdout {
+            fn write(self: &rw Self, buf: &[u8]) -> std::Result<usize, std::io::IoError> {
+                dec len = buf.len;
+                if len == (0 as usize) {
+                    return std::Result::Ok(0 as usize);
+                }
+                dec ptr = buf.data as *u8;
+                unsafe {
+                    dec n = __luna_stdout_write(ptr, len);
+                    if n < (0 as i64) {
+                        return std::Result::Err(IoError::Other);
+                    }
+                    return std::Result::Ok(n as usize);
+                }
+            }
+
+            fn flush(self: &rw Self) -> std::Result<void, std::io::IoError> {
+                unsafe {
+                    dec res = __luna_stdout_flush();
+                    if res != (0 as i32) {
+                        return std::Result::Err(IoError::Other);
+                    }
+                    return std::Result::Ok;
+                }
+            }
+        }
+
+        impl Write for Stderr {
+            fn write(self: &rw Self, buf: &[u8]) -> std::Result<usize, std::io::IoError> {
+                dec len = buf.len;
+                if len == (0 as usize) {
+                    return std::Result::Ok(0 as usize);
+                }
+                dec ptr = buf.data as *u8;
+                unsafe {
+                    dec n = __luna_stderr_write(ptr, len);
+                    if n < (0 as i64) {
+                        return std::Result::Err(IoError::Other);
+                    }
+                    return std::Result::Ok(n as usize);
+                }
+            }
+
+            fn flush(self: &rw Self) -> std::Result<void, std::io::IoError> {
+                unsafe {
+                    dec res = __luna_stderr_flush();
+                    if res != (0 as i32) {
+                        return std::Result::Err(IoError::Other);
+                    }
+                    return std::Result::Ok;
+                }
+            }
+        }
+
+        export struct StdoutWriter {};
+
+        impl std::fmt::Writer for StdoutWriter {
+            fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+                dec rw code: u32 = value as u32;
+                if (code >= (55296 as u32) && code <= (57343 as u32)) || (code > (1114111 as u32)) {
+                    code = 65533 as u32;
+                }
+                if code <= (127 as u32) {
+                    dec buf: [u8; 1] = [code as u8];
+                    unsafe {
+                        __luna_print(&buf as *u8, 1 as usize);
+                    }
+                } else if code <= (2047 as u32) {
+                    dec buf: [u8; 2] = [
+                        ((192 as u32) | (code >> (6 as u32))) as u8,
+                        ((128 as u32) | (code & (63 as u32))) as u8
+                    ];
+                    unsafe {
+                        __luna_print(&buf as *u8, 2 as usize);
+                    }
+                } else if code <= (65535 as u32) {
+                    dec buf: [u8; 3] = [
+                        ((224 as u32) | (code >> (12 as u32))) as u8,
+                        ((128 as u32) | ((code >> (6 as u32)) & (63 as u32))) as u8,
+                        ((128 as u32) | (code & (63 as u32))) as u8
+                    ];
+                    unsafe {
+                        __luna_print(&buf as *u8, 3 as usize);
+                    }
+                } else {
+                    dec buf: [u8; 4] = [
+                        ((240 as u32) | (code >> (18 as u32))) as u8,
+                        ((128 as u32) | ((code >> (12 as u32)) & (63 as u32))) as u8,
+                        ((128 as u32) | ((code >> (6 as u32)) & (63 as u32))) as u8,
+                        ((128 as u32) | (code & (63 as u32))) as u8
+                    ];
+                    unsafe {
+                        __luna_print(&buf as *u8, 4 as usize);
+                    }
+                }
+                return std::Result::Ok;
+            }
+        }
+
+        export struct StderrWriter {};
+
+        impl std::fmt::Writer for StderrWriter {
+            fn write_char(self: &rw Self, value: char) -> std::Result<void, std::fmt::FmtError> {
+                dec rw code: u32 = value as u32;
+                if (code >= (55296 as u32) && code <= (57343 as u32)) || (code > (1114111 as u32)) {
+                    code = 65533 as u32;
+                }
+                if code <= (127 as u32) {
+                    dec buf: [u8; 1] = [code as u8];
+                    unsafe {
+                        __luna_stderr_write(&buf as *u8, 1 as usize);
+                    }
+                } else if code <= (2047 as u32) {
+                    dec buf: [u8; 2] = [
+                        ((192 as u32) | (code >> (6 as u32))) as u8,
+                        ((128 as u32) | (code & (63 as u32))) as u8
+                    ];
+                    unsafe {
+                        __luna_stderr_write(&buf as *u8, 2 as usize);
+                    }
+                } else if code <= (65535 as u32) {
+                    dec buf: [u8; 3] = [
+                        ((224 as u32) | (code >> (12 as u32))) as u8,
+                        ((128 as u32) | ((code >> (6 as u32)) & (63 as u32))) as u8,
+                        ((128 as u32) | (code & (63 as u32))) as u8
+                    ];
+                    unsafe {
+                        __luna_stderr_write(&buf as *u8, 3 as usize);
+                    }
+                } else {
+                    dec buf: [u8; 4] = [
+                        ((240 as u32) | (code >> (18 as u32))) as u8,
+                        ((128 as u32) | ((code >> (12 as u32)) & (63 as u32))) as u8,
+                        ((128 as u32) | ((code >> (6 as u32)) & (63 as u32))) as u8,
+                        ((128 as u32) | (code & (63 as u32))) as u8
+                    ];
+                    unsafe {
+                        __luna_stderr_write(&buf as *u8, 4 as usize);
+                    }
+                }
+                return std::Result::Ok;
+            }
+        }
+
+        export fn print_val<T: std::fmt::Display>(val: &T) {
+            dec rw w = StdoutWriter {};
+            val.fmt(&rw w);
+        }
+
+        export fn eprint_val<T: std::fmt::Display>(val: &T) {
+            dec rw w = StderrWriter {};
+            val.fmt(&rw w);
+        }
+
+        export fn print_newline() {
+            unsafe {
+                __luna_println("" as *u8, 0 as usize);
+            }
+        }
+
+        export fn eprint_newline() {
+            unsafe {
+                __luna_eprintln("" as *u8, 0 as usize);
             }
         }
     }
+
+    export macro out {
+        (@a: expr) => {
+            std::io::print_val(&(@a));
+        }
+        (@a: expr, @b: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+        }
+        (@a: expr, @b: expr, @c: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_val(&(@c));
+        }
+        (@a: expr, @b: expr, @c: expr, @d: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_val(&(@c));
+            std::io::print_val(&(@d));
+        }
+    }
+
+    export macro outln {
+        () => {
+            std::io::print_newline();
+        }
+        (@a: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_newline();
+        }
+        (@a: expr, @b: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_newline();
+        }
+        (@a: expr, @b: expr, @c: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_val(&(@c));
+            std::io::print_newline();
+        }
+        (@a: expr, @b: expr, @c: expr, @d: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_val(&(@c));
+            std::io::print_val(&(@d));
+            std::io::print_newline();
+        }
+    }
+
+    export macro err {
+        (@a: expr) => {
+            std::io::eprint_val(&(@a));
+        }
+        (@a: expr, @b: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+        }
+        (@a: expr, @b: expr, @c: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_val(&(@c));
+        }
+        (@a: expr, @b: expr, @c: expr, @d: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_val(&(@c));
+            std::io::eprint_val(&(@d));
+        }
+    }
+
+    export macro errln {
+        () => {
+            std::io::eprint_newline();
+        }
+        (@a: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_newline();
+        }
+        (@a: expr, @b: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_newline();
+        }
+        (@a: expr, @b: expr, @c: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_val(&(@c));
+            std::io::eprint_newline();
+        }
+        (@a: expr, @b: expr, @c: expr, @d: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_val(&(@c));
+            std::io::eprint_val(&(@d));
+            std::io::eprint_newline();
+        }
+    }
+
+    export macro print {
+        (@a: expr) => {
+            std::io::print_val(&(@a));
+        }
+        (@a: expr, @b: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+        }
+        (@a: expr, @b: expr, @c: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_val(&(@c));
+        }
+        (@a: expr, @b: expr, @c: expr, @d: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_val(&(@c));
+            std::io::print_val(&(@d));
+        }
+    }
+
+    export macro println {
+        () => {
+            std::io::print_newline();
+        }
+        (@a: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_newline();
+        }
+        (@a: expr, @b: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_newline();
+        }
+        (@a: expr, @b: expr, @c: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_val(&(@c));
+            std::io::print_newline();
+        }
+        (@a: expr, @b: expr, @c: expr, @d: expr) => {
+            std::io::print_val(&(@a));
+            std::io::print_val(&(@b));
+            std::io::print_val(&(@c));
+            std::io::print_val(&(@d));
+            std::io::print_newline();
+        }
+    }
+
+    export macro eprint {
+        (@a: expr) => {
+            std::io::eprint_val(&(@a));
+        }
+        (@a: expr, @b: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+        }
+        (@a: expr, @b: expr, @c: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_val(&(@c));
+        }
+        (@a: expr, @b: expr, @c: expr, @d: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_val(&(@c));
+            std::io::eprint_val(&(@d));
+        }
+    }
+
+    export macro eprintln {
+        () => {
+            std::io::eprint_newline();
+        }
+        (@a: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_newline();
+        }
+        (@a: expr, @b: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_newline();
+        }
+        (@a: expr, @b: expr, @c: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_val(&(@c));
+            std::io::eprint_newline();
+        }
+        (@a: expr, @b: expr, @c: expr, @d: expr) => {
+            std::io::eprint_val(&(@a));
+            std::io::eprint_val(&(@b));
+            std::io::eprint_val(&(@c));
+            std::io::eprint_val(&(@d));
+            std::io::eprint_newline();
+        }
+    }
+}
+
+
+export macro out {
+    (@a: expr) => {
+        std::io::print_val(&(@a));
+    }
+    (@a: expr, @b: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+    }
+    (@a: expr, @b: expr, @c: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_val(&(@c));
+    }
+    (@a: expr, @b: expr, @c: expr, @d: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_val(&(@c));
+        std::io::print_val(&(@d));
+    }
+}
+
+export macro outln {
+    () => {
+        std::io::print_newline();
+    }
+    (@a: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_newline();
+    }
+    (@a: expr, @b: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_newline();
+    }
+    (@a: expr, @b: expr, @c: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_val(&(@c));
+        std::io::print_newline();
+    }
+    (@a: expr, @b: expr, @c: expr, @d: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_val(&(@c));
+        std::io::print_val(&(@d));
+        std::io::print_newline();
+    }
+}
+
+export macro err {
+    (@a: expr) => {
+        std::io::eprint_val(&(@a));
+    }
+    (@a: expr, @b: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+    }
+    (@a: expr, @b: expr, @c: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_val(&(@c));
+    }
+    (@a: expr, @b: expr, @c: expr, @d: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_val(&(@c));
+        std::io::eprint_val(&(@d));
+    }
+}
+
+export macro errln {
+    () => {
+        std::io::eprint_newline();
+    }
+    (@a: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_newline();
+    }
+    (@a: expr, @b: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_newline();
+    }
+    (@a: expr, @b: expr, @c: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_val(&(@c));
+        std::io::eprint_newline();
+    }
+    (@a: expr, @b: expr, @c: expr, @d: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_val(&(@c));
+        std::io::eprint_val(&(@d));
+        std::io::eprint_newline();
+    }
+}
+
+export macro print {
+    (@a: expr) => {
+        std::io::print_val(&(@a));
+    }
+    (@a: expr, @b: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+    }
+    (@a: expr, @b: expr, @c: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_val(&(@c));
+    }
+    (@a: expr, @b: expr, @c: expr, @d: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_val(&(@c));
+        std::io::print_val(&(@d));
+    }
+}
+
+export macro println {
+    () => {
+        std::io::print_newline();
+    }
+    (@a: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_newline();
+    }
+    (@a: expr, @b: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_newline();
+    }
+    (@a: expr, @b: expr, @c: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_val(&(@c));
+        std::io::print_newline();
+    }
+    (@a: expr, @b: expr, @c: expr, @d: expr) => {
+        std::io::print_val(&(@a));
+        std::io::print_val(&(@b));
+        std::io::print_val(&(@c));
+        std::io::print_val(&(@d));
+        std::io::print_newline();
+    }
+}
+
+export macro eprint {
+    (@a: expr) => {
+        std::io::eprint_val(&(@a));
+    }
+    (@a: expr, @b: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+    }
+    (@a: expr, @b: expr, @c: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_val(&(@c));
+    }
+    (@a: expr, @b: expr, @c: expr, @d: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_val(&(@c));
+        std::io::eprint_val(&(@d));
+    }
+}
+
+export macro eprintln {
+    () => {
+        std::io::eprint_newline();
+    }
+    (@a: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_newline();
+    }
+    (@a: expr, @b: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_newline();
+    }
+    (@a: expr, @b: expr, @c: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_val(&(@c));
+        std::io::eprint_newline();
+    }
+    (@a: expr, @b: expr, @c: expr, @d: expr) => {
+        std::io::eprint_val(&(@a));
+        std::io::eprint_val(&(@b));
+        std::io::eprint_val(&(@c));
+        std::io::eprint_val(&(@d));
+        std::io::eprint_newline();
+    }
+}
+
+export fn print_val<T: std::fmt::Display>(val: &T) {
+    std::io::print_val(val);
+}
+
+export fn eprint_val<T: std::fmt::Display>(val: &T) {
+    std::io::eprint_val(val);
+}
+
+export fn print_newline() {
+    std::io::print_newline();
+}
+
+export fn eprint_newline() {
+    std::io::eprint_newline();
 }

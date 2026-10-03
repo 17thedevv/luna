@@ -348,9 +348,13 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             }
         } else {
             // main(args: [str]) -> i32
+            let argc = start_fn.get_nth_param(0).unwrap().into_int_value();
+            let argv = start_fn.get_nth_param(1).unwrap().into_pointer_value();
+            let argc_i64 = self.builder.build_int_s_extend(argc, self.context.i64_type(), "argc_i64").unwrap();
             let slice_type = self.context.struct_type(&[ptr_type.into(), self.context.i64_type().into()], false);
-            let slice_val = slice_type.const_zero();
-            let ret = self.builder.build_call(user_main_fn, &[slice_val.into()], "user_ret").unwrap();
+            let slice_val = self.builder.build_insert_value(slice_type.const_zero(), argv, 0, "args_data").unwrap();
+            let slice_val = self.builder.build_insert_value(slice_val.into_struct_value(), argc_i64, 1, "args_len").unwrap();
+            let ret = self.builder.build_call(user_main_fn, &[slice_val.into_struct_value().into()], "user_ret").unwrap();
             ret.try_as_basic_value().left().unwrap().into_int_value()
         };
         self.builder.build_return(Some(&code)).unwrap();
@@ -633,6 +637,14 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 call.try_as_basic_value().left().ok_or_else(|| BackendError::InvariantViolation("__luna_alloc returned void".into()))
             }
             Instruction::Assign(val_op) => {
+                if let Operand::Number(number) = val_op {
+                    let llvm_ty = self.map_type(data.ty)?;
+                    if llvm_ty.is_int_type() {
+                        let bits = number.parse::<u128>().or_else(|_| number.parse::<i128>().map(|v| v as u128))
+                            .map_err(|_| BackendError::InvariantViolation(format!("Invalid canonical integer: {number}")))?;
+                        return Ok(llvm_ty.into_int_type().const_int_arbitrary_precision(&[bits as u64, (bits >> 64) as u64]).into());
+                    }
+                }
                 self.generate_operand(val_op)
             }
             Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
@@ -918,10 +930,21 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 
                 if !args.is_empty() {
                     let payload_ptr = self.builder.build_struct_gep(ty, alloca, 1, "payload_ptr").unwrap();
-                    // In a real implementation we would gep into the union/array based on field_idx.
-                    // For now, assume a single primitive payload.
-                    let arg_val = self.generate_operand(&args[0])?;
-                    self.builder.build_store(payload_ptr, arg_val).unwrap();
+                    if args.len() == 1 {
+                        let arg_val = self.generate_operand(&args[0])?;
+                        self.builder.build_store(payload_ptr, arg_val).unwrap();
+                    } else {
+                        let payload_ty = match self.semantic_ctx.types.get(*enum_ty) {
+                            SemanticType::Enum(_, _, variants) => variants.get(*variant_idx as usize).copied(),
+                            _ => None,
+                        }.ok_or_else(|| BackendError::InvariantViolation("Variant lacks a typed payload".into()))?;
+                        let payload_layout = self.map_type(payload_ty)?;
+                        for (index, arg) in args.iter().enumerate() {
+                            let field_ptr = self.builder.build_struct_gep(payload_layout, payload_ptr, index as u32, "variant_field").unwrap();
+                            let arg_val = self.generate_operand(arg)?;
+                            self.builder.build_store(field_ptr, arg_val).unwrap();
+                        }
+                    }
                 }
                 
                 let load = self.builder.build_load(ty, alloca, "enum_val").unwrap();
@@ -933,7 +956,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 let tag = self.builder.build_extract_value(llvm_val.into_struct_value(), 0, "tag").unwrap();
                 Ok(tag)
             }
-            Instruction::Extract { value, variant_idx: _, field_idx } => {
+            Instruction::Extract { value, variant_idx, field_idx } => {
                 let llvm_val = self.generate_operand(value)?;
                 
                 let mut is_enum = false;
@@ -954,7 +977,22 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     } else {
                         self.context.i32_type().into()
                     };
-                    let loaded = self.builder.build_load(target_ty, payload_ptr, "extracted_payload").unwrap();
+                    // A single tuple-valued field loads the whole payload;
+                    // multiple declared fields project through its tuple layout.
+                    let payload_ty = if let Operand::Value(vid) = value {
+                        match self.semantic_ctx.types.get(_func.values[vid.0 as usize].ty) {
+                            SemanticType::Enum(_, _, variants) => variants.get(*variant_idx as usize).copied(),
+                            _ => None,
+                        }
+                    } else { None };
+                    let field_ptr = if let Some(payload_ty) = payload_ty {
+                        if self.semantic_ctx.types.resolve(payload_ty) != self.semantic_ctx.types.resolve(data.ty)
+                            && matches!(self.semantic_ctx.types.get(payload_ty), SemanticType::Tuple(_)) {
+                            let layout = self.map_type(payload_ty)?;
+                            self.builder.build_struct_gep(layout, payload_ptr, *field_idx, "extracted_field").unwrap()
+                        } else { payload_ptr }
+                    } else { payload_ptr };
+                    let loaded = self.builder.build_load(target_ty, field_ptr, "extracted_payload").unwrap();
                     Ok(loaded)
                 } else {
                     let field = self.builder.build_extract_value(llvm_val.into_struct_value(), *field_idx, "struct_field").unwrap();
@@ -1392,10 +1430,23 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::PtrOffset { ptr, offset } => {
                 let ptr_val = self.generate_operand(ptr)?.into_pointer_value();
                 let offset_val = self.generate_operand(offset)?.into_int_value();
-                let elem_ty = match self.semantic_ctx.types.get(data.ty) {
-                    SemanticType::Pointer(_, elem) | SemanticType::Reference(_, _, elem) => self.map_type(*elem)?,
-                    _ if data.ty != SemanticTypeId(0) => self.map_type(data.ty)?,
-                    _ => self.context.i8_type().into(),
+                let elem_semantic_ty = match self.semantic_ctx.types.get(data.ty) {
+                    SemanticType::Pointer(_, elem) | SemanticType::Reference(_, _, elem) => *elem,
+                    _ => data.ty,
+                };
+                let elem_size = if elem_semantic_ty != SemanticTypeId(0) {
+                    self.layout_size(elem_semantic_ty)
+                } else {
+                    1
+                };
+                let elem_ty = if elem_size == 0 {
+                    self.context.i8_type().into()
+                } else {
+                    match self.semantic_ctx.types.get(data.ty) {
+                        SemanticType::Pointer(_, elem) | SemanticType::Reference(_, _, elem) => self.map_type(*elem)?,
+                        _ if data.ty != SemanticTypeId(0) => self.map_type(data.ty)?,
+                        _ => self.context.i8_type().into(),
+                    }
                 };
                 let res = unsafe {
                     self.builder.build_gep(elem_ty, ptr_val, &[offset_val], &format!("v{}", id.0)).unwrap()

@@ -22,6 +22,21 @@ path = "core/mem"
 visibility = "public"
 
 [[provider]]
+name = "cell"
+path = "core/cell"
+visibility = "public"
+
+[[provider]]
+name = "atomic"
+path = "core/atomic"
+visibility = "public"
+
+[[provider]]
+name = "sync"
+path = "core/sync"
+visibility = "public"
+
+[[provider]]
 name = "cmp"
 path = "core/cmp"
 visibility = "public"
@@ -53,6 +68,16 @@ path = "core/iter_consumers"
 visibility = "public"
 
 [[provider]]
+name = "algo"
+path = "core/algo"
+visibility = "public"
+
+[[provider]]
+name = "time"
+path = "core/time"
+visibility = "public"
+
+[[provider]]
 name = "try"
 path = "core/try"
 visibility = "public"
@@ -71,6 +96,34 @@ visibility = "public"
 [[provider]]
 name = "path"
 path = "path/path"
+visibility = "public"
+
+[[provider]]
+name = "net"
+path = "net/net"
+visibility = "public"
+
+[[provider]]
+name = "random"
+path = "core/random"
+visibility = "public"
+aliases = ["rand"]
+
+[[provider]]
+name = "encoding"
+path = "encoding/encoding"
+visibility = "public"
+aliases = ["hex", "base64"]
+
+[[provider]]
+name = "crypto"
+path = "crypto/crypto"
+visibility = "public"
+aliases = ["sha256", "chacha20"]
+
+[[provider]]
+name = "json"
+path = "json/json"
 visibility = "public"
 
 [[provider]]
@@ -128,6 +181,44 @@ visibility = "public"
 name = "iter_collect"
 path = "alloc/iter_collect"
 visibility = "public"
+
+[[provider]]
+name = "rc"
+path = "alloc/rc"
+visibility = "public"
+
+[[provider]]
+name = "arc"
+path = "alloc/arc"
+visibility = "public"
+
+[[provider]]
+name = "vecdeque"
+path = "alloc/vecdeque"
+visibility = "public"
+
+[[provider]]
+name = "binaryheap"
+path = "alloc/binaryheap"
+visibility = "public"
+
+[[provider]]
+name = "btreemap"
+path = "alloc/btreemap"
+visibility = "public"
+
+[[provider]]
+name = "btreeset"
+path = "alloc/btreeset"
+visibility = "public"
+
+[[provider]]
+name = "thread"
+path = "alloc/thread"
+visibility = "public"
+
+
+
 
 # ---------------------------------------------------------
 

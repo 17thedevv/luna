@@ -1,0 +1,18 @@
+// Standard C Library Interop
+extern fn malloc(size: usize) -> *rw u8;
+extern fn free(ptr: *rw u8);
+extern fn memcpy(dst: *rw u8, src: *u8, n: usize) -> *rw u8;
+
+export fn allocate_bytes(bytes: usize) -> *rw u8 {
+    // Raw pointers are safe to declare and pass
+    dec raw_ptr: *rw u8 = malloc(bytes);
+
+    // Dereferencing raw memory requires an explicit unsafe boundary
+    unsafe {
+        if raw_ptr != null {
+            *raw_ptr = 0;
+        }
+    }
+
+    return raw_ptr;
+}

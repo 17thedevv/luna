@@ -1,0 +1,6 @@
+fn widen(value: u8) -> u64 { return value as u64; }
+fn main() -> i32 {
+    if widen(255 as u8) != (255 as u64) { return 1; }
+    if widen(127 as u8) != (127 as u64) { return 2; }
+    return 0;
+}

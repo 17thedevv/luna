@@ -45,7 +45,7 @@ void* __luna_alloc(size_t size, size_t align) {
 
     void* ptr = NULL;
 #if defined(_WIN32)
-    if (align <= _Alignof(max_align_t)) {
+    if (align <= 16) {
         ptr = malloc(size);
     } else {
         ptr = _aligned_malloc(size, align);
@@ -90,7 +90,7 @@ void __luna_dealloc(void* ptr, size_t size, size_t align) {
     }
 
 #if defined(_WIN32)
-    if (align <= _Alignof(max_align_t)) {
+    if (align <= 16) {
         free(ptr);
     } else {
         _aligned_free(ptr);

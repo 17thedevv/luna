@@ -34,21 +34,7 @@ impl AstRelocator {
     }
 
     pub fn relocate_arena(&self, arena: &mut AstArena) {
-        for expr in &mut arena.exprs {
-            self.relocate_expr(expr);
-        }
-        for stmt in &mut arena.stmts {
-            self.relocate_stmt(stmt);
-        }
-        for decl in &mut arena.decls {
-            self.relocate_decl(decl);
-        }
-        for ty in &mut arena.types {
-            self.relocate_type(ty);
-        }
-        for pat in &mut arena.pats {
-            self.relocate_pat(pat);
-        }
+        AstMapping::relocate_arena(self, arena);
     }
 
     pub fn shift_expr_id(&self, id: ExprId) -> ExprId {
@@ -75,9 +61,39 @@ impl AstRelocator {
         span.file_id = self.new_file_id;
     }
 
+}
+
+/// One exhaustive AST walk shared by session relocation and portable identity
+/// normalization. Mappings own identity policy; the walk owns AST structure.
+pub trait AstMapping {
+    fn shift_expr_id(&self, id: ExprId) -> ExprId;
+    fn shift_stmt_id(&self, id: StmtId) -> StmtId;
+    fn shift_decl_id(&self, id: DeclId) -> DeclId;
+    fn shift_type_id(&self, id: TypeId) -> TypeId;
+    fn shift_pat_id(&self, id: PatId) -> PatId;
+    fn shift_span(&self, span: &mut Span);
+
+    fn relocate_arena(&self, arena: &mut AstArena) {
+        for expr in &mut arena.exprs {
+            self.relocate_expr(expr);
+        }
+        for stmt in &mut arena.stmts {
+            self.relocate_stmt(stmt);
+        }
+        for decl in &mut arena.decls {
+            self.relocate_decl(decl);
+        }
+        for ty in &mut arena.types {
+            self.relocate_type(ty);
+        }
+        for pat in &mut arena.pats {
+            self.relocate_pat(pat);
+        }
+    }
+
     fn relocate_expr(&self, expr: &mut Expr) {
         match expr {
-            Expr::Literal(_, _) => {}
+            Expr::Literal(token, _) => self.shift_span(&mut token.span),
             Expr::Identifier { segments, generic_args } => {
                 for s in segments { self.shift_span(s); }
                 for ga in generic_args { *ga = self.shift_type_id(*ga); }
@@ -158,15 +174,20 @@ impl AstRelocator {
                 }
                 *body = self.shift_stmt_id(*body);
             }
-            Expr::Try { expr: inner, .. } => *inner = self.shift_expr_id(*inner),
+            Expr::Try { expr: inner, try_span } => {
+                *inner = self.shift_expr_id(*inner);
+                self.shift_span(try_span);
+            }
             Expr::Await { expr: inner } => *inner = self.shift_expr_id(*inner),
             Expr::Sizeof { target_type } => *target_type = self.shift_type_id(*target_type),
             Expr::Alignof { target_type } => *target_type = self.shift_type_id(*target_type),
-            Expr::MacroCall { name, path, span, .. } => {
+            Expr::MacroCall { name, path, args, raw_tokens, span, .. } => {
                 self.shift_span(name);
                 for seg in path {
                     self.shift_span(seg);
                 }
+                for arg in args { self.relocate_token_tree(arg); }
+                for token in raw_tokens { self.shift_span(&mut token.span); }
                 self.shift_span(span);
             }
             Expr::Comptime { body } => *body = self.shift_stmt_id(*body),
@@ -407,6 +428,16 @@ impl AstRelocator {
         }
     }
 
+    fn relocate_token_tree(&self, tree: &mut crate::TokenTree) {
+        match tree {
+            crate::TokenTree::Leaf { token } => self.shift_span(&mut token.span),
+            crate::TokenTree::Group { tokens, span, .. } => {
+                self.shift_span(span);
+                for token in tokens { self.relocate_token_tree(token); }
+            }
+        }
+    }
+
     fn relocate_generic_params(&self, generic_params: &mut Vec<crate::GenericParam>) {
         for gp in generic_params {
             self.shift_span(&mut gp.name);
@@ -446,8 +477,11 @@ impl AstRelocator {
             Type::Never => {}
             Type::TraitObject { trait_type } => *trait_type = self.shift_type_id(*trait_type),
             Type::Typeof { expr } => *expr = self.shift_expr_id(*expr),
-            Type::MacroCall { path, span, .. } => {
+            Type::MacroCall { name, path, args, raw_tokens, span, .. } => {
+                self.shift_span(name);
                 for p in path { self.shift_span(p); }
+                for arg in args { self.relocate_token_tree(arg); }
+                for token in raw_tokens { self.shift_span(&mut token.span); }
                 self.shift_span(span);
             }
         }
@@ -455,7 +489,7 @@ impl AstRelocator {
 
     fn relocate_pat(&self, pat: &mut Pattern) {
         match pat {
-            Pattern::Literal(_) => {}
+            Pattern::Literal(token) => self.shift_span(&mut token.span),
             Pattern::Identifier { segments } => {
                 for s in segments { self.shift_span(s); }
             }
@@ -514,5 +548,14 @@ impl AstRelocator {
             self.shift_span(&mut constraint.span);
         }
     }
+}
+
+impl AstMapping for AstRelocator {
+    fn shift_expr_id(&self, id: ExprId) -> ExprId { AstRelocator::shift_expr_id(self, id) }
+    fn shift_stmt_id(&self, id: StmtId) -> StmtId { AstRelocator::shift_stmt_id(self, id) }
+    fn shift_decl_id(&self, id: DeclId) -> DeclId { AstRelocator::shift_decl_id(self, id) }
+    fn shift_type_id(&self, id: TypeId) -> TypeId { AstRelocator::shift_type_id(self, id) }
+    fn shift_pat_id(&self, id: PatId) -> PatId { AstRelocator::shift_pat_id(self, id) }
+    fn shift_span(&self, span: &mut Span) { AstRelocator::shift_span(self, span); }
 }
 

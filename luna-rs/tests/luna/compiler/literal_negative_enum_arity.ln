@@ -1,0 +1,2 @@
+enum Parcel<T> { One(T), }
+fn main() -> i32 { dec parcel: Parcel<(u8, u16)> = Parcel::One(72, 500); return 0; }

@@ -95,6 +95,9 @@ fn test_adv_comptime_02_make_trait_object_and_call() {
 
     // Register method in trait_methods
     ctx.tables.trait_methods.insert(trait_sym, vec![method_sym]);
+    ctx.tables.impl_methods.insert(luna_semantic::semantic_tables::ImplKey {
+        trait_id: Some(trait_sym), self_type_def: concrete_sym.into(),
+    }, vec![method_sym]);
 
     // Build concrete method function: fn greet(self: &Polite) -> i32 { return (*self).val * 2; }
     let mut method_fn = Function {

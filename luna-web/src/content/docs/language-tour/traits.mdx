@@ -1,0 +1,100 @@
+---
+title: Traits & Generics
+description: Polymorphism through traits and generic types.
+---
+
+## Traits
+
+Traits define shared behavior:
+
+```luna
+trait Printable {
+    fn print(self: &Self);
+}
+
+struct Point {
+    x: f64,
+    y: f64,
+};
+
+impl Printable for Point {
+    fn print(self: &Point) {
+        std::io::println("Point({}, {})", self.x, self.y);
+    }
+}
+```
+
+## Trait Methods with Default Implementations
+
+```luna
+trait Greet {
+    fn name(self: &Self) -> str;
+    fn greet(self: &Self) {
+        std::io::println("Hello, {}!", self.name());
+    }
+}
+```
+
+## Generics
+
+### Generic Functions
+
+```luna
+fn max<T: Comparable>(a: T, b: T) -> T {
+    if a > b { return a; } else { return b; }
+}
+
+fn swap<T>(a: T, b: T) -> (T, T) {
+    return (b, a);
+}
+```
+
+### Generic Structs
+
+```luna
+struct Pair<T, U> {
+    first: T,
+    second: U,
+};
+
+impl<T, U> Pair<T, U> {
+    fn new(first: T, second: U) -> Pair<T, U> {
+        return Pair { first: first, second: second };
+    }
+}
+```
+
+## Trait Bounds
+
+Constrain generic types:
+
+```luna
+trait Comparable {
+    fn greater_than(self: &Self, other: &Self) -> bool;
+}
+```
+
+## Trait Objects (Dynamic Dispatch)
+
+Store different types implementing a trait:
+
+```luna
+trait Drawable {
+    fn draw(self: &Self);
+}
+
+struct Square { size: f64 };
+struct Circle { radius: f64 };
+
+impl Drawable for Square {
+    fn draw(self: &Square) {
+        std::io::println("Drawing square: {}", self.size);
+    }
+}
+
+impl Drawable for Circle {
+    fn draw(self: &Circle) {
+        std::io::println("Drawing circle: {}", self.radius);
+    }
+}
+```

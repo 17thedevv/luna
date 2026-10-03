@@ -1,0 +1,166 @@
+import <random>;
+import <slice>;
+import <vec>;
+
+fn test_deterministic() -> i32 {
+    dec rw rng1 = std::rng_new(123456789 as u64);
+    dec rw rng2 = std::rng_new(123456789 as u64);
+    dec rw rng3 = std::rng_new(987654321 as u64);
+
+    dec rw i: usize = 0 as usize;
+    while i < (10 as usize) {
+        dec v1 = rng1.next_u64();
+        dec v2 = rng2.next_u64();
+        if v1 != v2 {
+            return 1;
+        }
+        i = i + (1 as usize);
+    }
+
+    dec v3 = rng3.next_u64();
+    dec rw rng4 = std::rng_new(123456789 as u64);
+    dec v4 = rng4.next_u64();
+    if v3 == v4 {
+        return 2;
+    }
+
+    return 0;
+}
+
+fn test_ranges() -> i32 {
+    dec rw rng = std::rng_new(42 as u64);
+
+    dec rw i: usize = 0 as usize;
+    while i < (50 as usize) {
+        dec r_i32 = rng.gen_range_i32(10 as i32, 20 as i32);
+        if r_i32 < (10 as i32) || r_i32 >= (20 as i32) {
+            return 10;
+        }
+
+        dec r_u64 = rng.gen_range_u64(100 as u64, 200 as u64);
+        if r_u64 < (100 as u64) || r_u64 >= (200 as u64) {
+            return 11;
+        }
+
+        i = i + (1 as usize);
+    }
+
+    return 0;
+}
+
+fn test_float() -> i32 {
+    dec rw rng = std::rng_new(999 as u64);
+
+    dec rw i: usize = 0 as usize;
+    while i < (50 as usize) {
+        dec f = rng.next_f64();
+        if f < 0.0 || f >= 1.0 {
+            return 20;
+        }
+        i = i + (1 as usize);
+    }
+
+    return 0;
+}
+
+fn test_fill_bytes() -> i32 {
+    dec rw rng = std::rng_new(2026 as u64);
+    dec rw v = std::vec_with_capacity<u8>(16 as u64);
+    dec rw i: u64 = 0 as u64;
+    while i < (16 as u64) {
+        v.push(0 as u8);
+        i = i + (1 as u64);
+    }
+
+    rng.fill_bytes(v.as_mut_slice());
+
+    dec slice = v.as_slice();
+    dec rw all_zeros = true;
+    dec rw j: usize = 0 as usize;
+    while j < (16 as usize) {
+        if slice[j] != (0 as u8) {
+            all_zeros = false;
+        }
+        j = j + (1 as usize);
+    }
+
+    if all_zeros {
+        return 30;
+    }
+
+    return 0;
+}
+
+fn test_shuffle() -> i32 {
+    dec rw rng = std::rng_new(777 as u64);
+    dec rw v = std::vec_with_capacity<i32>(5 as u64);
+    v.push(10 as i32);
+    v.push(20 as i32);
+    v.push(30 as i32);
+    v.push(40 as i32);
+    v.push(50 as i32);
+
+    rng.shuffle<i32>(v.as_mut_slice());
+
+    dec slice = v.as_slice();
+    if slice.len() != (5 as usize) {
+        return 40;
+    }
+
+    dec rw sum: i32 = 0 as i32;
+    dec rw i: usize = 0 as usize;
+    while i < (5 as usize) {
+        sum = sum + slice[i];
+        i = i + (1 as usize);
+    }
+
+    // 10 + 20 + 30 + 40 + 50 = 150
+    if sum != (150 as i32) {
+        return 41;
+    }
+
+    return 0;
+}
+
+fn test_helpers() -> i32 {
+    dec u = std::random_u64();
+    dec r = std::random_range_i32(1 as i32, 100 as i32);
+    if r < (1 as i32) || r >= (100 as i32) {
+        return 50;
+    }
+
+    dec f = std::random_f64();
+    if f < 0.0 || f >= 1.0 {
+        return 51;
+    }
+
+    dec b = std::random_bool();
+    // b must be boolean (true or false)
+    if b != true && b != false {
+        return 52;
+    }
+
+    return 0;
+}
+
+export fn main() -> i32 {
+    dec r1 = test_deterministic();
+    if r1 != 0 { return r1; }
+
+    dec r2 = test_ranges();
+    if r2 != 0 { return r2; }
+
+    dec r3 = test_float();
+    if r3 != 0 { return r3; }
+
+    dec r4 = test_fill_bytes();
+    if r4 != 0 { return r4; }
+
+    dec r5 = test_shuffle();
+    if r5 != 0 { return r5; }
+
+    dec r6 = test_helpers();
+    if r6 != 0 { return r6; }
+
+    return 0;
+}

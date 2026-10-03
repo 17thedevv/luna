@@ -188,7 +188,7 @@ fn probe_3_bitcast_pointer_reinterpretation() {
         }
 
         fn main() -> i32 {
-            dec u: u32 = 4294967295 as u32; // 0xFFFFFFFF
+            dec u: u32 = 4294967295u32; // 0xFFFFFFFF
             dec i: i32 = u32_to_i32_bits(u);
             if i == -1 {
                 return 0;

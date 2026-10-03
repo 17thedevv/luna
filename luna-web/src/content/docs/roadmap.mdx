@@ -1,0 +1,108 @@
+---
+title: Roadmap
+description: Luna's development roadmap — current status, planned features, and vision.
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+## Current Status
+
+Luna is in **active development** with a fully functional compiler pipeline, LLVM-based code generation, and a growing standard library.
+
+<Aside type="note">
+  Luna is a research and educational language under heavy development. APIs and syntax may change. Contributions and feedback are welcome!
+</Aside>
+
+## Feature Matrix
+
+### ✅ Stable & Implemented
+
+| Feature | Details |
+|---------|---------|
+| Variable Declarations | `dec`, `const`, type inference, `rw` (rewritable) modifier |
+| Primitive Types | `i8`–`i128`, `u8`–`u128`, `f32`, `f64`, `bool`, `char`, `str`, `void` |
+| Functions | Named functions, methods, recursion, explicit `self` parameter |
+| Structs | Named fields, generic structs, method implementations, lifetime contracts |
+| Enums | Variant enums, enums with associated data, generic enums |
+| Traits | Trait definitions, implementations, default methods |
+| Generics | Monomorphization, generic structs/functions/traits, trait bounds |
+| Ownership | Move semantics, single owner rule, RAII resource cleanup |
+| Borrowing | Shared references (`&T`), rewritable references (`&rw T`) |
+| Lifetimes | Lifetime annotations, `requires life(...) >= life(...)` constraints |
+| Pattern Matching | `match` expressions (`->`), destructuring, exhaustiveness checking |
+| Raw Pointers | `*T`, `*rw T`, unsafe pointer operations |
+| FFI | `extern` blocks, C ABI interop |
+| Async/Await | `async fn`, `.await` postfix expressions |
+| Modules | `import` (providers), `export` visibility, namespace `::` access |
+| Trait Objects | Dynamic dispatch via vtable |
+| LLVM Backend | Full native code generation, optimization passes |
+
+### 🔄 In Progress
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Closures | Implementation | Capturing closures with ownership semantics |
+| Standard Library Expansion | Active | More containers, algorithms, and I/O utilities |
+| Error Messages | Improving | Richer diagnostics with source spans and suggestions |
+| Incremental Compilation | Early | Artifact-based caching with identity validation |
+
+### 🗓️ Planned
+
+| Feature | Priority | Description |
+|---------|----------|-------------|
+| Macros | High | Declarative macro system for metaprogramming |
+| Comptime | High | Compile-time function evaluation and code generation |
+| WASM Target | Medium | WebAssembly compilation target for browser/edge |
+| Online Playground | Medium | Browser-based Luna REPL and editor |
+| VS Code Extension | Medium | Syntax highlighting, diagnostics, code completion |
+| Package Manager (`mpm`) | Medium | Dependency resolution, artifact caching, semantic versioning |
+| Cross-Compilation | Low | Target different platforms from a single host |
+| Documentation Generator | Low | Auto-generate API docs from source code |
+
+<hr class="section-divider" />
+
+## Compiler Architecture
+
+Luna's compiler is built as a multi-phase pipeline with strict separation of concerns:
+
+```
+Source (.ln) → Lexer → Parser → AST → Semantic Analysis → MVIR → LLVM IR → Native Binary
+```
+
+| Phase | Responsibility |
+|-------|---------------|
+| **Frontend** | Lexing, parsing, AST construction |
+| **Middle End** | Type checking, trait resolution, borrow checking, lifetime analysis |
+| **Optimizer** | MVIR transformations, monomorphization, inlining |
+| **Backend** | LLVM IR generation, machine code emission, linking |
+
+<Aside type="tip">
+  Each phase owns a single intermediate representation and communicates only through stable IR boundaries. This architecture enables independent testing and future parallelization.
+</Aside>
+
+## Vision
+
+Luna aims to be a practical systems language that proves you don't need to choose between:
+
+<CardGrid>
+  <Card title="Safety & Performance" icon="approve-check-circle">
+    Ownership-based memory safety with zero runtime cost. No GC, no reference counting, no overhead.
+  </Card>
+  <Card title="Power & Simplicity" icon="rocket">
+    Systems-level control with a clean, modern syntax. Low-level when needed, high-level by default.
+  </Card>
+  <Card title="Speed & Correctness" icon="star">
+    Native performance via LLVM with compile-time guarantees against common bugs.
+  </Card>
+  <Card title="Learning & Building" icon="open-book">
+    A language that teaches good systems programming habits while being productive enough for real projects.
+  </Card>
+</CardGrid>
+
+## Contributing
+
+Luna is open-source and welcomes contributions. Whether it's code, documentation, testing, or feedback — every contribution matters.
+
+- **Repository**: [github.com/17thedevv/luna](https://github.com/17thedevv/luna)
+- **Issues**: Report bugs or request features on GitHub
+- **Discussions**: Join the conversation in GitHub Discussions

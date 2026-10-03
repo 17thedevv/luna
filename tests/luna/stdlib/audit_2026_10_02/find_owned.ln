@@ -1,0 +1,11 @@
+import <vec>;
+import <box>;
+import <iter_consumers>;
+fn keep(item: std::Box<i32>) -> bool { return *item.as_ref() == 7; }
+fn main() -> i32 {
+    dec rw v = std::vec_new<std::Box<i32>>();
+    v.push(std::box_new<i32>(7));
+    dec result = std::iter::iter_find(v.into_iter(), keep).unwrap();
+    if *result.as_ref() != 7 { return 1; }
+    return 0;
+}

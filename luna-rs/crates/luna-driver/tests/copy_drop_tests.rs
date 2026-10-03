@@ -34,11 +34,11 @@ fn remove_artifacts(dir: &std::path::Path) {
     }
 }
 
-fn source_sysroot() -> Sysroot {
+fn source_sysroot(name: &str) -> Sysroot {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let external_dir = manifest_dir.parent().expect("crates directory")
         .parent().expect("workspace root").join("libs").join("external");
-    let root = create_temp_dir("source_sysroot");
+    let root = create_temp_dir(&format!("source_sysroot_{name}"));
     let source_external = root.join("libs").join("external");
     copy_dir_all(&external_dir, &source_external);
     remove_artifacts(&source_external);
@@ -46,7 +46,7 @@ fn source_sysroot() -> Sysroot {
 }
 
 fn run_compiler(name: &str, src: &str) -> (bool, Vec<luna_common::Diagnostic>) {
-    let test_sysroot = source_sysroot();
+    let test_sysroot = source_sysroot(name);
     let temp = create_temp_dir(name);
     let main_path = temp.join("main.ln");
     fs::write(&main_path, src).unwrap();

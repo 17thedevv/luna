@@ -206,11 +206,15 @@ enum_variant_list ::= enum_variant ("," enum_variant)* ","?
 enum_variant ::= IDENTIFIER ("(" parameters ")")?
 
 // --- STRUCT, TRAIT VÀ IMPL ---
-struct_decl ::= annotation* "export"? KW_STRUCT IDENTIFIER generic_params? "{" (struct_field ("," struct_field)* ","?)? "}" struct_lifetime_contracts? ";"
+struct_decl ::= annotation* "export"? KW_STRUCT IDENTIFIER generic_params? "{" (struct_field ("," struct_field)* ","?)? "}" struct_contracts? ";"
 
-struct_lifetime_contracts ::= requires_clause+
+// Canonical spelling uses one requires group; existing repeated groups are
+// accepted. Both kinds of contract may occur in a comma-separated group.
+struct_contracts ::= struct_requires_clause+
 
-requires_clause ::= "requires" lifetime_relation ("," lifetime_relation)*
+struct_requires_clause ::= KW_REQUIRES struct_contract_entry ("," struct_contract_entry)*
+struct_contract_entry ::= lifetime_relation | raw_storage_anchor
+raw_storage_anchor ::= "anchor" "(" IDENTIFIER ")" "=" KW_SELF_VAL
 
 lifetime_relation ::= "life" "(" struct_lifetime_target ")" (">=" | "<=") "life" "(" struct_lifetime_target ")"
 

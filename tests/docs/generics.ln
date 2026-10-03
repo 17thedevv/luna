@@ -1,0 +1,23 @@
+trait Container<T> {
+    fn len(self: &Self) -> usize;
+    fn is_empty(self: &Self) -> bool;
+}
+
+struct Stack<T> {
+    items: std::Vec<T>,
+};
+
+impl<T> Container<T> for Stack<T> {
+    fn len(self: &Self) -> usize {
+        return self.items.len();
+    }
+
+    fn is_empty(self: &Self) -> bool {
+        return self.items.len() == 0;
+    }
+}
+
+// Bounded generic function with static dispatch
+fn inspect<C: Container<i32>>(c: &C) {
+    std::io::println("Container size: {}", c.len());
+}
