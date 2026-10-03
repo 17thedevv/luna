@@ -59,6 +59,10 @@ target_include_directories(luna-runtime PUBLIC
 
 # Link pthreads on POSIX and ws2_32/bcrypt on Windows
 if(UNIX)
+    target_compile_definitions(luna-runtime PUBLIC _POSIX_C_SOURCE=200809L _DEFAULT_SOURCE)
+    if(APPLE)
+        target_compile_definitions(luna-runtime PUBLIC _DARWIN_C_SOURCE)
+    endif()
     target_link_libraries(luna-runtime PRIVATE pthread)
 endif()
 if(WIN32)
