@@ -126,8 +126,8 @@ BIT_XOR_ASSIGN ::= "^="
 LSHIFT_ASSIGN  ::= "<<="
 RSHIFT_ASSIGN  ::= ">>="
 
-assign_op ::= ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | SLASH_ASSIGN 
-            | PERC_ASSIGN | BIT_AND_ASSIGN | BIT_OR_ASSIGN | BIT_XOR_ASSIGN 
+assign_op ::= ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | STAR_ASSIGN | SLASH_ASSIGN
+            | PERC_ASSIGN | BIT_AND_ASSIGN | BIT_OR_ASSIGN | BIT_XOR_ASSIGN
             | LSHIFT_ASSIGN | RSHIFT_ASSIGN
 EQ_EQ      ::= "=="
 BANG_EQ    ::= "!="
@@ -159,8 +159,8 @@ annotation  ::= AT_BRACKET IDENTIFIER ("(" argument_list ")")? "]"
 program     ::= declaration* EOF
 
 declaration ::= use_decl
-              | var_decl 
-              | func_decl 
+              | var_decl
+              | func_decl
               | struct_decl
               | trait_decl
               | impl_decl
@@ -239,20 +239,20 @@ parameters     ::= receiver_param ("," regular_param)* ("," variadic_param)?
                  | regular_param ("," regular_param)* ("," variadic_param)?
                  | variadic_param
 
-type           ::= reference_type 
-                 | pointer_type 
-                 | array_type 
-                 | tuple_type 
-                 | func_type 
+type           ::= reference_type
+                 | pointer_type
+                 | array_type
+                 | tuple_type
+                 | func_type
                  | never_type
                  | builtin_type
                  | named_type
                  | trait_object_type
                  | placeholder_type
 
-builtin_type ::= BUILTIN_TYPE 
+builtin_type ::= BUILTIN_TYPE
 
-BUILTIN_TYPE ::= "int_4" | "int_8" | "int_16" | "int_32" | "int_64" | "int_128" 
+BUILTIN_TYPE ::= "int_4" | "int_8" | "int_16" | "int_32" | "int_64" | "int_128"
                  | "uint_4" | "uint_8" | "uint_16" | "uint_32" | "uint_64" | "uint_128"
                  | "float_32" | "float_64"
                  | "bool" | "char" | "str" | "void"
@@ -268,10 +268,10 @@ never_type     ::= BANG
 named_type     ::= type_path
 
 // --- LỆNH VÀ BIỂU THỨC ---
-statement   ::= expr_stmt 
-              | block_stmt 
-              | if_stmt 
-              | while_stmt 
+statement   ::= expr_stmt
+              | block_stmt
+              | if_stmt
+              | while_stmt
               | for_stmt
               | return_stmt
               | break_stmt
@@ -306,12 +306,12 @@ unsafe_stmt ::= "unsafe" block_stmt
 expression  ::= assignment
 const_expression ::= expression // Bắt buộc là hằng số tại compile-time
 
-assignment  ::= lvalue assign_op expression 
+assignment  ::= lvalue assign_op expression
               | range_expr
 
 lvalue      ::= "*"* value_path ("[" expression "]" | "." IDENTIFIER)*
 
-range_expr  ::= logical_or ((".." | "..=") logical_or?)? 
+range_expr  ::= logical_or ((".." | "..=") logical_or?)?
               | (".." | "..=") logical_or?
 
 logical_or  ::= logical_and ("||" logical_and)*
@@ -326,7 +326,7 @@ term        ::= factor (("+" | "-") factor)*
 factor      ::= cast (("*" | "/" | "%") cast)*
 cast        ::= unary (KW_AS type)*
 
-unary       ::= "-" unary 
+unary       ::= "-" unary
               | "*" unary
               | "!" unary
               | "~" unary
@@ -334,8 +334,8 @@ unary       ::= "-" unary
               | KW_AWAIT unary
               | primary
 
-postfix_op  ::= "[" expression "]" 
-              | "." IDENTIFIER 
+postfix_op  ::= "[" expression "]"
+              | "." IDENTIFIER
               | "?"
               | "++"
               | "--"
@@ -345,15 +345,15 @@ postfix_op  ::= "[" expression "]"
 primary     ::= base_primary postfix_op*
 
 // Thêm match_expr vào base_primary
-base_primary::= INTEGER_LITERAL 
-              | FLOAT_LITERAL 
+base_primary::= INTEGER_LITERAL
+              | FLOAT_LITERAL
               | CHAR_LITERAL
               | STRING_LITERAL
               | RAW_STRING_LITERAL
               | BYTE_LITERAL
               | BYTE_STRING_LITERAL
-              | KW_TRUE 
-              | KW_FALSE 
+              | KW_TRUE
+              | KW_FALSE
               | KW_SELF_VAL
               | array_literal
               | tuple_literal
@@ -362,7 +362,7 @@ base_primary::= INTEGER_LITERAL
               | lambda_expr
               | sizeof_expr
               | alignof_expr
-              | value_path 
+              | value_path
               | match_expr
               | macro_call_expr
               | "(" expression ")"
@@ -375,13 +375,13 @@ match_arm   ::= pattern "->" (expression | block_stmt) ","?
 
 enum_destruct ::= "(" IDENTIFIER ("," IDENTIFIER)* ")"
 
-pattern     ::= INTEGER_LITERAL 
-              | FLOAT_LITERAL 
+pattern     ::= INTEGER_LITERAL
+              | FLOAT_LITERAL
               | CHAR_LITERAL
               | STRING_LITERAL
               | RAW_STRING_LITERAL
-              | KW_TRUE 
-              | KW_FALSE 
+              | KW_TRUE
+              | KW_FALSE
               | "_"
               | tuple_pattern
               | unit_literal

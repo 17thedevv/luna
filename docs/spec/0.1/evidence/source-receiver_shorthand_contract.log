@@ -9,4 +9,3 @@ error: Expected expression.
    |
 3  | impl Item { fn read(&self) -> i32 { return self.value; } }
    |                                                        ^
-

@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-03",
+  "target": "Windows x86_64 GNU / LLVM 18",
+  "cargo_check_workspace_all_targets": {
+    "exit": 0
+  },
+  "frontend_tests": {
+    "exit": 0,
+    "passed": 41,
+    "failed": 0,
+    "binaries": 10
+  },
+  "semantic_selected_tests": {
+    "exit": 0,
+    "passed": 5,
+    "failed": 0,
+    "binaries": 2
+  },
+  "runtime_build": {
+    "exit": 0
+  },
+  "runtime_ctest": {
+    "exit": 0,
+    "passed": 1,
+    "failed": 0
+  },
+  "cli_build": {
+    "exit": 0
+  },
+  "sysroot_build": {
+    "exit": 0,
+    "timeout": false,
+    "seconds": 44.95300919999136,
+    "providers": 49
+  },
+  "website_build": {
+    "exit": 0,
+    "pages": 33,
+    "dependency_resolution_fix": "Explicit cookie@2.0.1 avoids resolving an unrelated ancestor cookie installation during prerender."
+  },
+  "cli_examples": {
+    "attempts": 16,
+    "contract_met": 8,
+    "known_grammar_failures": 6,
+    "characterization": 2
+  },
+  "full_workspace_tests": "not run for this integrated tree",
+  "release_conformance": "blocked / not verified",
+  "excluded_local_archival_refs": [
+    "recovery/pattern-matching",
+    "codex/integrate-all-worktrees-2026-10-03"
+  ],
+  "documentation": {
+    "documents": 157,
+    "site_pages": 24,
+    "checked_local_links": 927,
+    "errors": []
+  }
+}

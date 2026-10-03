@@ -1341,7 +1341,7 @@ impl<'a> MacroEngine<'a> {
                         }
                         let brace_start = i;
                         i += 1;
-                        
+
                         let mut depth = 1;
                         let mut in_str = false;
                         let mut in_char = false;

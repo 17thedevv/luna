@@ -18,9 +18,11 @@ and [document inventory](docs/documentation-index.md).
 The baseline retains defined contracts even where implementation is incomplete.
 **Release conformance is blocked**, not certified by historical FROZEN labels.
 The [2026-10-02 audit](docs/audits/stdlib-2026-10-02/README.md) found compiler and
-stdlib defects. This documentation refresh does not repair those defects.
+stdlib defects at `3dac3ac`. Later compiler, runtime, stdlib and website work
+has been integrated; prior audit results do not certify the merged implementation.
 
-The sysroot currently contains **32 component providers**. Six language-contract
+The merged sysroot contains **49 component providers**: 32 in the original audit
+and 17 later additions requiring their own acceptance evidence. Six language-contract
 families and controlled OptionExt visibility are bootstrapped; ordinary library
 APIs require their specified imports. Stdlib is a language consumer: compiler
 macro names, stream prefixes and newline suffixes must not select stdlib callees.
@@ -48,8 +50,8 @@ cargo test --manifest-path luna-rs/Cargo.toml --workspace
 python docs/tools/validate_v01_docs.py
 ```
 
-A full workspace test is a required implementation check, not a command verified
-by this documentation-only update. The documentation validator performs local
+A full workspace test remains a required implementation check. The integration
+record distinguishes current checks from historical acceptance. The documentation validator performs local
 consistency checks; CLI example checks are recorded separately.
 
 ## Repository

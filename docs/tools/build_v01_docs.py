@@ -69,13 +69,15 @@ def role(name):
         return 'guidance'
     if name.startswith('docs/audits/'):
         return 'evidence'
+    if name.startswith('docs/integration/'):
+        return 'evidence'
     return 'historical'
 
 
 def maintained_paths():
     tracked = subprocess.check_output(['git', 'ls-files'], cwd=ROOT, text=True).splitlines()
     names = {name for name in tracked if name.lower().endswith('.md')}
-    for folder in ('docs/spec/0.1', 'docs/history', 'docs/audits'):
+    for folder in ('docs/spec/0.1', 'docs/history', 'docs/audits', 'docs/integration'):
         names.update(p.relative_to(ROOT).as_posix() for p in (ROOT / folder).rglob('*.md'))
     names.add('docs/documentation-index.md')
     return sorted(name for name in names if (ROOT / name).is_file()
@@ -84,7 +86,7 @@ def maintained_paths():
 
 def notices(names):
     for name in names:
-        if name.startswith(('docs/spec/0.1/', 'docs/history/', 'docs/audits/')) or name == 'docs/documentation-index.md':
+        if name.startswith(('docs/spec/0.1/', 'docs/history/', 'docs/audits/', 'docs/integration/')) or name == 'docs/documentation-index.md':
             continue
         path = ROOT / name
         text = path.read_text(encoding='utf-8-sig')
@@ -113,12 +115,15 @@ def notices(names):
 def provider_inventory():
     manifest = ROOT / 'luna-rs/libs/external/sysroot.toml'
     providers = tomllib.loads(manifest.read_text(encoding='utf-8'))['provider']
+    original = tomllib.loads((SPEC / 'evidence/sysroot-audit-baseline.toml').read_text(encoding='utf-8'))['provider']
+    audited_names = {provider['name'] for provider in original}
     text = '# Luna 0.1 provider inventory\n\nGenerated from [sysroot.toml](../../../luna-rs/libs/external/sysroot.toml). Provider identity is not a namespace or a completeness claim.\n\n'
-    text += f'Baseline: **{len(providers)} providers**. Public/internal visibility controls import access, separately from exported declarations.\n\n'
-    text += '| Provider | Source component | Import visibility | Contract family |\n|---|---|---|---|\n'
+    text += f'Current manifest: **{len(providers)} providers**. The [original audit manifest](evidence/sysroot-audit-baseline.toml) has {len(original)}; later additions are implementation inventory, not automatic spec adoption or conformance. Public/internal visibility controls import access, separately from exported declarations.\n\n'
+    text += '| Provider | Source component | Import visibility | Contract family | Evidence boundary |\n|---|---|---|---|---|\n'
     for provider in providers:
         source = provider['path'] + '.ln'
-        text += f"| `{provider['name']}` | [{source}](../../../luna-rs/libs/external/{source}) | {provider['visibility']} | {provider.get('lang_contract', 'ordinary provider')} |\n"
+        boundary = 'original 32-provider audit' if provider['name'] in audited_names else 'later addition; unverified'
+        text += f"| `{provider['name']}` | [{source}](../../../luna-rs/libs/external/{source}) | {provider['visibility']} | {provider.get('lang_contract', 'ordinary provider')} | {boundary} |\n"
     text += '\nComponent builds and API conformance are separate. See [stdlib.md](stdlib.md) and [gaps.md](gaps.md).\n'
     (SPEC / 'stdlib-inventory.md').write_text(text, encoding='utf-8')
 

@@ -7,6 +7,11 @@
 Contract baseline: [spec/0.1](docs/spec/0.1/README.md). Release conformance:
 **BLOCKED / NOT VERIFIED**. Compiler revision evaluated: `3dac3ac`.
 
+The table below describes that audit revision. All-worktree integration on
+2026-10-03 adds later compiler/runtime/stdlib changes and a 49-provider manifest;
+it does not transfer the audit's verdicts or old freeze coverage automatically.
+See the [integration record](docs/integration/2026-10-03-all-worktrees.md).
+
 | Area | Current evidence |
 |---|---|
 | Compiler CLI / sysroot | Builds; 32 providers rebuilt through the official path |

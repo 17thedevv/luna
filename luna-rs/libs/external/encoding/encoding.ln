@@ -239,7 +239,7 @@ export module std {
             dec c1 = input[i + (1 as u64)];
             dec c2 = input[i + (2 as u64)];
             dec c3 = input[i + (3 as u64)];
-            
+
             dec v0_opt = b64_decode_char(c0, url_safe);
             dec v1_opt = b64_decode_char(c1, url_safe);
             if v0_opt.is_none() || v1_opt.is_none() {
@@ -247,7 +247,7 @@ export module std {
             }
             dec v0 = v0_opt.unwrap();
             dec v1 = v1_opt.unwrap();
-            
+
             if c2 == (61 as u8) {
                 if c3 != (61 as u8) || (i + (4 as u64)) != len {
                     return std::Result::Err(Base64Error::InvalidPadding);

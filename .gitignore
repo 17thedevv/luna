@@ -86,6 +86,7 @@ luna-cli-old-backup/
 !/docs/audits/stdlib-2026-10-02/*.py
 !/docs/tools/check_v01_examples.py
 !/docs/spec/0.1/evidence/*.log
+!/docs/integration/evidence/*.log
 !/luna-rs/tests/luna/stdlib/collections/test_phase_*.ln
 
 # Local build, browser and parity scratch output

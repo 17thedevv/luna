@@ -12,6 +12,7 @@
   "dependencies": {
     "@astrojs/starlight": "^0.42.4",
     "astro": "^7.2.10",
+    "cookie": "2.0.1",
     "sharp": "^0.35.3"
   }
 }

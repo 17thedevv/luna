@@ -1,11 +1,12 @@
 # Luna 0.1 — standard library contracts
 
-The stdlib is an ordinary consumer of Luna semantics. The baseline manifest has
-32 component providers; its generated [inventory](stdlib-inventory.md) is derived
-from `luna-rs/libs/external/sysroot.toml`, not a second hand-maintained manifest.
-Provider counts describe this baseline and may change only with an explicit
-manifest/spec update. Public APIs are not implicitly complete because all
-providers build.
+The stdlib is an ordinary consumer of Luna semantics. The original audited
+baseline has 32 component providers. All-worktree integration expands the
+implementation manifest to 49; its generated [inventory](stdlib-inventory.md)
+distinguishes the 32 audited components from 17 later additions. Adding a
+provider is not automatic adoption or verification of every public API it
+contains. The inventory is derived from `luna-rs/libs/external/sysroot.toml`,
+not a second hand-maintained manifest.
 
 ## Required invariants
 
@@ -31,9 +32,9 @@ arbitrary `T` storage as i32 or another particular library element type.
 
 Convert and Display inherit correct generic integer widening; they must not
 mask a compiler defect independently in every API. The existing char-to-text
-boundary has unresolved scalar-domain debt: String/Writer text invariants remain
-requirements while a decision about every integer-to-char cast is tracked
-separately. No new cast semantics are frozen by this documentation refresh.
+boundary retains the subsequently approved Unicode scalar/cast/operator contract
+in the exact-commit formatting record. Merged changes still require fresh
+verification; the original audit's counterexamples remain dated evidence.
 
 Optimization cannot weaken ownership, lifetime, overflow, text, ABI or parity
 contracts. Identity hashes with low-bit masking have a measured clustering

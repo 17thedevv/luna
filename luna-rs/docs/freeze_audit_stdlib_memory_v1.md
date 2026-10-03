@@ -1,7 +1,11 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # Luna Memory Subsystem (LUNA-MEM-V1) — Freeze & Implementation Audit
 
-**Status:** COMPLETE & FROZEN  
-**Date:** 2026-10-01  
+**Status:** COMPLETE & FROZEN
+**Date:** 2026-10-01
 **Architecture Rules Compliance:** Rule 6 (Identity), Rule 7 (Module Boundary), Rule 10 (BOX-FROZEN), Rule 11 (Stdlib-Compiler Boundary), Rule 12 (Testing Strategy), RAW-STORAGE-ANCHOR-v1.
 
 ---

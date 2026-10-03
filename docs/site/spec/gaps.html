@@ -6,6 +6,7 @@
 <main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
 <h1 id="luna-01--implementation-gaps-and-specification-debt">Luna 0.1 — implementation gaps and specification debt</h1>
 <p>Baseline date: 2026-10-02; implementation revision: <code>3dac3ac</code>. Audit IDs below are local to <a href="../../audits/stdlib-2026-10-02/README.md">stdlib-2026-10-02</a>, not substitutes for earlier compiler-gap IDs from unrelated phases. Existing contracts are retained. No row here grants permission to weaken them.</p>
+<p><strong>Integration update — 2026-10-03:</strong> later worktree changes have been merged. The rows and CLI evidence below describe <code>3dac3ac</code> unless explicitly stated otherwise. Some fixes may now be present; each original finding requires a fresh check before being marked closed. The merged manifest has 49 providers. V01-ARCH-02 is newly observed in the imported source, not the old audit.</p>
 <h2 id="confirmed-audit-defects">Confirmed audit defects</h2>
 <table>
 <tr><th>Audit ID</th><th>Priority</th><th>Requirement violated / observed failure</th></tr>
@@ -30,6 +31,7 @@
 <tr><td>V01-GRAMMAR-02</td><td>Retained parenthesized foreach head from normative Rule K.4</td><td>CLI confirms both modes reject the contract head and accept the unparenthesized implementation form; reconciliation must retain an explicit decision</td></tr>
 <tr><td>V01-GRAMMAR-03</td><td>Receiver shorthand equivalence from Rule K.5</td><td>CLI confirms both modes reject &amp;self shorthand; the complete equivalence contract remains a requirement</td></tr>
 <tr><td>V01-DIAG-01</td><td>DIAG-1 requires typed diagnostic codes for every compiler error</td><td>The foreach/receiver parser failures render <code>error:</code> without a code in both modes; the private-field rejection correctly renders E1003. Code identity/propagation still needs a focused diagnostic audit</td></tr>
+<tr><td>V01-ARCH-02</td><td>Compiler must not map library macro names, streams, suffixes or callee spellings</td><td>Imported D:/fdlang macro_engine.rs contains the eight-name/format_macro interception and print_val/newline lookup. It violates the retained boundary; preservation in Git is not semantic approval</td></tr>
 <tr><td>V01-DOC-01</td><td>Visibility-02: fields default public independently of type accessibility</td><td>Old grammar skill/reference says private by default; corrected to the approved amendment</td></tr>
 <tr><td>V01-DOC-02</td><td><code>requires life(...)</code> is the current relation spelling</td><td>Older docs/skills use removed <code>where outlives</code>; current guidance is corrected without changing the relation model</td></tr>
 <tr><td>V01-DOC-03</td><td>Luna .ln/.llib, 32 providers, six language contract families plus OptionExt contribution</td><td>Old overview/bootstrap pages claim Mellis core.ms, 25 providers or four families; current entry points are replaced</td></tr>
@@ -39,11 +41,11 @@
 <table>
 <tr><th>ID</th><th>Question / boundary</th></tr>
 <tr><td>V01-DESIGN-01</td><td>Exact inherent/trait method collision precedence or ambiguity policy; hash iteration cannot decide it</td></tr>
-<tr><td>V01-DESIGN-02</td><td>Domain of char and failure policy for invalid literal/dynamic integer-to-char conversion; UTF-8 text sinks must remain valid meanwhile</td></tr>
 <tr><td>V01-DESIGN-03</td><td>Runtime integer overflow policy outside defined checked/compile-time operations; avoid declaring current LLVM wrapping normative</td></tr>
 <tr><td>V01-DESIGN-04</td><td>Complete formal grammar beyond the consolidated productions; parser acceptance of legacy/uncontracted syntax is not adoption</td></tr>
 </table>
 <p>No new format-macro hook, interpolation syntax, runtime opcode or container language item is adopted. These require their own complete generic contract.</p>
+<p>V01-DESIGN-02 is resolved by the previously approved 2026-10-01 formatting contract, now recovered from the other branch: char is a Unicode scalar; invalid static casts diagnose, invalid dynamic casts trap, and arithmetic/ bitwise/shift/negation operators on char reject. The approval and acceptance apply to their recorded baseline, not every newly merged addition.</p>
 <h2 id="evidence-not-completed">Evidence not completed</h2>
 <p class="list-item">- All compiler integration tests, exhaustive input/generic domains, sanitizers</p>
 <p>  and fuzzing have not been verified by the stdlib audit.</p>
@@ -58,4 +60,5 @@
 <p class="list-item">- Existing public_surface and reject_std_vec fixtures contain stale expectations;</p>
 <p>  they must be corrected as tests, not treated as reasons to alter valid APIs.</p>
 <h2 id="documentation-cli-characterization--2026-10-03">Documentation CLI characterization — 2026-10-03</h2>
-<p><a href="../../spec/0.1/evidence/cli-examples.json">evidence/cli-examples.json</a> records eight standalone fixtures in source-only and artifact-only sysroots, 16 attempts total. Eight attempts meet their positive/negative requirements; six expose the three grammar gaps above; two characterize the accepted unparenthesized implementation form. The custom outln macro returns a value and emits no output, demonstrating that this name currently uses ordinary expansion. These checks are not a certification of every macro, field visibility or language capability.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>
+<p><a href="../../spec/0.1/evidence/cli-examples.json">evidence/cli-examples.json</a> records eight standalone fixtures in source-only and artifact-only sysroots, 16 attempts total. Eight attempts meet their positive/negative requirements; six expose the three grammar gaps above; two characterize the accepted unparenthesized implementation form. The custom outln macro returns a value and emits no output, demonstrating that this name currently uses ordinary expansion. These checks are not a certification of every macro, field visibility or language capability.</p>
+<p>The <a href="../../integration/evidence/cli-examples.json">integration CLI run</a>, after rebuilding the merged CLI/runtime and all 49 providers, repeats the same 16 attempts and outcomes. All three grammar gaps remain reproduced. The custom macro case uses an integer argument; it does not exercise or excuse the newly imported format-string interception recorded as V01-ARCH-02.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

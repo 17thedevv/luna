@@ -3,4 +3,3 @@ error[E1003]: Field `value` of struct `Item` is private and cannot be accessed f
    |
 7  |     return item.value - 42;
    |                 ^^^^^
-
