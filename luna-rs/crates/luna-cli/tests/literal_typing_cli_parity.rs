@@ -215,6 +215,43 @@ fn literals_full_codegen_and_negative_matrix_match_fresh_artifacts() {
             "{fixture} source/artifact mismatch"
         );
     }
+    {
+        let path = workspace().join("tests/luna/compiler/literal_comptime_provider_gap.ln");
+        let mut outcomes = Vec::new();
+        for (mode, root) in [("source", &roots.source), ("artifact", &roots.artifact)] {
+            let local_fixture = root.join(path.file_name().unwrap());
+            fs::copy(&path, &local_fixture).unwrap();
+            let executable = roots
+                .work
+                .join(format!("comptime-provider-gap-{mode}"))
+                .with_extension(std::env::consts::EXE_EXTENSION);
+            let build = cli(root)
+                .arg("build")
+                .arg(&local_fixture)
+                .args(["--quiet", "-I"])
+                .arg(root)
+                .arg("-o")
+                .arg(&executable)
+                .output()
+                .unwrap();
+            assert!(
+                build.status.success(),
+                "comptime_provider_gap/{mode}: {}",
+                render(&build)
+            );
+            let run = Command::new(executable).output().unwrap();
+            assert!(
+                run.status.success(),
+                "comptime_provider_gap/{mode}: {}",
+                render(&run)
+            );
+            outcomes.push((run.status.code(), run.stdout, run.stderr));
+        }
+        assert_eq!(
+            outcomes[0], outcomes[1],
+            "comptime_provider_gap source/artifact mismatch"
+        );
+    }
     for (fixture, diagnostic) in [
         ("default_range", "E_INTEGER_LITERAL_RANGE"),
         ("cast_context", "E_INTEGER_LITERAL_RANGE"),

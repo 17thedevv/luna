@@ -1355,6 +1355,7 @@ impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
             return Err(ComptimeError::TypeMismatch("E_UNRESOLVED_PROJECTION: cannot evaluate comptime expression with unresolved associated type projection".to_string()));
         }
         let mut generator = crate::generator::MvirGenerator::new(arena, ctx, source_manager);
+        generator.is_comptime = true;
         let func = generator.generate_expr_as_function(&expr_id, ret_ty);
         generator.generate_comptime_dependencies(&func);
         if !generator.diagnostics.is_empty() {
@@ -1378,6 +1379,7 @@ impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
 
     fn eval_stmt(&self, arena: &luna_ast::AstArena, ctx: &SemanticContext, source_manager: &luna_common::source::SourceManager, stmt_id: luna_ast::StmtId) -> Result<ComptimeValue, ComptimeError> {
         let mut generator = crate::generator::MvirGenerator::new(arena, ctx, source_manager);
+        generator.is_comptime = true;
         let func = generator.generate_stmt_as_function(&stmt_id, luna_semantic::SemanticTypeId(0));
         generator.generate_comptime_dependencies(&func);
         if !generator.diagnostics.is_empty() {

@@ -35,11 +35,11 @@ All work adheres to the Luna 0.1 architectural principles:
 | S-03 | Zero-Sized Type (ZST) slice iteration count | OPEN | `core/slice.ln` | `tests/luna/stdlib/audit_2026_10_02/slice_zst.ln` | - | - |
 | S-05 | Filter/find non-Copy item consumption | OPEN | `core/iter_adapters.ln` | `tests/luna/stdlib/audit_2026_10_02/filter_owned.ln` | - | - |
 | S-07 | Range<T: Step> advancing without premature move | OPEN | `core/iter_adapters.ln` | `tests/luna/stdlib/audit_2026_10_02/range_owned_step.ln` | - | - |
-| V01-GRAMMAR-01 | Comma-separated struct fields; semicolon rejected | OPEN | `luna-parser` | `tests/luna/language/spec_v01/reject_semicolon_fields.ln` | - | - |
-| V01-GRAMMAR-02 | Parenthesized foreach head per Rule K.4 | OPEN | `luna-parser` | `tests/luna/language/spec_v01/foreach_parenthesized_contract.ln` | - | - |
-| V01-GRAMMAR-03 | Receiver shorthand `&self`, `&rw self`, `self` | OPEN | `luna-parser` | `tests/luna/language/spec_v01/receiver_shorthand_contract.ln` | - | - |
-| V01-DIAG-01 | Typed diagnostic codes DIAG-1..10 across compiler phases | OPEN | `luna-parser` / error emitter | `tests/luna/language/spec_v01/` error reporting | - | - |
-| W7-COMPTIME | Portable comptime artifact without host session leakage | OPEN | `luna-llib` / `luna-mvir` interp | `tests/luna/language/literal_comptime_provider_gap.ln` | - | - |
+| V01-GRAMMAR-01 | Comma-separated struct fields; semicolon rejected | PASS | `luna-parser` | `tests/luna/language/spec_v01/reject_semicolon_fields.ln` | `41484c2` | `crates/luna-cli/tests/v01_grammar_acceptance_tests.rs` |
+| V01-GRAMMAR-02 | Parenthesized foreach head per Rule K.4 | PASS | `luna-parser` | `tests/luna/language/spec_v01/foreach_parenthesized_contract.ln` | `41484c2` | `crates/luna-cli/tests/v01_grammar_acceptance_tests.rs` |
+| V01-GRAMMAR-03 | Receiver shorthand `&self`, `&rw self`, `self` | PASS | `luna-parser` | `tests/luna/language/spec_v01/receiver_shorthand_contract.ln` | `41484c2` | `crates/luna-cli/tests/v01_grammar_acceptance_tests.rs` |
+| V01-DIAG-01 | Typed diagnostic codes DIAG-1..10 across compiler phases | PASS | `luna-parser` / error emitter | `tests/luna/language/spec_v01/` error reporting | `41484c2` | `crates/luna-cli/tests/v01_grammar_acceptance_tests.rs` |
+| W7-COMPTIME | Portable comptime artifact without host session leakage | PASS | `luna-llib` / `luna-mvir` interp | `tests/luna/language/literal_comptime_provider_gap.ln` | pending | `crates/luna-cli/tests/literal_typing_cli_parity.rs` |
 | W8-ALL-PROVIDERS | 49 stdlib providers contract & API audit matrix | OPEN | provider coverage | `luna-rs/libs/external/sysroot.toml` | - | - |
 | W9-PERF | Profiling and evidence-backed optimization | OPEN | benchmarks | `tests/luna/stdlib/audit_2026_10_02/hashmap_collision_pattern.ln` | - | - |
 

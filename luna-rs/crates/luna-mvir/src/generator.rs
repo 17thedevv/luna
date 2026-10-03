@@ -25,6 +25,8 @@ pub struct MvirGenerator<'a> {
     current_async_future: Option<ValueId>,
     unsafe_depth: usize,
     pub diagnostics: Vec<luna_common::Diagnostic>,
+    pub is_comptime: bool,
+    pub root_file_id: Option<luna_common::ids::FileId>,
     
     // The current monomorphic instance being generated
     current_instance: Option<*const luna_semantic::mono::InstantiatedFunction>,
@@ -55,11 +57,25 @@ impl<'a> MvirGenerator<'a> {
             current_async_future: None,
             unsafe_depth: 0,
             diagnostics: Vec::new(),
+            is_comptime: false,
+            root_file_id: None,
             current_instance: None,
         }
     }
 
-    pub fn generate(mut self, _items: &[Item]) -> (Module, Vec<luna_common::Diagnostic>) {
+    pub fn generate(mut self, items: &[Item]) -> (Module, Vec<luna_common::Diagnostic>) {
+        if self.root_file_id.is_none() {
+            for item in items {
+                if let Item::Decl(decl_id) = item {
+                    if let Some(decl) = self.arena.decls.get(decl_id.0 as usize) {
+                        if let Decl::Function { name, .. } = decl {
+                            self.root_file_id = Some(name.file_id);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         for instance in &self.ctx.instantiated_functions {
             self.generate_mono_instance(instance);
         }
@@ -300,6 +316,15 @@ impl<'a> MvirGenerator<'a> {
                 if generic_params.is_empty() {
                     let decl_id = luna_ast::DeclId(decl_id_idx as u32);
                     let sym_id_opt = self.ctx.tables.decl_symbols.get(&decl_id).copied();
+                    if let Some(s) = sym_id_opt {
+                        if (s.0 as usize) < self.ctx.symbol_table.symbols.len() {
+                            let sym = &self.ctx.symbol_table.symbols[s.0 as usize];
+                            // External non-generic functions are already compiled into their own .obj sidecar.
+                            if sym.provider_id.is_some() && sym.provider_id != self.ctx.current_provider {
+                                continue;
+                            }
+                        }
+                    }
                     let fn_name = sym_id_opt.map(|s| {
                         if (s.0 as usize) < self.ctx.symbol_table.symbols.len() {
                             self.ctx.symbol_table.symbols[s.0 as usize].name.clone()
@@ -1312,7 +1337,21 @@ impl<'a> MvirGenerator<'a> {
 
             let is_async = if let Decl::Function { is_async, .. } = decl { *is_async } else { false };
 
-            let is_extern = body.is_none();
+            let is_extern = body.is_none() || {
+                if instance.instance.subst.is_empty() && !self.is_comptime {
+                    if let Decl::Function { name, .. } = decl {
+                        if let Some(file_info) = self.source_manager.get_file(name.file_id) {
+                            file_info.name.ends_with(".llib") || file_info.name.ends_with(".mlib")
+                        } else {
+                            false
+                        }
+                    } else {
+                        false
+                    }
+                } else {
+                    false
+                }
+            };
             self.current_function = Some(Function {
                 name: global_id,
                 is_extern,

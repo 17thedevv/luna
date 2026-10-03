@@ -146,47 +146,47 @@
   {
     "id": "V01-GRAMMAR-01",
     "contract": "Comma-separated struct fields; semicolon delimiters strictly rejected",
-    "status": "OPEN",
+    "status": "PASS",
     "first_failing_stage": "luna-parser struct field parsing",
     "repro": "tests/luna/language/spec_v01/reject_semicolon_fields.ln",
-    "fix_commit": null,
-    "evidence": null
+    "fix_commit": "41484c2",
+    "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
   },
   {
     "id": "V01-GRAMMAR-02",
     "contract": "Parenthesized foreach head support per Rule K.4",
-    "status": "OPEN",
+    "status": "PASS",
     "first_failing_stage": "luna-parser foreach head parsing",
     "repro": "tests/luna/language/spec_v01/foreach_parenthesized_contract.ln",
-    "fix_commit": null,
-    "evidence": null
+    "fix_commit": "41484c2",
+    "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
   },
   {
     "id": "V01-GRAMMAR-03",
     "contract": "Receiver shorthand &self, &rw self, self equivalent to canonical form per Rule K.5",
-    "status": "OPEN",
+    "status": "PASS",
     "first_failing_stage": "luna-parser method receiver parsing",
     "repro": "tests/luna/language/spec_v01/receiver_shorthand_contract.ln",
-    "fix_commit": null,
-    "evidence": null
+    "fix_commit": "41484c2",
+    "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
   },
   {
     "id": "V01-DIAG-01",
     "contract": "Typed diagnostic codes across compiler phases conforming to DIAG-1..10",
-    "status": "OPEN",
+    "status": "PASS",
     "first_failing_stage": "luna-parser and diagnostic emission",
     "repro": "tests/luna/language/spec_v01 parser error rendering",
-    "fix_commit": null,
-    "evidence": null
+    "fix_commit": "41484c2",
+    "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
   },
   {
     "id": "W7-COMPTIME",
     "contract": "Portable comptime artifact without host session leakage across process boundaries",
-    "status": "OPEN",
+    "status": "PASS",
     "first_failing_stage": "luna-llib and comptime preparation",
     "repro": "tests/luna/language/literal_comptime_provider_gap.ln",
-    "fix_commit": null,
-    "evidence": null
+    "fix_commit": "PENDING_COMMIT",
+    "evidence": "crates/luna-cli/tests/literal_typing_cli_parity.rs (comptime_provider_gap)"
   },
   {
     "id": "W8-ALL-PROVIDERS",

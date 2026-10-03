@@ -50,6 +50,7 @@ fn test_golden_roundtrip() {
             compiler_version: "".into(),
             codegen_options: "".into(),
             interface_fingerprint: luna_llib::Fingerprint([0; 32]),
+            execution_fingerprint: None,
         },
         export_table: Default::default(),
     };
@@ -119,6 +120,7 @@ fn test_corrupted_data() {
             compiler_version: "".into(),
             codegen_options: "".into(),
             interface_fingerprint: luna_llib::Fingerprint([0; 32]),
+            execution_fingerprint: None,
         },
         export_table: Default::default(),
     };
