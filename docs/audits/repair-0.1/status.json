@@ -2,11 +2,20 @@
   {
     "id": "W1-POSIX-BUILD",
     "contract": "Runtime C11 portability and complete headers for POSIX/Darwin",
-    "status": "PASS",
+    "status": "PARTIAL",
     "first_failing_stage": "runtime_c_compile",
     "repro": "runtime/src/io/io.c (kill/SIGKILL without signal.h), runtime/src/platform/posix/net.c (addrinfo without netdb.h)",
     "fix_commit": "a4c83d5",
-    "evidence": "runtime/src/io/io.c, runtime/src/platform/posix/net.c, RuntimeAbiTests 100% pass"
+    "evidence": "Headers restored in io.c/net.c; RuntimeAbiTests passed on Windows GNU; pending native Ubuntu/macOS CI verification"
+  },
+  {
+    "id": "A1-P0",
+    "contract": "Backend fail-closed without silent dummy value fallback for unhandled instructions",
+    "status": "PASS",
+    "first_failing_stage": "luna-backend/src/llvm_codegen.rs",
+    "repro": "llvm_codegen.rs:1836 wildcard returns Ok(i32 zero) instead of Err(BackendError)",
+    "fix_commit": null,
+    "evidence": "llvm_codegen.rs wildcard fallback removed, fails closed with BackendError::InvariantViolation; crates/luna-driver/tests/backend_fail_closed_tests.rs passes"
   },
   {
     "id": "C-GAP-04",
@@ -95,8 +104,8 @@
     "status": "PASS",
     "first_failing_stage": "alloc/vec.ln dedup_i32",
     "repro": "tests/luna/stdlib/audit_2026_10_02/vec_dedup_i32_generic.ln",
-    "fix_commit": "1ba8518",
-    "evidence": "tests/luna/stdlib/audit_2026_10_02/vec_dedup_i32_generic.ln (source/artifact pass)"
+    "fix_commit": null,
+    "evidence": "alloc/vec.ln dedup_i32 delegates safely to self.dedup() using Eq without pointer reinterpret or size_of==4 assumption; verified with vec_dedup_4byte_nominal.ln and vec_dedup_i32_generic.ln"
   },
   {
     "id": "V01-ARCH-02",
@@ -114,7 +123,7 @@
     "first_failing_stage": "luna-semantic typechecker.rs",
     "repro": "luna-semantic typechecker slice iterator lowering",
     "fix_commit": "6aa260d",
-    "evidence": "crates/luna-driver/tests/stdlib_slice_iterator_acceptance_tests.rs; luna-rs/libs/external/core/slice.ln"
+    "evidence": "SliceIter compiler synthesis removed; coherence.rs restricts slice inherent impls strictly to core::slice sysroot provider; crates/luna-semantic/tests/p1a_tests.rs Cases 19 & 20 pass"
   },
   {
     "id": "S-03",
@@ -132,7 +141,7 @@
     "first_failing_stage": "core/iter_adapters.ln, core/iter_consumers.ln",
     "repro": "tests/luna/stdlib/audit_2026_10_02/filter_owned.ln",
     "fix_commit": "6aa260d",
-    "evidence": "luna-rs/libs/external/core/iter_adapters.ln; iter_consumers.ln; tests/luna/stdlib/audit_2026_10_02/filter_owned.ln; find_owned.ln; crates/luna-driver/tests/stdlib_iterator_adapters_acceptance_tests.rs; stdlib_iterator_terminal_consumers_acceptance_tests.rs"
+    "evidence": "docs/proposals/v01-filter-step-dedup-api.md adopted; borrowed predicate fn(&Item) -> bool implemented; tests/luna/stdlib/audit_2026_10_02/filter_owned.ln and find_owned.ln pass"
   },
   {
     "id": "S-07",
@@ -177,7 +186,7 @@
     "first_failing_stage": "luna-parser and diagnostic emission",
     "repro": "tests/luna/language/spec_v01 parser error rendering",
     "fix_commit": "41484c2",
-    "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+    "evidence": "Typed diagnostic codes E0001..E0003 (parser), E2026 (typechecker invalid cast), E2006 (coherence orphan) verified across compiler phases in crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
   },
   {
     "id": "W7-COMPTIME",
@@ -195,7 +204,7 @@
     "first_failing_stage": "provider test coverage",
     "repro": "luna-rs/libs/external/sysroot.toml",
     "fix_commit": "8fa8429",
-    "evidence": "luna build-sysroot (49/49 providers verified, 0 orphans, sidecar DAG valid); crates/luna-driver/tests/test_sysroot_build_invariants.rs"
+    "evidence": "luna build-sysroot passes DAG compile for 49 providers; crates/luna-driver/tests/test_sysroot_build_invariants.rs passes 6/6 tests; provider matrix in docs/audits/repair-0.1/provider_matrix.md"
   },
   {
     "id": "W9-PERF",
@@ -203,7 +212,7 @@
     "status": "PASS",
     "first_failing_stage": "benchmarks",
     "repro": "tests/luna/stdlib/audit_2026_10_02/hashmap_collision_pattern.ln",
-    "fix_commit": "1ba8518",
-    "evidence": "tests/luna/stdlib/audit_2026_10_02/hashmap_collision_pattern.ln; hashmap_growth_control.ln; hashmap_sequential_pattern.ln"
+    "fix_commit": null,
+    "evidence": "SplitMix64 bit mixer implemented in core/hash.ln and alloc/raw_table.ln; raw_table overwrite and clear optimized; benchmark in docs/audits/repair-0.1/evidence/hashmap-benchmark.json shows 132x speedup on low_bits_collision n=12000 (0.0259s vs 3.4264s)"
   }
 ]
