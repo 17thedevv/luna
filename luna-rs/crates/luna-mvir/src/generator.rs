@@ -2601,50 +2601,6 @@ impl<'a> MvirGenerator<'a> {
                                 right: zero,
                             }, self.ctx.types.bool_id());
                             return Operand::Value(eq_val);
-                        } else if idx == 3 || idx == 4 {
-                            let elem_ty_id = match obj_ty {
-                                luna_semantic::SemanticType::Reference(_, _, inner) | luna_semantic::SemanticType::Pointer(_, inner) => {
-                                    if let luna_semantic::SemanticType::Slice(elem) = self.ctx.types.get(*inner) { *elem } else { luna_semantic::SemanticTypeId(0) }
-                                }
-                                luna_semantic::SemanticType::Slice(elem) => *elem,
-                                _ => luna_semantic::SemanticTypeId(0),
-                            };
-                            let elem_ptr_ty = self.find_pointer_type(elem_ty_id);
-                            let ptr_field = self.push_inst(Instruction::FieldPtr {
-                                base: lval,
-                                field_idx: 0,
-                                field_name: None,
-                            }, elem_ptr_ty);
-                            let ptr_val = self.push_inst(Instruction::Load {
-                                ptr: Operand::Value(ptr_field),
-                            }, elem_ptr_ty);
-                            let end_val = self.push_inst(Instruction::PtrOffset {
-                                ptr: Operand::Value(ptr_val),
-                                offset: Operand::Value(len_val),
-                            }, elem_ptr_ty);
-                            let struct_alloca = self.push_inst(Instruction::Alloca, ty_id);
-                            let out_ptr_field = self.push_inst(Instruction::FieldPtr {
-                                base: Operand::Value(struct_alloca),
-                                field_idx: 0,
-                                field_name: None,
-                            }, elem_ptr_ty);
-                            self.push_inst(Instruction::Store {
-                                ptr: Operand::Value(out_ptr_field),
-                                value: Operand::Value(ptr_val),
-                            }, elem_ptr_ty);
-                            let out_end_field = self.push_inst(Instruction::FieldPtr {
-                                base: Operand::Value(struct_alloca),
-                                field_idx: 1,
-                                field_name: None,
-                            }, elem_ptr_ty);
-                            self.push_inst(Instruction::Store {
-                                ptr: Operand::Value(out_end_field),
-                                value: Operand::Value(end_val),
-                            }, elem_ptr_ty);
-                            let loaded_struct = self.push_inst(Instruction::Load {
-                                ptr: Operand::Value(struct_alloca),
-                            }, ty_id);
-                            return Operand::Value(loaded_struct);
                         }
                     }
                 }

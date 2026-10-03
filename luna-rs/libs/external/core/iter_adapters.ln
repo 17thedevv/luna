@@ -18,10 +18,10 @@ export struct Map<I, Item, Out> {
 
 impl<I: std::Iterator<Item>, Item, Out> std::Iterator<Out> for Map<I, Item, Out> {
     fn next(self: &rw Self) -> std::Option<Out> life_from(self) {
+        dec f_ptr = self.f;
         dec opt = self.iter.next();
         match opt {
             std::Option::Some(x) -> {
-                dec f_ptr = self.f;
                 return std::Option::Some(f_ptr(x));
             },
             std::Option::None -> {
@@ -65,11 +65,11 @@ export struct Enumerate<I, Item> {
 
 impl<I: std::Iterator<Item>, Item> std::Iterator<(u64, Item)> for Enumerate<I, Item> {
     fn next(self: &rw Self) -> std::Option<(u64, Item)> life_from(self) {
+        dec cur = self.count;
+        self.count = self.count + (1 as u64);
         dec opt = self.iter.next();
         match opt {
             std::Option::Some(x) -> {
-                dec cur = self.count;
-                self.count = self.count + (1 as u64);
                 return std::Option::Some((cur, x));
             },
             std::Option::None -> {
@@ -89,10 +89,10 @@ impl<I: std::Iterator<Item>, Item> std::Iterator<Item> for Take<I, Item> {
         if self.remaining == (0 as u64) {
             return std::Option::None;
         }
+        self.remaining = self.remaining - (1 as u64);
         dec item_opt = self.iter.next();
         match item_opt {
             std::Option::Some(x) -> {
-                self.remaining = self.remaining - (1 as u64);
                 return std::Option::Some(x);
             },
             std::Option::None -> {
@@ -273,11 +273,11 @@ export struct FilterMap<I, Item, Out> {
 
 impl<I: std::Iterator<Item>, Item, Out> std::Iterator<Out> for FilterMap<I, Item, Out> {
     fn next(self: &rw Self) -> std::Option<Out> life_from(self) {
+        dec f_ptr = self.f;
         while true {
             dec opt = self.iter.next();
             match opt {
                 std::Option::Some(x) -> {
-                    dec f_ptr = self.f;
                     dec mapped = f_ptr(x);
                     match mapped {
                         std::Option::Some(y) -> {
