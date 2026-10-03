@@ -1,0 +1,100 @@
+---
+title: Trait & Generic
+description: Tính đa hình thông qua trait và các kiểu dữ liệu generic trong Luna.
+---
+
+## Trait
+
+Trait định nghĩa các hành vi dùng chung giữa các kiểu dữ liệu:
+
+```luna
+trait Printable {
+    fn print(self: &Self);
+}
+
+struct Point {
+    x: f64,
+    y: f64,
+};
+
+impl Printable for Point {
+    fn print(self: &Point) {
+        std::io::println("Point({}, {})", self.x, self.y);
+    }
+}
+```
+
+## Phương thức Trait với triển khai mặc định
+
+```luna
+trait Greet {
+    fn name(self: &Self) -> str;
+    fn greet(self: &Self) {
+        std::io::println("Xin chào, {}!", self.name());
+    }
+}
+```
+
+## Generic
+
+### Hàm Generic
+
+```luna
+fn max<T: Comparable>(a: T, b: T) -> T {
+    if a > b { return a; } else { return b; }
+}
+
+fn swap<T>(a: T, b: T) -> (T, T) {
+    return (b, a);
+}
+```
+
+### Struct Generic
+
+```luna
+struct Pair<T, U> {
+    first: T,
+    second: U,
+};
+
+impl<T, U> Pair<T, U> {
+    fn new(first: T, second: U) -> Pair<T, U> {
+        return Pair { first: first, second: second };
+    }
+}
+```
+
+## Ràng buộc Trait (Trait Bounds)
+
+Ràng buộc các kiểu tham số generic phải thỏa mãn giao ước nhất định:
+
+```luna
+trait Comparable {
+    fn greater_than(self: &Self, other: &Self) -> bool;
+}
+```
+
+## Đối tượng Trait (Trait Objects - Điều phối động)
+
+Lưu trữ và gọi các kiểu khác nhau cùng triển khai một trait thông qua vtable:
+
+```luna
+trait Drawable {
+    fn draw(self: &Self);
+}
+
+struct Square { size: f64 };
+struct Circle { radius: f64 };
+
+impl Drawable for Square {
+    fn draw(self: &Square) {
+        std::io::println("Vẽ hình vuông: {}", self.size);
+    }
+}
+
+impl Drawable for Circle {
+    fn draw(self: &Circle) {
+        std::io::println("Vẽ hình tròn: {}", self.radius);
+    }
+}
+```

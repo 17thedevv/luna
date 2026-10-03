@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec value: i32 = 65;
+    dec address = &value as *i32;
+    dec invalid = address as char;
+    invalid as u32;
+    return 0;
+}

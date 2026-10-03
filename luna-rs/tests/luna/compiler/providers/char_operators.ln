@@ -1,0 +1,10 @@
+export module user_math {
+    export fn add<T>(left: T, right: T) -> T { return left + right; }
+    export fn shift<T>(left: T, right: T) -> T { return left << right; }
+    export fn negate<T>(value: T) -> T { return -value; }
+    export fn increment<T>(value: T, step: T) -> T {
+        dec rw result = value;
+        result += step;
+        return result;
+    }
+}

@@ -1,0 +1,7 @@
+import <vec>;
+fn main() -> i32 {
+    dec rw v = std::vec_new<u8>();
+    v.push(1 as u8);
+    v.reserve((0 as u64) - (1 as u64));
+    return 1;
+}

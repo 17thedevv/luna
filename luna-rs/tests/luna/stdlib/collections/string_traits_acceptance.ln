@@ -1,0 +1,65 @@
+import <string>;
+import <hashmap>;
+import <vec>;
+import <cmp>;
+import <hash>;
+import <clone>;
+
+fn main() -> i32 {
+    dec s1 = std::string_from_str("apple");
+    dec s2 = std::string_from_str("banana");
+    dec s3 = std::string_from_str("apple");
+
+    // 1. Eq
+    if s1.eq(&s3) == false { return 1; }
+    if s1.eq(&s2) == true { return 2; }
+
+    // 2. Ord
+    if s1.cmp(&s2) >= 0 { return 3; }
+    if s2.cmp(&s1) <= 0 { return 4; }
+    if s1.cmp(&s3) != 0 { return 5; }
+
+    // 3. Hash
+    dec h1 = s1.hash();
+    dec h2 = s2.hash();
+    dec h3 = s3.hash();
+    if h1 != h3 { return 6; }
+    if h1 == h2 { return 7; }
+
+    // 4. Clone
+    dec s1_clone = s1.clone();
+    if s1_clone.eq(&s1) == false { return 8; }
+
+    // 5. HashMap with String keys!
+    dec rw map = std::hashmap_new<std::String, i32>();
+    map.insert(s1, 100);
+    map.insert(s2, 200);
+
+    if map.len() != (2 as u64) { return 9; }
+
+    dec key_lookup = std::string_from_str("apple");
+    match map.get(&key_lookup) {
+        std::Option::Some(val) -> {
+            if *val != 100 { return 10; }
+        },
+        std::Option::None -> { return 11; },
+    }
+
+    // 6. Vec<String> sort
+    dec rw words = std::vec_new<std::String>();
+    words.push(std::string_from_str("cherry"));
+    words.push(std::string_from_str("banana"));
+    words.push(std::string_from_str("apple"));
+
+    words.sort();
+
+    dec expected0 = std::string_from_str("apple");
+    dec expected1 = std::string_from_str("banana");
+    dec expected2 = std::string_from_str("cherry");
+
+    if words.get(0 as u64).unwrap().eq(&expected0) == false { return 12; }
+    if words.get(1 as u64).unwrap().eq(&expected1) == false { return 13; }
+    if words.get(2 as u64).unwrap().eq(&expected2) == false { return 14; }
+
+    return 0;
+}

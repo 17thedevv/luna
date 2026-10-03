@@ -1,0 +1,15 @@
+struct Items<T> { data: *rw T, };
+
+impl<T> std::Drop for Items<T> {
+    fn drop(self: &rw Self) {}
+}
+
+enum Tree {
+    Leaf(i32),
+    Forest(Items<Tree>),
+}
+
+fn main() -> i32 {
+    dec tree = Tree::Leaf(7);
+    return 0;
+}

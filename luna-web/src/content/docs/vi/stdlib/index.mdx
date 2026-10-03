@@ -1,0 +1,41 @@
+---
+title: Thư viện chuẩn
+description: Các kiểu dữ liệu, trait và hàm tích hợp sẵn của ngôn ngữ Luna.
+---
+
+## Các Module Cốt lõi
+
+| Module | Mô tả |
+|--------|-------|
+| `std::option` | Kiểu giá trị tùy chọn (tồn tại hoặc không) |
+| `std::result` | Cơ chế xử lý lỗi tường minh |
+| `std::vec` | Mảng động cấp phát trên heap |
+| `std::string` | Chuỗi ký tự UTF-8 cấp phát trên heap |
+| `std::box` | Con trỏ sở hữu duy nhất trên heap |
+| `std::io` | Nhập/xuất dữ liệu terminal và file |
+| `std::path` | Thao tác đường dẫn hệ thống tệp |
+| `std::collections` | Bảng băm HashMap, tập hợp HashSet |
+
+## Sử dụng Thư viện chuẩn
+
+```luna
+import <alloc>;
+
+fn main() -> i32 {
+    dec rw v = std::Vec<i32>::new();
+    v.push(1);
+    v.push(2);
+
+    dec item: Option<i32> = v.get(0);
+    match item {
+        Option::Some(n) -> {
+            std::io::println("Tìm thấy: {}", n);
+        },
+        Option::None -> {
+            std::io::println("Không tìm thấy");
+        }
+    }
+
+    return 0;
+}
+```

@@ -1,0 +1,103 @@
+import <io>;
+import <vec>;
+import <result>;
+
+fn test_stdout_write() -> bool {
+    dec rw out = std::io::stdout();
+    dec bytes: [u8; 14] = [
+        '[' as u8, 'c' as u8, 'o' as u8, 'n' as u8, 's' as u8, 'o' as u8, 'l' as u8,
+        'e' as u8, '_' as u8, 'o' as u8, 'u' as u8, 't' as u8, ']' as u8, '\n' as u8
+    ];
+    dec res = out.write(&bytes);
+    if res.is_err() || res.unwrap() != (14 as usize) {
+        return false;
+    }
+    dec f_res = out.flush();
+    if f_res.is_err() {
+        return false;
+    }
+    return true;
+}
+
+fn test_stderr_write() -> bool {
+    dec rw err = std::io::stderr();
+    dec bytes: [u8; 14] = [
+        '[' as u8, 'c' as u8, 'o' as u8, 'n' as u8, 's' as u8, 'o' as u8, 'l' as u8,
+        'e' as u8, '_' as u8, 'e' as u8, 'r' as u8, 'r' as u8, ']' as u8, '\n' as u8
+    ];
+    dec res = err.write(&bytes);
+    if res.is_err() || res.unwrap() != (14 as usize) {
+        return false;
+    }
+    dec f_res = err.flush();
+    if f_res.is_err() {
+        return false;
+    }
+    return true;
+}
+
+fn test_io_functions() -> bool {
+    std::io::print_str("[print_str] hello ");
+    std::io::println_str("world");
+    std::io::eprint_str("[eprint_str] err ");
+    std::io::eprintln_str("log");
+
+    dec msg: [u8; 9] = [
+        '[' as u8, 'b' as u8, 'y' as u8, 't' as u8, 'e' as u8, 's' as u8, ']' as u8, ' ' as u8, '\n' as u8
+    ];
+    std::io::print(&msg);
+    std::io::println(&msg);
+    std::io::eprint(&msg);
+    std::io::eprintln(&msg);
+    return true;
+}
+
+fn test_io_macros() -> bool {
+    // New Luna console I/O macros
+    out!("[macro out] ");
+    outln!("hello outln");
+    outln!();
+    err!("[macro err] ");
+    errln!("error errln");
+    errln!();
+
+    std::out!("[std macro out] ");
+    std::outln!("std hello outln");
+    std::err!("[std macro err] ");
+    std::errln!("std error errln");
+
+    out!("multi_out: ", "arg1 ", "arg2\n");
+    outln!("multi_outln: ", "partA", " + ", "partB");
+    err!("multi_err: ", "e1 ", "e2\n");
+    errln!("multi_errln: ", "errA", " + ", "errB");
+    std::outln!("std_multi_out: ", "hello ", "from ", "outln");
+
+    // Backward compatibility aliases (print, println, eprint, eprintln)
+    print!("[macro print] ");
+    println!("hello macro");
+    println!();
+    eprint!("[macro eprint] ");
+    eprintln!("error macro");
+    eprintln!();
+
+    std::print!("[std macro print] ");
+    std::println!("std hello macro");
+    std::eprint!("[std macro eprint] ");
+    std::eprintln!("std error macro");
+
+    // Multi-argument tests
+    print!("multi: ", "arg1 ", "arg2\n");
+    println!("multi_println: ", "partA", " + ", "partB");
+    eprint!("multi_err: ", "e1 ", "e2\n");
+    eprintln!("multi_eprintln: ", "errA", " + ", "errB");
+    std::println!("std_multi: ", "hello ", "from ", "std");
+    return true;
+}
+
+fn main() -> i32 {
+    if test_stdout_write() == false { return 1; }
+    if test_stderr_write() == false { return 2; }
+    if test_io_functions() == false { return 3; }
+    if test_io_macros() == false { return 4; }
+    return 0;
+}

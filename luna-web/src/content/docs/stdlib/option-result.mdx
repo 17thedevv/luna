@@ -1,0 +1,97 @@
+---
+title: Option & Result
+description: Handling optional values and errors.
+---
+
+## Option
+
+`Option<T>` represents a value that may or may not be present.
+
+```luna
+enum Option<T> {
+    None,
+    Some(T),
+}
+```
+
+### Creating and Using Options
+
+```luna
+import <core>;
+
+fn find_user(id: u32) -> Option<str> {
+    if id == 1 {
+        return Option::Some("Alice");
+    }
+    return Option::None;
+}
+
+fn main() -> i32 {
+    dec user = find_user(1);
+    match user {
+        Option::Some(name) -> {
+            std::io::println("Found: {}", name);
+        },
+        Option::None -> {
+            std::io::println("User not found");
+        }
+    }
+    return 0;
+}
+```
+
+### Common Methods
+
+```luna
+dec value: Option<i32> = Option::Some(42);
+
+dec is_some = value.is_some();  // true
+dec is_none = value.is_none();   // false
+dec n = value.unwrap();           // 42
+dec fallback = value.unwrap_or(0);      // 42
+```
+
+## Result
+
+`Result<T, E>` represents either a success value or an error.
+
+```luna
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+### Basic Usage
+
+```luna
+import <core>;
+
+fn parse_number(s: str) -> Result<i32, str> {
+    return Result::Ok(42);
+}
+
+fn main() -> i32 {
+    match parse_number("42") {
+        Result::Ok(n) -> {
+            std::io::println("Parsed: {}", n);
+        },
+        Result::Err(e) -> {
+            std::io::println("Error: {}", e);
+        }
+    }
+    return 0;
+}
+```
+
+### Common Methods
+
+```luna
+dec result: Result<i32, str> = Ok(42);
+
+dec is_ok = result.is_ok();      // true
+dec is_err = result.is_err();   // false
+dec n = result.unwrap();         // 42
+dec n = result.unwrap_or(0);    // 42
+dec doubled = result.map(|x| x * 2);  // Ok(84)
+```

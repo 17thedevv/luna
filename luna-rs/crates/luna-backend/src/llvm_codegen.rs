@@ -348,9 +348,13 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             }
         } else {
             // main(args: [str]) -> i32
+            let argc = start_fn.get_nth_param(0).unwrap().into_int_value();
+            let argv = start_fn.get_nth_param(1).unwrap().into_pointer_value();
+            let argc_i64 = self.builder.build_int_s_extend(argc, self.context.i64_type(), "argc_i64").unwrap();
             let slice_type = self.context.struct_type(&[ptr_type.into(), self.context.i64_type().into()], false);
-            let slice_val = slice_type.const_zero();
-            let ret = self.builder.build_call(user_main_fn, &[slice_val.into()], "user_ret").unwrap();
+            let slice_val = self.builder.build_insert_value(slice_type.const_zero(), argv, 0, "args_data").unwrap();
+            let slice_val = self.builder.build_insert_value(slice_val.into_struct_value(), argc_i64, 1, "args_len").unwrap();
+            let ret = self.builder.build_call(user_main_fn, &[slice_val.into_struct_value().into()], "user_ret").unwrap();
             ret.try_as_basic_value().left().unwrap().into_int_value()
         };
         self.builder.build_return(Some(&code)).unwrap();
@@ -633,6 +637,14 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 call.try_as_basic_value().left().ok_or_else(|| BackendError::InvariantViolation("__luna_alloc returned void".into()))
             }
             Instruction::Assign(val_op) => {
+                if let Operand::Number(number) = val_op {
+                    let llvm_ty = self.map_type(data.ty)?;
+                    if llvm_ty.is_int_type() {
+                        let bits = number.parse::<u128>().or_else(|_| number.parse::<i128>().map(|v| v as u128))
+                            .map_err(|_| BackendError::InvariantViolation(format!("Invalid canonical integer: {number}")))?;
+                        return Ok(llvm_ty.into_int_type().const_int_arbitrary_precision(&[bits as u64, (bits >> 64) as u64]).into());
+                    }
+                }
                 self.generate_operand(val_op)
             }
             Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
@@ -918,10 +930,21 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 
                 if !args.is_empty() {
                     let payload_ptr = self.builder.build_struct_gep(ty, alloca, 1, "payload_ptr").unwrap();
-                    // In a real implementation we would gep into the union/array based on field_idx.
-                    // For now, assume a single primitive payload.
-                    let arg_val = self.generate_operand(&args[0])?;
-                    self.builder.build_store(payload_ptr, arg_val).unwrap();
+                    if args.len() == 1 {
+                        let arg_val = self.generate_operand(&args[0])?;
+                        self.builder.build_store(payload_ptr, arg_val).unwrap();
+                    } else {
+                        let payload_ty = match self.semantic_ctx.types.get(*enum_ty) {
+                            SemanticType::Enum(_, _, variants) => variants.get(*variant_idx as usize).copied(),
+                            _ => None,
+                        }.ok_or_else(|| BackendError::InvariantViolation("Variant lacks a typed payload".into()))?;
+                        let payload_layout = self.map_type(payload_ty)?;
+                        for (index, arg) in args.iter().enumerate() {
+                            let field_ptr = self.builder.build_struct_gep(payload_layout, payload_ptr, index as u32, "variant_field").unwrap();
+                            let arg_val = self.generate_operand(arg)?;
+                            self.builder.build_store(field_ptr, arg_val).unwrap();
+                        }
+                    }
                 }
                 
                 let load = self.builder.build_load(ty, alloca, "enum_val").unwrap();
@@ -933,7 +956,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 let tag = self.builder.build_extract_value(llvm_val.into_struct_value(), 0, "tag").unwrap();
                 Ok(tag)
             }
-            Instruction::Extract { value, variant_idx: _, field_idx } => {
+            Instruction::Extract { value, variant_idx, field_idx } => {
                 let llvm_val = self.generate_operand(value)?;
                 
                 let mut is_enum = false;
@@ -954,7 +977,22 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     } else {
                         self.context.i32_type().into()
                     };
-                    let loaded = self.builder.build_load(target_ty, payload_ptr, "extracted_payload").unwrap();
+                    // A single tuple-valued field loads the whole payload;
+                    // multiple declared fields project through its tuple layout.
+                    let payload_ty = if let Operand::Value(vid) = value {
+                        match self.semantic_ctx.types.get(_func.values[vid.0 as usize].ty) {
+                            SemanticType::Enum(_, _, variants) => variants.get(*variant_idx as usize).copied(),
+                            _ => None,
+                        }
+                    } else { None };
+                    let field_ptr = if let Some(payload_ty) = payload_ty {
+                        if self.semantic_ctx.types.resolve(payload_ty) != self.semantic_ctx.types.resolve(data.ty)
+                            && matches!(self.semantic_ctx.types.get(payload_ty), SemanticType::Tuple(_)) {
+                            let layout = self.map_type(payload_ty)?;
+                            self.builder.build_struct_gep(layout, payload_ptr, *field_idx, "extracted_field").unwrap()
+                        } else { payload_ptr }
+                    } else { payload_ptr };
+                    let loaded = self.builder.build_load(target_ty, field_ptr, "extracted_payload").unwrap();
                     Ok(loaded)
                 } else {
                     let field = self.builder.build_extract_value(llvm_val.into_struct_value(), *field_idx, "struct_field").unwrap();
@@ -1392,10 +1430,23 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::PtrOffset { ptr, offset } => {
                 let ptr_val = self.generate_operand(ptr)?.into_pointer_value();
                 let offset_val = self.generate_operand(offset)?.into_int_value();
-                let elem_ty = match self.semantic_ctx.types.get(data.ty) {
-                    SemanticType::Pointer(_, elem) | SemanticType::Reference(_, _, elem) => self.map_type(*elem)?,
-                    _ if data.ty != SemanticTypeId(0) => self.map_type(data.ty)?,
-                    _ => self.context.i8_type().into(),
+                let elem_semantic_ty = match self.semantic_ctx.types.get(data.ty) {
+                    SemanticType::Pointer(_, elem) | SemanticType::Reference(_, _, elem) => *elem,
+                    _ => data.ty,
+                };
+                let elem_size = if elem_semantic_ty != SemanticTypeId(0) {
+                    self.layout_size(elem_semantic_ty)
+                } else {
+                    1
+                };
+                let elem_ty = if elem_size == 0 {
+                    self.context.i8_type().into()
+                } else {
+                    match self.semantic_ctx.types.get(data.ty) {
+                        SemanticType::Pointer(_, elem) | SemanticType::Reference(_, _, elem) => self.map_type(*elem)?,
+                        _ if data.ty != SemanticTypeId(0) => self.map_type(data.ty)?,
+                        _ => self.context.i8_type().into(),
+                    }
                 };
                 let res = unsafe {
                     self.builder.build_gep(elem_ty, ptr_val, &[offset_val], &format!("v{}", id.0)).unwrap()
@@ -1453,6 +1504,8 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             }
             Instruction::Cast { value, target_ty } => {
                 let llvm_ty = self.map_type(*target_ty)?;
+                let resolved_target = self.semantic_ctx.types.resolve(*target_ty);
+                let target_sem = self.semantic_ctx.types.get(resolved_target);
                 if let Operand::Number(n) = value {
                     if llvm_ty.is_int_type() {
                         let parsed_u64 = if let Ok(u) = n.parse::<u64>() {
@@ -1466,6 +1519,136 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     }
                 }
                 let llvm_val = self.generate_operand(value)?;
+
+                // A Luna char is a Unicode scalar, although LLVM represents it
+                // as i32. Validate dynamic integer casts before producing that
+                // representation; the LLVM type match below is not semantic
+                // proof (notably for u32 -> char).
+                if matches!(target_sem, SemanticType::Primitive(BuiltinType::Char)) {
+                    let source_sem = match value {
+                        Operand::Value(source_id) if (source_id.0 as usize) < _func.values.len() => {
+                            let source_ty = _func.values[source_id.0 as usize].ty;
+                            self.semantic_ctx.types.get(self.semantic_ctx.types.resolve(source_ty))
+                        }
+                        Operand::Char(_) => {
+                            return Ok(llvm_val);
+                        }
+                        _ => {
+                            return Err(BackendError::InvariantViolation(
+                                "integer-to-char cast has no semantic source type".into(),
+                            ));
+                        }
+                    };
+
+                    match source_sem {
+                        SemanticType::Primitive(BuiltinType::Char) => return Ok(llvm_val),
+                        SemanticType::Primitive(source_builtin) if source_builtin.is_integer() => {
+                            if !llvm_val.is_int_value() {
+                                return Err(BackendError::InvariantViolation(
+                                    "integer-to-char cast did not lower to an integer value".into(),
+                                ));
+                            }
+
+                            let source = llvm_val.into_int_value();
+                            let zero = source.get_type().const_zero();
+                            let source_width = match source_builtin {
+                                BuiltinType::I8 | BuiltinType::U8 => 8,
+                                BuiltinType::I16 | BuiltinType::U16 => 16,
+                                BuiltinType::I32 | BuiltinType::U32 => 32,
+                                BuiltinType::I64 | BuiltinType::U64 | BuiltinType::Isize | BuiltinType::Usize => 64,
+                                BuiltinType::I128 | BuiltinType::U128 => 128,
+                                _ => unreachable!("integer source type was checked above"),
+                            };
+                            let source_is_signed = matches!(
+                                source_builtin,
+                                BuiltinType::I8
+                                    | BuiltinType::I16
+                                    | BuiltinType::I32
+                                    | BuiltinType::I64
+                                    | BuiltinType::I128
+                                    | BuiltinType::Isize
+                            );
+                            let nonnegative = if source_is_signed {
+                                self.builder.build_int_compare(
+                                    inkwell::IntPredicate::SGE,
+                                    source,
+                                    zero,
+                                    &format!("char_nonnegative_{}", id.0),
+                                ).unwrap()
+                            } else {
+                                self.context.bool_type().const_int(1, false)
+                            };
+                            let upper_valid = if source_width >= 32 {
+                                self.builder.build_int_compare(
+                                    inkwell::IntPredicate::ULE,
+                                    source,
+                                    source.get_type().const_int(0x10_FFFF, false),
+                                    &format!("char_upper_valid_{}", id.0),
+                                ).unwrap()
+                            } else {
+                                self.context.bool_type().const_int(1, false)
+                            };
+                            let outside_surrogates = if source_width >= 32
+                                || matches!(source_builtin, BuiltinType::U16)
+                            {
+                                let below_surrogates = self.builder.build_int_compare(
+                                    inkwell::IntPredicate::ULT,
+                                    source,
+                                    source.get_type().const_int(0xD800, false),
+                                    &format!("char_below_surrogates_{}", id.0),
+                                ).unwrap();
+                                let above_surrogates = self.builder.build_int_compare(
+                                    inkwell::IntPredicate::UGT,
+                                    source,
+                                    source.get_type().const_int(0xDFFF, false),
+                                    &format!("char_above_surrogates_{}", id.0),
+                                ).unwrap();
+                                self.builder.build_or(
+                                    below_surrogates,
+                                    above_surrogates,
+                                    &format!("char_outside_surrogates_{}", id.0),
+                                ).unwrap()
+                            } else {
+                                self.context.bool_type().const_int(1, false)
+                            };
+                            let scalar_valid = self.builder.build_and(
+                                upper_valid,
+                                nonnegative,
+                                &format!("char_range_valid_{}", id.0),
+                            ).unwrap();
+                            let scalar_valid = self.builder.build_and(
+                                scalar_valid,
+                                outside_surrogates,
+                                &format!("char_scalar_valid_{}", id.0),
+                            ).unwrap();
+
+                            let current_fn = self.builder.get_insert_block().unwrap().get_parent().unwrap();
+                            let cont_bb = self.context.append_basic_block(current_fn, "char_cast_ok");
+                            let trap_bb = self.context.append_basic_block(current_fn, "char_cast_trap");
+                            self.builder.build_conditional_branch(scalar_valid, cont_bb, trap_bb).unwrap();
+
+                            self.builder.position_at_end(trap_bb);
+                            let panic_fn = self.get_function("__luna_panic_default")
+                                .ok_or_else(|| BackendError::InvariantViolation("__luna_panic_default declaration missing".into()))?;
+                            self.builder.build_call(panic_fn, &[], "").unwrap();
+                            self.builder.build_unreachable().unwrap();
+
+                            self.builder.position_at_end(cont_bb);
+                            let casted = self.builder.build_int_cast_sign_flag(
+                                source,
+                                llvm_ty.into_int_type(),
+                                false,
+                                &format!("cast_char_{}", id.0),
+                            ).unwrap();
+                            return Ok(casted.into());
+                        }
+                        _ => {
+                            return Err(BackendError::InvariantViolation(
+                                "typechecker allowed a non-integer cast to char".into(),
+                            ));
+                        }
+                    }
+                }
                 
                 // Identity cast: source and target LLVM types are structurally identical.
                 // This handles representation-preserving casts like &dyn Foo → *dyn Foo
@@ -1496,9 +1679,14 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     ).unwrap();
                     Ok(casted.into())
                 } else if llvm_val.is_int_value() && llvm_ty.is_int_type() {
-                    let casted = self.builder.build_int_cast(
+                    // LLVM integer types are signless. Preserve Luna's source
+                    // integer signedness explicitly when widening; the
+                    // convenience cast otherwise sign-extends unsigned values
+                    // whose high bit is set (for example, `255 as u8 as u64`).
+                    let casted = self.builder.build_int_cast_sign_flag(
                         llvm_val.into_int_value(),
                         llvm_ty.into_int_type(),
+                        !self.is_unsigned_operand(value, _func),
                         &format!("cast_v{}", id.0)
                     ).unwrap();
                     Ok(casted.into())
@@ -1665,7 +1853,12 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                         }
                     } else if let Ok(expected_ty) = self.map_type(_func.ret_ty) {
                         if val.is_int_value() && expected_ty.is_int_type() && val.get_type() != expected_ty {
-                            let casted = self.builder.build_int_cast(val.into_int_value(), expected_ty.into_int_type(), "ret_cast").unwrap();
+                            let casted = self.builder.build_int_cast_sign_flag(
+                                val.into_int_value(),
+                                expected_ty.into_int_type(),
+                                !self.is_unsigned_operand(val_op, _func),
+                                "ret_cast",
+                            ).unwrap();
                             val = casted.into();
                         }
                     }

@@ -1,0 +1,18 @@
+struct Entry { value: i32, };
+struct Basket { values: [Entry; 2], };
+
+fn view(owner: &Basket) -> &[Entry] life_from(owner) {
+    return &owner.values;
+}
+
+fn first(owner: &Basket) -> &i32 life_from(owner) {
+    dec slice = view(owner);
+    dec entry = &slice[0];
+    return &entry.value;
+}
+
+fn main() -> i32 {
+    dec owner = Basket { values: [Entry { value: 17 }, Entry { value: 29 }] };
+    dec item = first(&owner);
+    return *item - 17;
+}

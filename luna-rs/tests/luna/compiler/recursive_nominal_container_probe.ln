@@ -1,0 +1,25 @@
+import <result>;
+
+struct Bucket<T> { data: *rw T, };
+impl<T> std::Drop for Bucket<T> {
+    fn drop(self: &rw Self) {}
+}
+
+enum Node {
+    Leaf(i32),
+    Children(Bucket<Node>),
+    Entries(Bucket<Entry>),
+}
+struct Entry { value: Node, };
+
+fn leaf() -> Node {
+    return Node::Leaf(7);
+}
+fn wrapped() -> std::Result<Node, i32> {
+    return std::Result::Ok(Node::Leaf(7));
+}
+fn main() -> i32 {
+    dec node = leaf();
+    dec result = wrapped();
+    return 0;
+}

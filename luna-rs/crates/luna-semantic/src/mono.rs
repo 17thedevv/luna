@@ -206,6 +206,10 @@ pub struct MonoCollector<'a> {
     
     pub worklist: Vec<MonoInstance>,
     pub instantiated: HashMap<MonoInstance, InstantiatedFunction>,
+    // A rejected instance is terminal for this collection run. Visiting a
+    // recursive body may enqueue it again before the concretization barrier;
+    // retrying it cannot make its already-fixed substitution more concrete.
+    failed_instances: HashSet<MonoInstance>,
     pub drop_glues: Vec<CanonicalInstanceIdentity>,
     pub visited_drop_types: HashSet<SemanticTypeId>,
     
@@ -232,6 +236,7 @@ impl<'a> MonoCollector<'a> {
             source_manager,
             worklist: Vec::new(),
             instantiated: HashMap::new(),
+            failed_instances: HashSet::new(),
             drop_glues: Vec::new(),
             visited_drop_types: HashSet::new(),
             current_instance: None,
@@ -525,7 +530,9 @@ impl<'a> MonoCollector<'a> {
 
     fn process_worklist(&mut self) {
         while let Some(instance) = self.worklist.pop() {
-            if self.instantiated.contains_key(&instance) {
+            if self.instantiated.contains_key(&instance)
+                || self.failed_instances.contains(&instance)
+            {
                 continue;
             }
 
@@ -710,6 +717,7 @@ impl<'a> MonoCollector<'a> {
             }
 
             if !is_concrete {
+                self.failed_instances.insert(instance);
                 continue; // Barrier: do not insert unresolved mono unit
             }
 
@@ -1550,6 +1558,23 @@ impl<'a> MonoCollector<'a> {
         }
     }
 
+    fn validate_instantiated_operator(&mut self, op: crate::operators::PrimitiveOperator, operand: &ExprId) {
+        // Generic bodies are checked with symbolic types first. Enforce the same
+        // primitive contract again on this instance's fully substituted operands.
+        if let Some(&ty) = self.current_expr_types.get(operand) {
+            if self.ctx.tables.expr_types.get(operand) == Some(&ty) {
+                // An unchanged concrete operand was already checked by the
+                // typechecker; this pass closes only the instantiation boundary.
+                return;
+            }
+            if let Some(message) = op.error_for_type(&self.ctx.types, ty) {
+                let span = self.get_expr_span_for_diag(operand)
+                    .unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                self.ctx.diagnostics.push(luna_common::Diagnostic::error(message).with_span(span));
+            }
+        }
+    }
+
     fn visit_expr(&mut self, expr_id: &ExprId) {
         let expr = &self.arena.exprs[expr_id.0 as usize];
         
@@ -1898,13 +1923,15 @@ impl<'a> MonoCollector<'a> {
                     self.discover_drop_obligations(ty);
                 }
             }
-            Expr::Binary { left, right, .. } => {
+            Expr::Binary { op, left, right } => {
                 self.visit_expr(left);
                 self.visit_expr(right);
+                self.validate_instantiated_operator(crate::operators::PrimitiveOperator::Binary(*op), left);
             }
-            Expr::Assign { lvalue, value, .. } => {
+            Expr::Assign { op, lvalue, value } => {
                 self.visit_expr(lvalue);
                 self.visit_expr(value);
+                self.validate_instantiated_operator(crate::operators::PrimitiveOperator::Assignment(*op), lvalue);
             }
             Expr::Member { object, .. } => {
                 self.visit_expr(object);
@@ -1952,8 +1979,9 @@ impl<'a> MonoCollector<'a> {
             Expr::Cast { expr: inner, .. } => {
                 self.visit_expr(inner);
             }
-            Expr::Unary { operand, .. } => {
+            Expr::Unary { op, operand } => {
                 self.visit_expr(operand);
+                self.validate_instantiated_operator(crate::operators::PrimitiveOperator::Unary(*op), operand);
             }
             Expr::Index { base, index } => {
                 self.visit_expr(base);

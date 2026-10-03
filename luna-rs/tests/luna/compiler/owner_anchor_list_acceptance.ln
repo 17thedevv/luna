@@ -1,0 +1,21 @@
+import "owner_anchor_list";
+
+fn main() -> i32 {
+    dec rw first: i32 = 41;
+    dec rw second: u64 = 70 as u64;
+    unsafe {
+        dec rw owner = owner_api::Owner<i32, u64> {
+            first: &rw first as *rw i32,
+            second: &rw second as *rw u64,
+        };
+        dec rw a = owner_api::first<i32, u64>(&rw owner);
+        if *a != 41 { return 1; }
+        *a = 42;
+        dec rw b = owner_api::second<i32, u64>(&rw owner);
+        if *b != 70 as u64 { return 2; }
+        *b = 71 as u64;
+        if *owner_api::first<i32, u64>(&rw owner) != 42 { return 3; }
+        if *owner_api::second<i32, u64>(&rw owner) != 71 as u64 { return 4; }
+    }
+    return 0;
+}

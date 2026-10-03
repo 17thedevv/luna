@@ -1,0 +1,5 @@
+struct First { value: Later, };
+struct Later { value: i32, };
+
+fn observe(value: &First) -> i32 { return value.value.value; }
+fn main() -> i32 { return 0; }

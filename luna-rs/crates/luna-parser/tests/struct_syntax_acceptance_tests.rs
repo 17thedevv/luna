@@ -135,3 +135,90 @@ fn test_struct_raw_storage_anchor_rejects_nested_path_syntax() {
     let (result, _arena, diags) = parse(input);
     assert!(result.is_err() || !diags.is_empty(), "nested anchor paths are not in v1 grammar");
 }
+
+#[test]
+fn struct_requires_accepts_multiple_anchors_in_one_group() {
+    let input = r#"
+export struct TreeStorage<K, V> {
+    private keys: *rw K,
+    private values: *rw V,
+    private lefts: *rw u64,
+    private rights: *rw u64,
+    private heights: *rw i32,
+} requires anchor(keys) = self,
+           anchor(values) = self,
+           anchor(lefts) = self,
+           anchor(rights) = self,
+           anchor(heights) = self;
+"#;
+    let (result, arena, diags) = parse(input);
+    assert!(diags.is_empty(), "{diags:?}");
+    let items = result.expect("parse successful");
+    assert_eq!(items.len(), 1);
+    let Item::Decl(decl_id) = items[0] else { panic!("Expected struct declaration") };
+    let Decl::Struct { raw_storage_anchor_contract, lifetime_contract, generic_params, fields, .. } = &arena.decls[decl_id.0 as usize] else {
+        panic!("Expected Decl::Struct");
+    };
+    assert_eq!(generic_params.len(), 2);
+    assert_eq!(fields.len(), 5);
+    assert!(lifetime_contract.is_none());
+    let anchors = &raw_storage_anchor_contract.as_ref().unwrap().anchors;
+    assert_eq!(
+        anchors.iter().map(|anchor| anchor.field_name.as_str()).collect::<Vec<_>>(),
+        ["keys", "values", "lefts", "rights", "heights"]
+    );
+    for anchor in anchors {
+        assert_eq!(
+            &input[anchor.span.start as usize..anchor.span.end as usize],
+            anchor.field_name
+        );
+    }
+}
+
+#[test]
+fn struct_requires_accepts_mixed_contract_entries_in_either_order() {
+    for contracts in [
+        "anchor(data) = self, life(borrowed) >= life(self), anchor(other) = self",
+        "life(borrowed) >= life(self), anchor(data) = self, anchor(other) = self",
+        "anchor(data) = self, anchor(other) = self, life(self) <= life(borrowed)",
+    ] {
+        let input = format!(
+            "struct Owner {{ borrowed: &i32, data: *rw u8, other: *u16, }} requires {contracts};"
+        );
+        let (result, arena, diags) = parse(&input);
+        assert!(diags.is_empty(), "{contracts}: {diags:?}");
+        let items = result.expect("parse successful");
+        let Item::Decl(decl_id) = items[0] else { panic!("Expected struct declaration") };
+        let Decl::Struct { raw_storage_anchor_contract, lifetime_contract, .. } = &arena.decls[decl_id.0 as usize] else {
+            panic!("Expected Decl::Struct");
+        };
+        let constraints = &lifetime_contract.as_ref().unwrap().constraints;
+        assert_eq!(constraints.len(), 1);
+        assert_eq!(constraints[0].longer.to_string(), "borrowed");
+        assert_eq!(constraints[0].shorter.to_string(), "self");
+        let anchors = &raw_storage_anchor_contract.as_ref().unwrap().anchors;
+        assert_eq!(anchors.len(), 2);
+        assert_eq!(anchors[0].field_name, "data");
+        assert_eq!(anchors[1].field_name, "other");
+    }
+}
+
+#[test]
+fn struct_requires_rejects_malformed_contract_lists() {
+    for contracts in [
+        "",
+        ", anchor(data) = self",
+        "anchor(data) = self,",
+        "anchor(data) = self,, anchor(other) = self",
+        "anchor(data) = self anchor(other) = self",
+        "life(borrowed) >= life(self) anchor(data) = self",
+        "anchor(data) = self, anchor(other) = owner",
+        "anchor(data) = self, anchor(other.ptr) = self",
+    ] {
+        let input = format!(
+            "struct Owner {{ borrowed: &i32, data: *rw u8, other: *u16, }} requires {contracts};"
+        );
+        let (result, _arena, diags) = parse(&input);
+        assert!(result.is_err() || !diags.is_empty(), "accepted malformed contract list: {contracts}");
+    }
+}

@@ -1,0 +1,41 @@
+---
+title: Standard Library
+description: Luna's built-in types, traits, and functions.
+---
+
+## Core Modules
+
+| Module | Description |
+|--------|-------------|
+| `std::option` | Optional values |
+| `std::result` | Error handling |
+| `std::vec` | Dynamic arrays |
+| `std::string` | Heap-allocated strings |
+| `std::box` | Heap allocation |
+| `std::io` | Input/output |
+| `std::path` | Path manipulation |
+| `std::collections` | HashMap, HashSet |
+
+## Using the Standard Library
+
+```luna
+import <alloc>;
+
+fn main() -> int_32 {
+    dec rw v = std::Vec<i32>::new();
+    v.push(1);
+    v.push(2);
+
+    dec item: Option<i32> = v.get(0);
+    match item {
+        Option::Some(n) -> {
+            std::io::println("Found: {}", n);
+        },
+        Option::None -> {
+            std::io::println("Not found");
+        }
+    }
+
+    return 0;
+}
+```

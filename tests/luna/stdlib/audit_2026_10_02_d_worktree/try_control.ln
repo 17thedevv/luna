@@ -1,0 +1,15 @@
+import <result>;
+import <try>;
+
+fn generic_try<T, E>(value: std::Result<T, E>) -> std::Result<T, E> {
+    dec output = value?;
+    return std::Result::Ok(output);
+}
+
+fn main() -> i32 {
+    dec success: std::Result<i32, i32> = generic_try(std::Result::Ok(41));
+    if success.unwrap() != 41 { return 1; }
+    dec failure: std::Result<i32, i32> = generic_try(std::Result::Err(9));
+    if failure.is_ok() { return 2; }
+    return 0;
+}

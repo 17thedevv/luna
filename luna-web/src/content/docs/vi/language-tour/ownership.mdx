@@ -1,0 +1,87 @@
+---
+title: Sở hữu & Vay mượn
+description: Tiếp cận an toàn bộ nhớ không cần garbage collection qua ownership và borrowing trong Luna.
+---
+
+## Vấn đề an toàn bộ nhớ
+
+Các ngôn ngữ lập trình hệ thống truyền thống trao toàn quyền kiểm soát nhưng dễ dẫn tới các lỗi nghiêm trọng:
+- Use-after-free (sử dụng sau khi giải phóng)
+- Double-free (giải phóng hai lần)
+- Data races (xung đột dữ liệu đa luồng)
+- Memory leaks (rò rỉ bộ nhớ)
+
+Luna giải quyết triệt để các vấn đề này tại thời điểm biên dịch thông qua **quy tắc quyền sở hữu (ownership)**.
+
+## Quy tắc Quyền sở hữu
+
+Mỗi giá trị trong Luna luôn có duy nhất một **chủ sở hữu (owner)**:
+
+```luna
+fn main() -> i32 {
+    dec s1 = std::String::new("hello");
+    dec s2 = s1;  // Quyền sở hữu chuyển sang s2 (move)
+
+    // s1 không còn hợp lệ tại đây
+    std::io::println(s2);  // Hợp lệ: s2 là chủ sở hữu chuỗi
+    return 0;
+}
+```
+
+## Ngữ nghĩa Di chuyển (Move Semantics)
+
+Khi bạn gán một giá trị hoặc truyền nó vào một hàm, quyền sở hữu sẽ **di chuyển (move)**:
+
+```luna
+fn take_ownership(s: std::String) {
+    std::io::println(s);
+}
+
+fn main() -> i32 {
+    dec s = std::String::new("Luna");
+    take_ownership(s);
+    // s không còn hợp lệ sau khi đã bị move
+    return 0;
+}
+```
+
+## Vay mượn (Borrowing)
+
+Thay vì chuyển quyền sở hữu, bạn có thể **vay mượn (borrow)** một tham chiếu:
+
+```luna
+fn calculate_length(s: &str) -> u64 {
+    return s.len() as u64;
+}
+
+fn main() -> i32 {
+    dec s = std::String::new("hello");
+    dec len = calculate_length(&s);
+    std::io::println("Độ dài: {}", len);
+    std::io::println(s);  // s vẫn hợp lệ vì chỉ cho mượn tham chiếu
+    return 0;
+}
+```
+
+## Tham chiếu Khả ghi (Mutable References)
+
+Khi bạn cần sửa đổi dữ liệu đang vay mượn:
+
+```luna
+fn append_world(s: &rw std::String) {
+    s.push_str(" world");
+}
+```
+
+## Quy tắc của Bộ kiểm tra Vay mượn (Borrow Checker)
+
+1. **Nhiều tham chiếu chia sẻ**: Bạn có thể có nhiều tham chiếu `&T` cùng lúc
+2. **Tham chiếu khả ghi duy nhất**: Bạn có thể có DUY NHẤT một tham chiếu `&rw T`, hoặc nhiều `&T`, nhưng không bao giờ cả hai cùng lúc
+3. **Thời gian sống của tham chiếu**: Tham chiếu không bao giờ được phép tồn tại lâu hơn dữ liệu mà nó tham chiếu tới
+
+## Lợi ích đem lại
+
+- **Không dùng garbage collector** → Hiệu năng tất định và có thể dự đoán
+- **Không có phụ phí runtime** → Abstraction không tốn chi phí (zero-cost)
+- **An toàn tại compile-time** → Không lỗi phân đoạn (segfault), không xung đột luồng
+- **Kiểm soát tường minh** → Các khối `unsafe` luôn sẵn sàng khi cần thao tác phần cứng cấp thấp

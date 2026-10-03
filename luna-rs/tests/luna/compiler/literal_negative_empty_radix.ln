@@ -1,0 +1,1 @@
+fn main() -> i32 { dec value = 0xu8; return 0; }

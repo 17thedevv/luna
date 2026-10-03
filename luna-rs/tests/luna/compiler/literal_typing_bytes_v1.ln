@@ -1,0 +1,13 @@
+fn inspect(bytes: &[u8]) -> u8 { return bytes[0]; }
+fn main() -> i32 {
+    dec bytes: [u8; 4] = b"A\0\xFF\n";
+    dec hello = b"Hello, ";
+    dec empty: [u8; 0] = b"";
+    dec byte: u8 = b'A';
+    if bytes[0] != byte || bytes[1] != 0u8 || bytes[2] != 255u8 || bytes[3] != 10u8 { return 1; }
+    if hello[6] != 32u8 || inspect(&bytes) != 65u8 { return 2; }
+    dec rw writable = b"ab";
+    writable[0] = b'z';
+    if writable[0] != 122u8 { return 3; }
+    return 0;
+}

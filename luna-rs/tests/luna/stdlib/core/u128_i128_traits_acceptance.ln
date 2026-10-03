@@ -1,0 +1,86 @@
+import <cmp>;
+import <hash>;
+import <clone>;
+import <copy>;
+import <default>;
+import <num>;
+
+fn test_eq_ord_u128() -> bool {
+    dec a: u128 = 100u128;
+    dec b: u128 = 200u128;
+    dec c: u128 = 100u128;
+
+    if a.eq(&c) == false { return false; }
+    if a.eq(&b) == true { return false; }
+    if a.cmp(&b) >= 0 { return false; }
+    if b.cmp(&a) <= 0 { return false; }
+    if a.cmp(&c) != 0 { return false; }
+    return true;
+}
+
+fn test_eq_ord_i128() -> bool {
+    dec a: i128 = -500i128;
+    dec b: i128 = 500i128;
+    dec c: i128 = -500i128;
+
+    if a.eq(&c) == false { return false; }
+    if a.eq(&b) == true { return false; }
+    if a.cmp(&b) >= 0 { return false; }
+    if b.cmp(&a) <= 0 { return false; }
+    if a.cmp(&c) != 0 { return false; }
+    return true;
+}
+
+fn test_hash() -> bool {
+    dec u1: u128 = 12345678901234567890u128;
+    dec u2: u128 = 12345678901234567890u128;
+    dec u3: u128 = 999u128;
+
+    if u1.hash() != u2.hash() { return false; }
+    if u1.hash() == u3.hash() { return false; }
+
+    dec i1: i128 = -12345i128;
+    dec i2: i128 = -12345i128;
+    dec i3: i128 = 12345i128;
+
+    if i1.hash() != i2.hash() { return false; }
+    if i1.hash() == i3.hash() { return false; }
+    return true;
+}
+
+fn test_numerics() -> bool {
+    // u128 checked add & saturation
+    dec max_u: u128 = 340282366920938463463374607431768211455u128;
+    if std::checked_add_u128(max_u, 1u128).is_some() { return false; }
+    if std::saturating_add_u128(max_u, 100u128) != max_u { return false; }
+
+    dec zero_u: u128 = 0u128;
+    if std::checked_sub_u128(zero_u, 1u128).is_some() { return false; }
+    if std::saturating_sub_u128(zero_u, 10u128) != zero_u { return false; }
+
+    // i128 checked mul & saturation
+    dec max_i: i128 = 170141183460469231731687303715884105727i128;
+    if std::checked_mul_i128(max_i, 2i128).is_some() { return false; }
+    if std::saturating_mul_i128(max_i, 2i128) != max_i { return false; }
+
+    dec min_i: i128 = -170141183460469231731687303715884105728i128;
+    if std::checked_abs_i128(min_i).is_some() { return false; }
+    if std::abs_i128(-42i128) != 42i128 { return false; }
+
+    return true;
+}
+
+fn main() -> i32 {
+    if test_eq_ord_u128() == false { return 1; }
+    if test_eq_ord_i128() == false { return 2; }
+    if test_hash() == false { return 3; }
+    if test_numerics() == false { return 4; }
+
+    // Clone & Copy
+    dec val_u: u128 = 777u128;
+    dec copy_u = val_u;
+    dec clone_u = val_u.clone();
+    if copy_u != clone_u { return 5; }
+
+    return 0;
+}

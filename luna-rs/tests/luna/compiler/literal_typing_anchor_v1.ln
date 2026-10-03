@@ -1,0 +1,18 @@
+struct EmptyOwner {
+    ptr: *rw u8,
+} requires anchor(ptr) = self;
+
+fn empty_legacy() -> EmptyOwner {
+    return EmptyOwner { ptr: 0 as u64 as *rw u8 };
+}
+
+fn empty_suffix() -> EmptyOwner {
+    return EmptyOwner { ptr: 0u64 as *rw u8 };
+}
+
+fn main() -> i32 {
+    dec legacy = empty_legacy();
+    dec suffix = empty_suffix();
+    if legacy.ptr as u64 != 0u64 || suffix.ptr as u64 != 0u64 { return 1; }
+    return 0;
+}

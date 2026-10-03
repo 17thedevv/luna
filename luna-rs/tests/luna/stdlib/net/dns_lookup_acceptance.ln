@@ -1,0 +1,75 @@
+import <net>;
+import <result>;
+
+fn test_dns_lookup() -> bool {
+    // "127.0.0.1"
+    dec host_bytes = [49 as u8, 50 as u8, 55 as u8, 46 as u8, 48 as u8, 46 as u8, 48 as u8, 46 as u8, 49 as u8];
+    dec res = std::lookup_host(&host_bytes);
+    if res.is_err() {
+        return false;
+    }
+    dec ip = res.unwrap();
+    if ip.is_loopback() == false {
+        return false;
+    }
+    if ip.octets()[0] != (127 as u8) || ip.octets()[3] != (1 as u8) {
+        return false;
+    }
+
+    return true;
+}
+
+fn test_udp_socket() -> bool {
+    dec ip = std::ipv4_localhost();
+    dec s1_res = std::udp_socket_bind(&ip, 19876 as u16);
+    if s1_res.is_err() {
+        return false;
+    }
+    dec rw s1 = s1_res.unwrap();
+
+    dec s2_res = std::udp_socket_bind(&ip, 19877 as u16);
+    if s2_res.is_err() {
+        s1.close();
+        return false;
+    }
+    dec rw s2 = s2_res.unwrap();
+
+    // Send from s1 to s2
+    dec msg = [65 as u8, 66 as u8, 67 as u8]; // "ABC"
+    dec send_res = s1.send_to(&msg, &ip, 19877 as u16);
+    if send_res.is_err() || send_res.unwrap() != (3 as usize) {
+        s1.close();
+        s2.close();
+        return false;
+    }
+
+    // Recv on s2
+    dec rw buf: [u8; 8] = [0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8];
+    dec recv_res = s2.recv_from(&rw buf);
+    if recv_res.is_err() || recv_res.unwrap() != (3 as usize) {
+        s1.close();
+        s2.close();
+        return false;
+    }
+    if buf[0] != (65 as u8) || buf[1] != (66 as u8) || buf[2] != (67 as u8) {
+        s1.close();
+        s2.close();
+        return false;
+    }
+
+    s1.close();
+    s2.close();
+    return true;
+}
+
+fn main() -> i32 {
+    if test_dns_lookup() == false {
+        return 1;
+    }
+
+    if test_udp_socket() == false {
+        return 2;
+    }
+
+    return 0;
+}

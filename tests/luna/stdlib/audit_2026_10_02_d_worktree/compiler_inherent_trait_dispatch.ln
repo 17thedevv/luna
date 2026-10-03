@@ -1,0 +1,13 @@
+trait Drain { fn drain(self: Self) -> i32; }
+struct Counter { value: i32 };
+impl Counter {
+    fn drain(self: Self) -> i32 { return self.value; }
+}
+impl Drain for Counter {
+    fn drain(self: Self) -> i32 { return self.drain(); }
+}
+fn main() -> i32 {
+    dec counter = Counter { value: 7 };
+    if counter.drain() != 7 { return 1; }
+    return 0;
+}

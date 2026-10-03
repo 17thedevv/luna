@@ -1,0 +1,108 @@
+import <path>;
+import <string>;
+import <file>;
+import <result>;
+import <cmp>;
+
+fn str_equals(s: &std::String, lit: str) -> bool {
+    dec expected = std::string_from_str(lit);
+    return s.eq(&expected);
+}
+
+fn test_path_functions() -> bool {
+    // 1. file_stem tests
+    dec s1 = std::string_from_str("hello.txt");
+    dec stem1 = std::path::file_stem(&s1).unwrap();
+    if str_equals(&stem1, "hello") == false { return false; }
+
+    dec s2 = std::string_from_str("archive.tar.gz");
+    dec stem2 = std::path::file_stem(&s2).unwrap();
+    if str_equals(&stem2, "archive.tar") == false { return false; }
+
+    dec s3 = std::string_from_str(".config");
+    dec stem3 = std::path::file_stem(&s3).unwrap();
+    if str_equals(&stem3, ".config") == false { return false; }
+
+    dec s4 = std::string_from_str(".config.json");
+    dec stem4 = std::path::file_stem(&s4).unwrap();
+    if str_equals(&stem4, ".config") == false { return false; }
+
+    dec s5 = std::string_from_str("standalone");
+    dec stem5 = std::path::file_stem(&s5).unwrap();
+    if str_equals(&stem5, "standalone") == false { return false; }
+
+    // 2. is_absolute & has_root
+    dec abs1 = std::string_from_str("/usr/bin");
+    if std::path::is_absolute(&abs1) == false { return false; }
+    if std::path::has_root(&abs1) == false { return false; }
+
+    dec abs2 = std::string_from_str("C:/Windows");
+    if std::path::is_absolute(&abs2) == false { return false; }
+
+    dec rel1 = std::string_from_str("relative/path/to/file");
+    if std::path::is_absolute(&rel1) { return false; }
+    if std::path::has_root(&rel1) { return false; }
+
+    return true;
+}
+
+fn test_path_buf() -> bool {
+    dec rw pb = std::path::path_buf_new();
+    if pb.is_empty() == false { return false; }
+
+    dec base = std::string_from_str("my_project");
+    pb.push(&base);
+    dec sub = std::string_from_str("src");
+    pb.push(&sub);
+    dec f = std::string_from_str("main.ln");
+    pb.push(&f);
+
+    dec fn_str = pb.file_name().unwrap();
+    if str_equals(&fn_str, "main.ln") == false { return false; }
+    dec fs_str = pb.file_stem().unwrap();
+    if str_equals(&fs_str, "main") == false { return false; }
+    dec ext_str = pb.extension().unwrap();
+    if str_equals(&ext_str, "ln") == false { return false; }
+
+    // Pop file -> should be "my_project/src"
+    dec pop_res = pb.pop();
+    if pop_res == false { return false; }
+    dec popped_name = pb.file_name().unwrap();
+    if str_equals(&popped_name, "src") == false { return false; }
+
+    // Join without mutating pb
+    dec extra = std::string_from_str("lib.ln");
+    dec joined = pb.join(&extra);
+    dec joined_name = joined.file_name().unwrap();
+    if str_equals(&joined_name, "lib.ln") == false { return false; }
+
+    // Clone
+    dec cloned = pb.clone();
+    if cloned.as_string().eq(pb.as_string()) == false { return false; }
+
+    return true;
+}
+
+fn test_file_read_write_string() -> bool {
+    dec test_path = std::string_from_str("target/test_file_rw_string.tmp");
+    dec content = std::string_from_str("Hello Luna Standard Library File I/O!");
+
+    // Write string
+    dec w_res = std::write_string(&test_path, &content);
+    if w_res.is_err() { return false; }
+
+    // Read to string
+    dec r_res = std::read_to_string(&test_path);
+    if r_res.is_err() { return false; }
+    dec read_content = r_res.unwrap();
+    if read_content.eq(&content) == false { return false; }
+
+    return true;
+}
+
+fn main() -> i32 {
+    if test_path_functions() == false { return 1; }
+    if test_path_buf() == false { return 2; }
+    if test_file_read_write_string() == false { return 3; }
+    return 0;
+}

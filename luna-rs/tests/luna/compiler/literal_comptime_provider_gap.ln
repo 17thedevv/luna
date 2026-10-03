@@ -1,0 +1,8 @@
+// Investigation reproducer, not a passing closure acceptance fixture.
+// Arrange providers/literal_provider.ln (or its fresh .llib/.obj) beside this file.
+import "literal_provider";
+const PROVIDER_BYTES: [u8; 4] = comptime { literals::bytes() };
+fn main() -> i32 {
+    if PROVIDER_BYTES[2] != b'\xFF' { return 1; }
+    return 0;
+}

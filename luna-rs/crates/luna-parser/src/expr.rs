@@ -755,6 +755,8 @@ impl<'a> Parser<'a> {
     fn parse_primary(&mut self, allow_struct_literal: bool) -> Result<ExprId, ()> {
         if self.check(TokenKind::IntegerLiteral)
             || self.check(TokenKind::FloatLiteral)
+            || self.check(TokenKind::ByteLiteral)
+            || self.check(TokenKind::ByteStringLiteral)
             || self.check(TokenKind::StringLiteral)
             || self.check(TokenKind::RawStringLiteral)
             || self.check(TokenKind::CharLiteral)

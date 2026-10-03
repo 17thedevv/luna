@@ -569,7 +569,29 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 println!("\n--- Optimizer ---");
             }
             let mut pass_manager = luna_optimizer::PassManager::new();
-            pass_manager.add_pass(Box::new(luna_optimizer::ConstantFolding::new()));
+            // Forward immutable numeric facts with the MVIR type handles.
+            // Folding must not replace wrapping narrow arithmetic with an
+            // untruncated host integer and then fold comparisons against it.
+            let integer_ranges = semantic_ctx.types.get_all_types().into_iter().filter_map(|ty| {
+                use luna_semantic::ty::{BuiltinType, SemanticType};
+                let (bits, signed) = match semantic_ctx.types.get(semantic_ctx.types.resolve_inference(ty)) {
+                    SemanticType::Primitive(BuiltinType::I8) => (8, true),
+                    SemanticType::Primitive(BuiltinType::I16) => (16, true),
+                    SemanticType::Primitive(BuiltinType::I32) => (32, true),
+                    SemanticType::Primitive(BuiltinType::I64) => (64, true),
+                    SemanticType::Primitive(BuiltinType::I128) => (128, true),
+                    SemanticType::Primitive(BuiltinType::Isize) => (semantic_ctx.target_pointer_bits, true),
+                    SemanticType::Primitive(BuiltinType::U8) => (8, false),
+                    SemanticType::Primitive(BuiltinType::U16) => (16, false),
+                    SemanticType::Primitive(BuiltinType::U32) => (32, false),
+                    SemanticType::Primitive(BuiltinType::U64) => (64, false),
+                    SemanticType::Primitive(BuiltinType::U128) => (128, false),
+                    SemanticType::Primitive(BuiltinType::Usize) => (semantic_ctx.target_pointer_bits, false),
+                    _ => return None,
+                };
+                Some((ty.0, bits, signed))
+            });
+            pass_manager.add_pass(Box::new(luna_optimizer::ConstantFolding::with_integer_ranges(integer_ranges)));
             pass_manager.add_pass(Box::new(luna_optimizer::DeadCodeElimination::new()));
             pass_manager.run(&mut module);
             if !options.quiet {

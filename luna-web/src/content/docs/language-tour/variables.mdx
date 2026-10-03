@@ -1,0 +1,68 @@
+---
+title: Variables & Types
+description: Declaring variables and understanding Luna's type system.
+---
+
+## Declarations
+
+Luna uses `dec` for variable declarations:
+
+```luna
+// Immutable (default)
+dec x = 10;
+dec name = "Luna";
+
+// Mutable with 'rw' (rewritable)
+dec rw counter = 0;
+counter = counter + 1;
+
+// Mutable reference
+dec rw ref_c: &rw i32 = &rw counter;
+*ref_c = 42;
+```
+
+## Constants
+
+Constants are evaluated at compile-time:
+
+```luna
+const PI: f64 = 3.14159;
+const MAX_SIZE: i32 = 1000;
+```
+
+## Primitive Types
+
+```luna
+// Integer types
+i8, i16, i32, i64, i128, isize    // signed
+u8, u16, u32, u64, u128, usize    // unsigned
+
+// Floating point
+f32, f64
+
+// Other primitives
+bool, char, str
+void        // for functions that return nothing
+```
+
+## Type Annotations
+
+```luna
+dec x: i32 = 42;
+dec name: str = "Luna";
+dec data: &[u8] = &[1, 2, 3, 4];
+
+fn add(a: i32, b: i32) -> i32 {
+    return a + b;
+}
+```
+
+## Arrays and Slices
+
+```luna
+// Fixed-size array
+dec arr = [1, 2, 3, 4, 5];
+
+// Slice (borrowed view)
+dec slice: &[i32] = &arr;
+```

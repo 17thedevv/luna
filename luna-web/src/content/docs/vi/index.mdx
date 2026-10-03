@@ -1,0 +1,485 @@
+---
+title: Ngôn ngữ lập trình Luna
+description: Ngôn ngữ lập trình hệ thống hiện đại với an toàn bộ nhớ dựa trên ownership, hiệu năng bản địa qua LLVM, và kiểm soát tường minh cấp thấp.
+template: splash
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<div class="splash-container">
+
+  {/* ── 1. Hero Split Section ── */}
+  <section class="luna-hero">
+    <div class="luna-hero-content">
+      <div class="luna-hero-brand-emblem">
+        <div class="luna-hero-symbol-wrapper">
+          <img src="/brand/luna-symbol-dark.png" alt="Biểu tượng Luna" class="luna-hero-symbol luna-dark-only" />
+          <img src="/brand/luna-symbol-light.png" alt="Biểu tượng Luna" class="luna-hero-symbol luna-light-only" />
+        </div>
+        <div class="luna-badge">
+          <span class="luna-badge-dot"></span>
+          <span>Luna v0.1 • Ngôn ngữ hệ thống</span>
+        </div>
+      </div>
+
+      <h1 class="luna-hero-title">
+        Lập trình sát phần cứng.<br />
+        Không đánh đổi <br class="luna-break-mobile" />sự tường minh.
+      </h1>
+
+      <p class="luna-hero-subtitle">
+        Luna là ngôn ngữ lập trình hệ thống được thiết kế cho hiệu năng đỉnh cao,
+        an toàn bộ nhớ tại compile-time không dùng garbage collector, và kiểm soát tường minh cấp thấp.
+      </p>
+
+      <div class="luna-hero-actions">
+        <a href="/vi/getting-started/" class="luna-btn luna-btn-primary"><span>Bắt đầu ngay</span><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg></a>
+        <a href="/vi/language-tour/" class="luna-btn luna-btn-secondary"><span>Khám phá ngôn ngữ</span></a>
+        <a href="https://github.com/17thedevv/luna.git" target="_blank" rel="noopener" class="luna-btn luna-btn-secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
+      </div>
+
+      <div class="luna-quick-install">
+        <div class="luna-quick-line">
+          <span class="luna-prompt-symbol">$</span>
+          <span class="luna-quick-code">git clone https://github.com/17thedevv/luna.git</span>
+        </div>
+        <div class="luna-quick-line">
+          <span class="luna-prompt-symbol">$</span>
+          <span class="luna-quick-code">cd luna/luna-rs &amp;&amp; cargo build --release</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Live Code Editor Chrome Panel */}
+    <div class="luna-editor-panel">
+      <div class="luna-editor-header">
+        <div class="luna-editor-dots">
+          <span class="luna-dot"></span>
+          <span class="luna-dot"></span>
+          <span class="luna-dot"></span>
+        </div>
+        <div class="luna-editor-tab">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+          <span>main.ln</span>
+        </div>
+        <div class="luna-editor-status">UTF-8</div>
+      </div>
+      <div class="luna-editor-body">
+```luna
+import <core>;
+
+export struct Point {
+    export x: f64,
+    export y: f64,
+};
+
+trait Computable {
+    fn magnitude_squared(self: &Self) -> f64;
+}
+
+impl Computable for Point {
+    fn magnitude_squared(self: &Self) -> f64 {
+        return self.x * self.x + self.y * self.y;
+    }
+}
+
+fn main() -> i32 {
+    dec pt = Point { x: 3.0, y: 4.0 };
+    dec dist_sq = pt.magnitude_squared();
+
+    // Biến bất biến tường minh tại compile-time
+    dec total = dist_sq;
+    std::io::println("Magnitude squared: {}", total);
+    return 0;
+}
+```
+      </div>
+    </div>
+  </section>
+
+  {/* ── 1b. Differentiator Strip (Đặc trưng hệ thống) ── */}
+  <div class="luna-differentiator-strip">
+    <div class="luna-diff-item">
+      <span class="luna-diff-badge">Ownership không GC</span>
+      <p class="luna-diff-desc">Mô hình sở hữu đơn và kiểm tra mượn (borrow checking) hoàn toàn tại thời điểm biên dịch.</p>
+    </div>
+    <div class="luna-diff-item">
+      <span class="luna-diff-badge">Provider ≠ Namespace</span>
+      <p class="luna-diff-desc">Tách biệt nạp file nhị phân/nguồn vật lý khỏi tra cứu không gian tên logic.</p>
+    </div>
+    <div class="luna-diff-item">
+      <span class="luna-diff-badge">Pipeline Semantic MVIR</span>
+      <p class="luna-diff-desc">Tầng biểu diễn trung gian kiểm chứng ngữ nghĩa độc lập trước khi hạ cấp sang LLVM.</p>
+    </div>
+    <div class="luna-diff-item">
+      <span class="luna-diff-badge">Ranh giới Unsafe rõ ràng</span>
+      <p class="luna-diff-desc">Con trỏ thô <code>*rw T</code> được phân loại rõ ràng và cô lập sau các khối unsafe.</p>
+    </div>
+  </div>
+
+  {/* ── 2. Value Pillars (3 Trụ cột cốt lõi) ── */}
+  <section class="luna-section">
+    <div class="luna-triad">
+      <div class="luna-triad-card">
+        <div class="luna-triad-number">01 / KIẾN TRÚC</div>
+        <h3>An toàn bộ nhớ không GC</h3>
+        <p>
+          Trong mã Luna an toàn, quyền sở hữu biên dịch ngăn ngừa triệt để lỗi use-after-free và double-free,
+          trong khi các quy tắc alias hạn chế đột biến bất an toàn. Không dừng gom rác (GC pauses),
+          không luồng tracing nền, không phụ phí đếm tham chiếu (ref-counting overhead).
+        </p>
+      </div>
+
+      <div class="luna-triad-card">
+        <div class="luna-triad-number">02 / TRÌNH BIÊN DỊCH</div>
+        <h3>Hiệu năng bản địa với LLVM</h3>
+        <p>
+          Các abstraction không chi phí phụ (zero-cost) và generic được monomorphize trực tiếp thành
+          mã máy tối ưu cao thông qua chuỗi công cụ chuẩn công nghiệp LLVM backend.
+        </p>
+      </div>
+
+      <div class="luna-triad-card">
+        <div class="luna-triad-number">03 / KIỂM SOÁT</div>
+        <h3>Nguyên thủy hệ thống tường minh</h3>
+        <p>
+          Thu hồi tài nguyên tất định qua RAII, ngữ nghĩa con trỏ thô rõ ràng (<code>*rw T</code>),
+          phạm vi <code>unsafe</code> có ranh giới nghiêm ngặt, và tương thích nhị phân trực tiếp với C ABI.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 3. Quản lý bộ nhớ (Editorial Split 1) ── */}
+  <section class="luna-section">
+    <div class="luna-editorial-grid">
+      <div class="luna-editorial-text">
+        <div class="luna-section-tag">Quản lý bộ nhớ</div>
+        <h3>Vòng đời tài nguyên xác định.<br />Không chi phí runtime ẩn.</h3>
+        <p>
+          Trong Luna, mỗi giá trị gắn với một binding sở hữu duy nhất. Khi chủ sở hữu ra khỏi scope,
+          tài nguyên được tự động giải phóng ngay lập tức. Giá trị có thể chuyển nhượng qua ngữ nghĩa move
+          hoặc cho mượn thông qua tham chiếu chia sẻ (<code>&amp;T</code>) và tham chiếu khả ghi (<code>&amp;rw T</code>).
+        </p>
+        <p>
+          Trình biên dịch thực thi nguyên tắc aliasing XOR mutability tại thời điểm biên dịch, ngăn chặn
+          lỗi xung đột đột biến trước khi mã máy được sinh ra.
+        </p>
+        <ul class="luna-key-points">
+          <li><strong>Không chi phí runtime:</strong> Xác minh hoàn toàn lúc biên dịch.</li>
+          <li><strong>Đột biến tường minh:</strong> Mặc định bất biến (<code>dec</code>), chỉ ghi đè khi khai báo <code>rw</code>.</li>
+          <li><strong>Hợp đồng Lifetime:</strong> Khai báo bất biến thời gian sống rõ ràng với <code>requires life(f) &gt;= life(self)</code>.</li>
+        </ul>
+      </div>
+
+      <div class="luna-editor-panel">
+        <div class="luna-editor-header">
+          <div class="luna-editor-dots"><span class="luna-dot"></span><span class="luna-dot"></span><span class="luna-dot"></span></div>
+          <div class="luna-editor-tab">ownership.ln</div>
+          <div class="luna-editor-status">Kiểm tra Borrowck</div>
+        </div>
+        <div class="luna-editor-body">
+```luna
+import <alloc>;
+
+fn process(buf: std::Vec<u8>) {
+    // Nhận quyền sở hữu của buf; giải phóng khi thoát hàm
+}
+
+fn main() -> i32 {
+    dec rw v = std::Vec<u8>::new();
+    v.push(42);
+
+    // Phạm vi mượn chia sẻ: cho phép nhiều độc giả
+    {
+        dec r1: &std::Vec<u8> = &v;
+        dec r2: &std::Vec<u8> = &v;
+        std::io::println("Length: {}", r1.len());
+    } // Các lượt mượn kết thúc tại đây trước khi move v
+
+    // Chuyển giao quyền sở hữu (move)
+    process(v);
+
+    // Lỗi tại compile-time:
+    // v đã bị di chuyển, không thể truy cập
+    // v.push(99);
+
+    return 0;
+}
+```
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 4. Kiến trúc Pipeline Compiler ── */}
+  <section class="luna-section">
+    <div class="luna-section-header">
+      <div class="luna-section-tag">Kiến trúc Compiler</div>
+      <h2 class="luna-section-title">Phân tách giai đoạn nghiêm ngặt.<br />Luồng thông tin một chiều.</h2>
+      <p class="luna-section-desc">
+        Trình biên dịch Luna tuân thủ các ranh giới kiến trúc bất biến. Mỗi giai đoạn chỉ chịu trách nhiệm
+        duy nhất một phần việc và giao tiếp hoàn toàn qua các tầng Biểu diễn Trung gian (IR) đã được chứng thực.
+      </p>
+    </div>
+
+    <div class="luna-pipeline-container">
+      <div class="luna-pipeline-flow">
+        <div class="luna-stage">
+          <div class="luna-stage-ir">Mã nguồn</div>
+          <div class="luna-stage-name">Frontend</div>
+          <div class="luna-stage-sub">Lexer &amp; Parser</div>
+        </div>
+        <div class="luna-stage">
+          <div class="luna-stage-ir">AST</div>
+          <div class="luna-stage-name">Middle End</div>
+          <div class="luna-stage-sub">Type &amp; Borrowck</div>
+        </div>
+        <div class="luna-stage">
+          <div class="luna-stage-ir">Semantic IR</div>
+          <div class="luna-stage-name">Optimizer</div>
+          <div class="luna-stage-sub">MVIR &amp; Mono</div>
+        </div>
+        <div class="luna-stage">
+          <div class="luna-stage-ir">LLVM IR</div>
+          <div class="luna-stage-name">Backend</div>
+          <div class="luna-stage-sub">LLVM &amp; Codegen</div>
+        </div>
+        <div class="luna-stage">
+          <div class="luna-stage-ir">Đích</div>
+          <div class="luna-stage-name">Nhị phân</div>
+          <div class="luna-stage-sub">Native Object / ELF</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 5. C ABI & Con trỏ thô (Editorial Split 2) ── */}
+  <section class="luna-section">
+    <div class="luna-editorial-grid">
+      <div class="luna-editor-panel">
+        <div class="luna-editor-header">
+          <div class="luna-editor-dots"><span class="luna-dot"></span><span class="luna-dot"></span><span class="luna-dot"></span></div>
+          <div class="luna-editor-tab">ffi_native.ln</div>
+          <div class="luna-editor-status">C ABI</div>
+        </div>
+        <div class="luna-editor-body">
+```luna
+// Tương tác Thư viện C Tiêu chuẩn
+extern fn malloc(size: usize) -> *rw u8;
+extern fn free(ptr: *rw u8);
+extern fn memcpy(dst: *rw u8, src: *u8, n: usize) -> *rw u8;
+
+export fn allocate_bytes(bytes: usize) -> *rw u8 {
+    // Khai báo và truyền con trỏ thô hoàn toàn an toàn
+    dec raw_ptr: *rw u8 = malloc(bytes);
+
+    // Thao tác giải mã vùng nhớ thô bắt buộc phải đặt trong khối unsafe
+    unsafe {
+        if raw_ptr != null {
+            *raw_ptr = 0;
+        }
+    }
+
+    return raw_ptr;
+}
+```
+        </div>
+      </div>
+
+      <div class="luna-editorial-text">
+        <div class="luna-section-tag">Khả năng tương thích cấp thấp</div>
+        <h3>Kiểm soát phần cứng trực tiếp.<br />Ranh giới an toàn tường minh.</h3>
+        <p>
+          Lập trình hệ thống đòi hỏi khả năng giao tiếp không cản trở với hệ điều hành,
+          thư viện C sẵn có và giao diện phần cứng chuyên biệt.
+        </p>
+        <p>
+          Luna cung cấp khai báo FFI chuẩn xác, con trỏ thô hạng nhất (<code>*T</code> và <code>*rw T</code>),
+          cùng ranh giới <code>unsafe</code> nghiêm ngặt nhằm cách ly và bảo vệ mã nguồn cấp cao.
+        </p>
+        <ul class="luna-key-points">
+          <li><strong>Không phụ phí C FFI:</strong> Gọi hàm C trực tiếp mà không cần wrapper runtime trung gian.</li>
+          <li><strong>Kiểm soát đột biến con trỏ:</strong> Phân biệt rành mạch giữa <code>*T</code> (chỉ đọc) và <code>*rw T</code> (khả đọc/ghi).</li>
+          <li><strong>Khoanh vùng lỗi:</strong> Bất kỳ thao tác dereference thô nào cũng bị khoanh vùng trong khối <code>unsafe</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 6. Trình diễn Ngữ pháp & Cú pháp ── */}
+  <section class="luna-section">
+    <div class="luna-section-header">
+      <div class="luna-section-tag">Tính năng Ngôn ngữ</div>
+      <h2 class="luna-section-title">Hiện đại. Nhất quán. Kỷ luật.</h2>
+      <p class="luna-section-desc">
+        Cú pháp của Luna loại bỏ sự rườm rà nhưng bảo toàn tính tường minh tuyệt đối.
+      </p>
+    </div>
+
+    <Tabs>
+      <TabItem label="Struct &amp; Trait">
+        <div class="luna-showcase-split">
+          <div class="luna-showcase-code">
+```luna
+import <core>;
+
+export struct Buffer<T> {
+    data: *rw T,
+    len: usize,
+    capacity: usize,
+};
+
+trait Resizable {
+    fn reserve(self: &rw Self, additional: usize);
+}
+
+impl<T> Resizable for Buffer<T> {
+    fn reserve(self: &rw Self, additional: usize) {
+        // Tái cấp phát bộ đệm an toàn
+    }
+}
+```
+          </div>
+          <div class="luna-showcase-info">
+            <h4>Hệ thống Kiểu mạnh &amp; Đa hình tĩnh</h4>
+            <p>Định nghĩa cấu trúc dữ liệu với generic monomorphize, hợp đồng lifetime và triển khai trait không tốn chi phí ảo hóa runtime.</p>
+            <ul class="luna-showcase-features">
+              <li>Monomorphization tĩnh hoàn toàn lúc biên dịch</li>
+              <li>Hỗ trợ trait bound và default methods</li>
+              <li>Tự động suy luận tham số generic</li>
+            </ul>
+            <a href="/vi/language-tour/structs-enums/" class="luna-showcase-link">Xem chi tiết Struct &amp; Trait →</a>
+          </div>
+        </div>
+      </TabItem>
+
+      <TabItem label="Pattern Matching">
+        <div class="luna-showcase-split">
+          <div class="luna-showcase-code">
+```luna
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+};
+
+fn handle_connection(res: Result<Socket, Error>) -> i32 {
+    match res {
+        Result::Ok(sock) -> {
+            sock.send("HELLO\n");
+            return 0;
+        },
+        Result::Err(err) -> {
+            std::io::println("Lỗi kết nối: {}", err.code);
+            return 1;
+        },
+    }
+}
+```
+          </div>
+          <div class="luna-showcase-info">
+            <h4>Khớp mẫu vét cạn (Exhaustive Pattern Matching)</h4>
+            <p>Trình biên dịch bảo đảm kiểm tra mọi trường hợp có thể xảy ra của Enum, loại bỏ hoàn toàn các nhánh điều kiện bị bỏ sót.</p>
+            <ul class="luna-showcase-features">
+              <li>Trích xuất dữ liệu gắn liền với variant</li>
+              <li>Bảo đảm vét cạn tại thời điểm biên dịch</li>
+              <li>Cú pháp mũi tên gọn gàng, rõ ràng</li>
+            </ul>
+            <a href="/vi/language-tour/variables/" class="luna-showcase-link">Xem chi tiết Pattern Matching →</a>
+          </div>
+        </div>
+      </TabItem>
+
+      <TabItem label="Provider &amp; Module">
+        <div class="luna-showcase-split">
+          <div class="luna-showcase-code">
+```luna
+// Provider: alloc.ms (source) hoặc alloc.mlib (artifact)
+// Cùng cung cấp vào không gian tên std::
+module std {
+    export struct Vec<T> {
+        ptr: *rw T,
+        len: usize,
+        cap: usize,
+    };
+}
+
+// Bên tiêu thụ:
+import <alloc>; // Chọn provider
+fn test() {
+    dec v = std::Vec<i32>::new(); // Truy xuất namespace
+}
+```
+          </div>
+          <div class="luna-showcase-info">
+            <h4>Kiến trúc Module hóa Độc lập</h4>
+            <p>Nguyên tắc phân tách rành mạch: <code>import</code> chọn provider phát hành, <code>module</code> định nghĩa không gian tên logic, và <code>::</code> truy cập biểu tượng.</p>
+            <ul class="luna-showcase-features">
+              <li>Không gian tên sạch, không ô nhiễm phạm vi toàn cục</li>
+              <li>Nhiều provider có thể cùng đóng góp vào một namespace</li>
+              <li>Tương thích hoàn hảo giữa mã nguồn và artifact biên dịch sẵn (.mlib)</li>
+            </ul>
+            <a href="/vi/language-tour/modules/" class="luna-showcase-link">Xem chi tiết Kiến trúc Module →</a>
+          </div>
+        </div>
+      </TabItem>
+    </Tabs>
+  </section>
+
+  {/* ── 7. Bắt đầu nhanh trong 3 bước ── */}
+  <section class="luna-section">
+    <div class="luna-section-header">
+      <div class="luna-section-tag">Khởi đầu Nhanh</div>
+      <h2 class="luna-section-title">Bắt đầu với Luna trong 3 bước</h2>
+      <p class="luna-section-desc">
+        Từ kho lưu trữ mã nguồn đến chương trình đầu tiên chạy bằng mã máy bản địa chỉ trong vài phút.
+      </p>
+    </div>
+
+    <div class="luna-quickstart-grid">
+      <div class="luna-step">
+        <div class="luna-step-num">1</div>
+        <h4>Sao chép &amp; Biên dịch Compiler</h4>
+        <p>Tải mã nguồn Luna từ GitHub và biên dịch bộ công cụ compiler bản phát hành chính thức qua Cargo.</p>
+        <pre class="luna-step-code"><code>git clone https://github.com/17thedevv/luna.git
+cd luna/luna-rs &amp;&amp; cargo build --release</code></pre>
+      </div>
+
+      <div class="luna-step">
+        <div class="luna-step-num">2</div>
+        <h4>Viết mã nguồn Luna</h4>
+        <p>Tạo tập tin <code>hello.ln</code> với hàm <code>main() -&gt; i32</code> chuẩn của Luna.</p>
+        <pre class="luna-step-code"><code>import &lt;core&gt;;
+fn main() -&gt; i32 &#123;
+    std::io::println("Xin chào, Luna!");
+    return 0;
+&#125;</code></pre>
+      </div>
+
+      <div class="luna-step">
+        <div class="luna-step-num">3</div>
+        <h4>Biên dịch &amp; Chạy trực tiếp</h4>
+        <p>Thực thi mã nguồn trực tiếp qua lệnh <code>run</code> hoặc xây dựng tệp nhị phân bản địa tối ưu.</p>
+        <pre class="luna-step-code"><code>./target/release/luna run hello.ln
+// Kết quả: Xin chào, Luna!</code></pre>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 8. Chân trang Thương hiệu ── */}
+  <footer class="luna-brand-footer">
+    <div class="luna-footer-lockup">
+      <img src="/brand/luna-lockup-dark.png" alt="Ngôn ngữ lập trình Luna" class="luna-footer-logo luna-dark-only" />
+      <img src="/brand/luna-lockup-light.png" alt="Ngôn ngữ lập trình Luna" class="luna-footer-logo luna-light-only" />
+    </div>
+    <p class="luna-footer-desc">
+      Một ngôn ngữ lập trình hệ thống hiện đại được thiết kế vì an toàn bộ nhớ, hiệu năng native và kiểm soát tường minh cấp thấp.
+    </p>
+    <div class="luna-footer-meta">
+      <span>Công cụ Mã nguồn mở cho Kỹ sư Hệ thống</span>
+      <span class="luna-meta-sep">•</span>
+      <a href="https://github.com/17thedevv/luna.git" target="_blank" rel="noopener">github.com/17thedevv/luna</a>
+    </div>
+  </footer>
+
+</div>

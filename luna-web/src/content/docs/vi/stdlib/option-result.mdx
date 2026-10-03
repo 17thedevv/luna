@@ -1,0 +1,96 @@
+---
+title: Option & Result
+description: Xử lý giá trị có thể vắng mặt và quản lý lỗi trong Luna.
+---
+
+## Option
+
+`Option<T>` đại diện cho một giá trị có thể tồn tại hoặc không tồn tại.
+
+```luna
+enum Option<T> {
+    None,
+    Some(T),
+}
+```
+
+### Khởi tạo và Sử dụng Option
+
+```luna
+import <core>;
+
+fn find_user(id: u32) -> Option<str> {
+    if id == 1 {
+        return Option::Some("Alice");
+    }
+    return Option::None;
+}
+
+fn main() -> i32 {
+    dec user = find_user(1);
+    match user {
+        Option::Some(name) -> {
+            std::io::println("Tìm thấy: {}", name);
+        },
+        Option::None -> {
+            std::io::println("Không tìm thấy người dùng");
+        }
+    }
+    return 0;
+}
+```
+
+### Các phương thức thông dụng
+
+```luna
+dec value: Option<i32> = Option::Some(42);
+
+dec is_some = value.is_some();  // true
+dec is_none = value.is_none();   // false
+dec n = value.unwrap();           // 42
+dec fallback = value.unwrap_or(0);      // 42
+```
+
+## Result
+
+`Result<T, E>` đại diện cho một thao tác có thể thành công hoặc thất bại.
+
+```luna
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+### Cách dùng cơ bản
+
+```luna
+import <core>;
+
+fn parse_number(s: str) -> Result<i32, str> {
+    return Result::Ok(42);
+}
+
+fn main() -> i32 {
+    match parse_number("42") {
+        Result::Ok(n) -> {
+            std::io::println("Phân tích thành công: {}", n);
+        },
+        Result::Err(e) -> {
+            std::io::println("Lỗi: {}", e);
+        }
+    }
+    return 0;
+}
+```
+
+### Các phương thức thông dụng
+
+```luna
+dec result: Result<i32, str> = Ok(42);
+
+dec is_ok = result.is_ok();      // true
+dec is_err = result.is_err();   // false
+dec n = result.unwrap();         // 42
+dec n = result.unwrap_or(0);    // 42
+```

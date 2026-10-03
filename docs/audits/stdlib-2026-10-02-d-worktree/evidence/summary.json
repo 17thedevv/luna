@@ -1,0 +1,1513 @@
+{
+  "providers": [
+    {
+      "source": "luna-rs/libs/external/alloc/arc.ln",
+      "lines": 202,
+      "sha256": "bcdc69add672ac5c30bdc5a69fa3b65e3b8c59051e0b835dd76fab7638781240"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/binaryheap.ln",
+      "lines": 221,
+      "sha256": "3e59dfe6f0682296bfcf4385cf801d4eb58923f64e431b8a8b1ff8b4e4ad3b69"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/box.ln",
+      "lines": 62,
+      "sha256": "92e05919e1524ee2b02c7de930c316a3ed6a5edca789a6296827701db2e2149b"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/btreemap.ln",
+      "lines": 719,
+      "sha256": "e45dddddc809f8d67043f2a4b889aa37e2bc1068c01baf915768e0043bbd540d"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/btreeset.ln",
+      "lines": 131,
+      "sha256": "6a5bec3b087aba603837fd3953dedd786e61226abe755f79a47e482c44f95c18"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/global.ln",
+      "lines": 7,
+      "sha256": "bee987b47d62710d808c2a2ca7c47e55540591a9cacce15447f60a18d68792d9"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/hashmap.ln",
+      "lines": 225,
+      "sha256": "b01cb4c700e68448ca117554186cd6ff6999e82b6d9de36f03482d0e4824fecc"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/hashset.ln",
+      "lines": 273,
+      "sha256": "dbae48437afc2b958ab4d828852cbeecd51403ef04e5ec9f9bb3bfeccfbe4795"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/iter_collect.ln",
+      "lines": 65,
+      "sha256": "146cf50ef8dd51d2c3d4ecf247f77f6c7ffcb0eb7d4b63b5eac1b04e78dbeea3"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/raw_table.ln",
+      "lines": 605,
+      "sha256": "0627352e3f647f1cdcff94f5a88b02371a369ea8cf02c6675389906b53c4ecba"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/rc.ln",
+      "lines": 206,
+      "sha256": "090898537e7c5821522b06fa6a7e4cf8e7d502ea9d01cb6615c5281cedd13238"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "lines": 1207,
+      "sha256": "be9f2373cfdec5cc16e9706ff683298231294e12171ff9075a4be82af054ba0c"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/thread.ln",
+      "lines": 226,
+      "sha256": "4d4fccd81303a08d0f3fbbb17e231cdbb80677bc85dd7ba58c9555ab779896df"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "lines": 784,
+      "sha256": "c06a1153d6828f78f21248c5ae9295b98c4215e3b4fb4d1314933fb7db47879d"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/vecdeque.ln",
+      "lines": 448,
+      "sha256": "ae1a7948317f58fe29a635b9b17ac93526ceebdf5d6d1ba1e3c32284780b85a1"
+    },
+    {
+      "source": "luna-rs/libs/external/core/algo.ln",
+      "lines": 255,
+      "sha256": "d61e3acfe7c33e4765c0d66998b5f1877247111da85b1fbe6fb3cfb58b5f8808"
+    },
+    {
+      "source": "luna-rs/libs/external/core/atomic.ln",
+      "lines": 353,
+      "sha256": "41b312d85a977aa503c262eaa7dc78b25666f68b2fd37232249bcce50a3483f0"
+    },
+    {
+      "source": "luna-rs/libs/external/core/cell.ln",
+      "lines": 144,
+      "sha256": "e01d085488309282fc52d36ace69fb246d486c29ff4c15d615de861bcec5dbed"
+    },
+    {
+      "source": "luna-rs/libs/external/core/clone.ln",
+      "lines": 20,
+      "sha256": "14dedcf6a37d5bc96d940ce7daa0803163b4b8abd6448f4d589344038325106e"
+    },
+    {
+      "source": "luna-rs/libs/external/core/cmp.ln",
+      "lines": 201,
+      "sha256": "a9884e35ef55ac508cb80a4c832213a6cd39b2e51c628b6a1bc9b8c06b7ad501"
+    },
+    {
+      "source": "luna-rs/libs/external/core/convert.ln",
+      "lines": 273,
+      "sha256": "5ac54ed5d6ce9ca3077ea726c7235e30a9b5e3c1e5eaad498a197680a464ba12"
+    },
+    {
+      "source": "luna-rs/libs/external/core/copy.ln",
+      "lines": 22,
+      "sha256": "f57b7ca80c749bc4c9908847d005765877d9f6b3637bd2eebc22bdc53210577b"
+    },
+    {
+      "source": "luna-rs/libs/external/core/default.ln",
+      "lines": 27,
+      "sha256": "566e23313470cce9343b6e32d9c318c6863d7692538826a49be40b0bb256c51e"
+    },
+    {
+      "source": "luna-rs/libs/external/core/float.ln",
+      "lines": 308,
+      "sha256": "08f6082db6103c354700ee08cbae5736b52ce70ca8a0e07aab26e2b107a4fbd1"
+    },
+    {
+      "source": "luna-rs/libs/external/core/fmt.ln",
+      "lines": 212,
+      "sha256": "218238dd97cb8233ba7a60c1409970b17c30b0db4b8cf57d16732a14e028c1de"
+    },
+    {
+      "source": "luna-rs/libs/external/core/hash.ln",
+      "lines": 40,
+      "sha256": "236f1f8962c2b01d4a4bb78a5e150d5fd98ad77700dd5523e9b86afd25b81aaf"
+    },
+    {
+      "source": "luna-rs/libs/external/core/iter_adapters.ln",
+      "lines": 799,
+      "sha256": "972317d0fe145329f6f2633cef224d33112f33b5c86af1728769b1e67aa49dd4"
+    },
+    {
+      "source": "luna-rs/libs/external/core/iter_consumers.ln",
+      "lines": 502,
+      "sha256": "0ecfb94db36d2815d472de5d6e5ad621a9afa443d1dc0a102fe12d42b59bd998"
+    },
+    {
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "lines": 104,
+      "sha256": "d696946656f2b9275feadb7be5a96c53f0666d2af5a37f05ba83ca4f7489a0ae"
+    },
+    {
+      "source": "luna-rs/libs/external/core/num.ln",
+      "lines": 830,
+      "sha256": "d5fdd373e4b7aa6dcf58eb233d940213281ca255d167e8bf652e6932549587c3"
+    },
+    {
+      "source": "luna-rs/libs/external/core/panic.ln",
+      "lines": 128,
+      "sha256": "06114095bfc3514a4cdeaae0510f642c4a5518539d6a56345f042ce421ca3de8"
+    },
+    {
+      "source": "luna-rs/libs/external/core/ptr.ln",
+      "lines": 101,
+      "sha256": "6a2450ee22125b214d9af640018359cf3a8a62f0c463fa121643c11cc725cebb"
+    },
+    {
+      "source": "luna-rs/libs/external/core/random.ln",
+      "lines": 193,
+      "sha256": "a8acc3c784957cabee2779818f162c2f587935b46342e632d743fbbba9030a16"
+    },
+    {
+      "source": "luna-rs/libs/external/core/result.ln",
+      "lines": 154,
+      "sha256": "acf07ba147e78303d9ea06aff3da09e35ddb01422c6f2aa71cdb02741e0c5eff"
+    },
+    {
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "lines": 764,
+      "sha256": "27a7845a2e6017cf49c36497c94a7f7085f509217f6a8de50c849fdb5d81d751"
+    },
+    {
+      "source": "luna-rs/libs/external/core/sync.ln",
+      "lines": 892,
+      "sha256": "bc8e64164ce38e0f0d55081170f99d70b1c4d4d3787bdab82c0439f1912a213c"
+    },
+    {
+      "source": "luna-rs/libs/external/core/time.ln",
+      "lines": 551,
+      "sha256": "941525c9e20109d36bade471500b13638c58e0756cf8809f08572cabcb5cafcf"
+    },
+    {
+      "source": "luna-rs/libs/external/core/try.ln",
+      "lines": 136,
+      "sha256": "9b425e4a4111f74f12643f2c28d2e143ea6fe2f550f3eca2a90c55de73ed6caa"
+    },
+    {
+      "source": "luna-rs/libs/external/crypto/crypto.ln",
+      "lines": 576,
+      "sha256": "d7033041c91c934e1b17e81a1b5484ed1c9640b3d45ea5a067a7fc5675479bde"
+    },
+    {
+      "source": "luna-rs/libs/external/encoding/encoding.ln",
+      "lines": 305,
+      "sha256": "608400fbef229d6059250b2bf6ed9649c519bac8300ae525ff6f2e96eb0dc566"
+    },
+    {
+      "source": "luna-rs/libs/external/file/file.ln",
+      "lines": 1026,
+      "sha256": "b999457aa83db4aa3a83bdd94fec517dfdc22818521fe863c6a09b5bca79a1ef"
+    },
+    {
+      "source": "luna-rs/libs/external/io/io.ln",
+      "lines": 624,
+      "sha256": "bbed22c0980471137ea3e21f3cf37db1e4386e658f5bfb45581a4e08a0fab478"
+    },
+    {
+      "source": "luna-rs/libs/external/json/json.ln",
+      "lines": 827,
+      "sha256": "b32d22940a58a1b4cca97e15dad4e993db53c6e3eca54b954599e0d1017a38de"
+    },
+    {
+      "source": "luna-rs/libs/external/lang/drop.ln",
+      "lines": 7,
+      "sha256": "d2442f6c9b478fc89bfadc9af41927ca34794007811880bb62f9e5fcbfd341ea"
+    },
+    {
+      "source": "luna-rs/libs/external/lang/into_iterator.ln",
+      "lines": 6,
+      "sha256": "a06573f7738f54f7713cf37a4a5e52dd68730922ae01f2b0ef77fe1cda8feba3"
+    },
+    {
+      "source": "luna-rs/libs/external/lang/iterator.ln",
+      "lines": 8,
+      "sha256": "9717d3a6c13a6f7098c2f14cb8cc6a59fbbb32e87576d8b58a4c00bc97fb70c9"
+    },
+    {
+      "source": "luna-rs/libs/external/lang/option.ln",
+      "lines": 115,
+      "sha256": "600559b763a0b63e54214df45e5518e64049f76dc467f9864ba7d48b3810372b"
+    },
+    {
+      "source": "luna-rs/libs/external/net/net.ln",
+      "lines": 748,
+      "sha256": "8d653e2753e8b2ec8aa449d389f2f6c49d8acd7749c3810bd6c96ede5551bd6b"
+    },
+    {
+      "source": "luna-rs/libs/external/path/path.ln",
+      "lines": 347,
+      "sha256": "21126202d4886309a439be30fcc2cf264786282b1758f6ae6428f20bc09266db"
+    }
+  ],
+  "provider_count": 49,
+  "source_lines": 16979,
+  "git_head": "c6c4bfc80982dfb46257471dfb235bbf6aab1cf4",
+  "artifacts": [
+    {
+      "path": "luna-rs/libs/external/alloc/arc.llib",
+      "sha256": "b3134b372a5d61bf91de5a6030f799403835fe2daeca300e20f9fdbd7cbe78e2"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/arc.obj",
+      "sha256": "7710ca64f7e25f5e4649146021948a68c582861ed0384190352aea1600f4eb3f"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/binaryheap.llib",
+      "sha256": "c94842ffd568f4f182df9a986d48e181be74c1055bcc609b42ff8dea833112bb"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/binaryheap.obj",
+      "sha256": "ab0e6ac692636e41f3042e53f0cc24532d44d1e94be749ef55f9c7e7ce56b395"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/box.llib",
+      "sha256": "95e7daec3415217cfce734c48695396c427eafcbd4d239629358fdd7bb9e42db"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/box.obj",
+      "sha256": "926e8f50dc388f990ac04d594459a467c6e8051b62adfc5219c9a3d73991eafe"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/btreemap.llib",
+      "sha256": "b78b8f519eebb6532a3df3d09f688ce5a7f73cae49f2c17c60d4ed2b9add283a"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/btreemap.obj",
+      "sha256": "05237211ea40134a10ab9e7e5342f254de9b5d70fe5bdd11d7d221432f57cfaf"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/btreeset.llib",
+      "sha256": "c7080cfbd9a9379f770842847e804492b6fd8c3febd5e8f2de1ddad35dd0e70c"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/btreeset.obj",
+      "sha256": "a8d0fd37e8e1f4f3f503e09224e9a41927671839a82439175fd0eea7fcd38422"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/global.llib",
+      "sha256": "f3a8fa58e9e26282d16f3fb23b73fad6250270af44ca6c0b0e2044b126d8991d"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/global.obj",
+      "sha256": "a305b83ca889cf4f7db7a1bc9c4ad259675146966d69f97e56d48516e896d3b5"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/hashmap.llib",
+      "sha256": "7d36b201ad9f9c61773804ce6c31a9cb4876d6cf9c84f13a5a02347f9a0f0e64"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/hashmap.obj",
+      "sha256": "d98b5dc989bc03d54984fbf4cb8b7a0d97b49ea9725d8ee8bcb58fbeb82a3bd5"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/hashset.llib",
+      "sha256": "a8eee027d8471139ce25d5c3e61d4d34811c9cde8d9676a6121dff140f9fe9ff"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/hashset.obj",
+      "sha256": "c3e38ab4974deb7065fb87ee69e57fa5c6ec3ff1e23a2ed28d5d0e2176665ac1"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/iter_collect.llib",
+      "sha256": "db1a417e9928b36826d3cedb1f91a6e082f64af70ec63091d10c7fa09978bfed"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/iter_collect.obj",
+      "sha256": "8dcf26c881617aa52fab61c89c91f41be6dfe186fc635cc707d4ad9bfdcaf409"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/raw_table.llib",
+      "sha256": "7dee0c0b4c282e152e380a1141bcef6e640a0c0f9564becb9a467ef10a30d115"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/raw_table.obj",
+      "sha256": "7bcbe288b75bd0d2d43b391da4f73d98db52a25c554bc638a408b1ea2cc369be"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/rc.llib",
+      "sha256": "85b04f6a7d93455f59be87685edf7142ee2d559f9c21711cc52629e6dd5ff631"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/rc.obj",
+      "sha256": "8559f011b0b46b4f6179a79e7fe1337f005c19922c7d676ded5e1ff291e876d2"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/string.llib",
+      "sha256": "e73c626fc261a8ad312c915b48385eed6b486a751384aedd98b2c2452967e043"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/string.obj",
+      "sha256": "d90ade9dee389d37b610e656893e8d180775325470bf51292985e9a92572f4aa"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/thread.llib",
+      "sha256": "6b0fa11a6b2b9e6709fbb44bcb0ad587822d688686ab44c0447c26eb73d63737"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/thread.obj",
+      "sha256": "a8bb7d643a161a92ebc4278947431994b1f2cc7e976d583c96595ccea31f0515"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/vec.llib",
+      "sha256": "3dedd13abcf3c22592b9abb62f5f2332e4df8ca276dc4f030c5e249be6b78247"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/vec.obj",
+      "sha256": "64eb494789e7117079eca540e81e0fd6f67c2f5910e130b5595bb415cc2e18bd"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/vecdeque.llib",
+      "sha256": "7cf58e66c5187b5c0a99036a12b8e7ec734cbd18227acdd2c0b118f9142508ad"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/vecdeque.obj",
+      "sha256": "3039edd9db79a253430b170254ce0710df5bd14f9239296a595a1c1360da3ee0"
+    },
+    {
+      "path": "luna-rs/libs/external/core/algo.llib",
+      "sha256": "64b77b57ef4aca6939966a47ce8303d7f40e2e7b642e467ca1c895171b7a2878"
+    },
+    {
+      "path": "luna-rs/libs/external/core/algo.obj",
+      "sha256": "b31ff9f793310eb6795055a8ab729dd1f5b39cc8a8fddb11249987560dc11202"
+    },
+    {
+      "path": "luna-rs/libs/external/core/atomic.llib",
+      "sha256": "7f42a3e9c149bb81faa35bc753d636d0c4ea07a9e81e5cf387e03c5f3c385bc7"
+    },
+    {
+      "path": "luna-rs/libs/external/core/atomic.obj",
+      "sha256": "408d2535a265ba0d24a6ff61bad946249032e5eaebc985e9e8f773efec06713b"
+    },
+    {
+      "path": "luna-rs/libs/external/core/cell.llib",
+      "sha256": "3708ad54e1f8dd0fdc5c1722b6be4e7924232ac89eb1aaa65b44068a0e801e48"
+    },
+    {
+      "path": "luna-rs/libs/external/core/cell.obj",
+      "sha256": "2c527e48ed41bfa220f86d495845061afb1008594fb74cd142d7492733ffceb5"
+    },
+    {
+      "path": "luna-rs/libs/external/core/clone.llib",
+      "sha256": "44b08d3179f0c2b10a781bca2be09bae72b0f76a410f3670910efaf3ac466f1a"
+    },
+    {
+      "path": "luna-rs/libs/external/core/clone.obj",
+      "sha256": "14eb9744ac7dd63b49ee02ed07526cc04026eaeac607adf39c493f217c2c0c17"
+    },
+    {
+      "path": "luna-rs/libs/external/core/cmp.llib",
+      "sha256": "b703df76a36bd50c6ea173a8f91bd936bf85624bce7d66dcb9fba7be63971979"
+    },
+    {
+      "path": "luna-rs/libs/external/core/cmp.obj",
+      "sha256": "1184fc1c6283d18149d301a542bc4a3f3cc9022c68b31f44b47935dbd9caeba8"
+    },
+    {
+      "path": "luna-rs/libs/external/core/convert.llib",
+      "sha256": "0ae71fdb19424ac473ad080bb671407bd0de0ac079be1f51142516c08fdf3956"
+    },
+    {
+      "path": "luna-rs/libs/external/core/convert.obj",
+      "sha256": "d402304c667b971a9023e283d7ebc4b6dbcc57075be9192ad9784ec7111ac464"
+    },
+    {
+      "path": "luna-rs/libs/external/core/copy.llib",
+      "sha256": "7f0aeebe98d5e6cf5a972f0d6b839338292fe69ebaac0847ad0a1c2262ffc233"
+    },
+    {
+      "path": "luna-rs/libs/external/core/copy.obj",
+      "sha256": "84a40161d15b775ec4948ac18c4ef4200335305e446258534800b9a25b95d33f"
+    },
+    {
+      "path": "luna-rs/libs/external/core/default.llib",
+      "sha256": "4d370c6d9d59ab2ae3b55433d79f7f14d9a77b316e3510dd3586077cc687cd33"
+    },
+    {
+      "path": "luna-rs/libs/external/core/default.obj",
+      "sha256": "59ca2a855f6cda1e98b7f1d16214ca02acd3a9fa5d91c971c75bb219dd02ba71"
+    },
+    {
+      "path": "luna-rs/libs/external/core/float.llib",
+      "sha256": "6e74d5b07b412e19e9d90f20ed7aa72ad001a200061f7fd093de52cc75f07dfe"
+    },
+    {
+      "path": "luna-rs/libs/external/core/float.obj",
+      "sha256": "46cab36694b28e455857b221addab5865c1600e5524e13da6012be738658ac27"
+    },
+    {
+      "path": "luna-rs/libs/external/core/fmt.llib",
+      "sha256": "2c20d7eb7c4b6b067bfdb03a75d80a65456a8e9f3cbf81e889330fa77f5076d4"
+    },
+    {
+      "path": "luna-rs/libs/external/core/fmt.obj",
+      "sha256": "2880427bc9f10b3adf3cde9ed202911f74001ae5d033c805290465ce86b37af4"
+    },
+    {
+      "path": "luna-rs/libs/external/core/hash.llib",
+      "sha256": "550163d35629f59feae5242bc94f6d2118787364afd657db9c4221dd797fded6"
+    },
+    {
+      "path": "luna-rs/libs/external/core/hash.obj",
+      "sha256": "b55c05523d8855defeb72e3efce42fdd2ef4e99650375f035e54694721e4f01c"
+    },
+    {
+      "path": "luna-rs/libs/external/core/iter_adapters.llib",
+      "sha256": "8c13ade3832bcc7baf3c21135e2d6081f72ce5c0d4c1d9ff5716be568b50cecb"
+    },
+    {
+      "path": "luna-rs/libs/external/core/iter_adapters.obj",
+      "sha256": "22764ace18bc2952a2de2ea67521e5095eaa84d804d91e74dacf728cd5ba5388"
+    },
+    {
+      "path": "luna-rs/libs/external/core/iter_consumers.llib",
+      "sha256": "db51251fc34ad5cd9d09d7fbdc78de457c4b28ac6ff7f2de4b3e3b0f081103ab"
+    },
+    {
+      "path": "luna-rs/libs/external/core/iter_consumers.obj",
+      "sha256": "63844c72553760887a3d2955501b3eb865f9821d9be013a02f23e838f4ae51d6"
+    },
+    {
+      "path": "luna-rs/libs/external/core/mem.llib",
+      "sha256": "a963e1a3c33a6e4a714a136e2f9d9326a04cd5e720f46d3480b0e3a2c3e577c0"
+    },
+    {
+      "path": "luna-rs/libs/external/core/mem.obj",
+      "sha256": "6f02fad5ee6018fe64f54b3128b24b19474b7d242efda05c7eb49f13cfbfb516"
+    },
+    {
+      "path": "luna-rs/libs/external/core/num.llib",
+      "sha256": "74e99c7c549faf752e3201100f42714a4590d49ceb0a22950fbc05028911cfc6"
+    },
+    {
+      "path": "luna-rs/libs/external/core/num.obj",
+      "sha256": "11e372fba3f53653fd63a2d72e14c37c196db35b9d3bdd9558579989b5978376"
+    },
+    {
+      "path": "luna-rs/libs/external/core/panic.llib",
+      "sha256": "6316e4e4867f316bdf5448aab7d72ff1723cf73db8bf01569120c1a064c71d29"
+    },
+    {
+      "path": "luna-rs/libs/external/core/panic.obj",
+      "sha256": "2aa3267f6a53f04f14d88d8112926fec88ef9a2c1ac8ef45671bf1572698294f"
+    },
+    {
+      "path": "luna-rs/libs/external/core/ptr.llib",
+      "sha256": "3cbef9c08339eb946edb45af00d91b373587868951de87734bac1d3b6b7e1164"
+    },
+    {
+      "path": "luna-rs/libs/external/core/ptr.obj",
+      "sha256": "fe4babcd5078a986e9b1acc1c6f9847d0383d682a218137da777dc5dabfb90d1"
+    },
+    {
+      "path": "luna-rs/libs/external/core/random.llib",
+      "sha256": "d0afa688de917f1bd955adfc3c202f83ad662395d36a553f39ad8ed8dfcb4f48"
+    },
+    {
+      "path": "luna-rs/libs/external/core/random.obj",
+      "sha256": "e1dbb13f5b126321f85ef1c0db28483d57233b289c27985bdb559ed502e1feec"
+    },
+    {
+      "path": "luna-rs/libs/external/core/result.llib",
+      "sha256": "7d06ceb8656321161164ffd652b9eb1a90e01905f6af145eb112b5e1e968cdda"
+    },
+    {
+      "path": "luna-rs/libs/external/core/result.obj",
+      "sha256": "9b35246c5c0a78407d16640a2712673495e36e0f65ad4f41dd974993532b258b"
+    },
+    {
+      "path": "luna-rs/libs/external/core/slice.llib",
+      "sha256": "0d153611ba0a38edc40160c784569bf2a6e9b965335edea41b37abb17f8885b5"
+    },
+    {
+      "path": "luna-rs/libs/external/core/slice.obj",
+      "sha256": "1d31a068d99a1fc1d19b988cb9679af5292451c892311e18b906f80a16cf26f3"
+    },
+    {
+      "path": "luna-rs/libs/external/core/sync.llib",
+      "sha256": "8d3586d6a2fcdd944c0ec41923e12c63236cb56bac968ecd46b9904b067651bf"
+    },
+    {
+      "path": "luna-rs/libs/external/core/sync.obj",
+      "sha256": "d5ef50e095dcbfdd8350c44235d4a54adbc8c3fdb72465e3778b76fa2b8f31b1"
+    },
+    {
+      "path": "luna-rs/libs/external/core/time.llib",
+      "sha256": "e5143e64180e31f5936b305fb3ea517183b00a76eb149baed513984e2eec90cf"
+    },
+    {
+      "path": "luna-rs/libs/external/core/time.obj",
+      "sha256": "0116325639fccacc6cb4b82297496407af42b13cd5d51d2261c410da8b4c4da3"
+    },
+    {
+      "path": "luna-rs/libs/external/core/try.llib",
+      "sha256": "66e5b361cd2b974aedc8a7f740bd71949f8ec0ec9a74169808d2cb608a8a6dd3"
+    },
+    {
+      "path": "luna-rs/libs/external/core/try.obj",
+      "sha256": "54c49887fa3659f43e9bfd0fd1ca98a210e8d7f41c3bce137f1bd3a0285a68b2"
+    },
+    {
+      "path": "luna-rs/libs/external/crypto/crypto.llib",
+      "sha256": "fee282951cb0723c6bfbf89c857fe777c4265c6a879a4eddc7907db86a6d7be6"
+    },
+    {
+      "path": "luna-rs/libs/external/crypto/crypto.obj",
+      "sha256": "1636277f9c94c6b09122bc6f11e3d2591a47957c1cebde504c01c1f8324046b2"
+    },
+    {
+      "path": "luna-rs/libs/external/encoding/encoding.llib",
+      "sha256": "f034b9224037241487045aa09b2261f3b2d9fe9e65ca3f6fd52f39c1279b72a8"
+    },
+    {
+      "path": "luna-rs/libs/external/encoding/encoding.obj",
+      "sha256": "f9181ac2994ee8ee2a23a40b2f16f8550b68659553ba748245c892b07c1d30ec"
+    },
+    {
+      "path": "luna-rs/libs/external/file/file.llib",
+      "sha256": "f56d907453616b730f1596194ec181fd72c9ef66e84df7f82d7f8a85f60872cf"
+    },
+    {
+      "path": "luna-rs/libs/external/file/file.obj",
+      "sha256": "3ad2b433385a50aa95aef11e042b8e058ef69a2eae42db06e16549e691fb9863"
+    },
+    {
+      "path": "luna-rs/libs/external/io/io.llib",
+      "sha256": "3a5942bf5d9b016013d429dd484d2ce0b7329d27bcb62236db627b7682c74c20"
+    },
+    {
+      "path": "luna-rs/libs/external/io/io.obj",
+      "sha256": "776eafde78b4bc57f08f1cec16aa4ea19e4c2d76a6ab8711d191d052ae43e752"
+    },
+    {
+      "path": "luna-rs/libs/external/json/json.llib",
+      "sha256": "f70978d7e094924a476877193d2fd021b1ad78cff0e4af00ac1c1a307373382b"
+    },
+    {
+      "path": "luna-rs/libs/external/json/json.obj",
+      "sha256": "f2435c95a5ab2d7c5a811c47b4beac1e0690b045fda2aeac7c73e665c9655ad5"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/drop.llib",
+      "sha256": "2e779707826e16afd511201e77c5e67ea4ca089e0e00d24a1b526f72b7e24344"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/drop.obj",
+      "sha256": "42f32a165786ca315e14278fb47fdce68d1abb05608d2fcba06697e35c18fb99"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/into_iterator.llib",
+      "sha256": "4aeab25a2501c4c516993328464f4e9ceec64d6c663eb5e176fb0a9b3230626f"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/into_iterator.obj",
+      "sha256": "d7d020e2a8c468f13ba85351c28527462539ee3029d7c34b7c089308d94e0026"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/iterator.llib",
+      "sha256": "bf497b96cd9c629711bb50686d6270214093b6f26fa99e92a7bcdabcddefa5e7"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/iterator.obj",
+      "sha256": "797ce00b26a0c805e7dd40f04e91d9d63d94b5d6cbc46dea8bb2d266eae8f5bf"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/option.llib",
+      "sha256": "dd1571d6ddee666553c728662b5d1fe5ab7eae36c0e3719203f011f062c8051a"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/option.obj",
+      "sha256": "e570a63d3e3580f8dfd662c7a4d3fc8215d009a751c48c1b0cfd1200be8eab6b"
+    },
+    {
+      "path": "luna-rs/libs/external/net/net.llib",
+      "sha256": "6c2b40496595d37373c06341694902857bec2095e7791179087201f0f8dd5bb0"
+    },
+    {
+      "path": "luna-rs/libs/external/net/net.obj",
+      "sha256": "74f4ff41a7a7d503215fed60936946173863dcb17719c3b3b569b368260047b5"
+    },
+    {
+      "path": "luna-rs/libs/external/path/path.llib",
+      "sha256": "5a398a76220db901d7ad06749bf4f581d57ad1d99741e5c3a74058621cabc683"
+    },
+    {
+      "path": "luna-rs/libs/external/path/path.obj",
+      "sha256": "bcf42dbdb5aa764894f2a241eba145d9c4264b1bc2af6ed5a959fe5ac50c54b3"
+    }
+  ],
+  "existing-suites": {
+    "count": 34,
+    "passed": 33,
+    "timeout": 1,
+    "failed": 0,
+    "individual_passed": 258
+  },
+  "cli-regressions": {
+    "count": 228,
+    "passed": 189,
+    "positive": 156,
+    "negative": 72,
+    "failed": [
+      {
+        "mode": "source",
+        "fixture": "collections\\btreemap_iterator_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: btreemap\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: btreeset\nDEBUG loading package: btreemap\nDEBUG loading package: vec\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221225477,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "collections\\test_phase_c5_iter_map.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_consumers\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashset\nDEBUG loading package: hashmap\nDEBUG loading package: default\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG loading package: slice\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/iter_adapters.ln:395:34\n   |\n395|                 dec f_ptr = self.f;\n   |                                  ^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "core\\arc_atomic_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: atomic\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: arc\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: atomic\nDEBUG loading package: result\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221226356,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "core\\concurrency_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: atomic\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: sync\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: time\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: copy\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: thread\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: result\nDEBUG loading package: time\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: time\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: E1002: conflicting imported symbol `__luna_atomic_store_u32`: symbol already defined or imported from another provider\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\concurrency_acceptance.ln:2:9\n   |\n2  | import <sync>;\n   |         ^^^^\n\nerror: E1002: conflicting imported symbol `__luna_atomic_cas_u32`: symbol already defined or imported from another provider\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\concurrency_acceptance.ln:2:9\n   |\n2  | import <sync>;\n   |         ^^^^\n\nerror: E1002: conflicting imported symbol `__luna_atomic_load_u32`: symbol already defined or imported from another provider\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\concurrency_acceptance.ln:2:9\n   |\n2  | import <sync>;\n   |         ^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "core\\global_provider_load.ln",
+        "negative": false,
+        "timeout": "Command '['D:\\\\fdlang\\\\luna-rs\\\\target\\\\debug\\\\luna.exe', 'build', 'D:\\\\fdlang\\\\luna-rs\\\\tests\\\\luna\\\\stdlib\\\\core\\\\global_provider_load.ln', '-q', '-o', 'D:\\\\tmp\\\\luna-audit-2026-10-02\\\\luna_cli_regression_k9x8sici\\\\source\\\\case_27\\\\main.exe']' timed out after 60 seconds",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "core\\rc_ownership_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: rc\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cell\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221226356,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "core\\test_math_scratch.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "error: Expected ';' after struct declaration\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\test_math_scratch.ln:5:1\n   |\n5  | impl MathWrapper {\n   | ^^^^\n\nerror: Expected expression.\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\test_math_scratch.ln:9:1\n   |\n9  | }\n   | ^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "core\\time_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: time\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: copy\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v2' (root: Value(ValueId(2))) because it is borrowed as &rw (root: Value(ValueId(2)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/time.ln:411:9\n   |\n411|         __luna_time_system_epoch(&rw s as *rw u64, &rw ns as *rw u32);\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v6' (root: Value(ValueId(6))) because it is borrowed as &rw (root: Value(ValueId(6)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/time.ln:411:9\n   |\n411|         __luna_time_system_epoch(&rw s as *rw u64, &rw ns as *rw u32);\n   |         ^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v2' (root: Value(ValueId(2))) because it is borrowed as &rw (root: Value(ValueId(2)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/time.ln:414:15\n   |\n414|         secs: s,\n   |               ^\n\nerror[E3003]: Cannot access '%v14' (root: Value(ValueId(2))) because it is borrowed as &rw (root: Value(ValueId(2)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/time.ln:413:12\n   |\n413|     return SystemTime {\n   |            ^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v6' (root: Value(ValueId(6))) because it is borrowed as &rw (root: Value(ValueId(6)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/time.ln:415:16\n   |\n415|         nanos: ns,\n   |                ^^\n\nerror[E3003]: Cannot access '%v17' (root: Value(ValueId(6))) because it is borrowed as &rw (root: Value(ValueId(6)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/time.ln:413:12\n   |\n413|     return SystemTime {\n   |            ^^^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "core\\utility_surface.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_consumers\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/iter_adapters.ln:24:34\n   |\n24 |                 dec f_ptr = self.f;\n   |                                  ^\n\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/iter_adapters.ln:95:22\n   |\n95 |                 self.remaining = self.remaining - (1 as u64);\n   |                      ^^^^^^^^^\n\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\core/iter_adapters.ln:95:39\n   |\n95 |                 self.remaining = self.remaining - (1 as u64);\n   |                                       ^^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "crypto\\crypto_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: crypto\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: encoding\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: result\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: encoding\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: slice\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: Backend Error: LLVM Verification failed: Call parameter type does not match function signature!\n  %v5 = alloca [32 x i8], align 1\n { ptr, i64 }  %v8 = call { { ptr, i64, i64 } } @_MFN3std10hex_encodeE(ptr %v5)\nCall parameter type does not match function signature!\n  %v574 = alloca [64 x i8], align 1\n { ptr, i64 }  %v876 = call {} @_MMN3std6Sha256E6update(ptr %v872, ptr %v574)\nCall parameter type does not match function signature!\n  %v6 = alloca [32 x i8], align 1\n { ptr, i64 }  %v10 = call i1 @_MFN3std16constant_time_eqE(ptr %v6, { ptr, i64 } %v9)\nCall parameter type does not match function signature!\n  %v11 = getelementptr inbounds { { i32, i32, i32, i32, i32, i32, i32, i32, { ptr, i64, i64 }, i64 }, [64 x i8] }, ptr %v10, i32 0, i32 1\n { ptr, i64 }  %v14 = call {} @_MMN3std6Sha256E6update(ptr %v8, ptr %v11)\nCall parameter type does not match function signature!\n  %v5 = alloca [32 x i8], align 1\n { ptr, i64 }  %v17 = call {} @_MMN3std6Sha256E6update(ptr %v8, ptr %v5)\nCall parameter type does not match function signature!\n  %v14 = getelementptr inbounds { [16 x i32] }, ptr %v13, i32 0, i32 0\n { ptr, i64 }  %v16 = call [64 x i8] @_MFN14chacha20_blockE(ptr %v14)\nCall parameter type does not match function signature!\n  %v3 = alloca [32 x i8], align 1\n { ptr, i64 }  %v6 = call { { ptr, i64, i64 } } @_MFN3std10hex_encodeE(ptr %v3)\n\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "fs\\file_fs_stream_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: file\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __alloc_global\nDEBUG loading package: fmt\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:584:23\n   |\n584|             dec res = __luna_fs_metadata(\n   |                       ^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v16' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:584:23\n   |\n584|             dec res = __luna_fs_metadata(\n   |                       ^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:594:22\n   |\n594|                 len: out_size,\n   |                      ^^^^^^^^\n\nerror[E3003]: Cannot access '%v41' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:593:36\n   |\n593|             return std::Result::Ok(Metadata {\n   |                                    ^^^^^^^^\n\nerror[E3003]: Cannot access '%v16' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:595:25\n   |\n595|                 is_dir: out_is_dir != (0 as i32),\n   |                         ^^^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "fs\\path_file_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: path\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: file\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __alloc_global\nDEBUG loading package: fmt\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "fs\\process_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: file\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __alloc_global\nDEBUG loading package: fmt\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v13' (root: Value(ValueId(13))) because it is borrowed as &rw (root: Value(ValueId(13)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:860:27\n   |\n860|                 dec res = __luna_process_wait(self.handle, &rw exit_code as *rw i32);\n   |                           ^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v13' (root: Value(ValueId(13))) because it is borrowed as &rw (root: Value(ValueId(13)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:864:63\n   |\n864|                 return std::Result::Ok(ExitStatus { code_val: exit_code });\n   |                                                               ^^^^^^^^^\n\nerror[E3003]: Cannot access '%v32' (root: Value(ValueId(13))) because it is borrowed as &rw (root: Value(ValueId(13)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:864:40\n   |\n864|                 return std::Result::Ok(ExitStatus { code_val: exit_code });\n   |                                        ^^^^^^^^^^\n\nerror[E3003]: Cannot write to '%v3' because it is borrowed as &\n\nerror[E3003]: Cannot access '%v17' (root: Value(ValueId(17))) because it is borrowed as &rw (root: Value(ValueId(17)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:984:27\n   |\n984|                 dec res = __luna_process_output(\n   |                           ^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v22' (root: Value(ValueId(22))) because it is borrowed as &rw (root: Value(ValueId(22)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:984:27\n   |\n984|                 dec res = __luna_process_output(\n   |                           ^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v26' (root: Value(ValueId(26))) because it is borrowed as &rw (root: Value(ValueId(26)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:984:27\n   |\n984|                 dec res = __luna_process_output(\n   |                           ^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v30' (root: Value(ValueId(30))) because it is borrowed as &rw (root: Value(ValueId(30)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:984:27\n   |\n984|                 dec res = __luna_process_output(\n   |                           ^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v35' (root: Value(ValueId(35))) because it is borrowed as &rw (root: Value(ValueId(35)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:984:27\n   |\n984|                 dec res = __luna_process_output(\n   |                           ^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v39' (root: Value(ValueId(39))) because it is borrowed as &rw (root: Value(ValueId(39)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:984:27\n   |\n984|                 dec res = __luna_process_output(\n   |                           ^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v43' (root: Value(ValueId(43))) because it is borrowed as &rw (root: Value(ValueId(43)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:984:27\n   |\n984|                 dec res = __luna_process_output(\n   |                           ^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot write to '%v3' because it is borrowed as &\n\nerror[E3003]: Cannot access '%v26' (root: Value(ValueId(26))) because it is borrowed as &rw (root: Value(ValueId(26)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1001:27\n   |\n1001|                 while i < out_len {\n   |                           ^^^^^^^\n\nerror[E3003]: Cannot access '%v84' (root: Value(ValueId(26))) because it is borrowed as &rw (root: Value(ValueId(26)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1001:23\n   |\n1001|                 while i < out_len {\n   |                       ^\n\nerror[E3003]: Cannot access '%v22' (root: Value(ValueId(22))) because it is borrowed as &rw (root: Value(ValueId(22)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1002:66\n   |\n1002|                     dec b = std::ptr::read<u8>(std::ptr::add<u8>(out_ptr as *u8, i as u64));\n   |                                                                  ^^^^^^^\n\nerror[E3003]: Cannot access '%v22' (root: Value(ValueId(22))) because it is borrowed as &rw (root: Value(ValueId(22)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1002:48\n   |\n1002|                     dec b = std::ptr::read<u8>(std::ptr::add<u8>(out_ptr as *u8, i as u64));\n   |                                                ^^^\n\nerror[E3003]: Cannot access '%v22' (root: Value(ValueId(22))) because it is borrowed as &rw (root: Value(ValueId(22)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1006:36\n   |\n1006|                 __luna_buffer_free(out_ptr, out_cap);\n   |                                    ^^^^^^^\n\nerror[E3003]: Cannot access '%v30' (root: Value(ValueId(30))) because it is borrowed as &rw (root: Value(ValueId(30)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1006:45\n   |\n1006|                 __luna_buffer_free(out_ptr, out_cap);\n   |                                             ^^^^^^^\n\nerror[E3003]: Cannot access '%v22' (root: Value(ValueId(22))) because it is borrowed as &rw (root: Value(ValueId(22)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1006:17\n   |\n1006|                 __luna_buffer_free(out_ptr, out_cap);\n   |                 ^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v103' (root: Value(ValueId(30))) because it is borrowed as &rw (root: Value(ValueId(30)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1006:17\n   |\n1006|                 __luna_buffer_free(out_ptr, out_cap);\n   |                 ^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v39' (root: Value(ValueId(39))) because it is borrowed as &rw (root: Value(ValueId(39)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1010:27\n   |\n1010|                 while j < err_len {\n   |                           ^^^^^^^\n\nerror[E3003]: Cannot access '%v113' (root: Value(ValueId(39))) because it is borrowed as &rw (root: Value(ValueId(39)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1010:23\n   |\n1010|                 while j < err_len {\n   |                       ^\n\nerror[E3003]: Cannot access '%v35' (root: Value(ValueId(35))) because it is borrowed as &rw (root: Value(ValueId(35)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1011:66\n   |\n1011|                     dec b = std::ptr::read<u8>(std::ptr::add<u8>(err_ptr as *u8, j as u64));\n   |                                                                  ^^^^^^^\n\nerror[E3003]: Cannot access '%v35' (root: Value(ValueId(35))) because it is borrowed as &rw (root: Value(ValueId(35)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1011:48\n   |\n1011|                     dec b = std::ptr::read<u8>(std::ptr::add<u8>(err_ptr as *u8, j as u64));\n   |                                                ^^^\n\nerror[E3003]: Cannot access '%v35' (root: Value(ValueId(35))) because it is borrowed as &rw (root: Value(ValueId(35)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1015:36\n   |\n1015|                 __luna_buffer_free(err_ptr, err_cap);\n   |                                    ^^^^^^^\n\nerror[E3003]: Cannot access '%v43' (root: Value(ValueId(43))) because it is borrowed as &rw (root: Value(ValueId(43)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1015:45\n   |\n1015|                 __luna_buffer_free(err_ptr, err_cap);\n   |                                             ^^^^^^^\n\nerror[E3003]: Cannot access '%v35' (root: Value(ValueId(35))) because it is borrowed as &rw (root: Value(ValueId(35)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1015:17\n   |\n1015|                 __luna_buffer_free(err_ptr, err_cap);\n   |                 ^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v132' (root: Value(ValueId(43))) because it is borrowed as &rw (root: Value(ValueId(43)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1015:17\n   |\n1015|                 __luna_buffer_free(err_ptr, err_cap);\n   |                 ^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v17' (root: Value(ValueId(17))) because it is borrowed as &rw (root: Value(ValueId(17)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1018:52\n   |\n1018|                     status: ExitStatus { code_val: out_code },\n   |                                                    ^^^^^^^^\n\nerror[E3003]: Cannot access '%v137' (root: Value(ValueId(17))) because it is borrowed as &rw (root: Value(ValueId(17)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:1018:29\n   |\n1018|                     status: ExitStatus { code_val: out_code },\n   |                             ^^^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "fs\\read_dir_canonicalize_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: file\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __alloc_global\nDEBUG loading package: fmt\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v13' (root: Value(ValueId(13))) because it is borrowed as &rw (root: Value(ValueId(13)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:699:27\n   |\n699|                 dec res = __luna_fs_readdir(\n   |                           ^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v17' (root: Value(ValueId(17))) because it is borrowed as &rw (root: Value(ValueId(17)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:699:27\n   |\n699|                 dec res = __luna_fs_readdir(\n   |                           ^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v13' (root: Value(ValueId(13))) because it is borrowed as &rw (root: Value(ValueId(13)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:714:86\n   |\n714|                 dec name_slice = std::mem::slice_from_raw_parts<u8>(name_buf as *u8, out_len as u64);\n   |                                                                                      ^^^^^^^\n\nerror[E3003]: Cannot access '%v68' (root: Value(ValueId(13))) because it is borrowed as &rw (root: Value(ValueId(13)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:714:34\n   |\n714|                 dec name_slice = std::mem::slice_from_raw_parts<u8>(name_buf as *u8, out_len as u64);\n   |                                  ^^^\n\nerror[E3003]: Cannot access '%v17' (root: Value(ValueId(17))) because it is borrowed as &rw (root: Value(ValueId(17)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:735:35\n   |\n735|                     is_directory: out_is_dir != (0 as i32),\n   |                                   ^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:766:23\n   |\n766|             dec res = __luna_fs_canonicalize(\n   |                       ^^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:777:76\n   |\n777|             dec slice = std::mem::slice_from_raw_parts<u8>(out_buf as *u8, out_len as u64);\n   |                                                                            ^^^^^^^\n\nerror[E3003]: Cannot access '%v51' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\file/file.ln:777:25\n   |\n777|             dec slice = std::mem::slice_from_raw_parts<u8>(out_buf as *u8, out_len as u64);\n   |                         ^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "io\\io_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 1,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "json\\json_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: json\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: result\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:11:31\n   |\n11 |     dec null_bytes = null_str.as_bytes();\n   |                               ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:19:40\n   |\n19 |     dec t_res = std::json::parse(t_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:27:40\n   |\n27 |     dec f_res = std::json::parse(f_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:34:40\n   |\n34 |     dec n_res = std::json::parse(n_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:41:44\n   |\n41 |     dec neg_res = std::json::parse(neg_str.as_bytes());\n   |                                            ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:48:40\n   |\n48 |     dec s_res = std::json::parse(s_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:60:40\n   |\n60 |     dec res = std::json::parse(arr_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:85:40\n   |\n85 |     dec res = std::json::parse(obj_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:120:40\n   |\n120|     dec res = std::json::parse(obj_str.as_bytes());\n   |                                        ^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "macros_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221225725,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "net\\dns_lookup_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: net\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: time\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: copy\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v27' (root: Value(ValueId(27))) because it is borrowed as &rw (root: Value(ValueId(27)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:735:23\n   |\n735|             dec res = __luna_net_resolve(\n   |                       ^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v31' (root: Value(ValueId(31))) because it is borrowed as &rw (root: Value(ValueId(31)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:735:23\n   |\n735|             dec res = __luna_net_resolve(\n   |                       ^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v31' (root: Value(ValueId(31))) because it is borrowed as &rw (root: Value(ValueId(31)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:742:37\n   |\n742|             if res != (0 as i32) || count == (0 as usize) {\n   |                                     ^^^^^\n\nerror[E3003]: Cannot access '%v56' (root: Value(ValueId(31))) because it is borrowed as &rw (root: Value(ValueId(31)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:742:37\n   |\n742|             if res != (0 as i32) || count == (0 as usize) {\n   |                                     ^^^^^\n\nerror[E3003]: Cannot access '%v27' (root: Value(ValueId(27))) because it is borrowed as &rw (root: Value(ValueId(27)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:745:50\n   |\n745|             return std::Result::Ok(ipv4_from_u32(ips[0]));\n   |                                                  ^^^\n\nerror[E3003]: Cannot access '%v69' (root: Value(ValueId(27))) because it is borrowed as &rw (root: Value(ValueId(27)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:745:36\n   |\n745|             return std::Result::Ok(ipv4_from_u32(ips[0]));\n   |                                    ^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v37' (root: Value(ValueId(37))) because it is borrowed as &rw (root: Value(ValueId(37)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:624:25\n   |\n624|                 dec n = __luna_udp_recv_from(self.raw_sock, ptr, len as u64, &rw out_ip as *rw u32, &rw out_port as *rw u16);\n   |                         ^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v41' (root: Value(ValueId(41))) because it is borrowed as &rw (root: Value(ValueId(41)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:624:25\n   |\n624|                 dec n = __luna_udp_recv_from(self.raw_sock, ptr, len as u64, &rw out_ip as *rw u32, &rw out_port as *rw u16);\n   |                         ^^^^^^^^^^^^^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "net\\net_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: net\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: time\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: copy\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: slice\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:477:30\n   |\n477|                 dec client = __luna_tcp_accept(self.raw_sock, &rw client_ip as *rw u32, &rw client_port as *rw u16);\n   |                              ^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v16' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:477:30\n   |\n477|                 dec client = __luna_tcp_accept(self.raw_sock, &rw client_ip as *rw u32, &rw client_port as *rw u16);\n   |                              ^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v69' (root: Value(ValueId(69))) because it is borrowed as &rw (root: Value(ValueId(69)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:645:25\n   |\n645|                 dec n = __luna_udp_recv_from(self.raw_sock, ptr, len as u64, &rw out_ip as *rw u32, &rw out_port as *rw u16);\n   |                         ^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v73' (root: Value(ValueId(73))) because it is borrowed as &rw (root: Value(ValueId(73)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:645:25\n   |\n645|                 dec n = __luna_udp_recv_from(self.raw_sock, ptr, len as u64, &rw out_ip as *rw u32, &rw out_port as *rw u16);\n   |                         ^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v69' (root: Value(ValueId(69))) because it is borrowed as &rw (root: Value(ValueId(69)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:652:43\n   |\n652|                         ip: ipv4_from_u32(out_ip),\n   |                                           ^^^^^^\n\nerror[E3003]: Cannot access '%v103' (root: Value(ValueId(69))) because it is borrowed as &rw (root: Value(ValueId(69)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:652:29\n   |\n652|                         ip: ipv4_from_u32(out_ip),\n   |                             ^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v73' (root: Value(ValueId(73))) because it is borrowed as &rw (root: Value(ValueId(73)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:653:31\n   |\n653|                         port: out_port,\n   |                               ^^^^^^^^\n\nerror[E3003]: Cannot access '%v107' (root: Value(ValueId(73))) because it is borrowed as &rw (root: Value(ValueId(73)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:651:29\n   |\n651|                     sender: SocketAddrV4 {\n   |                             ^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:326:27\n   |\n326|                 dec res = __luna_socket_peer_addr(self.raw_sock, &rw ip as *rw u32, &rw port as *rw u16);\n   |                           ^^^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v16' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:326:27\n   |\n326|                 dec res = __luna_socket_peer_addr(self.raw_sock, &rw ip as *rw u32, &rw port as *rw u16);\n   |                           ^^^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:332:35\n   |\n332|                 ip: ipv4_from_u32(ip),\n   |                                   ^^\n\nerror[E3003]: Cannot access '%v36' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:332:21\n   |\n332|                 ip: ipv4_from_u32(ip),\n   |                     ^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v16' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:333:23\n   |\n333|                 port: port,\n   |                       ^^^^\n\nerror[E3003]: Cannot access '%v40' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:331:36\n   |\n331|             return std::Result::Ok(SocketAddrV4 {\n   |                                    ^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:515:27\n   |\n515|                 dec res = __luna_socket_local_addr(self.raw_sock, &rw ip as *rw u32, &rw port as *rw u16);\n   |                           ^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v16' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:515:27\n   |\n515|                 dec res = __luna_socket_local_addr(self.raw_sock, &rw ip as *rw u32, &rw port as *rw u16);\n   |                           ^^^^^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:521:35\n   |\n521|                 ip: ipv4_from_u32(ip),\n   |                                   ^^\n\nerror[E3003]: Cannot access '%v36' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:521:21\n   |\n521|                 ip: ipv4_from_u32(ip),\n   |                     ^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v16' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:522:23\n   |\n522|                 port: port,\n   |                       ^^^^\n\nerror[E3003]: Cannot access '%v40' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:520:36\n   |\n520|             return std::Result::Ok(SocketAddrV4 {\n   |                                    ^^^^^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "net\\socket_timeout_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: net\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: time\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: copy\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: time\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v12' (root: Value(ValueId(12))) because it is borrowed as &rw (root: Value(ValueId(12)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:477:30\n   |\n477|                 dec client = __luna_tcp_accept(self.raw_sock, &rw client_ip as *rw u32, &rw client_port as *rw u16);\n   |                              ^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v16' (root: Value(ValueId(16))) because it is borrowed as &rw (root: Value(ValueId(16)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:477:30\n   |\n477|                 dec client = __luna_tcp_accept(self.raw_sock, &rw client_ip as *rw u32, &rw client_port as *rw u16);\n   |                              ^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v37' (root: Value(ValueId(37))) because it is borrowed as &rw (root: Value(ValueId(37)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:624:25\n   |\n624|                 dec n = __luna_udp_recv_from(self.raw_sock, ptr, len as u64, &rw out_ip as *rw u32, &rw out_port as *rw u16);\n   |                         ^^^^^^^^^^^^^^^^^^^^\n\nerror[E3003]: Cannot access '%v41' (root: Value(ValueId(41))) because it is borrowed as &rw (root: Value(ValueId(41)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\libs\\external\\net/net.ln:624:25\n   |\n624|                 dec n = __luna_udp_recv_from(self.raw_sock, ptr, len as u64, &rw out_ip as *rw u32, &rw out_port as *rw u16);\n   |                         ^^^^^^^^^^^^^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "phase3\\public_surface.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: box\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashset\nDEBUG loading package: hashmap\nDEBUG loading package: default\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_collect\nDEBUG loading package: vec\nDEBUG loading package: hashmap\nDEBUG loading package: hashset\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: Symbol 'root_map' not found\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:28:8\n   |\n28 |     if root_map.len() != (0 as u64) || std_map.len() != (0 as u64) {\n   |        ^^^^^^^^\n\nerror: Symbol 'std_map' not found\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:28:40\n   |\n28 |     if root_map.len() != (0 as u64) || std_map.len() != (0 as u64) {\n   |                                        ^^^^^^^\n\nerror: Symbol 'root_set' not found\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:31:8\n   |\n31 |     if root_set.len() != (0 as u64) || std_set.len() != (0 as u64) {\n   |        ^^^^^^^^\n\nerror: Symbol 'std_set' not found\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:31:40\n   |\n31 |     if root_set.len() != (0 as u64) || std_set.len() != (0 as u64) {\n   |                                        ^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "phase3\\reject_std_vec.ln",
+        "negative": true,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "string\\cstr_cow_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221226356,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "sync\\barrier_semaphore_scope_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: sync\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: time\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: copy\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: thread\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: result\nDEBUG loading package: time\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: Link Error: native linker exited with status exit code: 1: c:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/12.1.0/../../../../x86_64-w64-mingw32/bin/ld.exe: D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\source\\case_110\\main.obj:barrier_semaphore_:(.text$_MFN3std10spawn_withEGTN10WorkerDataEEE[_MFN3std10spawn_withEGTN10WorkerDataEEE]+0x5c): undefined reference to `__luna_thread_arg_worker'\ncollect2.exe: error: ld returned 1 exit status\n\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "collections\\btreemap_iterator_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: btreemap\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: btreeset\nDEBUG loading package: btreemap\nDEBUG loading package: vec\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221225477,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "artifact",
+        "fixture": "collections\\test_phase_c5_iter_map.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_consumers\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashset\nDEBUG loading package: hashmap\nDEBUG loading package: default\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG loading package: slice\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\artifact\\libs\\external\\core/iter_adapters.llib:395:34\n   |\n395|                 dec f_ptr = self.f;\n   |                                  ^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "core\\arc_atomic_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: atomic\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: arc\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: atomic\nDEBUG loading package: result\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221226356,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "artifact",
+        "fixture": "core\\concurrency_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: atomic\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: sync\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: time\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: copy\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: thread\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: result\nDEBUG loading package: time\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: time\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: E1002: conflicting imported symbol `__luna_atomic_cas_u32`: symbol already defined or imported from another provider\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\concurrency_acceptance.ln:2:9\n   |\n2  | import <sync>;\n   |         ^^^^\n\nerror: E1002: conflicting imported symbol `__luna_atomic_store_u32`: symbol already defined or imported from another provider\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\concurrency_acceptance.ln:2:9\n   |\n2  | import <sync>;\n   |         ^^^^\n\nerror: E1002: conflicting imported symbol `__luna_atomic_load_u32`: symbol already defined or imported from another provider\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\concurrency_acceptance.ln:2:9\n   |\n2  | import <sync>;\n   |         ^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "core\\global_provider_load.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_consumers\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: box\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashset\nDEBUG loading package: hashmap\nDEBUG loading package: default\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_collect\nDEBUG loading package: vec\nDEBUG loading package: hashmap\nDEBUG loading package: hashset\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\artifact\\libs\\external\\core/iter_adapters.llib:24:34\n   |\n24 |                 dec f_ptr = self.f;\n   |                                  ^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "core\\rc_ownership_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: rc\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cell\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221226356,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "artifact",
+        "fixture": "core\\test_math_scratch.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "error: Expected ';' after struct declaration\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\test_math_scratch.ln:5:1\n   |\n5  | impl MathWrapper {\n   | ^^^^\n\nerror: Expected expression.\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\core\\test_math_scratch.ln:9:1\n   |\n9  | }\n   | ^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "core\\utility_surface.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_consumers\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\artifact\\libs\\external\\core/iter_adapters.llib:24:34\n   |\n24 |                 dec f_ptr = self.f;\n   |                                  ^\n\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\artifact\\libs\\external\\core/iter_adapters.llib:95:22\n   |\n95 |                 self.remaining = self.remaining - (1 as u64);\n   |                      ^^^^^^^^^\n\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_cli_regression_k9x8sici\\artifact\\libs\\external\\core/iter_adapters.llib:95:39\n   |\n95 |                 self.remaining = self.remaining - (1 as u64);\n   |                                       ^^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "fs\\path_file_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: path\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: file\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __alloc_global\nDEBUG loading package: fmt\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "artifact",
+        "fixture": "io\\io_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 1,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "artifact",
+        "fixture": "json\\json_acceptance.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: json\nDEBUG loading package: vec\nDEBUG loading package: string\nDEBUG loading package: result\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:11:31\n   |\n11 |     dec null_bytes = null_str.as_bytes();\n   |                               ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:19:40\n   |\n19 |     dec t_res = std::json::parse(t_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:27:40\n   |\n27 |     dec f_res = std::json::parse(f_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:34:40\n   |\n34 |     dec n_res = std::json::parse(n_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:41:44\n   |\n41 |     dec neg_res = std::json::parse(neg_str.as_bytes());\n   |                                            ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:48:40\n   |\n48 |     dec s_res = std::json::parse(s_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:60:40\n   |\n60 |     dec res = std::json::parse(arr_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:85:40\n   |\n85 |     dec res = std::json::parse(obj_str.as_bytes());\n   |                                        ^^^^^^^^\n\nerror: Method `as_bytes` not found for type `Primitive(String)`\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\json\\json_acceptance.ln:120:40\n   |\n120|     dec res = std::json::parse(obj_str.as_bytes());\n   |                                        ^^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "macros_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221225725,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "artifact",
+        "fixture": "phase3\\public_surface.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: box\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashset\nDEBUG loading package: hashmap\nDEBUG loading package: default\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_collect\nDEBUG loading package: vec\nDEBUG loading package: hashmap\nDEBUG loading package: hashset\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: Symbol 'root_map' not found\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:28:8\n   |\n28 |     if root_map.len() != (0 as u64) || std_map.len() != (0 as u64) {\n   |        ^^^^^^^^\n\nerror: Symbol 'std_map' not found\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:28:40\n   |\n28 |     if root_map.len() != (0 as u64) || std_map.len() != (0 as u64) {\n   |                                        ^^^^^^^\n\nerror: Symbol 'root_set' not found\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:31:8\n   |\n31 |     if root_set.len() != (0 as u64) || std_set.len() != (0 as u64) {\n   |        ^^^^^^^^\n\nerror: Symbol 'std_set' not found\n  --> D:\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:31:40\n   |\n31 |     if root_set.len() != (0 as u64) || std_set.len() != (0 as u64) {\n   |                                        ^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "phase3\\reject_std_vec.ln",
+        "negative": true,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "string\\cstr_cow_acceptance.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+        "pass": false,
+        "run_exit": 3221226356,
+        "stdout": "",
+        "stderr": ""
+      }
+    ]
+  },
+  "probes": {
+    "count": 44,
+    "outcomes": [
+      {
+        "mode": "source",
+        "fixture": "baseline.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07004389999201521
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07251959998393431
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_invalid_char.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_main_args.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06167179998010397
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_move_after_call.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_unsigned_cast.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.061525900033302605
+      },
+      {
+        "mode": "source",
+        "fixture": "convert_unsigned_widen.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07662680000066757
+      },
+      {
+        "mode": "source",
+        "fixture": "filter_owned.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "find_owned.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "format_unsigned_high_bit.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "255\n",
+        "run_seconds": 0.06791310000699013
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_capacity_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 3,
+        "stdout": "",
+        "run_seconds": 2.379731399996672
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_collision_pattern.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.1775348999653943
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_growth_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06801590003306046
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_sequential_pattern.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06997279997449368
+      },
+      {
+        "mode": "source",
+        "fixture": "range_owned_step.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06956259999424219
+      },
+      {
+        "mode": "source",
+        "fixture": "slice_zst.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06809299997985363
+      },
+      {
+        "mode": "source",
+        "fixture": "slice_zst_mut.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06932990002678707
+      },
+      {
+        "mode": "source",
+        "fixture": "string_invalid_char.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "try_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.0689097999711521
+      },
+      {
+        "mode": "source",
+        "fixture": "vec_capacity_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.09088490001158789
+      },
+      {
+        "mode": "source",
+        "fixture": "vec_dedup_i32_generic.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07168589998036623
+      },
+      {
+        "mode": "source",
+        "fixture": "vec_reserve_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 3,
+        "stdout": "",
+        "run_seconds": 2.2158696000115015
+      },
+      {
+        "mode": "artifact",
+        "fixture": "baseline.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06548779999138787
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06788379995850846
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_invalid_char.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_main_args.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.0697964999708347
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_move_after_call.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_unsigned_cast.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06697159999748692
+      },
+      {
+        "mode": "artifact",
+        "fixture": "convert_unsigned_widen.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07885629998054355
+      },
+      {
+        "mode": "artifact",
+        "fixture": "filter_owned.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "find_owned.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "format_unsigned_high_bit.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "255\n",
+        "run_seconds": 0.06536830001277849
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_capacity_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 3,
+        "stdout": "",
+        "run_seconds": 2.2370691999676637
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_collision_pattern.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.17871589999413118
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_growth_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07161169999744743
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_sequential_pattern.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07019919995218515
+      },
+      {
+        "mode": "artifact",
+        "fixture": "range_owned_step.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.072124199999962
+      },
+      {
+        "mode": "artifact",
+        "fixture": "slice_zst.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.06916130002355203
+      },
+      {
+        "mode": "artifact",
+        "fixture": "slice_zst_mut.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07316010002978146
+      },
+      {
+        "mode": "artifact",
+        "fixture": "string_invalid_char.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "try_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07328519999282435
+      },
+      {
+        "mode": "artifact",
+        "fixture": "vec_capacity_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07414360000984743
+      },
+      {
+        "mode": "artifact",
+        "fixture": "vec_dedup_i32_generic.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.07294839998940006
+      },
+      {
+        "mode": "artifact",
+        "fixture": "vec_reserve_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 3,
+        "stdout": "",
+        "run_seconds": 2.1027718000113964
+      }
+    ]
+  },
+  "dispatch-repeat": {
+    "count": 16,
+    "outcomes": [
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 0,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 1,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 2,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 3,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 4,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 5,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 6,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 7,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 0,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 1,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 2,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 3,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 4,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 5,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 6,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 7,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      }
+    ]
+  },
+  "storage-retry": {
+    "count": 3,
+    "outcomes": [
+      {
+        "test": "test_ht5_resize_growth_and_relocation",
+        "timeout": true
+      },
+      {
+        "test": "test_ht6_drop_tracker_stress_soundness",
+        "timeout": true
+      },
+      {
+        "test": "test_ht7_source_vs_llib_parity",
+        "exit": 0
+      }
+    ]
+  }
+}

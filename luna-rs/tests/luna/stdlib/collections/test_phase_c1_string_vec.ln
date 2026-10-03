@@ -1,0 +1,159 @@
+import <string>;
+import <vec>;
+import <slice>;
+
+fn main() -> i32 {
+    // =========================================================================
+    // Vec & Slice Tests
+    // =========================================================================
+    dec rw v: std::Vec<i32> = std::vec_new<i32>();
+    v.push(40);
+    v.push(10);
+    v.push(30);
+    v.push(20);
+    v.push(50);
+
+    // contains
+    dec needle30 = 30;
+    dec needle99 = 99;
+    if v.contains(&needle30) == false { return 1; }
+    if v.contains(&needle99) == true { return 2; }
+
+    // sort
+    v.sort();
+    dec s = v.as_slice();
+    if s[0] != 10 || s[1] != 20 || s[2] != 30 || s[3] != 40 || s[4] != 50 { return 3; }
+
+    // binary_search
+    dec bs_res = v.binary_search(&needle30);
+    match bs_res {
+        std::Option::Some(idx) -> {
+            if idx != (2 as u64) { return 4; }
+        },
+        std::Option::None -> { return 5; },
+    }
+    dec bs_none = v.binary_search(&needle99);
+    match bs_none {
+        std::Option::Some(_) -> { return 6; },
+        std::Option::None -> {},
+    }
+
+    // reverse
+    v.reverse();
+    dec rev_s = v.as_slice();
+    if rev_s[0] != 50 || rev_s[1] != 40 || rev_s[2] != 30 || rev_s[3] != 20 || rev_s[4] != 10 { return 7; }
+
+    // first
+    match v.first() {
+        std::Option::Some(f) -> {
+            if *f != 50 { return 8; }
+        },
+        std::Option::None -> { return 9; },
+    }
+
+    // swap
+    v.swap(0 as u64, 4 as u64);
+    dec swap_s = v.as_slice();
+    if swap_s[0] != 10 || swap_s[4] != 50 { return 10; }
+
+    // split_off
+    dec rw right = v.split_off(3 as u64);
+    if v.len() != (3 as u64) { return 11; }
+    if right.len() != (2 as u64) { return 12; }
+
+    // append
+    v.append(&rw right);
+    if v.len() != (5 as u64) { return 13; }
+    if right.len() != (0 as u64) { return 14; }
+
+    // take
+    dec rw taken = v.take();
+    if v.len() != (0 as u64) { return 15; }
+    if taken.len() != (5 as u64) { return 16; }
+
+    // =========================================================================
+    // String Tests
+    // =========================================================================
+    dec greeting = std::string_from_str("Hello, World!");
+
+    // char_count
+    if greeting.char_count() != (13 as u64) { return 20; }
+
+    // chars iterator
+    dec rw it = greeting.chars();
+    dec opt_first = it.next();
+    match opt_first {
+        std::Option::Some(c) -> {
+            if c != 'H' { return 21; }
+        },
+        std::Option::None -> { return 22; },
+    }
+
+    // contains_str
+    if greeting.contains_str("World") == false { return 23; }
+    if greeting.contains_str("Luna") == true { return 24; }
+
+    // starts_with_str & ends_with_str
+    if greeting.starts_with_str("Hello") == false { return 25; }
+    if greeting.starts_with_str("World") == true { return 26; }
+    if greeting.ends_with_str("World!") == false { return 27; }
+    if greeting.ends_with_str("Hello") == true { return 28; }
+
+    // find_str
+    match greeting.find_str("World") {
+        std::Option::Some(pos) -> {
+            if pos != (7 as u64) { return 29; }
+        },
+        std::Option::None -> { return 30; },
+    }
+    match greeting.find_str("xyz") {
+        std::Option::Some(_) -> { return 31; },
+        std::Option::None -> {},
+    }
+
+    // substr
+    dec sub = greeting.substr(7 as u64, 12 as u64);
+    dec wanted_sub = std::string_from_str("World");
+    if sub.eq(&wanted_sub) == false { return 32; }
+
+    // to_uppercase & to_lowercase
+    dec upper = greeting.to_uppercase();
+    dec wanted_upper = std::string_from_str("HELLO, WORLD!");
+    if upper.eq(&wanted_upper) == false { return 33; }
+
+    dec lower = greeting.to_lowercase();
+    dec wanted_lower = std::string_from_str("hello, world!");
+    if lower.eq(&wanted_lower) == false { return 34; }
+
+    // trim
+    dec padded = std::string_from_str("  \t hello \n  ");
+    dec trimmed = padded.trim();
+    dec wanted_trimmed = std::string_from_str("hello");
+    if trimmed.eq(&wanted_trimmed) == false { return 35; }
+
+    // replace_str
+    dec replaced = greeting.replace_str("World", "Luna");
+    dec wanted_rep = std::string_from_str("Hello, Luna!");
+    if replaced.eq(&wanted_rep) == false { return 36; }
+
+    // push_string
+    dec rw buf = std::string_from_str("Foo");
+    dec bar = std::string_from_str("Bar");
+    buf.push_string(&bar);
+    dec wanted_buf = std::string_from_str("FooBar");
+    if buf.eq(&wanted_buf) == false { return 37; }
+
+    // split_char
+    dec csv = std::string_from_str("alpha,beta,gamma");
+    dec parts = csv.split_char(',');
+    if parts.len() != (3 as u64) { return 38; }
+    dec p_slice = parts.as_slice();
+    dec w_alpha = std::string_from_str("alpha");
+    dec w_beta = std::string_from_str("beta");
+    dec w_gamma = std::string_from_str("gamma");
+    if p_slice[0].eq(&w_alpha) == false { return 39; }
+    if p_slice[1].eq(&w_beta) == false { return 40; }
+    if p_slice[2].eq(&w_gamma) == false { return 41; }
+
+    return 0;
+}

@@ -112,6 +112,25 @@ module std {
                 map: self.map.into_iter(),
             };
         }
+
+        export fn is_subset(self: &Self, other: &Self) -> bool {
+            if self.len() > other.len() { return false; }
+            dec rw it = self.iter();
+            while true {
+                dec item = it.next();
+                match item {
+                    std::Option::Some(val) -> {
+                        if other.contains(val) == false { return false; }
+                    },
+                    std::Option::None -> { break; },
+                }
+            }
+            return true;
+        }
+
+        export fn is_superset(self: &Self, other: &Self) -> bool {
+            return other.is_subset(self);
+        }
     }
 
     impl<T: std::Clone + std::Hash + std::Eq> HashSet<T> {
@@ -173,6 +192,35 @@ module std {
             }
             return res;
         }
+
+        export fn symmetric_difference_owned(self: &Self, other: &Self) -> HashSet<T> {
+            dec rw res = hashset_new<T>();
+            dec rw it_a = self.iter();
+            while true {
+                dec item = it_a.next();
+                match item {
+                    std::Option::Some(val) -> {
+                        if other.contains(val) == false {
+                            res.insert((*val).clone());
+                        }
+                    },
+                    std::Option::None -> { break; },
+                }
+            }
+            dec rw it_b = other.iter();
+            while true {
+                dec item = it_b.next();
+                match item {
+                    std::Option::Some(val) -> {
+                        if self.contains(val) == false {
+                            res.insert((*val).clone());
+                        }
+                    },
+                    std::Option::None -> { break; },
+                }
+            }
+            return res;
+        }
     }
 
     export fn union_owned<T: std::Clone + std::Hash + std::Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
@@ -185,6 +233,34 @@ module std {
 
     export fn difference_owned<T: std::Clone + std::Hash + std::Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
         return a.difference_owned(b);
+    }
+
+    export fn symmetric_difference_owned<T: std::Clone + std::Hash + std::Eq>(a: &HashSet<T>, b: &HashSet<T>) -> HashSet<T> {
+        return a.symmetric_difference_owned(b);
+    }
+
+    impl<T: std::Clone + std::Hash + std::Eq> std::Clone for HashSet<T> {
+        fn clone(self: &Self) -> Self {
+            dec rw res = hashset_new<T>();
+            dec rw it = self.iter();
+            while true {
+                dec item = it.next();
+                match item {
+                    std::Option::Some(val) -> {
+                        res.insert((*val).clone());
+                    },
+                    std::Option::None -> { break; },
+                }
+            }
+            return res;
+        }
+    }
+
+    impl<T: std::Hash + std::Eq> std::Eq for HashSet<T> {
+        fn eq(self: &Self, other: &Self) -> bool {
+            if self.len() != other.len() { return false; }
+            return self.is_subset(other);
+        }
     }
 }
 

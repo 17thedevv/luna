@@ -50,10 +50,13 @@ LUNA_NORETURN void __luna_panic_code(
     uint32_t       col
 );
 
-// Specific condition traps
 LUNA_NORETURN void __luna_div_zero_fail(const char* file, uint32_t line);
 LUNA_NORETURN void __luna_assert_fail(const char* msg, const char* file, uint32_t line);
 LUNA_NORETURN void __luna_overflow_fail(const char* file, uint32_t line);
+
+// --- Tier 3: Diagnostic Backtrace ABI -----------------------------------------
+uint32_t __luna_backtrace_capture(void** frames, uint32_t max_frames);
+uint32_t __luna_backtrace_symbol(void* addr, char* buf, uint32_t max_len);
 
 #ifdef __cplusplus
 } // extern "C"

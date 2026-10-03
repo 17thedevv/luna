@@ -1,0 +1,5 @@
+import "char_operators";
+fn main() -> i32 {
+    dec result = user_math::shift('a', 'b');
+    return 0;
+}

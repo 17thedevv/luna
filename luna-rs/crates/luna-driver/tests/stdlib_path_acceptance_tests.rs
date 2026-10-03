@@ -136,10 +136,10 @@ fn path_provider_source_llib_loading_parity() {
 
     assert!(source_external.join("path").join("path.ln").exists());
     assert!(!source_external.join("path").join("path.llib").exists());
-    assert_eq!(count_files_with_extension(&source_external, "llib"), 31);
+    assert_eq!(count_files_with_extension(&source_external, "llib"), 35);
     assert_eq!(count_files_with_extension(&artifact_external, "ln"), 0);
-    assert_eq!(count_files_with_extension(&artifact_external, "llib"), 32);
-    assert_eq!(count_files_with_extension(&artifact_external, "obj"), 32);
+    assert_eq!(count_files_with_extension(&artifact_external, "llib"), 36);
+    assert_eq!(count_files_with_extension(&artifact_external, "obj"), 36);
 
     let source = include_str!("../../../tests/luna/stdlib/path/path_semantics_v1.ln");
     let source_output = run_fixture("source", &source_root, source, &dir.join("run_source"));

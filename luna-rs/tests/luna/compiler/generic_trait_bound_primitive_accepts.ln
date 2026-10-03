@@ -1,0 +1,10 @@
+trait Supported {}
+
+impl Supported for i32 {}
+
+fn require_supported<T: Supported>(value: &T) {}
+
+fn main() {
+    dec value: i32 = 65;
+    require_supported(&value);
+}

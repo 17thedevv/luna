@@ -1,0 +1,65 @@
+import <panic>;
+import <cmp>;
+import <vec>;
+import <clone>;
+
+fn main() -> i32 {
+    // 1. Test assert! and std::assert!
+    assert!(1 == 1);
+    assert!(2 > 1, "two is greater than one");
+    std::assert!(3 == 3);
+    std::assert!(4 > 2, "four is greater than two");
+
+    // 2. Test assert_eq! and std::assert_eq!
+    assert_eq!(10 + 20, 30);
+    std::assert_eq!(5 * 5, 25);
+
+    // 3. Test assert_ne! and std::assert_ne!
+    assert_ne!(10, 20);
+    std::assert_ne!(5, 6);
+
+    // 4. Test debug_assert!, debug_assert_eq!, debug_assert_ne!
+    debug_assert!(100 == 100);
+    debug_assert!(200 > 100, "debug assert with message");
+    std::debug_assert!(300 == 300);
+    std::debug_assert!(400 > 200, "std debug assert with message");
+
+    debug_assert_eq!(10 + 5, 15);
+    std::debug_assert_eq!(20 * 2, 40);
+
+    debug_assert_ne!(15, 25);
+    std::debug_assert_ne!(30, 40);
+
+    // 5. Test matches! and std::matches!
+    dec opt: std::Option<i32> = std::Option::Some<i32>(42);
+    dec is_some: bool = matches!(opt, std::Option::Some(_));
+    assert!(is_some);
+
+    dec is_ten: bool = std::matches!(10, 10);
+    assert!(is_ten);
+
+    dec is_twenty: bool = matches!(10, 20);
+    assert_eq!(is_twenty, false);
+
+    // 6. Test vec! macro forms (empty, repeated, elements)
+    dec v_empty: std::Vec<i32> = vec![];
+    assert_eq!(v_empty.len(), 0 as u64);
+
+    dec v_repeat: std::Vec<i32> = vec![7; 4];
+    assert_eq!(v_repeat.len(), 4 as u64);
+    assert_eq!(*v_repeat.get(0).unwrap(), 7);
+    assert_eq!(*v_repeat.get(3).unwrap(), 7);
+
+    dec v_list: std::Vec<i32> = vec![1, 2, 3];
+    assert_eq!(v_list.len(), 3 as u64);
+    assert_eq!(*v_list.get(0).unwrap(), 1);
+    assert_eq!(*v_list.get(1).unwrap(), 2);
+    assert_eq!(*v_list.get(2).unwrap(), 3);
+
+    dec v_std: std::Vec<i32> = std::vec![10, 20, 30];
+    assert_eq!(v_std.len(), 3 as u64);
+    assert_eq!(*v_std.get(0).unwrap(), 10);
+    assert_eq!(*v_std.get(2).unwrap(), 30);
+
+    return 0;
+}

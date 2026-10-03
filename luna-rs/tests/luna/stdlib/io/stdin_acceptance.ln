@@ -1,0 +1,62 @@
+import <io>;
+import <vec>;
+import <result>;
+
+fn main() -> i32 {
+    dec rw s = std::io::stdin();
+    dec rw buf = std::vec_new<u8>();
+    dec res = s.read_line(&rw buf);
+    match res {
+        std::Result::Ok(n) -> {
+            if n != (5 as usize) {
+                return 1;
+            }
+            if buf.len() != (5 as u64) {
+                return 2;
+            }
+            dec slice = buf.as_slice();
+            // Expected "hello"
+            if slice[0] != ('h' as u8) || slice[1] != ('e' as u8) || slice[2] != ('l' as u8) || slice[3] != ('l' as u8) || slice[4] != ('o' as u8) {
+                return 3;
+            }
+        },
+        std::Result::Err(e) -> {
+            return 4;
+        },
+    }
+
+    // Test std::io::read_line top-level helper function on the second line
+    dec rw buf2 = std::vec_new<u8>();
+    dec res2 = std::io::read_line(&rw buf2);
+    match res2 {
+        std::Result::Ok(n2) -> {
+            if n2 != (5 as usize) {
+                return 5;
+            }
+            dec slice2 = buf2.as_slice();
+            // Expected "world"
+            if slice2[0] != ('w' as u8) || slice2[1] != ('o' as u8) || slice2[2] != ('r' as u8) || slice2[3] != ('l' as u8) || slice2[4] != ('d' as u8) {
+                return 6;
+            }
+        },
+        std::Result::Err(e) -> {
+            return 7;
+        },
+    }
+
+    // Test EOF handling: reading past the end must return Ok(0)
+    dec rw buf3 = std::vec_new<u8>();
+    dec res3 = std::io::read_line(&rw buf3);
+    match res3 {
+        std::Result::Ok(n3) -> {
+            if n3 != (0 as usize) {
+                return 8;
+            }
+        },
+        std::Result::Err(e) -> {
+            return 9;
+        },
+    }
+
+    return 0;
+}

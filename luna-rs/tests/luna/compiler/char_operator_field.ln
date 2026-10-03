@@ -1,0 +1,6 @@
+struct UserValue { scalar: char, };
+fn main() -> i32 {
+    dec value = UserValue { scalar: 'a' };
+    dec result = value.scalar << 'b';
+    return 0;
+}

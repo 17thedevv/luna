@@ -1,0 +1,5 @@
+fn main() -> i32 {
+    dec rw value: char = 'a';
+    value <<= 'b';
+    return 0;
+}

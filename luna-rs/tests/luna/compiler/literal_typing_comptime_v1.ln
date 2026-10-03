@@ -1,0 +1,30 @@
+const BYTE: u8 = 255;
+const WIDE: u128 = 340282366920938463463374607431768211455u128;
+const MINIMUM: i128 = -170141183460469231731687303715884105728i128;
+const BYTES: [u8; 3] = b"A\0\xFF";
+const HIGH: u128 = 340282366920938463463374607431768211455u128 >> 64u128;
+const REDUCED: u128 = 340282366920938463463374607431768211455u128 - 1u128;
+const ORDERED: bool = 340282366920938463463374607431768211455u128 > 1u128;
+const SIGNED: i128 = -170141183460469231731687303715884105728i128 + 1i128;
+fn computed_byte() -> u8 { dec bytes = b"AZ"; return bytes[1]; }
+const COMPUTED: u8 = comptime { computed_byte() };
+fn computed_empty() -> [u8; 0] { return b""; }
+const EMPTY: [u8; 0] = comptime { computed_empty() };
+trait ByteSource { fn byte(self: &Self) -> u8; }
+struct First {};
+struct Second {};
+impl ByteSource for First { fn byte(self: &First) -> u8 { dec bytes = b"A"; return bytes[0]; } }
+impl ByteSource for Second { fn byte(self: &Second) -> u8 { dec bytes = b"Z"; return bytes[0]; } }
+const FIRST: u8 = comptime { dec first = First {}; dec source: &dyn ByteSource = &first; source.byte() };
+const SECOND: u8 = comptime { dec second = Second {}; dec source: &dyn ByteSource = &second; source.byte() };
+fn main() -> i32 {
+    if BYTE != 255u8 || WIDE != (0u128 - 1u128) { return 1; }
+    if MINIMUM != (-170141183460469231731687303715884105727i128 - 1i128) { return 2; }
+    if BYTES[2] != 255u8 { return 3; }
+    if HIGH != 18446744073709551615u128 || ORDERED == false { return 4; }
+    if REDUCED != 340282366920938463463374607431768211454u128 { return 5; }
+    if SIGNED != -170141183460469231731687303715884105727i128 { return 6; }
+    if COMPUTED != b'Z' { return 7; }
+    if FIRST != b'A' || SECOND != b'Z' { return 8; }
+    return 0;
+}

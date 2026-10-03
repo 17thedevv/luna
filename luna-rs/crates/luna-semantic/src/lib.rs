@@ -14,6 +14,7 @@ pub mod lang_item;
 pub mod coherence;
 pub mod const_eval;
 pub mod coercion;
+mod operators;
 
 pub mod mangler;
 pub mod region;
@@ -64,6 +65,9 @@ pub enum NeedsDropState {
 }
 
 pub struct SemanticContext {
+    /// Pointer width of the compilation target. The native-only driver defaults
+    /// to its native width; explicit semantic target contexts may override it.
+    pub target_pointer_bits: u32,
     pub symbol_table: SymbolTable,
     pub tables: SemanticTables,
     pub types: TypeContext,
@@ -84,6 +88,9 @@ pub struct SemanticContext {
 impl SemanticContext {
     pub fn new() -> Self {
         Self {
+            // The current driver emits for its native target. Explicit target
+            // contexts may override this before semantic analysis starts.
+            target_pointer_bits: usize::BITS,
             symbol_table: SymbolTable::new(),
             tables: SemanticTables::new(),
             types: TypeContext::new(),

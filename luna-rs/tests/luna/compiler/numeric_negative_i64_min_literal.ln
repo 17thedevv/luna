@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec minimum: i64 = -9223372036854775808 as i64;
+    if minimum == (0 as i64) {
+        return 0;
+    }
+    return 1;
+}

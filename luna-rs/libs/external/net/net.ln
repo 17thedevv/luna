@@ -1,0 +1,748 @@
+import <ptr>;
+import <mem>;
+import <slice>;
+import <result>;
+import <time>;
+import <__lang_drop>;
+import <__lang_option>;
+
+export extern fn __luna_net_init() -> i32;
+export extern fn __luna_tcp_listen(ipv4_host: u32, port: u16, backlog: i32) -> i64;
+export extern fn __luna_tcp_accept(listener: i64, out_ip: *rw u32, out_port: *rw u16) -> i64;
+export extern fn __luna_tcp_connect(ipv4_host: u32, port: u16) -> i64;
+export extern fn __luna_tcp_read(sock: i64, buf: *rw void, len: u64) -> i64;
+export extern fn __luna_tcp_write(sock: i64, buf: *void, len: u64) -> i64;
+export extern fn __luna_tcp_shutdown(sock: i64, how: i32) -> i32;
+
+export extern fn __luna_udp_bind(ipv4_host: u32, port: u16) -> i64;
+export extern fn __luna_udp_send_to(sock: i64, buf: *void, len: u64, ipv4_host: u32, port: u16) -> i64;
+export extern fn __luna_udp_recv_from(sock: i64, buf: *rw void, len: u64, out_ip: *rw u32, out_port: *rw u16) -> i64;
+
+export extern fn __luna_socket_close(sock: i64) -> i32;
+export extern fn __luna_socket_local_addr(sock: i64, out_ip: *rw u32, out_port: *rw u16) -> i32;
+export extern fn __luna_socket_peer_addr(sock: i64, out_ip: *rw u32, out_port: *rw u16) -> i32;
+export extern fn __luna_socket_set_timeout(sock: i64, is_read: i32, timeout_ms: u64) -> i32;
+export extern fn __luna_socket_set_nodelay(sock: i64, nodelay: i32) -> i32;
+export extern fn __luna_socket_set_nonblocking(sock: i64, nonblocking: i32) -> i32;
+export extern fn __luna_socket_set_broadcast(sock: i64, broadcast: i32) -> i32;
+export extern fn __luna_socket_last_error() -> i32;
+export extern fn __luna_net_resolve(host_ptr: *u8, host_len: usize, out_ips: *rw u32, max_ips: usize, out_count: *rw usize) -> i32;
+
+export module std {
+    // =========================================================================
+    // Net Errors & Enums
+    // =========================================================================
+    export enum NetError {
+        ConnectionRefused,
+        ConnectionReset,
+        ConnectionAborted,
+        NotConnected,
+        AddrInUse,
+        AddrNotAvailable,
+        TimedOut,
+        WouldBlock,
+        InvalidInput,
+        IoError(i32),
+    }
+
+    impl std::Error for NetError {
+        fn description(self: &Self) -> str {
+            return match *self {
+                NetError::ConnectionRefused -> "connection refused",
+                NetError::ConnectionReset -> "connection reset",
+                NetError::ConnectionAborted -> "connection aborted",
+                NetError::NotConnected -> "not connected",
+                NetError::AddrInUse -> "address in use",
+                NetError::AddrNotAvailable -> "address not available",
+                NetError::TimedOut -> "timed out",
+                NetError::WouldBlock -> "operation would block",
+                NetError::InvalidInput -> "invalid input",
+                NetError::IoError(_) -> "I/O error",
+            };
+        }
+    }
+
+    export enum Shutdown {
+        Read,
+        Write,
+        Both,
+    }
+
+    export fn net_map_error(err: i32) -> NetError {
+        if err == (10035 as i32) || err == (11 as i32) {
+            return NetError::WouldBlock;
+        }
+        if err == (10061 as i32) || err == (111 as i32) {
+            return NetError::ConnectionRefused;
+        }
+        if err == (10054 as i32) || err == (104 as i32) {
+            return NetError::ConnectionReset;
+        }
+        if err == (10053 as i32) || err == (103 as i32) {
+            return NetError::ConnectionAborted;
+        }
+        if err == (10048 as i32) || err == (98 as i32) {
+            return NetError::AddrInUse;
+        }
+        if err == (10049 as i32) || err == (99 as i32) {
+            return NetError::AddrNotAvailable;
+        }
+        if err == (10060 as i32) || err == (110 as i32) {
+            return NetError::TimedOut;
+        }
+        if err == (10057 as i32) || err == (107 as i32) {
+            return NetError::NotConnected;
+        }
+        return NetError::IoError(err);
+    }
+
+    // =========================================================================
+    // Ipv4Addr
+    // =========================================================================
+    export struct Ipv4Addr {
+        a: u8,
+        b: u8,
+        c: u8,
+        d: u8,
+    };
+
+    export fn ipv4_new(a: u8, b: u8, c: u8, d: u8) -> Ipv4Addr {
+        return Ipv4Addr { a: a, b: b, c: c, d: d };
+    }
+
+    export fn ipv4_localhost() -> Ipv4Addr {
+        return Ipv4Addr { a: 127 as u8, b: 0 as u8, c: 0 as u8, d: 1 as u8 };
+    }
+
+    export fn ipv4_any() -> Ipv4Addr {
+        return Ipv4Addr { a: 0 as u8, b: 0 as u8, c: 0 as u8, d: 0 as u8 };
+    }
+
+    export fn ipv4_from_u32(raw: u32) -> Ipv4Addr {
+        dec a = ((raw >> (24 as u32)) & (255 as u32)) as u8;
+        dec b = ((raw >> (16 as u32)) & (255 as u32)) as u8;
+        dec c = ((raw >> (8 as u32)) & (255 as u32)) as u8;
+        dec d = (raw & (255 as u32)) as u8;
+        return Ipv4Addr { a: a, b: b, c: c, d: d };
+    }
+
+    impl Ipv4Addr {
+        export fn new(a: u8, b: u8, c: u8, d: u8) -> Ipv4Addr {
+            return ipv4_new(a, b, c, d);
+        }
+
+        export fn localhost() -> Ipv4Addr {
+            return ipv4_localhost();
+        }
+
+        export fn any() -> Ipv4Addr {
+            return ipv4_any();
+        }
+
+        export fn to_u32(self: &Self) -> u32 {
+            dec a32 = self.a as u32;
+            dec b32 = self.b as u32;
+            dec c32 = self.c as u32;
+            dec d32 = self.d as u32;
+            return (a32 << (24 as u32)) | (b32 << (16 as u32)) | (c32 << (8 as u32)) | d32;
+        }
+
+        export fn from_u32(raw: u32) -> Ipv4Addr {
+            return ipv4_from_u32(raw);
+        }
+
+        export fn octets(self: &Self) -> [u8; 4] {
+            return [self.a, self.b, self.c, self.d];
+        }
+
+        export fn is_loopback(self: &Self) -> bool {
+            return self.a == (127 as u8);
+        }
+
+        export fn is_unspecified(self: &Self) -> bool {
+            return self.a == (0 as u8) && self.b == (0 as u8) && self.c == (0 as u8) && self.d == (0 as u8);
+        }
+
+        export fn equals(self: &Self, other: &Ipv4Addr) -> bool {
+            return self.a == other.a && self.b == other.b && self.c == other.c && self.d == other.d;
+        }
+    }
+
+    // =========================================================================
+    // SocketAddrV4
+    // =========================================================================
+    export struct SocketAddrV4 {
+        ip: Ipv4Addr,
+        port: u16,
+    };
+
+    export fn socket_addr_v4_new(ip: Ipv4Addr, port: u16) -> SocketAddrV4 {
+        return SocketAddrV4 { ip: ip, port: port };
+    }
+
+    impl SocketAddrV4 {
+        export fn new(ip: Ipv4Addr, port: u16) -> SocketAddrV4 {
+            return socket_addr_v4_new(ip, port);
+        }
+
+        export fn ip(self: &Self) -> Ipv4Addr {
+            return self.ip;
+        }
+
+        export fn port(self: &Self) -> u16 {
+            return self.port;
+        }
+
+        export fn equals(self: &Self, other: &SocketAddrV4) -> bool {
+            return self.ip.equals(&other.ip) && self.port == other.port;
+        }
+    }
+
+    // =========================================================================
+    // TcpStream
+    // =========================================================================
+    export struct TcpStream {
+        private raw_sock: i64,
+    };
+
+    impl std::Drop for TcpStream {
+        fn drop(self: &rw Self) {
+            if self.raw_sock >= (0 as i64) {
+                unsafe {
+                    __luna_socket_close(self.raw_sock);
+                }
+                self.raw_sock = -1 as i64;
+            }
+        }
+    }
+
+    export fn tcp_stream_connect(ip: &Ipv4Addr, port: u16) -> std::Result<TcpStream, NetError> {
+        dec ip32 = ip.to_u32();
+        unsafe {
+            dec s = __luna_tcp_connect(ip32, port);
+            if s < (0 as i64) {
+                dec err = __luna_socket_last_error();
+                return std::Result::Err(net_map_error(err));
+            }
+            return std::Result::Ok(TcpStream { raw_sock: s });
+        }
+    }
+
+    export fn tcp_stream_connect_addr(addr: &SocketAddrV4) -> std::Result<TcpStream, NetError> {
+        dec ip = addr.ip();
+        return tcp_stream_connect(&ip, addr.port());
+    }
+
+    impl TcpStream {
+        export fn connect(ip: &Ipv4Addr, port: u16) -> std::Result<TcpStream, NetError> {
+            return tcp_stream_connect(ip, port);
+        }
+
+        export fn connect_addr(addr: &SocketAddrV4) -> std::Result<TcpStream, NetError> {
+            return tcp_stream_connect_addr(addr);
+        }
+
+        export fn read(self: &rw Self, buf: &rw [u8]) -> std::Result<usize, NetError> {
+            if self.raw_sock < (0 as i64) {
+                return std::Result::Err(NetError::NotConnected);
+            }
+            dec len = buf.len();
+            if len == (0 as usize) {
+                return std::Result::Ok(0 as usize);
+            }
+            dec ptr = &rw buf[0] as *rw u8 as *rw void;
+            unsafe {
+                dec n = __luna_tcp_read(self.raw_sock, ptr, len as u64);
+                if n < (0 as i64) {
+                    dec err = __luna_socket_last_error();
+                    return std::Result::Err(net_map_error(err));
+                }
+                return std::Result::Ok(n as usize);
+            }
+        }
+
+        export fn write_raw(self: &rw Self, ptr: *void, len: usize) -> std::Result<usize, NetError> {
+            if self.raw_sock < (0 as i64) {
+                return std::Result::Err(NetError::NotConnected);
+            }
+            if len == (0 as usize) {
+                return std::Result::Ok(0 as usize);
+            }
+            unsafe {
+                dec n = __luna_tcp_write(self.raw_sock, ptr, len as u64);
+                if n < (0 as i64) {
+                    dec err = __luna_socket_last_error();
+                    return std::Result::Err(net_map_error(err));
+                }
+                return std::Result::Ok(n as usize);
+            }
+        }
+
+        export fn write(self: &rw Self, buf: &[u8]) -> std::Result<usize, NetError> {
+            dec len = buf.len();
+            if len == (0 as usize) {
+                return std::Result::Ok(0 as usize);
+            }
+            dec ptr = &buf[0] as *u8 as *void;
+            return self.write_raw(ptr, len);
+        }
+
+        export fn write_all(self: &rw Self, buf: &[u8]) -> std::Result<void, NetError> {
+            dec rw remaining = buf.len();
+            dec rw offset: usize = 0 as usize;
+            if remaining == (0 as usize) {
+                return std::Result::Ok(());
+            }
+            dec base_ptr = &buf[0] as *u8;
+            while remaining > (0 as usize) {
+                dec rw res: std::Result<usize, NetError> = std::Result::Err(NetError::ConnectionAborted);
+                unsafe {
+                    dec curr_ptr = (base_ptr + offset) as *void;
+                    res = self.write_raw(curr_ptr, remaining);
+                }
+                match res {
+                    std::Result::Ok(written) -> {
+                        if written == (0 as usize) {
+                            return std::Result::Err(NetError::ConnectionAborted);
+                        }
+                        offset = offset + written;
+                        remaining = remaining - written;
+                    },
+                    std::Result::Err(e) -> {
+                        return std::Result::Err(e);
+                    },
+                }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn peer_addr(self: &Self) -> std::Result<SocketAddrV4, NetError> {
+            if self.raw_sock < (0 as i64) {
+                return std::Result::Err(NetError::NotConnected);
+            }
+            dec rw ip: u32 = 0 as u32;
+            dec rw port: u16 = 0 as u16;
+            unsafe {
+                dec res = __luna_socket_peer_addr(self.raw_sock, &rw ip as *rw u32, &rw port as *rw u16);
+                if res != 0 {
+                    return std::Result::Err(NetError::NotConnected);
+                }
+            }
+            return std::Result::Ok(SocketAddrV4 {
+                ip: ipv4_from_u32(ip),
+                port: port,
+            });
+        }
+
+        export fn local_addr(self: &Self) -> std::Result<SocketAddrV4, NetError> {
+            if self.raw_sock < (0 as i64) {
+                return std::Result::Err(NetError::NotConnected);
+            }
+            dec rw ip: u32 = 0 as u32;
+            dec rw port: u16 = 0 as u16;
+            unsafe {
+                dec res = __luna_socket_local_addr(self.raw_sock, &rw ip as *rw u32, &rw port as *rw u16);
+                if res != 0 {
+                    return std::Result::Err(NetError::NotConnected);
+                }
+            }
+            return std::Result::Ok(SocketAddrV4 {
+                ip: ipv4_from_u32(ip),
+                port: port,
+            });
+        }
+
+        export fn set_read_timeout(self: &rw Self, dur: &std::Duration) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec ms = dur.as_millis();
+            unsafe {
+                dec res = __luna_socket_set_timeout(self.raw_sock, 1 as i32, ms);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn set_write_timeout(self: &rw Self, dur: &std::Duration) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec ms = dur.as_millis();
+            unsafe {
+                dec res = __luna_socket_set_timeout(self.raw_sock, 0 as i32, ms);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn set_nonblocking(self: &rw Self, nonblocking: bool) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec rw opt: i32 = 0 as i32;
+            if nonblocking { opt = 1 as i32; }
+            unsafe {
+                dec res = __luna_socket_set_nonblocking(self.raw_sock, opt);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn set_nodelay(self: &rw Self, nodelay: bool) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec rw opt: i32 = 0 as i32;
+            if nodelay { opt = 1 as i32; }
+            unsafe {
+                dec res = __luna_socket_set_nodelay(self.raw_sock, opt);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn shutdown(self: &rw Self, how: Shutdown) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec code: i32 = match how {
+                Shutdown::Read -> 0 as i32,
+                Shutdown::Write -> 1 as i32,
+                Shutdown::Both -> 2 as i32,
+            };
+            unsafe {
+                dec res = __luna_tcp_shutdown(self.raw_sock, code);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn close(self: &rw Self) {
+            if self.raw_sock >= (0 as i64) {
+                unsafe {
+                    __luna_socket_close(self.raw_sock);
+                }
+                self.raw_sock = -1 as i64;
+            }
+        }
+    }
+
+    // =========================================================================
+    // TcpListener
+    // =========================================================================
+    export struct TcpListener {
+        private raw_sock: i64,
+    };
+
+    impl std::Drop for TcpListener {
+        fn drop(self: &rw Self) {
+            if self.raw_sock >= (0 as i64) {
+                unsafe {
+                    __luna_socket_close(self.raw_sock);
+                }
+                self.raw_sock = -1 as i64;
+            }
+        }
+    }
+
+    export struct TcpConnection {
+        stream: TcpStream,
+        peer: SocketAddrV4,
+    };
+
+    export fn tcp_listener_bind(ip: &Ipv4Addr, port: u16) -> std::Result<TcpListener, NetError> {
+        dec ip32 = ip.to_u32();
+        unsafe {
+            dec s = __luna_tcp_listen(ip32, port, 128 as i32);
+            if s < (0 as i64) {
+                dec err = __luna_socket_last_error();
+                return std::Result::Err(net_map_error(err));
+            }
+            return std::Result::Ok(TcpListener { raw_sock: s });
+        }
+    }
+
+    export fn tcp_listener_bind_addr(addr: &SocketAddrV4) -> std::Result<TcpListener, NetError> {
+        dec ip = addr.ip();
+        return tcp_listener_bind(&ip, addr.port());
+    }
+
+    impl TcpListener {
+        export fn bind(ip: &Ipv4Addr, port: u16) -> std::Result<TcpListener, NetError> {
+            return tcp_listener_bind(ip, port);
+        }
+
+        export fn bind_addr(addr: &SocketAddrV4) -> std::Result<TcpListener, NetError> {
+            return tcp_listener_bind_addr(addr);
+        }
+
+        export fn accept(self: &Self) -> std::Result<TcpStream, NetError> {
+            if self.raw_sock < (0 as i64) {
+                return std::Result::Err(NetError::NotConnected);
+            }
+            dec rw client_ip: u32 = 0 as u32;
+            dec rw client_port: u16 = 0 as u16;
+            unsafe {
+                dec client = __luna_tcp_accept(self.raw_sock, &rw client_ip as *rw u32, &rw client_port as *rw u16);
+                if client < (0 as i64) {
+                    dec err = __luna_socket_last_error();
+                    return std::Result::Err(net_map_error(err));
+                }
+                return std::Result::Ok(TcpStream { raw_sock: client });
+            }
+        }
+
+        export fn accept_conn(self: &Self) -> std::Result<TcpConnection, NetError> {
+            if self.raw_sock < (0 as i64) {
+                return std::Result::Err(NetError::NotConnected);
+            }
+            dec rw client_ip: u32 = 0 as u32;
+            dec rw client_port: u16 = 0 as u16;
+            unsafe {
+                dec client = __luna_tcp_accept(self.raw_sock, &rw client_ip as *rw u32, &rw client_port as *rw u16);
+                if client < (0 as i64) {
+                    dec err = __luna_socket_last_error();
+                    return std::Result::Err(net_map_error(err));
+                }
+                return std::Result::Ok(TcpConnection {
+                    stream: TcpStream { raw_sock: client },
+                    peer: SocketAddrV4 {
+                        ip: ipv4_from_u32(client_ip),
+                        port: client_port,
+                    },
+                });
+            }
+        }
+
+        export fn local_addr(self: &Self) -> std::Result<SocketAddrV4, NetError> {
+            if self.raw_sock < (0 as i64) {
+                return std::Result::Err(NetError::NotConnected);
+            }
+            dec rw ip: u32 = 0 as u32;
+            dec rw port: u16 = 0 as u16;
+            unsafe {
+                dec res = __luna_socket_local_addr(self.raw_sock, &rw ip as *rw u32, &rw port as *rw u16);
+                if res != 0 {
+                    return std::Result::Err(NetError::NotConnected);
+                }
+            }
+            return std::Result::Ok(SocketAddrV4 {
+                ip: ipv4_from_u32(ip),
+                port: port,
+            });
+        }
+
+        export fn set_nonblocking(self: &rw Self, nonblocking: bool) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec rw opt: i32 = 0 as i32;
+            if nonblocking { opt = 1 as i32; }
+            unsafe {
+                dec res = __luna_socket_set_nonblocking(self.raw_sock, opt);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn close(self: &rw Self) {
+            if self.raw_sock >= (0 as i64) {
+                unsafe {
+                    __luna_socket_close(self.raw_sock);
+                }
+                self.raw_sock = -1 as i64;
+            }
+        }
+    }
+
+    // =========================================================================
+    // UdpSocket
+    // =========================================================================
+    export struct UdpSocket {
+        private raw_sock: i64,
+    };
+
+    impl std::Drop for UdpSocket {
+        fn drop(self: &rw Self) {
+            if self.raw_sock >= (0 as i64) {
+                unsafe {
+                    __luna_socket_close(self.raw_sock);
+                }
+                self.raw_sock = -1 as i64;
+            }
+        }
+    }
+
+    export struct UdpRecvInfo {
+        bytes_read: usize,
+        sender: SocketAddrV4,
+    };
+
+    export fn udp_socket_bind(ip: &Ipv4Addr, port: u16) -> std::Result<UdpSocket, NetError> {
+        dec ip32 = ip.to_u32();
+        unsafe {
+            dec s = __luna_udp_bind(ip32, port);
+            if s < (0 as i64) {
+                dec err = __luna_socket_last_error();
+                return std::Result::Err(net_map_error(err));
+            }
+            return std::Result::Ok(UdpSocket { raw_sock: s });
+        }
+    }
+
+    export fn udp_socket_bind_addr(addr: &SocketAddrV4) -> std::Result<UdpSocket, NetError> {
+        dec ip = addr.ip();
+        return udp_socket_bind(&ip, addr.port());
+    }
+
+    impl UdpSocket {
+        export fn bind(ip: &Ipv4Addr, port: u16) -> std::Result<UdpSocket, NetError> {
+            return udp_socket_bind(ip, port);
+        }
+
+        export fn bind_addr(addr: &SocketAddrV4) -> std::Result<UdpSocket, NetError> {
+            return udp_socket_bind_addr(addr);
+        }
+
+        export fn send_to(self: &Self, buf: &[u8], ip: &Ipv4Addr, port: u16) -> std::Result<usize, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec len = buf.len();
+            if len == (0 as usize) { return std::Result::Ok(0 as usize); }
+            dec ptr = &buf[0] as *u8 as *void;
+            dec ip32 = ip.to_u32();
+            unsafe {
+                dec n = __luna_udp_send_to(self.raw_sock, ptr, len as u64, ip32, port);
+                if n < (0 as i64) {
+                    return std::Result::Err(net_map_error(__luna_socket_last_error()));
+                }
+                return std::Result::Ok(n as usize);
+            }
+        }
+
+        export fn send_to_addr(self: &Self, buf: &[u8], addr: &SocketAddrV4) -> std::Result<usize, NetError> {
+            dec ip = addr.ip();
+            return self.send_to(buf, &ip, addr.port());
+        }
+
+        export fn recv_from(self: &Self, buf: &rw [u8]) -> std::Result<usize, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec len = buf.len();
+            if len == (0 as usize) { return std::Result::Ok(0 as usize); }
+            dec ptr = &rw buf[0] as *rw u8 as *rw void;
+            dec rw out_ip: u32 = 0 as u32;
+            dec rw out_port: u16 = 0 as u16;
+            unsafe {
+                dec n = __luna_udp_recv_from(self.raw_sock, ptr, len as u64, &rw out_ip as *rw u32, &rw out_port as *rw u16);
+                if n < (0 as i64) {
+                    return std::Result::Err(net_map_error(__luna_socket_last_error()));
+                }
+                return std::Result::Ok(n as usize);
+            }
+        }
+
+        export fn recv_from_addr(self: &Self, buf: &rw [u8]) -> std::Result<UdpRecvInfo, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec len = buf.len();
+            if len == (0 as usize) {
+                return std::Result::Ok(UdpRecvInfo {
+                    bytes_read: 0 as usize,
+                    sender: SocketAddrV4 { ip: Ipv4Addr { a: 0 as u8, b: 0 as u8, c: 0 as u8, d: 0 as u8 }, port: 0 as u16 },
+                });
+            }
+            dec ptr = &rw buf[0] as *rw u8 as *rw void;
+            dec rw out_ip: u32 = 0 as u32;
+            dec rw out_port: u16 = 0 as u16;
+            unsafe {
+                dec n = __luna_udp_recv_from(self.raw_sock, ptr, len as u64, &rw out_ip as *rw u32, &rw out_port as *rw u16);
+                if n < (0 as i64) {
+                    return std::Result::Err(net_map_error(__luna_socket_last_error()));
+                }
+                return std::Result::Ok(UdpRecvInfo {
+                    bytes_read: n as usize,
+                    sender: SocketAddrV4 {
+                        ip: ipv4_from_u32(out_ip),
+                        port: out_port,
+                    },
+                });
+            }
+        }
+
+        export fn local_addr(self: &Self) -> std::Result<SocketAddrV4, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec rw ip: u32 = 0 as u32;
+            dec rw port: u16 = 0 as u16;
+            unsafe {
+                dec res = __luna_socket_local_addr(self.raw_sock, &rw ip as *rw u32, &rw port as *rw u16);
+                if res != 0 { return std::Result::Err(NetError::NotConnected); }
+            }
+            return std::Result::Ok(SocketAddrV4 {
+                ip: ipv4_from_u32(ip),
+                port: port,
+            });
+        }
+
+        export fn set_broadcast(self: &rw Self, broadcast: bool) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec rw opt: i32 = 0 as i32;
+            if broadcast { opt = 1 as i32; }
+            unsafe {
+                dec res = __luna_socket_set_broadcast(self.raw_sock, opt);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn set_nonblocking(self: &rw Self, nonblocking: bool) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec rw opt: i32 = 0 as i32;
+            if nonblocking { opt = 1 as i32; }
+            unsafe {
+                dec res = __luna_socket_set_nonblocking(self.raw_sock, opt);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn set_read_timeout(self: &rw Self, dur: &std::Duration) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec ms = dur.as_millis();
+            unsafe {
+                dec res = __luna_socket_set_timeout(self.raw_sock, 1 as i32, ms);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn set_write_timeout(self: &rw Self, dur: &std::Duration) -> std::Result<void, NetError> {
+            if self.raw_sock < (0 as i64) { return std::Result::Err(NetError::NotConnected); }
+            dec ms = dur.as_millis();
+            unsafe {
+                dec res = __luna_socket_set_timeout(self.raw_sock, 0 as i32, ms);
+                if res != 0 { return std::Result::Err(net_map_error(__luna_socket_last_error())); }
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn close(self: &rw Self) {
+            if self.raw_sock >= (0 as i64) {
+                unsafe {
+                    __luna_socket_close(self.raw_sock);
+                }
+                self.raw_sock = -1 as i64;
+            }
+        }
+    }
+
+    // =========================================================================
+    // DNS Host Resolution
+    // =========================================================================
+    export fn lookup_host(host: &[u8]) -> std::Result<Ipv4Addr, NetError> {
+        if host.len() == (0 as usize) {
+            return std::Result::Err(NetError::InvalidInput);
+        }
+        dec rw ips: [u32; 4] = [0 as u32, 0 as u32, 0 as u32, 0 as u32];
+        dec rw count: usize = 0 as usize;
+        unsafe {
+            dec res = __luna_net_resolve(
+                host.data as *u8,
+                host.len(),
+                &rw ips[0] as *rw u32,
+                4 as usize,
+                &rw count as *rw usize
+            );
+            if res != (0 as i32) || count == (0 as usize) {
+                return std::Result::Err(NetError::AddrNotAvailable);
+            }
+            return std::Result::Ok(ipv4_from_u32(ips[0]));
+        }
+    }
+}

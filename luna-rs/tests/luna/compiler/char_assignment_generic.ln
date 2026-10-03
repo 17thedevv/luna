@@ -1,0 +1,9 @@
+fn increment<T>(value: T, step: T) -> T {
+    dec rw result = value;
+    result += step;
+    return result;
+}
+fn main() -> i32 {
+    dec result = increment('a', 'b');
+    return 0;
+}

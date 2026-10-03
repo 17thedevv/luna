@@ -1,0 +1,177 @@
+import <iter_adapters>;
+import <iter_consumers>;
+import <hashmap>;
+import <hashset>;
+import <slice>;
+import <vec>;
+
+fn add_nums(a: i32, b: i32) -> i32 {
+    return a + b;
+}
+
+fn inspect_dummy(x: &i32) {
+    dec _v = *x;
+}
+
+fn main() -> i32 {
+    // =========================================================================
+    // 1. StepBy Adapter
+    // =========================================================================
+    dec r = std::iter::range(1, 10); // 1, 2, 3, 4, 5, 6, 7, 8, 9
+    dec rw step_iter = std::iter::iter_step_by<std::iter::Range<i32>, i32>(r, 2 as u64); // 1, 3, 5, 7, 9
+
+    match step_iter.next() {
+        std::Option::Some(v) -> { if v != 1 { return 1; } },
+        std::Option::None -> { return 2; },
+    }
+    match step_iter.next() {
+        std::Option::Some(v) -> { if v != 3 { return 3; } },
+        std::Option::None -> { return 4; },
+    }
+    match step_iter.next() {
+        std::Option::Some(v) -> { if v != 5 { return 5; } },
+        std::Option::None -> { return 6; },
+    }
+    match step_iter.next() {
+        std::Option::Some(v) -> { if v != 7 { return 7; } },
+        std::Option::None -> { return 8; },
+    }
+    match step_iter.next() {
+        std::Option::Some(v) -> { if v != 9 { return 9; } },
+        std::Option::None -> { return 10; },
+    }
+    match step_iter.next() {
+        std::Option::Some(_) -> { return 11; },
+        std::Option::None -> {},
+    }
+
+    // =========================================================================
+    // 2. Inspect Adapter
+    // =========================================================================
+    dec r2 = std::iter::range(10, 13);
+    dec rw insp = std::iter::iter_inspect<std::iter::Range<i32>, i32>(r2, inspect_dummy);
+    match insp.next() {
+        std::Option::Some(v) -> { if v != 10 { return 12; } },
+        std::Option::None -> { return 13; },
+    }
+    match insp.next() {
+        std::Option::Some(v) -> { if v != 11 { return 14; } },
+        std::Option::None -> { return 15; },
+    }
+    match insp.next() {
+        std::Option::Some(v) -> { if v != 12 { return 16; } },
+        std::Option::None -> { return 17; },
+    }
+    match insp.next() {
+        std::Option::Some(_) -> { return 18; },
+        std::Option::None -> {},
+    }
+
+    // =========================================================================
+    // 3. Cloned Adapter from Vec / Slice
+    // =========================================================================
+    dec rw v: std::Vec<i32> = std::vec_new<i32>();
+    v.push(100);
+    v.push(200);
+    v.push(300);
+
+    dec s = v.as_slice();
+    dec s_iter = s.iter();
+    dec rw cloned_iter = std::iter::iter_cloned<std::slice::SliceIter<i32>, i32>(s_iter);
+    match cloned_iter.next() {
+        std::Option::Some(item) -> { if item != 100 { return 19; } },
+        std::Option::None -> { return 20; },
+    }
+    match cloned_iter.next() {
+        std::Option::Some(item) -> { if item != 200 { return 21; } },
+        std::Option::None -> { return 22; },
+    }
+    match cloned_iter.next() {
+        std::Option::Some(item) -> { if item != 300 { return 23; } },
+        std::Option::None -> { return 24; },
+    }
+    match cloned_iter.next() {
+        std::Option::Some(_) -> { return 25; },
+        std::Option::None -> {},
+    }
+
+    // =========================================================================
+    // 4. Consumers: reduce, min, max, product
+    // =========================================================================
+    dec r_red = std::iter::range(1, 5); // 1, 2, 3, 4
+    dec sum_opt = std::iter::iter_reduce<std::iter::Range<i32>, i32>(r_red, add_nums);
+    match sum_opt {
+        std::Option::Some(res) -> { if res != 10 { return 26; } },
+        std::Option::None -> { return 27; },
+    }
+
+    dec r_min = std::iter::range(5, 10);
+    dec min_opt = std::iter::iter_min<std::iter::Range<i32>, i32>(r_min);
+    match min_opt {
+        std::Option::Some(m) -> { if m != 5 { return 28; } },
+        std::Option::None -> { return 29; },
+    }
+
+    dec r_max = std::iter::range(5, 10);
+    dec max_opt = std::iter::iter_max<std::iter::Range<i32>, i32>(r_max);
+    match max_opt {
+        std::Option::Some(m) -> { if m != 9 { return 30; } },
+        std::Option::None -> { return 31; },
+    }
+
+    dec r_prod = std::iter::range(1, 5); // 1 * 2 * 3 * 4 = 24
+    dec prod = std::iter::iter_product_i32<std::iter::Range<i32>>(r_prod);
+    if prod != 24 { return 32; }
+
+    // =========================================================================
+    // 5. HashMap: Clone & Eq
+    // =========================================================================
+    dec rw map1: std::HashMap<i32, i32> = std::hashmap_new<i32, i32>();
+    map1.insert(1, 10);
+    map1.insert(2, 20);
+    map1.insert(3, 30);
+
+    dec map2 = map1.clone();
+    if map2.len() != (3 as u64) { return 33; }
+    if map1.eq(&map2) == false { return 34; }
+
+    dec rw map3 = map2.clone();
+    map3.insert(3, 33);
+    if map1.eq(&map3) == true { return 35; }
+
+    // =========================================================================
+    // 6. HashSet: subset, superset, symmetric_difference, Clone & Eq
+    // =========================================================================
+    dec rw set_a: std::HashSet<i32> = std::hashset_new<i32>();
+    set_a.insert(1);
+    set_a.insert(2);
+    set_a.insert(3);
+
+    dec rw set_b: std::HashSet<i32> = std::hashset_new<i32>();
+    set_b.insert(2);
+    set_b.insert(3);
+    set_b.insert(4);
+
+    dec rw set_sub: std::HashSet<i32> = std::hashset_new<i32>();
+    set_sub.insert(1);
+    set_sub.insert(2);
+
+    if set_sub.is_subset(&set_a) == false { return 36; }
+    if set_a.is_superset(&set_sub) == false { return 37; }
+    if set_a.is_subset(&set_sub) == true { return 38; }
+
+    dec sym_diff = set_a.symmetric_difference_owned(&set_b); // should contain {1, 4}
+    if sym_diff.len() != (2 as u64) { return 39; }
+    dec k1 = 1;
+    dec k2 = 2;
+    dec k4 = 4;
+    if sym_diff.contains(&k1) == false { return 40; }
+    if sym_diff.contains(&k4) == false { return 41; }
+    if sym_diff.contains(&k2) == true { return 42; }
+
+    dec cloned_set = set_a.clone();
+    if set_a.eq(&cloned_set) == false { return 43; }
+    if set_a.eq(&set_b) == true { return 44; }
+
+    return 0;
+}
