@@ -1,0 +1,55 @@
+import <vec>;
+import <cmp>;
+
+struct Pair {
+    a: i16,
+    b: i16,
+};
+
+impl std::Eq for Pair {
+    fn eq(self: &Self, other: &Self) -> bool {
+        return self.a == other.a && self.b == other.b;
+    }
+}
+
+fn main() -> i32 {
+    dec rw v = std::vec_new<Pair>();
+    v.push(Pair { a: 1 as i16, b: 2 as i16 });
+    v.push(Pair { a: 1 as i16, b: 2 as i16 });
+    v.push(Pair { a: 2 as i16, b: 1 as i16 });
+    v.push(Pair { a: 2 as i16, b: 1 as i16 });
+    v.push(Pair { a: 3 as i16, b: 3 as i16 });
+
+    // Calling dedup_i32 on a 4-byte non-i32 nominal type must safely dedup via Eq!
+    v.dedup_i32();
+
+    if v.len() != (3 as u64) {
+        return 1;
+    }
+
+    dec first = v.get(0 as u64);
+    match first {
+        std::Option::Some(p) -> {
+            if p.a != (1 as i16) || p.b != (2 as i16) { return 2; }
+        },
+        std::Option::None -> { return 3; },
+    }
+
+    dec second = v.get(1 as u64);
+    match second {
+        std::Option::Some(p) -> {
+            if p.a != (2 as i16) || p.b != (1 as i16) { return 4; }
+        },
+        std::Option::None -> { return 5; },
+    }
+
+    dec third = v.get(2 as u64);
+    match third {
+        std::Option::Some(p) -> {
+            if p.a != (3 as i16) || p.b != (3 as i16) { return 6; }
+        },
+        std::Option::None -> { return 7; },
+    }
+
+    return 0;
+}
