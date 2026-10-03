@@ -30,13 +30,14 @@ pub struct CanonicalSymbolId {
 pub enum ExternalImplSelfTypeKey {
     Nominal(CanonicalSymbolId),
     Primitive(luna_semantic::ty::BuiltinType),
+    Slice,
 }
 
 impl ExternalImplSelfTypeKey {
     pub fn provider_id(&self) -> Option<ProviderId> {
         match self {
             Self::Nominal(canon) => Some(canon.provider_id),
-            Self::Primitive(_) => None,
+            Self::Primitive(_) | Self::Slice => None,
         }
     }
 }
@@ -175,6 +176,9 @@ impl ModuleRegistry {
             }
             luna_semantic::semantic_tables::ImplSelfTypeKey::Primitive(b) => {
                 ExternalImplSelfTypeKey::Primitive(b)
+            }
+            luna_semantic::semantic_tables::ImplSelfTypeKey::Slice => {
+                ExternalImplSelfTypeKey::Slice
             }
         };
         ExternalImplKey {
@@ -576,6 +580,7 @@ impl ModuleRegistry {
                 match ext_self {
                     ExternalImplSelfTypeKey::Nominal(canon) => resolve_canonical(canon).map(luna_semantic::semantic_tables::ImplSelfTypeKey::Nominal),
                     ExternalImplSelfTypeKey::Primitive(b) => Some(luna_semantic::semantic_tables::ImplSelfTypeKey::Primitive(*b)),
+                    ExternalImplSelfTypeKey::Slice => Some(luna_semantic::semantic_tables::ImplSelfTypeKey::Slice),
                 }
             };
 
@@ -1084,13 +1089,33 @@ impl ModuleRegistry {
             }
         }
 
+        let is_impl_local = |key: &luna_semantic::semantic_tables::ImplKey| -> bool {
+            if let Some(decl_ids) = ctx.tables.trait_impls.get(key) {
+                if decl_ids.iter().any(|d| ranges.decls.contains(&d.0)) {
+                    return true;
+                }
+            }
+            if let Some(method_syms) = ctx.tables.impl_methods.get(key) {
+                if method_syms.iter().any(|&s| {
+                    let sym = ctx.symbol_table.get_symbol(s);
+                    sym.decl_id.map_or(false, |d| ranges.decls.contains(&d.0))
+                        || sym.provider_id == Some(provider_id)
+                        || sym.provider_id.is_none()
+                }) {
+                    return true;
+                }
+            }
+            false
+        };
+
         let mut trait_impls = HashMap::new();
         for (k, v) in &ctx.tables.trait_impls {
             let ext_key = Self::to_external_impl_key(k, ctx, provider_id);
-            if ext_key
-                .trait_id
-                .as_ref()
-                .map_or(false, |t| t.provider_id == provider_id)
+            if is_impl_local(k)
+                || ext_key
+                    .trait_id
+                    .as_ref()
+                    .map_or(false, |t| t.provider_id == provider_id)
                 || ext_key.self_type_def.provider_id() == Some(provider_id)
             {
                 trait_impls.insert(ext_key, v.clone());
@@ -1100,10 +1125,11 @@ impl ModuleRegistry {
         let mut impl_methods = HashMap::new();
         for (k, v) in &ctx.tables.impl_methods {
             let new_impl_key = Self::to_external_impl_key(k, ctx, provider_id);
-            if new_impl_key
-                .trait_id
-                .as_ref()
-                .map_or(false, |t| t.provider_id == provider_id)
+            if is_impl_local(k)
+                || new_impl_key
+                    .trait_id
+                    .as_ref()
+                    .map_or(false, |t| t.provider_id == provider_id)
                 || new_impl_key.self_type_def.provider_id() == Some(provider_id)
             {
                 let methods: Vec<_> = v.iter()
@@ -1167,10 +1193,11 @@ impl ModuleRegistry {
         for ((impl_key, trait_assoc_sym), &ty_id) in &ctx.tables.impl_associated_types {
             let ext_key = Self::to_external_impl_key(impl_key, ctx, provider_id);
             let canon_assoc = Self::get_canonical(*trait_assoc_sym, ctx, provider_id);
-            if ext_key
-                .trait_id
-                .as_ref()
-                .map_or(false, |t| t.provider_id == provider_id)
+            if is_impl_local(impl_key)
+                || ext_key
+                    .trait_id
+                    .as_ref()
+                    .map_or(false, |t| t.provider_id == provider_id)
                 || ext_key.self_type_def.provider_id() == Some(provider_id)
             {
                 impl_associated_types.insert((ext_key, canon_assoc), ty_id);
@@ -1193,10 +1220,11 @@ impl ModuleRegistry {
         let mut impl_generic_params = HashMap::new();
         for (impl_key, gp_syms) in &ctx.tables.impl_generic_params {
             let ext_key = Self::to_external_impl_key(impl_key, ctx, provider_id);
-            if ext_key
-                .trait_id
-                .as_ref()
-                .map_or(false, |t| t.provider_id == provider_id)
+            if is_impl_local(impl_key)
+                || ext_key
+                    .trait_id
+                    .as_ref()
+                    .map_or(false, |t| t.provider_id == provider_id)
                 || ext_key.self_type_def.provider_id() == Some(provider_id)
             {
                 let canon_gps = gp_syms
@@ -1210,10 +1238,11 @@ impl ModuleRegistry {
         let mut impl_self_types = HashMap::new();
         for (impl_key, &self_ty_id) in &ctx.tables.impl_self_types {
             let ext_key = Self::to_external_impl_key(impl_key, ctx, provider_id);
-            if ext_key
-                .trait_id
-                .as_ref()
-                .map_or(false, |t| t.provider_id == provider_id)
+            if is_impl_local(impl_key)
+                || ext_key
+                    .trait_id
+                    .as_ref()
+                    .map_or(false, |t| t.provider_id == provider_id)
                 || ext_key.self_type_def.provider_id() == Some(provider_id)
             {
                 impl_self_types.insert(ext_key, self_ty_id);
@@ -1227,7 +1256,8 @@ impl ModuleRegistry {
             let head_canon = head_sym.map(|s| Self::get_canonical(s, ctx, provider_id));
             let is_local_trait = canon_trait.provider_id == provider_id;
             let is_local_head = head_canon.as_ref().map_or(false, |h| h.provider_id == provider_id);
-            if is_local_trait || is_local_head {
+            let is_local_decl = entry.decl_id.map_or(false, |did| ranges.decls.contains(&did.0));
+            if is_local_trait || is_local_head || is_local_decl {
                 let canon_gps = entry
                     .generic_params
                     .iter()

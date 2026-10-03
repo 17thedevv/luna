@@ -1,7 +1,7 @@
 import <vec>;
 import <box>;
 import <iter_consumers>;
-fn keep(item: std::Box<i32>) -> bool { return *item.as_ref() == 7; }
+fn keep(item: &std::Box<i32>) -> bool { return *item.as_ref() == 7; }
 fn main() -> i32 {
     dec rw v = std::vec_new<std::Box<i32>>();
     v.push(std::box_new<i32>(7));

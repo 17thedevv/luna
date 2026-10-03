@@ -16,7 +16,7 @@
       "0"
     ],
     "compile_exit": 0,
-    "compile_seconds": 0.22662959998706356,
+    "compile_seconds": 0.1825059000402689,
     "run_exit": 0
   },
   {
@@ -64,7 +64,7 @@
       "0"
     ],
     "compile_exit": 0,
-    "compile_seconds": 0.2523852000012994,
+    "compile_seconds": 0.19149390002712607,
     "run_exit": 0
   },
   {
@@ -140,7 +140,7 @@
       "0"
     ],
     "compile_exit": 0,
-    "compile_seconds": 0.23834500001976267,
+    "compile_seconds": 0.25693750008940697,
     "run_exit": 0
   },
   {
@@ -244,151 +244,37 @@
       "0"
     ],
     "compile_exit": 0,
-    "compile_seconds": 0.3190182000398636,
+    "compile_seconds": 0.2859582999954,
     "run_exit": 0
   },
   {
     "depth": 0,
     "mode": "artifact",
-    "metadata": [
-      {
-        "provider": "p0",
-        "bounds": 1,
-        "unique": 1,
-        "local": 1,
-        "foreign": 0
-      }
-    ],
-    "phase_exit": 0,
-    "phase_diagnostics": [
-      "0"
-    ],
+    "metadata": [],
+    "phase_exit": 101,
+    "phase_diagnostics": [],
     "compile_exit": 0,
-    "compile_seconds": 0.20914640004048124,
+    "compile_seconds": 0.22420379996765405,
     "run_exit": 0
   },
   {
     "depth": 4,
     "mode": "artifact",
-    "metadata": [
-      {
-        "provider": "p0",
-        "bounds": 1,
-        "unique": 1,
-        "local": 1,
-        "foreign": 0
-      },
-      {
-        "provider": "p1",
-        "bounds": 1,
-        "unique": 1,
-        "local": 0,
-        "foreign": 1
-      },
-      {
-        "provider": "p2",
-        "bounds": 2,
-        "unique": 1,
-        "local": 0,
-        "foreign": 2
-      },
-      {
-        "provider": "p3",
-        "bounds": 4,
-        "unique": 1,
-        "local": 0,
-        "foreign": 4
-      },
-      {
-        "provider": "p4",
-        "bounds": 8,
-        "unique": 1,
-        "local": 0,
-        "foreign": 8
-      }
-    ],
-    "phase_exit": 0,
-    "phase_diagnostics": [
-      "0"
-    ],
+    "metadata": [],
+    "phase_exit": 101,
+    "phase_diagnostics": [],
     "compile_exit": 0,
-    "compile_seconds": 0.37815379997482523,
+    "compile_seconds": 0.5447177999885753,
     "run_exit": 0
   },
   {
     "depth": 8,
     "mode": "artifact",
-    "metadata": [
-      {
-        "provider": "p0",
-        "bounds": 1,
-        "unique": 1,
-        "local": 1,
-        "foreign": 0
-      },
-      {
-        "provider": "p1",
-        "bounds": 1,
-        "unique": 1,
-        "local": 0,
-        "foreign": 1
-      },
-      {
-        "provider": "p2",
-        "bounds": 2,
-        "unique": 1,
-        "local": 0,
-        "foreign": 2
-      },
-      {
-        "provider": "p3",
-        "bounds": 4,
-        "unique": 1,
-        "local": 0,
-        "foreign": 4
-      },
-      {
-        "provider": "p4",
-        "bounds": 8,
-        "unique": 1,
-        "local": 0,
-        "foreign": 8
-      },
-      {
-        "provider": "p5",
-        "bounds": 16,
-        "unique": 1,
-        "local": 0,
-        "foreign": 16
-      },
-      {
-        "provider": "p6",
-        "bounds": 32,
-        "unique": 1,
-        "local": 0,
-        "foreign": 32
-      },
-      {
-        "provider": "p7",
-        "bounds": 64,
-        "unique": 1,
-        "local": 0,
-        "foreign": 64
-      },
-      {
-        "provider": "p8",
-        "bounds": 128,
-        "unique": 1,
-        "local": 0,
-        "foreign": 128
-      }
-    ],
-    "phase_exit": 0,
-    "phase_diagnostics": [
-      "0"
-    ],
+    "metadata": [],
+    "phase_exit": 101,
+    "phase_diagnostics": [],
     "compile_exit": 0,
-    "compile_seconds": 2.5585989999817684,
+    "compile_seconds": 5.7532666000770405,
     "run_exit": 0
   }
 ]

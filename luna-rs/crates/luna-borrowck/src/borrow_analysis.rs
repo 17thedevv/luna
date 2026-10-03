@@ -726,13 +726,7 @@ impl<'a> BorrowAnalyzer<'a> {
 
                     if let Some(live_carriers) = analyzer.live_after.get(&val_id) {
                         for &carrier in live_carriers {
-                            let mut provenance = Vec::new();
-                            if let Some(loans) = current_state.direct_provenance.get(&carrier) {
-                                provenance.extend(loans.iter().map(|l| l.place.clone()));
-                            }
-                            if let Some(loans) = current_state.carried_provenance.get(&carrier) {
-                                provenance.extend(loans.iter().map(|l| l.place.clone()));
-                            }
+                            let provenance = analyzer.carrier_provenance_places(carrier, &current_state);
                             if !provenance.is_empty() {
                                 let shadow_verdict = bridge.check_carrier_use(carrier, &provenance, val_id);
                                 let legacy_verdict = if let Some(diag) = &emitted_diag {
@@ -771,23 +765,12 @@ impl<'a> BorrowAnalyzer<'a> {
                                 "a reference derived from unknown raw provenance cannot be returned, directly or inside an aggregate",
                             );
                         }
-                        let mut ret_loans = Vec::new();
-                        if let Some(loans) = current_state.direct_provenance.get(val) {
-                            ret_loans.extend(loans.iter().map(|l| l.place.clone()));
-                        }
-                        if let Some(loans) = current_state.carried_provenance.get(val) {
-                            ret_loans.extend(loans.iter().map(|l| l.place.clone()));
-                        }
-                        let val_op = Operand::Value(*val);
+                                                let mut ret_loans = analyzer.carrier_provenance_places(*val, &current_state);
+let val_op = Operand::Value(*val);
                         let resolved_op = analyzer.resolve_alias(&val_op, &current_state);
                         if let Operand::Value(res_v) = resolved_op {
                             if *res_v != *val {
-                                if let Some(loans) = current_state.direct_provenance.get(res_v) {
-                                    ret_loans.extend(loans.iter().map(|l| l.place.clone()));
-                                }
-                                if let Some(loans) = current_state.carried_provenance.get(res_v) {
-                                    ret_loans.extend(loans.iter().map(|l| l.place.clone()));
-                                }
+                                ret_loans.extend(analyzer.carrier_provenance_places(*res_v, &current_state));
                             }
                         }
 
@@ -981,7 +964,7 @@ impl<'a> BorrowAnalyzer<'a> {
 
     /// A field reached through a safe reference belongs to its referent, not
     /// to the local slot holding the reference value. Preserve the real parent
-    /// loans when creating a projected reborrow (whole-value domain in v1).
+    /// loans when creating a projected reborrow.
     fn reference_projection_loans(&self, place: &Operand, state: &BorrowStateData) -> Option<HashSet<Loan>> {
         let &Operand::Value(mut value) = place else { return None };
         let mut visited = HashSet::new();
@@ -1000,6 +983,39 @@ impl<'a> BorrowAnalyzer<'a> {
             value = *parent;
         }
         None
+    }
+
+    fn is_projection_through_reference(&self, place: &Operand) -> bool {
+        let &Operand::Value(mut value) = place else { return false };
+        let mut visited = HashSet::new();
+        while visited.insert(value) {
+            let Some(data) = self.func.values.get(value.0 as usize) else { return false };
+            let Instruction::FieldPtr { base: Operand::Value(parent), .. } = &data.inst else { return false };
+            let Some(parent_data) = self.func.values.get(parent.0 as usize) else { return false };
+            if self.ctx.is_some_and(|ctx| matches!(ctx.types.get(parent_data.ty), SemanticType::Reference(..))) {
+                return true;
+            }
+            value = *parent;
+        }
+        false
+    }
+
+    fn carrier_provenance_places(&self, carrier: ValueId, state: &BorrowStateData) -> Vec<Operand> {
+        let mut places = Vec::new();
+        let mut add_loans = |loans: &HashSet<Loan>| {
+            for l in loans {
+                if !self.is_projection_through_reference(&l.place) {
+                    places.push(l.place.clone());
+                }
+            }
+        };
+        if let Some(loans) = state.direct_provenance.get(&carrier) {
+            add_loans(loans);
+        }
+        if let Some(loans) = state.carried_provenance.get(&carrier) {
+            add_loans(loans);
+        }
+        places
     }
 
     fn call_reborrow_places(&self, argument: &Operand, state: &BorrowStateData) -> HashSet<Operand> {
@@ -3111,13 +3127,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
 
                 if !is_base_ptr_or_ref {
                     // Issue a loan on the variable/storage being borrowed
-                    if let Some(parents) = self.reference_projection_loans(base, state) {
-                        for parent in parents {
-                            self.issue_loan(&parent.place, *is_rw, val_id, state);
-                        }
-                    } else {
-                        self.issue_loan(base, *is_rw, val_id, state);
-                    }
+                    self.issue_loan(base, *is_rw, val_id, state);
                 }
 
                 let result_is_raw_pointer = self.ctx.is_some_and(|ctx| {
@@ -3266,6 +3276,9 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                         }
                         if let Some(prov) = state.carried_provenance.get(base_v).cloned() {
                             state.carried_provenance.entry(val_id).or_default().extend(prov);
+                        }
+                        if let Some(parents) = self.reference_projection_loans(base, state) {
+                            state.carried_provenance.entry(val_id).or_default().extend(parents);
                         }
                     }
                     state.aliases.insert(val_id, Operand::Value(*base_v));

@@ -1022,6 +1022,8 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                     luna_lexer::BuiltinKind::Void => return,
                                 };
                                 Some(crate::semantic_tables::ImplSelfTypeKey::Primitive(bt))
+                            } else if matches!(self_ast_ty, luna_ast::Type::Slice { .. }) {
+                                Some(crate::semantic_tables::ImplSelfTypeKey::Slice)
                             } else {
                                 self_sym_opt.map(crate::semantic_tables::ImplSelfTypeKey::Nominal)
                             }

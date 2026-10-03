@@ -2679,6 +2679,9 @@ impl<'a> MvirGenerator<'a> {
                         luna_semantic::SemanticType::Primitive(b) => {
                             Some(luna_semantic::semantic_tables::ImplSelfTypeKey::Primitive(*b))
                         }
+                        luna_semantic::SemanticType::Slice(_) => {
+                            Some(luna_semantic::semantic_tables::ImplSelfTypeKey::Slice)
+                        }
                         _ => None,
                     };
                     if let Some(self_key) = target_key {

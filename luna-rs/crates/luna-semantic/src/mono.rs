@@ -63,6 +63,7 @@ impl CanonicalInstanceIdentity {
                         let self_path = match impl_key.self_type_def {
                             crate::semantic_tables::ImplSelfTypeKey::Nominal(sym) => symbol_table.get_full_logical_path(sym),
                             crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => vec![format!("{:?}", b).to_lowercase()],
+                            crate::semantic_tables::ImplSelfTypeKey::Slice => vec!["slice".to_string()],
                         };
                         if let Some(trait_sym) = impl_key.trait_id {
                             let trait_path = symbol_table.get_full_logical_path(trait_sym);
@@ -79,6 +80,7 @@ impl CanonicalInstanceIdentity {
                                         (crate::ty::SemanticType::Primitive(b1), crate::semantic_tables::ImplSelfTypeKey::Primitive(b2)) => b1 == b2,
                                         (crate::ty::SemanticType::Struct(s1, ..), crate::semantic_tables::ImplSelfTypeKey::Nominal(s2)) => s1 == s2,
                                         (crate::ty::SemanticType::Enum(s1, ..), crate::semantic_tables::ImplSelfTypeKey::Nominal(s2)) => s1 == s2,
+                                        (crate::ty::SemanticType::Slice(_), crate::semantic_tables::ImplSelfTypeKey::Slice) => true,
                                         _ => false,
                                     };
                                     if !self_matches { return false; }
@@ -810,6 +812,9 @@ impl<'a> MonoCollector<'a> {
             (&SemanticType::Pointer(_, inner1), &SemanticType::Pointer(_, inner2)) => {
                 self.match_types(inner1, inner2, subst);
             }
+            (&SemanticType::Slice(elem1), &SemanticType::Slice(elem2)) => {
+                self.match_types(elem1, elem2, subst);
+            }
             _ => {}
         }
     }
@@ -1105,6 +1110,9 @@ impl<'a> MonoCollector<'a> {
             }
             crate::ty::SemanticType::Primitive(b) => {
                 Some(crate::semantic_tables::ImplSelfTypeKey::Primitive(*b))
+            }
+            crate::ty::SemanticType::Slice(_) => {
+                Some(crate::semantic_tables::ImplSelfTypeKey::Slice)
             }
             _ => None,
         };
@@ -1784,6 +1792,7 @@ impl<'a> MonoCollector<'a> {
                         let target_key = match self.ctx.types.get(peeled_sub_ty) {
                             SemanticType::Struct(s, ..) | SemanticType::Enum(s, ..) => Some(crate::semantic_tables::ImplSelfTypeKey::Nominal(*s)),
                             SemanticType::Primitive(b) => Some(crate::semantic_tables::ImplSelfTypeKey::Primitive(*b)),
+                            SemanticType::Slice(_) => Some(crate::semantic_tables::ImplSelfTypeKey::Slice),
                             _ => None,
                         };
                         if let Some(self_key) = target_key {

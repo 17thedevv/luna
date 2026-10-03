@@ -57,8 +57,9 @@ impl SemanticContext {
                 return Err(());
             }
         } else {
-            // Inherent impl
-            if !is_head_local {
+            // Inherent impl: allowed for local nominal heads or slice types in the stdlib
+            let is_inherent_allowed = is_head_local || matches!(self.types.get(self_ty_res), SemanticType::Slice(_));
+            if !is_inherent_allowed {
                 let self_name = nominal_head
                     .map(|s| self.symbol_table.get_symbol(s).name.clone())
                     .unwrap_or_else(|| format!("{:?}", self.types.get(self_ty_res)));
