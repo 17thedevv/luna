@@ -54,7 +54,7 @@ export module std {
             return self.next_ref();
         }
     }
-    
+
     impl<T> std::Clone for SliceIter<T> {
         fn clone(self: &Self) -> Self {
             unsafe {

@@ -3,6 +3,10 @@
 Contract baseline: **0.1**. Release conformance: **BLOCKED / NOT VERIFIED**.
 Consolidated 2026-10-03 at compiler revision `3dac3ac`.
 
+Subsequent [all-worktree integration](../../integration/2026-10-03-all-worktrees.md)
+preserves newer implementation and prior approved records. The original audit
+and CLI evidence keep their revision boundary; they do not certify the merge.
+
 This specification retains previously defined language contracts even where
 the implementation is incomplete. Compiler acceptance, a historical freeze
 report, and successful execution of one program do not redefine a contract.

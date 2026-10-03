@@ -9,15 +9,15 @@ fn main() -> i32 {
         std::Result::Ok(cs) -> {
             dec s = cs.to_string();
             if s.eq(&exp_hello) == false { return 1; }
-            
+
             dec c_str = cs.as_c_str();
             dec b = c_str.to_bytes();
             if b.len != (18 as usize) { return 2; }
-            
+
             dec b_nul = c_str.to_bytes_with_nul();
             if b_nul.len != (19 as usize) { return 3; }
             if b_nul[18 as usize] != (0 as u8) { return 4; }
-            
+
             dec cloned = cs.clone();
             dec cloned_s = cloned.to_string();
             if cloned_s.eq(&exp_hello) == false { return 5; }

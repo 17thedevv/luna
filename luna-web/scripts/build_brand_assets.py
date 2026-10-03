@@ -129,26 +129,26 @@ def create_lockup(symbol_img, wordmark_img, target_h=112):
     s_h = target_h
     s_w = int(s_h * s_aspect)
     s_scaled = symbol_img.resize((s_w, s_h), Image.Resampling.LANCZOS)
-    
+
     # Scale wordmark to be optically balanced with symbol (wordmark height ~ 68% of symbol height)
     w_target_h = int(target_h * 0.64)
     w_aspect = wordmark_img.width / wordmark_img.height
     w_w = int(w_target_h * w_aspect)
     w_scaled = wordmark_img.resize((w_w, w_target_h), Image.Resampling.LANCZOS)
-    
+
     # Gap between symbol and wordmark
     gap = int(target_h * 0.16)
-    
+
     total_w = s_w + gap + w_w
     total_h = target_h
-    
+
     canvas = Image.new('RGBA', (total_w, total_h), (0, 0, 0, 0))
     canvas.paste(s_scaled, (0, 0), s_scaled)
-    
+
     # Center wordmark vertically with symbol
     w_y = (total_h - w_target_h) // 2 + int(target_h * 0.02) # optical baseline nudge
     canvas.paste(w_scaled, (s_w + gap, w_y), w_scaled)
-    
+
     return canvas
 
 lockup_dark = create_lockup(s_dark, w_dark, target_h=120)

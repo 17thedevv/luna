@@ -27,6 +27,12 @@ value for representable widening, using source signedness. Runtime overflow
 policy outside already defined checked APIs remains specification debt; an
 observed LLVM wrap is not by itself a language-wide arithmetic contract.
 
+The recovered approved formatting contract defines char as a Unicode scalar,
+excluding surrogates and values above U+10FFFF. Invalid known integer-to-char
+casts diagnose, invalid dynamic values trap, and char arithmetic/bitwise/shift/
+negation operators reject. This approval predates the integration; current
+implementation conformance is separate from its exact-commit acceptance.
+
 ## References, lifetime relations and raw pointers
 
 A safe reference carries **provenance, region constraints, and capability**.

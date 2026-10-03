@@ -70,11 +70,11 @@ impl<T> std::FromResidual<std::Option<std::Infallible> > for std::Option<T> {
 impl<T> std::Try for std::Option<T> {
     type Output = T;
     type Residual = std::Option<std::Infallible>;
-    
+
     fn from_output(v: T) -> Self {
         return std::Option::Some(v);
     }
-    
+
     fn branch(self: Self) -> std::ControlFlow<std::Option<std::Infallible>, T> {
         return match self {
             std::Option::Some(v) -> std::ControlFlow::Continue(v),

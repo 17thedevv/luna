@@ -6,7 +6,7 @@
 
 ## Purpose and Scope
 
-This document serves as the authoritative source of truth for the `core.ms` semantic contracts within the Mellis compiler architecture. It establishes the strict boundaries between **Compiler Contracts** (items the compiler has explicit knowledge of) and **Standard APIs** (items defined purely in user-space). 
+This document serves as the authoritative source of truth for the `core.ms` semantic contracts within the Mellis compiler architecture. It establishes the strict boundaries between **Compiler Contracts** (items the compiler has explicit knowledge of) and **Standard APIs** (items defined purely in user-space).
 
 The goal of this document is to ensure that future language features (e.g., closures, async, iterators) are implemented systematically via the `LangItem` registry without introducing ad-hoc string comparisons or violating semantic decoupling.
 
@@ -163,7 +163,7 @@ The `core` component is fundamentally tied to the compiler. The compiler expects
 
 ## 6. Rename Independence Audit
 
-As of this contract definition, **ZERO** semantic string dependencies remain in the compiler. No phase of the compiler checks strings such as `"drop"`, `"branch"`, or `"from_residual"` for semantic lowering. The only strings present are diagnostic text, documentation, and the canonical `#[lang("...")]` mappings. 
+As of this contract definition, **ZERO** semantic string dependencies remain in the compiler. No phase of the compiler checks strings such as `"drop"`, `"branch"`, or `"from_residual"` for semantic lowering. The only strings present are diagnostic text, documentation, and the canonical `#[lang("...")]` mappings.
 
 ## 7. Evidence Requirements and Summary
 

@@ -5,6 +5,12 @@ Audit IDs below are local to [stdlib-2026-10-02](../../audits/stdlib-2026-10-02/
 not substitutes for earlier compiler-gap IDs from unrelated phases. Existing
 contracts are retained. No row here grants permission to weaken them.
 
+**Integration update — 2026-10-03:** later worktree changes have been merged.
+The rows and CLI evidence below describe `3dac3ac` unless explicitly stated
+otherwise. Some fixes may now be present; each original finding requires a
+fresh check before being marked closed. The merged manifest has 49 providers.
+V01-ARCH-02 is newly observed in the imported source, not the old audit.
+
 ## Confirmed audit defects
 
 | Audit ID | Priority | Requirement violated / observed failure |
@@ -35,6 +41,7 @@ instrumented pipeline evidence, not a claimed full profile of every old suite.
 | V01-GRAMMAR-02 | Retained parenthesized foreach head from normative Rule K.4 | CLI confirms both modes reject the contract head and accept the unparenthesized implementation form; reconciliation must retain an explicit decision |
 | V01-GRAMMAR-03 | Receiver shorthand equivalence from Rule K.5 | CLI confirms both modes reject &self shorthand; the complete equivalence contract remains a requirement |
 | V01-DIAG-01 | DIAG-1 requires typed diagnostic codes for every compiler error | The foreach/receiver parser failures render `error:` without a code in both modes; the private-field rejection correctly renders E1003. Code identity/propagation still needs a focused diagnostic audit |
+| V01-ARCH-02 | Compiler must not map library macro names, streams, suffixes or callee spellings | Imported D:/fdlang macro_engine.rs contains the eight-name/format_macro interception and print_val/newline lookup. It violates the retained boundary; preservation in Git is not semantic approval |
 | V01-DOC-01 | Visibility-02: fields default public independently of type accessibility | Old grammar skill/reference says private by default; corrected to the approved amendment |
 | V01-DOC-02 | `requires life(...)` is the current relation spelling | Older docs/skills use removed `where outlives`; current guidance is corrected without changing the relation model |
 | V01-DOC-03 | Luna .ln/.llib, 32 providers, six language contract families plus OptionExt contribution | Old overview/bootstrap pages claim Mellis core.ms, 25 providers or four families; current entry points are replaced |
@@ -48,12 +55,17 @@ examples under a historical-role notice.
 | ID | Question / boundary |
 |---|---|
 | V01-DESIGN-01 | Exact inherent/trait method collision precedence or ambiguity policy; hash iteration cannot decide it |
-| V01-DESIGN-02 | Domain of char and failure policy for invalid literal/dynamic integer-to-char conversion; UTF-8 text sinks must remain valid meanwhile |
 | V01-DESIGN-03 | Runtime integer overflow policy outside defined checked/compile-time operations; avoid declaring current LLVM wrapping normative |
 | V01-DESIGN-04 | Complete formal grammar beyond the consolidated productions; parser acceptance of legacy/uncontracted syntax is not adoption |
 
 No new format-macro hook, interpolation syntax, runtime opcode or container
 language item is adopted. These require their own complete generic contract.
+
+V01-DESIGN-02 is resolved by the previously approved 2026-10-01 formatting
+contract, now recovered from the other branch: char is a Unicode scalar;
+invalid static casts diagnose, invalid dynamic casts trap, and arithmetic/
+bitwise/shift/negation operators on char reject. The approval and acceptance
+apply to their recorded baseline, not every newly merged addition.
 
 ## Evidence not completed
 
@@ -81,3 +93,9 @@ gaps above; two characterize the accepted unparenthesized implementation form.
 The custom outln macro returns a value and emits no output, demonstrating that
 this name currently uses ordinary expansion. These checks are not a certification
 of every macro, field visibility or language capability.
+
+The [integration CLI run](../../integration/evidence/cli-examples.json), after
+rebuilding the merged CLI/runtime and all 49 providers, repeats the same 16
+attempts and outcomes. All three grammar gaps remain reproduced. The custom
+macro case uses an integer argument; it does not exercise or excuse the newly
+imported format-string interception recorded as V01-ARCH-02.

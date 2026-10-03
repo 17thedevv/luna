@@ -165,5 +165,3 @@ uint32_t __luna_atomic_swap_u32(volatile uint32_t* ptr, uint32_t val) {
     return (uint32_t)InterlockedExchange((volatile LONG*)ptr, (LONG)val);
 #endif
 }
-
-

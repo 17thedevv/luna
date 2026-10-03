@@ -72,3 +72,5 @@ runtime archive. Other build locations can be selected with `LUNA_DOCS_CLI` and
 `LUNA_RUNTIME_LIB`; `LUNA_DOCS_TOOLCHAIN_PATH` optionally prepends toolchain
 directories to PATH, and `LUNA_DOCS_TEMP` selects temporary storage. Rebuild
 the matching CLI, runtime and sysroot artifacts before collecting new evidence.
+Use `LUNA_DOCS_EVIDENCE_OUT` to keep a later run separate from the original
+audit evidence; the integration run is stored in `docs/integration/evidence`.

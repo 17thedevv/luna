@@ -47,7 +47,7 @@ import <iter_collect>;
 
         fn run_stress_lifecycle(drop_count_ptr: *rw i32) -> i32 {
             dec rw table = std::hashmap_with_capacity<TrackedItem, TrackedItem>(8 as u64);
-            
+
             // Insert 6 key-value pairs (12 tracked items)
             dec rw i: i32 = 1;
             while i <= 6 {
@@ -106,4 +106,3 @@ import <iter_collect>;
 
             return 0;
         }
-    

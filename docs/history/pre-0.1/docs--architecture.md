@@ -108,7 +108,7 @@ Long-term goals:
 
 # 4. `.mlib` Interchange Format
 
-`.mlib` is not a traditional object file; it is the **Mellis semantic compilation artifact and module interchange format**. 
+`.mlib` is not a traditional object file; it is the **Mellis semantic compilation artifact and module interchange format**.
 
 It acts as a strict serialization boundary. The generator `.mlib` phase reads exclusively from the `SemanticSnapshot` and `MVIR`, completely decoupled from the AST. The consumer phase loads semantic metadata directly without needing to re-parse or type-check dependencies.
 

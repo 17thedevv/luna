@@ -4,7 +4,7 @@ import <result>;
 
 fn test_read_dir_and_canonicalize() -> bool {
     dec dir_name = std::string_from_str("test_rd_tmp");
-    
+
     // Clean up if exists from previous run
     std::remove_file(&std::string_from_str("test_rd_tmp/a.txt"));
     std::remove_file(&std::string_from_str("test_rd_tmp/b.txt"));

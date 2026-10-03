@@ -1,3 +1,2 @@
 import "p0";
 export module probe1 { export fn tag() -> i32 { return 1; } }
-

@@ -10,8 +10,8 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURES = ROOT / 'tests/luna/language/spec_v01'
 CLI = Path(os.environ.get('LUNA_DOCS_CLI', str(ROOT / 'luna-rs/target/debug/luna.exe')))
-OUT = ROOT / 'docs/spec/0.1/evidence'
-OUT.mkdir(exist_ok=True)
+OUT = Path(os.environ.get('LUNA_DOCS_EVIDENCE_OUT', str(ROOT / 'docs/spec/0.1/evidence')))
+OUT.mkdir(parents=True, exist_ok=True)
 BASE = Path(os.environ.get('LUNA_DOCS_TEMP', tempfile.gettempdir()))
 BASE.mkdir(parents=True, exist_ok=True)
 env = os.environ.copy()

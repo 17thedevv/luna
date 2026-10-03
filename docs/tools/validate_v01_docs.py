@@ -69,8 +69,9 @@ for source in (ROOT / 'docs/tools').glob('*.py'):
     ast.parse(source.read_text(encoding='utf-8'), filename=str(source))
 manifest = tomllib.loads((ROOT / 'luna-rs/libs/external/sysroot.toml').read_text(encoding='utf-8'))
 table = (ROOT / 'docs/spec/0.1/stdlib-inventory.md').read_text(encoding='utf-8')
-assert len(manifest['provider']) == 32
-assert '**32 providers**' in table
+assert f"**{len(manifest['provider'])} providers**" in table
+original = tomllib.loads((ROOT / 'docs/spec/0.1/evidence/sysroot-audit-baseline.toml').read_text(encoding='utf-8'))
+assert len(original['provider']) == 32
 for provider in manifest['provider']:
     assert f"`{provider['name']}`" in table
     assert (ROOT / 'luna-rs/libs/external' / (provider['path'] + '.ln')).is_file()

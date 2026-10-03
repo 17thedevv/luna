@@ -11,7 +11,7 @@
 Mellis v1.0 — Semantic Foundation Frozen / Core Hardening in Progress
 The frontend, middle-end, and `.mlib` serialization systems are highly structured. The Language Core v1.0 is currently passing **100% of tests**, and we are working to reach 100% semantic completion.
 
-- **FrontEnd (`Lexer`, `Parser`)**: 
+- **FrontEnd (`Lexer`, `Parser`)**:
   - Supports struct, enum, trait, impl, match expressions, and standard control flow.
 - **Resolver (`Resolver.cpp`)**:
   - Exclusively handles Name Resolution and Path Semantics.

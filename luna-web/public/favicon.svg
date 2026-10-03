@@ -7,7 +7,7 @@
       <stop offset="85%" stop-color="#8b5cf6"/>
       <stop offset="100%" stop-color="#6d28d9"/>
     </linearGradient>
-    
+
     <!-- Laptop screen glow -->
     <linearGradient id="laptopGlow" x1="0%" y1="100%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#c4b5fd"/>
@@ -25,7 +25,7 @@
     .moon-path { fill: url(#moonGlow); filter: url(#lunarAura); }
     .figure-silhouette { fill: #ffffff; opacity: 0.96; }
     .laptop-glow { fill: url(#laptopGlow); }
-    
+
     @media (prefers-color-scheme: light) {
       .bg-plate { fill: #ffffff; stroke: #e2e8f0; }
       .moon-path { fill: #1e1b4b; filter: none; }
@@ -46,7 +46,7 @@
     <!-- Head & Hair Bun -->
     <circle class="figure-silhouette" cx="30" cy="24" r="3.2"/>
     <ellipse class="figure-silhouette" cx="30.5" cy="21.5" rx="1.8" ry="1.5"/>
-    
+
     <!-- Flowing Hair streaming toward the crescent curve -->
     <path class="figure-silhouette" d="M 28 24 C 23 23, 19 28, 14 31 C 18 30, 22 28, 27 27 Z"/>
 

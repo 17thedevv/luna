@@ -205,6 +205,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/stdlib-2026-10-02-d-worktree/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/audits/stdlib-2026-10-02/README.md",
     "role": "evidence",
     "owner": "stdlib"
@@ -315,6 +320,11 @@
     "owner": "syntax"
   },
   {
+    "path": "docs/history/pre-0.1/worktree-phase6-formatting-notes.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/implementation_plan.md",
     "role": "historical",
     "owner": "conformance"
@@ -322,6 +332,11 @@
   {
     "path": "docs/implementation_plan_mvir.md",
     "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/integration/2026-10-03-all-worktrees.md",
+    "role": "evidence",
     "owner": "conformance"
   },
   {
@@ -625,9 +640,19 @@
     "owner": "stdlib"
   },
   {
+    "path": "luna-rs/docs/freeze_audit_stdlib_memory_v1.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
     "path": "luna-rs/docs/freeze_audit_stdlib_phase4c.md",
     "role": "historical",
     "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/literal_typing_01.md",
+    "role": "historical",
+    "owner": "conformance"
   },
   {
     "path": "luna-rs/docs/master_semantic_audit.md",
@@ -655,9 +680,24 @@
     "owner": "macros"
   },
   {
+    "path": "luna-rs/docs/phase5_reaudit_2026_09_30.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/phase6_completion_plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
     "path": "luna-rs/docs/phase6_core_formatting_v1.md",
     "role": "adopted-contract",
     "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/portable_comptime_artifact_v1.md",
+    "role": "historical",
+    "owner": "modules"
   },
   {
     "path": "luna-rs/docs/raw_storage_anchor_v1.md",
@@ -708,5 +748,40 @@
     "path": "luna-rs/docs/whole_file_io_v1.md",
     "role": "adopted-contract",
     "owner": "stdlib"
+  },
+  {
+    "path": "luna-web/AGENTS.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-web/CLAUDE.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-web/README.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-web/src/content/docs/guides/example.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-web/src/content/docs/reference/example.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-web/src/content/docs/vi/guides/example.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-web/src/content/docs/vi/reference/example.md",
+    "role": "historical",
+    "owner": "conformance"
   }
 ]

@@ -42,8 +42,11 @@ The adopted formatting foundation defines Writer, Display, FmtError and ordinary
 implementations. It explicitly excludes formatting macros, format-string parsing,
 width/alignment/precision syntax and general streaming writers from that phase.
 Those exclusions remain in effect for the 0.1 baseline unless amended explicitly.
-The current checkout contains no implementation of the eight-name mapping or
-`#[format_macro]` described in the earlier discussion.
+The original audit checkout at `3dac3ac` contained no implementation of the
+eight-name mapping or `#[format_macro]` described in the earlier discussion.
+All-worktree integration imports such a mapping from D:/fdlang in
+`luna-semantic/src/macro_engine.rs`. This is an implementation boundary defect,
+recorded as V01-ARCH-02; merging it does not amend or approve the contract above.
 
 If `{expr}` interpolation is added, its language/macro capability must specify
 literal/expression segmentation, escaping, evaluation order, evaluation count,
