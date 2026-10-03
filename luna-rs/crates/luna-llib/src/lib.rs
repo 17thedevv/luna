@@ -16,6 +16,7 @@ pub struct ValidationContext {
     pub expected_target: String,
     pub expected_source_fingerprint: Option<format::Fingerprint>,
     pub expected_dependencies: std::collections::HashMap<String, format::Fingerprint>,
+    pub expected_execution_dependencies: std::collections::HashMap<String, format::Fingerprint>,
 }
 
 pub fn validate_artifact(manifest: &crate::format::Manifest, ctx: &ValidationContext) -> Result<(), String> {
@@ -34,6 +35,13 @@ pub fn validate_artifact(manifest: &crate::format::Manifest, ctx: &ValidationCon
         if let Some(expected_dep_fingerprint) = ctx.expected_dependencies.get(&dep.provider_name) {
             if &dep.interface_fingerprint != expected_dep_fingerprint {
                 return Err(format!("dependency interface fingerprint mismatch for provider {}", dep.provider_name));
+            }
+        }
+        if let Some(expected_exec_fingerprint) = ctx.expected_execution_dependencies.get(&dep.provider_name) {
+            if let Some(exec_fp) = &dep.execution_fingerprint {
+                if exec_fp != expected_exec_fingerprint {
+                    return Err(format!("dependency execution fingerprint mismatch for provider {}", dep.provider_name));
+                }
             }
         }
     }

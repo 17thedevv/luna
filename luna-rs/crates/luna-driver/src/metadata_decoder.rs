@@ -186,6 +186,7 @@ impl InterfaceDecoder {
             id: self.provider_id,
             name: self.provider_name,
             interface_fingerprint: self.interface_fingerprint,
+            execution_fingerprint: None,
             exported_symbols,
             symbol_types,
             symbol_struct_field_names: HashMap::new(),

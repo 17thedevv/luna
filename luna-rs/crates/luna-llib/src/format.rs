@@ -117,11 +117,17 @@ pub struct DependencyTable {
     pub native_deps: Vec<String>,
 }
 
+/// Execution fingerprint: H(canonical provider execution payload)
+pub type ExecutionFingerprint = Fingerprint;
+
 /// A single dependency with its interface fingerprint.
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DependencyEntry {
     pub provider_name: String,
     pub interface_fingerprint: InterfaceFingerprint,
+    #[serde(default)]
+    pub execution_fingerprint: Option<ExecutionFingerprint>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -137,6 +143,8 @@ pub struct Provenance {
     pub compiler_version: String,
     pub codegen_options: String,
     pub interface_fingerprint: InterfaceFingerprint,
+    #[serde(default)]
+    pub execution_fingerprint: Option<ExecutionFingerprint>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -491,7 +491,8 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             if !all_diagnostics.is_empty() {
                 return Err(all_diagnostics);
             }
-            let generator = MvirGenerator::new(&arena, &semantic_ctx, &session.source_manager);
+            let mut generator = MvirGenerator::new(&arena, &semantic_ctx, &session.source_manager);
+            generator.root_file_id = Some(file_id);
             let (mut module, mvir_diags) = generator.generate(&items_mut);
             if !mvir_diags.is_empty() {
                 return Err(mvir_diags);
@@ -702,6 +703,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                         let dep_entry = luna_llib::format::DependencyEntry {
                             provider_name: interface.name.clone(),
                             interface_fingerprint: interface.interface_fingerprint,
+                            execution_fingerprint: interface.execution_fingerprint,
                         };
                         deps.push(dep_entry);
                     }
@@ -731,6 +733,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                         compiler_version: "0.1.0".to_string(),
                         codegen_options: "".to_string(),
                         interface_fingerprint: luna_llib::format::Fingerprint([0; 32]),
+                        execution_fingerprint: None,
                     },
                     export_table: None,
                 };

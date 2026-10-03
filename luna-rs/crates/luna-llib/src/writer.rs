@@ -15,26 +15,7 @@ impl LlibWriter {
         Self::serialize_module_internal(&mut mvir_payload, &mlib_module)?;
 
         let mut ast_payload = Vec::new();
-        let mut public_arena = arena.clone();
-        
-        let mut generic_impl_methods = std::collections::HashSet::new();
-        for decl in &public_arena.decls {
-            if let luna_ast::Decl::Impl { generic_params, methods, .. } = decl {
-                if !generic_params.is_empty() {
-                    for method_id in methods {
-                        generic_impl_methods.insert(*method_id);
-                    }
-                }
-            }
-        }
-
-        for (i, decl) in public_arena.decls.iter_mut().enumerate() {
-            if let luna_ast::Decl::Function { generic_params, body, .. } = decl {
-                if generic_params.is_empty() && !generic_impl_methods.contains(&luna_ast::DeclId(i as u32)) {
-                    *body = None;
-                }
-            }
-        }
+        let public_arena = arena.clone();
         bincode::serialize_into(&mut ast_payload, &(public_arena, items.to_vec(), source.to_string()))
             .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
 
@@ -42,6 +23,10 @@ impl LlibWriter {
         let mut source_hasher = Sha256::new();
         source_hasher.update(source.as_bytes());
         manifest.provenance.source_fingerprint = crate::format::Fingerprint(source_hasher.finalize().into());
+
+        let mut ast_hasher = Sha256::new();
+        ast_hasher.update(&ast_payload);
+        manifest.provenance.execution_fingerprint = Some(crate::format::Fingerprint(ast_hasher.finalize().into()));
 
         let mut interface_hasher = Sha256::new();
         if let Some(semantic) = semantic_metadata {

@@ -41,8 +41,12 @@ impl ExternalComponentLoader {
         }
 
         let mut expected_dependencies = std::collections::HashMap::new();
+        let mut expected_execution_dependencies = std::collections::HashMap::new();
         for interface in driver_session.registry.interfaces.values() {
             expected_dependencies.insert(interface.name.clone(), interface.interface_fingerprint);
+            if let Some(exec_fp) = interface.execution_fingerprint {
+                expected_execution_dependencies.insert(interface.name.clone(), exec_fp);
+            }
         }
 
         let validation_ctx = luna_llib::ValidationContext {
@@ -50,6 +54,7 @@ impl ExternalComponentLoader {
             expected_target: luna_backend::TargetConfig::default().triple,
             expected_source_fingerprint,
             expected_dependencies,
+            expected_execution_dependencies,
         };
 
         if let Err(reason) = luna_llib::validate_artifact(&manifest, &validation_ctx) {
@@ -160,14 +165,19 @@ impl ExternalComponentLoader {
             // reject the artifact rather than silently consume stale metadata.
             {
                 let mut loaded_dependencies = std::collections::HashMap::new();
+                let mut loaded_execution_dependencies = std::collections::HashMap::new();
                 for interface in driver_session.registry.interfaces.values() {
                     loaded_dependencies.insert(interface.name.clone(), interface.interface_fingerprint);
+                    if let Some(exec_fp) = interface.execution_fingerprint {
+                        loaded_execution_dependencies.insert(interface.name.clone(), exec_fp);
+                    }
                 }
                 let dep_validation_ctx = luna_llib::ValidationContext {
                     expected_compiler_version: "0.1.0".to_string(),
                     expected_target: luna_backend::TargetConfig::default().triple,
                     expected_source_fingerprint: None,
                     expected_dependencies: loaded_dependencies,
+                    expected_execution_dependencies: loaded_execution_dependencies,
                 };
                 if let Err(reason) = luna_llib::validate_artifact(&manifest, &dep_validation_ctx) {
                     driver_session.registry.finish_loading();
@@ -260,6 +270,7 @@ impl ExternalComponentLoader {
             // dependency freshness validation compares against the real interface identity
             // rather than the default zero fingerprint.
             interface.interface_fingerprint = manifest.provenance.interface_fingerprint;
+            interface.execution_fingerprint = manifest.provenance.execution_fingerprint;
             driver_session.registry.register_external(descriptor.name.clone(), interface);
             driver_session.registry.finish_loading();
 
