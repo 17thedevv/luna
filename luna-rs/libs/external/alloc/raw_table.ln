@@ -90,7 +90,13 @@ import <__lang_iterator>;
         }
     }
 
-    impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
+    fn mix_hash(h: u64) -> u64 {
+    dec rw z = (h ^ (h >> 30u64)) * 13787848793156543929u64;
+    z = (z ^ (z >> 27u64)) * 10723151780598845931u64;
+    return z ^ (z >> 31u64);
+}
+
+impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         export fn len(self: &Self) -> u64 {
             return self.len;
         }
@@ -117,7 +123,7 @@ import <__lang_iterator>;
                 return ProbeResult::Vacant(0 as u64);
             }
             dec mask = self.cap - (1 as u64);
-            dec rw idx = hash & mask;
+            dec rw idx = mix_hash(hash) & mask;
             dec rw first_tombstone: u64 = self.cap;
             dec rw step: u64 = 0 as u64;
 
@@ -340,7 +346,7 @@ import <__lang_iterator>;
         }
 
         export fn clear(self: &rw Self) {
-            if self.len > (0 as u64) {
+            if self.cap > (0 as u64) {
                 dec rw i: u64 = 0 as u64;
                 while i < self.cap {
                     dec rw state_val: u8 = 0 as u8;
@@ -415,7 +421,7 @@ import <__lang_iterator>;
                             dec k = std::ptr::read<K>(std::ptr::add<K>(self.keys as *K, i));
                             dec v = std::ptr::read<V>(std::ptr::add<V>(self.values as *V, i));
 
-                            dec rw new_idx = cached_hash & new_mask;
+                            dec rw new_idx = mix_hash(cached_hash) & new_mask;
                             while *std::ptr::add<u8>(new_states as *u8, new_idx) != (0 as u8) {
                                 new_idx = (new_idx + (1 as u64)) & new_mask;
                             }

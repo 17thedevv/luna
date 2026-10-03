@@ -464,33 +464,9 @@ impl<T> Vec<T> {
         self.len = write;
     }
 
-    // For primitive i32 vec dedup:
-    export fn dedup_i32(self: &rw Self) {
-        if std::mem::size_of<T>() != (4 as u64) {
-            return;
-        }
-        if self.len <= (1 as u64) { return; }
-        dec rw write: u64 = 1 as u64;
-        dec rw read: u64 = 1 as u64;
-        while read < self.len {
-            unsafe {
-                dec p_read = std::ptr::add<T>(self.ptr as *T, read) as *i32;
-                dec p_prev = std::ptr::add<T>(self.ptr as *T, write - (1 as u64)) as *i32;
-                if *p_prev == *p_read {
-                    dec p_read_mut = std::ptr::add_mut<T>(self.ptr, read);
-                    std::ptr::drop_in_place<T>(p_read_mut);
-                } else {
-                    if read != write {
-                        dec p_write = std::ptr::add_mut<T>(self.ptr, write);
-                        dec val = std::ptr::read<T>(std::ptr::add<T>(self.ptr as *T, read));
-                        std::ptr::write<T>(p_write, val);
-                    }
-                    write = write + (1 as u64);
-                }
-            }
-            read = read + (1 as u64);
-        }
-        self.len = write;
+    // Deprecated alias for dedup; delegates safely via Eq without reinterpreting T as i32.
+    export fn dedup_i32<T: std::Eq>(self: &rw Self) {
+        self.dedup();
     }
 
 

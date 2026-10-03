@@ -3,30 +3,36 @@ export trait Hash {
     fn hash(self: &Self) -> u64;
 }
 
+fn mix_u64(x: u64) -> u64 {
+    dec rw z = (x ^ (x >> 30u64)) * 13787848793156543929u64;
+    z = (z ^ (z >> 27u64)) * 10723151780598845931u64;
+    return z ^ (z >> 31u64);
+}
+
 impl Hash for bool {
     fn hash(self: &Self) -> u64 {
-        if *self { return 1 as u64; } else { return 0 as u64; }
+        if *self { return mix_u64(1 as u64); } else { return mix_u64(0 as u64); }
     }
 }
 impl Hash for char {
-    fn hash(self: &Self) -> u64 { return (*self as u32) as u64; }
+    fn hash(self: &Self) -> u64 { return mix_u64((*self as u32) as u64); }
 }
 
-impl Hash for u8 { fn hash(self: &Self) -> u64 { return *self as u64; } }
-impl Hash for u16 { fn hash(self: &Self) -> u64 { return *self as u64; } }
-impl Hash for u32 { fn hash(self: &Self) -> u64 { return *self as u64; } }
-impl Hash for u64 { fn hash(self: &Self) -> u64 { return *self; } }
-impl Hash for usize { fn hash(self: &Self) -> u64 { return *self as u64; } }
-impl Hash for i8 { fn hash(self: &Self) -> u64 { return *self as u64; } }
-impl Hash for i16 { fn hash(self: &Self) -> u64 { return *self as u64; } }
-impl Hash for i32 { fn hash(self: &Self) -> u64 { return *self as u64; } }
-impl Hash for i64 { fn hash(self: &Self) -> u64 { return *self as u64; } }
-impl Hash for isize { fn hash(self: &Self) -> u64 { return *self as u64; } }
+impl Hash for u8 { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
+impl Hash for u16 { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
+impl Hash for u32 { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
+impl Hash for u64 { fn hash(self: &Self) -> u64 { return mix_u64(*self); } }
+impl Hash for usize { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
+impl Hash for i8 { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
+impl Hash for i16 { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
+impl Hash for i32 { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
+impl Hash for i64 { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
+impl Hash for isize { fn hash(self: &Self) -> u64 { return mix_u64(*self as u64); } }
 impl Hash for u128 {
     fn hash(self: &Self) -> u64 {
         dec lo = (*self) as u64;
         dec hi = ((*self) >> 64u128) as u64;
-        return lo ^ hi;
+        return mix_u64(lo ^ hi);
     }
 }
 impl Hash for i128 {
@@ -34,7 +40,7 @@ impl Hash for i128 {
         dec u = (*self) as u128;
         dec lo = u as u64;
         dec hi = (u >> 64u128) as u64;
-        return lo ^ hi;
+        return mix_u64(lo ^ hi);
     }
 }
 }

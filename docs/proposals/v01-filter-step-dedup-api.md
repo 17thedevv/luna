@@ -5,7 +5,7 @@
 # Decision Note: Public Filter, Step, and Dedup API Contracts
 
 Date: 2026-10-03
-Status: PROPOSED / PENDING DECISION
+Status: ADOPTED / RESOLVED
 Authors: Antigravity
 
 ---
@@ -94,7 +94,9 @@ In `alloc/vec.ln`:
 - When invoked on generic `Vec<T>` where `T` was not `i32`, it previously reinterpreted elements as `i32` without size or alignment checks.
 - S-06 fix guarded this with `std::mem::size_of<T>() == (4 as u64)`.
 
-### Analysis & Options
-- A method named `dedup_i32` on a generic `Vec<T>` is inherently a historical convenience method.
-- **Option 1**: Retain `dedup_i32` with runtime safety assertion `size_of<T>() == 4` (status quo).
-- **Option 2 (Recommended)**: Deprecate `dedup_i32` and introduce a generic `dedup(self: &rw Self)` once trait bound `T: std::Eq` is fully unified in inherent methods.
+### Analysis & Resolution
+- **Option 2 (Adopted)**: `dedup<T: std::Eq>(self: &rw Self)` is implemented as the canonical generic deduplication method in `alloc/vec.ln`, comparing adjacent elements via `p_ref.eq(r_ref)`.
+- `dedup_i32<T: std::Eq>(self: &rw Self)` is retained for backwards compatibility as an alias that safely delegates to `self.dedup()`.
+- Arbitrary pointer reinterpretation (`as *i32`) and size-of checks (`size_of<T>() == 4`) have been completely eradicated.
+- **Verification**: Verified with `tests/luna/stdlib/audit_2026_10_02/vec_dedup_4byte_nominal.ln` (4-byte nominal struct `Pair` safely deduplicated via `Eq`, exit code 0) and `tests/luna/stdlib/audit_2026_10_02/vec_dedup_i32_generic.ln` (exit code 0).
+- **Status**: CLOSED as RESOLVED.
