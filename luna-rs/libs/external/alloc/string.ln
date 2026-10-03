@@ -5,8 +5,13 @@ import <ptr>;
 import <mem>;
 import <__lang_option>;
 import <__lang_drop>;
+import <__lang_iterator>;
+import <__lang_into_iterator>;
 import <fmt>;
 import <result>;
+import <clone>;
+import <cmp>;
+import <hash>;
 
 module utf8 {
     export fn validate(bytes: &[u8]) -> bool {
@@ -95,7 +100,10 @@ module utf8 {
     }
 
     export fn encode_char(ch: char, out_vec: &rw std::Vec<u8>) {
-        dec code = ch as u32;
+        dec rw code: u32 = ch as u32;
+        if (code >= (55296 as u32) && code <= (57343 as u32)) || (code > (1114111 as u32)) {
+            code = 65533 as u32;
+        }
         if code <= (127 as u32) {
             out_vec.push(code as u8);
         } else if code <= (2047 as u32) {
@@ -112,6 +120,22 @@ module utf8 {
             out_vec.push(((128 as u32) | (code & (63 as u32))) as u8);
         }
     }
+}
+
+// Provider-private helpers
+fn str_len(s: str) -> u64 {
+    dec s_ptr = s as *u8;
+    dec rw len: u64 = 0 as u64;
+    unsafe {
+        while (*(std::ptr::add<u8>(s_ptr, len))) != (0 as u8) {
+            len = len + (1 as u64);
+        }
+    }
+    return len;
+}
+
+fn is_ascii_whitespace(b: u8) -> bool {
+    return b == (32 as u8) || (b >= (9 as u8) && b <= (13 as u8));
 }
 
 module std {
@@ -217,6 +241,16 @@ module std {
             }
         }
 
+        export fn push_string(self: &rw Self, other: &Self) {
+            dec bytes = other.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                self.vec.push(bytes[i]);
+                i = i + (1 as u64);
+            }
+        }
+
         export fn clear(self: &rw Self) {
             self.vec.clear();
         }
@@ -258,6 +292,63 @@ module std {
                 i = i + (1 as u64);
             }
             return true;
+        }
+
+        export fn cmp(self: &Self, other: &Self) -> i32 {
+            dec a = self.as_bytes();
+            dec b = other.as_bytes();
+            dec a_len = a.len as u64;
+            dec b_len = b.len as u64;
+            dec rw min_len = a_len;
+            if b_len < min_len {
+                min_len = b_len;
+            }
+            dec rw i: u64 = 0 as u64;
+            while i < min_len {
+                if a[i] < b[i] { return 0 - 1; }
+                if a[i] > b[i] { return 1; }
+                i = i + (1 as u64);
+            }
+            if a_len < b_len { return 0 - 1; }
+            if a_len > b_len { return 1; }
+            return 0;
+        }
+
+        export fn hash(self: &Self) -> u64 {
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw h: u64 = 14695981039346656037u64;
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                h = h ^ (bytes[i] as u64);
+                h = h * (1099511628211u64);
+                i = i + (1 as u64);
+            }
+            return h;
+        }
+    }
+
+    impl std::Clone for String {
+        fn clone(self: &Self) -> Self {
+            return self.clone();
+        }
+    }
+
+    impl std::Eq for String {
+        fn eq(self: &Self, other: &Self) -> bool {
+            return self.eq(other);
+        }
+    }
+
+    impl std::Ord for String {
+        fn cmp(self: &Self, other: &Self) -> i32 {
+            return self.cmp(other);
+        }
+    }
+
+    impl std::Hash for String {
+        fn hash(self: &Self) -> u64 {
+            return self.hash();
         }
     }
 
@@ -309,4 +400,808 @@ module std {
             return std::Result::Ok;
         }
     }
+
+    impl std::fmt::Debug for String {
+        fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, std::fmt::FmtError> {
+            if writer.write_char('"').is_err() {
+                return std::Result::Err(std::fmt::FmtError::WriteFailed);
+            }
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                dec first = bytes[i];
+                if first <= (127 as u8) {
+                    if writer.write_char(first as char).is_err() {
+                        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+                    }
+                    i = i + (1 as u64);
+                } else if first <= (223 as u8) {
+                    dec code = (((first & (31 as u8)) as u32) << (6 as u32))
+                        | ((bytes[i + (1 as u64)] & (63 as u8)) as u32);
+                    if writer.write_char(code as char).is_err() {
+                        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+                    }
+                    i = i + (2 as u64);
+                } else if first <= (239 as u8) {
+                    dec code = (((first & (15 as u8)) as u32) << (12 as u32))
+                        | (((bytes[i + (1 as u64)] & (63 as u8)) as u32) << (6 as u32))
+                        | ((bytes[i + (2 as u64)] & (63 as u8)) as u32);
+                    if writer.write_char(code as char).is_err() {
+                        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+                    }
+                    i = i + (3 as u64);
+                } else {
+                    dec code = (((first & (7 as u8)) as u32) << (18 as u32))
+                        | (((bytes[i + (1 as u64)] & (63 as u8)) as u32) << (12 as u32))
+                        | (((bytes[i + (2 as u64)] & (63 as u8)) as u32) << (6 as u32))
+                        | ((bytes[i + (3 as u64)] & (63 as u8)) as u32);
+                    if writer.write_char(code as char).is_err() {
+                        return std::Result::Err(std::fmt::FmtError::WriteFailed);
+                    }
+                    i = i + (4 as u64);
+                }
+            }
+            if writer.write_char('"').is_err() {
+                return std::Result::Err(std::fmt::FmtError::WriteFailed);
+            }
+            return std::Result::Ok;
+        }
+    }
+
+    // =========================================================================
+    // StringChars: Borrowed UTF-8 char iterator over String
+    // =========================================================================
+    export struct StringChars {
+        private ptr: *u8,
+        private end: *u8,
+    } requires anchor(ptr) = self
+      requires anchor(end) = self;
+
+    impl std::Iterator<char> for StringChars {
+        fn next(self: &rw Self) -> std::Option<char> life_from(self) {
+            if (self.ptr as u64) >= (self.end as u64) {
+                return std::Option::None;
+            }
+            unsafe {
+                dec first = *self.ptr;
+                if first <= (127 as u8) {
+                    self.ptr = ((self.ptr as u64) + (1 as u64)) as *u8;
+                    return std::Option::Some(first as char);
+                } else if first <= (223 as u8) {
+                    dec p = self.ptr as u64;
+                    dec b1 = *((p + (1 as u64)) as *u8);
+                    dec code = (((first & (31 as u8)) as u32) << (6 as u32))
+                        | ((b1 & (63 as u8)) as u32);
+                    self.ptr = (p + (2 as u64)) as *u8;
+                    return std::Option::Some(code as char);
+                } else if first <= (239 as u8) {
+                    dec p = self.ptr as u64;
+                    dec b1 = *((p + (1 as u64)) as *u8);
+                    dec b2 = *((p + (2 as u64)) as *u8);
+                    dec code = (((first & (15 as u8)) as u32) << (12 as u32))
+                        | (((b1 & (63 as u8)) as u32) << (6 as u32))
+                        | ((b2 & (63 as u8)) as u32);
+                    self.ptr = (p + (3 as u64)) as *u8;
+                    return std::Option::Some(code as char);
+                } else {
+                    dec p = self.ptr as u64;
+                    dec b1 = *((p + (1 as u64)) as *u8);
+                    dec b2 = *((p + (2 as u64)) as *u8);
+                    dec b3 = *((p + (3 as u64)) as *u8);
+                    dec code = (((first & (7 as u8)) as u32) << (18 as u32))
+                        | (((b1 & (63 as u8)) as u32) << (12 as u32))
+                        | (((b2 & (63 as u8)) as u32) << (6 as u32))
+                        | ((b3 & (63 as u8)) as u32);
+                    self.ptr = (p + (4 as u64)) as *u8;
+                    return std::Option::Some(code as char);
+                }
+            }
+            return std::Option::None;
+        }
+    }
+
+    // =========================================================================
+    // StringIntoIter: Consuming UTF-8 char iterator
+    // =========================================================================
+    export struct StringIntoIter {
+        private vec: Vec<u8>,
+        private pos: u64,
+    };
+
+    impl std::Iterator<char> for StringIntoIter {
+        fn next(self: &rw Self) -> std::Option<char> life_from(self) {
+            dec len = self.vec.len();
+            if self.pos >= len {
+                return std::Option::None;
+            }
+            dec bytes = self.vec.as_slice();
+            dec first = bytes[self.pos];
+            if first <= (127 as u8) {
+                self.pos = self.pos + (1 as u64);
+                return std::Option::Some(first as char);
+            } else if first <= (223 as u8) {
+                dec b1 = bytes[self.pos + (1 as u64)];
+                dec code = (((first & (31 as u8)) as u32) << (6 as u32))
+                    | ((b1 & (63 as u8)) as u32);
+                self.pos = self.pos + (2 as u64);
+                return std::Option::Some(code as char);
+            } else if first <= (239 as u8) {
+                dec b1 = bytes[self.pos + (1 as u64)];
+                dec b2 = bytes[self.pos + (2 as u64)];
+                dec code = (((first & (15 as u8)) as u32) << (12 as u32))
+                    | (((b1 & (63 as u8)) as u32) << (6 as u32))
+                    | ((b2 & (63 as u8)) as u32);
+                self.pos = self.pos + (3 as u64);
+                return std::Option::Some(code as char);
+            } else {
+                dec b1 = bytes[self.pos + (1 as u64)];
+                dec b2 = bytes[self.pos + (2 as u64)];
+                dec b3 = bytes[self.pos + (3 as u64)];
+                dec code = (((first & (7 as u8)) as u32) << (18 as u32))
+                    | (((b1 & (63 as u8)) as u32) << (12 as u32))
+                    | (((b2 & (63 as u8)) as u32) << (6 as u32))
+                    | ((b3 & (63 as u8)) as u32);
+                self.pos = self.pos + (4 as u64);
+                return std::Option::Some(code as char);
+            }
+            return std::Option::None;
+        }
+    }
+
+    impl std::IntoIterator<char, StringIntoIter> for String {
+        fn into_iter(self: Self) -> StringIntoIter {
+            dec v = self.vec.take();
+            return StringIntoIter {
+                vec: v,
+                pos: 0 as u64,
+            };
+        }
+    }
+
+    // =========================================================================
+    // Extended String API
+    // =========================================================================
+    impl String {
+        export fn chars(self: &Self) -> StringChars life_from(self) {
+            dec bytes = self.as_bytes();
+            dec p = bytes.data as *u8;
+            dec e = ((p as u64) + (bytes.len as u64)) as *u8;
+            unsafe {
+                return StringChars { ptr: p, end: e };
+            }
+        }
+
+        export fn char_count(self: &Self) -> u64 {
+            dec rw count: u64 = 0 as u64;
+            dec rw it = self.chars();
+            while true {
+                dec opt = it.next();
+                match opt {
+                    std::Option::Some(ch) -> {
+                        count = count + (1 as u64);
+                    },
+                    std::Option::None -> { break; },
+                }
+            }
+            return count;
+        }
+
+        export fn contains_str(self: &Self, needle: str) -> bool {
+            dec needle_ptr = needle as *u8;
+            dec needle_len = str_len(needle);
+            if needle_len == (0 as u64) { return true; }
+            dec haystack = self.as_bytes();
+            dec haystack_len = haystack.len as u64;
+            if needle_len > haystack_len { return false; }
+            dec limit = haystack_len - needle_len + (1 as u64);
+            dec rw i: u64 = 0 as u64;
+            while i < limit {
+                dec rw matched = true;
+                dec rw j: u64 = 0 as u64;
+                while j < needle_len {
+                    unsafe {
+                        if haystack[i + j] != (*(std::ptr::add<u8>(needle_ptr, j))) {
+                            matched = false;
+                            break;
+                        }
+                    }
+                    j = j + (1 as u64);
+                }
+                if matched { return true; }
+                i = i + (1 as u64);
+            }
+            return false;
+        }
+
+        export fn contains(self: &Self, needle: &String) -> bool {
+            dec needle_bytes = needle.as_bytes();
+            dec needle_len = needle_bytes.len as u64;
+            if needle_len == (0 as u64) { return true; }
+            dec haystack = self.as_bytes();
+            dec haystack_len = haystack.len as u64;
+            if needle_len > haystack_len { return false; }
+            dec limit = haystack_len - needle_len + (1 as u64);
+            dec rw i: u64 = 0 as u64;
+            while i < limit {
+                dec rw matched = true;
+                dec rw j: u64 = 0 as u64;
+                while j < needle_len {
+                    if haystack[i + j] != needle_bytes[j] {
+                        matched = false;
+                        break;
+                    }
+                    j = j + (1 as u64);
+                }
+                if matched { return true; }
+                i = i + (1 as u64);
+            }
+            return false;
+        }
+
+        export fn starts_with_str(self: &Self, prefix: str) -> bool {
+            dec prefix_ptr = prefix as *u8;
+            dec prefix_len = str_len(prefix);
+            dec haystack = self.as_bytes();
+            if prefix_len > (haystack.len as u64) { return false; }
+            dec rw i: u64 = 0 as u64;
+            while i < prefix_len {
+                unsafe {
+                    if haystack[i] != (*(std::ptr::add<u8>(prefix_ptr, i))) {
+                        return false;
+                    }
+                }
+                i = i + (1 as u64);
+            }
+            return true;
+        }
+
+        export fn starts_with(self: &Self, prefix: &String) -> bool {
+            dec prefix_bytes = prefix.as_bytes();
+            dec prefix_len = prefix_bytes.len as u64;
+            dec haystack = self.as_bytes();
+            if prefix_len > (haystack.len as u64) { return false; }
+            dec rw i: u64 = 0 as u64;
+            while i < prefix_len {
+                if haystack[i] != prefix_bytes[i] {
+                    return false;
+                }
+                i = i + (1 as u64);
+            }
+            return true;
+        }
+
+        export fn ends_with_str(self: &Self, suffix: str) -> bool {
+            dec suffix_ptr = suffix as *u8;
+            dec suffix_len = str_len(suffix);
+            dec haystack = self.as_bytes();
+            dec h_len = haystack.len as u64;
+            if suffix_len > h_len { return false; }
+            dec offset = h_len - suffix_len;
+            dec rw i: u64 = 0 as u64;
+            while i < suffix_len {
+                unsafe {
+                    if haystack[offset + i] != (*(std::ptr::add<u8>(suffix_ptr, i))) {
+                        return false;
+                    }
+                }
+                i = i + (1 as u64);
+            }
+            return true;
+        }
+
+        export fn ends_with(self: &Self, suffix: &String) -> bool {
+            dec suffix_bytes = suffix.as_bytes();
+            dec suffix_len = suffix_bytes.len as u64;
+            dec haystack = self.as_bytes();
+            dec h_len = haystack.len as u64;
+            if suffix_len > h_len { return false; }
+            dec offset = h_len - suffix_len;
+            dec rw i: u64 = 0 as u64;
+            while i < suffix_len {
+                if haystack[offset + i] != suffix_bytes[i] {
+                    return false;
+                }
+                i = i + (1 as u64);
+            }
+            return true;
+        }
+
+        export fn find_str(self: &Self, needle: str) -> std::Option<u64> {
+            dec needle_ptr = needle as *u8;
+            dec needle_len = str_len(needle);
+            if needle_len == (0 as u64) { return std::Option::Some(0 as u64); }
+            dec haystack = self.as_bytes();
+            dec h_len = haystack.len as u64;
+            if needle_len > h_len { return std::Option::None; }
+            dec limit = h_len - needle_len + (1 as u64);
+            dec rw i: u64 = 0 as u64;
+            while i < limit {
+                dec rw matched = true;
+                dec rw j: u64 = 0 as u64;
+                while j < needle_len {
+                    unsafe {
+                        if haystack[i + j] != (*(std::ptr::add<u8>(needle_ptr, j))) {
+                            matched = false;
+                            break;
+                        }
+                    }
+                    j = j + (1 as u64);
+                }
+                if matched { return std::Option::Some(i); }
+                i = i + (1 as u64);
+            }
+            return std::Option::None;
+        }
+
+        export fn find(self: &Self, needle: &String) -> std::Option<u64> {
+            dec needle_bytes = needle.as_bytes();
+            dec needle_len = needle_bytes.len as u64;
+            if needle_len == (0 as u64) { return std::Option::Some(0 as u64); }
+            dec haystack = self.as_bytes();
+            dec h_len = haystack.len as u64;
+            if needle_len > h_len { return std::Option::None; }
+            dec limit = h_len - needle_len + (1 as u64);
+            dec rw i: u64 = 0 as u64;
+            while i < limit {
+                dec rw matched = true;
+                dec rw j: u64 = 0 as u64;
+                while j < needle_len {
+                    if haystack[i + j] != needle_bytes[j] {
+                        matched = false;
+                        break;
+                    }
+                    j = j + (1 as u64);
+                }
+                if matched { return std::Option::Some(i); }
+                i = i + (1 as u64);
+            }
+            return std::Option::None;
+        }
+
+        export fn push_string(self: &rw Self, other: &String) {
+            dec bytes = other.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                self.vec.push(bytes[i]);
+                i = i + (1 as u64);
+            }
+        }
+
+        export fn substr(self: &Self, start: u64, end_pos: u64) -> String {
+            dec bytes = self.as_bytes();
+            dec b_len = bytes.len as u64;
+            if start > b_len { __luna_panic(); }
+            dec rw actual_end = end_pos;
+            if actual_end > b_len { actual_end = b_len; }
+            if start > actual_end { __luna_panic(); }
+            if utf8::is_char_boundary(bytes, start) == false { __luna_panic(); }
+            if utf8::is_char_boundary(bytes, actual_end) == false { __luna_panic(); }
+            dec sub_len = actual_end - start;
+            dec rw v = std::vec_with_capacity<u8>(sub_len);
+            dec rw i: u64 = 0 as u64;
+            while i < sub_len {
+                v.push(bytes[start + i]);
+                i = i + (1 as u64);
+            }
+            return String { vec: v };
+        }
+
+        export fn to_uppercase(self: &Self) -> String {
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw v = std::vec_with_capacity<u8>(len);
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                dec b = bytes[i];
+                if (b >= (97 as u8)) && (b <= (122 as u8)) {
+                    v.push(b - (32 as u8));
+                } else {
+                    v.push(b);
+                }
+                i = i + (1 as u64);
+            }
+            return String { vec: v };
+        }
+
+        export fn to_lowercase(self: &Self) -> String {
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw v = std::vec_with_capacity<u8>(len);
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                dec b = bytes[i];
+                if (b >= (65 as u8)) && (b <= (90 as u8)) {
+                    v.push(b + (32 as u8));
+                } else {
+                    v.push(b);
+                }
+                i = i + (1 as u64);
+            }
+            return String { vec: v };
+        }
+
+        export fn trim(self: &Self) -> String {
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            if len == (0 as u64) { return string_new(); }
+            dec rw start: u64 = 0 as u64;
+            while start < len {
+                if is_ascii_whitespace(bytes[start]) == false { break; }
+                start = start + (1 as u64);
+            }
+            dec rw end_idx = len;
+            while end_idx > start {
+                if is_ascii_whitespace(bytes[end_idx - (1 as u64)]) == false { break; }
+                end_idx = end_idx - (1 as u64);
+            }
+            if start >= end_idx { return string_new(); }
+            return self.substr(start, end_idx);
+        }
+
+        export fn trim_start(self: &Self) -> String {
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            if len == (0 as u64) { return string_new(); }
+            dec rw start: u64 = 0 as u64;
+            while start < len {
+                if is_ascii_whitespace(bytes[start]) == false { break; }
+                start = start + (1 as u64);
+            }
+            if start >= len { return string_new(); }
+            return self.substr(start, len);
+        }
+
+        export fn trim_end(self: &Self) -> String {
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            if len == (0 as u64) { return string_new(); }
+            dec rw end_idx = len;
+            while end_idx > (0 as u64) {
+                if is_ascii_whitespace(bytes[end_idx - (1 as u64)]) == false { break; }
+                end_idx = end_idx - (1 as u64);
+            }
+            if end_idx == (0 as u64) { return string_new(); }
+            return self.substr(0 as u64, end_idx);
+        }
+
+        export fn replace_str(self: &Self, from: str, to: str) -> String {
+            dec from_ptr = from as *u8;
+            dec from_len = str_len(from);
+            dec to_ptr = to as *u8;
+            dec to_len = str_len(to);
+            dec bytes = self.as_bytes();
+            dec h_len = bytes.len as u64;
+            dec rw result = string_new();
+            if from_len == (0 as u64) { return self.clone(); }
+            dec rw i: u64 = 0 as u64;
+            while i < h_len {
+                if (i + from_len) <= h_len {
+                    dec rw matched = true;
+                    dec rw j: u64 = 0 as u64;
+                    while j < from_len {
+                        unsafe {
+                            if bytes[i + j] != (*(std::ptr::add<u8>(from_ptr, j))) {
+                                matched = false;
+                                break;
+                            }
+                        }
+                        j = j + (1 as u64);
+                    }
+                    if matched {
+                        dec rw k: u64 = 0 as u64;
+                        while k < to_len {
+                            unsafe {
+                                result.vec.push(*(std::ptr::add<u8>(to_ptr, k)));
+                            }
+                            k = k + (1 as u64);
+                        }
+                        i = i + from_len;
+                    } else {
+                        result.vec.push(bytes[i]);
+                        i = i + (1 as u64);
+                    }
+                } else {
+                    result.vec.push(bytes[i]);
+                    i = i + (1 as u64);
+                }
+            }
+            return result;
+        }
+
+        export fn replace(self: &Self, from: &String, to: &String) -> String {
+            dec from_bytes = from.as_bytes();
+            dec from_len = from_bytes.len as u64;
+            dec to_bytes = to.as_bytes();
+            dec to_len = to_bytes.len as u64;
+            dec bytes = self.as_bytes();
+            dec h_len = bytes.len as u64;
+            dec rw result = string_new();
+            if from_len == (0 as u64) { return self.clone(); }
+            dec rw i: u64 = 0 as u64;
+            while i < h_len {
+                if (i + from_len) <= h_len {
+                    dec rw matched = true;
+                    dec rw j: u64 = 0 as u64;
+                    while j < from_len {
+                        if bytes[i + j] != from_bytes[j] {
+                            matched = false;
+                            break;
+                        }
+                        j = j + (1 as u64);
+                    }
+                    if matched {
+                        dec rw k: u64 = 0 as u64;
+                        while k < to_len {
+                            result.vec.push(to_bytes[k]);
+                            k = k + (1 as u64);
+                        }
+                        i = i + from_len;
+                    } else {
+                        result.vec.push(bytes[i]);
+                        i = i + (1 as u64);
+                    }
+                } else {
+                    result.vec.push(bytes[i]);
+                    i = i + (1 as u64);
+                }
+            }
+            return result;
+        }
+
+        export fn split_char(self: &Self, delim: char) -> Vec<String> {
+            dec code = delim as u32;
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw result: Vec<String> = std::vec_new<String>();
+            dec rw seg_start: u64 = 0 as u64;
+            dec rw pos: u64 = 0 as u64;
+            while pos < len {
+                dec first = bytes[pos];
+                dec rw ch_code: u32 = 0 as u32;
+                dec rw ch_len: u64 = 1 as u64;
+                if first <= (127 as u8) {
+                    ch_code = first as u32;
+                    ch_len = 1 as u64;
+                } else if first <= (223 as u8) {
+                    ch_code = (((first & (31 as u8)) as u32) << (6 as u32))
+                        | ((bytes[pos + (1 as u64)] & (63 as u8)) as u32);
+                    ch_len = 2 as u64;
+                } else if first <= (239 as u8) {
+                    ch_code = (((first & (15 as u8)) as u32) << (12 as u32))
+                        | (((bytes[pos + (1 as u64)] & (63 as u8)) as u32) << (6 as u32))
+                        | ((bytes[pos + (2 as u64)] & (63 as u8)) as u32);
+                    ch_len = 3 as u64;
+                } else {
+                    ch_code = (((first & (7 as u8)) as u32) << (18 as u32))
+                        | (((bytes[pos + (1 as u64)] & (63 as u8)) as u32) << (12 as u32))
+                        | (((bytes[pos + (2 as u64)] & (63 as u8)) as u32) << (6 as u32))
+                        | ((bytes[pos + (3 as u64)] & (63 as u8)) as u32);
+                    ch_len = 4 as u64;
+                }
+                if ch_code == code {
+                    result.push(self.substr(seg_start, pos));
+                    seg_start = pos + ch_len;
+                }
+                pos = pos + ch_len;
+            }
+            result.push(self.substr(seg_start, len));
+            return result;
+        }
+
+        export fn split_whitespace(self: &Self) -> Vec<String> {
+            dec bytes = self.as_bytes();
+            dec len = bytes.len as u64;
+            dec rw result: Vec<String> = std::vec_new<String>();
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                while i < len {
+                    if is_ascii_whitespace(bytes[i]) == false { break; }
+                    i = i + (1 as u64);
+                }
+                if i >= len { break; }
+                dec word_start = i;
+                while i < len {
+                    if is_ascii_whitespace(bytes[i]) { break; }
+                    i = i + (1 as u64);
+                }
+                result.push(self.substr(word_start, i));
+            }
+            return result;
+        }
+    }
+
+    // =========================================================================
+    // CStr & CString — C-ABI Compatible Null-Terminated Strings
+    // =========================================================================
+
+    export enum NulError {
+        InteriorNul(u64),
+        NotNulTerminated,
+    }
+
+    export struct CStr {
+        private ptr: *u8,
+        private len_with_nul: u64,
+    };
+
+    export fn cstr_from_ptr(p: *u8) -> CStr {
+        dec rw l: u64 = 0 as u64;
+        unsafe {
+            while (*(std::ptr::add<u8>(p, l))) != (0 as u8) {
+                l = l + (1 as u64);
+            }
+        }
+        return CStr {
+            ptr: p,
+            len_with_nul: l + (1 as u64),
+        };
+    }
+
+    export fn cstr_from_bytes_with_nul(bytes: &[u8]) -> std::Result<CStr, NulError> {
+        dec total = bytes.len as u64;
+        if total == (0 as u64) || bytes[total - (1 as u64)] != (0 as u8) {
+            return std::Result::Err(NulError::NotNulTerminated);
+        }
+        dec rw i: u64 = 0 as u64;
+        while i < (total - (1 as u64)) {
+            if bytes[i] == (0 as u8) {
+                return std::Result::Err(NulError::InteriorNul(i));
+            }
+            i = i + (1 as u64);
+        }
+        return std::Result::Ok(CStr {
+            ptr: bytes.data as *u8,
+            len_with_nul: total,
+        });
+    }
+
+    impl CStr {
+        export fn from_ptr(p: *u8) -> CStr {
+            return cstr_from_ptr(p);
+        }
+
+        export fn from_bytes_with_nul(bytes: &[u8]) -> std::Result<CStr, NulError> {
+            return cstr_from_bytes_with_nul(bytes);
+        }
+
+        export fn as_ptr(self: &Self) -> *u8 {
+            return self.ptr;
+        }
+
+        export fn to_bytes(self: &Self) -> &[u8] life_from(self) {
+            unsafe {
+                return std::mem::slice_from_raw_parts<u8>(self.ptr, self.len_with_nul - (1 as u64));
+            }
+        }
+
+        export fn to_bytes_with_nul(self: &Self) -> &[u8] life_from(self) {
+            unsafe {
+                return std::mem::slice_from_raw_parts<u8>(self.ptr, self.len_with_nul);
+            }
+        }
+
+        export fn to_string(self: &Self) -> std::String {
+            dec slice = self.to_bytes();
+            dec opt = std::string_from_bytes(slice);
+            return match opt {
+                std::Option::Some(s) -> s,
+                std::Option::None -> std::string_new(),
+            };
+        }
+    }
+
+    export struct CString {
+        private vec: std::Vec<u8>,
+    };
+
+    export fn cstring_new(s: str) -> std::Result<CString, NulError> {
+        dec s_ptr = s as *u8;
+        dec rw len: u64 = 0 as u64;
+        unsafe {
+            while (*(std::ptr::add<u8>(s_ptr, len))) != (0 as u8) {
+                len = len + (1 as u64);
+            }
+        }
+        dec rw v = std::vec_with_capacity<u8>(len + (1 as u64));
+        dec rw i: u64 = 0 as u64;
+        while i < len {
+            dec rw b: u8 = 0 as u8;
+            unsafe {
+                b = *(std::ptr::add<u8>(s_ptr, i));
+            }
+            if b == (0 as u8) {
+                return std::Result::Err(NulError::InteriorNul(i));
+            }
+            v.push(b);
+            i = i + (1 as u64);
+        }
+        v.push(0 as u8);
+        return std::Result::Ok(CString { vec: v });
+    }
+
+    impl CString {
+        export fn new(s: str) -> std::Result<CString, NulError> {
+            return cstring_new(s);
+        }
+
+        export fn as_c_str(self: &Self) -> CStr {
+            return CStr {
+                ptr: self.vec.as_slice().data as *u8,
+                len_with_nul: self.vec.len(),
+            };
+        }
+
+        export fn as_ptr(self: &Self) -> *u8 {
+            return self.vec.as_slice().data as *u8;
+        }
+
+        export fn to_string(self: &Self) -> std::String {
+            dec slice = self.as_c_str().to_bytes();
+            dec opt = std::string_from_bytes(slice);
+            return match opt {
+                std::Option::Some(s) -> s,
+                std::Option::None -> std::string_new(),
+            };
+        }
+
+        export fn clone(self: &Self) -> CString {
+            dec bytes = self.vec.as_slice();
+            dec len = bytes.len as u64;
+            dec rw v = std::vec_with_capacity<u8>(len);
+            dec rw i: u64 = 0 as u64;
+            while i < len {
+                v.push(bytes[i]);
+                i = i + (1 as u64);
+            }
+            return CString { vec: v };
+        }
+    }
+
+    impl std::Clone for CString {
+        fn clone(self: &Self) -> Self {
+            return self.clone();
+        }
+    }
+
+    // =========================================================================
+    // CowStr & Cow<T> — Clone-On-Write Smart Containers
+    // =========================================================================
+
+    export enum CowStr {
+        Borrowed(str),
+        Owned(std::String),
+    }
+
+    impl CowStr {
+        export fn to_string(self: &Self) -> std::String {
+            return match *self {
+                CowStr::Borrowed(s) -> std::string_from_str(s),
+                CowStr::Owned(s) -> s.clone(),
+            };
+        }
+
+        export fn into_owned(self) -> std::String {
+            return match self {
+                CowStr::Borrowed(s) -> std::string_from_str(s),
+                CowStr::Owned(s) -> s,
+            };
+        }
+    }
+
+    export enum Cow<T> {
+        Borrowed(&T),
+        Owned(T),
+    }
+
+    impl<T: std::Clone> Cow<T> {
+        export fn into_owned(self) -> T {
+            return match self {
+                Cow::Borrowed(b) -> b.clone(),
+                Cow::Owned(o) -> o,
+            };
+        }
+    }
 }
+

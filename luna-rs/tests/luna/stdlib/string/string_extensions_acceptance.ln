@@ -1,0 +1,75 @@
+import <string>;
+import <vec>;
+
+fn main() -> i32 {
+    // 1. starts_with & ends_with
+    dec s = std::string_from_str("hello luna world");
+    dec p1 = std::string_from_str("hello");
+    dec p2 = std::string_from_str("luna");
+    dec p3 = std::string_from_str("world");
+
+    if s.starts_with(&p1) == false { return 1; }
+    if s.starts_with(&p2) != false { return 2; }
+    if s.ends_with(&p3) == false { return 3; }
+    if s.ends_with(&p2) != false { return 4; }
+
+    // 2. contains & find
+    if s.contains(&p2) == false { return 5; }
+    dec not_found = std::string_from_str("rust");
+    if s.contains(&not_found) != false { return 6; }
+
+    dec opt_pos = s.find(&p2);
+    match opt_pos {
+        std::Option::Some(pos) -> {
+            // "hello luna world" -> "luna" starts at index 6
+            if pos != (6 as u64) { return 7; }
+        },
+        std::Option::None -> {
+            return 8;
+        },
+    }
+
+    dec opt_none = s.find(&not_found);
+    match opt_none {
+        std::Option::Some(pos) -> { return 9; },
+        std::Option::None -> {},
+    }
+
+    // 3. replace
+    dec replaced = s.replace(&p2, &std::string_from_str("beautiful luna"));
+    dec expected_rep = std::string_from_str("hello beautiful luna world");
+    if replaced.eq(&expected_rep) == false { return 10; }
+
+    // 4. trim_start & trim_end
+    dec padded = std::string_from_str("  \t\n  hello world  \r\n  ");
+    dec t_start = padded.trim_start();
+    dec exp_start = std::string_from_str("hello world  \r\n  ");
+    if t_start.eq(&exp_start) == false { return 11; }
+
+    dec t_end = padded.trim_end();
+    dec exp_end = std::string_from_str("  \t\n  hello world");
+    if t_end.eq(&exp_end) == false { return 12; }
+
+    // 5. split_whitespace
+    dec words_str = std::string_from_str("   antigravity   luna \t language \n compiler   ");
+    dec rw words = words_str.split_whitespace();
+    if words.len() != (4 as u64) { return 13; }
+
+    dec w0 = std::string_from_str("antigravity");
+    dec w1 = std::string_from_str("luna");
+    dec w2 = std::string_from_str("language");
+    dec w3 = std::string_from_str("compiler");
+
+    dec words_slice = words.as_slice();
+    if words_slice[0 as u64].eq(&w0) == false { return 14; }
+    if words_slice[1 as u64].eq(&w1) == false { return 15; }
+    if words_slice[2 as u64].eq(&w2) == false { return 16; }
+    if words_slice[3 as u64].eq(&w3) == false { return 17; }
+
+    // Empty / whitespace only split_whitespace
+    dec empty_str = std::string_from_str("    \t \n  ");
+    dec empty_words = empty_str.split_whitespace();
+    if empty_words.len() != (0 as u64) { return 18; }
+
+    return 0;
+}

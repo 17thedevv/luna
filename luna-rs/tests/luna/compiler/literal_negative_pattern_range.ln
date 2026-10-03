@@ -1,0 +1,1 @@
+fn main() -> i32 { dec value = 72u8; dec result = match value { 256 -> 1, _ -> 0 }; return result; }

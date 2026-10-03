@@ -145,6 +145,10 @@ export fn result_transpose<T, E>(res: Result<std::Option<T>, E>) -> std::Option<
     };
 }
 
+export trait Error {
+    fn description(self: &Self) -> str;
+}
+
 }
 
 

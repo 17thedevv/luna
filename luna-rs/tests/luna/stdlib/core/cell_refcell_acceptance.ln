@@ -1,0 +1,106 @@
+import <cell>;
+
+fn main() -> i32 {
+    // 1. Test Cell<i32>
+    dec c = std::cell_new<i32>(42);
+    if c.get() != 42 {
+        return 1;
+    }
+    c.set(100);
+    if c.get() != 100 {
+        return 2;
+    }
+    dec old = c.replace(200);
+    if old != 100 {
+        return 3;
+    }
+    if c.get() != 200 {
+        return 4;
+    }
+
+    // 2. Test RefCell<i32> shared borrows
+    dec rc = std::ref_cell_new<i32>(10);
+    {
+        dec b1_opt = rc.borrow();
+        match b1_opt {
+            std::Option::Some(b1) -> {
+                if *b1.as_ref() != 10 {
+                    return 5;
+                }
+                // Second concurrent shared borrow should succeed
+                dec b2_opt = rc.borrow();
+                match b2_opt {
+                    std::Option::Some(b2) -> {
+                        if *b2.as_ref() != 10 {
+                            return 6;
+                        }
+                    },
+                    std::Option::None -> {
+                        return 7;
+                    },
+                };
+                // While shared borrows are active, borrow_mut must fail (return None)
+                dec m_opt = rc.borrow_mut();
+                match m_opt {
+                    std::Option::Some(m) -> {
+                        return 8;
+                    },
+                    std::Option::None -> {},
+                };
+            },
+            std::Option::None -> {
+                return 9;
+            },
+        };
+    }
+
+    // 3. After b1 and b2 drop, borrow_mut should succeed!
+    {
+        dec m_opt = rc.borrow_mut();
+        match m_opt {
+            std::Option::Some(mut_ref) -> {
+                dec rw m = mut_ref;
+                *m.as_mut() = 99;
+                if *m.as_ref() != 99 {
+                    return 10;
+                }
+                // While mutable borrow is active, borrow must fail
+                dec b_opt = rc.borrow();
+                match b_opt {
+                    std::Option::Some(b) -> {
+                        return 11;
+                    },
+                    std::Option::None -> {},
+                };
+                // Also borrow_mut must fail
+                dec m2_opt = rc.borrow_mut();
+                match m2_opt {
+                    std::Option::Some(m2) -> {
+                        return 12;
+                    },
+                    std::Option::None -> {},
+                };
+            },
+            std::Option::None -> {
+                return 13;
+            },
+        };
+    }
+
+    // 4. After mut_ref dropped, shared borrow sees updated value 99
+    {
+        dec b_final = rc.borrow();
+        match b_final {
+            std::Option::Some(b) -> {
+                if *b.as_ref() != 99 {
+                    return 14;
+                }
+            },
+            std::Option::None -> {
+                return 15;
+            },
+        };
+    }
+
+    return 0;
+}

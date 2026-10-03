@@ -80,7 +80,7 @@ export fn saturating_mul_u16(a: u16, b: u16) -> u16 {
 
 // --- u32 ---
 export fn checked_add_u32(a: u32, b: u32) -> std::Option<u32> {
-    dec max_val: u32 = 4294967295 as u32;
+    dec max_val: u32 = 4294967295u32;
     if max_val - b < a { return std::Option::None; }
     return std::Option::Some(a + b);
 }
@@ -90,7 +90,7 @@ export fn checked_sub_u32(a: u32, b: u32) -> std::Option<u32> {
 }
 export fn checked_mul_u32(a: u32, b: u32) -> std::Option<u32> {
     if a == (0 as u32) || b == (0 as u32) { return std::Option::Some(0 as u32); }
-    dec max_val: u32 = 4294967295 as u32;
+    dec max_val: u32 = 4294967295u32;
     if max_val / b < a { return std::Option::None; }
     return std::Option::Some(a * b);
 }
@@ -99,7 +99,7 @@ export fn checked_div_u32(a: u32, b: u32) -> std::Option<u32> {
     return std::Option::Some(a / b);
 }
 export fn saturating_add_u32(a: u32, b: u32) -> u32 {
-    dec max_val: u32 = 4294967295 as u32;
+    dec max_val: u32 = 4294967295u32;
     if max_val - b < a { return max_val; }
     return a + b;
 }
@@ -109,7 +109,7 @@ export fn saturating_sub_u32(a: u32, b: u32) -> u32 {
 }
 export fn saturating_mul_u32(a: u32, b: u32) -> u32 {
     if a == (0 as u32) || b == (0 as u32) { return 0 as u32; }
-    dec max_val: u32 = 4294967295 as u32;
+    dec max_val: u32 = 4294967295u32;
     if max_val / b < a { return max_val; }
     return a * b;
 }
@@ -491,8 +491,8 @@ export fn saturating_mul_i32(a: i32, b: i32) -> i32 {
 
 // --- i64 ---
 export fn checked_add_i64(a: i64, b: i64) -> std::Option<i64> {
-    dec max_val: i64 = 9223372036854775807 as i64;
-    dec min_val: i64 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec max_val: i64 = 9223372036854775807i64;
+    dec min_val: i64 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     if b > (0 as i64) {
         if a > max_val - b { return std::Option::None; }
     }
@@ -502,8 +502,8 @@ export fn checked_add_i64(a: i64, b: i64) -> std::Option<i64> {
     return std::Option::Some(a + b);
 }
 export fn checked_sub_i64(a: i64, b: i64) -> std::Option<i64> {
-    dec max_val: i64 = 9223372036854775807 as i64;
-    dec min_val: i64 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec max_val: i64 = 9223372036854775807i64;
+    dec min_val: i64 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     if b > (0 as i64) {
         if a < min_val + b { return std::Option::None; }
     }
@@ -514,8 +514,8 @@ export fn checked_sub_i64(a: i64, b: i64) -> std::Option<i64> {
 }
 export fn checked_mul_i64(a: i64, b: i64) -> std::Option<i64> {
     if a == (0 as i64) || b == (0 as i64) { return std::Option::Some(0 as i64); }
-    dec max_val: i64 = 9223372036854775807 as i64;
-    dec min_val: i64 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec max_val: i64 = 9223372036854775807i64;
+    dec min_val: i64 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     dec neg_one: i64 = (0 as i64) - (1 as i64);
     if a == neg_one && b == min_val { return std::Option::None; }
     if b == neg_one && a == min_val { return std::Option::None; }
@@ -536,13 +536,13 @@ export fn checked_mul_i64(a: i64, b: i64) -> std::Option<i64> {
 }
 export fn checked_div_i64(a: i64, b: i64) -> std::Option<i64> {
     if b == (0 as i64) { return std::Option::None; }
-    dec min_val: i64 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec min_val: i64 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     dec neg_one: i64 = (0 as i64) - (1 as i64);
     if a == min_val && b == neg_one { return std::Option::None; }
     return std::Option::Some(a / b);
 }
 export fn checked_abs_i64(a: i64) -> std::Option<i64> {
-    dec min_val: i64 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec min_val: i64 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     if a == min_val { return std::Option::None; }
     if a < (0 as i64) { return std::Option::Some((0 as i64) - a); }
     return std::Option::Some(a);
@@ -552,8 +552,8 @@ export fn abs_i64(a: i64) -> i64 {
     return a;
 }
 export fn saturating_add_i64(a: i64, b: i64) -> i64 {
-    dec max_val: i64 = 9223372036854775807 as i64;
-    dec min_val: i64 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec max_val: i64 = 9223372036854775807i64;
+    dec min_val: i64 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     if b > (0 as i64) {
         if a > max_val - b { return max_val; }
     }
@@ -563,8 +563,8 @@ export fn saturating_add_i64(a: i64, b: i64) -> i64 {
     return a + b;
 }
 export fn saturating_sub_i64(a: i64, b: i64) -> i64 {
-    dec max_val: i64 = 9223372036854775807 as i64;
-    dec min_val: i64 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec max_val: i64 = 9223372036854775807i64;
+    dec min_val: i64 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     if b > (0 as i64) {
         if a < min_val + b { return min_val; }
     }
@@ -580,8 +580,8 @@ export fn saturating_mul_i64(a: i64, b: i64) -> i64 {
             return x;
         },
         std::Option::None -> {
-            dec max_val: i64 = 9223372036854775807 as i64;
-            dec min_val: i64 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+            dec max_val: i64 = 9223372036854775807i64;
+            dec min_val: i64 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
             if (a > (0 as i64) && b > (0 as i64)) || (a < (0 as i64) && b < (0 as i64)) {
                 return max_val;
             }
@@ -592,8 +592,8 @@ export fn saturating_mul_i64(a: i64, b: i64) -> i64 {
 
 // --- isize ---
 export fn checked_add_isize(a: isize, b: isize) -> std::Option<isize> {
-    dec max_val: isize = 9223372036854775807 as isize;
-    dec min_val: isize = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec max_val: isize = 9223372036854775807isize;
+    dec min_val: isize = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     if b > (0 as isize) {
         if a > max_val - b { return std::Option::None; }
     }
@@ -603,8 +603,8 @@ export fn checked_add_isize(a: isize, b: isize) -> std::Option<isize> {
     return std::Option::Some(a + b);
 }
 export fn checked_sub_isize(a: isize, b: isize) -> std::Option<isize> {
-    dec max_val: isize = 9223372036854775807 as isize;
-    dec min_val: isize = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec max_val: isize = 9223372036854775807isize;
+    dec min_val: isize = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     if b > (0 as isize) {
         if a < min_val + b { return std::Option::None; }
     }
@@ -615,8 +615,8 @@ export fn checked_sub_isize(a: isize, b: isize) -> std::Option<isize> {
 }
 export fn checked_mul_isize(a: isize, b: isize) -> std::Option<isize> {
     if a == (0 as isize) || b == (0 as isize) { return std::Option::Some(0 as isize); }
-    dec max_val: isize = 9223372036854775807 as isize;
-    dec min_val: isize = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec max_val: isize = 9223372036854775807isize;
+    dec min_val: isize = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     dec neg_one: isize = (0 as isize) - (1 as isize);
     if a == neg_one && b == min_val { return std::Option::None; }
     if b == neg_one && a == min_val { return std::Option::None; }
@@ -637,13 +637,13 @@ export fn checked_mul_isize(a: isize, b: isize) -> std::Option<isize> {
 }
 export fn checked_div_isize(a: isize, b: isize) -> std::Option<isize> {
     if b == (0 as isize) { return std::Option::None; }
-    dec min_val: isize = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec min_val: isize = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     dec neg_one: isize = (0 as isize) - (1 as isize);
     if a == min_val && b == neg_one { return std::Option::None; }
     return std::Option::Some(a / b);
 }
 export fn checked_abs_isize(a: isize) -> std::Option<isize> {
-    dec min_val: isize = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec min_val: isize = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     if a == min_val { return std::Option::None; }
     if a < (0 as isize) { return std::Option::Some((0 as isize) - a); }
     return std::Option::Some(a);
@@ -653,8 +653,8 @@ export fn abs_isize(a: isize) -> isize {
     return a;
 }
 export fn saturating_add_isize(a: isize, b: isize) -> isize {
-    dec max_val: isize = 9223372036854775807 as isize;
-    dec min_val: isize = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec max_val: isize = 9223372036854775807isize;
+    dec min_val: isize = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     if b > (0 as isize) {
         if a > max_val - b { return max_val; }
     }
@@ -664,8 +664,8 @@ export fn saturating_add_isize(a: isize, b: isize) -> isize {
     return a + b;
 }
 export fn saturating_sub_isize(a: isize, b: isize) -> isize {
-    dec max_val: isize = 9223372036854775807 as isize;
-    dec min_val: isize = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec max_val: isize = 9223372036854775807isize;
+    dec min_val: isize = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     if b > (0 as isize) {
         if a < min_val + b { return min_val; }
     }
@@ -681,9 +681,146 @@ export fn saturating_mul_isize(a: isize, b: isize) -> isize {
             return x;
         },
         std::Option::None -> {
-            dec max_val: isize = 9223372036854775807 as isize;
-            dec min_val: isize = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+            dec max_val: isize = 9223372036854775807isize;
+            dec min_val: isize = (0 as isize) - (9223372036854775807isize) - (1 as isize);
             if (a > (0 as isize) && b > (0 as isize)) || (a < (0 as isize) && b < (0 as isize)) {
+                return max_val;
+            }
+            return min_val;
+        },
+    }
+}
+
+// --- u128 ---
+export fn checked_add_u128(a: u128, b: u128) -> std::Option<u128> {
+    dec max_val: u128 = 340282366920938463463374607431768211455u128;
+    if max_val - b < a { return std::Option::None; }
+    return std::Option::Some(a + b);
+}
+export fn checked_sub_u128(a: u128, b: u128) -> std::Option<u128> {
+    if a < b { return std::Option::None; }
+    return std::Option::Some(a - b);
+}
+export fn checked_mul_u128(a: u128, b: u128) -> std::Option<u128> {
+    if a == (0 as u128) || b == (0 as u128) { return std::Option::Some(0 as u128); }
+    dec max_val: u128 = 340282366920938463463374607431768211455u128;
+    if max_val / b < a { return std::Option::None; }
+    return std::Option::Some(a * b);
+}
+export fn checked_div_u128(a: u128, b: u128) -> std::Option<u128> {
+    if b == (0 as u128) { return std::Option::None; }
+    return std::Option::Some(a / b);
+}
+export fn saturating_add_u128(a: u128, b: u128) -> u128 {
+    dec max_val: u128 = 340282366920938463463374607431768211455u128;
+    if max_val - b < a { return max_val; }
+    return a + b;
+}
+export fn saturating_sub_u128(a: u128, b: u128) -> u128 {
+    if a < b { return 0 as u128; }
+    return a - b;
+}
+export fn saturating_mul_u128(a: u128, b: u128) -> u128 {
+    if a == (0 as u128) || b == (0 as u128) { return 0 as u128; }
+    dec max_val: u128 = 340282366920938463463374607431768211455u128;
+    if max_val / b < a { return max_val; }
+    return a * b;
+}
+
+// --- i128 ---
+export fn checked_add_i128(a: i128, b: i128) -> std::Option<i128> {
+    dec max_val: i128 = 170141183460469231731687303715884105727i128;
+    dec min_val: i128 = -170141183460469231731687303715884105728i128;
+    if b > (0 as i128) {
+        if a > max_val - b { return std::Option::None; }
+    }
+    if b < (0 as i128) {
+        if a < min_val - b { return std::Option::None; }
+    }
+    return std::Option::Some(a + b);
+}
+export fn checked_sub_i128(a: i128, b: i128) -> std::Option<i128> {
+    dec max_val: i128 = 170141183460469231731687303715884105727i128;
+    dec min_val: i128 = -170141183460469231731687303715884105728i128;
+    if b > (0 as i128) {
+        if a < min_val + b { return std::Option::None; }
+    }
+    if b < (0 as i128) {
+        if a > max_val + b { return std::Option::None; }
+    }
+    return std::Option::Some(a - b);
+}
+export fn checked_mul_i128(a: i128, b: i128) -> std::Option<i128> {
+    if a == (0 as i128) || b == (0 as i128) { return std::Option::Some(0 as i128); }
+    dec max_val: i128 = 170141183460469231731687303715884105727i128;
+    dec min_val: i128 = -170141183460469231731687303715884105728i128;
+    dec neg_one: i128 = (0 as i128) - (1 as i128);
+    if a == neg_one && b == min_val { return std::Option::None; }
+    if b == neg_one && a == min_val { return std::Option::None; }
+    if a > (0 as i128) {
+        if b > (0 as i128) {
+            if a > max_val / b { return std::Option::None; }
+        } else {
+            if b < min_val / a { return std::Option::None; }
+        }
+    } else {
+        if b > (0 as i128) {
+            if a < min_val / b { return std::Option::None; }
+        } else {
+            if b < max_val / a { return std::Option::None; }
+        }
+    }
+    return std::Option::Some(a * b);
+}
+export fn checked_div_i128(a: i128, b: i128) -> std::Option<i128> {
+    if b == (0 as i128) { return std::Option::None; }
+    dec min_val: i128 = -170141183460469231731687303715884105728i128;
+    dec neg_one: i128 = (0 as i128) - (1 as i128);
+    if a == min_val && b == neg_one { return std::Option::None; }
+    return std::Option::Some(a / b);
+}
+export fn checked_abs_i128(a: i128) -> std::Option<i128> {
+    dec min_val: i128 = -170141183460469231731687303715884105728i128;
+    if a == min_val { return std::Option::None; }
+    if a < (0 as i128) { return std::Option::Some((0 as i128) - a); }
+    return std::Option::Some(a);
+}
+export fn abs_i128(a: i128) -> i128 {
+    if a < (0 as i128) { return (0 as i128) - a; }
+    return a;
+}
+export fn saturating_add_i128(a: i128, b: i128) -> i128 {
+    dec max_val: i128 = 170141183460469231731687303715884105727i128;
+    dec min_val: i128 = -170141183460469231731687303715884105728i128;
+    if b > (0 as i128) {
+        if a > max_val - b { return max_val; }
+    }
+    if b < (0 as i128) {
+        if a < min_val - b { return min_val; }
+    }
+    return a + b;
+}
+export fn saturating_sub_i128(a: i128, b: i128) -> i128 {
+    dec max_val: i128 = 170141183460469231731687303715884105727i128;
+    dec min_val: i128 = -170141183460469231731687303715884105728i128;
+    if b > (0 as i128) {
+        if a < min_val + b { return min_val; }
+    }
+    if b < (0 as i128) {
+        if a > max_val + b { return max_val; }
+    }
+    return a - b;
+}
+export fn saturating_mul_i128(a: i128, b: i128) -> i128 {
+    dec opt = checked_mul_i128(a, b);
+    match opt {
+        std::Option::Some(x) -> {
+            return x;
+        },
+        std::Option::None -> {
+            dec max_val: i128 = 170141183460469231731687303715884105727i128;
+            dec min_val: i128 = -170141183460469231731687303715884105728i128;
+            if (a > (0 as i128) && b > (0 as i128)) || (a < (0 as i128) && b < (0 as i128)) {
                 return max_val;
             }
             return min_val;

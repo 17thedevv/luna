@@ -1,0 +1,9 @@
+struct Later { value: i32, };
+struct First { value: Later, };
+
+fn identity(value: First) -> First { return value; }
+fn main() -> i32 {
+    dec first = First { value: Later { value: 7 } };
+    dec copied = identity(first);
+    return copied.value.value - 7;
+}

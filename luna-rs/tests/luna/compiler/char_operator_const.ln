@@ -1,0 +1,2 @@
+const INVALID: char = 'a' + 'b';
+fn main() -> i32 { return 0; }

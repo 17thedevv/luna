@@ -67,7 +67,7 @@ fn test_checked_div_and_abs_pre_operation_checks() {
             dec d3 = std::checked_div_i32(min_i32, neg_one);
             if d3.is_some() { return 3; }
 
-            dec min_i64: i64 = ((0 as i64) - (9223372036854775807 as i64)) - (1 as i64);
+            dec min_i64: i64 = ((0 as i64) - 9223372036854775807i64) - (1 as i64);
             dec neg_one_64: i64 = (0 as i64) - (1 as i64);
             dec d4 = std::checked_div_i64(min_i64, neg_one_64);
             if d4.is_some() { return 4; }

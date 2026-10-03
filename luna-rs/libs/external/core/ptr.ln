@@ -31,11 +31,14 @@ export module std {
         }
     
         export unsafe fn copy<T>(src: *T, dst: *rw T, count: u64) {
+            dec bytes = count * (sizeof(T) as u64);
+            dec s_u8 = src as u64 as *u8;
+            dec d_u8 = dst as u64 as *rw u8;
             dec rw i: u64 = 0 as u64;
-            while i < count {
-                dec s = add<T>(src, i);
-                dec d = add_mut<T>(dst, i);
-                write<T>(d, read<T>(s));
+            while i < bytes {
+                dec s = (s_u8 as u64 + i) as *u8;
+                dec d = (d_u8 as u64 + i) as *rw u8;
+                *d = *s;
                 i = i + (1 as u64);
             }
         }
@@ -49,12 +52,50 @@ export module std {
             if (a as u64) == (b as u64) {
                 return;
             }
-            dec tmp = read<T>(a as *T);
-            write<T>(a, read<T>(b as *T));
-            write<T>(b, tmp);
+            dec bytes = sizeof(T) as u64;
+            dec a_u8 = a as u64 as *rw u8;
+            dec b_u8 = b as u64 as *rw u8;
+            dec rw i: u64 = 0 as u64;
+            while i < bytes {
+                dec ap = (a_u8 as u64 + i) as *rw u8;
+                dec bp = (b_u8 as u64 + i) as *rw u8;
+                dec tmp = *ap;
+                *ap = *bp;
+                *bp = tmp;
+                i = i + (1 as u64);
+            }
+        }
+
+        export struct NonNull<T> {
+            private pointer: *rw T,
+        } requires anchor(pointer) = self;
+
+        export unsafe fn nonnull_new_unchecked<T>(p: *rw T) -> NonNull<T> {
+            unsafe {
+                return NonNull<T> { pointer: p };
+            }
+        }
+
+        impl<T> NonNull<T> {
+            export fn is_null(self: &Self) -> bool {
+                return (self.pointer as u64) == (0 as u64);
+            }
+
+            export fn as_ptr(self: &Self) -> *rw T {
+                return self.pointer;
+            }
+
+            export fn as_ref(self: &Self) -> &T life_from(self) {
+                unsafe {
+                    return &*(self.pointer as *T);
+                }
+            }
+
+            export fn as_mut(self: &rw Self) -> &rw T life_from(self) {
+                unsafe {
+                    return &rw *self.pointer;
+                }
+            }
         }
     }
 }
-
-
-

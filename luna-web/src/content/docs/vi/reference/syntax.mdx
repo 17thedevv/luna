@@ -1,0 +1,99 @@
+---
+title: Tham khảo Cú pháp
+description: Bảng tra cứu cú pháp và từ khóa hoàn chỉnh của ngôn ngữ Luna.
+---
+
+## Từ khóa (Keywords)
+
+```
+dec         // Khai báo biến (bất biến theo mặc định)
+const       // Hằng số tính toán lúc biên dịch
+rw          // Sửa đổi khả biến (rewritable)
+fn          // Khai báo hàm
+struct      // Định nghĩa struct
+enum        // Định nghĩa enum
+trait       // Định nghĩa trait
+impl        // Khối triển khai method hoặc trait
+export      // Xuất công khai định danh (public)
+import      // Nạp artifact provider module
+using       // Tạo bí danh namespace cục bộ (using ... as ...)
+as          // Ràng buộc bí danh
+return      // Lệnh trả về giá trị
+if          // Nhánh rẽ điều kiện
+else        // Nhánh rẽ thay thế
+loop        // Vòng lặp vô hạn
+while       // Vòng lặp kiểm tra điều kiện
+for         // Vòng lặp duyệt iterator
+in          // Ràng buộc biến lặp
+break       // Thoát khỏi vòng lặp
+continue    // Tiếp tục vòng lặp tiếp theo
+match       // Khớp mẫu (sử dụng ->)
+self        // Tham chiếu thực thể hiện tại
+Self        // Kiểu dữ liệu hiện tại
+async       // Khai báo hàm bất đồng bộ
+unsafe      // Ranh giới không an toàn có khoanh vùng
+extern      // Khai báo tương tác nhị phân C ABI
+requires    // Hợp đồng điều kiện tiên quyết ở mức kiểu
+life        // Hàm hợp đồng thời gian sống (lifetime)
+anchor      // Hợp đồng điểm neo vùng nhớ
+type        // Định nghĩa bí danh kiểu (type alias)
+```
+
+## Biểu thức (Expressions)
+
+### Hằng số nguyên văn (Literals)
+
+```luna
+42          // Số nguyên
+3.14        // Số thực
+true        // Boolean đúng
+false       // Boolean sai
+'a'         // Ký tự
+"hello"     // Chuỗi ký tự
+[1, 2, 3]   // Mảng nguyên văn
+```
+
+### Toán tử (Operators)
+
+```luna
+// Số học
++   -   *   /   %
+
+// So sánh
+==  !=  <   >   <=  >=
+
+// Logic
+&&  ||  !
+
+// Thao tác bit
+&   |   ^   <<  >>  ~
+
+// Gán giá trị
+=   +=  -=  *=  /=  %=
+```
+
+## Ngữ pháp Tham chiếu & Con trỏ
+
+```luna
+&T            // Tham chiếu chia sẻ (chỉ đọc)
+&rw T         // Tham chiếu khả ghi (độc quyền ghi)
+*T            // Con trỏ thô bất biến
+*rw T         // Con trỏ thô khả biến
+```
+
+## Ngữ pháp Khai báo Hàm
+
+```luna
+// Hàm cơ bản
+fn name(params) -> ReturnType { body }
+
+// Phương thức
+fn method(self: &Type) { }
+fn method(self: &rw Type) { }
+
+// Hàm Generic (monomorphize tĩnh)
+fn generic<T>(x: T) -> T { return x; }
+
+// Hàm bất đồng bộ (gọi qua .await)
+async fn fetch() -> Result<str, i32> { }
+```

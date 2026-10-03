@@ -1,0 +1,8 @@
+import "owner_anchor_list";
+
+unsafe fn claim_first(a: &rw owner_api::Owner<i32, u64>, b: &rw owner_api::Owner<i32, u64>) -> &rw i32 life_from(b) {
+    dec raw = a.first;
+    return &rw *raw;
+}
+
+fn main() {}

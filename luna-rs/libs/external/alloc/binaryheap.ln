@@ -1,0 +1,221 @@
+import <vec>;
+import <slice>;
+import <cmp>;
+import <clone>;
+import <default>;
+import <__lang_drop>;
+import <__lang_option>;
+import <__lang_iterator>;
+import <__lang_into_iterator>;
+
+module std {
+
+export type BinaryHeapIter<T> = std::slice::SliceIter<T>;
+
+export struct BinaryHeapIntoIter<T> {
+    private vec_iter: std::VecIntoIter<T>,
+};
+
+impl<T> BinaryHeapIntoIter<T> {
+    export fn next(self: &rw Self) -> std::Option<T> {
+        return self.vec_iter.next();
+    }
+}
+
+impl<T> std::Iterator<T> for BinaryHeapIntoIter<T> {
+    fn next(self: &rw Self) -> std::Option<T> life_from(self) {
+        return self.vec_iter.next();
+    }
+}
+
+export struct BinaryHeap<T> {
+    private data: Vec<T>,
+};
+
+export fn binaryheap_new<T>() -> BinaryHeap<T> {
+    return BinaryHeap<T> {
+        data: std::vec_new<T>(),
+    };
+}
+
+export fn binaryheap_with_capacity<T>(capacity: u64) -> BinaryHeap<T> {
+    return BinaryHeap<T> {
+        data: std::vec_with_capacity<T>(capacity),
+    };
+}
+
+export fn binaryheap_from_vec<T: std::Ord>(v: Vec<T>) -> BinaryHeap<T> {
+    dec rw heap = BinaryHeap<T> {
+        data: v,
+    };
+    dec len = heap.data.len();
+    if len <= (1 as u64) {
+        return heap;
+    }
+    dec rw i = len / (2 as u64);
+    while true {
+        heap.sift_down(i);
+        if i == (0 as u64) {
+            break;
+        }
+        i = i - (1 as u64);
+    }
+    return heap;
+}
+
+impl<T> std::Default for BinaryHeap<T> {
+    fn default() -> Self {
+        return binaryheap_new<T>();
+    }
+}
+
+impl<T> BinaryHeap<T> {
+    export fn len(self: &Self) -> u64 {
+        return self.data.len();
+    }
+
+    export fn is_empty(self: &Self) -> bool {
+        return self.data.is_empty();
+    }
+
+    export fn capacity(self: &Self) -> u64 {
+        return self.data.capacity();
+    }
+
+    export fn peek(self: &Self) -> std::Option<&T> life_from(self) {
+        return self.data.first();
+    }
+
+    export fn clear(self: &rw Self) {
+        self.data.clear();
+    }
+
+    export fn into_vec(self: &rw Self) -> Vec<T> {
+        return self.data.take();
+    }
+
+    export fn iter(self: &Self) -> std::slice::SliceIter<T> life_from(self) {
+        return self.data.iter();
+    }
+
+    export fn into_iter(self: Self) -> BinaryHeapIntoIter<T> {
+        return BinaryHeapIntoIter<T> {
+            vec_iter: self.data.into_iter(),
+        };
+    }
+}
+
+impl<T: std::Ord> BinaryHeap<T> {
+    fn sift_up(self: &rw Self, start_idx: u64) {
+        dec rw idx = start_idx;
+        while idx > (0 as u64) {
+            dec parent = (idx - (1 as u64)) / (2 as u64);
+            dec slice = self.data.as_slice();
+            if slice[parent].cmp(&slice[idx]) < 0 {
+                self.data.swap(parent, idx);
+                idx = parent;
+            } else {
+                break;
+            }
+        }
+    }
+
+    fn sift_down(self: &rw Self, start_idx: u64) {
+        dec len = self.data.len();
+        dec rw idx = start_idx;
+        while true {
+            dec left = ((2 as u64) * idx) + (1 as u64);
+            dec right = ((2 as u64) * idx) + (2 as u64);
+            dec rw largest = idx;
+
+            dec slice = self.data.as_slice();
+            if left < len {
+                if slice[largest].cmp(&slice[left]) < 0 {
+                    largest = left;
+                }
+            }
+            if right < len {
+                if slice[largest].cmp(&slice[right]) < 0 {
+                    largest = right;
+                }
+            }
+
+            if largest != idx {
+                self.data.swap(idx, largest);
+                idx = largest;
+            } else {
+                break;
+            }
+        }
+    }
+
+    export fn push(self: &rw Self, item: T) {
+        self.data.push(item);
+        dec last_idx = self.data.len() - (1 as u64);
+        self.sift_up(last_idx);
+    }
+
+    export fn pop(self: &rw Self) -> std::Option<T> {
+        dec len = self.data.len();
+        if len == (0 as u64) {
+            return std::Option::None;
+        }
+        dec last_idx = len - (1 as u64);
+        self.data.swap(0 as u64, last_idx);
+        dec val = self.data.pop();
+        if self.data.len() > (0 as u64) {
+            self.sift_down(0 as u64);
+        }
+        return val;
+    }
+
+    // Drain heap into an ascending sorted Vec
+    export fn into_sorted_vec(self: &rw Self) -> Vec<T> {
+        dec len = self.data.len();
+        dec rw result = std::vec_with_capacity<T>(len);
+        while self.data.len() > (0 as u64) {
+            dec opt = self.pop();
+            match opt {
+                std::Option::Some(val) -> {
+                    result.push(val);
+                },
+                std::Option::None -> { break; },
+            }
+        }
+        // Result is in descending order; reverse to ascending
+        result.reverse();
+        return result;
+    }
+
+    export fn retain(self: &rw Self, pred: fn(&T) -> bool) {
+        self.data.retain(pred);
+        dec len = self.data.len();
+        if len <= (1 as u64) {
+            return;
+        }
+        dec rw i = len / (2 as u64);
+        while true {
+            self.sift_down(i);
+            if i == (0 as u64) {
+                break;
+            }
+            i = i - (1 as u64);
+        }
+    }
+}
+
+impl<T: std::Clone> std::Clone for BinaryHeap<T> {
+    export fn clone(self: &Self) -> Self {
+        return BinaryHeap<T> {
+            data: self.data.clone(),
+        };
+    }
+}
+
+}
+
+impl<T> std::IntoIterator<T, std::BinaryHeapIntoIter<T>> for std::BinaryHeap<T> {
+    fn into_iter(self: Self) -> std::BinaryHeapIntoIter<T> {
+        return self.into_iter();
+    }
+}

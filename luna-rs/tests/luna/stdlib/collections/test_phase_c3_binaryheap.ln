@@ -1,0 +1,91 @@
+import <binaryheap>;
+import <vec>;
+
+fn main() -> i32 {
+    dec rw heap: std::BinaryHeap<i32> = std::binaryheap_new<i32>();
+
+    if heap.len() != (0 as u64) { return 1; }
+    if heap.is_empty() == false { return 2; }
+
+    // push elements in arbitrary order: 15, 30, 10, 50, 20
+    heap.push(15);
+    heap.push(30);
+    heap.push(10);
+    heap.push(50);
+    heap.push(20);
+
+    if heap.len() != (5 as u64) { return 3; }
+    if heap.is_empty() == true { return 4; }
+
+    // peek must return max element (50)
+    match heap.peek() {
+        std::Option::Some(max_val) -> {
+            if *max_val != 50 { return 5; }
+        },
+        std::Option::None -> { return 6; },
+    }
+
+    // clone
+    dec rw heap_copy = heap.clone();
+    if heap_copy.len() != (5 as u64) { return 7; }
+
+    // pop from heap_copy must yield: 50, 30, 20, 15, 10
+    dec p1 = heap_copy.pop();
+    match p1 {
+        std::Option::Some(v) -> { if v != 50 { return 8; } },
+        std::Option::None -> { return 9; },
+    }
+    dec p2 = heap_copy.pop();
+    match p2 {
+        std::Option::Some(v) -> { if v != 30 { return 10; } },
+        std::Option::None -> { return 11; },
+    }
+    dec p3 = heap_copy.pop();
+    match p3 {
+        std::Option::Some(v) -> { if v != 20 { return 12; } },
+        std::Option::None -> { return 13; },
+    }
+    dec p4 = heap_copy.pop();
+    match p4 {
+        std::Option::Some(v) -> { if v != 15 { return 14; } },
+        std::Option::None -> { return 15; },
+    }
+    dec p5 = heap_copy.pop();
+    match p5 {
+        std::Option::Some(v) -> { if v != 10 { return 16; } },
+        std::Option::None -> { return 17; },
+    }
+    dec p6 = heap_copy.pop();
+    match p6 {
+        std::Option::Some(_) -> { return 18; },
+        std::Option::None -> {},
+    }
+
+    // into_sorted_vec on original heap must yield ascending sorted vector: [10, 15, 20, 30, 50]
+    dec sorted_vec = heap.into_sorted_vec();
+    if sorted_vec.len() != (5 as u64) { return 19; }
+    dec s = sorted_vec.as_slice();
+    if s[0] != 10 || s[1] != 15 || s[2] != 20 || s[3] != 30 || s[4] != 50 { return 20; }
+
+    // Test binaryheap_from_vec (heapify O(n))
+    dec rw raw_v: std::Vec<i32> = std::vec_new<i32>();
+    raw_v.push(9);
+    raw_v.push(3);
+    raw_v.push(7);
+    raw_v.push(1);
+    raw_v.push(8);
+    raw_v.push(2);
+
+    dec rw heapified = std::binaryheap_from_vec<i32>(raw_v);
+    match heapified.peek() {
+        std::Option::Some(v) -> { if *v != 9 { return 21; } },
+        std::Option::None -> { return 22; },
+    }
+
+    // clear
+    heapified.clear();
+    if heapified.len() != (0 as u64) { return 23; }
+    if heapified.is_empty() == false { return 24; }
+
+    return 0;
+}

@@ -1,0 +1,5 @@
+struct Owner {
+    data: *rw u8,
+} requires anchor(data) = self, anchor(missing) = self;
+
+fn main() {}

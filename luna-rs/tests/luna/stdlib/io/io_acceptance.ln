@@ -1,0 +1,145 @@
+import <io>;
+import <vec>;
+import <result>;
+
+fn test_cursor_read_write_seek() -> bool {
+    dec rw v = std::vec_new<u8>();
+    dec rw cur = std::io::cursor_new<std::Vec<u8>>(v);
+
+    // Write [10, 20, 30] into cursor
+    dec rw data: [u8; 3] = [10 as u8, 20 as u8, 30 as u8];
+    dec w_res = cur.write(&data);
+    if w_res.is_err() || w_res.unwrap() != (3 as usize) {
+        return false;
+    }
+    if cur.position() != (3 as u64) {
+        return false;
+    }
+
+    // Seek back to start
+    dec s_res = cur.seek(std::io::SeekFrom::Start(0 as u64));
+    if s_res.is_err() || s_res.unwrap() != (0 as u64) {
+        return false;
+    }
+
+    // Read back into buffer
+    dec rw buf: [u8; 3] = [0 as u8, 0 as u8, 0 as u8];
+    dec r_res = cur.read(&rw buf);
+    if r_res.is_err() || r_res.unwrap() != (3 as usize) {
+        return false;
+    }
+    if buf[0] != (10 as u8) || buf[1] != (20 as u8) || buf[2] != (30 as u8) {
+        return false;
+    }
+
+    // Test SeekFrom::End
+    dec s_end = cur.seek(std::io::SeekFrom::End(-1 as i64));
+    if s_end.is_err() || s_end.unwrap() != (2 as u64) {
+        return false;
+    }
+    dec rw last_buf: [u8; 1] = [0 as u8];
+    dec r_last = cur.read(&rw last_buf);
+    if r_last.is_err() || r_last.unwrap() != (1 as usize) || last_buf[0] != (30 as u8) {
+        return false;
+    }
+
+    return true;
+}
+
+fn test_io_helpers() -> bool {
+    dec rw src_vec = std::vec_new<u8>();
+    src_vec.push(1 as u8);
+    src_vec.push(2 as u8);
+    src_vec.push(3 as u8);
+    src_vec.push(4 as u8);
+    dec rw reader = std::io::cursor_new<std::Vec<u8>>(src_vec);
+
+    // Test read_exact
+    dec rw exact_buf: [u8; 2] = [0 as u8, 0 as u8];
+    dec re_res = std::io::read_exact<std::io::Cursor<std::Vec<u8>>>(&rw reader, &rw exact_buf);
+    if re_res.is_err() {
+        return false;
+    }
+    if exact_buf[0] != (1 as u8) || exact_buf[1] != (2 as u8) {
+        return false;
+    }
+
+    // Test read_to_end for the rest
+    dec rw out_vec = std::vec_new<u8>();
+    dec rte_res = std::io::read_to_end<std::io::Cursor<std::Vec<u8>>>(&rw reader, &rw out_vec);
+    if rte_res.is_err() || rte_res.unwrap() != (2 as usize) {
+        return false;
+    }
+    if out_vec.len() != (2 as u64) || out_vec.as_slice()[0] != (3 as u8) || out_vec.as_slice()[1] != (4 as u8) {
+        return false;
+    }
+
+    // Test copy
+    dec rw copy_src = std::vec_new<u8>();
+    copy_src.push(100 as u8);
+    copy_src.push(101 as u8);
+    dec rw r_cur = std::io::cursor_new<std::Vec<u8>>(copy_src);
+    dec rw w_cur = std::io::cursor_new<std::Vec<u8>>(std::vec_new<u8>());
+
+    dec cp_res = std::io::copy<std::io::Cursor<std::Vec<u8>>, std::io::Cursor<std::Vec<u8>>>(&rw r_cur, &rw w_cur);
+    if cp_res.is_err() || cp_res.unwrap() != (2 as u64) {
+        return false;
+    }
+    dec copied_vec = w_cur.into_inner();
+    if copied_vec.len() != (2 as u64) || copied_vec.as_slice()[0] != (100 as u8) || copied_vec.as_slice()[1] != (101 as u8) {
+        return false;
+    }
+
+    return true;
+}
+
+fn test_buf_reader_writer() -> bool {
+    // Test BufWriter
+    dec rw dest = std::io::cursor_new<std::Vec<u8>>(std::vec_new<u8>());
+    dec rw writer = std::io::buf_writer_with_capacity<std::io::Cursor<std::Vec<u8>>>(dest, 4 as usize);
+
+    dec rw d1: [u8; 2] = [65 as u8, 66 as u8];
+    dec w1 = writer.write(&d1);
+    if w1.is_err() || w1.unwrap() != (2 as usize) { return false; }
+
+    dec rw d2: [u8; 3] = [67 as u8, 68 as u8, 69 as u8];
+    // This write will exceed buffer capacity (2 + 3 > 4), triggering flush
+    dec w2 = writer.write(&d2);
+    if w2.is_err() || w2.unwrap() != (3 as usize) { return false; }
+
+    // Final flush
+    dec f_res = writer.flush();
+    if f_res.is_err() { return false; }
+
+    dec inner_dest = writer.into_inner();
+    dec result_vec = inner_dest.into_inner();
+    if result_vec.len() != (5 as u64) { return false; }
+
+    // Test BufReader
+    dec rw src_cur = std::io::cursor_new<std::Vec<u8>>(result_vec);
+    dec rw reader = std::io::buf_reader_with_capacity<std::io::Cursor<std::Vec<u8>>>(src_cur, 2 as usize);
+
+    dec rw read_buf: [u8; 5] = [0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8];
+    dec read_res = std::io::read_exact<std::io::BufReader<std::io::Cursor<std::Vec<u8>>>>(&rw reader, &rw read_buf);
+    if read_res.is_err() { return false; }
+    if read_buf[0] != (65 as u8) || read_buf[1] != (66 as u8) || read_buf[2] != (67 as u8) || read_buf[3] != (68 as u8) || read_buf[4] != (69 as u8) {
+        return false;
+    }
+
+    return true;
+}
+
+fn test_io_error() -> bool {
+    dec err = std::io::IoError::NotFound;
+    dec desc = err.description();
+    if desc == "" { return false; }
+    return true;
+}
+
+fn main() -> i32 {
+    if test_cursor_read_write_seek() == false { return 1; }
+    if test_io_helpers() == false { return 2; }
+    if test_buf_reader_writer() == false { return 3; }
+    if test_io_error() == false { return 4; }
+    return 0;
+}

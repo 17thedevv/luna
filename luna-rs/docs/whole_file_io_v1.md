@@ -4,8 +4,11 @@
 
 # WHOLE-FILE-IO-v1
 
-Status: implemented, pending design/freeze review. This document does not freeze
-Phase 5.
+Status: implementation-complete and cross-platform-verified; **NOT FROZEN**
+pending design-authority review. The 2026-09-30 re-audit found a generic
+enum-pattern lowering defect, which was fixed and verified before the closure
+commit was merged to `main`. See the dated
+[re-audit and resolution record](phase5_reaudit_2026_09_30.md).
 
 ## Public surface
 
@@ -22,6 +25,14 @@ std::copy_file(src: &std::String, dst: &std::String) -> std::Result<u64, std::Fi
 `std::FileError` has exactly four variants: `NotFound`, `PermissionDenied`,
 `InvalidInput`, and `Io`. There is no `std::fs` module and no root/provider-name
 aliases.
+
+The Phase 6 formatting extension implements `std::fmt::Display` for
+`std::FileError` with the public messages `file not found`, `permission
+denied`, `invalid input`, and `I/O error`, respectively. Design authority
+approved these exact strings on 2026-09-30. This adds no I/O behavior. The
+broader Phase 6 implementation's native acceptance and full Ubuntu workspace
+CI gates have passed; Phase 6 remains not frozen pending design-authority
+review.
 
 ## Error mapping
 
@@ -106,6 +117,9 @@ in [GitHub Actions run 36661193516](https://github.com/17thedevv/luna/actions/ru
   those generated artifacts are not committed.
 
 The CI result establishes native Linux and macOS build/runtime evidence in
-addition to the existing Windows verification. Phase 5 remains **NOT FROZEN**;
-implementation is **CROSS-PLATFORM VERIFIED** and **READY FOR DESIGN/FREEZE
-REVIEW**.
+addition to the existing Windows verification. The subsequent
+[2026-09-30 re-audit](phase5_reaudit_2026_09_30.md) found public error-path
+counterexamples not covered by the first suite. Those counterexamples were
+closed by the generic enum-pattern lowering repair and permanent source/fresh-
+artifact regressions recorded in the resolution addendum. Phase 5 remains
+**NOT FROZEN** only pending design-authority review.

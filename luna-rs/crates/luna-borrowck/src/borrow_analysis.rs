@@ -960,6 +960,60 @@ impl<'a> BorrowAnalyzer<'a> {
         current
     }
 
+    /// MVIR lvalue addresses use the pointee type, rather than a pointer type.
+    /// An indexed lvalue formed from a raw data pointer is nevertheless an
+    /// address derived from that pointer; it must preserve that value's origin
+    /// until the explicit Borrow boundary. This is not a scalar data dependency.
+    fn is_raw_derived_index_address(&self, value: ValueId) -> bool {
+        let mut current = value;
+        let mut visited = HashSet::new();
+        while visited.insert(current) {
+            let Some(data) = self.func.values.get(current.0 as usize) else { return false };
+            let Instruction::PtrOffset { ptr: Operand::Value(source), .. } = &data.inst else { return false };
+            let Some(source_data) = self.func.values.get(source.0 as usize) else { return false };
+            if self.ctx.is_some_and(|ctx| matches!(ctx.types.get(source_data.ty), SemanticType::Pointer(..))) {
+                return true;
+            }
+            current = *source;
+        }
+        false
+    }
+
+    /// A field reached through a safe reference belongs to its referent, not
+    /// to the local slot holding the reference value. Preserve the real parent
+    /// loans when creating a projected reborrow (whole-value domain in v1).
+    fn reference_projection_loans(&self, place: &Operand, state: &BorrowStateData) -> Option<HashSet<Loan>> {
+        let &Operand::Value(mut value) = place else { return None };
+        let mut visited = HashSet::new();
+        while visited.insert(value) {
+            let Some(data) = self.func.values.get(value.0 as usize) else { return None };
+            let Instruction::FieldPtr { base: Operand::Value(parent), .. } = &data.inst else { return None };
+            let parent_data = self.func.values.get(parent.0 as usize)?;
+            if !matches!(parent_data.inst, Instruction::Alloca | Instruction::FieldPtr { .. })
+                && self.ctx.is_some_and(|ctx| matches!(ctx.types.get(parent_data.ty), SemanticType::Reference(..)))
+            {
+                let mut loans = HashSet::new();
+                loans.extend(state.direct_provenance.get(parent).into_iter().flatten().cloned());
+                loans.extend(state.carried_provenance.get(parent).into_iter().flatten().cloned());
+                return (!loans.is_empty()).then_some(loans);
+            }
+            value = *parent;
+        }
+        None
+    }
+
+    fn call_reborrow_places(&self, argument: &Operand, state: &BorrowStateData) -> HashSet<Operand> {
+        let mut places = HashSet::new();
+        if let Operand::Value(value) = argument {
+            if self.ctx.is_some_and(|ctx| ctx.types.contains_safe_reference(self.func.value(*value).ty)) {
+                places.extend(state.direct_provenance.get(value).into_iter().flatten().map(|loan| loan.place.clone()));
+                places.extend(state.carried_provenance.get(value).into_iter().flatten().map(|loan| loan.place.clone()));
+            }
+        }
+        if places.is_empty() { places.insert(argument.clone()); }
+        places
+    }
+
     fn declared_anchor_owner(&self, field_ptr: ValueId, state: &BorrowStateData) -> Option<PlaceDesc> {
         let ctx = self.ctx?;
         let Instruction::FieldPtr { base, field_name: Some(field_name), .. } =
@@ -1077,7 +1131,8 @@ impl<'a> BorrowAnalyzer<'a> {
                 Operand::Number(number) => number.trim().parse::<i128>().is_ok_and(|number| number == 0),
                 Operand::Value(value_id) => match func.values.get(value_id.0 as usize).map(|v| &v.inst) {
                     Some(Instruction::Null { .. }) => true,
-                    Some(Instruction::Cast { value, .. }) => visit(func, value, depth + 1),
+                    Some(Instruction::Cast { value, .. })
+                    | Some(Instruction::Assign(value)) => visit(func, value, depth + 1),
                     _ => false,
                 },
                 _ => false,
@@ -2513,11 +2568,14 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                         if let SemanticType::Reference(_, mutability, _) =
                                             ctx.types.get(self.func.value(val_id).ty)
                                         {
-                                            state.direct_provenance.entry(val_id).or_default().insert(Loan {
-                                                id: val_id,
-                                                place: args[idx].clone(),
-                                                is_rw: *mutability == luna_semantic::ty::Mutability::Mutable,
-                                            });
+                                            // Reborrow the actual referent, not the
+                                            // caller's local slot holding a reference.
+                                            for place in self.call_reborrow_places(&args[idx], state) {
+                                                state.direct_provenance.entry(val_id).or_default().insert(Loan {
+                                                    id: val_id, place,
+                                                    is_rw: *mutability == luna_semantic::ty::Mutability::Mutable,
+                                                });
+                                            }
                                         }
                                     }
                                 }
@@ -2546,11 +2604,12 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                         if let SemanticType::Reference(_, mutability, _) =
                                             ctx.types.get(self.func.value(val_id).ty)
                                         {
-                                            state.direct_provenance.entry(val_id).or_default().insert(Loan {
-                                                id: val_id,
-                                                place: args[idx].clone(),
-                                                is_rw: *mutability == luna_semantic::ty::Mutability::Mutable,
-                                            });
+                                            for place in self.call_reborrow_places(&args[idx], state) {
+                                                state.direct_provenance.entry(val_id).or_default().insert(Loan {
+                                                    id: val_id, place,
+                                                    is_rw: *mutability == luna_semantic::ty::Mutability::Mutable,
+                                                });
+                                            }
                                         }
                                     }
                                 }
@@ -3040,19 +3099,25 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     let is_storage_address = self.func.values.get(b_v.0 as usize).is_some_and(|value| {
                         matches!(value.inst, Instruction::Alloca | Instruction::FieldPtr { .. })
                     });
-                    !is_storage_address && self.ctx.is_some_and(|ctx| {
+                    self.is_raw_derived_index_address(*b_v) || (!is_storage_address && self.ctx.is_some_and(|ctx| {
                         matches!(
                             ctx.types.get(self.func.value(*b_v).ty),
                             SemanticType::Pointer(..) | SemanticType::Reference(..)
                         )
-                    })
+                    }))
                 } else {
                     false
                 };
 
                 if !is_base_ptr_or_ref {
                     // Issue a loan on the variable/storage being borrowed
-                    self.issue_loan(base, *is_rw, val_id, state);
+                    if let Some(parents) = self.reference_projection_loans(base, state) {
+                        for parent in parents {
+                            self.issue_loan(&parent.place, *is_rw, val_id, state);
+                        }
+                    } else {
+                        self.issue_loan(base, *is_rw, val_id, state);
+                    }
                 }
 
                 let result_is_raw_pointer = self.ctx.is_some_and(|ctx| {
@@ -3084,7 +3149,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                 }
 
                 if let (true, Operand::Value(base_val)) = (is_base_ptr_or_ref, base) {
-                    let base_is_raw_pointer = self.ctx.map(|ctx| {
+                    let base_is_raw_pointer = self.is_raw_derived_index_address(*base_val) || self.ctx.map(|ctx| {
                         matches!(ctx.types.get(self.func.value(*base_val).ty), SemanticType::Pointer(..))
                     }).unwrap_or(false);
                     let result_is_safe_reference = self.ctx.map(|ctx| {
@@ -3186,7 +3251,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                             current = *alias_v;
                         } else { break; }
                     }
-                    let raw_pointer_base = self.ctx.is_some_and(|ctx| {
+                    let raw_pointer_base = self.is_raw_derived_index_address(*base_v) || self.ctx.is_some_and(|ctx| {
                         matches!(ctx.types.get(self.func.value(*base_v).ty), SemanticType::Pointer(..))
                     });
                     if !is_base_ptr_or_ref || !raw_pointer_base {
@@ -3304,7 +3369,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     let resolved = self.resolve_alias(ptr, state);
                     let check_val = if let Operand::Value(rv) = resolved { *rv } else { *p };
                     state.aliases.insert(val_id, Operand::Value(check_val));
-                    let is_raw_pointer = self.ctx.map(|ctx| {
+                    let is_raw_pointer = self.is_raw_derived_index_address(val_id) || self.ctx.map(|ctx| {
                         matches!(ctx.types.get(self.func.value(val_id).ty), SemanticType::Pointer(..))
                     }).unwrap_or(false);
                     if is_raw_pointer {

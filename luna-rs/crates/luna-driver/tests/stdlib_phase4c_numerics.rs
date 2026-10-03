@@ -291,7 +291,7 @@ fn test_standard_conversions() {
                 std::Result::Ok(v) -> { if v != (42 as i64) { return 20; } },
                 std::Result::Err(_) -> { return 21; },
             }
-            dec too_wide: u64 = 3000000000 as u64;
+            dec too_wide: u64 = 3000000000u64;
             dec too_wide_result: std::Result<i32, std::TryConvertError> = too_wide.try_convert();
             match too_wide_result {
                 std::Result::Err(std::TryConvertError::Overflow) -> {},
@@ -417,7 +417,7 @@ fn test_float_semantics_and_operations() {
             if std::f64_nan().is_nan() == false { return 24; }
             if std::f64_infinity().is_infinite() == false { return 25; }
             if std::f64_neg_infinity().is_sign_negative() == false { return 26; }
-            if std::f64_to_bits(std::f64_from_bits(9221120237041090560 as u64)) != 9221120237041090560 as u64 { return 27; }
+            if std::f64_to_bits(std::f64_from_bits(9221120237041090560u64)) != 9221120237041090560u64 { return 27; }
 
             return 0;
         }

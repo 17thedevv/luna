@@ -1,0 +1,8 @@
+fn cast_dynamic(value: u128) -> char {
+    return value as char;
+}
+
+fn main() -> i32 {
+    dec high_bit = (1 as u128) << (127 as u128);
+    return cast_dynamic(high_bit) as i32;
+}

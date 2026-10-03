@@ -1,0 +1,187 @@
+import <io>;
+import <crypto>;
+import <encoding>;
+import <vec>;
+import <string>;
+import <slice>;
+
+fn test_constant_time() -> i32 {
+    dec a: [u8; 4] = [1 as u8, 2 as u8, 3 as u8, 4 as u8];
+    dec b: [u8; 4] = [1 as u8, 2 as u8, 3 as u8, 4 as u8];
+    dec c: [u8; 4] = [1 as u8, 2 as u8, 99 as u8, 4 as u8];
+    dec d: [u8; 3] = [1 as u8, 2 as u8, 3 as u8];
+
+    if std::constant_time_eq(&a, &b) == false {
+        return 1;
+    }
+    if std::constant_time_eq(&a, &c) == true {
+        return 2;
+    }
+    if std::constant_time_eq(&a, &d) == true {
+        return 3;
+    }
+    return 0;
+}
+
+fn test_sha256() -> i32 {
+    // Vector 1: Empty string -> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+    dec rw empty_vec = std::vec_new<u8>();
+    dec empty_hex = std::sha256_hex(empty_vec.as_slice());
+    dec eh_bytes = empty_hex.as_bytes();
+    // Check length 64 hex chars
+    if eh_bytes.len != (64 as usize) {
+        return 10;
+    }
+    // "e3b0c442"
+    if eh_bytes[0] != (101 as u8) || eh_bytes[1] != (51 as u8) || eh_bytes[2] != (98 as u8) || eh_bytes[3] != (48 as u8) {
+        return 11;
+    }
+    // end "b855"
+    if eh_bytes[60] != (98 as u8) || eh_bytes[61] != (56 as u8) || eh_bytes[62] != (53 as u8) || eh_bytes[63] != (53 as u8) {
+        return 12;
+    }
+
+    // Vector 2: "abc" -> ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
+    dec abc_data: [u8; 3] = [97 as u8, 98 as u8, 99 as u8];
+    dec abc_hex = std::sha256_hex(&abc_data);
+    dec abc_bytes = abc_hex.as_bytes();
+    if abc_bytes.len != (64 as usize) {
+        return 13;
+    }
+    // "ba7816bf"
+    if abc_bytes[0] != (98 as u8) || abc_bytes[1] != (97 as u8) || abc_bytes[2] != (55 as u8) || abc_bytes[3] != (56 as u8) {
+        return 14;
+    }
+    // end "15ad"
+    if abc_bytes[60] != (49 as u8) || abc_bytes[61] != (53 as u8) || abc_bytes[62] != (97 as u8) || abc_bytes[63] != (100 as u8) {
+        return 15;
+    }
+
+    // Vector 3: streaming update with "a", "b", "c" produces identical hash as "abc"
+    dec rw hasher = std::sha256_new();
+    dec part_a: [u8; 1] = [97 as u8];
+    dec part_b: [u8; 1] = [98 as u8];
+    dec part_c: [u8; 1] = [99 as u8];
+    hasher.update(&part_a);
+    hasher.update(&part_b);
+    hasher.update(&part_c);
+    dec stream_digest = hasher.finish();
+    dec direct_digest = std::sha256_digest(&abc_data);
+    if std::constant_time_eq(&stream_digest, &direct_digest) == false {
+        return 16;
+    }
+
+    return 0;
+}
+
+fn test_hmac_sha256() -> i32 {
+    // RFC 4231 Test Case 1:
+    // Key: 20 bytes of 0x0b
+    dec key: [u8; 20] = [
+        11 as u8, 11 as u8, 11 as u8, 11 as u8, 11 as u8,
+        11 as u8, 11 as u8, 11 as u8, 11 as u8, 11 as u8,
+        11 as u8, 11 as u8, 11 as u8, 11 as u8, 11 as u8,
+        11 as u8, 11 as u8, 11 as u8, 11 as u8, 11 as u8
+    ];
+    // Data: "Hi There" = [72, 105, 32, 84, 104, 101, 114, 101]
+    dec data: [u8; 8] = [72 as u8, 105 as u8, 32 as u8, 84 as u8, 104 as u8, 101 as u8, 114 as u8, 101 as u8];
+
+    // Expected digest: b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7
+    dec tag_hex = std::hmac_sha256_hex(&key, &data);
+    dec tag_bytes = tag_hex.as_bytes();
+    if tag_bytes.len != (64 as usize) {
+        return 20;
+    }
+    // "b0344c61"
+    if tag_bytes[0] != (98 as u8) || tag_bytes[1] != (48 as u8) || tag_bytes[2] != (51 as u8) || tag_bytes[3] != (52 as u8) {
+        return 21;
+    }
+    // end "cff7"
+    if tag_bytes[60] != (99 as u8) || tag_bytes[61] != (102 as u8) || tag_bytes[62] != (102 as u8) || tag_bytes[63] != (55 as u8) {
+        return 22;
+    }
+
+    // Verify helper
+    dec expected_tag = std::hmac_sha256(&key, &data);
+    if std::hmac_sha256_verify(&key, &data, &expected_tag) == false {
+        return 23;
+    }
+
+    return 0;
+}
+
+fn test_chacha20() -> i32 {
+    // Key: 32 bytes
+    dec key: [u8; 32] = [
+        0 as u8, 1 as u8, 2 as u8, 3 as u8, 4 as u8, 5 as u8, 6 as u8, 7 as u8,
+        8 as u8, 9 as u8, 10 as u8, 11 as u8, 12 as u8, 13 as u8, 14 as u8, 15 as u8,
+        16 as u8, 17 as u8, 18 as u8, 19 as u8, 20 as u8, 21 as u8, 22 as u8, 23 as u8,
+        24 as u8, 25 as u8, 26 as u8, 27 as u8, 28 as u8, 29 as u8, 30 as u8, 31 as u8
+    ];
+    // Nonce: 12 bytes
+    dec nonce: [u8; 12] = [
+        0 as u8, 0 as u8, 0 as u8, 0 as u8,
+        0 as u8, 0 as u8, 0 as u8, 74 as u8,
+        0 as u8, 0 as u8, 0 as u8, 0 as u8
+    ];
+    dec counter: u32 = 1 as u32;
+
+    // Test message (15 bytes)
+    dec msg: [u8; 15] = [
+        76 as u8, 117 as u8, 110 as u8, 97 as u8, 32 as u8,
+        67 as u8, 114 as u8, 121 as u8, 112 as u8, 116 as u8,
+        111 as u8, 32 as u8, 84 as u8, 101 as u8, 115 as u8
+    ];
+
+    // Encrypt
+    dec ciphertext = std::chacha20_crypt(&key, &nonce, counter, &msg);
+    if ciphertext.len() != (15 as u64) {
+        return 30;
+    }
+    // Verify ciphertext is different from plaintext
+    if ciphertext.as_slice()[0] == msg[0] && ciphertext.as_slice()[1] == msg[1] {
+        return 31;
+    }
+
+    // Decrypt (same operation with same key, nonce, counter)
+    dec decrypted = std::chacha20_crypt(&key, &nonce, counter, ciphertext.as_slice());
+    if decrypted.len() != (15 as u64) {
+        return 32;
+    }
+
+    // Verify decrypted matches original plaintext
+    dec d_slice = decrypted.as_slice();
+    dec rw k: usize = 0 as usize;
+    while k < (15 as usize) {
+        if d_slice[k] != msg[k] {
+            return (40 as i32) + (k as i32);
+        }
+        k = k + (1 as usize);
+    }
+
+    return 0;
+}
+
+export fn main() -> i32 {
+    dec ct_code = test_constant_time();
+    if ct_code != 0 {
+        return ct_code;
+    }
+
+    dec sha_code = test_sha256();
+    if sha_code != 0 {
+        return sha_code;
+    }
+
+    dec hmac_code = test_hmac_sha256();
+    if hmac_code != 0 {
+        return hmac_code;
+    }
+
+    dec chacha_code = test_chacha20();
+    if chacha_code != 0 {
+        return chacha_code;
+    }
+
+    return 0;
+}

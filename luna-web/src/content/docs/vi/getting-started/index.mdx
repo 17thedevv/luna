@@ -1,0 +1,137 @@
+---
+title: Bắt đầu với Luna
+description: Hướng dẫn cài đặt Luna và viết chương trình đầu tiên trong vòng chưa đầy 5 phút.
+---
+
+import { Tabs, TabItem, Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+## Yêu cầu môi trường
+
+Trước khi cài đặt Luna, hãy đảm bảo hệ thống của bạn đã cài đặt các công cụ sau:
+
+| Công cụ | Mục đích | Hướng dẫn cài đặt |
+|---------|----------|-------------------|
+| **Rust** (1.75+) | Biên dịch compiler từ mã nguồn | [rustup.rs](https://rustup.rs/) |
+| **LLVM 17+** | Backend sinh mã máy tối ưu | [llvm.org](https://llvm.org/) |
+| **Clang** | Liên kết nhị phân bản địa (linking) | Đi kèm với LLVM |
+| **Git** | Sao chép kho lưu trữ | [git-scm.com](https://git-scm.com/) |
+
+## Cài đặt
+
+<Tabs>
+  <TabItem label="Linux / macOS">
+    ```bash
+    # Sao chép kho lưu trữ
+    git clone https://github.com/17thedevv/luna.git
+    cd luna/luna-rs
+
+    # Biên dịch ở chế độ release
+    cargo build --release
+
+    # Thêm vào PATH (tùy chọn)
+    export PATH="$PWD/target/release:$PATH"
+
+    # Kiểm tra cài đặt
+    luna --version
+    ```
+  </TabItem>
+  <TabItem label="Windows">
+    ```powershell
+    # Sao chép kho lưu trữ
+    git clone https://github.com/17thedevv/luna.git
+    cd luna\luna-rs
+
+    # Biên dịch ở chế độ release
+    cargo build --release
+
+    # Thêm vào PATH (tùy chọn)
+    $env:PATH = "$PWD\target\release;$env:PATH"
+
+    # Kiểm tra cài đặt
+    luna --version
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  **Mẹo:** Biên dịch ở chế độ release (`--release`) tạo ra nhị phân trình biên dịch nhanh hơn đáng kể. Các bản dựng debug thuận tiện cho việc phát triển nhưng sẽ chậm hơn rõ rệt khi biên dịch các chương trình lớn.
+</Aside>
+
+## Chương trình đầu tiên
+
+Tạo một tệp có tên `hello.ln`:
+
+```luna
+fn main() -> i32 {
+    dec name = "Luna";
+    std::io::println("Xin chào từ {}! 🌙", name);
+
+    dec numbers = [1, 2, 3, 4, 5];
+    dec rw sum: i32 = 0;
+    for n in &numbers {
+        sum = sum + *n;
+    }
+    std::io::println("Tổng: {}", sum);
+
+    return 0;
+}
+```
+
+### Biên dịch và Chạy
+
+```bash
+# Biên dịch và chạy trong một bước duy nhất
+luna run hello.ln
+
+# Hoặc biên dịch thành file nhị phân riêng
+luna build hello.ln -o hello
+./hello
+```
+
+### Kết quả mong đợi
+
+```
+Xin chào từ Luna! 🌙
+Tổng: 15
+```
+
+## Phân tích mã nguồn
+
+| Thành phần | Ý nghĩa |
+|------------|---------|
+| `fn main() -> i32` | Hàm điểm vào (entry point) trả về mã trạng thái thoát |
+| `dec name = "Luna"` | Khai báo biến bất biến với tự động suy luận kiểu |
+| `dec rw sum: i32 = 0` | Khai báo biến khả ghi (`rw`) với chú giải kiểu rõ ràng |
+| `&numbers` | Vay mượn (borrowing) — tham chiếu chia sẻ tới mảng |
+| `*n` | Giải tham chiếu (dereference) để lấy giá trị |
+| `std::io::println(...)` | Xuất dữ liệu định dạng từ thư viện chuẩn |
+| `return 0` | Lệnh trả về tường minh (0 biểu thị thành công) |
+
+<Aside type="note">
+  Trong Luna, các biến **mặc định là bất biến**. Hãy sử dụng từ khóa `rw` (rewritable) khi bạn cần thay đổi giá trị của một binding: `dec rw count = 0;`. Thiết kế này ngăn chặn các lỗi đột biến ngoài ý muốn và bảo đảm an toàn dữ liệu đa luồng (data-race freedom) ngay tại thời điểm biên dịch.
+</Aside>
+
+## Các bước tiếp theo
+
+<CardGrid>
+  <Card title="Khám phá ngôn ngữ" icon="open-book">
+    Tìm hiểu toàn diện về cú pháp, hệ thống kiểu, mô hình sở hữu, trait và module của Luna.
+
+    [Bắt đầu khám phá →](/vi/language-tour/)
+  </Card>
+  <Card title="Thư viện chuẩn" icon="document">
+    Tìm hiểu về Vec, String, Option, Result, HashMap, I/O và các kiểu nền tảng khác.
+
+    [Duyệt Thư viện chuẩn →](/vi/stdlib/)
+  </Card>
+  <Card title="Tham khảo cú pháp" icon="information">
+    Tài liệu tra cứu đầy đủ cho tất cả các từ khóa, toán tử và cấu trúc ngôn ngữ.
+
+    [Xem Cú pháp →](/vi/reference/syntax/)
+  </Card>
+  <Card title="Lộ trình phát triển" icon="star">
+    Xem kế hoạch phát triển sắp tới — macro, comptime, WebAssembly và hơn thế nữa.
+
+    [Xem Lộ trình →](/vi/roadmap/)
+  </Card>
+</CardGrid>

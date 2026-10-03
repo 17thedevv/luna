@@ -1,0 +1,206 @@
+import <algo>;
+import <vec>;
+
+fn is_even(x: &i32) -> bool {
+    return (*x % 2) == 0;
+}
+
+fn cmp_descending(a: &i32, b: &i32) -> i32 {
+    if *a > *b { return 0 - 1; }
+    if *a < *b { return 1; }
+    return 0;
+}
+
+fn main() -> i32 {
+    // =========================================================================
+    // 1. is_sorted & is_sorted_by
+    // =========================================================================
+    dec rw v_sorted: std::Vec<i32> = std::vec_new<i32>();
+    v_sorted.push(10);
+    v_sorted.push(20);
+    v_sorted.push(20);
+    v_sorted.push(30);
+    v_sorted.push(40);
+
+    if std::algo::is_sorted<i32>(v_sorted.as_slice()) == false { return 1; }
+
+    dec rw v_unsorted: std::Vec<i32> = std::vec_new<i32>();
+    v_unsorted.push(10);
+    v_unsorted.push(30);
+    v_unsorted.push(20);
+    v_unsorted.push(40);
+
+    if std::algo::is_sorted<i32>(v_unsorted.as_slice()) == true { return 2; }
+
+    dec rw v_empty: std::Vec<i32> = std::vec_new<i32>();
+    if std::algo::is_sorted<i32>(v_empty.as_slice()) == false { return 3; }
+
+    dec rw v_desc: std::Vec<i32> = std::vec_new<i32>();
+    v_desc.push(50);
+    v_desc.push(40);
+    v_desc.push(30);
+    v_desc.push(10);
+
+    if std::algo::is_sorted_by<i32>(v_desc.as_slice(), cmp_descending) == false { return 4; }
+
+    // =========================================================================
+    // 2. partition_point
+    // =========================================================================
+    dec rw v_part: std::Vec<i32> = std::vec_new<i32>();
+    v_part.push(2);
+    v_part.push(4);
+    v_part.push(6);
+    v_part.push(7);
+    v_part.push(9);
+    v_part.push(11);
+
+    dec pt = std::algo::partition_point<i32>(v_part.as_slice(), is_even);
+    if pt != (3 as u64) { return 5; }
+
+    // =========================================================================
+    // 3. partition
+    // =========================================================================
+    dec rw v_to_part: std::Vec<i32> = std::vec_new<i32>();
+    v_to_part.push(5);
+    v_to_part.push(2);
+    v_to_part.push(8);
+    v_to_part.push(1);
+    v_to_part.push(9);
+    v_to_part.push(4);
+    v_to_part.push(3);
+    v_to_part.push(6);
+
+    dec count_even = std::algo::partition<i32>(v_to_part.as_mut_slice(), is_even);
+    if count_even != (4 as u64) { return 6; }
+
+    dec s_part = v_to_part.as_slice();
+    dec rw idx: u64 = 0 as u64;
+    while idx < count_even {
+        if is_even(&s_part[idx]) == false { return 7; }
+        idx = idx + (1 as u64);
+    }
+    while idx < (s_part.len as u64) {
+        if is_even(&s_part[idx]) == true { return 8; }
+        idx = idx + (1 as u64);
+    }
+
+    // =========================================================================
+    // 4. lower_bound, upper_bound, equal_range
+    // =========================================================================
+    dec rw v_bounds: std::Vec<i32> = std::vec_new<i32>();
+    v_bounds.push(10);
+    v_bounds.push(20);
+    v_bounds.push(20);
+    v_bounds.push(20);
+    v_bounds.push(30);
+    v_bounds.push(40);
+
+    dec s_bounds = v_bounds.as_slice();
+    dec target_20 = 20;
+    dec lb20 = std::algo::lower_bound<i32>(s_bounds, &target_20);
+    if lb20 != (1 as u64) { return 9; }
+
+    dec ub20 = std::algo::upper_bound<i32>(s_bounds, &target_20);
+    if ub20 != (4 as u64) { return 10; }
+
+    dec eq_range = std::algo::equal_range<i32>(s_bounds, &target_20);
+    if eq_range.0 != (1 as u64) { return 11; }
+    if eq_range.1 != (4 as u64) { return 12; }
+
+    dec target_25 = 25;
+    if std::algo::lower_bound<i32>(s_bounds, &target_25) != (4 as u64) { return 13; }
+
+    dec target_5 = 5;
+    if std::algo::lower_bound<i32>(s_bounds, &target_5) != (0 as u64) { return 14; }
+
+    dec target_50 = 50;
+    if std::algo::lower_bound<i32>(s_bounds, &target_50) != (6 as u64) { return 15; }
+
+    // =========================================================================
+    // 5. rotate_left & rotate_right
+    // =========================================================================
+    dec rw v_rot: std::Vec<i32> = std::vec_new<i32>();
+    v_rot.push(1);
+    v_rot.push(2);
+    v_rot.push(3);
+    v_rot.push(4);
+    v_rot.push(5);
+
+    std::algo::rotate_left<i32>(v_rot.as_mut_slice(), 2 as u64); // [3, 4, 5, 1, 2]
+    dec s_rot1 = v_rot.as_slice();
+    if s_rot1[0 as u64] != 3 { return 16; }
+    if s_rot1[1 as u64] != 4 { return 17; }
+    if s_rot1[2 as u64] != 5 { return 18; }
+    if s_rot1[3 as u64] != 1 { return 19; }
+    if s_rot1[4 as u64] != 2 { return 20; }
+
+    std::algo::rotate_right<i32>(v_rot.as_mut_slice(), 2 as u64); // back to [1, 2, 3, 4, 5]
+    dec s_rot2 = v_rot.as_slice();
+    if s_rot2[0 as u64] != 1 { return 21; }
+    if s_rot2[1 as u64] != 2 { return 22; }
+    if s_rot2[2 as u64] != 3 { return 23; }
+    if s_rot2[3 as u64] != 4 { return 24; }
+    if s_rot2[4 as u64] != 5 { return 25; }
+
+    // =========================================================================
+    // 6. fill
+    // =========================================================================
+    dec rw v_fill: std::Vec<i32> = std::vec_new<i32>();
+    v_fill.push(0);
+    v_fill.push(0);
+    v_fill.push(0);
+    v_fill.push(0);
+
+    dec fill_val = 99;
+    std::algo::fill<i32>(v_fill.as_mut_slice(), &fill_val);
+    dec s_fill = v_fill.as_slice();
+    if s_fill[0 as u64] != 99 { return 26; }
+    if s_fill[1 as u64] != 99 { return 27; }
+    if s_fill[2 as u64] != 99 { return 28; }
+    if s_fill[3 as u64] != 99 { return 29; }
+
+    // =========================================================================
+    // 7. swap_ranges
+    // =========================================================================
+    dec rw v_a: std::Vec<i32> = std::vec_new<i32>();
+    v_a.push(1);
+    v_a.push(2);
+    v_a.push(3);
+
+    dec rw v_b: std::Vec<i32> = std::vec_new<i32>();
+    v_b.push(10);
+    v_b.push(20);
+    v_b.push(30);
+
+    std::algo::swap_ranges<i32>(v_a.as_mut_slice(), v_b.as_mut_slice());
+    dec sa = v_a.as_slice();
+    dec sb = v_b.as_slice();
+    if sa[0 as u64] != 10 { return 30; }
+    if sa[1 as u64] != 20 { return 31; }
+    if sa[2 as u64] != 30 { return 32; }
+    if sb[0 as u64] != 1 { return 33; }
+    if sb[1 as u64] != 2 { return 34; }
+    if sb[2 as u64] != 3 { return 35; }
+
+    // =========================================================================
+    // 8. Math algorithms
+    // =========================================================================
+    if std::algo::clamp_i32(15, 0, 10) != 10 { return 36; }
+    if std::algo::clamp_i32(0 - 5, 0, 10) != 0 { return 37; }
+    if std::algo::clamp_i32(5, 0, 10) != 5 { return 38; }
+
+    if std::algo::clamp_u64(100 as u64, 10 as u64, 50 as u64) != (50 as u64) { return 39; }
+    if std::algo::clamp_u64(5 as u64, 10 as u64, 50 as u64) != (10 as u64) { return 40; }
+
+    if std::algo::gcd_u64(48 as u64, 18 as u64) != (6 as u64) { return 41; }
+    if std::algo::gcd_u64(101 as u64, 10 as u64) != (1 as u64) { return 42; }
+
+    if std::algo::lcm_u64(12 as u64, 18 as u64) != (36 as u64) { return 43; }
+
+    if std::algo::abs_i32(0 - 42) != 42 { return 44; }
+    if std::algo::abs_i32(42) != 42 { return 45; }
+
+    if std::algo::abs_i64((0 as i64) - (1000 as i64)) != (1000 as i64) { return 46; }
+
+    return 0;
+}

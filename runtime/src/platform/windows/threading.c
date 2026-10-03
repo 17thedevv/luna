@@ -17,6 +17,7 @@ typedef struct {
 static DWORD WINAPI win_thread_trampoline(LPVOID param) {
     WinThreadArgs* args = (WinThreadArgs*)param;
     args->fn(args->arg);
+    free(args);
     return 0;
 }
 

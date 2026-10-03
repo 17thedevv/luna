@@ -36,7 +36,13 @@ export fn vec_with_capacity<T>(capacity: u64) -> Vec<T> {
     if capacity == (0 as u64) {
         return vec_new<T>();
     }
-    dec size = capacity * (std::mem::size_of<T>() as u64);
+    dec elem_size = std::mem::size_of<T>() as u64;
+    if elem_size > (0 as u64) {
+        if capacity > (18446744073709551615u64 / elem_size) {
+            return vec_new<T>();
+        }
+    }
+    dec size = capacity * elem_size;
     dec align = std::mem::align_of<T>() as u64;
     dec ptr = __luna_alloc(size, align) as u64 as *rw T;
     unsafe {
@@ -45,6 +51,35 @@ export fn vec_with_capacity<T>(capacity: u64) -> Vec<T> {
             len: 0 as u64,
             cap: capacity,
         };
+    }
+}
+
+export fn vec_from_slice<T: std::Clone>(slice: &[T]) -> Vec<T> {
+    dec rw v = vec_with_capacity<T>(slice.len() as u64);
+    v.extend_from_slice(slice);
+    return v;
+}
+
+export fn vec_repeat<T: std::Clone>(elem: T, count: usize) -> Vec<T> {
+    dec rw v = vec_with_capacity<T>(count as u64);
+    dec n = count as u64;
+    dec rw i = 0 as u64;
+    while i < n {
+        v.push(elem.clone());
+        i = i + (1 as u64);
+    }
+    return v;
+}
+
+export macro vec {
+    () => {
+        std::vec_new()
+    }
+    (@elem: expr; @count: expr) => {
+        std::vec_repeat(@elem, @count)
+    }
+    ($(@x: expr),*) => {
+        std::vec_from_slice(&[$($x),*])
     }
 }
 
@@ -230,14 +265,23 @@ impl<T> Vec<T> {
     }
 
     export fn grow(self: &rw Self) {
+        dec elem_size = std::mem::size_of<T>() as u64;
         dec rw new_cap: u64 = 0 as u64;
         if self.cap == (0 as u64) {
             new_cap = 4 as u64;
         } else {
+            if self.cap > 9223372036854775807u64 {
+                __luna_panic_default();
+            }
             new_cap = self.cap * (2 as u64);
         }
+        if elem_size > (0 as u64) {
+            if new_cap > (18446744073709551615u64 / elem_size) {
+                __luna_panic_default();
+            }
+        }
         
-        dec new_size = new_cap * (std::mem::size_of<T>() as u64);
+        dec new_size = new_cap * elem_size;
         dec align = std::mem::align_of<T>() as u64;
         dec new_ptr = __luna_alloc(new_size, align) as u64 as *rw T;
 
@@ -245,7 +289,7 @@ impl<T> Vec<T> {
             unsafe {
                 std::ptr::copy<T>(self.ptr as *T, new_ptr, self.len);
             }
-            dec old_size = self.cap * (std::mem::size_of<T>() as u64);
+            dec old_size = self.cap * elem_size;
             __luna_dealloc(self.ptr as *rw u8, old_size, align);
         }
 
@@ -256,18 +300,32 @@ impl<T> Vec<T> {
     }
 
     export fn reserve(self: &rw Self, additional: u64) {
+        if additional > (18446744073709551615u64 - self.len) {
+            __luna_panic_default();
+        }
         if self.len + additional <= self.cap {
             return;
         }
         dec rw new_cap = self.len + additional;
-        if new_cap < self.cap * (2 as u64) {
-            new_cap = self.cap * (2 as u64);
+        if self.cap <= 9223372036854775807u64 {
+            if new_cap < self.cap * (2 as u64) {
+                new_cap = self.cap * (2 as u64);
+            }
         }
         if new_cap < (4 as u64) {
             new_cap = 4 as u64;
         }
+        dec elem_size = std::mem::size_of<T>() as u64;
+        if elem_size > (0 as u64) {
+            if new_cap > (18446744073709551615u64 / elem_size) {
+                if (self.len + additional) > (18446744073709551615u64 / elem_size) {
+                    __luna_panic_default();
+                }
+                new_cap = self.len + additional;
+            }
+        }
 
-        dec new_size = new_cap * (std::mem::size_of<T>() as u64);
+        dec new_size = new_cap * elem_size;
         dec align = std::mem::align_of<T>() as u64;
         dec new_ptr = __luna_alloc(new_size, align) as u64 as *rw T;
 
@@ -275,7 +333,7 @@ impl<T> Vec<T> {
             unsafe {
                 std::ptr::copy<T>(self.ptr as *T, new_ptr, self.len);
             }
-            dec old_size = self.cap * (std::mem::size_of<T>() as u64);
+            dec old_size = self.cap * elem_size;
             __luna_dealloc(self.ptr as *rw u8, old_size, align);
         }
 
@@ -408,6 +466,9 @@ impl<T> Vec<T> {
 
     // For primitive i32 vec dedup:
     export fn dedup_i32(self: &rw Self) {
+        if std::mem::size_of<T>() != (4 as u64) {
+            return;
+        }
         if self.len <= (1 as u64) { return; }
         dec rw write: u64 = 1 as u64;
         dec rw read: u64 = 1 as u64;
@@ -421,7 +482,7 @@ impl<T> Vec<T> {
                 } else {
                     if read != write {
                         dec p_write = std::ptr::add_mut<T>(self.ptr, write);
-                        dec val = std::ptr::read<T>(p_read as *T);
+                        dec val = std::ptr::read<T>(std::ptr::add<T>(self.ptr as *T, read));
                         std::ptr::write<T>(p_write, val);
                     }
                     write = write + (1 as u64);
@@ -549,6 +610,117 @@ impl<T> Vec<T> {
             return removed;
         }
     }
+
+    // =========================================================================
+    // Phase C1: Convenience Methods
+    // =========================================================================
+
+    // Transfer buffer ownership, leaving self as a valid empty Vec.
+    export fn take(self: &rw Self) -> Vec<T> {
+        dec p = self.ptr;
+        dec l = self.len;
+        dec c = self.cap;
+        unsafe {
+            self.ptr = 0 as u64 as *rw T;
+        }
+        self.len = 0 as u64;
+        self.cap = 0 as u64;
+        unsafe {
+            return Vec<T> { ptr: p, len: l, cap: c };
+        }
+    }
+
+    // Swap two elements by index using raw pointers.
+    export fn swap(self: &rw Self, i: u64, j: u64) {
+        if i >= self.len || j >= self.len {
+            __luna_panic_default();
+        }
+        if i == j { return; }
+        unsafe {
+            dec pi = std::ptr::add_mut<T>(self.ptr, i);
+            dec pj = std::ptr::add_mut<T>(self.ptr, j);
+            dec tmp = std::ptr::read<T>(pi as *T);
+            std::ptr::copy<T>(pj as *T, pi, 1 as u64);
+            std::ptr::write<T>(pj, tmp);
+        }
+    }
+
+    // Returns a reference to the first element.
+    export fn first(self: &Self) -> std::Option<&T> life_from(self) {
+        if self.len == (0 as u64) {
+            return std::Option::None;
+        }
+        unsafe {
+            return std::Option::Some(&*(self.ptr as *T));
+        }
+    }
+
+    // Reverse elements in-place.
+    export fn reverse(self: &rw Self) {
+        std::slice::slice_reverse<T>(self.as_mut_slice());
+    }
+
+    // Split vec at position, returning elements [at..] as a new Vec.
+    export fn split_off(self: &rw Self, at: u64) -> Vec<T> {
+        if at > self.len {
+            __luna_panic_default();
+        }
+        dec new_len = self.len - at;
+        dec rw result = vec_with_capacity<T>(new_len);
+        dec rw i: u64 = 0 as u64;
+        while i < new_len {
+            unsafe {
+                dec src = std::ptr::add<T>(self.ptr as *T, at + i);
+                result.push(std::ptr::read<T>(src));
+            }
+            i = i + (1 as u64);
+        }
+        self.len = at;
+        return result;
+    }
+
+    // Move all elements from another Vec into self.
+    export fn append(self: &rw Self, other: &rw Vec<T>) {
+        dec other_len = other.len;
+        if other_len == (0 as u64) { return; }
+        self.reserve(other_len);
+        dec rw i: u64 = 0 as u64;
+        while i < other_len {
+            unsafe {
+                dec src = std::ptr::add<T>(other.ptr as *T, i);
+                self.push(std::ptr::read<T>(src));
+            }
+            i = i + (1 as u64);
+        }
+        other.len = 0 as u64;
+    }
+}
+
+impl<T: std::Eq> Vec<T> {
+    // Linear search for an element.
+    export fn contains(self: &Self, value: &T) -> bool {
+        dec s = self.as_slice();
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            if s[i].eq(value) {
+                return true;
+            }
+            i = i + (1 as u64);
+        }
+        return false;
+    }
+}
+
+impl<T: std::Ord> Vec<T> {
+    // Binary search on sorted Vec.
+    export fn binary_search(self: &Self, value: &T) -> std::Option<u64> {
+        return std::slice::slice_binary_search<T>(self.as_slice(), value);
+    }
+
+    // Sort in-place using Ord trait.
+    export fn sort(self: &rw Self) {
+        std::slice::slice_sort<T>(self.as_mut_slice());
+    }
 }
 
 extern fn __luna_panic_default();
@@ -599,5 +771,16 @@ impl<T: std::Eq> std::Eq for Vec<T> {
         return true;
     }
 }
+}
 
+export macro vec {
+    () => {
+        std::vec_new()
+    }
+    (@elem: expr; @count: expr) => {
+        std::vec_repeat(@elem, @count)
+    }
+    ($(@x: expr),*) => {
+        std::vec_from_slice(&[$($x),*])
+    }
 }

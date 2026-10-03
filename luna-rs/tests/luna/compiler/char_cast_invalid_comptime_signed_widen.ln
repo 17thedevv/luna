@@ -1,0 +1,5 @@
+const INVALID: char = -1 as i8 as i64 as char;
+
+fn main() -> i32 {
+    return 0;
+}

@@ -1,0 +1,76 @@
+import <file>;
+import <string>;
+import <vec>;
+import <result>;
+
+fn test_command_output() -> i32 {
+    dec prog = std::string_from_str("cmd.exe");
+    dec rw cmd = std::command_new(&prog);
+    dec arg1 = std::string_from_str("/c");
+    dec arg2 = std::string_from_str("echo luna_process_ok");
+    cmd.arg(&arg1);
+    cmd.arg(&arg2);
+
+    dec res = cmd.output();
+    if res.is_err() {
+        return 11;
+    }
+    dec out = res.unwrap();
+    if out.status().success() == false {
+        return 12;
+    }
+    dec stdout_bytes = out.stdout().as_slice();
+    if stdout_bytes.len() < (15 as usize) {
+        return 13;
+    }
+
+    // Verify "luna_process_ok" starts at the beginning
+    // 'l'=108, 'u'=117, 'n'=110, 'a'=97, '_'=95
+    if stdout_bytes[0] != (108 as u8) || stdout_bytes[1] != (117 as u8) || stdout_bytes[2] != (110 as u8) || stdout_bytes[3] != (97 as u8) {
+        return 14;
+    }
+
+    return 0;
+}
+
+fn test_command_spawn_and_wait() -> bool {
+    dec prog = std::string_from_str("cmd.exe");
+    dec rw cmd = std::command_new(&prog);
+    dec arg1 = std::string_from_str("/c");
+    dec arg2 = std::string_from_str("exit 0");
+    cmd.arg(&arg1);
+    cmd.arg(&arg2);
+
+    dec res = cmd.spawn();
+    if res.is_err() {
+        return false;
+    }
+    dec rw child = res.unwrap();
+    if child.id() == (0 as u32) {
+        return false;
+    }
+
+    dec wait_res = child.wait();
+    if wait_res.is_err() {
+        return false;
+    }
+    dec status = wait_res.unwrap();
+    if status.success() == false {
+        return false;
+    }
+
+    return true;
+}
+
+fn main() -> i32 {
+    dec err1 = test_command_output();
+    if err1 != 0 {
+        return err1;
+    }
+
+    if test_command_spawn_and_wait() == false {
+        return 2;
+    }
+
+    return 0;
+}

@@ -1,0 +1,74 @@
+import <net>;
+import <time>;
+import <result>;
+
+fn test_udp_timeout_and_nonblocking() -> bool {
+    dec localhost = std::ipv4_localhost();
+    dec bind_res = std::udp_socket_bind(&localhost, 18991 as u16);
+    if bind_res.is_err() {
+        return false;
+    }
+    dec rw sock = bind_res.unwrap();
+
+    // 1. Test set_read_timeout
+    dec dur = std::duration_from_millis(50 as u64);
+    dec timeout_res = sock.set_read_timeout(&dur);
+    if timeout_res.is_err() {
+        return false;
+    }
+
+    // 2. Test set_write_timeout
+    dec wtimeout_res = sock.set_write_timeout(&dur);
+    if wtimeout_res.is_err() {
+        return false;
+    }
+
+    // 3. Test set_nonblocking
+    dec nb_res = sock.set_nonblocking(true);
+    if nb_res.is_err() {
+        return false;
+    }
+
+    // 4. In nonblocking mode, recv_from on empty socket must return Err without blocking
+    dec rw buf: [u8; 16] = [0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8];
+    dec recv_res = sock.recv_from(&rw buf);
+    if recv_res.is_ok() {
+        return false;
+    }
+
+    sock.close();
+    return true;
+}
+
+fn test_tcp_listener_nonblocking() -> bool {
+    dec localhost = std::ipv4_localhost();
+    dec bind_res = std::tcp_listener_bind(&localhost, 18992 as u16);
+    if bind_res.is_err() {
+        return false;
+    }
+    dec rw listener = bind_res.unwrap();
+
+    dec nb_res = listener.set_nonblocking(true);
+    if nb_res.is_err() {
+        return false;
+    }
+
+    // accept() on nonblocking listener with no pending connections must return Err
+    dec accept_res = listener.accept();
+    if accept_res.is_ok() {
+        return false;
+    }
+
+    listener.close();
+    return true;
+}
+
+fn main() -> i32 {
+    if test_udp_timeout_and_nonblocking() == false {
+        return 1 as i32;
+    }
+    if test_tcp_listener_nonblocking() == false {
+        return 2 as i32;
+    }
+    return 0 as i32;
+}

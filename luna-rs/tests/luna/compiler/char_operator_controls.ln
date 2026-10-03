@@ -1,0 +1,20 @@
+fn add<T>(left: T, right: T) -> T { return left + right; }
+fn main() -> i32 {
+    dec rw value: char = 'a';
+    value = 'b';
+    if value == 'a' || value != 'b' { return 1; }
+    if value < 'b' || value > 'b' { return 2; }
+    if value <= 'a' || value >= 'c' { return 3; }
+    dec number = value as u32;
+    dec next = (number + (1 as u32)) as char;
+    if next != 'c' { return 4; }
+    if add(12 as i32, 34 as i32) != 46 { return 5; }
+    if add(12.0 as f64, 34.0 as f64) != (46.0 as f64) { return 6; }
+    dec integer = (((((10 + 2 - 1) * 3 / 3) % 8) | 8) & 15) ^ 2;
+    if integer != 9 { return 7; }
+    if -integer != -9 { return 8; }
+    if ((12 as i32) & (10 as i32)) != 8 { return 9; }
+    if ((12 as i32) | (10 as i32)) != 14 { return 10; }
+    if ((12 as i32) ^ (10 as i32)) != 6 { return 11; }
+    return 0;
+}

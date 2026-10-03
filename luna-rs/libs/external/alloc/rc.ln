@@ -1,0 +1,206 @@
+import <__alloc_global>;
+import <ptr>;
+import <mem>;
+import <cell>;
+import <result>;
+import <__lang_drop>;
+import <__lang_option>;
+
+export module std {
+    struct RcBox<T> {
+        strong: std::Cell<u64>,
+        weak: std::Cell<u64>,
+        value: T,
+    };
+
+    export struct Rc<T> {
+        private ptr: *rw RcBox<T>,
+    } requires anchor(ptr) = self;
+
+    export struct RcWeak<T> {
+        private ptr: *rw RcBox<T>,
+    } requires anchor(ptr) = self;
+
+    export fn rc_new<T>(val: T) -> Rc<T> {
+        dec size = std::mem::size_of<RcBox<T>>();
+        dec align = std::mem::align_of<RcBox<T>>();
+        dec raw = __luna_alloc(size, align) as *rw RcBox<T>;
+        unsafe {
+            std::ptr::write<RcBox<T>>(raw, RcBox<T> {
+                strong: std::cell_new<u64>(1 as u64),
+                weak: std::cell_new<u64>(1 as u64),
+                value: val,
+            });
+            return Rc<T> { ptr: raw };
+        }
+    }
+
+    impl<T> Rc<T> {
+        export fn clone(self: &Self) -> Rc<T> {
+            unsafe {
+                dec box = &*self.ptr;
+                box.strong.set(box.strong.get() + (1 as u64));
+                return Rc<T> { ptr: self.ptr };
+            }
+        }
+
+        export fn downgrade(self: &Self) -> RcWeak<T> {
+            unsafe {
+                dec box = &*self.ptr;
+                box.weak.set(box.weak.get() + (1 as u64));
+                return RcWeak<T> { ptr: self.ptr };
+            }
+        }
+
+        export fn strong_count(self: &Self) -> u64 {
+            unsafe {
+                return (*self.ptr).strong.get();
+            }
+        }
+
+        export fn weak_count(self: &Self) -> u64 {
+            unsafe {
+                dec w = (*self.ptr).weak.get();
+                if w > (0 as u64) {
+                    return w - (1 as u64);
+                }
+                return 0 as u64;
+            }
+        }
+
+        export fn as_ref(self: &Self) -> &T life_from(self) {
+            unsafe {
+                return &(*self.ptr).value;
+            }
+        }
+
+        export fn try_unwrap(self: Self) -> std::Result<T, Rc<T>> {
+            unsafe {
+                dec count = (*self.ptr).strong.get();
+                if count == (1 as u64) {
+                    dec raw = self.ptr;
+                    dec val = std::ptr::read<T>(&(*raw).value as *T);
+                    dec w_count = (*raw).weak.get();
+                    if w_count <= (1 as u64) {
+                        __luna_dealloc(
+                            raw as *rw u8,
+                            std::mem::size_of<RcBox<T>>(),
+                            std::mem::align_of<RcBox<T>>()
+                        );
+                    } else {
+                        (*raw).strong.set(0 as u64);
+                        (*raw).weak.set(w_count - (1 as u64));
+                    }
+                    dec rw unwrap_self = self;
+                    unwrap_self.ptr = 0 as u64 as *rw RcBox<T>;
+                    return std::Result::Ok(val);
+                }
+                return std::Result::Err(self);
+            }
+        }
+    }
+
+    impl<T> std::Drop for Rc<T> {
+        fn drop(self: &rw Self) {
+            if (self.ptr as u64) != (0 as u64) {
+                unsafe {
+                    dec box = &*self.ptr;
+                    dec count = box.strong.get();
+                    if count > (1 as u64) {
+                        box.strong.set(count - (1 as u64));
+                    } else {
+                        box.strong.set(0 as u64);
+                        std::ptr::drop_in_place<T>(&rw (*self.ptr).value);
+                        dec w_count = box.weak.get();
+                        if w_count > (1 as u64) {
+                            box.weak.set(w_count - (1 as u64));
+                        } else {
+                            __luna_dealloc(
+                                self.ptr as *rw u8,
+                                std::mem::size_of<RcBox<T>>(),
+                                std::mem::align_of<RcBox<T>>()
+                            );
+                        }
+                    }
+                    self.ptr = 0 as u64 as *rw RcBox<T>;
+                }
+            }
+        }
+    }
+
+    impl<T> RcWeak<T> {
+        export fn clone(self: &Self) -> RcWeak<T> {
+            unsafe {
+                if (self.ptr as u64) == (0 as u64) {
+                    return RcWeak<T> { ptr: self.ptr };
+                }
+                dec box = &*self.ptr;
+                box.weak.set(box.weak.get() + (1 as u64));
+                return RcWeak<T> { ptr: self.ptr };
+            }
+        }
+
+        export fn strong_count(self: &Self) -> u64 {
+            if (self.ptr as u64) == (0 as u64) {
+                return 0 as u64;
+            }
+            unsafe {
+                return (*self.ptr).strong.get();
+            }
+        }
+
+        export fn weak_count(self: &Self) -> u64 {
+            if (self.ptr as u64) == (0 as u64) {
+                return 0 as u64;
+            }
+            unsafe {
+                dec w = (*self.ptr).weak.get();
+                dec s = (*self.ptr).strong.get();
+                if s > (0 as u64) && w > (0 as u64) {
+                    return w - (1 as u64);
+                }
+                return w;
+            }
+        }
+
+        export fn upgrade(self: &Self) -> std::Option<Rc<T>> {
+            if (self.ptr as u64) == (0 as u64) {
+                return std::Option::None;
+            }
+            unsafe {
+                dec box = &*self.ptr;
+                dec s = box.strong.get();
+                if s == (0 as u64) {
+                    return std::Option::None;
+                }
+                box.strong.set(s + (1 as u64));
+                return std::Option::Some(Rc<T> { ptr: self.ptr });
+            }
+        }
+    }
+
+    impl<T> std::Drop for RcWeak<T> {
+        fn drop(self: &rw Self) {
+            if (self.ptr as u64) != (0 as u64) {
+                unsafe {
+                    dec box = &*self.ptr;
+                    dec w = box.weak.get();
+                    if w > (1 as u64) {
+                        box.weak.set(w - (1 as u64));
+                    } else {
+                        if box.strong.get() == (0 as u64) {
+                            __luna_dealloc(
+                                self.ptr as *rw u8,
+                                std::mem::size_of<RcBox<T>>(),
+                                std::mem::align_of<RcBox<T>>()
+                            );
+                        } else {
+                            box.weak.set(0 as u64);
+                        }
+                    }
+                    self.ptr = 0 as u64 as *rw RcBox<T>;
+                }
+            }
+        }
+    }
+}

@@ -22,6 +22,9 @@ pub struct TypeChecker<'a> {
     comptime_engine: Option<&'a dyn crate::ComptimeEngine>,
     current_return_type: Vec<SemanticTypeId>,
     expected_expr_type: Vec<SemanticTypeId>,
+    comptime_prepared_functions: std::collections::HashSet<luna_ast::DeclId>,
+    populating_nominal_types: std::collections::HashSet<luna_ast::DeclId>,
+    populated_nominal_types: std::collections::HashSet<luna_ast::DeclId>,
     current_scope: crate::ScopeId,
     pub current_trait: Option<luna_common::ids::SymbolId>,
     pub current_trait_impl: Option<luna_ast::DeclId>,
@@ -48,6 +51,9 @@ impl<'a> TypeChecker<'a> {
             comptime_engine: None,
             current_return_type: Vec::new(),
             expected_expr_type: Vec::new(),
+            comptime_prepared_functions: std::collections::HashSet::new(),
+            populating_nominal_types: std::collections::HashSet::new(),
+            populated_nominal_types: std::collections::HashSet::new(),
             current_scope: crate::ScopeId(0),
             current_trait: None,
             current_trait_impl: None,
@@ -69,6 +75,9 @@ impl<'a> TypeChecker<'a> {
             comptime_engine: Some(comptime_engine),
             current_return_type: Vec::new(),
             expected_expr_type: Vec::new(),
+            comptime_prepared_functions: std::collections::HashSet::new(),
+            populating_nominal_types: std::collections::HashSet::new(),
+            populated_nominal_types: std::collections::HashSet::new(),
             current_scope: crate::ScopeId(0),
             current_trait: None,
             current_trait_impl: None,
@@ -78,6 +87,7 @@ impl<'a> TypeChecker<'a> {
     }
 
     pub fn eval_comptime_expr(&mut self, expr_id: luna_ast::ExprId) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
+        self.prepare_comptime_bodies();
         if let Some(engine) = self.comptime_engine {
             engine.eval_expr(self.arena, self.ctx, self.source_manager, expr_id)
         } else {
@@ -86,6 +96,7 @@ impl<'a> TypeChecker<'a> {
     }
 
     pub fn eval_comptime_stmt(&mut self, stmt_id: luna_ast::StmtId) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
+        self.prepare_comptime_bodies();
         if let Some(engine) = self.comptime_engine {
             engine.eval_stmt(self.arena, self.ctx, self.source_manager, stmt_id)
         } else {
@@ -93,6 +104,92 @@ impl<'a> TypeChecker<'a> {
         }
     }
     
+    /// Body elaboration belongs to semantic analysis, including bodies required
+    /// by an early comptime evaluation. Follow already-typed call sites to a
+    /// fixed point; MVIR must never guess types for an unelaborated callee.
+    /// Imported providers have already elaborated their bodies and injected the
+    /// resulting semantic tables. Their reconstructed export scopes are not
+    /// lexical body scopes, so they must not be rechecked in this consumer.
+    fn prepare_comptime_bodies(&mut self) {
+        if self.comptime_engine.is_none() { return; }
+        loop {
+            let mut callees = Vec::new();
+            for expr in self.ctx.tables.expr_types.keys() {
+                let symbol = match &self.arena.exprs[expr.0 as usize] {
+                    Expr::Call { callee, .. } => self.ctx.tables.expr_symbols.get(callee),
+                    Expr::MethodCall { .. } => self.ctx.tables.expr_symbols.get(expr),
+                    _ => None,
+                };
+                if let Some(decl) = symbol.and_then(|symbol| self.ctx.tables.symbol_decls.get(symbol)).copied() {
+                    if !self.comptime_prepared_functions.contains(&decl)
+                        && symbol.is_some_and(|symbol| {
+                            let symbol = self.ctx.symbol_table.get_symbol(*symbol);
+                            symbol.provider_id == self.ctx.current_provider && symbol.inner_scope.is_some()
+                        })
+                        && matches!(&self.arena.decls[decl.0 as usize], Decl::Function { body: Some(_), .. }) {
+                        callees.push(decl);
+                    }
+                }
+            }
+            // A concrete-to-dyn coercion makes its implementation methods
+            // reachable even though the call site names only a trait method.
+            for coercion in self.ctx.tables.coercions.values() {
+                if let crate::CoercionKind::ConcreteToDyn { trait_sym, concrete_sym } = coercion {
+                    let key = crate::semantic_tables::ImplKey {
+                        trait_id: Some(*trait_sym),
+                        self_type_def: (*concrete_sym).into(),
+                    };
+                    let methods = self.ctx.tables.impl_methods.get(&key).into_iter().flatten()
+                        .copied().chain(self.ctx.tables.drop_impls.get(concrete_sym).copied());
+                    for symbol in methods {
+                        if let Some(&decl) = self.ctx.tables.symbol_decls.get(&symbol) {
+                            if !self.comptime_prepared_functions.contains(&decl)
+                                && self.ctx.symbol_table.get_symbol(symbol).provider_id == self.ctx.current_provider
+                                && self.ctx.symbol_table.get_symbol(symbol).inner_scope.is_some()
+                                && matches!(&self.arena.decls[decl.0 as usize], Decl::Function { body: Some(_), .. }) {
+                                callees.push(decl);
+                            }
+                        }
+                    }
+                }
+            }
+            if callees.is_empty() { break; }
+            callees.sort_by_key(|decl| decl.0);
+            callees.dedup();
+            for decl in callees {
+                if !self.comptime_prepared_functions.insert(decl) { continue; }
+                let saved_expected = std::mem::take(&mut self.expected_expr_type);
+                let saved_lambdas = std::mem::take(&mut self.active_lambdas);
+                let saved_unsafe = self.is_unsafe_context;
+                let saved_loop_depth = self.loop_depth;
+                let saved_self = self.current_self_type;
+                let saved_trait = self.current_trait;
+                let saved_impl = self.current_trait_impl;
+                let saved_provider = self.ctx.current_provider;
+                self.is_unsafe_context = false;
+                self.loop_depth = 0;
+                self.current_trait = None;
+                self.ctx.current_provider = self.ctx.tables.decl_symbols.get(&decl)
+                    .and_then(|symbol| self.ctx.symbol_table.get_symbol(*symbol).provider_id);
+                self.current_trait_impl = self.ctx.tables.method_to_impl_decl.get(&decl).copied();
+                self.current_self_type = self.current_trait_impl.and_then(|impl_decl| {
+                    if let Decl::Impl { self_type, .. } = &self.arena.decls[impl_decl.0 as usize] {
+                        self.ctx.tables.ast_type_to_semantic.get(self_type).copied()
+                    } else { None }
+                });
+                self.typecheck_item(&Item::Decl(decl));
+                self.current_self_type = saved_self;
+                self.current_trait = saved_trait;
+                self.current_trait_impl = saved_impl;
+                self.ctx.current_provider = saved_provider;
+                self.loop_depth = saved_loop_depth;
+                self.is_unsafe_context = saved_unsafe;
+                self.active_lambdas = saved_lambdas;
+                self.expected_expr_type = saved_expected;
+            }
+        }
+    }
+
     pub fn unify(&mut self, expected: SemanticTypeId, actual: SemanticTypeId) -> Result<(), String> {
         let expected = self.normalize_type(expected);
         let actual = self.normalize_type(actual);
@@ -1288,6 +1385,14 @@ impl<'a> TypeChecker<'a> {
         for item in items {
             if let Item::Decl(decl_id) = item {
                 let decl = &self.arena.decls[decl_id.0 as usize];
+                let is_nominal = matches!(decl, Decl::Struct { .. } | Decl::Enum { .. });
+                if is_nominal {
+                    if self.populated_nominal_types.contains(decl_id)
+                        || !self.populating_nominal_types.insert(*decl_id)
+                    {
+                        continue;
+                    }
+                }
                 match decl {
                     Decl::Struct { fields, .. } => {
                         let prev_scope = self.current_scope;
@@ -1459,6 +1564,10 @@ impl<'a> TypeChecker<'a> {
                         self.current_scope = prev_scope;
                     }
                     _ => {}
+                }
+                if is_nominal {
+                    self.populating_nominal_types.remove(decl_id);
+                    self.populated_nominal_types.insert(*decl_id);
                 }
             }
         }
@@ -1976,7 +2085,10 @@ impl<'a> TypeChecker<'a> {
                         Decl::Var { type_annot, .. } => (*type_annot, self.ctx.tables.decl_symbols.get(&decl_id).copied()),
                         _ => (None, None),
                     };
-                    let init_ty = self.typecheck_expr(&init);
+                    let init_ty = if let Some(annot) = type_annot {
+                        let expected = self.lower_type(annot);
+                        self.typecheck_expr_expected(&init, expected)
+                    } else { self.typecheck_expr(&init) };
                     let final_ty = if let Some(annot) = type_annot {
                         let annot_ty = self.lower_type(annot);
                         if let Err(e) = self.unify(annot_ty, init_ty) {
@@ -2275,60 +2387,64 @@ impl<'a> TypeChecker<'a> {
                         }
                         _ => None,
                     };
-                    if let Some(concrete_key) = concrete_self_key {
-                        if let Some(bounds) = self.ctx.tables.trait_bounds.get(&gp_sym).cloned() {
-                            for bound in &bounds {
+                    if let Some(bounds) = self.ctx.tables.trait_bounds.get(&gp_sym).cloned() {
+                        for bound in &bounds {
+                            let has_concrete_impl = concrete_self_key.is_some_and(|concrete_key| {
                                 let impl_key = crate::semantic_tables::ImplKey {
                                     trait_id: Some(bound.trait_id),
                                     self_type_def: concrete_key,
                                 };
-                                let has_concrete_impl = self.ctx.tables.trait_impls.contains_key(&impl_key);
-                                let mut matched_entry = None;
-                                if !has_concrete_impl || !bound.trait_args.is_empty() {
-                                    for entry in &self.ctx.tables.trait_impl_entries {
-                                        if entry.trait_id != bound.trait_id {
-                                            continue;
-                                        }
-                                        let mut test_subst = crate::ty::Substitution::new();
-                                        let matched = self.ctx.matches_impl_pattern(entry.self_type, resolved_ty, &entry.generic_params, &mut test_subst)
-                                            || match self.ctx.types.get(resolved_ty) {
-                                                SemanticType::Reference(_, _, inner) | SemanticType::Pointer(_, inner) => {
-                                                    self.ctx.matches_impl_pattern(entry.self_type, *inner, &entry.generic_params, &mut test_subst)
-                                                }
-                                                _ => false,
-                                            };
-                                        if matched {
-                                            matched_entry = Some((entry.clone(), test_subst));
-                                            break;
-                                        }
+                                self.ctx.tables.trait_impls.contains_key(&impl_key)
+                            });
+                            let mut matched_entry = None;
+                            if !has_concrete_impl || !bound.trait_args.is_empty() {
+                                for entry in &self.ctx.tables.trait_impl_entries {
+                                    if entry.trait_id != bound.trait_id {
+                                        continue;
+                                    }
+                                    let mut test_subst = crate::ty::Substitution::new();
+                                    let matched = self.ctx.matches_impl_pattern(entry.self_type, resolved_ty, &entry.generic_params, &mut test_subst)
+                                        || match self.ctx.types.get(resolved_ty) {
+                                            SemanticType::Reference(_, _, inner) | SemanticType::Pointer(_, inner) => {
+                                                self.ctx.matches_impl_pattern(entry.self_type, *inner, &entry.generic_params, &mut test_subst)
+                                            }
+                                            _ => false,
+                                        };
+                                    if matched {
+                                        matched_entry = Some((entry.clone(), test_subst));
+                                        break;
                                     }
                                 }
-                                if !has_concrete_impl && matched_entry.is_none() {
-                                    let trait_name = self.ctx.symbol_table.get_symbol(bound.trait_id).name.clone();
-                                    let type_name = match concrete_key {
-                                        crate::semantic_tables::ImplSelfTypeKey::Nominal(s) => self.ctx.symbol_table.get_symbol(s).name.clone(),
-                                        crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => format!("{:?}", b).to_lowercase(),
-                                    };
-                                    let gp_name = self.ctx.symbol_table.get_symbol(gp_sym).name.clone();
-                                    self.ctx.diagnostics.push(
-                                        Diagnostic::error(format!(
-                                            "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`)",
-                                            type_name, trait_name, gp_name
-                                        )).with_span(span)
-                                    );
-                                } else if let Some((entry, test_subst)) = matched_entry {
-                                    if !bound.trait_args.is_empty() {
-                                        for (arg_idx, &b_arg) in bound.trait_args.iter().enumerate() {
-                                            if let Some(&impl_arg) = entry.trait_args.get(arg_idx) {
-                                                let concrete_impl_arg = self.ctx.types.subst(impl_arg, &test_subst);
-                                                let expected_b_arg = self.ctx.types.subst(b_arg, subst);
-                                                let _ = self.unify(expected_b_arg, concrete_impl_arg);
-                                            }
+                            }
+                            if !has_concrete_impl && matched_entry.is_none() {
+                                let trait_name = self.ctx.symbol_table.get_symbol(bound.trait_id).name.clone();
+                                let type_name = concrete_self_key.map(|concrete_key| match concrete_key {
+                                    crate::semantic_tables::ImplSelfTypeKey::Nominal(s) => self.ctx.symbol_table.get_symbol(s).name.clone(),
+                                    crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => format!("{:?}", b).to_lowercase(),
+                                }).unwrap_or_else(|| {
+                                    crate::comptime::reflect::ComptimeReflection::type_name(resolved_ty, &self.ctx)
+                                });
+                                let gp_name = self.ctx.symbol_table.get_symbol(gp_sym).name.clone();
+                                self.ctx.diagnostics.push(
+                                    Diagnostic::error(format!(
+                                        "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`)",
+                                        type_name, trait_name, gp_name
+                                    )).with_span(span)
+                                );
+                            } else if let Some((entry, test_subst)) = matched_entry {
+                                if !bound.trait_args.is_empty() {
+                                    for (arg_idx, &b_arg) in bound.trait_args.iter().enumerate() {
+                                        if let Some(&impl_arg) = entry.trait_args.get(arg_idx) {
+                                            let concrete_impl_arg = self.ctx.types.subst(impl_arg, &test_subst);
+                                            let expected_b_arg = self.ctx.types.subst(b_arg, subst);
+                                            let _ = self.unify(expected_b_arg, concrete_impl_arg);
                                         }
                                     }
                                 }
                             }
                         }
+                    }
+                    if let Some(concrete_key) = concrete_self_key {
                         if let Some(assoc_bounds) = self.ctx.tables.assoc_type_bounds.get(&gp_sym).cloned() {
                             for (trait_sym, assoc_sym, expected_ty) in assoc_bounds {
                                 let norm_ty = self.normalize_projection(resolved_ty, trait_sym, assoc_sym, span);
@@ -2631,6 +2747,22 @@ impl<'a> TypeChecker<'a> {
                         // This is a generic type parameter - return GenericParam type
                         self.ctx.types.intern(SemanticType::GenericParam(sym))
                     } else {
+                        // Resolution knows declarations independently of source
+                        // order. Populate a referenced local nominal definition
+                        // before lowering its use, rather than inventing an
+                        // unconstrained inference variable for a known symbol.
+                        // Imported types are already available; recursive local
+                        // definitions use the dummy identity installed while
+                        // their own declaration is being populated.
+                        if !self.ctx.tables.symbol_types.contains_key(&sym) {
+                            if let Some(decl_id) = self.ctx.tables.symbol_decls.get(&sym).copied() {
+                                if matches!(self.arena.decls.get(decl_id.0 as usize),
+                                    Some(Decl::Struct { .. } | Decl::Enum { .. }))
+                                {
+                                    self.populate_types(&[Item::Decl(decl_id)]);
+                                }
+                            }
+                        }
                         let base_ty = self.ctx.tables.symbol_types.get(&sym).copied().unwrap_or_else(|| self.ctx.types.new_inference_var());
                         if generic_args.is_empty() {
                             base_ty
@@ -2884,6 +3016,7 @@ impl<'a> TypeChecker<'a> {
                 let decl = &self.arena.decls[decl_id.0 as usize];
                 match decl {
                     Decl::Function { name, params, body, is_async, return_type, is_unsafe, .. } => {
+                        self.comptime_prepared_functions.insert(*decl_id);
                         let prev_scope = self.current_scope;
                         let mut is_main = false;
                         if let Some(sym_id) = self.ctx.tables.decl_symbols.get(decl_id).copied() {
@@ -2989,7 +3122,7 @@ impl<'a> TypeChecker<'a> {
                         }
                         self.current_return_type.push(ret_ty);
                         if let Some(body_stmt) = body {
-                            self.typecheck_stmt(body_stmt);
+                            self.typecheck_function_body(body_stmt, ret_ty);
                         }
                         self.current_return_type.pop();
                         self.is_unsafe_context = prev_unsafe;
@@ -3119,7 +3252,7 @@ impl<'a> TypeChecker<'a> {
                                     self.ctx.types.intern(SemanticType::Void)
                                 };
                                 self.current_return_type.push(ret_ty);
-                                self.typecheck_stmt(body_stmt);
+                                self.typecheck_function_body(body_stmt, ret_ty);
                                 self.current_return_type.pop();
                                 self.is_unsafe_context = prev_unsafe;
                                 self.current_async_fn = prev_async;
@@ -3181,6 +3314,15 @@ impl<'a> TypeChecker<'a> {
         
         let pattern = &self.arena.pats[pat_id.0 as usize];
         match pattern {
+            luna_ast::Pattern::Literal(token) if token.kind == TokenKind::IntegerLiteral => {
+                let text = self.get_span_text(token.span).to_string();
+                self.expected_expr_type.push(ty);
+                let literal_ty = self.typecheck_integer_literal_at(token.span, &text, false);
+                self.expected_expr_type.pop();
+                if let Err(message) = self.unify(ty, literal_ty) {
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(token.span));
+                }
+            }
             luna_ast::Pattern::Tuple { elements, .. } => {
                 let resolved_ty = self.ctx.types.get(ty).clone();
                 if let SemanticType::Tuple(elem_tys) = resolved_ty {
@@ -3597,11 +3739,32 @@ impl<'a> TypeChecker<'a> {
         );
     }
 
+    fn typecheck_function_body(&mut self, body: &luna_ast::StmtId, expected: SemanticTypeId) {
+        self.expected_expr_type.push(expected);
+        self.typecheck_stmt(body);
+        self.expected_expr_type.pop();
+        if let Stmt::Block { tail_expr: Some(tail), .. } = &self.arena.stmts[body.0 as usize] {
+            if let Some(&actual) = self.ctx.tables.expr_types.get(tail) {
+                // Statement-shaped tails whose branches return have no value;
+                // their return legality is checked by the control-flow rules.
+                if !matches!(self.ctx.types.get(actual), SemanticType::Void) && !self.try_coerce(*tail, actual, expected) {
+                    if let Err(message) = self.unify(expected, actual) {
+                        self.ctx.diagnostics.push(Diagnostic::error(message).with_span(self.get_expr_span_for_diag(tail).unwrap_or_default()));
+                    }
+                }
+            }
+        }
+    }
+
     fn typecheck_stmt(&mut self, stmt_id: &luna_ast::StmtId) {
         let stmt = &self.arena.stmts[stmt_id.0 as usize];
         match stmt {
             Stmt::Block { body, tail_expr } => {
+                // A block's output context belongs to its tail, not unrelated
+                // statements or unannotated declarations inside the block.
+                let output_context = std::mem::take(&mut self.expected_expr_type);
                 self.typecheck_items(body);
+                self.expected_expr_type = output_context;
                 if let Some(expr) = tail_expr {
                     self.typecheck_expr(expr);
                 }
@@ -3749,13 +3912,78 @@ impl<'a> TypeChecker<'a> {
         }
     }
 
+    fn typecheck_expr_expected(&mut self, expr: &luna_ast::ExprId, expected: SemanticTypeId) -> SemanticTypeId {
+        self.expected_expr_type.push(expected);
+        let result = self.typecheck_expr(expr);
+        self.expected_expr_type.pop();
+        result
+    }
+
+    fn typecheck_integer_literal(&mut self, expr: luna_ast::ExprId, text: &str, negative: bool) -> SemanticTypeId {
+        let span = self.get_expr_span_for_diag(&expr).unwrap_or_default();
+        let ty = self.typecheck_integer_literal_at(span, text, negative);
+        self.ctx.tables.expr_types.insert(expr, ty);
+        ty
+    }
+
+    fn typecheck_integer_literal_at(&mut self, span: luna_common::Span, text: &str, negative: bool) -> SemanticTypeId {
+        let decoded = match luna_lexer::literal::decode_integer(text) {
+            Ok(value) => value,
+            Err(message) => {
+                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INTEGER_LITERAL: {message}")).with_span(span));
+                return self.ctx.types.error_id();
+            }
+        };
+        let explicit = decoded.suffix.map(|kind| match kind {
+            BuiltinKind::I8 => BuiltinType::I8, BuiltinKind::I16 => BuiltinType::I16,
+            BuiltinKind::I32 => BuiltinType::I32, BuiltinKind::I64 => BuiltinType::I64,
+            BuiltinKind::I128 => BuiltinType::I128, BuiltinKind::Isize => BuiltinType::Isize,
+            BuiltinKind::U8 => BuiltinType::U8, BuiltinKind::U16 => BuiltinType::U16,
+            BuiltinKind::U32 => BuiltinType::U32, BuiltinKind::U64 => BuiltinType::U64,
+            BuiltinKind::U128 => BuiltinType::U128, BuiltinKind::Usize => BuiltinType::Usize,
+            _ => unreachable!("decoder only returns integer suffixes"),
+        });
+        let contextual = self.expected_expr_type.last().and_then(|&ty| {
+            match self.ctx.types.get(self.ctx.types.resolve_inference(ty)) {
+                SemanticType::Primitive(b) if b.is_integer() => Some(*b),
+                _ => None,
+            }
+        });
+        let builtin = explicit.or(contextual).unwrap_or(BuiltinType::I32);
+        let width = crate::IntWidth::from_builtin(builtin);
+        let bits = if matches!(builtin, BuiltinType::Isize | BuiltinType::Usize) {
+            self.ctx.target_pointer_bits
+        } else { width.bit_width() };
+        if !luna_lexer::literal::magnitude_fits(decoded.magnitude, negative, bits, width.is_signed()) {
+            self.ctx.diagnostics.push(Diagnostic::error(format!("E_INTEGER_LITERAL_RANGE: literal `{}` is outside {:?}", text, builtin)).with_span(span));
+            return self.ctx.types.error_id();
+        }
+        self.ctx.types.intern(SemanticType::Primitive(builtin))
+    }
+
     fn typecheck_expr(&mut self, expr_id: &luna_ast::ExprId) -> SemanticTypeId {
         let expr = &self.arena.exprs[expr_id.0 as usize];
         let ty_id = match expr {
             Expr::Literal(tok, text) => {
                 // Determine type based on literal token type
                 let kind = match tok.kind {
-                    TokenKind::IntegerLiteral => SemanticType::Primitive(BuiltinType::I32), // Default to i32
+                    TokenKind::IntegerLiteral => return self.typecheck_integer_literal(*expr_id, text, false),
+                    TokenKind::ByteLiteral | TokenKind::ByteStringLiteral => {
+                        match luna_lexer::literal::decode_bytes(text, tok.kind == TokenKind::ByteLiteral) {
+                            Ok(bytes) => {
+                                let byte_ty = self.ctx.types.intern(SemanticType::Primitive(BuiltinType::U8));
+                                let ty = if tok.kind == TokenKind::ByteLiteral { byte_ty } else {
+                                    self.ctx.types.intern(SemanticType::Array(byte_ty, bytes.len() as u64))
+                                };
+                                self.ctx.tables.expr_types.insert(*expr_id, ty);
+                                return ty;
+                            }
+                            Err(message) => {
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_BYTE_LITERAL: {message}")).with_span(tok.span));
+                                return self.ctx.types.error_id();
+                            }
+                        }
+                    }
                     TokenKind::FloatLiteral => {
                         if text.ends_with("f32") {
                             SemanticType::Primitive(BuiltinType::F32)
@@ -3903,8 +4131,16 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             Expr::Binary { op, left, right, .. } => {
-                let l_ty = self.typecheck_expr(left);
-                let r_ty = self.typecheck_expr(right);
+                let left_is_literal = matches!(&self.arena.exprs[left.0 as usize], Expr::Literal(tok, _) if tok.kind == TokenKind::IntegerLiteral)
+                    || matches!(&self.arena.exprs[left.0 as usize], Expr::Unary { op: luna_ast::expr::UnaryOp::Neg, operand } if matches!(&self.arena.exprs[operand.0 as usize], Expr::Literal(tok, _) if tok.kind == TokenKind::IntegerLiteral));
+                let right_is_literal = matches!(&self.arena.exprs[right.0 as usize], Expr::Literal(tok, _) if tok.kind == TokenKind::IntegerLiteral);
+                let (l_ty, r_ty) = if left_is_literal && !right_is_literal {
+                    let right_ty = self.typecheck_expr(right);
+                    (self.typecheck_expr_expected(left, right_ty), right_ty)
+                } else {
+                    let left_ty = self.typecheck_expr(left);
+                    (left_ty, self.typecheck_expr_expected(right, left_ty))
+                };
                 
                 // Coerce pointer/int comparisons if applicable
                 let l_is_ptr = matches!(self.ctx.types.get(l_ty), SemanticType::Pointer(_, _));
@@ -3966,6 +4202,14 @@ impl<'a> TypeChecker<'a> {
                                     self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
                                 } 
                 
+                if let Some(message) = crate::operators::PrimitiveOperator::Binary(*op)
+                    .error_for_type(&self.ctx.types, l_ty)
+                {
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    return self.ctx.types.error_id();
+                }
+
                 use luna_ast::expr::BinaryOp;
                 match op {
                     BinaryOp::Eq | BinaryOp::Ne | BinaryOp::Lt | BinaryOp::Le | BinaryOp::Gt | BinaryOp::Ge | BinaryOp::LogicAnd | BinaryOp::LogicOr => {
@@ -4090,13 +4334,23 @@ impl<'a> TypeChecker<'a> {
 
                 if let SemanticType::Function { params, return_type } = callee_ty {
                     ret_ty_id = if has_generics { self.ctx.types.subst(return_type, &subst) } else { return_type };
+                    if has_generics {
+                        if let Some(expected) = self.expected_expr_type.last().copied() {
+                            if !matches!(self.ctx.types.get(expected), SemanticType::Error) {
+                                let _ = self.unify(ret_ty_id, expected);
+                            }
+                        }
+                    }
                     let expected_params = if is_method_call {
                         &params[1..]
                     } else {
                         &params[..]
                     };
                     for (i, arg) in args.iter().enumerate() {
-                        let arg_ty = self.typecheck_expr(&arg.value);
+                        let expected = expected_params.get(i).map(|&ty| if has_generics { self.ctx.types.subst(ty, &subst) } else { ty });
+                        let arg_ty = if let Some(expected) = expected {
+                            self.typecheck_expr_expected(&arg.value, expected)
+                        } else { self.typecheck_expr(&arg.value) };
                         if let Some(&expected_p) = expected_params.get(i) {
                             let expected_p = if has_generics { self.ctx.types.subst(expected_p, &subst) } else { expected_p };
                             if !self.try_coerce(arg.value, arg_ty, expected_p) {
@@ -4142,30 +4396,48 @@ impl<'a> TypeChecker<'a> {
                             }
 
 
+                            if has_enum_generics {
+                                if let Some(expected) = self.expected_expr_type.last().copied() {
+                                    let instantiated = self.ctx.types.subst(callee_ty_id, &enum_subst);
+                                    let _ = self.unify(instantiated, expected);
+                                }
+                            }
                             let mut variant_ty = variants[variant_idx as usize];
                             if has_enum_generics {
                                 variant_ty = self.ctx.types.subst(variant_ty, &enum_subst);
                             }
                             
-                            if let SemanticType::Tuple(field_tys) = self.ctx.types.get(variant_ty).clone() {
+                            // Payload arity belongs to the declaration, not its
+                            // instantiated type: One<T> remains one argument
+                            // when T becomes a tuple or void.
+                            let field_count = self.ctx.symbol_table.get_symbol(func_sym).decl_id
+                                .and_then(|decl| match &self.arena.decls[decl.0 as usize] {
+                                    Decl::Enum { variants, .. } => variants.get(variant_idx as usize).map(|variant| variant.fields.len()),
+                                    _ => None,
+                                });
+                            let field_tys = match field_count {
+                                Some(0) => Vec::new(),
+                                Some(1) => vec![variant_ty],
+                                _ => match self.ctx.types.get(variant_ty).clone() {
+                                    SemanticType::Tuple(fields) => fields,
+                                    SemanticType::Void => Vec::new(),
+                                    _ => vec![variant_ty],
+                                },
+                            };
+                            if args.len() != field_tys.len() {
+                                let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("Enum variant expects {} fields, but {} were provided", field_tys.len(), args.len())).with_span(span));
+                            }
+                            {
                                 for (i, arg) in args.iter().enumerate() {
-                                    let arg_ty = self.typecheck_expr(&arg.value);
+                                    let arg_ty = field_tys.get(i).map(|&expected| self.typecheck_expr_expected(&arg.value, expected))
+                                        .unwrap_or_else(|| self.typecheck_expr(&arg.value));
                                     if let Some(&expected_p) = field_tys.get(i) {
                                         if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                             if let Err(e) = self.unify(expected_p, arg_ty) {
                                                 let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                                                 self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
                                             }
-                                        }
-                                    }
-                                }
-                            } else if variant_ty != self.ctx.types.intern(SemanticType::Void) {
-                                if let Some(arg) = args.first() {
-                                    let arg_ty = self.typecheck_expr(&arg.value);
-                                    if !self.try_coerce(arg.value, arg_ty, variant_ty) {
-                                        if let Err(e) = self.unify(variant_ty, arg_ty) {
-                                            let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                            self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
                                         }
                                     }
                                 }
@@ -4201,7 +4473,7 @@ impl<'a> TypeChecker<'a> {
 
                 ret_ty_id
             }
-            Expr::Assign { lvalue, value, .. } => {
+            Expr::Assign { op, lvalue, value } => {
                 let lvalue_expr = &self.arena.exprs[lvalue.0 as usize];
                 if !Self::is_place(lvalue_expr) {
                     let span = self.get_expr_span_for_diag(lvalue).unwrap_or_else(|| self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
@@ -4234,8 +4506,15 @@ impl<'a> TypeChecker<'a> {
                 }
 
                 let l_ty = self.typecheck_expr(lvalue);
-                let r_ty = self.typecheck_expr(value);
+                let r_ty = self.typecheck_expr_expected(value, l_ty);
                 self.enforce_mutability(lvalue);
+                if let Some(message) = crate::operators::PrimitiveOperator::Assignment(*op)
+                    .error_for_type(&self.ctx.types, l_ty)
+                {
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    return self.ctx.types.error_id();
+                }
                 if !self.try_coerce(*value, r_ty, l_ty) {
                     if let Err(e) = self.unify(l_ty, r_ty) {
                                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
@@ -4339,29 +4618,45 @@ impl<'a> TypeChecker<'a> {
 
                     // Look up methods on this struct (from local impl blocks)
                     let target_key = crate::semantic_tables::ImplSelfTypeKey::Nominal(sym_id);
-                    for (impl_key, impl_decl_ids) in &self.ctx.tables.trait_impls {
-                        for &impl_decl_id in impl_decl_ids {
-                            if impl_key.self_type_def == target_key && (impl_decl_id.0 as usize) < self.arena.decls.len() {
-                                if let Decl::Impl { methods, .. } = &self.arena.decls[impl_decl_id.0 as usize] {
-                                    for &m_id in methods {
-                                        if (m_id.0 as usize) < self.arena.decls.len() {
-                                            if let Decl::Function { name, .. } = &self.arena.decls[m_id.0 as usize] {
-                                                let m_name = self.get_span_text(*name);
-                                                if m_name == member_name {
-                                                    if let Some(&m_sym) = self.ctx.tables.decl_symbols.get(&m_id) {
-                                                        let is_accessible = if let Some(trait_id) = impl_key.trait_id {
-                                                            self.ctx.symbol_table.is_accessible(trait_id, self.current_scope, self.ctx.current_provider)
-                                                        } else {
-                                                            self.ctx.symbol_table.is_accessible(m_sym, self.current_scope, self.ctx.current_provider)
-                                                        };
-                                                        if !is_accessible {
-                                                            self.ctx.diagnostics.push(Diagnostic::error(format!("Method `{}` is private and cannot be accessed from this scope", member_name)).with_code(DiagnosticCode::PrivateSymbolAccess).with_span(*member));
-                                                            return self.ctx.types.intern(SemanticType::Error);
-                                                        }
-                                                        if let Some(&m_ty) = self.ctx.tables.symbol_types.get(&m_sym) {
-                                                            self.ctx.tables.expr_symbols.insert(*expr_id, m_sym);
-                                                            self.ctx.tables.expr_types.insert(*expr_id, m_ty);
-                                                            return m_ty;
+                    let mut impl_candidates: Vec<_> = self.ctx.tables.trait_impls
+                        .iter()
+                        .filter(|(k, _)| k.self_type_def == target_key)
+                        .collect();
+                    impl_candidates.sort_by_key(|(k, decl_ids)| {
+                        let is_trait = k.trait_id.is_some();
+                        let trait_sym_id = k.trait_id.map(|s| s.0).unwrap_or(0);
+                        let first_decl = decl_ids.first().map(|d| d.0).unwrap_or(0);
+                        (is_trait, trait_sym_id, first_decl)
+                    });
+
+                    for search_traits in [false, true] {
+                        for (impl_key, impl_decl_ids) in &impl_candidates {
+                            if impl_key.trait_id.is_some() != search_traits {
+                                continue;
+                            }
+                            for &impl_decl_id in *impl_decl_ids {
+                                if (impl_decl_id.0 as usize) < self.arena.decls.len() {
+                                    if let Decl::Impl { methods, .. } = &self.arena.decls[impl_decl_id.0 as usize] {
+                                        for m_id in methods {
+                                            if (m_id.0 as usize) < self.arena.decls.len() {
+                                                if let Decl::Function { name, .. } = &self.arena.decls[m_id.0 as usize] {
+                                                    let m_name = self.get_span_text(*name);
+                                                    if m_name == member_name {
+                                                        if let Some(&m_sym) = self.ctx.tables.decl_symbols.get(&m_id) {
+                                                            let is_accessible = if let Some(trait_id) = impl_key.trait_id {
+                                                                self.ctx.symbol_table.is_accessible(trait_id, self.current_scope, self.ctx.current_provider)
+                                                            } else {
+                                                                self.ctx.symbol_table.is_accessible(m_sym, self.current_scope, self.ctx.current_provider)
+                                                            };
+                                                            if !is_accessible {
+                                                                self.ctx.diagnostics.push(Diagnostic::error(format!("Method `{}` is private and cannot be accessed from this scope", member_name)).with_code(DiagnosticCode::PrivateSymbolAccess).with_span(*member));
+                                                                return self.ctx.types.intern(SemanticType::Error);
+                                                            }
+                                                            if let Some(&m_ty) = self.ctx.tables.symbol_types.get(&m_sym) {
+                                                                self.ctx.tables.expr_symbols.insert(*expr_id, m_sym);
+                                                                self.ctx.tables.expr_types.insert(*expr_id, m_ty);
+                                                                return m_ty;
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -4374,9 +4669,23 @@ impl<'a> TypeChecker<'a> {
                     }
 
                     // Look up methods from external impl_methods table
-                    for (impl_key, method_syms) in &self.ctx.tables.impl_methods {
-                        if impl_key.self_type_def == target_key {
-                            for &m_sym in method_syms {
+                    let mut ext_candidates: Vec<_> = self.ctx.tables.impl_methods
+                        .iter()
+                        .filter(|(k, _)| k.self_type_def == target_key)
+                        .collect();
+                    ext_candidates.sort_by_key(|(k, method_syms)| {
+                        let is_trait = k.trait_id.is_some();
+                        let trait_sym_id = k.trait_id.map(|s| s.0).unwrap_or(0);
+                        let first_method = method_syms.first().map(|s| s.0).unwrap_or(0);
+                        (is_trait, trait_sym_id, first_method)
+                    });
+
+                    for search_traits in [false, true] {
+                        for (impl_key, method_syms) in &ext_candidates {
+                            if impl_key.trait_id.is_some() != search_traits {
+                                continue;
+                            }
+                            for &m_sym in *method_syms {
                                 let sym = self.ctx.symbol_table.get_symbol(m_sym);
                                 if sym.name == member_name {
                                     let is_accessible = if let Some(trait_id) = impl_key.trait_id {
@@ -4443,19 +4752,35 @@ impl<'a> TypeChecker<'a> {
 
                 if let SemanticType::Primitive(b) = &peeled_ty {
                     let target_key = crate::semantic_tables::ImplSelfTypeKey::Primitive(*b);
-                    for (impl_key, impl_decl_ids) in &self.ctx.tables.trait_impls {
-                        for &impl_decl_id in impl_decl_ids {
-                            if impl_key.self_type_def == target_key && (impl_decl_id.0 as usize) < self.arena.decls.len() {
-                                if let Decl::Impl { methods, .. } = &self.arena.decls[impl_decl_id.0 as usize] {
-                                    for &m_id in methods {
-                                        if (m_id.0 as usize) < self.arena.decls.len() {
-                                            if let Decl::Function { name, .. } = &self.arena.decls[m_id.0 as usize] {
-                                                if self.get_span_text(*name) == member_name {
-                                                    if let Some(&m_sym) = self.ctx.tables.decl_symbols.get(&m_id) {
-                                                        if let Some(&m_ty) = self.ctx.tables.symbol_types.get(&m_sym) {
-                                                            self.ctx.tables.expr_symbols.insert(*expr_id, m_sym);
-                                                            self.ctx.tables.expr_types.insert(*expr_id, m_ty);
-                                                            return m_ty;
+                    let mut impl_candidates: Vec<_> = self.ctx.tables.trait_impls
+                        .iter()
+                        .filter(|(k, _)| k.self_type_def == target_key)
+                        .collect();
+                    impl_candidates.sort_by_key(|(k, decl_ids)| {
+                        let is_trait = k.trait_id.is_some();
+                        let trait_sym_id = k.trait_id.map(|s| s.0).unwrap_or(0);
+                        let first_decl = decl_ids.first().map(|d| d.0).unwrap_or(0);
+                        (is_trait, trait_sym_id, first_decl)
+                    });
+
+                    for search_traits in [false, true] {
+                        for (impl_key, impl_decl_ids) in &impl_candidates {
+                            if impl_key.trait_id.is_some() != search_traits {
+                                continue;
+                            }
+                            for &impl_decl_id in *impl_decl_ids {
+                                if (impl_decl_id.0 as usize) < self.arena.decls.len() {
+                                    if let Decl::Impl { methods, .. } = &self.arena.decls[impl_decl_id.0 as usize] {
+                                        for m_id in methods {
+                                            if (m_id.0 as usize) < self.arena.decls.len() {
+                                                if let Decl::Function { name, .. } = &self.arena.decls[m_id.0 as usize] {
+                                                    if self.get_span_text(*name) == member_name {
+                                                        if let Some(&m_sym) = self.ctx.tables.decl_symbols.get(&m_id) {
+                                                            if let Some(&m_ty) = self.ctx.tables.symbol_types.get(&m_sym) {
+                                                                self.ctx.tables.expr_symbols.insert(*expr_id, m_sym);
+                                                                self.ctx.tables.expr_types.insert(*expr_id, m_ty);
+                                                                return m_ty;
+                                                            }
                                                         }
                                                     }
                                                 }
@@ -4466,9 +4791,24 @@ impl<'a> TypeChecker<'a> {
                             }
                         }
                     }
-                    for (impl_key, method_syms) in &self.ctx.tables.impl_methods {
-                        if impl_key.self_type_def == target_key {
-                            for &m_sym in method_syms {
+
+                    let mut ext_candidates: Vec<_> = self.ctx.tables.impl_methods
+                        .iter()
+                        .filter(|(k, _)| k.self_type_def == target_key)
+                        .collect();
+                    ext_candidates.sort_by_key(|(k, method_syms)| {
+                        let is_trait = k.trait_id.is_some();
+                        let trait_sym_id = k.trait_id.map(|s| s.0).unwrap_or(0);
+                        let first_method = method_syms.first().map(|s| s.0).unwrap_or(0);
+                        (is_trait, trait_sym_id, first_method)
+                    });
+
+                    for search_traits in [false, true] {
+                        for (impl_key, method_syms) in &ext_candidates {
+                            if impl_key.trait_id.is_some() != search_traits {
+                                continue;
+                            }
+                            for &m_sym in *method_syms {
                                 let sym = self.ctx.symbol_table.get_symbol(m_sym);
                                 if sym.name == member_name {
                                     if let Some(&m_ty) = self.ctx.tables.symbol_types.get(&m_sym) {
@@ -4584,6 +4924,11 @@ impl<'a> TypeChecker<'a> {
                 }
 
                 let struct_ty = self.ctx.types.intern(SemanticType::Struct(sym_id, concrete_args, field_tys.clone()));
+                if let Some(expected) = self.expected_expr_type.last().copied() {
+                    if matches!(self.ctx.types.get(expected), SemanticType::Struct(expected_sym, ..) if *expected_sym == sym_id) {
+                        let _ = self.unify(struct_ty, expected);
+                    }
+                }
 
                 let mut init_indices = Vec::with_capacity(fields.len());
                 for field in fields {
@@ -4592,7 +4937,7 @@ impl<'a> TypeChecker<'a> {
                         self.get_span_text(declared.name) == field_name
                     }) {
                         self.check_field_visibility(symbol, declared.visibility, field_name, field.name);
-                        let value_ty = self.typecheck_expr(&field.value);
+                        let value_ty = self.typecheck_expr_expected(&field.value, field_tys[index]);
                         if self.unify(field_tys[index], value_ty).is_err() {
                             self.ctx.diagnostics.push(Diagnostic::error(format!("Type mismatch for field '{}'", field_name)).with_span(field.name));
                         }
@@ -4617,8 +4962,13 @@ impl<'a> TypeChecker<'a> {
             }
             Expr::ArrayLiteral { elements } => {
                 let mut elem_ty = self.ctx.types.new_inference_var();
+                let expected_elem = self.expected_expr_type.last().and_then(|&ty| match self.ctx.types.get(self.ctx.types.resolve_inference(ty)) {
+                    SemanticType::Array(elem, _) => Some(*elem), _ => None,
+                });
                 for (i, el) in elements.iter().enumerate() {
-                    let ty = self.typecheck_expr(el);
+                    let ty = if let Some(expected) = expected_elem {
+                        self.typecheck_expr_expected(el, expected)
+                    } else { self.typecheck_expr(el) };
                     if i == 0 {
                         elem_ty = ty;
                     } else if self.unify(elem_ty, ty).is_err() {
@@ -4629,8 +4979,13 @@ impl<'a> TypeChecker<'a> {
             }
             Expr::TupleLiteral { elements } => {
                 let mut elem_tys = Vec::new();
-                for el in elements {
-                    elem_tys.push(self.typecheck_expr(el));
+                let expected_fields = self.expected_expr_type.last().and_then(|&ty| match self.ctx.types.get(self.ctx.types.resolve_inference(ty)) {
+                    SemanticType::Tuple(fields) => Some(fields.clone()), _ => None,
+                });
+                for (index, el) in elements.iter().enumerate() {
+                    elem_tys.push(if let Some(expected) = expected_fields.as_ref().and_then(|fields| fields.get(index)) {
+                        self.typecheck_expr_expected(el, *expected)
+                    } else { self.typecheck_expr(el) });
                 }
                 self.ctx.types.intern(SemanticType::Tuple(elem_tys))
             }
@@ -4654,7 +5009,7 @@ impl<'a> TypeChecker<'a> {
             }
             Expr::Index { base, index } => {
                 let base_ty_id = self.typecheck_expr(base);
-                let index_ty_id = self.typecheck_expr(index);
+                let index_ty_id = self.typecheck_expr_expected(index, self.ctx.types.usize_id());
                 
                 let base_ty = self.ctx.types.get(base_ty_id).clone();
                 let index_ty = self.ctx.types.get(index_ty_id).clone();
@@ -4770,7 +5125,8 @@ impl<'a> TypeChecker<'a> {
                                     if let SemanticType::Function { params, return_type } = self.ctx.types.get(m_ty).clone() {
                                         let expected_params = if params.len() == args.len() + 1 { &params[1..] } else { &params[..] };
                                         for (i, arg) in args.iter().enumerate() {
-                                            let arg_ty = self.typecheck_expr(&arg.value);
+                                            let arg_ty = expected_params.get(i).map(|&expected| self.typecheck_expr_expected(&arg.value, expected))
+                                                .unwrap_or_else(|| self.typecheck_expr(&arg.value));
                                             if let Some(&expected_p) = expected_params.get(i) {
                                                 if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                                     if let Err(e) = self.unify(expected_p, arg_ty) {
@@ -4965,7 +5321,9 @@ impl<'a> TypeChecker<'a> {
                                 let return_type = if m_has_generics { self.ctx.types.subst(return_type, &subst) } else { return_type };
                                 let expected_params = if params.len() == args.len() + 1 { &params[1..] } else { &params[..] };
                                 for (i, arg) in args.iter().enumerate() {
-                                    let arg_ty = self.typecheck_expr(&arg.value);
+                                    let expected = expected_params.get(i).map(|&ty| if m_has_generics { self.ctx.types.subst(ty, &subst) } else { ty });
+                                    let arg_ty = expected.map(|ty| self.typecheck_expr_expected(&arg.value, ty))
+                                        .unwrap_or_else(|| self.typecheck_expr(&arg.value));
                                     if let Some(&expected_p) = expected_params.get(i) {
                                         let expected_p = if m_has_generics { self.ctx.types.subst(expected_p, &subst) } else { expected_p };
                                         if !self.try_coerce(arg.value, arg_ty, expected_p) {
@@ -5022,75 +5380,111 @@ impl<'a> TypeChecker<'a> {
                 if let Some((target_key, struct_args, nominal_sym_opt)) = target_self_info {
                     let mut found_method = None;
                     let expected_return = self.expected_expr_type.last().copied();
-                    let mut found_expected_return = false;
-                    for (impl_key, impl_decl_ids) in &self.ctx.tables.trait_impls {
-                        for &impl_decl_id in impl_decl_ids {
-                            if impl_key.self_type_def == target_key && (impl_decl_id.0 as usize) < self.arena.decls.len() {
-                                if let Decl::Impl { methods, .. } = &self.arena.decls[impl_decl_id.0 as usize] {
-                                    for &m_id in methods {
-                                        if (m_id.0 as usize) < self.arena.decls.len() {
-                                            if let Decl::Function { name, .. } = &self.arena.decls[m_id.0 as usize] {
-                                                if self.get_span_text(*name) == member_name {
-                                                    if let Some(&m_sym) = self.ctx.tables.decl_symbols.get(&m_id) {
-                                                        let candidate = (m_sym, impl_key.clone(), Some(impl_decl_id));
-                                                        let return_matches = expected_return
-                                                            .and_then(|expected| self.ctx.tables.symbol_types.get(&m_sym).copied().map(|ty| (expected, ty)))
-                                                            .and_then(|(expected, ty)| match self.ctx.types.get(ty) {
-                                                                SemanticType::Function { return_type, .. } => {
-                                                                    let mut candidate_subst = crate::ty::Substitution::new();
-                                                                    if let Some(trait_id) = impl_key.trait_id {
-                                                                        if let Some(entry) = self.ctx.tables.trait_impl_entries.iter().find(|entry| entry.decl_id == Some(impl_decl_id)) {
-                                                                            if let Some(trait_gps) = self.ctx.tables.trait_generic_params.get(&trait_id) {
-                                                                                for (idx, &gp) in trait_gps.iter().enumerate() {
-                                                                                    if let Some(&arg) = entry.trait_args.get(idx) {
-                                                                                        candidate_subst.insert(gp, arg);
+
+                    let mut impl_candidates: Vec<_> = self.ctx.tables.trait_impls
+                        .iter()
+                        .filter(|(k, _)| k.self_type_def == target_key)
+                        .collect();
+                    impl_candidates.sort_by_key(|(k, decl_ids)| {
+                        let is_trait = k.trait_id.is_some();
+                        let trait_sym_id = k.trait_id.map(|s| s.0).unwrap_or(0);
+                        let first_decl = decl_ids.first().map(|d| d.0).unwrap_or(0);
+                        (is_trait, trait_sym_id, first_decl)
+                    });
+
+                    // Search inherent methods first (search_traits == false), then trait methods (search_traits == true)
+                    for search_traits in [false, true] {
+                        let mut found_expected_return = false;
+                        for (impl_key, impl_decl_ids) in &impl_candidates {
+                            if impl_key.trait_id.is_some() != search_traits {
+                                continue;
+                            }
+                            for &impl_decl_id in *impl_decl_ids {
+                                if (impl_decl_id.0 as usize) < self.arena.decls.len() {
+                                    if let Decl::Impl { methods, .. } = &self.arena.decls[impl_decl_id.0 as usize] {
+                                        for m_id in methods {
+                                            if (m_id.0 as usize) < self.arena.decls.len() {
+                                                if let Decl::Function { name, .. } = &self.arena.decls[m_id.0 as usize] {
+                                                    if self.get_span_text(*name) == member_name {
+                                                        if let Some(&m_sym) = self.ctx.tables.decl_symbols.get(&m_id) {
+                                                            let candidate = (m_sym, (*impl_key).clone(), Some(impl_decl_id));
+                                                            let return_matches = expected_return
+                                                                .and_then(|expected| self.ctx.tables.symbol_types.get(&m_sym).copied().map(|ty| (expected, ty)))
+                                                                .and_then(|(expected, ty)| match self.ctx.types.get(ty) {
+                                                                    SemanticType::Function { return_type, .. } => {
+                                                                        let mut candidate_subst = crate::ty::Substitution::new();
+                                                                        if let Some(trait_id) = impl_key.trait_id {
+                                                                            if let Some(entry) = self.ctx.tables.trait_impl_entries.iter().find(|entry| entry.decl_id == Some(impl_decl_id)) {
+                                                                                if let Some(trait_gps) = self.ctx.tables.trait_generic_params.get(&trait_id) {
+                                                                                    for (idx, &gp) in trait_gps.iter().enumerate() {
+                                                                                        if let Some(&arg) = entry.trait_args.get(idx) {
+                                                                                            candidate_subst.insert(gp, arg);
+                                                                                        }
                                                                                     }
                                                                                 }
-                                                                            }
-                                                                            if let Some(impl_gps) = self.ctx.tables.impl_generic_params.get(impl_key) {
-                                                                                for (idx, &gp) in impl_gps.iter().enumerate() {
-                                                                                    if let Some(&arg) = struct_args.get(idx) {
-                                                                                        candidate_subst.insert(gp, arg);
+                                                                                if let Some(impl_gps) = self.ctx.tables.impl_generic_params.get(impl_key) {
+                                                                                    for (idx, &gp) in impl_gps.iter().enumerate() {
+                                                                                        if let Some(&arg) = struct_args.get(idx) {
+                                                                                            candidate_subst.insert(gp, arg);
+                                                                                        }
                                                                                     }
                                                                                 }
                                                                             }
                                                                         }
+                                                                        let candidate_return = self.ctx.types.subst(*return_type, &candidate_subst);
+                                                                        Some(self.ctx.types.resolve(candidate_return) == self.ctx.types.resolve(expected))
                                                                     }
-                                                                    let candidate_return = self.ctx.types.subst(*return_type, &candidate_subst);
-                                                                    Some(self.ctx.types.resolve(candidate_return) == self.ctx.types.resolve(expected))
-                                                                }
-                                                                _ => None,
-                                                            })
-                                                            .unwrap_or(false);
-                                                        if return_matches {
-                                                            found_method = Some(candidate);
-                                                            found_expected_return = true;
-                                                        } else if found_method.is_none() {
-                                                            found_method = Some(candidate);
+                                                                    _ => None,
+                                                                })
+                                                                .unwrap_or(false);
+                                                            if return_matches {
+                                                                found_method = Some(candidate);
+                                                                found_expected_return = true;
+                                                            } else if found_method.is_none() {
+                                                                found_method = Some(candidate);
+                                                            }
+                                                            if return_matches || expected_return.is_none() { break; }
                                                         }
-                                                        if return_matches || expected_return.is_none() { break; }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
-                            }
+                                if expected_return.is_none() || found_expected_return { break; }
                             }
                             if expected_return.is_none() || found_expected_return { break; }
                         }
-                        if expected_return.is_none() || found_expected_return { break; }
+                        if found_method.is_some() {
+                            break;
+                        }
                     }
 
                     if found_method.is_none() {
-                        for (impl_key, method_syms) in &self.ctx.tables.impl_methods {
-                            if impl_key.self_type_def == target_key {
-                                for &m_sym in method_syms {
+                        let mut ext_candidates: Vec<_> = self.ctx.tables.impl_methods
+                            .iter()
+                            .filter(|(k, _)| k.self_type_def == target_key)
+                            .collect();
+                        ext_candidates.sort_by_key(|(k, method_syms)| {
+                            let is_trait = k.trait_id.is_some();
+                            let trait_sym_id = k.trait_id.map(|s| s.0).unwrap_or(0);
+                            let first_method = method_syms.first().map(|s| s.0).unwrap_or(0);
+                            (is_trait, trait_sym_id, first_method)
+                        });
+
+                        for search_traits in [false, true] {
+                            for (impl_key, method_syms) in &ext_candidates {
+                                if impl_key.trait_id.is_some() != search_traits {
+                                    continue;
+                                }
+                                for &m_sym in *method_syms {
                                     let sym = self.ctx.symbol_table.get_symbol(m_sym);
                                     if sym.name == member_name {
-                                        found_method = Some((m_sym, impl_key.clone(), None));
+                                        found_method = Some((m_sym, (*impl_key).clone(), None));
                                         break;
                                     }
                                 }
+                                if found_method.is_some() { break; }
                             }
                             if found_method.is_some() { break; }
                         }
@@ -5263,7 +5657,9 @@ impl<'a> TypeChecker<'a> {
                                 let mut return_type = if m_has_generics { self.ctx.types.subst(return_type, &subst) } else { return_type };
                                 let expected_params = if params.len() == args.len() + 1 { &params[1..] } else { &params[..] };
                                 for (i, arg) in args.iter().enumerate() {
-                                    let arg_ty = self.typecheck_expr(&arg.value);
+                                    let expected = expected_params.get(i).map(|&ty| if m_has_generics { self.ctx.types.subst(ty, &subst) } else { ty });
+                                    let arg_ty = expected.map(|ty| self.typecheck_expr_expected(&arg.value, ty))
+                                        .unwrap_or_else(|| self.typecheck_expr(&arg.value));
                                     if let Some(&expected_p) = expected_params.get(i) {
                                         let expected_p = if m_has_generics { self.ctx.types.subst(expected_p, &subst) } else { expected_p };
                                         if !self.try_coerce(arg.value, arg_ty, expected_p) {
@@ -5341,10 +5737,50 @@ impl<'a> TypeChecker<'a> {
                 self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::I32))
             }
             Expr::Cast { expr: e, target_type } => {
-                let source_ty_id = self.typecheck_expr(e);
+                // A cast converts an independently typed operand; it is not
+                // contextual literal typing, even within a typed initializer.
+                let source_ty_id = self.typecheck_expr_expected(e, self.ctx.types.error_id());
                 let target_ty_id = self.lower_type(*target_type);
                 let source_ty = self.ctx.types.get(source_ty_id).clone();
                 let target_ty = self.ctx.types.get(target_ty_id).clone();
+
+                // Luna `char` denotes a Unicode scalar value, not an arbitrary
+                // 32-bit integer. Keep that semantic invariant in the frontend
+                // so known-invalid values never reach code generation.
+                if matches!(target_ty, SemanticType::Primitive(BuiltinType::Char)) {
+                    let source_is_char = matches!(source_ty, SemanticType::Primitive(BuiltinType::Char));
+                    let source_is_integer = matches!(source_ty, SemanticType::Primitive(b) if b.is_integer());
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+
+                    if source_is_integer {
+                        if crate::const_eval::is_const_evaluable(
+                            self.arena,
+                            self.ctx,
+                            self.source_manager,
+                            *e,
+                        )
+                        .is_ok()
+                        {
+                            if let Ok(crate::ComptimeValue::Int { val, .. }) = self.eval_comptime_expr(*e) {
+                                if !Self::is_unicode_scalar(val) {
+                                    self.ctx.diagnostics.push(
+                                        Diagnostic::error(
+                                            "invalid integer-to-char cast: value is not a Unicode scalar",
+                                        )
+                                        .with_span(span),
+                                    );
+                                }
+                            }
+                        }
+                    } else if !source_is_char {
+                        self.ctx.diagnostics.push(
+                            Diagnostic::error(
+                                "invalid cast to char: source must be an integer or char",
+                            )
+                            .with_span(span),
+                        );
+                    }
+                }
 
                 // Diagnose statically-known float-to-integer overflow before lowering.
                 // This keeps comptime casts out of the backend's runtime trap path and
@@ -5410,7 +5846,7 @@ impl<'a> TypeChecker<'a> {
                 target_ty_id
             }
             Expr::Match { subject, arms, match_span } => {
-                let subject_ty_id = self.typecheck_expr(subject);
+                let subject_ty_id = self.typecheck_expr_expected(subject, self.ctx.types.error_id());
                 let subject_ty = self.ctx.types.get(subject_ty_id).clone();
                 let mut result_ty = self.ctx.types.new_inference_var();
                 
@@ -5532,7 +5968,7 @@ impl<'a> TypeChecker<'a> {
                 
                 self.active_lambdas.push(*expr_id);
                 self.current_return_type.push(ret_ty_id);
-                self.typecheck_stmt(body);
+                self.typecheck_function_body(body, ret_ty_id);
                 self.current_return_type.pop();
                 self.active_lambdas.pop();
                 if let Some(body_ty) = self.infer_stmt_value_type(body) {
@@ -5803,7 +6239,29 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             Expr::Unary { op, operand } => {
-                let inner_ty = self.typecheck_expr(operand);
+                let inner_ty = if *op == luna_ast::expr::UnaryOp::Neg {
+                    if let Expr::Literal(token, text) = &self.arena.exprs[operand.0 as usize] {
+                        if token.kind == TokenKind::IntegerLiteral {
+                            self.typecheck_integer_literal(*operand, text, true)
+                        } else { self.typecheck_expr(operand) }
+                    } else { self.typecheck_expr(operand) }
+                } else if matches!(op, luna_ast::expr::UnaryOp::Ref | luna_ast::expr::UnaryOp::RefMut) {
+                    let expected_inner = self.expected_expr_type.last().and_then(|&expected| {
+                        match self.ctx.types.get(self.ctx.types.resolve_inference(expected)) {
+                            SemanticType::Reference(_, _, inner) => Some(*inner),
+                            _ => None,
+                        }
+                    });
+                    if let Some(expected) = expected_inner { self.typecheck_expr_expected(operand, expected) }
+                    else { self.typecheck_expr_expected(operand, self.ctx.types.error_id()) }
+                } else { self.typecheck_expr(operand) };
+                if let Some(message) = crate::operators::PrimitiveOperator::Unary(*op)
+                    .error_for_type(&self.ctx.types, inner_ty)
+                {
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    return self.ctx.types.error_id();
+                }
 
                 use luna_ast::expr::UnaryOp;
                 match op {
@@ -5903,6 +6361,10 @@ impl<'a> TypeChecker<'a> {
             }
             _ => None,
         }
+    }
+
+    fn is_unicode_scalar(value: i128) -> bool {
+        (0..=0x10_FFFF).contains(&value) && !(0xD800..=0xDFFF).contains(&value)
     }
 
     fn impl_method_substitution(

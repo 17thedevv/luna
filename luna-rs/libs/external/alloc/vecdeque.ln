@@ -1,0 +1,448 @@
+import <__alloc_global>;
+import <ptr>;
+import <mem>;
+import <clone>;
+import <cmp>;
+import <default>;
+import <__lang_drop>;
+import <__lang_option>;
+import <__lang_iterator>;
+import <__lang_into_iterator>;
+
+module std {
+
+export struct VecDequeIter<T> {
+    private buf: *T,
+    private head: u64,
+    private cap: u64,
+    private remaining: u64,
+    private current: u64,
+} requires anchor(buf) = self;
+
+impl<T> VecDequeIter<T> {
+    export fn next(self: &rw Self) -> std::Option<&T> life_from(self) {
+        if self.current == self.remaining {
+            return std::Option::None;
+        }
+        dec phys_idx = (self.head + self.current) % self.cap;
+        self.current = self.current + (1 as u64);
+        unsafe {
+            dec p = std::ptr::add<T>(self.buf, phys_idx);
+            return std::Option::Some(&*p);
+        }
+    }
+}
+
+impl<T> std::Iterator<&T> for VecDequeIter<T> {
+    fn next(self: &rw Self) -> std::Option<&T> life_from(self) {
+        return self.next();
+    }
+}
+
+export struct VecDequeIntoIter<T> {
+    private deque: VecDeque<T>,
+};
+
+impl<T> VecDequeIntoIter<T> {
+    export fn next(self: &rw Self) -> std::Option<T> {
+        return self.deque.pop_front();
+    }
+}
+
+impl<T> std::Iterator<T> for VecDequeIntoIter<T> {
+    fn next(self: &rw Self) -> std::Option<T> life_from(self) {
+        return self.deque.pop_front();
+    }
+}
+
+export struct VecDeque<T> {
+    private buf: *rw T,
+    private head: u64,
+    private len: u64,
+    private cap: u64,
+} requires anchor(buf) = self;
+
+export fn vecdeque_new<T>() -> VecDeque<T> {
+    return VecDeque<T> {
+        buf: 0 as u64 as *rw T,
+        head: 0 as u64,
+        len: 0 as u64,
+        cap: 0 as u64,
+    };
+}
+
+export fn vecdeque_with_capacity<T>(capacity: u64) -> VecDeque<T> {
+    if capacity == (0 as u64) {
+        return vecdeque_new<T>();
+    }
+    dec size = capacity * (std::mem::size_of<T>() as u64);
+    dec align = std::mem::align_of<T>() as u64;
+    unsafe {
+        dec raw = __luna_alloc(size, align);
+        if raw == (0 as u64 as *rw u8) {
+            __luna_panic_default();
+        }
+        return VecDeque<T> {
+            buf: raw as *rw T,
+            head: 0 as u64,
+            len: 0 as u64,
+            cap: capacity,
+        };
+    }
+}
+
+impl<T> std::Default for VecDeque<T> {
+    fn default() -> Self {
+        return vecdeque_new<T>();
+    }
+}
+
+impl<T> VecDeque<T> {
+    export fn len(self: &Self) -> u64 {
+        return self.len;
+    }
+
+    export fn is_empty(self: &Self) -> bool {
+        return self.len == (0 as u64);
+    }
+
+    export fn capacity(self: &Self) -> u64 {
+        return self.cap;
+    }
+
+    fn grow(self: &rw Self) {
+        dec rw new_cap: u64 = 4 as u64;
+        if self.cap > (0 as u64) {
+            new_cap = self.cap * (2 as u64);
+        }
+        dec new_size = new_cap * (std::mem::size_of<T>() as u64);
+        dec align = std::mem::align_of<T>() as u64;
+        unsafe {
+            dec new_raw = __luna_alloc(new_size, align);
+            if new_raw == (0 as u64 as *rw u8) {
+                __luna_panic_default();
+            }
+            dec new_buf = new_raw as *rw T;
+
+            dec rw i: u64 = 0 as u64;
+            while i < self.len {
+                dec phys_idx = (self.head + i) % self.cap;
+                dec src = std::ptr::add<T>(self.buf as *T, phys_idx);
+                dec dst = std::ptr::add_mut<T>(new_buf, i);
+                std::ptr::copy<T>(src, dst, 1 as u64);
+                i = i + (1 as u64);
+            }
+
+            if self.cap > (0 as u64) {
+                dec old_size = self.cap * (std::mem::size_of<T>() as u64);
+                __luna_dealloc(self.buf as *rw u8, old_size, align);
+            }
+
+            self.buf = new_buf;
+            self.head = 0 as u64;
+            self.cap = new_cap;
+        }
+    }
+
+    export fn push_back(self: &rw Self, item: T) {
+        if self.len == self.cap {
+            self.grow();
+        }
+        dec phys_idx = (self.head + self.len) % self.cap;
+        unsafe {
+            dec dst = std::ptr::add_mut<T>(self.buf, phys_idx);
+            std::ptr::write<T>(dst, item);
+        }
+        self.len = self.len + (1 as u64);
+    }
+
+    export fn push_front(self: &rw Self, item: T) {
+        if self.len == self.cap {
+            self.grow();
+        }
+        dec phys_idx = (self.head + self.cap - (1 as u64)) % self.cap;
+        unsafe {
+            dec dst = std::ptr::add_mut<T>(self.buf, phys_idx);
+            std::ptr::write<T>(dst, item);
+        }
+        self.head = phys_idx;
+        self.len = self.len + (1 as u64);
+    }
+
+    export fn pop_front(self: &rw Self) -> std::Option<T> {
+        if self.len == (0 as u64) {
+            return std::Option::None;
+        }
+        unsafe {
+            dec src = std::ptr::add<T>(self.buf as *T, self.head);
+            dec val = std::ptr::read<T>(src);
+            self.head = (self.head + (1 as u64)) % self.cap;
+            self.len = self.len - (1 as u64);
+            return std::Option::Some(val);
+        }
+    }
+
+    export fn pop_back(self: &rw Self) -> std::Option<T> {
+        if self.len == (0 as u64) {
+            return std::Option::None;
+        }
+        dec phys_idx = (self.head + self.len - (1 as u64)) % self.cap;
+        unsafe {
+            dec src = std::ptr::add<T>(self.buf as *T, phys_idx);
+            dec val = std::ptr::read<T>(src);
+            self.len = self.len - (1 as u64);
+            return std::Option::Some(val);
+        }
+    }
+
+    export fn front(self: &Self) -> std::Option<&T> life_from(self) {
+        if self.len == (0 as u64) {
+            return std::Option::None;
+        }
+        unsafe {
+            dec src = std::ptr::add<T>(self.buf as *T, self.head);
+            return std::Option::Some(&*src);
+        }
+    }
+
+    export fn back(self: &Self) -> std::Option<&T> life_from(self) {
+        if self.len == (0 as u64) {
+            return std::Option::None;
+        }
+        dec phys_idx = (self.head + self.len - (1 as u64)) % self.cap;
+        unsafe {
+            dec src = std::ptr::add<T>(self.buf as *T, phys_idx);
+            return std::Option::Some(&*src);
+        }
+    }
+
+    export fn get(self: &Self, index: u64) -> std::Option<&T> life_from(self) {
+        if index >= self.len {
+            return std::Option::None;
+        }
+        dec phys_idx = (self.head + index) % self.cap;
+        unsafe {
+            dec src = std::ptr::add<T>(self.buf as *T, phys_idx);
+            return std::Option::Some(&*src);
+        }
+    }
+
+    export fn get_mut(self: &rw Self, index: u64) -> std::Option<&rw T> life_from(self) {
+        if index >= self.len {
+            return std::Option::None;
+        }
+        dec phys_idx = (self.head + index) % self.cap;
+        unsafe {
+            dec src = std::ptr::add_mut<T>(self.buf, phys_idx);
+            return std::Option::Some(&rw *src);
+        }
+    }
+
+    export fn clear(self: &rw Self) {
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            dec phys_idx = (self.head + i) % self.cap;
+            unsafe {
+                std::ptr::drop_in_place<T>(std::ptr::add_mut<T>(self.buf, phys_idx));
+            }
+            i = i + (1 as u64);
+        }
+        self.head = 0 as u64;
+        self.len = 0 as u64;
+    }
+
+    export fn swap(self: &rw Self, i: u64, j: u64) {
+        if i >= self.len || j >= self.len {
+            __luna_panic_default();
+        }
+        if i == j { return; }
+        dec pi = (self.head + i) % self.cap;
+        dec pj = (self.head + j) % self.cap;
+        unsafe {
+            dec ptr_i = std::ptr::add_mut<T>(self.buf, pi);
+            dec ptr_j = std::ptr::add_mut<T>(self.buf, pj);
+            dec tmp = std::ptr::read<T>(ptr_i as *T);
+            std::ptr::copy<T>(ptr_j as *T, ptr_i, 1 as u64);
+            std::ptr::write<T>(ptr_j, tmp);
+        }
+    }
+
+    export fn iter(self: &Self) -> VecDequeIter<T> life_from(self) {
+        unsafe {
+            return VecDequeIter<T> {
+                buf: self.buf as *T,
+                head: self.head,
+                cap: self.cap,
+                remaining: self.len,
+                current: 0 as u64,
+            };
+        }
+    }
+
+    export fn into_iter(self: Self) -> VecDequeIntoIter<T> {
+        return VecDequeIntoIter<T> {
+            deque: self,
+        };
+    }
+
+    export fn make_contiguous(self: &rw Self) -> &rw [T] life_from(self) {
+        if self.len == (0 as u64) {
+            unsafe {
+                return std::mem::slice_from_raw_parts_mut<T>(self.buf, 0 as u64);
+            }
+        }
+        if self.head == (0 as u64) {
+            unsafe {
+                return std::mem::slice_from_raw_parts_mut<T>(self.buf, self.len);
+            }
+        }
+        dec size = self.cap * (std::mem::size_of<T>() as u64);
+        dec align = std::mem::align_of<T>() as u64;
+        unsafe {
+            dec new_raw = __luna_alloc(size, align);
+            if new_raw == (0 as u64 as *rw u8) {
+                __luna_panic_default();
+            }
+            dec new_buf = new_raw as *rw T;
+            dec rw i: u64 = 0 as u64;
+            while i < self.len {
+                dec phys = (self.head + i) % self.cap;
+                dec src = std::ptr::add<T>(self.buf as *T, phys);
+                dec dst = std::ptr::add_mut<T>(new_buf, i);
+                std::ptr::copy<T>(src, dst, 1 as u64);
+                i = i + (1 as u64);
+            }
+            __luna_dealloc(self.buf as *rw u8, size, align);
+            self.buf = new_buf;
+            self.head = 0 as u64;
+            return std::mem::slice_from_raw_parts_mut<T>(self.buf, self.len);
+        }
+    }
+
+    export fn as_slices(self: &Self) -> (&[T], &[T]) life_from(self) {
+        unsafe {
+            dec rw s1: &[T] = std::mem::slice_from_raw_parts<T>(self.buf as *T, 0 as u64);
+            dec rw s2: &[T] = std::mem::slice_from_raw_parts<T>(self.buf as *T, 0 as u64);
+            if self.len > (0 as u64) {
+                if (self.head + self.len) <= self.cap {
+                    dec s1_ptr = std::ptr::add<T>(self.buf as *T, self.head);
+                    s1 = std::mem::slice_from_raw_parts<T>(s1_ptr, self.len);
+                } else {
+                    dec first_len = self.cap - self.head;
+                    dec second_len = self.len - first_len;
+                    dec s1_ptr = std::ptr::add<T>(self.buf as *T, self.head);
+                    s1 = std::mem::slice_from_raw_parts<T>(s1_ptr, first_len);
+                    s2 = std::mem::slice_from_raw_parts<T>(self.buf as *T, second_len);
+                }
+            }
+            return (s1, s2);
+        }
+    }
+
+    export fn retain(self: &rw Self, pred: fn(&T) -> bool) {
+        dec p_fn = pred;
+        dec rw i: u64 = 0 as u64;
+        dec rw write_idx: u64 = 0 as u64;
+        dec orig_len = self.len;
+        while i < orig_len {
+            dec cur_phys = (self.head + i) % self.cap;
+            unsafe {
+                dec cur_ptr = std::ptr::add_mut<T>(self.buf, cur_phys);
+                if p_fn(&*cur_ptr) {
+                    if write_idx != i {
+                        dec w_phys = (self.head + write_idx) % self.cap;
+                        dec w_ptr = std::ptr::add_mut<T>(self.buf, w_phys);
+                        std::ptr::copy<T>(cur_ptr as *T, w_ptr, 1 as u64);
+                    }
+                    write_idx = write_idx + (1 as u64);
+                } else {
+                    std::ptr::drop_in_place<T>(cur_ptr);
+                }
+            }
+            i = i + (1 as u64);
+        }
+        self.len = write_idx;
+    }
+}
+
+impl<T: std::Eq> VecDeque<T> {
+    export fn contains(self: &Self, value: &T) -> bool {
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            dec phys_idx = (self.head + i) % self.cap;
+            unsafe {
+                dec elem = std::ptr::add<T>(self.buf as *T, phys_idx);
+                if (*elem).eq(value) {
+                    return true;
+                }
+            }
+            i = i + (1 as u64);
+        }
+        return false;
+    }
+}
+
+extern fn __luna_panic_default();
+
+impl<T> std::Drop for VecDeque<T> {
+    fn drop(self: &rw Self) {
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            dec phys_idx = (self.head + i) % self.cap;
+            unsafe {
+                std::ptr::drop_in_place<T>(std::ptr::add_mut<T>(self.buf, phys_idx));
+            }
+            i = i + (1 as u64);
+        }
+        if self.cap > (0 as u64) {
+            dec old_size = self.cap * (std::mem::size_of<T>() as u64);
+            __luna_dealloc(self.buf as *rw u8, old_size, std::mem::align_of<T>() as u64);
+        }
+    }
+}
+
+impl<T: std::Clone> std::Clone for VecDeque<T> {
+    export fn clone(self: &Self) -> Self {
+        dec rw res: VecDeque<T> = vecdeque_with_capacity<T>(self.len);
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            dec phys_idx = (self.head + i) % self.cap;
+            unsafe {
+                dec elem = std::ptr::add<T>(self.buf as *T, phys_idx);
+                res.push_back((*elem).clone());
+            }
+            i = i + (1 as u64);
+        }
+        return res;
+    }
+}
+
+impl<T: std::Eq> std::Eq for VecDeque<T> {
+    export fn eq(self: &Self, other: &Self) -> bool {
+        if self.len != other.len {
+            return false;
+        }
+        dec rw i: u64 = 0 as u64;
+        while i < self.len {
+            dec p1 = (self.head + i) % self.cap;
+            dec p2 = (other.head + i) % other.cap;
+            unsafe {
+                dec e1 = std::ptr::add<T>(self.buf as *T, p1);
+                dec e2 = std::ptr::add<T>(other.buf as *T, p2);
+                if (*e1).eq(&*e2) == false {
+                    return false;
+                }
+            }
+            i = i + (1 as u64);
+        }
+        return true;
+    }
+}
+
+}
+
+impl<T> std::IntoIterator<T, std::VecDequeIntoIter<T>> for std::VecDeque<T> {
+    fn into_iter(self: Self) -> std::VecDequeIntoIter<T> {
+        return self.into_iter();
+    }
+}

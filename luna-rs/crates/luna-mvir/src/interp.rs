@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use luna_common::ids::{SymbolId, Span};
 use luna_semantic::{
     ComptimeValue, ComptimeError, IntWidth, FloatWidth,
-    SemanticContext, SemanticTypeId, SemanticType,
+    SemanticContext, SemanticTypeId, SemanticType, BuiltinType,
     effect::Effect,
 };
 use crate::mvir::*;
@@ -150,6 +150,37 @@ impl RuntimeValue {
     }
 }
 
+fn integer_mask(width: IntWidth) -> u128 {
+    let bits = width.bit_width();
+    if bits == 128 {
+        u128::MAX
+    } else {
+        (1u128 << bits) - 1
+    }
+}
+
+fn cast_integer_value(value: i128, source: IntWidth, target: IntWidth) -> i128 {
+    let source_mask = integer_mask(source);
+    let source_bits = (value as u128) & source_mask;
+    let extended_bits = if source.is_signed() && value < 0 {
+        source_bits | !source_mask
+    } else {
+        source_bits
+    };
+    let target_bits = extended_bits & integer_mask(target);
+    if target.is_signed() {
+        let bits = target.bit_width();
+        let sign_bit = 1u128 << (bits - 1);
+        if target_bits & sign_bit != 0 && bits < 128 {
+            (target_bits as i128) - (1i128 << bits)
+        } else {
+            target_bits as i128
+        }
+    } else {
+        target_bits as i128
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct HeapArena {
     pub allocations: HashMap<usize, Vec<MemorySlot>>,
@@ -270,7 +301,7 @@ impl<'a> MvirInterpreter<'a> {
                 match addr {
                     Address::Stack { field_idx: Some(f_idx), .. } | Address::Heap { field_idx: Some(f_idx), .. } => {
                         if let RuntimeValue::Compound(fields) = &val {
-                            let f_val = fields.get(f_idx as usize).cloned().unwrap_or(RuntimeValue::Unit);
+                            let f_val = fields.get(f_idx as usize).cloned().ok_or_else(|| ComptimeError::Custom("aggregate field access out of bounds".into()))?;
                             Ok(f_val)
                         } else if let RuntimeValue::TraitObject { data, .. } = &val {
                             if f_idx == 0 {
@@ -303,6 +334,13 @@ impl<'a> MvirInterpreter<'a> {
     }
 
     fn write_memory(&mut self, addr: Address, value: RuntimeValue) -> Result<(), ComptimeError> {
+        let ty = self.get_slot_mut(addr)?.ty;
+        if let SemanticType::Array(_, len) = self.ctx.types.get(ty) {
+            let field = match addr { Address::Stack { field_idx, .. } | Address::Heap { field_idx, .. } => field_idx };
+            if field.is_some_and(|field| field as u64 >= *len) {
+                return Err(ComptimeError::Custom("array element store out of bounds".into()));
+            }
+        }
         let slot = self.get_slot_mut(addr)?;
         match addr {
             Address::Stack { field_idx: Some(f_idx), .. } | Address::Heap { field_idx: Some(f_idx), .. } => {
@@ -358,10 +396,12 @@ impl<'a> MvirInterpreter<'a> {
                 }
                 if let Ok(i) = s.parse::<i128>() {
                     Ok(RuntimeValue::Int { val: i, width: IntWidth::I32 })
+                } else if let Ok(u) = s.parse::<u128>() {
+                    Ok(RuntimeValue::Int { val: u as i128, width: IntWidth::U128 })
                 } else if let Ok(f) = s.parse::<f64>() {
                     Ok(RuntimeValue::Float { val: f, width: FloatWidth::F64 })
                 } else {
-                    Ok(RuntimeValue::Int { val: 0, width: IntWidth::I32 })
+                    Err(ComptimeError::Custom(format!("invalid canonical numeric operand: {s}")))
                 }
             }
             Operand::Global(gid) => {
@@ -387,6 +427,21 @@ impl<'a> MvirInterpreter<'a> {
     }
 
     fn eval_binary_op(&self, left: i128, right: i128, width: IntWidth, op: &str) -> Result<RuntimeValue, ComptimeError> {
+        if !width.is_signed() {
+            let left = (left as u128) & integer_mask(width);
+            let right = (right as u128) & integer_mask(width);
+            if matches!(op, "/" | "%") && right == 0 {
+                return Err(ComptimeError::DivisionByZero);
+            }
+            let result = match op {
+                "+" => left.checked_add(right), "-" => left.checked_sub(right),
+                "*" => left.checked_mul(right), "/" => left.checked_div(right),
+                "%" => left.checked_rem(right),
+                _ => return Err(ComptimeError::UnsupportedOperation(format!("binary op {}", op))),
+            }.ok_or(ComptimeError::IntegerOverflow)?;
+            if result > integer_mask(width) { return Err(ComptimeError::IntegerOverflow); }
+            return Ok(RuntimeValue::Int { val: result as i128, width });
+        }
         let res = match op {
             "+" => {
                 left.checked_add(right).ok_or(ComptimeError::IntegerOverflow)?
@@ -414,8 +469,8 @@ impl<'a> MvirInterpreter<'a> {
 
         let bit_w = width.bit_width();
         if width.is_signed() {
-            let min = -(1i128 << (bit_w - 1));
-            let max = (1i128 << (bit_w - 1)) - 1;
+            let min = if bit_w == 128 { i128::MIN } else { -(1i128 << (bit_w - 1)) };
+            let max = if bit_w == 128 { i128::MAX } else { (1i128 << (bit_w - 1)) - 1 };
             if res < min || res > max {
                 return Err(ComptimeError::IntegerOverflow);
             }
@@ -430,6 +485,24 @@ impl<'a> MvirInterpreter<'a> {
     }
 
     pub fn eval_function(&mut self, func: &Function, args: Vec<RuntimeValue>) -> Result<RuntimeValue, ComptimeError> {
+        // Every execution entry point (including Drop, closure and trait
+        // dispatch) must enforce the same comptime boundary. Retaining an
+        // artifact body does not make an extern or effectful function pure.
+        if func.is_extern {
+            return Err(ComptimeError::ForbiddenSideEffect(format!(
+                "calling extern function '{}' is forbidden in comptime", func.name.name
+            )));
+        }
+        if let Some(symbol) = func.name.symbol_id {
+            if self.ctx.tables.function_effects.get(&symbol).is_some_and(|effects| !effects.is_pure()) {
+                return Err(ComptimeError::ForbiddenSideEffect(format!(
+                    "calling function '{}' with effect is forbidden in comptime", func.name.name
+                )));
+            }
+        }
+        if func.blocks.is_empty() {
+            return Err(ComptimeError::SymbolNotFound(func.name.name.clone()));
+        }
         if self.call_stack.len() >= self.max_depth {
             return Err(ComptimeError::RecursionLimitExceeded(self.max_depth));
         }
@@ -496,7 +569,22 @@ impl<'a> MvirInterpreter<'a> {
                         RuntimeValue::Unit
                     }
                     Instruction::Assign(op) => {
-                        self.eval_operand(op)?
+                        let value = self.eval_operand(op)?;
+                        match (value, self.ctx.types.get(self.ctx.types.resolve(inst_ty))) {
+                            (RuntimeValue::Int { val, .. }, SemanticType::Primitive(b)) if b.is_integer() => {
+                                RuntimeValue::Int { val, width: IntWidth::from_builtin(*b) }
+                            }
+                            (value, _) => value,
+                        }
+                    }
+                    Instruction::MarkInit { value } => {
+                        let RuntimeValue::Pointer(address) = self.eval_operand(value)? else {
+                            return Err(ComptimeError::TypeMismatch("initialization requires storage".into()));
+                        };
+                        let slot = self.get_slot_mut(address)?;
+                        if matches!(slot.value, RuntimeValue::Unit) { slot.value = RuntimeValue::Compound(Vec::new()); }
+                        slot.state = PlaceState::Initialized;
+                        RuntimeValue::Unit
                     }
                     Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                         let ptr_val = self.eval_operand(ptr)?;
@@ -525,6 +613,30 @@ impl<'a> MvirInterpreter<'a> {
                     Instruction::Borrow { base, .. } => {
                         let base_val = self.eval_operand(base)?;
                         base_val
+                    }
+                    Instruction::PtrOffset { ptr, offset } => {
+                        let pointer = self.eval_operand(ptr)?;
+                        let amount = self.eval_operand(offset)?.as_i128()?;
+                        let amount = isize::try_from(amount).map_err(|_| ComptimeError::IntegerOverflow)?;
+                        let RuntimeValue::Pointer(address) = pointer else {
+                            return Err(ComptimeError::TypeMismatch("pointer offset requires a pointer".into()));
+                        };
+                        let slot_type = self.get_slot_mut(address)?.ty;
+                        let is_array = matches!(self.ctx.types.get(slot_type), SemanticType::Array(..));
+                        let (field, old_offset) = match address {
+                            Address::Stack { field_idx, offset, .. } | Address::Heap { field_idx, offset, .. } => (field_idx, offset),
+                        };
+                        let (field, offset) = if is_array {
+                            let index = (field.unwrap_or(0) as isize).checked_add(amount).ok_or(ComptimeError::IntegerOverflow)?;
+                            let index = u32::try_from(index).map_err(|_| ComptimeError::Custom("array pointer offset out of bounds".into()))?;
+                            (Some(index), old_offset)
+                        } else {
+                            (field, old_offset.checked_add(amount).ok_or(ComptimeError::IntegerOverflow)?)
+                        };
+                        RuntimeValue::Pointer(match address {
+                            Address::Stack { frame_idx, slot_idx, .. } => Address::Stack { frame_idx, slot_idx, field_idx: field, offset },
+                            Address::Heap { alloc_id, .. } => Address::Heap { alloc_id, field_idx: field, offset },
+                        })
                     }
                     Instruction::FieldPtr { base, field_idx, .. } => {
                         let base_val = self.eval_operand(base)?;
@@ -686,8 +798,8 @@ impl<'a> MvirInterpreter<'a> {
                         let l = self.eval_operand(left)?;
                         let r = self.eval_operand(right)?;
                         match (l, r) {
-                            (RuntimeValue::Int { val: v1, .. }, RuntimeValue::Int { val: v2, .. }) => {
-                                RuntimeValue::Bool(v1 < v2)
+                            (RuntimeValue::Int { val: v1, width }, RuntimeValue::Int { val: v2, .. }) => {
+                                RuntimeValue::Bool(if width.is_signed() { v1 < v2 } else { ((v1 as u128) & integer_mask(width)) < ((v2 as u128) & integer_mask(width)) })
                             }
                             (RuntimeValue::Float { val: v1, .. }, RuntimeValue::Float { val: v2, .. }) => {
                                 RuntimeValue::Bool(v1 < v2)
@@ -699,8 +811,8 @@ impl<'a> MvirInterpreter<'a> {
                         let l = self.eval_operand(left)?;
                         let r = self.eval_operand(right)?;
                         match (l, r) {
-                            (RuntimeValue::Int { val: v1, .. }, RuntimeValue::Int { val: v2, .. }) => {
-                                RuntimeValue::Bool(v1 <= v2)
+                            (RuntimeValue::Int { val: v1, width }, RuntimeValue::Int { val: v2, .. }) => {
+                                RuntimeValue::Bool(if width.is_signed() { v1 <= v2 } else { ((v1 as u128) & integer_mask(width)) <= ((v2 as u128) & integer_mask(width)) })
                             }
                             (RuntimeValue::Float { val: v1, .. }, RuntimeValue::Float { val: v2, .. }) => {
                                 RuntimeValue::Bool(v1 <= v2)
@@ -712,8 +824,8 @@ impl<'a> MvirInterpreter<'a> {
                         let l = self.eval_operand(left)?;
                         let r = self.eval_operand(right)?;
                         match (l, r) {
-                            (RuntimeValue::Int { val: v1, .. }, RuntimeValue::Int { val: v2, .. }) => {
-                                RuntimeValue::Bool(v1 > v2)
+                            (RuntimeValue::Int { val: v1, width }, RuntimeValue::Int { val: v2, .. }) => {
+                                RuntimeValue::Bool(if width.is_signed() { v1 > v2 } else { ((v1 as u128) & integer_mask(width)) > ((v2 as u128) & integer_mask(width)) })
                             }
                             (RuntimeValue::Float { val: v1, .. }, RuntimeValue::Float { val: v2, .. }) => {
                                 RuntimeValue::Bool(v1 > v2)
@@ -725,13 +837,46 @@ impl<'a> MvirInterpreter<'a> {
                         let l = self.eval_operand(left)?;
                         let r = self.eval_operand(right)?;
                         match (l, r) {
-                            (RuntimeValue::Int { val: v1, .. }, RuntimeValue::Int { val: v2, .. }) => {
-                                RuntimeValue::Bool(v1 >= v2)
+                            (RuntimeValue::Int { val: v1, width }, RuntimeValue::Int { val: v2, .. }) => {
+                                RuntimeValue::Bool(if width.is_signed() { v1 >= v2 } else { ((v1 as u128) & integer_mask(width)) >= ((v2 as u128) & integer_mask(width)) })
                             }
                             (RuntimeValue::Float { val: v1, .. }, RuntimeValue::Float { val: v2, .. }) => {
                                 RuntimeValue::Bool(v1 >= v2)
                             }
                             _ => return Err(ComptimeError::TypeMismatch("comparison operand mismatch".to_string())),
+                        }
+                    }
+                    Instruction::BitAnd { left, right } | Instruction::BitOr { left, right }
+                    | Instruction::BitXor { left, right } | Instruction::Shl { left, right }
+                    | Instruction::Shr { left, right } => {
+                        let l = self.eval_operand(left)?;
+                        let r = self.eval_operand(right)?;
+                        match (l, r) {
+                            (RuntimeValue::Int { val: left, width }, RuntimeValue::Int { val: right, .. }) => {
+                                let result = match &val_data.inst {
+                                    Instruction::BitAnd { .. } => left & right,
+                                    Instruction::BitOr { .. } => left | right,
+                                    Instruction::BitXor { .. } => left ^ right,
+                                    Instruction::Shl { .. } | Instruction::Shr { .. } => {
+                                        let shift = u32::try_from(right).ok().filter(|&n| n < width.bit_width())
+                                            .ok_or_else(|| ComptimeError::Custom("integer shift count out of range".into()))?;
+                                        if matches!(&val_data.inst, Instruction::Shl { .. }) { left.wrapping_shl(shift) }
+                                        else if width.is_signed() { left >> shift }
+                                        else { (((left as u128) & integer_mask(width)) >> shift) as i128 }
+                                    }
+                                    _ => unreachable!(),
+                                };
+                                RuntimeValue::Int { val: cast_integer_value(result, width, width), width }
+                            }
+                            (RuntimeValue::Bool(left), RuntimeValue::Bool(right)) => {
+                                RuntimeValue::Bool(match &val_data.inst {
+                                    Instruction::BitAnd { .. } => left & right,
+                                    Instruction::BitOr { .. } => left | right,
+                                    Instruction::BitXor { .. } => left ^ right,
+                                    _ => return Err(ComptimeError::TypeMismatch("cannot shift booleans".into())),
+                                })
+                            }
+                            _ => return Err(ComptimeError::TypeMismatch("integer bitwise operand mismatch".into())),
                         }
                     }
                     Instruction::BoundsCheck { index, len } => {
@@ -843,9 +988,10 @@ impl<'a> MvirInterpreter<'a> {
                         }
                         if should_drop {
                             if let Some(c_id) = callee {
-                                if let Some(f) = self.module.functions.iter().find(|f| f.name.name == c_id.name).cloned() {
-                                    self.eval_function(&f, vec![val])?;
-                                }
+                                let f = self.module.functions.iter()
+                                    .find(|f| f.name.name == c_id.name).cloned()
+                                    .ok_or_else(|| ComptimeError::SymbolNotFound(c_id.name.clone()))?;
+                                self.eval_function(&f, vec![val])?;
                             } else if let RuntimeValue::Pointer(Address::Heap { alloc_id, .. }) = val {
                                 self.heap.allocations.remove(&alloc_id);
                                 self.heap.freed.insert(alloc_id, true);
@@ -889,9 +1035,47 @@ impl<'a> MvirInterpreter<'a> {
                                     _ => val,
                                 }
                             }
+                            SemanticType::Primitive(BuiltinType::Char) => {
+                                match val {
+                                    RuntimeValue::Int { val, width } => {
+                                        let numeric = if width.is_signed() {
+                                            if val < 0 {
+                                                return Err(ComptimeError::Custom(
+                                                    "invalid integer-to-char cast: value is not a Unicode scalar".to_string(),
+                                                ));
+                                            }
+                                            val as u128
+                                        } else {
+                                            (val as u128) & integer_mask(width)
+                                        };
+                                        if numeric > 0x10_FFFF
+                                            || (0xD800..=0xDFFF).contains(&numeric)
+                                        {
+                                            return Err(ComptimeError::Custom(
+                                                "invalid integer-to-char cast: value is not a Unicode scalar".to_string(),
+                                            ));
+                                        }
+                                        RuntimeValue::Int {
+                                            val: numeric as i128,
+                                            width: IntWidth::U32,
+                                        }
+                                    }
+                                    _ => {
+                                        return Err(ComptimeError::TypeMismatch(
+                                            "integer-to-char cast expected an integer value".to_string(),
+                                        ));
+                                    }
+                                }
+                            }
                             SemanticType::Primitive(b) if b.is_integer() => {
                                 match val {
-                                    RuntimeValue::Int { val: v, .. } => RuntimeValue::Int { val: v, width: IntWidth::from_builtin(*b) },
+                                    RuntimeValue::Int { val: v, width } => {
+                                        let target_width = IntWidth::from_builtin(*b);
+                                        RuntimeValue::Int {
+                                            val: cast_integer_value(v, width, target_width),
+                                            width: target_width,
+                                        }
+                                    }
                                     RuntimeValue::Pointer(_) => val,
                                     RuntimeValue::NullPointer => RuntimeValue::Int { val: 0, width: IntWidth::from_builtin(*b) },
                                     _ => val,
@@ -937,9 +1121,16 @@ impl<'a> MvirInterpreter<'a> {
                                     if let Some(&m_sym) = methods.get(*method_idx as usize) {
                                         let concrete_name = &self.ctx.symbol_table.get_symbol(concrete_sym).name;
                                         let m_name = &self.ctx.symbol_table.get_symbol(m_sym).name;
-                                        let mangled_name = format!("{}_{}", concrete_name, m_name);
-                                        let target_func = self.module.functions.iter().find(|f| {
-                                            f.name.name == mangled_name || f.name.name == *m_name || f.name.name.ends_with(m_name)
+                                        let key = luna_semantic::semantic_tables::ImplKey {
+                                            trait_id: Some(trait_sym),
+                                            self_type_def: concrete_sym.into(),
+                                        };
+                                        let implementation = self.ctx.tables.impl_methods.get(&key)
+                                            .and_then(|methods| methods.iter().find(|&&symbol| {
+                                                self.ctx.symbol_table.get_symbol(symbol).name == *m_name
+                                            })).copied();
+                                        let target_func = implementation.and_then(|symbol| {
+                                            self.module.functions.iter().find(|f| f.name.symbol_id == Some(symbol))
                                         }).cloned();
                                         if let Some(f) = target_func {
                                             let mut call_args = vec![*data];
@@ -988,11 +1179,8 @@ impl<'a> MvirInterpreter<'a> {
                         match obj_val {
                             RuntimeValue::TraitObject { data, concrete_sym, .. } => {
                                 if let Some(&drop_sym) = self.ctx.tables.drop_impls.get(&concrete_sym) {
-                                    let drop_name = &self.ctx.symbol_table.get_symbol(drop_sym).name;
-                                    let concrete_name = &self.ctx.symbol_table.get_symbol(concrete_sym).name;
-                                    let mangled_name = format!("{}_{}", concrete_name, drop_name);
                                     let drop_func = self.module.functions.iter().find(|f| {
-                                        f.name.name == mangled_name || f.name.name == *drop_name || f.name.name.ends_with(drop_name)
+                                        f.name.symbol_id == Some(drop_sym)
                                     }).cloned();
                                     if let Some(f) = drop_func {
                                         self.eval_function(&f, vec![*data])?;
@@ -1167,8 +1355,11 @@ impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
             return Err(ComptimeError::TypeMismatch("E_UNRESOLVED_PROJECTION: cannot evaluate comptime expression with unresolved associated type projection".to_string()));
         }
         let mut generator = crate::generator::MvirGenerator::new(arena, ctx, source_manager);
-        generator.generate_all_known_functions();
         let func = generator.generate_expr_as_function(&expr_id, ret_ty);
+        generator.generate_comptime_dependencies(&func);
+        if !generator.diagnostics.is_empty() {
+            return Err(ComptimeError::TypeMismatch(generator.diagnostics.iter().map(|d| d.message.clone()).collect::<Vec<_>>().join("; ")));
+        }
         if func.values.iter().any(|v| has_unresolved_projection(ctx, v.ty)) {
             return Err(ComptimeError::TypeMismatch("E_UNRESOLVED_PROJECTION: comptime function contains unresolved associated type projection".to_string()));
         }
@@ -1187,8 +1378,11 @@ impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
 
     fn eval_stmt(&self, arena: &luna_ast::AstArena, ctx: &SemanticContext, source_manager: &luna_common::source::SourceManager, stmt_id: luna_ast::StmtId) -> Result<ComptimeValue, ComptimeError> {
         let mut generator = crate::generator::MvirGenerator::new(arena, ctx, source_manager);
-        generator.generate_all_known_functions();
         let func = generator.generate_stmt_as_function(&stmt_id, luna_semantic::SemanticTypeId(0));
+        generator.generate_comptime_dependencies(&func);
+        if !generator.diagnostics.is_empty() {
+            return Err(ComptimeError::TypeMismatch(generator.diagnostics.iter().map(|d| d.message.clone()).collect::<Vec<_>>().join("; ")));
+        }
         if func.values.iter().any(|v| has_unresolved_projection(ctx, v.ty)) {
             return Err(ComptimeError::TypeMismatch("E_UNRESOLVED_PROJECTION: comptime function contains unresolved associated type projection".to_string()));
         }

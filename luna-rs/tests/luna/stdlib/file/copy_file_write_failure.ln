@@ -1,0 +1,28 @@
+// Run in an isolated writable directory. Writing to "." must fail, and
+// copy_file must propagate that failure rather than claim a successful copy.
+import <file>;
+import <result>;
+import <string>;
+import <vec>;
+
+fn main() -> i32 {
+    dec source = std::string_from_str("copy-error-source.bin");
+    dec destination = std::string_from_str(".");
+    dec bytes = std::vec_new<u8>();
+    bytes.push(65 as u8);
+
+    match std::write_file(&source, bytes.as_slice()) {
+        std::Result::Err(_) -> { return 10; },
+        _ -> {},
+    }
+    // Control: the same destination really does reject a direct write.
+    match std::write_file(&destination, bytes.as_slice()) {
+        std::Result::Err(_) -> {},
+        _ -> { return 11; },
+    }
+    // Err comes first so this oracle does not rely on a fieldless Ok pattern.
+    match std::copy_file(&source, &destination) {
+        std::Result::Err(_) -> { return 0; },
+        std::Result::Ok(_) -> { return 1; },
+    }
+}

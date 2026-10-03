@@ -1,0 +1,8 @@
+struct Token { value: i32 };
+impl std::Drop for Token { fn drop(self: &rw Self) {} }
+fn consume(item: Token) -> bool { return item.value == 7; }
+fn main() -> i32 {
+    dec item = Token { value: 7 };
+    if consume(item) { return item.value; }
+    return 0;
+}

@@ -1,0 +1,255 @@
+import <slice>;
+import <cmp>;
+import <clone>;
+import <ptr>;
+import <mem>;
+import <__lang_option>;
+
+export module std {
+    export module algo {
+
+// =========================================================================
+// 1. Sequence Checking & Partitioning
+// =========================================================================
+
+export fn is_sorted<T: std::Ord>(s: &[T]) -> bool {
+    dec slen = s.len as u64;
+    if slen <= (1 as u64) { return true; }
+    dec rw i: u64 = 1 as u64;
+    while i < slen {
+        if s[i - (1 as u64)].cmp(&s[i]) > 0 {
+            return false;
+        }
+        i = i + (1 as u64);
+    }
+    return true;
+}
+
+export fn is_sorted_by<T>(s: &[T], compare: fn(&T, &T) -> i32) -> bool {
+    dec slen = s.len as u64;
+    if slen <= (1 as u64) { return true; }
+    dec rw i: u64 = 1 as u64;
+    while i < slen {
+        dec cmp_fn = compare;
+        if cmp_fn(&s[i - (1 as u64)], &s[i]) > 0 {
+            return false;
+        }
+        i = i + (1 as u64);
+    }
+    return true;
+}
+
+export fn partition_point<T>(s: &[T], pred: fn(&T) -> bool) -> u64 {
+    dec slen = s.len as u64;
+    dec rw lo: u64 = 0 as u64;
+    dec rw hi: u64 = slen;
+    while lo < hi {
+        dec mid = lo + ((hi - lo) / (2 as u64));
+        dec p_fn = pred;
+        if p_fn(&s[mid]) {
+            lo = mid + (1 as u64);
+        } else {
+            hi = mid;
+        }
+    }
+    return lo;
+}
+
+export fn partition<T>(s: &rw [T], pred: fn(&T) -> bool) -> u64 {
+    dec slen = s.len as u64;
+    if slen == (0 as u64) { return 0 as u64; }
+    dec rw i: u64 = 0 as u64;
+    dec rw j: u64 = slen;
+    while true {
+        while i < slen {
+            dec p_fn = pred;
+            if p_fn(&s[i]) == false {
+                break;
+            }
+            i = i + (1 as u64);
+        }
+        while j > i {
+            j = j - (1 as u64);
+            dec p_fn = pred;
+            if p_fn(&s[j]) {
+                break;
+            }
+        }
+        if i >= j {
+            return i;
+        }
+        unsafe {
+            dec pi = std::ptr::add_mut<T>(s.data, i);
+            dec pj = std::ptr::add_mut<T>(s.data, j);
+            dec tmp = std::ptr::read<T>(pi as *T);
+            std::ptr::write<T>(pi, std::ptr::read<T>(pj as *T));
+            std::ptr::write<T>(pj, tmp);
+        }
+        i = i + (1 as u64);
+    }
+    return i;
+}
+
+// =========================================================================
+// 2. Binary Searching Bounds
+// =========================================================================
+
+export fn lower_bound<T: std::Ord>(s: &[T], val: &T) -> u64 {
+    dec slen = s.len as u64;
+    dec rw lo: u64 = 0 as u64;
+    dec rw hi: u64 = slen;
+    while lo < hi {
+        dec mid = lo + ((hi - lo) / (2 as u64));
+        if s[mid].cmp(val) < 0 {
+            lo = mid + (1 as u64);
+        } else {
+            hi = mid;
+        }
+    }
+    return lo;
+}
+
+export fn upper_bound<T: std::Ord>(s: &[T], val: &T) -> u64 {
+    dec slen = s.len as u64;
+    dec rw lo: u64 = 0 as u64;
+    dec rw hi: u64 = slen;
+    while lo < hi {
+        dec mid = lo + ((hi - lo) / (2 as u64));
+        if s[mid].cmp(val) <= 0 {
+            lo = mid + (1 as u64);
+        } else {
+            hi = mid;
+        }
+    }
+    return lo;
+}
+
+export fn equal_range<T: std::Ord>(s: &[T], val: &T) -> (u64, u64) {
+    dec lb = lower_bound<T>(s, val);
+    dec ub = upper_bound<T>(s, val);
+    return (lb, ub);
+}
+
+// =========================================================================
+// 3. In-Place Slice Manipulation
+// =========================================================================
+
+fn reverse_subslice<T>(data: *rw T, lo: u64, hi: u64) {
+    if hi <= lo { return; }
+    dec rw l = lo;
+    dec rw r = hi - (1 as u64);
+    while l < r {
+        unsafe {
+            dec pl = std::ptr::add_mut<T>(data, l);
+            dec pr = std::ptr::add_mut<T>(data, r);
+            dec tmp = std::ptr::read<T>(pl as *T);
+            std::ptr::write<T>(pl, std::ptr::read<T>(pr as *T));
+            std::ptr::write<T>(pr, tmp);
+        }
+        l = l + (1 as u64);
+        r = r - (1 as u64);
+    }
+}
+
+export fn rotate_left<T>(s: &rw [T], k: u64) {
+    dec slen = s.len as u64;
+    if slen <= (1 as u64) { return; }
+    dec step = k % slen;
+    if step == (0 as u64) { return; }
+    reverse_subslice<T>(s.data, 0 as u64, step);
+    reverse_subslice<T>(s.data, step, slen);
+    reverse_subslice<T>(s.data, 0 as u64, slen);
+}
+
+export fn rotate_right<T>(s: &rw [T], k: u64) {
+    dec slen = s.len as u64;
+    if slen <= (1 as u64) { return; }
+    dec step = k % slen;
+    if step == (0 as u64) { return; }
+    rotate_left<T>(s, slen - step);
+}
+
+export fn fill<T: std::Clone>(s: &rw [T], val: &T) {
+    dec slen = s.len as u64;
+    dec rw i: u64 = 0 as u64;
+    while i < slen {
+        unsafe {
+            dec p = std::ptr::add_mut<T>(s.data, i);
+            std::ptr::drop_in_place<T>(p);
+            std::ptr::write<T>(p, (*val).clone());
+        }
+        i = i + (1 as u64);
+    }
+}
+
+export fn swap_ranges<T>(a: &rw [T], b: &rw [T]) {
+    dec rw n = a.len as u64;
+    if (b.len as u64) < n {
+        n = b.len as u64;
+    }
+    dec rw i: u64 = 0 as u64;
+    while i < n {
+        unsafe {
+            dec pa = std::ptr::add_mut<T>(a.data, i);
+            dec pb = std::ptr::add_mut<T>(b.data, i);
+            dec tmp = std::ptr::read<T>(pa as *T);
+            std::ptr::write<T>(pa, std::ptr::read<T>(pb as *T));
+            std::ptr::write<T>(pb, tmp);
+        }
+        i = i + (1 as u64);
+    }
+}
+
+// =========================================================================
+// 4. Core Math Algorithms
+// =========================================================================
+
+export fn clamp_i32(val: i32, min_val: i32, max_val: i32) -> i32 {
+    if val < min_val { return min_val; }
+    if val > max_val { return max_val; }
+    return val;
+}
+
+export fn clamp_u64(val: u64, min_val: u64, max_val: u64) -> u64 {
+    if val < min_val { return min_val; }
+    if val > max_val { return max_val; }
+    return val;
+}
+
+export fn clamp_f64(val: f64, min_val: f64, max_val: f64) -> f64 {
+    if val < min_val { return min_val; }
+    if val > max_val { return max_val; }
+    return val;
+}
+
+export fn gcd_u64(a: u64, b: u64) -> u64 {
+    dec rw x = a;
+    dec rw y = b;
+    while y > (0 as u64) {
+        dec rem = x % y;
+        x = y;
+        y = rem;
+    }
+    return x;
+}
+
+export fn lcm_u64(a: u64, b: u64) -> u64 {
+    if a == (0 as u64) || b == (0 as u64) {
+        return 0 as u64;
+    }
+    dec g = gcd_u64(a, b);
+    return (a / g) * b;
+}
+
+export fn abs_i32(x: i32) -> i32 {
+    if x < 0 { return 0 - x; }
+    return x;
+}
+
+export fn abs_i64(x: i64) -> i64 {
+    if x < (0 as i64) { return (0 as i64) - x; }
+    return x;
+}
+
+    }
+}

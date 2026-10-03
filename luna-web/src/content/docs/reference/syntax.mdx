@@ -1,0 +1,99 @@
+---
+title: Syntax Reference
+description: Complete grammar and syntax reference for Luna.
+---
+
+## Keywords
+
+```
+dec         // Variable declaration (immutable)
+const       // Compile-time constant
+rw          // Rewritable (mutable) modifier
+fn          // Function declaration
+struct      // Struct definition
+enum        // Enum definition
+trait       // Trait definition
+impl        // Implementation block
+export      // Export visibility (public)
+import      // Module provider import
+using       // Local namespace alias (using ... as ...)
+as          // Alias binding
+return      // Return statement
+if          // Conditional
+else        // Alternative branch
+loop        // Infinite loop
+while       // While loop
+for         // For loop
+in          // Iterator binding
+break       // Exit loop
+continue    // Continue loop
+match       // Pattern matching (uses ->)
+self        // Current instance
+Self        // Current type
+async       // Async function
+unsafe      // Delimited unsafe boundary
+extern      // C ABI declaration
+requires    // Postfix type-level contract
+life        // Lifetime contract function
+anchor      // Storage anchor contract
+type        // Type alias
+```
+
+## Expressions
+
+### Literals
+
+```luna
+42          // Integer
+3.14        // Float
+true        // Boolean
+false       // Boolean
+'a'         // Character
+"hello"     // String literal
+[1, 2, 3]   // Array literal
+```
+
+### Operators
+
+```luna
+// Arithmetic
++   -   *   /   %
+
+// Comparison
+==  !=  <   >   <=  >=
+
+// Logical
+&&  ||  !
+
+// Bitwise
+&   |   ^   <<  >>  ~
+
+// Assignment
+=   +=  -=  *=  /=  %=
+```
+
+## Reference Syntax
+
+```luna
+&T            // Shared reference (read-only)
+&rw T         // Rewritable reference (exclusive write)
+*T            // Raw immutable pointer
+*rw T         // Raw mutable pointer
+```
+
+## Function Syntax
+
+```luna
+// Basic function
+fn name(params) -> ReturnType { body }
+
+// Method syntax
+fn method(self: &Type) { }
+fn method(self: &rw Type) { }
+
+// Generic function (monomorphized)
+fn generic<T>(x: T) -> T { return x; }
+
+// Async function (invoked via .await)
+async fn fetch() -> Result<str, i32> { }
+```

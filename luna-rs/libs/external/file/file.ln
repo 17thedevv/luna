@@ -4,6 +4,7 @@ import <string>;
 import <ptr>;
 import <mem>;
 import <__alloc_global>;
+import <fmt>;
 
 extern fn __luna_read_file(
     path: *u8,
@@ -20,12 +21,159 @@ extern fn __luna_write_file(
 ) -> i32;
 extern fn __luna_buffer_free(ptr: *rw u8, cap: usize);
 
+extern fn __luna_file_open(
+    path: *u8,
+    path_len: usize,
+    read: i32,
+    write: i32,
+    create: i32,
+    truncate: i32,
+    append: i32
+) -> *rw void;
+extern fn __luna_file_read(handle: *rw void, buf: *rw u8, len: usize) -> i64;
+extern fn __luna_file_write(handle: *rw void, buf: *u8, len: usize) -> i64;
+extern fn __luna_file_seek(handle: *rw void, offset: i64, whence: i32) -> i64;
+extern fn __luna_file_flush(handle: *rw void) -> i32;
+extern fn __luna_file_close(handle: *rw void);
+
+extern fn __luna_fs_create_dir(path: *u8, path_len: usize) -> i32;
+extern fn __luna_fs_remove_file(path: *u8, path_len: usize) -> i32;
+extern fn __luna_fs_remove_dir(path: *u8, path_len: usize) -> i32;
+extern fn __luna_fs_metadata(path: *u8, path_len: usize, out_size: *rw u64, out_is_dir: *rw i32) -> i32;
+extern fn __luna_fs_opendir(path: *u8, path_len: usize) -> *rw void;
+extern fn __luna_fs_readdir(handle: *rw void, out_buf: *rw u8, max_len: usize, out_len: *rw usize, out_is_dir: *rw i32) -> i32;
+extern fn __luna_fs_closedir(handle: *rw void);
+extern fn __luna_fs_canonicalize(path: *u8, path_len: usize, out_buf: *rw u8, max_len: usize, out_len: *rw usize) -> i32;
+
+extern fn __luna_process_spawn(cmd_ptr: *u8, cmd_len: usize) -> *rw void;
+extern fn __luna_process_wait(handle: *rw void, out_exit_code: *rw i32) -> i32;
+extern fn __luna_process_kill(handle: *rw void) -> i32;
+extern fn __luna_process_id(handle: *rw void) -> u32;
+extern fn __luna_process_close(handle: *rw void);
+extern fn __luna_process_output(
+    cmd_ptr: *u8,
+    cmd_len: usize,
+    out_exit_code: *rw i32,
+    out_out_ptr: *rw *rw u8,
+    out_out_len: *rw usize,
+    out_out_cap: *rw usize,
+    out_err_ptr: *rw *rw u8,
+    out_err_len: *rw usize,
+    out_err_cap: *rw usize
+) -> i32;
+
 export module std {
     export enum FileError {
         NotFound,
         PermissionDenied,
         InvalidInput,
+        AlreadyExists,
         Io,
+    }
+
+    impl std::fmt::Display for FileError {
+        fn fmt<W: std::fmt::Writer>(
+            self: &Self,
+            writer: &rw W
+        ) -> std::Result<void, std::fmt::FmtError> {
+            dec kind = match *self {
+                FileError::NotFound -> 0 as u8,
+                FileError::PermissionDenied -> 1 as u8,
+                FileError::InvalidInput -> 2 as u8,
+                FileError::Io -> 3 as u8,
+                FileError::AlreadyExists -> 4 as u8,
+            };
+            if kind == (0 as u8) {
+                    if writer.write_char('f').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('l').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('o').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('t').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('f').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('o').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('u').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('d');
+            }
+            if kind == (1 as u8) {
+                    if writer.write_char('p').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('m').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('s').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('s').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('o').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('d').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('d');
+            }
+            if kind == (2 as u8) {
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('v').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('a').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('l').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('d').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('n').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('p').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('u').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('t');
+            }
+            if kind == (3 as u8) {
+                    if writer.write_char('I').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('/').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('O').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('o').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('r');
+            }
+            if kind == (4 as u8) {
+                    if writer.write_char('a').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('l').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('r').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('a').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('d').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('y').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('e').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('x').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('i').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('s').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    if writer.write_char('t').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+                    return writer.write_char('s');
+            }
+            return std::Result::Err(std::fmt::FmtError::WriteFailed);
+        }
+    }
+
+    impl std::Error for FileError {
+        fn description(self: &Self) -> str {
+            return match *self {
+                FileError::NotFound -> "file not found",
+                FileError::PermissionDenied -> "permission denied",
+                FileError::InvalidInput -> "invalid input",
+                FileError::AlreadyExists -> "already exists",
+                FileError::Io -> "I/O error",
+            };
+        }
     }
 
     fn path_has_nul(path: &std::String) -> bool {
@@ -46,6 +194,9 @@ export module std {
         }
         if status == (-2 as i32) {
             return FileError::PermissionDenied;
+        }
+        if status == (-6 as i32) {
+            return FileError::AlreadyExists;
         }
         // The stdlib detects embedded NUL before crossing the ABI boundary.
         // Other runtime INVALID_ARGUMENT statuses remain conservatively Io.
@@ -182,4 +333,694 @@ export module std {
             std::Result::Err(error) -> std::Result::Err(error),
         }
     }
+
+    export fn read_to_string(path: &std::String) -> std::Result<std::String, FileError> {
+        dec res = read_file(path);
+        match res {
+            std::Result::Ok(bytes) -> {
+                dec s_res = std::string_from_bytes(bytes.as_slice());
+                match s_res {
+                    std::Option::Some(s) -> {
+                        return std::Result::Ok(s);
+                    },
+                    std::Option::None -> {
+                        return std::Result::Err(FileError::InvalidInput);
+                    },
+                }
+            },
+            std::Result::Err(e) -> {
+                return std::Result::Err(e);
+            },
+        }
+    }
+
+    export fn write_string(path: &std::String, content: &std::String) -> std::Result<void, FileError> {
+        return write_file(path, content.as_bytes());
+    }
+
+    export struct File {
+        private handle: *rw void,
+    };
+
+    impl std::Drop for File {
+        fn drop(self: &rw Self) {
+            if (self.handle as u64) != (0 as u64) {
+                unsafe {
+                    __luna_file_close(self.handle);
+                }
+                self.handle = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    export struct OpenOptions {
+        private read_flag: bool,
+        private write_flag: bool,
+        private create_flag: bool,
+        private truncate_flag: bool,
+        private append_flag: bool,
+    };
+
+    export fn open_options_new() -> OpenOptions {
+        return OpenOptions {
+            read_flag: false,
+            write_flag: false,
+            create_flag: false,
+            truncate_flag: false,
+            append_flag: false,
+        };
+    }
+
+    impl OpenOptions {
+        export fn new() -> OpenOptions {
+            return open_options_new();
+        }
+
+        export fn read(self: &rw Self, read: bool) -> &rw Self life_from(self) {
+            self.read_flag = read;
+            return self;
+        }
+
+        export fn write(self: &rw Self, write: bool) -> &rw Self life_from(self) {
+            self.write_flag = write;
+            return self;
+        }
+
+        export fn create(self: &rw Self, create: bool) -> &rw Self life_from(self) {
+            self.create_flag = create;
+            return self;
+        }
+
+        export fn truncate(self: &rw Self, truncate: bool) -> &rw Self life_from(self) {
+            self.truncate_flag = truncate;
+            return self;
+        }
+
+        export fn append(self: &rw Self, append: bool) -> &rw Self life_from(self) {
+            self.append_flag = append;
+            return self;
+        }
+
+        export fn open(self: &Self, path: &std::String) -> std::Result<File, FileError> {
+            if path_has_nul(path) {
+                return std::Result::Err(FileError::InvalidInput);
+            }
+            dec path_bytes = path.as_bytes();
+            dec rw r_mode: i32 = 0 as i32;
+            dec rw w_mode: i32 = 0 as i32;
+            dec rw c_mode: i32 = 0 as i32;
+            dec rw t_mode: i32 = 0 as i32;
+            dec rw a_mode: i32 = 0 as i32;
+            if self.read_flag { r_mode = 1 as i32; }
+            if self.write_flag { w_mode = 1 as i32; }
+            if self.create_flag { c_mode = 1 as i32; }
+            if self.truncate_flag { t_mode = 1 as i32; }
+            if self.append_flag { a_mode = 1 as i32; }
+
+            unsafe {
+                dec h = __luna_file_open(
+                    path_bytes.data as *u8,
+                    path_bytes.len() as usize,
+                    r_mode,
+                    w_mode,
+                    c_mode,
+                    t_mode,
+                    a_mode
+                );
+                if (h as u64) == (0 as u64) {
+                    return std::Result::Err(FileError::NotFound);
+                }
+                return std::Result::Ok(File { handle: h });
+            }
+        }
+    }
+
+    export fn file_open(path: &std::String) -> std::Result<File, FileError> {
+        dec rw opts = OpenOptions::new();
+        opts.read(true);
+        return opts.open(path);
+    }
+
+    export fn file_create(path: &std::String) -> std::Result<File, FileError> {
+        dec rw opts = OpenOptions::new();
+        opts.write(true);
+        opts.create(true);
+        opts.truncate(true);
+        return opts.open(path);
+    }
+
+    impl File {
+        export fn open(path: &std::String) -> std::Result<File, FileError> {
+            return file_open(path);
+        }
+
+        export fn create(path: &std::String) -> std::Result<File, FileError> {
+            return file_create(path);
+        }
+
+        export fn options() -> OpenOptions {
+            return OpenOptions::new();
+        }
+
+        export fn read(self: &rw Self, buf: &rw [u8]) -> std::Result<usize, FileError> {
+            if (self.handle as u64) == (0 as u64) {
+                return std::Result::Err(FileError::Io);
+            }
+            dec len = buf.len;
+            if len == (0 as usize) {
+                return std::Result::Ok(0 as usize);
+            }
+            dec ptr = &rw buf[0] as *rw u8;
+            unsafe {
+                dec n = __luna_file_read(self.handle, ptr, len);
+                if n < (0 as i64) {
+                    return std::Result::Err(FileError::Io);
+                }
+                return std::Result::Ok(n as usize);
+            }
+        }
+
+        export fn write(self: &rw Self, buf: &[u8]) -> std::Result<usize, FileError> {
+            if (self.handle as u64) == (0 as u64) {
+                return std::Result::Err(FileError::Io);
+            }
+            dec len = buf.len;
+            if len == (0 as usize) {
+                return std::Result::Ok(0 as usize);
+            }
+            dec ptr = &buf[0] as *u8;
+            unsafe {
+                dec n = __luna_file_write(self.handle, ptr, len);
+                if n < (0 as i64) {
+                    return std::Result::Err(FileError::Io);
+                }
+                return std::Result::Ok(n as usize);
+            }
+        }
+
+        export fn flush(self: &rw Self) -> std::Result<void, FileError> {
+            if (self.handle as u64) == (0 as u64) {
+                return std::Result::Err(FileError::Io);
+            }
+            unsafe {
+                dec res = __luna_file_flush(self.handle);
+                if res != (0 as i32) {
+                    return std::Result::Err(FileError::Io);
+                }
+                return std::Result::Ok;
+            }
+        }
+
+        export fn seek(self: &rw Self, offset: i64, whence: i32) -> std::Result<u64, FileError> {
+            if (self.handle as u64) == (0 as u64) {
+                return std::Result::Err(FileError::Io);
+            }
+            unsafe {
+                dec res = __luna_file_seek(self.handle, offset, whence);
+                if res < (0 as i64) {
+                    return std::Result::Err(FileError::Io);
+                }
+                return std::Result::Ok(res as u64);
+            }
+        }
+
+        export fn close(self: &rw Self) {
+            if (self.handle as u64) != (0 as u64) {
+                unsafe {
+                    __luna_file_close(self.handle);
+                }
+                self.handle = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    export struct Metadata {
+        len: u64,
+        is_dir: bool,
+    };
+
+    impl Metadata {
+        export fn len(self: &Self) -> u64 {
+            return self.len;
+        }
+
+        export fn is_dir(self: &Self) -> bool {
+            return self.is_dir;
+        }
+
+        export fn is_file(self: &Self) -> bool {
+            return self.is_dir == false;
+        }
+    }
+
+    export fn file_metadata(path: &std::String) -> std::Result<Metadata, FileError> {
+        if path_has_nul(path) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+        dec path_bytes = path.as_bytes();
+        dec rw out_size: u64 = 0 as u64;
+        dec rw out_is_dir: i32 = 0 as i32;
+        unsafe {
+            dec res = __luna_fs_metadata(
+                path_bytes.data as *u8,
+                path_bytes.len() as usize,
+                &rw out_size as *rw u64,
+                &rw out_is_dir as *rw i32
+            );
+            if res != (0 as i32) {
+                return std::Result::Err(error_from_runtime_status(res));
+            }
+            return std::Result::Ok(Metadata {
+                len: out_size,
+                is_dir: out_is_dir != (0 as i32),
+            });
+        }
+    }
+
+    export fn metadata(path: &std::String) -> std::Result<Metadata, FileError> {
+        return file_metadata(path);
+    }
+
+    export fn create_dir(path: &std::String) -> std::Result<void, FileError> {
+        if path_has_nul(path) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+        dec path_bytes = path.as_bytes();
+        unsafe {
+            dec res = __luna_fs_create_dir(path_bytes.data as *u8, path_bytes.len() as usize);
+            if res != (0 as i32) {
+                return std::Result::Err(error_from_runtime_status(res));
+            }
+            return std::Result::Ok;
+        }
+    }
+
+    export fn remove_file(path: &std::String) -> std::Result<void, FileError> {
+        if path_has_nul(path) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+        dec path_bytes = path.as_bytes();
+        unsafe {
+            dec res = __luna_fs_remove_file(path_bytes.data as *u8, path_bytes.len() as usize);
+            if res != (0 as i32) {
+                return std::Result::Err(error_from_runtime_status(res));
+            }
+            return std::Result::Ok;
+        }
+    }
+
+    export fn remove_dir(path: &std::String) -> std::Result<void, FileError> {
+        if path_has_nul(path) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+        dec path_bytes = path.as_bytes();
+        unsafe {
+            dec res = __luna_fs_remove_dir(path_bytes.data as *u8, path_bytes.len() as usize);
+            if res != (0 as i32) {
+                return std::Result::Err(error_from_runtime_status(res));
+            }
+            return std::Result::Ok;
+        }
+    }
+
+    export struct DirEntry {
+        file_name: std::String,
+        path: std::String,
+        is_directory: bool,
+    };
+
+    impl DirEntry {
+        export fn file_name(self: &Self) -> &std::String {
+            return &self.file_name;
+        }
+
+        export fn path(self: &Self) -> &std::String {
+            return &self.path;
+        }
+
+        export fn is_dir(self: &Self) -> bool {
+            return self.is_directory;
+        }
+
+        export fn is_file(self: &Self) -> bool {
+            return self.is_directory == false;
+        }
+
+        export fn metadata(self: &Self) -> std::Result<Metadata, FileError> {
+            return file_metadata(&self.path);
+        }
+    }
+
+    export struct ReadDir {
+        private handle: *rw void,
+        private dir_path: std::String,
+    };
+
+    impl std::Drop for ReadDir {
+        fn drop(self: &rw Self) {
+            if (self.handle as u64) != (0 as u64) {
+                unsafe {
+                    __luna_fs_closedir(self.handle);
+                }
+                self.handle = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl ReadDir {
+        export fn next_entry(self: &rw Self) -> std::Result<std::Option<DirEntry>, FileError> {
+            if (self.handle as u64) == (0 as u64) {
+                return std::Result::Ok(std::Option::None);
+            }
+            dec rw out_len: usize = 0 as usize;
+            dec rw out_is_dir: i32 = 0 as i32;
+            unsafe {
+                dec name_buf = __luna_alloc(512 as u64, 1 as u64);
+                dec res = __luna_fs_readdir(
+                    self.handle,
+                    name_buf,
+                    512 as usize,
+                    &rw out_len as *rw usize,
+                    &rw out_is_dir as *rw i32
+                );
+                if res == (1 as i32) {
+                    __luna_dealloc(name_buf, 512 as u64, 1 as u64);
+                    return std::Result::Ok(std::Option::None);
+                }
+                if res < (0 as i32) {
+                    __luna_dealloc(name_buf, 512 as u64, 1 as u64);
+                    return std::Result::Err(error_from_runtime_status(res));
+                }
+                dec name_slice = std::mem::slice_from_raw_parts<u8>(name_buf as *u8, out_len as u64);
+                dec name_opt = std::string_from_bytes(name_slice);
+                dec name_str = match name_opt {
+                    std::Option::Some(s) -> s,
+                    std::Option::None -> std::string_new(),
+                };
+                __luna_dealloc(name_buf, 512 as u64, 1 as u64);
+
+                dec rw full = self.dir_path.clone();
+                dec dlen = full.len();
+                if dlen > (0 as u64) {
+                    dec last_ch = full.as_bytes()[dlen - (1 as u64)];
+                    if last_ch != (47 as u8) && last_ch != (92 as u8) {
+                        full.push_char('/');
+                    }
+                }
+                full.push_string(&name_str);
+
+                return std::Result::Ok(std::Option::Some(DirEntry {
+                    file_name: name_str,
+                    path: full,
+                    is_directory: out_is_dir != (0 as i32),
+                }));
+            }
+        }
+    }
+
+    export fn read_dir(path: &std::String) -> std::Result<ReadDir, FileError> {
+        if path_has_nul(path) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+        dec path_bytes = path.as_bytes();
+        unsafe {
+            dec h = __luna_fs_opendir(path_bytes.data as *u8, path_bytes.len() as usize);
+            if (h as u64) == (0 as u64) {
+                return std::Result::Err(FileError::NotFound);
+            }
+            return std::Result::Ok(ReadDir {
+                handle: h,
+                dir_path: path.clone(),
+            });
+        }
+    }
+
+    export fn canonicalize(path: &std::String) -> std::Result<std::String, FileError> {
+        if path_has_nul(path) {
+            return std::Result::Err(FileError::InvalidInput);
+        }
+        dec path_bytes = path.as_bytes();
+        dec rw out_len: usize = 0 as usize;
+        unsafe {
+            dec out_buf = __luna_alloc(1024 as u64, 1 as u64);
+            dec res = __luna_fs_canonicalize(
+                path_bytes.data as *u8,
+                path_bytes.len() as usize,
+                out_buf,
+                1024 as usize,
+                &rw out_len as *rw usize
+            );
+            if res != (0 as i32) {
+                __luna_dealloc(out_buf, 1024 as u64, 1 as u64);
+                return std::Result::Err(error_from_runtime_status(res));
+            }
+            dec slice = std::mem::slice_from_raw_parts<u8>(out_buf as *u8, out_len as u64);
+            dec str_opt = std::string_from_bytes(slice);
+            dec res_str = match str_opt {
+                std::Option::Some(s) -> s,
+                std::Option::None -> std::string_new(),
+            };
+            __luna_dealloc(out_buf, 1024 as u64, 1 as u64);
+            return std::Result::Ok(res_str);
+        }
+    }
+
+
+
+    // =========================================================================
+    // Process Execution (std::process)
+    // =========================================================================
+
+    export enum ProcessError {
+        SpawnFailed,
+        WaitFailed,
+        KillFailed,
+        InvalidInput,
+    }
+
+    impl std::Error for ProcessError {
+        fn description(self: &Self) -> str {
+            return match *self {
+                ProcessError::SpawnFailed -> "process spawn failed",
+                ProcessError::WaitFailed -> "process wait failed",
+                ProcessError::KillFailed -> "process kill failed",
+                ProcessError::InvalidInput -> "invalid input",
+            };
+        }
+    }
+
+    export struct ExitStatus {
+        code_val: i32,
+    };
+
+    impl ExitStatus {
+        export fn code(self: &Self) -> std::Option<i32> {
+            if self.code_val < (0 as i32) {
+                return std::Option::None;
+            }
+            return std::Option::Some(self.code_val);
+        }
+
+        export fn success(self: &Self) -> bool {
+            return self.code_val == (0 as i32);
+        }
+    }
+
+    export struct Child {
+        private handle: *rw void,
+    };
+
+    impl std::Drop for Child {
+        fn drop(self: &rw Self) {
+            if (self.handle as u64) != (0 as u64) {
+                unsafe {
+                    __luna_process_close(self.handle);
+                }
+                self.handle = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl Child {
+        export fn id(self: &Self) -> u32 {
+            if (self.handle as u64) == (0 as u64) {
+                return 0 as u32;
+            }
+            unsafe {
+                return __luna_process_id(self.handle);
+            }
+        }
+
+        export fn wait(self: &rw Self) -> std::Result<ExitStatus, ProcessError> {
+            if (self.handle as u64) == (0 as u64) {
+                return std::Result::Err(ProcessError::WaitFailed);
+            }
+            dec rw exit_code: i32 = 0 as i32;
+            unsafe {
+                dec res = __luna_process_wait(self.handle, &rw exit_code as *rw i32);
+                if res != (0 as i32) {
+                    return std::Result::Err(ProcessError::WaitFailed);
+                }
+                return std::Result::Ok(ExitStatus { code_val: exit_code });
+            }
+        }
+
+        export fn kill(self: &rw Self) -> std::Result<void, ProcessError> {
+            if (self.handle as u64) == (0 as u64) {
+                return std::Result::Err(ProcessError::KillFailed);
+            }
+            unsafe {
+                dec res = __luna_process_kill(self.handle);
+                if res != (0 as i32) {
+                    return std::Result::Err(ProcessError::KillFailed);
+                }
+                return std::Result::Ok;
+            }
+        }
+    }
+
+    export struct Output {
+        status: ExitStatus,
+        stdout: std::Vec<u8>,
+        stderr: std::Vec<u8>,
+    };
+
+    impl Output {
+        export fn status(self: &Self) -> ExitStatus {
+            return self.status;
+        }
+
+        export fn stdout(self: &Self) -> &std::Vec<u8> life_from(self) {
+            return &self.stdout;
+        }
+
+        export fn stderr(self: &Self) -> &std::Vec<u8> life_from(self) {
+            return &self.stderr;
+        }
+    }
+
+    export struct Command {
+        private program: std::String,
+        private args: std::Vec<std::String>,
+    };
+
+    export fn command_new(program: &std::String) -> Command {
+        return Command {
+            program: program.clone(),
+            args: std::vec_new<std::String>(),
+        };
+    }
+
+    impl Command {
+        export fn new(program: &std::String) -> Command {
+            return command_new(program);
+        }
+
+        export fn arg(self: &rw Self, arg: &std::String) -> &rw Self life_from(self) {
+            self.args.push(arg.clone());
+            return self;
+        }
+
+        fn build_command_line(self: &Self) -> std::String {
+            dec rw cmd = self.program.clone();
+            dec rw i: usize = 0 as usize;
+            dec args_slice = self.args.as_slice();
+            while i < args_slice.len() {
+                cmd.push_char(' ');
+                dec rw j: usize = 0 as usize;
+                dec arg_bytes = args_slice[i].as_bytes();
+                while j < arg_bytes.len() {
+                    cmd.push_char(arg_bytes[j] as char);
+                    j = j + (1 as usize);
+                }
+                i = i + (1 as usize);
+            }
+            return cmd;
+        }
+
+        export fn spawn(self: &Self) -> std::Result<Child, ProcessError> {
+            dec cmd_line = self.build_command_line();
+            if path_has_nul(&cmd_line) {
+                return std::Result::Err(ProcessError::InvalidInput);
+            }
+            dec bytes = cmd_line.as_bytes();
+            unsafe {
+                dec h = __luna_process_spawn(bytes.data as *u8, bytes.len() as usize);
+                if (h as u64) == (0 as u64) {
+                    return std::Result::Err(ProcessError::SpawnFailed);
+                }
+                return std::Result::Ok(Child { handle: h });
+            }
+        }
+
+        export fn status(self: &Self) -> std::Result<ExitStatus, ProcessError> {
+            dec spawn_res = self.spawn();
+            match spawn_res {
+                std::Result::Ok(c) -> {
+                    dec rw child = c;
+                    return child.wait();
+                },
+                std::Result::Err(e) -> {
+                    return std::Result::Err(e);
+                },
+            }
+        }
+
+        export fn output(self: &Self) -> std::Result<Output, ProcessError> {
+            dec cmd_line = self.build_command_line();
+            if path_has_nul(&cmd_line) {
+                return std::Result::Err(ProcessError::InvalidInput);
+            }
+            dec bytes = cmd_line.as_bytes();
+            dec rw out_code: i32 = 0 as i32;
+            dec rw out_ptr: *rw u8 = 0 as u64 as *rw u8;
+            dec rw out_len: usize = 0 as usize;
+            dec rw out_cap: usize = 0 as usize;
+            dec rw err_ptr: *rw u8 = 0 as u64 as *rw u8;
+            dec rw err_len: usize = 0 as usize;
+            dec rw err_cap: usize = 0 as usize;
+
+            unsafe {
+                dec res = __luna_process_output(
+                    bytes.data as *u8,
+                    bytes.len() as usize,
+                    &rw out_code as *rw i32,
+                    &rw out_ptr as *rw *rw u8,
+                    &rw out_len as *rw usize,
+                    &rw out_cap as *rw usize,
+                    &rw err_ptr as *rw *rw u8,
+                    &rw err_len as *rw usize,
+                    &rw err_cap as *rw usize
+                );
+                if res != (0 as i32) {
+                    return std::Result::Err(ProcessError::SpawnFailed);
+                }
+
+                dec rw stdout_vec = std::vec_new<u8>();
+                dec rw i: usize = 0 as usize;
+                while i < out_len {
+                    dec b = std::ptr::read<u8>(std::ptr::add<u8>(out_ptr as *u8, i as u64));
+                    stdout_vec.push(b);
+                    i = i + (1 as usize);
+                }
+                __luna_buffer_free(out_ptr, out_cap);
+
+                dec rw stderr_vec = std::vec_new<u8>();
+                dec rw j: usize = 0 as usize;
+                while j < err_len {
+                    dec b = std::ptr::read<u8>(std::ptr::add<u8>(err_ptr as *u8, j as u64));
+                    stderr_vec.push(b);
+                    j = j + (1 as usize);
+                }
+                __luna_buffer_free(err_ptr, err_cap);
+
+                return std::Result::Ok(Output {
+                    status: ExitStatus { code_val: out_code },
+                    stdout: stdout_vec,
+                    stderr: stderr_vec,
+                });
+            }
+        }
+    }
 }
+

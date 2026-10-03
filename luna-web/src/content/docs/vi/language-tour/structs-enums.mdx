@@ -1,0 +1,107 @@
+---
+title: Struct & Enum
+description: Các kiểu dữ liệu do người dùng tự định nghĩa trong Luna.
+---
+
+## Struct
+
+### Khai báo trường có tên
+
+```luna
+struct Point {
+    x: f64,
+    y: f64,
+};
+
+fn main() -> i32 {
+    dec origin = Point { x: 0.0, y: 0.0 };
+    dec p = Point { x: 3.0, y: 4.0 };
+    return 0;
+}
+```
+
+### Generic Struct
+
+```luna
+struct Box<T> {
+    value: T,
+};
+
+impl<T> Box<T> {
+    fn new(value: T) -> Box<T> {
+        return Box { value: value };
+    }
+
+    fn get(self: &Box<T>) -> &T {
+        return &self.value;
+    }
+}
+```
+
+## Enum
+
+### Enum cơ bản
+
+```luna
+enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
+fn turn_left(d: Direction) -> Direction {
+    match d {
+        Direction::North -> Direction::East,
+        Direction::South -> Direction::West,
+        Direction::East -> Direction::South,
+        Direction::West -> Direction::North,
+    }
+}
+```
+
+### Enum mang dữ liệu liên kết
+
+```luna
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(str),
+    ChangeColor(u8, u8, u8),
+}
+
+fn process(msg: Message) {
+    match msg {
+        Message::Quit -> {
+            std::io::println("Thoát");
+        },
+        Message::Move { x, y } -> {
+            std::io::println("Di chuyển tới {}, {}", x, y);
+        },
+        Message::Write(s) -> {
+            std::io::println("Ghi: {}", s);
+        },
+        Message::ChangeColor(r, g, b) -> {
+            std::io::println("Màu sắc: {}, {}, {}", r, g, b);
+        },
+    }
+}
+```
+
+## Khớp mẫu (Pattern Matching)
+
+Enum kết hợp với khớp mẫu tạo nên công cụ xử lý logic mạnh mẽ:
+
+```luna
+enum Tree<T> {
+    Leaf(T),
+    Node { left: Box<Tree<T>>, right: Box<Tree<T>> },
+}
+
+fn sum(tree: &Tree<i32>) -> i32 {
+    match tree {
+        Tree::Leaf(n) -> *n,
+        Tree::Node { left, right } -> sum(left) + sum(right),
+    }
+}
+```

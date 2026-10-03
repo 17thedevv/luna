@@ -1,0 +1,20 @@
+enum Shape {
+    Circle(f64),
+    Rectangle(f64, f64),
+    Point,
+}
+
+fn calculate_area(shape: &Shape) -> f64 {
+    // Luna pattern match arms use ->
+    match shape {
+        Shape::Circle(radius) -> {
+            return 3.14159265 * radius * radius;
+        },
+        Shape::Rectangle(width, height) -> {
+            return width * height;
+        },
+        Shape::Point -> {
+            return 0.0;
+        }
+    }
+}

@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <!-- Lunar Moonlight Gradient -->
+    <linearGradient id="moonGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5f3ff"/>
+      <stop offset="40%" stop-color="#ddd6fe"/>
+      <stop offset="85%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    
+    <!-- Laptop screen glow -->
+    <linearGradient id="laptopGlow" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#c4b5fd"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <filter id="lunarAura" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <style>
+    .bg-plate { fill: #07090e; stroke: #191e2b; }
+    .moon-path { fill: url(#moonGlow); filter: url(#lunarAura); }
+    .figure-silhouette { fill: #ffffff; opacity: 0.96; }
+    .laptop-glow { fill: url(#laptopGlow); }
+    
+    @media (prefers-color-scheme: light) {
+      .bg-plate { fill: #ffffff; stroke: #e2e8f0; }
+      .moon-path { fill: #1e1b4b; filter: none; }
+      .figure-silhouette { fill: #0f172a; opacity: 1; }
+      .laptop-glow { fill: #7c3aed; }
+    }
+  </style>
+
+  <!-- Canvas badge plate with subtle border for high tab contrast -->
+  <rect class="bg-plate" width="64" height="64" rx="14" stroke-width="1.5"/>
+
+  <!-- Iconic Crescent Moon + Chị Hằng Coder silhouette mark -->
+  <g transform="translate(4, 4)">
+    <!-- Crescent Moon Body -->
+    <path class="moon-path" d="M 40 4 C 18 4 6 22 6 36 C 6 48 18 54 38 52 C 24 50 18 40 18 32 C 18 18 28 8 40 4 Z"/>
+
+    <!-- Chị Hằng Seated Silhouette Inside Moon -->
+    <!-- Head & Hair Bun -->
+    <circle class="figure-silhouette" cx="30" cy="24" r="3.2"/>
+    <ellipse class="figure-silhouette" cx="30.5" cy="21.5" rx="1.8" ry="1.5"/>
+    
+    <!-- Flowing Hair streaming toward the crescent curve -->
+    <path class="figure-silhouette" d="M 28 24 C 23 23, 19 28, 14 31 C 18 30, 22 28, 27 27 Z"/>
+
+    <!-- Slender Torso & Draped Gown -->
+    <path class="figure-silhouette" d="M 28 27 C 29 32, 29 35, 33 39 C 31 43, 29 47, 30 50 C 33 46, 35 43, 36 39 C 35 34, 32 30, 29 27 Z"/>
+
+    <!-- Laptop resting on lap emitting glow -->
+    <!-- Base -->
+    <path d="M 33 38.5 L 39.5 38.5 L 40 39.5 L 32.5 39.5 Z" fill="#94a3b8"/>
+    <!-- Screen upright glowing -->
+    <path class="laptop-glow" d="M 38 38.5 L 41 33.5 L 42 34 L 39 39 Z"/>
+  </g>
+</svg>

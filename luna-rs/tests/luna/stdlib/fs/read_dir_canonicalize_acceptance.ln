@@ -1,0 +1,117 @@
+import <file>;
+import <string>;
+import <result>;
+
+fn test_read_dir_and_canonicalize() -> bool {
+    dec dir_name = std::string_from_str("test_rd_tmp");
+    
+    // Clean up if exists from previous run
+    std::remove_file(&std::string_from_str("test_rd_tmp/a.txt"));
+    std::remove_file(&std::string_from_str("test_rd_tmp/b.txt"));
+    std::remove_dir(&dir_name);
+
+    // Create test directory
+    dec mkdir_res = std::create_dir(&dir_name);
+    if mkdir_res.is_err() {
+        return false;
+    }
+
+    // Create 2 files
+    dec fa_path = std::string_from_str("test_rd_tmp/a.txt");
+    dec fb_path = std::string_from_str("test_rd_tmp/b.txt");
+    dec fa_res = std::file_create(&fa_path);
+    if fa_res.is_err() {
+        std::remove_dir(&dir_name);
+        return false;
+    }
+    dec fb_res = std::file_create(&fb_path);
+    if fb_res.is_err() {
+        std::remove_file(&fa_path);
+        std::remove_dir(&dir_name);
+        return false;
+    }
+
+    // Open dir for reading
+    dec rd_res = std::read_dir(&dir_name);
+    if rd_res.is_err() {
+        std::remove_file(&fa_path);
+        std::remove_file(&fb_path);
+        std::remove_dir(&dir_name);
+        return false;
+    }
+    dec rw rd = rd_res.unwrap();
+
+    dec rw count: usize = 0 as usize;
+    dec rw found_a = false;
+    dec rw found_b = false;
+
+    while true {
+        dec entry_res = rd.next_entry();
+        if entry_res.is_err() {
+            std::remove_file(&fa_path);
+            std::remove_file(&fb_path);
+            std::remove_dir(&dir_name);
+            return false;
+        }
+        dec entry_opt = entry_res.unwrap();
+        match entry_opt {
+            std::Option::Some(entry) -> {
+                count = count + (1 as usize);
+                dec name = entry.file_name();
+                if name.eq(&std::string_from_str("a.txt")) {
+                    found_a = true;
+                    if entry.is_file() == false {
+                        return false;
+                    }
+                }
+                if name.eq(&std::string_from_str("b.txt")) {
+                    found_b = true;
+                    if entry.is_file() == false {
+                        return false;
+                    }
+                }
+            },
+            std::Option::None -> {
+                break;
+            },
+        }
+    }
+
+    if count != (2 as usize) || found_a == false || found_b == false {
+        std::remove_file(&fa_path);
+        std::remove_file(&fb_path);
+        std::remove_dir(&dir_name);
+        return false;
+    }
+
+    // Test canonicalize
+    dec canon_res = std::canonicalize(&dir_name);
+    if canon_res.is_err() {
+        std::remove_file(&fa_path);
+        std::remove_file(&fb_path);
+        std::remove_dir(&dir_name);
+        return false;
+    }
+    dec canon_str = canon_res.unwrap();
+    if canon_str.is_empty() {
+        std::remove_file(&fa_path);
+        std::remove_file(&fb_path);
+        std::remove_dir(&dir_name);
+        return false;
+    }
+
+    // Clean up
+    std::remove_file(&fa_path);
+    std::remove_file(&fb_path);
+    std::remove_dir(&dir_name);
+
+    return true;
+}
+
+fn main() -> i32 {
+    dec ok = test_read_dir_and_canonicalize();
+    if ok == false {
+        return 1 as i32;
+    }
+    return 0 as i32;
+}

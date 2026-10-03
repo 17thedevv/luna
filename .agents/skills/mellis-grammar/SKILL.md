@@ -142,7 +142,20 @@ struct Holder {
 struct RawOwner {
     private data: *rw u8,
 } requires anchor(data) = self;
+
+// Multiple contracts use one requires and comma-separated entries:
+struct RawPair {
+    private first: *rw u8,
+    private second: *rw u16,
+} requires anchor(first) = self, anchor(second) = self;
 ```
+
+The canonical struct contract spelling is one `requires` followed by a
+non-empty comma-separated list. Anchor and lifetime constraints may be mixed
+in that list. A trailing comma after the last contract is not accepted.
+Existing repeated `requires` groups remain accepted; they have the same
+semantics as the single-group spelling. This does not change function
+lifetime clauses or the raw storage anchor contract.
 
 `requires anchor(field) = self` is valid only for a direct field whose type is
 `*T` or `*rw T`. The canonical identity is the owning type plus the field

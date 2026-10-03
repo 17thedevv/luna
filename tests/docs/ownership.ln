@@ -1,0 +1,22 @@
+import <alloc>;
+
+fn process(buf: std::Vec<u8>) {
+    // Takes ownership of buf; deallocated on exit
+}
+
+fn main() -> i32 {
+    dec rw v = std::Vec<u8>::new();
+    v.push(42);
+
+    // Shared borrow scope: multiple readers permitted
+    {
+        dec r1: &std::Vec<u8> = &v;
+        dec r2: &std::Vec<u8> = &v;
+        std::io::println("Length: {}", r1.len());
+    } // Shared borrows end here before moving v
+
+    // Transfer ownership (move)
+    process(v);
+
+    return 0;
+}

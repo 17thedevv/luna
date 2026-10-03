@@ -1,5 +1,6 @@
 import <vec>;
 import <string>;
+import <clone>;
 
 export module std {
     export module path {
@@ -176,6 +177,171 @@ export module std {
             return std::Option::None;
         }
         return std::Option::Some(make_string(input, dot + (1 as u64), len));
+    }
+
+    export fn file_stem(input: &std::String) -> std::Option<std::String> {
+        dec bytes = input.as_bytes();
+        dec len = input.len();
+        if len == (0 as u64) {
+            return std::Option::None;
+        }
+        if bytes[len - (1 as u64)] == (47 as u8) {
+            return std::Option::None;
+        }
+
+        dec rw start: u64 = 0 as u64;
+        dec rw i = len;
+        while i > (0 as u64) {
+            i = i - (1 as u64);
+            if bytes[i] == (47 as u8) {
+                start = i + (1 as u64);
+                break;
+            }
+        }
+
+        dec name_len = len - start;
+        if name_len == (1 as u64) && bytes[start] == (46 as u8) {
+            return std::Option::None;
+        }
+        if name_len == (2 as u64)
+            && bytes[start] == (46 as u8)
+            && bytes[start + (1 as u64)] == (46 as u8)
+        {
+            return std::Option::None;
+        }
+
+        dec rw dot = len;
+        dec rw j = len;
+        while j > start {
+            j = j - (1 as u64);
+            if bytes[j] == (46 as u8) {
+                dot = j;
+                break;
+            }
+        }
+
+        if dot <= start || dot == len {
+            return std::Option::Some(make_string(input, start, len));
+        }
+        return std::Option::Some(make_string(input, start, dot));
+    }
+
+    export fn is_absolute(input: &std::String) -> bool {
+        dec bytes = input.as_bytes();
+        dec len = input.len();
+        if len == (0 as u64) {
+            return false;
+        }
+        if bytes[0] == (47 as u8) || bytes[0] == (92 as u8) {
+            return true;
+        }
+        if len >= (3 as u64) {
+            dec c = bytes[0];
+            dec is_alpha = (c >= (65 as u8) && c <= (90 as u8)) || (c >= (97 as u8) && c <= (122 as u8));
+            if is_alpha && bytes[1] == (58 as u8) && (bytes[2] == (47 as u8) || bytes[2] == (92 as u8)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    export fn has_root(input: &std::String) -> bool {
+        return is_absolute(input);
+    }
+
+    export struct PathBuf {
+        private inner: std::String,
+    };
+
+    export fn path_buf_new() -> PathBuf {
+        return PathBuf {
+            inner: std::string_new(),
+        };
+    }
+
+    export fn path_buf_from(s: &std::String) -> PathBuf {
+        return PathBuf {
+            inner: (*s).clone(),
+        };
+    }
+
+    impl PathBuf {
+        export fn as_string(self: &Self) -> &std::String life_from(self) {
+            return &self.inner;
+        }
+
+        export fn to_string(self: &Self) -> std::String {
+            return self.inner.clone();
+        }
+
+        export fn is_empty(self: &Self) -> bool {
+            return self.inner.len() == (0 as u64);
+        }
+
+        export fn push(self: &rw Self, other: &std::String) {
+            self.inner = std::path::join(&self.inner, other);
+        }
+
+        export fn pop(self: &rw Self) -> bool {
+            dec p = std::path::parent(&self.inner);
+            match p {
+                std::Option::Some(parent_str) -> {
+                    self.inner = parent_str;
+                    return true;
+                },
+                std::Option::None -> {
+                    return false;
+                },
+            }
+        }
+
+        export fn file_name(self: &Self) -> std::Option<std::String> {
+            return std::path::file_name(&self.inner);
+        }
+
+        export fn file_stem(self: &Self) -> std::Option<std::String> {
+            return std::path::file_stem(&self.inner);
+        }
+
+        export fn extension(self: &Self) -> std::Option<std::String> {
+            return std::path::extension(&self.inner);
+        }
+
+        export fn parent(self: &Self) -> std::Option<PathBuf> {
+            dec p = std::path::parent(&self.inner);
+            match p {
+                std::Option::Some(s) -> {
+                    return std::Option::Some(PathBuf { inner: s });
+                },
+                std::Option::None -> {
+                    return std::Option::None;
+                },
+            }
+        }
+
+        export fn is_absolute(self: &Self) -> bool {
+            return std::path::is_absolute(&self.inner);
+        }
+
+        export fn join(self: &Self, other: &std::String) -> PathBuf {
+            return PathBuf {
+                inner: std::path::join(&self.inner, other),
+            };
+        }
+
+        export fn clone(self: &Self) -> PathBuf {
+            return PathBuf {
+                inner: self.inner.clone(),
+            };
+        }
+    }
+
+    impl std::Clone for PathBuf {
+        fn clone(self: &Self) -> Self {
+            return PathBuf {
+                inner: self.inner.clone(),
+            };
+        }
     }
 }
 }

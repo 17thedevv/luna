@@ -1,0 +1,34 @@
+struct Fields { byte: u8, pair: (u16, usize), bytes: [u8; 2], };
+fn byte_arg(value: u8) -> u8 { return value; }
+fn identity<T>(value: T) -> T { return value; }
+fn return_byte() -> u8 { return 255; }
+fn main() -> i32 {
+    dec rw byte: u8 = 72;
+    byte = 73;
+    dec index = 0usize;
+    dec bytes: [u8; 2] = [72, 0];
+    dec fields = Fields { byte: 42, pair: (65535, 0), bytes: [1, 2] };
+    if byte != 73u8 || bytes[0] != 72u8 || fields.byte != 42u8 { return 1; }
+    if byte_arg(255) != return_byte() || identity<u8>(72) != 72u8 { return 2; }
+    dec minimum = -9223372036854775808i64;
+    if minimum != ((-9223372036854775807i64) - 1i64) { return 3; }
+    dec big = 18446744073709551615u64;
+    if big != (0u64 - 1u64) { return 4; }
+    dec wide = 340282366920938463463374607431768211455u128;
+    if (wide >> 64u128) != 18446744073709551615u128 { return 5; }
+    dec signed_wide = -170141183460469231731687303715884105728i128;
+    if signed_wide != (-170141183460469231731687303715884105727i128 - 1i128) { return 6; }
+    if 0xffu8 != 255u8 || 0o377u16 != 255u16 || 0b1111_1111u32 != 255u32 { return 7; }
+    if (255u8 + 1u8) != 0u8 || (0u8 - 1u8) != 255u8 { return 8; }
+    dec i8_min: i8 = -128; dec i8_max = 127i8;
+    dec i16_min = -32768i16; dec i16_max: i16 = 32767;
+    dec i32_min = -2147483648; dec i32_max = 2147483647i32;
+    dec u16_max = 65535u16; dec u32_max = 4294967295u32;
+    dec isize_min = -9223372036854775808isize;
+    dec usize_max = 18446744073709551615usize;
+    if i8_min != -128i8 || i8_max != 127 || i16_min != -32768 || i16_max != 32767 { return 9; }
+    if i32_min != -2147483648i32 || i32_max != 2147483647 { return 10; }
+    if u16_max != 65535 || u32_max != 4294967295 { return 11; }
+    if isize_min != (-9223372036854775807isize - 1isize) || usize_max != (0usize - 1usize) { return 12; }
+    return index as i32;
+}

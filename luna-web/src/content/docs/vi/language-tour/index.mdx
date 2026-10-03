@@ -1,0 +1,57 @@
+---
+title: Khám phá ngôn ngữ Luna
+description: Tổng quan về cú pháp và các khái niệm cốt lõi của Luna.
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Biến & Kiểu dữ liệu" icon="seti:config">
+    Tìm hiểu về khai báo biến, tính bất biến và hệ thống kiểu dữ liệu của Luna.
+  </Card>
+  <Card title="Hàm & Phương thức" icon="seti:function">
+    Khai báo hàm, phương thức và closure.
+  </Card>
+  <Card title="Struct & Enum" icon="seti:json">
+    Định nghĩa kiểu do người dùng tạo và khớp mẫu (pattern matching).
+  </Card>
+  <Card title="Sở hữu & Vay mượn" icon="seti:lock">
+    Mô hình quản lý bộ nhớ an toàn độc đáo của Luna.
+  </Card>
+  <Card title="Trait & Generic" icon="seti:template">
+    Đa hình thông qua trait và generic monomorphize.
+  </Card>
+  <Card title="Module & Namespace" icon="seti:folder">
+    Tổ chức mã nguồn với import, export và không gian tên logic.
+  </Card>
+</CardGrid>
+
+## Ví dụ Nhanh
+
+```luna
+struct Counter {
+    value: i32,
+};
+
+impl Counter {
+    fn new() -> Counter {
+        return Counter { value: 0 };
+    }
+
+    fn increment(self: &rw Counter) {
+        self.value = self.value + 1;
+    }
+
+    fn get(self: &Counter) -> i32 {
+        return self.value;
+    }
+}
+
+fn main() -> i32 {
+    dec rw counter = Counter::new();
+    counter.increment();
+    counter.increment();
+    std::io::println("Đếm: {}", counter.get());
+    return 0;
+}
+```

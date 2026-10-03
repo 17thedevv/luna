@@ -1,0 +1,10 @@
+trait Supported {}
+
+impl Supported for i32 {}
+
+fn require_supported<T: Supported>(value: &T) {}
+
+fn main() {
+    dec values: [u8; 1] = [65 as u8];
+    require_supported(&values);
+}

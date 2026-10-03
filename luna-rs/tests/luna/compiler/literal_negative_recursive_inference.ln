@@ -1,0 +1,8 @@
+fn recursive() {
+    dec unconstrained = [];
+    recursive();
+}
+
+fn main() {
+    recursive();
+}

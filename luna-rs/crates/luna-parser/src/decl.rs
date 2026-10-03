@@ -357,50 +357,53 @@ impl<'a> Parser<'a> {
     ), ()> {
         let mut constraints = Vec::new();
         let mut anchors = Vec::new();
+        // Each requires group is a comma-separated list of struct contracts.
+        // Retain repeated groups for existing sources, but parse every entry
+        // identically so anchors and lifetime constraints can share one group.
         while self.match_token(TokenKind::KwRequires) {
-            if self.check(TokenKind::Identifier)
-                && self.get_token_text(self.peek().span) == "anchor"
-            {
-                self.advance();
-                self.consume(TokenKind::LParen, "Expected '(' after 'anchor'")?;
-                let field = self.consume(TokenKind::Identifier, "Expected direct raw-pointer field name in 'anchor(...)'")?;
-                let field_name = self.get_token_text(field.span).to_string();
-                self.consume(TokenKind::RParen, "Expected ')' after anchored field name")?;
-                self.consume(TokenKind::Equal, "Expected '=' after 'anchor(field)'")?;
-                self.consume(TokenKind::KwSelfVal, "Expected 'self' after 'anchor(field) ='")?;
-                anchors.push(luna_ast::RawStorageAnchorAst {
-                    field_name,
-                    span: field.span,
-                });
-                continue;
-            }
             loop {
-                let start_span = self.peek().span;
-                let lhs = self.parse_lifetime_target()?;
-
-                let is_gte = if self.match_token(TokenKind::GreaterThanEqual) {
-                    true
-                } else if self.match_token(TokenKind::LessThanEqual) {
-                    false
+                if self.check(TokenKind::Identifier)
+                    && self.get_token_text(self.peek().span) == "anchor"
+                {
+                    self.advance();
+                    self.consume(TokenKind::LParen, "Expected '(' after 'anchor'")?;
+                    let field = self.consume(TokenKind::Identifier, "Expected direct raw-pointer field name in 'anchor(...)'")?;
+                    let field_name = self.get_token_text(field.span).to_string();
+                    self.consume(TokenKind::RParen, "Expected ')' after anchored field name")?;
+                    self.consume(TokenKind::Equal, "Expected '=' after 'anchor(field)'")?;
+                    self.consume(TokenKind::KwSelfVal, "Expected 'self' after 'anchor(field) ='")?;
+                    anchors.push(luna_ast::RawStorageAnchorAst {
+                        field_name,
+                        span: field.span,
+                    });
                 } else {
-                    let span = self.peek().span;
-                    self.error_at_current("Expected '>=' or '<=' in lifetime constraint", span);
-                    return Err(());
-                };
+                    let start_span = self.peek().span;
+                    let lhs = self.parse_lifetime_target()?;
 
-                let rhs = self.parse_lifetime_target()?;
-                let (longer, shorter) = if is_gte {
-                    (lhs, rhs)
-                } else {
-                    (rhs, lhs)
-                };
-                let end_span = self.previous().span;
-                let constraint_span = Span::new(start_span.file_id, start_span.start, end_span.end);
-                constraints.push(luna_ast::LifetimeConstraintAst::new(
-                    longer,
-                    shorter,
-                    constraint_span,
-                ));
+                    let is_gte = if self.match_token(TokenKind::GreaterThanEqual) {
+                        true
+                    } else if self.match_token(TokenKind::LessThanEqual) {
+                        false
+                    } else {
+                        let span = self.peek().span;
+                        self.error_at_current("Expected '>=' or '<=' in lifetime constraint", span);
+                        return Err(());
+                    };
+
+                    let rhs = self.parse_lifetime_target()?;
+                    let (longer, shorter) = if is_gte {
+                        (lhs, rhs)
+                    } else {
+                        (rhs, lhs)
+                    };
+                    let end_span = self.previous().span;
+                    let constraint_span = Span::new(start_span.file_id, start_span.start, end_span.end);
+                    constraints.push(luna_ast::LifetimeConstraintAst::new(
+                        longer,
+                        shorter,
+                        constraint_span,
+                    ));
+                }
 
                 if !self.match_token(TokenKind::Comma) {
                     break;

@@ -1,0 +1,15 @@
+import "literal_provider";
+fn main() -> i32 {
+    dec bytes = literals::bytes();
+    if bytes[0] != b'A' || bytes[1] != 0 || bytes[2] != 255 || bytes[3] != b'\n' { return 1; }
+    if literals::maximum() != (0u128 - 1u128) { return 2; }
+    if literals::minimum() != (-170141183460469231731687303715884105727i128 - 1i128) { return 3; }
+    dec inferred: u8 = literals::identity(72);
+    if inferred != 72 || literals::byte(71) != 72 { return 4; }
+    dec wrapped = literals::envelope(73u8);
+    // A later comptime expression must not re-elaborate an imported generic
+    // body using its reconstructed export scope instead of its lexical scope.
+    dec size: i32 = comptime { sizeof(i32) };
+    if size != 4 || wrapped.value != 73u8 { return 5; }
+    return 0;
+}

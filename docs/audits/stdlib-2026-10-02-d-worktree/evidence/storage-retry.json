@@ -1,0 +1,17 @@
+[
+  {
+    "test": "test_ht5_resize_growth_and_relocation",
+    "timeout_seconds": 120,
+    "timeout": true
+  },
+  {
+    "test": "test_ht6_drop_tracker_stress_soundness",
+    "timeout_seconds": 120,
+    "timeout": true
+  },
+  {
+    "test": "test_ht7_source_vs_llib_parity",
+    "timeout_seconds": 120,
+    "exit": 0
+  }
+]

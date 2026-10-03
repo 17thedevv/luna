@@ -1,0 +1,6 @@
+struct Owner {
+    data: *rw u8,
+    other: *rw u16,
+} requires anchor(data) = self, anchor(other) = self, anchor(data) = self;
+
+fn main() {}

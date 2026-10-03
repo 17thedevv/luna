@@ -1,0 +1,7 @@
+fn cast_dynamic(value: u16) -> char {
+    return value as char;
+}
+
+fn main() -> i32 {
+    return cast_dynamic(55296 as u16) as i32;
+}

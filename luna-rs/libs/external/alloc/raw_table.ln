@@ -41,11 +41,29 @@ import <__lang_iterator>;
         if capacity == (0 as u64) {
             return raw_table_new<K, V>();
         }
+        if capacity > 4611686018427387904u64 {
+            __luna_panic_default();
+        }
         dec rw cap: u64 = 8 as u64;
         while cap < capacity {
+            if cap > 4611686018427387904u64 {
+                __luna_panic_default();
+            }
             cap = cap * (2 as u64);
         }
-        dec k_size = cap * (std::mem::size_of<K>() as u64);
+        dec k_elem = std::mem::size_of<K>() as u64;
+        dec v_elem = std::mem::size_of<V>() as u64;
+        if k_elem > (0 as u64) {
+            if cap > (18446744073709551615u64 / k_elem) {
+                __luna_panic_default();
+            }
+        }
+        if v_elem > (0 as u64) {
+            if cap > (18446744073709551615u64 / v_elem) {
+                __luna_panic_default();
+            }
+        }
+        dec k_size = cap * k_elem;
         dec k_align = std::mem::align_of<K>() as u64;
         dec v_size = cap * (std::mem::size_of<V>() as u64);
         dec v_align = std::mem::align_of<V>() as u64;
@@ -349,11 +367,27 @@ import <__lang_iterator>;
                 if self.len * (2 as u64) <= self.cap {
                     new_cap = self.cap;
                 } else {
+                    if self.cap > 4611686018427387904u64 {
+                        __luna_panic_default();
+                    }
                     new_cap = self.cap * (2 as u64);
                 }
             }
 
-            dec k_size = new_cap * (std::mem::size_of<K>() as u64);
+            dec k_elem = std::mem::size_of<K>() as u64;
+            dec v_elem = std::mem::size_of<V>() as u64;
+            if k_elem > (0 as u64) {
+                if new_cap > (18446744073709551615u64 / k_elem) {
+                    __luna_panic_default();
+                }
+            }
+            if v_elem > (0 as u64) {
+                if new_cap > (18446744073709551615u64 / v_elem) {
+                    __luna_panic_default();
+                }
+            }
+
+            dec k_size = new_cap * k_elem;
             dec k_align = std::mem::align_of<K>() as u64;
             dec v_size = new_cap * (std::mem::size_of<V>() as u64);
             dec v_align = std::mem::align_of<V>() as u64;
@@ -567,3 +601,5 @@ import <__lang_iterator>;
             return std::Option::None;
         }
     }
+
+extern fn __luna_panic_default();

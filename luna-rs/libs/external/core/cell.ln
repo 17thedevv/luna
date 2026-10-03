@@ -1,0 +1,144 @@
+import <ptr>;
+import <mem>;
+import <__lang_drop>;
+import <__lang_option>;
+
+export module std {
+    export struct Cell<T> {
+        private value: T,
+    };
+
+    export fn cell_new<T>(val: T) -> Cell<T> {
+        return Cell<T> { value: val };
+    }
+
+    impl<T> Cell<T> {
+        export fn set(self: &Self, val: T) {
+            dec p_imm = &self.value as *T;
+            dec p_mut = p_imm as *rw T;
+            unsafe {
+                *p_mut = val;
+            }
+        }
+
+        export fn get(self: &Self) -> T {
+            dec p_imm = &self.value as *T;
+            unsafe {
+                return *p_imm;
+            }
+        }
+
+        export fn replace(self: &Self, val: T) -> T {
+            dec p_imm = &self.value as *T;
+            dec p_mut = p_imm as *rw T;
+            unsafe {
+                dec old = *p_imm;
+                *p_mut = val;
+                return old;
+            }
+        }
+    }
+
+    export struct RefCell<T> {
+        private value: T,
+        private borrow: Cell<i64>,
+    };
+
+    export fn ref_cell_new<T>(val: T) -> RefCell<T> {
+        return RefCell<T> {
+            value: val,
+            borrow: cell_new<i64>(0 as i64),
+        };
+    }
+
+    export struct Ref<T> {
+        private ptr: *T,
+        private borrow: *Cell<i64>,
+    } requires anchor(ptr) = self;
+
+    impl<T> std::Drop for Ref<T> {
+        fn drop(self: &rw Self) {
+            if (self.borrow as u64) != (0 as u64) {
+                unsafe {
+                    dec cell = &*self.borrow;
+                    cell.set(cell.get() - (1 as i64));
+                }
+                self.borrow = 0 as u64 as *Cell<i64>;
+            }
+        }
+    }
+
+    impl<T> Ref<T> {
+        export fn as_ref(self: &Self) -> &T life_from(self) {
+            unsafe {
+                return &*self.ptr;
+            }
+        }
+    }
+
+    export struct RefMut<T> {
+        private ptr: *rw T,
+        private borrow: *Cell<i64>,
+    } requires anchor(ptr) = self;
+
+    impl<T> std::Drop for RefMut<T> {
+        fn drop(self: &rw Self) {
+            if (self.borrow as u64) != (0 as u64) {
+                unsafe {
+                    dec cell = &*self.borrow;
+                    cell.set(0 as i64);
+                }
+                self.borrow = 0 as u64 as *Cell<i64>;
+            }
+        }
+    }
+
+    impl<T> RefMut<T> {
+        export fn as_mut(self: &rw Self) -> &rw T life_from(self) {
+            unsafe {
+                return &rw *self.ptr;
+            }
+        }
+
+        export fn as_ref(self: &Self) -> &T life_from(self) {
+            unsafe {
+                return &*self.ptr;
+            }
+        }
+    }
+
+    impl<T> RefCell<T> {
+        export fn borrow(self: &Self) -> std::Option<Ref<T>> {
+            dec state = self.borrow.get();
+            if state < (0 as i64) {
+                return std::Option::None;
+            }
+            self.borrow.set(state + (1 as i64));
+            dec p = &self.value as *T;
+            dec b = &self.borrow as *Cell<i64>;
+            unsafe {
+                return std::Option::Some(Ref<T> {
+                    ptr: p,
+                    borrow: b,
+                });
+            }
+        }
+
+        export fn borrow_mut(self: &Self) -> std::Option<RefMut<T>> {
+            dec state = self.borrow.get();
+            if state != (0 as i64) {
+                return std::Option::None;
+            }
+            self.borrow.set(-1 as i64);
+            dec p_imm = &self.value as *T;
+            dec p_mut = p_imm as *rw T;
+            dec b = &self.borrow as *Cell<i64>;
+            unsafe {
+                return std::Option::Some(RefMut<T> {
+                    ptr: p_mut,
+                    borrow: b,
+                });
+            }
+        }
+    }
+}
