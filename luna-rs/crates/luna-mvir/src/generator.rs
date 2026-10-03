@@ -1,5 +1,5 @@
 use crate::mvir::*;
-use luna_ast::{AstArena, Item, Expr, Stmt, Decl};
+use luna_ast::{AstArena, Item, Expr, Stmt, Decl, AssignOp};
 use luna_semantic::SemanticContext;
 use std::collections::HashMap;
 
@@ -2406,14 +2406,45 @@ impl<'a> MvirGenerator<'a> {
                 }
                 Operand::Number("0".to_string())
             }
-            Expr::Assign { op: _, lvalue, value } => {
+            Expr::Assign { op, lvalue, value } => {
                 let ptr_op = self.generate_lvalue(lvalue);
                 let val_op = self.generate_expr(value);
                 let val_ty_id = self.ctx.tables.expr_types.get(value).copied().unwrap_or(luna_semantic::SemanticTypeId(0));
+                let lvalue_ty_id = self.get_expr_type(lvalue);
+                let store_ty_id = if lvalue_ty_id != luna_semantic::SemanticTypeId(0) {
+                    lvalue_ty_id
+                } else {
+                    val_ty_id
+                };
+
+                let final_val = match op {
+                    AssignOp::Assign => val_op,
+                    _ => {
+                        let current_val = self.push_inst(Instruction::Load {
+                            ptr: ptr_op.clone(),
+                        }, store_ty_id);
+                        let inst = match op {
+                            AssignOp::AddAssign => Instruction::Add { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::SubAssign => Instruction::Sub { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::MulAssign => Instruction::Mul { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::DivAssign => Instruction::Div { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::ModAssign => Instruction::Rem { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::BitAndAssign => Instruction::BitAnd { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::BitOrAssign => Instruction::BitOr { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::BitXorAssign => Instruction::BitXor { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::LShiftAssign => Instruction::Shl { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::RShiftAssign => Instruction::Shr { left: Operand::Value(current_val), right: val_op },
+                            AssignOp::Assign => unreachable!(),
+                        };
+                        let res_val = self.push_inst(inst, store_ty_id);
+                        Operand::Value(res_val)
+                    }
+                };
+
                 self.push_inst_span(Instruction::Store {
                     ptr: ptr_op,
-                    value: val_op,
-                }, val_ty_id, self.extract_expr_span(expr_id));
+                    value: final_val,
+                }, store_ty_id, self.extract_expr_span(expr_id));
                 Operand::Number("0".to_string())
             }
             Expr::StructInit { fields, .. } => {
