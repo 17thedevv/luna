@@ -1,0 +1,83 @@
+---
+title: Module & Không gian tên
+description: Tổ chức mã nguồn với hệ thống module phân tầng độc lập trong Luna.
+---
+
+## Provider và Không gian tên (Namespace)
+
+Luna phân tách rạch ròi giữa **artifact provider** và **module namespace**:
+- `import` chọn một **provider** (`import <alloc>;` hoặc `import "math";`)
+- `module` định nghĩa một **không gian tên (namespace)** bên trong một provider
+- `::` dùng để truy xuất các định danh bên trong một namespace (`math::add(1, 2)`)
+- `using <path> as <alias>;` tạo bí danh không gian tên cục bộ
+
+### Xuất định danh từ Provider
+
+```luna
+// Trong tệp math.ln (provider = "math")
+export fn add(a: i32, b: i32) -> i32 {
+    return a + b;
+}
+
+export fn multiply(a: i32, b: i32) -> i32 {
+    return a * b;
+}
+
+const SECRET = 42;  // Mặc định là private (nội bộ)
+```
+
+## Nạp Provider với `import`
+
+```luna
+import "math";
+
+fn main() -> i32 {
+    dec result = math::add(1, 2);
+    std::io::println("Kết quả: {}", result);
+    return 0;
+}
+```
+
+## Tạo bí danh Namespace với `using`
+
+```luna
+import "math";
+import <alloc>;
+
+// Tạo bí danh cục bộ cho namespace
+using math as m;
+using std::collections as col;
+
+fn main() -> i32 {
+    dec result = m::add(1, 2) * m::multiply(3, 4);
+    dec map = col::HashMap<str, i32>::new();
+    return result;
+}
+```
+
+## Khả năng hiển thị (`export`)
+
+Mọi định danh trong Luna **mặc định là private**. Sử dụng từ khóa `export` để công khai cho các provider khác truy cập:
+
+```luna
+export fn public_function() { }        // Công khai
+fn private_helper() { }                // Nội bộ trong file này
+
+export struct PublicStruct {
+    export name: str,                  // Trường công khai
+    id: u64,                           // Trường nội bộ
+};
+
+struct PrivateStruct { };              // Struct nội bộ
+```
+
+## Các Provider Thư viện chuẩn
+
+Thư viện chuẩn của Luna được module hóa thành các provider độc lập:
+
+```luna
+import <core>;        // Kiểu nền tảng, kiểu nguyên thủy, core traits
+import <alloc>;       // std::Vec, std::String, std::Box, collections
+import <io>;          // File, terminal, stream I/O
+import <net>;         // Socket, giao tiếp mạng TCP/UDP
+```

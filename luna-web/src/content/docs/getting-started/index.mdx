@@ -1,0 +1,137 @@
+---
+title: Getting Started
+description: Install Luna and write your first program in under 5 minutes.
+---
+
+import { Tabs, TabItem, Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+## Prerequisites
+
+Before installing Luna, ensure you have the following tools:
+
+| Tool | Purpose | Install |
+|------|---------|---------|
+| **Rust** (1.75+) | Building the compiler from source | [rustup.rs](https://rustup.rs/) |
+| **LLVM 17+** | Backend code generation | [llvm.org](https://llvm.org/) |
+| **Clang** | Linking native binaries | Included with LLVM |
+| **Git** | Cloning the repository | [git-scm.com](https://git-scm.com/) |
+
+## Installation
+
+<Tabs>
+  <TabItem label="Linux / macOS">
+    ```bash
+    # Clone the repository
+    git clone https://github.com/17thedevv/luna.git
+    cd luna/luna-rs
+
+    # Build in release mode
+    cargo build --release
+
+    # Add to PATH (optional)
+    export PATH="$PWD/target/release:$PATH"
+
+    # Verify installation
+    luna --version
+    ```
+  </TabItem>
+  <TabItem label="Windows">
+    ```powershell
+    # Clone the repository
+    git clone https://github.com/17thedevv/luna.git
+    cd luna\luna-rs
+
+    # Build in release mode
+    cargo build --release
+
+    # Add to PATH (optional)
+    $env:PATH = "$PWD\target\release;$env:PATH"
+
+    # Verify installation
+    luna --version
+    ```
+  </TabItem>
+</Tabs>
+
+<Aside type="tip">
+  **Tip:** Building in release mode (`--release`) produces a significantly faster compiler binary. Development builds are fine for testing but noticeably slower on larger programs.
+</Aside>
+
+## Your First Program
+
+Create a file called `hello.ln`:
+
+```luna
+fn main() -> i32 {
+    dec name = "Luna";
+    std::io::println("Hello from {}! 🌙", name);
+
+    dec numbers = [1, 2, 3, 4, 5];
+    dec rw sum: i32 = 0;
+    for n in &numbers {
+        sum = sum + *n;
+    }
+    std::io::println("Sum: {}", sum);
+
+    return 0;
+}
+```
+
+### Compile and Run
+
+```bash
+# Compile and run in one step
+luna run hello.ln
+
+# Or compile separately
+luna build hello.ln -o hello
+./hello
+```
+
+### Expected Output
+
+```
+Hello from Luna! 🌙
+Sum: 15
+```
+
+## Understanding the Code
+
+| Element | Meaning |
+|---------|---------|
+| `fn main() -> i32` | Entry point function returning an exit code |
+| `dec name = "Luna"` | Immutable variable declaration with type inference |
+| `dec rw sum: i32 = 0` | Rewritable (mutable) variable with explicit type annotation |
+| `&numbers` | Borrowing — shared reference to the array |
+| `*n` | Dereferencing to get the value |
+| `std::io::println(...)` | Standard library formatted output |
+| `return 0` | Explicit return (0 = success) |
+
+<Aside type="note">
+  In Luna, variables are **immutable by default**. Use `rw` (rewritable) when you need to mutate a binding: `dec rw count = 0;`. This design prevents accidental mutations and ensures data race freedom at compile time.
+</Aside>
+
+## Next Steps
+
+<CardGrid>
+  <Card title="Language Tour" icon="open-book">
+    Comprehensive walkthrough of Luna's syntax, types, ownership model, traits, and modules.
+
+    [Start the Tour →](/language-tour/)
+  </Card>
+  <Card title="Standard Library" icon="document">
+    Explore Vec, String, Option, Result, HashMap, I/O, and other foundational types.
+
+    [Browse Stdlib →](/stdlib/)
+  </Card>
+  <Card title="Syntax Reference" icon="information">
+    Complete reference for all keywords, operators, and language constructs.
+
+    [View Reference →](/reference/syntax/)
+  </Card>
+  <Card title="Roadmap" icon="star">
+    See what's coming — macros, comptime, WebAssembly, and more.
+
+    [View Roadmap →](/roadmap/)
+  </Card>
+</CardGrid>

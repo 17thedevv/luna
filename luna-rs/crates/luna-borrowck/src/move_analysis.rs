@@ -562,7 +562,7 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                                         self.diagnostics.push(diag);
                                     }
                                 }
-                                if loc_state == MoveState::Moved || loc_state == MoveState::Dropped || loc_state == MoveState::Uninitialized {
+                                if loc_state == MoveState::Moved || loc_state == MoveState::Dropped || loc_state == MoveState::Uninitialized || loc_state == MoveState::PartialMoved {
                                     self.dead_drops.insert(val_id);
                                 }
                             }

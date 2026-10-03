@@ -57,5 +57,48 @@ export module std {
             return old;
         }
     }
+
+    export struct Layout {
+        private size_: u64,
+        private align_: u64,
+    };
+
+    export fn layout_for_type<T>() -> Layout {
+        return Layout {
+            size_: size_of<T>(),
+            align_: align_of<T>(),
+        };
+    }
+
+    export fn layout_from_size_align_unchecked(size: u64, align: u64) -> Layout {
+        return Layout {
+            size_: size,
+            align_: align,
+        };
+    }
+
+    export fn layout_is_valid_align(align: u64) -> bool {
+        if align == (0 as u64) {
+            return false;
+        }
+        return (align & (align - (1 as u64))) == (0 as u64);
+    }
+
+    impl Layout {
+        export fn size(self: &Self) -> u64 {
+            return self.size_;
+        }
+
+        export fn align(self: &Self) -> u64 {
+            return self.align_;
+        }
+
+        export fn is_valid(self: &Self) -> bool {
+            if self.align_ == (0 as u64) {
+                return false;
+            }
+            return (self.align_ & (self.align_ - (1 as u64))) == (0 as u64);
+        }
+    }
 }
 }

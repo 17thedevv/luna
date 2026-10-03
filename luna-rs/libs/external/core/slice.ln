@@ -36,9 +36,13 @@ export module std {
             if (self.ptr as u64) >= (self.end as u64) {
                 return std::Option::None;
             }
+            dec rw step: u64 = sizeof(T) as u64;
+            if step == (0 as u64) {
+                step = 1 as u64;
+            }
             unsafe {
-                self.ptr = (self.ptr as u64 + (sizeof(T) as u64)) as *T;
-                dec item_ptr = (self.ptr as u64 - (sizeof(T) as u64)) as *T;
+                self.ptr = (self.ptr as u64 + step) as *T;
+                dec item_ptr = (self.ptr as u64 - step) as *T;
                 return std::Option::Some(&*item_ptr);
             }
         }
@@ -47,13 +51,17 @@ export module std {
     // ITER-9: Item is &T (borrowed reference, not owned value)
     impl<T> std::Iterator<&T> for SliceIter<T> {
         fn next(self: &rw Self) -> std::Option<&T> life_from(self) {
-            if (self.ptr as u64) >= (self.end as u64) {
-                return std::Option::None;
-            }
+            return self.next_ref();
+        }
+    }
+    
+    impl<T> std::Clone for SliceIter<T> {
+        fn clone(self: &Self) -> Self {
             unsafe {
-                self.ptr = (self.ptr as u64 + (sizeof(T) as u64)) as *T;
-                dec item_ptr = (self.ptr as u64 - (sizeof(T) as u64)) as *T;
-                return std::Option::Some(&*item_ptr);
+                return SliceIter<T> {
+                    ptr: self.ptr,
+                    end: self.end,
+                };
             }
         }
     }
@@ -69,9 +77,13 @@ export module std {
             if (self.ptr as u64) >= (self.end as u64) {
                 return std::Option::None;
             }
+            dec rw step: u64 = sizeof(T) as u64;
+            if step == (0 as u64) {
+                step = 1 as u64;
+            }
             unsafe {
-                self.ptr = (self.ptr as u64 + (sizeof(T) as u64)) as *rw T;
-                dec item_ptr = (self.ptr as u64 - (sizeof(T) as u64)) as *rw T;
+                self.ptr = (self.ptr as u64 + step) as *rw T;
+                dec item_ptr = (self.ptr as u64 - step) as *rw T;
                 return std::Option::Some(&rw *item_ptr);
             }
         }
@@ -79,19 +91,16 @@ export module std {
     
     impl<T> std::Iterator<&rw T> for SliceIterMut<T> {
         fn next(self: &rw Self) -> std::Option<&rw T> life_from(self) {
-            if (self.ptr as u64) >= (self.end as u64) {
-                return std::Option::None;
-            }
-            unsafe {
-                self.ptr = (self.ptr as u64 + (sizeof(T) as u64)) as *rw T;
-                dec item_ptr = (self.ptr as u64 - (sizeof(T) as u64)) as *rw T;
-                return std::Option::Some(&rw *item_ptr);
-            }
+            return self.next_mut();
         }
     }
     
     export fn slice_iter<T>(s: &[T]) -> SliceIter<T> life_from(s) {
-        dec end_ptr = (s.data as u64 + (s.len as u64 * (sizeof(T) as u64))) as *T;
+        dec rw step: u64 = sizeof(T) as u64;
+        if step == (0 as u64) {
+            step = 1 as u64;
+        }
+        dec end_ptr = (s.data as u64 + (s.len as u64 * step)) as *T;
         unsafe {
             return SliceIter<T> {
                 ptr: s.data as *T,
@@ -101,7 +110,11 @@ export module std {
     }
     
     export fn slice_iter_mut<T>(s: &rw [T]) -> SliceIterMut<T> life_from(s) {
-        dec end_ptr = (s.data as u64 + (s.len as u64 * (sizeof(T) as u64))) as *rw T;
+        dec rw step: u64 = sizeof(T) as u64;
+        if step == (0 as u64) {
+            step = 1 as u64;
+        }
+        dec end_ptr = (s.data as u64 + (s.len as u64 * step)) as *rw T;
         unsafe {
             return SliceIterMut<T> {
                 ptr: s.data as *rw T,
@@ -636,6 +649,73 @@ export fn slice_sort<T: std::Ord>(s: &rw [T]) {
     dec depth_limit = (2 as u64) * floor_log2(slen);
     introsort_ord_rec<T>(s.data as *rw T, 0 as u64, slen, depth_limit);
 }
+
+// Linear search for an element in a slice
+export fn slice_contains<T: std::Eq>(s: &[T], value: &T) -> bool {
+    dec slen = s.len as u64;
+    dec rw i: u64 = 0 as u64;
+    while i < slen {
+        if s[i].eq(value) {
+            return true;
+        }
+        i = i + (1 as u64);
+    }
+    return false;
+}
+
+// Binary search on a sorted slice
+export fn slice_binary_search<T: std::Ord>(s: &[T], value: &T) -> std::Option<u64> {
+    dec slen = s.len as u64;
+    if slen == (0 as u64) {
+        return std::Option::None;
+    }
+    dec rw lo: u64 = 0 as u64;
+    dec rw hi: u64 = slen;
+    while lo < hi {
+        dec mid = lo + ((hi - lo) / (2 as u64));
+        dec cmp_res = s[mid].cmp(value);
+        if cmp_res == 0 {
+            return std::Option::Some(mid);
+        } else if cmp_res < 0 {
+            lo = mid + (1 as u64);
+        } else {
+            hi = mid;
+        }
+    }
+    return std::Option::None;
+}
+
+// Check if slice starts with the given prefix
+export fn slice_starts_with<T: std::Eq>(s: &[T], prefix: &[T]) -> bool {
+    dec s_len = s.len as u64;
+    dec p_len = prefix.len as u64;
+    if p_len > s_len { return false; }
+    dec rw i: u64 = 0 as u64;
+    while i < p_len {
+        if s[i].eq(&prefix[i]) == false {
+            return false;
+        }
+        i = i + (1 as u64);
+    }
+    return true;
+}
+
+// Check if slice ends with the given suffix
+export fn slice_ends_with<T: std::Eq>(s: &[T], suffix: &[T]) -> bool {
+    dec s_len = s.len as u64;
+    dec suf_len = suffix.len as u64;
+    if suf_len > s_len { return false; }
+    dec offset = s_len - suf_len;
+    dec rw i: u64 = 0 as u64;
+    while i < suf_len {
+        if s[offset + i].eq(&suffix[i]) == false {
+            return false;
+        }
+        i = i + (1 as u64);
+    }
+    return true;
+}
+
 
 // Generic slice copy for std::Copy types
 export fn slice_copy_from_slice<T: std::Copy>(dst: &rw [T], src: &[T]) {

@@ -1,9 +1,214 @@
 extern fn __luna_panic_default() -> !;
 
 export extern fn __luna_panic() -> !;
+export extern fn __luna_backtrace_capture(frames: *rw *void, max_frames: u32) -> u32;
 
 export module std {
-export fn panic() -> ! {
-    __luna_panic_default();
+    export fn panic() -> ! {
+        __luna_panic_default();
+    }
+
+    export struct Backtrace {
+        private count: u32,
+    };
+
+    export fn backtrace_capture() -> Backtrace {
+        dec rw dummy: *void = 0 as u64 as *void;
+        dec count = __luna_backtrace_capture(&rw dummy, 32 as u32);
+        return Backtrace { count: count };
+    }
+
+    impl Backtrace {
+        export fn capture() -> Backtrace {
+            return backtrace_capture();
+        }
+
+        export fn frame_count(self: &Self) -> u32 {
+            return self.count;
+        }
+
+        export fn is_empty(self: &Self) -> bool {
+            return self.count == (0 as u32);
+        }
+    }
+
+    export macro assert {
+        (@cond: expr) => {
+            if (@cond) == false {
+                std::panic();
+            }
+        }
+        (@cond: expr, @msg: expr) => {
+            if (@cond) == false {
+                std::panic();
+            }
+        }
+    }
+
+    export macro assert_eq {
+        (@left: expr, @right: expr) => {
+            if (@left) != (@right) {
+                std::panic();
+            }
+        }
+    }
+
+    export macro assert_ne {
+        (@left: expr, @right: expr) => {
+            if (@left) == (@right) {
+                std::panic();
+            }
+        }
+    }
+
+    export macro todo {
+        () => {
+            std::panic()
+        }
+        (@msg: expr) => {
+            std::panic()
+        }
+    }
+
+    export macro unimplemented {
+        () => {
+            std::panic()
+        }
+        (@msg: expr) => {
+            std::panic()
+        }
+    }
+
+    export macro unreachable {
+        () => {
+            std::panic()
+        }
+        (@msg: expr) => {
+            std::panic()
+        }
+    }
+
+    export macro debug_assert {
+        (@cond: expr) => {
+            if (@cond) == false {
+                std::panic();
+            }
+        }
+        (@cond: expr, @msg: expr) => {
+            if (@cond) == false {
+                std::panic();
+            }
+        }
+    }
+
+    export macro debug_assert_eq {
+        (@left: expr, @right: expr) => {
+            if (@left) != (@right) {
+                std::panic();
+            }
+        }
+    }
+
+    export macro debug_assert_ne {
+        (@left: expr, @right: expr) => {
+            if (@left) == (@right) {
+                std::panic();
+            }
+        }
+    }
 }
+
+export macro assert {
+    (@cond: expr) => {
+        if (@cond) == false {
+            std::panic();
+        }
+    }
+    (@cond: expr, @msg: expr) => {
+        if (@cond) == false {
+            std::panic();
+        }
+    }
 }
+
+export macro assert_eq {
+    (@left: expr, @right: expr) => {
+        if (@left) != (@right) {
+            std::panic();
+        }
+    }
+}
+
+export macro assert_ne {
+    (@left: expr, @right: expr) => {
+        if (@left) == (@right) {
+            std::panic();
+        }
+    }
+}
+
+export macro todo {
+    () => {
+        std::panic()
+    }
+    (@msg: expr) => {
+        std::panic()
+    }
+}
+
+export macro unimplemented {
+    () => {
+        std::panic()
+    }
+    (@msg: expr) => {
+        std::panic()
+    }
+}
+
+export macro panic {
+    () => {
+        std::panic()
+    }
+    (@msg: expr) => {
+        std::panic()
+    }
+}
+
+export macro unreachable {
+    () => {
+        std::panic()
+    }
+    (@msg: expr) => {
+        std::panic()
+    }
+}
+
+export macro debug_assert {
+    (@cond: expr) => {
+        if (@cond) == false {
+            std::panic();
+        }
+    }
+    (@cond: expr, @msg: expr) => {
+        if (@cond) == false {
+            std::panic();
+        }
+    }
+}
+
+export macro debug_assert_eq {
+    (@left: expr, @right: expr) => {
+        if (@left) != (@right) {
+            std::panic();
+        }
+    }
+}
+
+export macro debug_assert_ne {
+    (@left: expr, @right: expr) => {
+        if (@left) == (@right) {
+            std::panic();
+        }
+    }
+}
+

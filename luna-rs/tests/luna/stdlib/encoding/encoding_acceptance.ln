@@ -1,0 +1,170 @@
+import <io>;
+import <encoding>;
+import <vec>;
+import <string>;
+import <result>;
+
+fn test_hex() -> i32 {
+    // Test 1: encode [0xde, 0xad, 0xbe, 0xef] -> "deadbeef"
+    dec data: [u8; 4] = [222 as u8, 173 as u8, 190 as u8, 239 as u8];
+    dec h = std::hex_encode(&data);
+    dec h_bytes = h.as_bytes();
+    if h_bytes.len != (8 as usize) {
+        return 1;
+    }
+    // "deadbeef" = [100, 101, 97, 100, 98, 101, 101, 102]
+    if h_bytes[0] != (100 as u8) || h_bytes[1] != (101 as u8) || h_bytes[2] != (97 as u8) || h_bytes[3] != (100 as u8) {
+        return 2;
+    }
+    if h_bytes[4] != (98 as u8) || h_bytes[5] != (101 as u8) || h_bytes[6] != (101 as u8) || h_bytes[7] != (102 as u8) {
+        return 3;
+    }
+
+    // Test 2: upper encode -> "DEADBEEF"
+    dec hu = std::hex_encode_upper(&data);
+    dec hu_bytes = hu.as_bytes();
+    // 'D'=68, 'E'=69, 'A'=65, 'D'=68, 'B'=66, 'E'=69, 'E'=69, 'F'=70
+    if hu_bytes[0] != (68 as u8) || hu_bytes[1] != (69 as u8) || hu_bytes[2] != (65 as u8) || hu_bytes[3] != (68 as u8) {
+        return 4;
+    }
+
+    // Test 3: decode "deadbeef"
+    dec decoded_res = std::hex_decode(h_bytes);
+    if decoded_res.is_err() {
+        return 5;
+    }
+    dec decoded = decoded_res.ok().unwrap();
+    if decoded.len() != (4 as u64) {
+        return 6;
+    }
+    dec slice = decoded.as_slice();
+    if slice[0] != (222 as u8) || slice[1] != (173 as u8) || slice[2] != (190 as u8) || slice[3] != (239 as u8) {
+        return 7;
+    }
+
+    // Test 4: decode uppercase "DEADBEEF"
+    dec dec_upper_res = std::hex_decode(hu_bytes);
+    if dec_upper_res.is_err() {
+        return 8;
+    }
+    dec dec_upper = dec_upper_res.ok().unwrap();
+    if dec_upper.as_slice()[0] != (222 as u8) {
+        return 9;
+    }
+
+    // Test 5: decode invalid length (odd number of hex digits)
+    dec odd_input: [u8; 3] = [100 as u8, 101 as u8, 97 as u8];
+    dec odd_res = std::hex_decode(&odd_input);
+    if odd_res.is_ok() {
+        return 10;
+    }
+
+    // Test 6: decode invalid character ('z' = 122)
+    dec invalid_char: [u8; 2] = [122 as u8, 101 as u8];
+    dec inv_res = std::hex_decode(&invalid_char);
+    if inv_res.is_ok() {
+        return 11;
+    }
+
+    return 0;
+}
+
+fn test_base64() -> i32 {
+    // Test RFC 4648 test vectors:
+    // "" -> ""
+    dec rw empty_vec = std::vec_new<u8>();
+    dec b_empty = std::base64_encode(empty_vec.as_slice());
+    if b_empty.as_bytes().len != (0 as usize) {
+        return 20;
+    }
+
+    // "f" (102) -> "Zg=="
+    dec f_data: [u8; 1] = [102 as u8];
+    dec f_enc = std::base64_encode(&f_data);
+    dec f_bytes = f_enc.as_bytes();
+    // "Zg==" = [90, 103, 61, 61]
+    if f_bytes.len != (4 as usize) || f_bytes[0] != (90 as u8) || f_bytes[1] != (103 as u8) || f_bytes[2] != (61 as u8) || f_bytes[3] != (61 as u8) {
+        return 21;
+    }
+
+    // "fo" (102, 111) -> "Zm8="
+    dec fo_data: [u8; 2] = [102 as u8, 111 as u8];
+    dec fo_enc = std::base64_encode(&fo_data);
+    dec fo_bytes = fo_enc.as_bytes();
+    // "Zm8=" = [90, 109, 56, 61]
+    if fo_bytes.len != (4 as usize) || fo_bytes[0] != (90 as u8) || fo_bytes[1] != (109 as u8) || fo_bytes[2] != (56 as u8) || fo_bytes[3] != (61 as u8) {
+        return 22;
+    }
+
+    // "foo" (102, 111, 111) -> "Zm9v"
+    dec foo_data: [u8; 3] = [102 as u8, 111 as u8, 111 as u8];
+    dec foo_enc = std::base64_encode(&foo_data);
+    dec foo_bytes = foo_enc.as_bytes();
+    // "Zm9v" = [90, 109, 57, 118]
+    if foo_bytes.len != (4 as usize) || foo_bytes[0] != (90 as u8) || foo_bytes[1] != (109 as u8) || foo_bytes[2] != (57 as u8) || foo_bytes[3] != (118 as u8) {
+        return 23;
+    }
+
+    // Decode "Zm9v" -> "foo"
+    dec foo_dec_res = std::base64_decode(foo_bytes);
+    if foo_dec_res.is_err() {
+        return 24;
+    }
+    dec foo_dec = foo_dec_res.ok().unwrap();
+    if foo_dec.len() != (3 as u64) || foo_dec.as_slice()[0] != (102 as u8) || foo_dec.as_slice()[1] != (111 as u8) || foo_dec.as_slice()[2] != (111 as u8) {
+        return 25;
+    }
+
+    // Decode "Zm8=" -> "fo"
+    dec fo_dec_res = std::base64_decode(fo_bytes);
+    if fo_dec_res.is_err() {
+        return 26;
+    }
+    dec fo_dec = fo_dec_res.ok().unwrap();
+    if fo_dec.len() != (2 as u64) || fo_dec.as_slice()[0] != (102 as u8) || fo_dec.as_slice()[1] != (111 as u8) {
+        return 27;
+    }
+
+    // Decode "Zg==" -> "f"
+    dec f_dec_res = std::base64_decode(f_bytes);
+    if f_dec_res.is_err() {
+        return 28;
+    }
+    dec f_dec = f_dec_res.ok().unwrap();
+    if f_dec.len() != (1 as u64) || f_dec.as_slice()[0] != (102 as u8) {
+        return 29;
+    }
+
+    // URL-safe test: bytes [251, 239] -> standard is "++8=", url-safe is "--8="
+    dec url_test: [u8; 2] = [251 as u8, 239 as u8];
+    dec url_enc = std::base64_url_encode(&url_test);
+    dec url_bytes = url_enc.as_bytes();
+    // '-' = 45
+    if url_bytes[0] != (45 as u8) || url_bytes[1] != (45 as u8) {
+        return 30;
+    }
+    dec url_dec_res = std::base64_url_decode(url_bytes);
+    if url_dec_res.is_err() {
+        return 31;
+    }
+    dec url_dec = url_dec_res.ok().unwrap();
+    if url_dec.len() != (2 as u64) || url_dec.as_slice()[0] != (251 as u8) || url_dec.as_slice()[1] != (239 as u8) {
+        return 32;
+    }
+
+    return 0;
+}
+
+export fn main() -> i32 {
+    dec hex_code = test_hex();
+    if hex_code != 0 {
+        return hex_code;
+    }
+
+    dec b64_code = test_base64();
+    if b64_code != 0 {
+        return b64_code;
+    }
+
+    return 0;
+}

@@ -1,0 +1,37 @@
+struct Counter { value: u8, };
+struct Container<T> { value: T, };
+enum Parcel<T> { One(T), Two(T, u8), }
+impl Counter {
+    fn add(self: &Counter, value: u8) -> u8 { return self.value + value; }
+}
+fn identity<T>(value: T) -> T { return value; }
+fn observe(value: &u8) -> u8 { return *value; }
+fn tail() -> u8 { 255 }
+fn countdown(value: u8) -> u8 {
+    if value == 0 { return 72; }
+    return countdown(value - 1);
+}
+fn main() -> i32 {
+    dec counter = Counter { value: 70 };
+    dec inferred: u8 = identity(72);
+    dec sum: u8 = 70 + 2;
+    dec scoped: u8 = comptime { dec untyped = 72; dec typed: i32 = untyped; 72 };
+    if counter.add(2) != 72 || inferred != 72 || sum != 72 { return 1; }
+    if 72 != inferred || inferred + 1 != 73 || 1 + inferred != 73 { return 2; }
+    if tail() != 255 || scoped != 72 { return 3; }
+    dec selected: u8 = match inferred { 0x48u8 -> 72, _ -> 0 };
+    if selected != 72 { return 4; }
+    dec container: Container<u8> = Container { value: 72 };
+    dec option: std::Option<u8> = std::Option::Some(72);
+    dec from_option: u8 = match option { std::Option::Some(value) -> value, _ -> 0 };
+    if container.value != 72 || from_option != 72 { return 5; }
+    if observe(&72) != 72 { return 6; }
+    dec parcel: Parcel<(u8, u16)> = Parcel::One((72, 500));
+    dec check_parcel: u8 = match parcel { Parcel::One(pair) -> pair.0, _ -> 0 };
+    if check_parcel != 72 { return 7; }
+    dec two: Parcel<u16> = Parcel::Two(500, 72);
+    dec check_two: u8 = match two { Parcel::Two(wide, small) -> small, _ -> 0 };
+    if check_two != 72 { return 8; }
+    if countdown(3) != 72 { return 9; }
+    return 0;
+}

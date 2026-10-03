@@ -1,0 +1,100 @@
+---
+title: Lộ trình phát triển
+description: Lộ trình phát triển ngôn ngữ Luna — trạng thái hiện tại, tính năng dự kiến và tầm nhìn tương lai.
+---
+
+import { Card, CardGrid, Aside } from '@astrojs/starlight/components';
+
+## Trạng thái hiện tại
+
+Luna đang trong giai đoạn **phát triển tích cực** với toàn bộ pipeline trình biên dịch hoàn chỉnh, sinh mã máy tối ưu qua LLVM và một thư viện chuẩn đang mở rộng nhanh chóng.
+
+<Aside type="note">
+  Luna là ngôn ngữ nghiên cứu và ứng dụng hệ thống đang được phát triển mạnh mẽ. Cú pháp và API có thể tiếp tục hoàn thiện. Mọi đóng góp và phản hồi từ cộng đồng đều được chào đón!
+</Aside>
+
+## Bảng tính năng
+
+### ✅ Ổn định & Đã triển khai
+
+| Tính năng | Chi tiết |
+|-----------|----------|
+| Khai báo biến | `dec`, `const`, suy luận kiểu, sửa đổi khả ghi `rw` (rewritable) |
+| Kiểu nguyên thủy | `i8`–`i128`, `u8`–`u128`, `f32`, `f64`, `bool`, `char`, `str`, `void` |
+| Hàm | Hàm có tên, phương thức, đệ quy, tham số `self` tường minh |
+| Struct | Trường có tên, generic struct, triển khai method, hợp đồng lifetime |
+| Enum | Variant enum, enum mang dữ liệu liên kết, generic enum |
+| Trait | Khai báo trait, triển khai method mặc định, ràng buộc trait bound |
+| Generic | Monomorphization tĩnh, generic struct/function/trait, trait bounds |
+| Quyền sở hữu (Ownership) | Ngữ nghĩa di chuyển (move), nguyên tắc chủ sở hữu duy nhất, RAII |
+| Vay mượn (Borrowing) | Tham chiếu chia sẻ (`&T`), tham chiếu khả ghi (`&rw T`) |
+| Thời gian sống (Lifetimes) | Chú giải lifetime, ràng buộc `requires life(...) >= life(...)` |
+| Khớp mẫu (Pattern Matching) | Biểu thức `match` (`->`), phân rã cấu trúc, kiểm tra vét cạn |
+| Con trỏ thô | `*T`, `*rw T`, thao tác con trỏ trong khối unsafe |
+| FFI | Khối `extern`, tương tác trực tiếp nhị phân qua C ABI |
+| Bất đồng bộ (Async/Await) | `async fn`, biểu thức hậu tố `.await` |
+| Module | `import` (chọn provider), độ hiển thị `export`, truy cập `::` |
+| Trait Object | Điều phối động (dynamic dispatch) qua bảng vtable |
+| Backend LLVM | Sinh mã máy native tối ưu hoàn chỉnh |
+
+### 🔄 Đang triển khai
+
+| Tính năng | Trạng thái | Ghi chú |
+|-----------|------------|---------|
+| Closure | Đang hoàn thiện | Closure bắt ngữ cảnh với ngữ nghĩa quyền sở hữu |
+| Mở rộng Thư viện chuẩn | Tích cực | Thêm cấu trúc dữ liệu, thuật toán và tiện ích I/O |
+| Thông báo lỗi | Nâng cấp | Báo cáo chi tiết vị trí mã nguồn và gợi ý sửa lỗi trực quan |
+| Biên dịch Incremental | Ban đầu | Cache artifact dựa trên xác thực định danh (identity validation) |
+
+### 🗓️ Kế hoạch tiếp theo
+
+| Tính năng | Ưu tiên | Mô tả |
+|-----------|---------|-------|
+| Macro | Cao | Hệ thống macro khai báo phục vụ siêu lập trình (metaprogramming) |
+| Comptime | Cao | Đánh giá hàm và sinh mã lúc biên dịch |
+| Đích WASM | Trung bình | Biên dịch sang WebAssembly chạy trên trình duyệt và edge computing |
+| Online Playground | Trung bình | Môi trường REPL và trình biên dịch tương tác trực tuyến |
+| VS Code Extension | Trung bình | Highlight cú pháp, chuẩn đoán lỗi và gợi ý mã thông minh |
+| Quản lý gói (`mpm`) | Trung bình | Giải quyết phụ thuộc, lưu bộ đệm artifact, định danh phiên bản ngữ nghĩa |
+| Cross-Compilation | Thấp | Biên dịch chéo sang nhiều nền tảng từ một máy chủ |
+| Trình tạo Tài liệu | Thấp | Tự động sinh tài liệu API từ mã nguồn |
+
+<hr class="section-divider" />
+
+## Kiến trúc Compiler
+
+Trình biên dịch của Luna được xây dựng dưới dạng pipeline nhiều giai đoạn với phân tách trách nhiệm nghiêm ngặt:
+
+```
+Source (.ln) → Lexer → Parser → AST → Semantic Analysis → MVIR → LLVM IR → Native Binary
+```
+
+| Giai đoạn | Trách nhiệm chính |
+|-----------|-------------------|
+| **Frontend** | Phân tích từ vựng (lexing), ngữ pháp (parsing), xây dựng AST |
+| **Middle End** | Kiểm tra kiểu, phân giải trait, borrow checking, phân tích lifetime |
+| **Optimizer** | Biến đổi MVIR, monomorphization, inlining |
+| **Backend** | Sinh mã LLVM IR, tối ưu hóa mã máy, liên kết nhị phân |
+
+<Aside type="tip">
+  Mỗi giai đoạn làm chủ duy nhất một tầng biểu diễn trung gian và chỉ giao tiếp qua các ranh giới IR ổn định. Kiến trúc này cho phép kiểm thử độc lập và mở rộng song song hóa trong tương lai.
+</Aside>
+
+## Tầm nhìn
+
+Luna hướng tới trở thành ngôn ngữ hệ thống thực dụng, chứng minh rằng lập trình viên không phải đánh đổi giữa:
+
+<CardGrid>
+  <Card title="An toàn &amp; Hiệu năng" icon="approve-check-circle">
+    An toàn bộ nhớ dựa trên ownership với chi phí runtime bằng 0. Không GC, không đếm tham chiếu, không phụ phí.
+  </Card>
+  <Card title="Sức mạnh &amp; Tối giản" icon="rocket">
+    Kiểm soát ở cấp độ hệ thống với cú pháp hiện đại, tinh gọn. Cấp thấp khi cần, cấp cao theo mặc định.
+  </Card>
+  <Card title="Tốc độ &amp; Chuẩn xác" icon="star">
+    Hiệu năng mã máy gốc qua LLVM với bảo đảm lúc biên dịch trước các lỗi bộ nhớ phổ biến.
+  </Card>
+  <Card title="Học hỏi &amp; Xây dựng" icon="open-book">
+    Ngôn ngữ rèn luyện tư duy lập trình hệ thống mẫu mực, đồng thời đủ mạnh mẽ cho các dự án thực tế.
+  </Card>
+</CardGrid>

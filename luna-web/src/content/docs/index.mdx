@@ -1,0 +1,557 @@
+---
+title: Luna Programming Language
+description: A modern systems programming language with ownership-based memory safety, predictable native performance via LLVM, and explicit low-level control.
+template: splash
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+<div class="splash-container">
+
+  {/* ── 1. Hero Split Section ── */}
+  <section class="luna-hero">
+    <div class="luna-hero-content">
+      <div class="luna-hero-brand-emblem">
+        <div class="luna-hero-symbol-wrapper">
+          <img src="/brand/luna-symbol-dark.png" alt="Luna Symbol" class="luna-hero-symbol luna-dark-only" />
+          <img src="/brand/luna-symbol-light.png" alt="Luna Symbol" class="luna-hero-symbol luna-light-only" />
+        </div>
+        <div class="luna-badge">
+          <span class="luna-badge-dot"></span>
+          <span>Luna v0.1 • Systems Language</span>
+        </div>
+      </div>
+
+      <h1 class="luna-hero-title">
+        Build close to the metal.<br />
+        Without fighting <br class="luna-break-mobile" />the language.
+      </h1>
+
+      <p class="luna-hero-subtitle">
+        Luna is a systems programming language engineered for uncompromising performance,
+        compile-time memory safety without garbage collection, and explicit low-level control.
+      </p>
+
+      <div class="luna-hero-actions">
+        <a href="/getting-started/" class="luna-btn luna-btn-primary"><span>Get Started</span><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg></a>
+        <a href="/language-tour/" class="luna-btn luna-btn-secondary"><span>Language Tour</span></a>
+        <a href="https://github.com/17thedevv/luna.git" target="_blank" rel="noopener" class="luna-btn luna-btn-secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
+      </div>
+
+      <div class="luna-quick-install">
+        <div class="luna-quick-line">
+          <span class="luna-prompt-symbol">$</span>
+          <span class="luna-quick-code">git clone https://github.com/17thedevv/luna.git</span>
+        </div>
+        <div class="luna-quick-line">
+          <span class="luna-prompt-symbol">$</span>
+          <span class="luna-quick-code">cd luna/luna-rs &amp;&amp; cargo build --release</span>
+        </div>
+      </div>
+    </div>
+
+    {/* Live Code Editor Chrome Panel */}
+    <div class="luna-editor-panel">
+      <div class="luna-editor-header">
+        <div class="luna-editor-dots">
+          <span class="luna-dot"></span>
+          <span class="luna-dot"></span>
+          <span class="luna-dot"></span>
+        </div>
+        <div class="luna-editor-tab">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+          </svg>
+          <span>main.ln</span>
+        </div>
+        <div class="luna-editor-status">UTF-8</div>
+      </div>
+      <div class="luna-editor-body">
+
+```luna
+import <core>;
+
+export struct Point {
+    export x: f64,
+    export y: f64,
+};
+
+trait Computable {
+    fn magnitude_squared(self: &Self) -> f64;
+}
+
+impl Computable for Point {
+    fn magnitude_squared(self: &Self) -> f64 {
+        return self.x * self.x + self.y * self.y;
+    }
+}
+
+fn main() -> i32 {
+    dec pt = Point { x: 3.0, y: 4.0 };
+    dec dist_sq = pt.magnitude_squared();
+    
+    // Explicit compile-time immutability
+    dec total = dist_sq;
+    std::io::println("Magnitude squared: {}", total);
+    return 0;
+}
+```
+
+      </div>
+    </div>
+  </section>
+
+  {/* ── 1b. Differentiator Strip ── */}
+  <div class="luna-differentiator-strip">
+    <div class="luna-diff-item">
+      <span class="luna-diff-badge">Ownership Without GC</span>
+      <p class="luna-diff-desc">Deterministic single ownership and borrow checking at compile time.</p>
+    </div>
+    <div class="luna-diff-item">
+      <span class="luna-diff-badge">Provider ≠ Namespace</span>
+      <p class="luna-diff-desc">Physical artifact loading isolated from logical namespace lookup.</p>
+    </div>
+    <div class="luna-diff-item">
+      <span class="luna-diff-badge">Semantic MVIR Pipeline</span>
+      <p class="luna-diff-desc">Dedicated semantic verification IR before lowering to LLVM.</p>
+    </div>
+    <div class="luna-diff-item">
+      <span class="luna-diff-badge">Explicit Unsafe Boundaries</span>
+      <p class="luna-diff-desc">First-class <code>*rw T</code> pointers quarantined behind strict blocks.</p>
+    </div>
+  </div>
+
+  {/* ── 2. Core Triad Principles ── */}
+  <section class="luna-section">
+    <div class="luna-triad">
+      <div class="luna-triad-card">
+        <div class="luna-triad-number">01 / ARCHITECTURE</div>
+        <h3>Memory Safety Without GC</h3>
+        <p>
+          In safe Luna code, compile-time ownership prevents use-after-free and double-free, while
+          aliasing rules restrict unsafe shared mutation. No garbage collection pauses, no background
+          tracing threads, and no hidden reference counting overhead.
+        </p>
+      </div>
+      <div class="luna-triad-card">
+        <div class="luna-triad-number">02 / COMPILER</div>
+        <h3>Native LLVM Performance</h3>
+        <p>
+          Monomorphized generics and zero-cost abstractions compile directly to optimized native
+          machine code through the industry-standard LLVM backend pipeline.
+        </p>
+      </div>
+      <div class="luna-triad-card">
+        <div class="luna-triad-number">03 / CONTROL</div>
+        <h3>Explicit Systems Primitives</h3>
+        <p>
+          Predictable resource reclamation via RAII, explicit raw pointer semantics (`*rw T`),
+          delimited `unsafe` scopes, and direct C ABI interoperability.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 3. Editorial Deep Dive: Ownership & Borrowing ── */}
+  <section class="luna-section">
+    <div class="luna-editorial-grid">
+      <div class="luna-editorial-text">
+        <div class="luna-section-tag">Memory Management</div>
+        <h3>Deterministic resource lifetimes.<br />No hidden runtime penalties.</h3>
+        <p>
+          In Luna, every value has a unique owning binding. When an owner goes out of scope,
+          its resources are immediately reclaimed. Values can be transferred via move semantics
+          or borrowed through explicit shared (`&T`) and mutable (`&rw T`) references.
+        </p>
+        <p>
+          The compiler enforces aliasing XOR mutability at compile time, preventing mutable
+          aliasing bugs before machine code is produced.
+        </p>
+        <ul class="luna-key-points">
+          <li><strong>Zero Runtime Cost:</strong> Verification occurs entirely at compile time.</li>
+          <li><strong>Explicit Mutability:</strong> Bindings are immutable by default (`dec`), made rewritable via `rw`.</li>
+          <li><strong>Lifetime Contracts:</strong> Structs declare explicit lifetime invariants with `requires life(f) >= life(self)`.</li>
+        </ul>
+      </div>
+
+      <div class="luna-editor-panel">
+        <div class="luna-editor-header">
+          <div class="luna-editor-dots">
+            <span class="luna-dot"></span>
+            <span class="luna-dot"></span>
+            <span class="luna-dot"></span>
+          </div>
+          <div class="luna-editor-tab">ownership.ln</div>
+          <div class="luna-editor-status">Borrowck Check</div>
+        </div>
+        <div class="luna-editor-body">
+
+```luna
+import <alloc>;
+
+fn process(buf: std::Vec<u8>) {
+    // Takes ownership of buf; deallocated on exit
+}
+
+fn main() -> i32 {
+    dec rw v = std::Vec<u8>::new();
+    v.push(42);
+
+    // Shared borrow scope: multiple readers permitted
+    {
+        dec r1: &std::Vec<u8> = &v;
+        dec r2: &std::Vec<u8> = &v;
+        std::io::println("Length: {}", r1.len());
+    } // Shared borrows end here before moving v
+
+    // Transfer ownership (move)
+    process(v);
+
+    // Error at compile-time:
+    // v has been moved, cannot access
+    // v.push(99);
+
+    return 0;
+}
+```
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 4. Compiler & Toolchain Architecture ── */}
+  <section class="luna-section">
+    <div class="luna-section-header">
+      <div class="luna-section-tag">Compiler Architecture</div>
+      <h2 class="luna-section-title">Strict Phase Separation.<br />Forward-Only Information Flow.</h2>
+      <p class="luna-section-desc">
+        Luna’s compiler adheres to strict architectural boundaries. Each phase owns a single responsibility
+        and communicates exclusively through stable, verified Intermediate Representations.
+      </p>
+    </div>
+
+    <div class="luna-pipeline-container">
+      <div class="luna-pipeline-flow">
+        <div class="luna-stage">
+          <div class="luna-stage-ir">Source</div>
+          <div class="luna-stage-name">Frontend</div>
+          <div class="luna-stage-sub">Lexer &amp; Parser</div>
+        </div>
+        <div class="luna-stage">
+          <div class="luna-stage-ir">AST</div>
+          <div class="luna-stage-name">Middle End</div>
+          <div class="luna-stage-sub">Type &amp; Borrowck</div>
+        </div>
+        <div class="luna-stage">
+          <div class="luna-stage-ir">Semantic IR</div>
+          <div class="luna-stage-name">Optimizer</div>
+          <div class="luna-stage-sub">MVIR &amp; Mono</div>
+        </div>
+        <div class="luna-stage">
+          <div class="luna-stage-ir">LLVM IR</div>
+          <div class="luna-stage-name">Backend</div>
+          <div class="luna-stage-sub">LLVM &amp; Codegen</div>
+        </div>
+        <div class="luna-stage">
+          <div class="luna-stage-ir">Target</div>
+          <div class="luna-stage-name">Binary</div>
+          <div class="luna-stage-sub">Native Object / ELF</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 5. Editorial Deep Dive: Systems Interop & FFI ── */}
+  <section class="luna-section">
+    <div class="luna-editorial-grid">
+      <div class="luna-editor-panel">
+        <div class="luna-editor-header">
+          <div class="luna-editor-dots">
+            <span class="luna-dot"></span>
+            <span class="luna-dot"></span>
+            <span class="luna-dot"></span>
+          </div>
+          <div class="luna-editor-tab">ffi_native.ln</div>
+          <div class="luna-editor-status">C ABI</div>
+        </div>
+        <div class="luna-editor-body">
+
+```luna
+// Standard C Library Interop
+extern fn malloc(size: usize) -> *rw u8;
+extern fn free(ptr: *rw u8);
+extern fn memcpy(dst: *rw u8, src: *u8, n: usize) -> *rw u8;
+
+export fn allocate_bytes(bytes: usize) -> *rw u8 {
+    // Raw pointers are safe to declare and pass
+    dec raw_ptr: *rw u8 = malloc(bytes);
+
+    // Dereferencing raw memory requires an explicit unsafe boundary
+    unsafe {
+        if raw_ptr != null {
+            *raw_ptr = 0;
+        }
+    }
+
+    return raw_ptr;
+}
+```
+
+        </div>
+      </div>
+
+      <div class="luna-editorial-text">
+        <div class="luna-section-tag">Low-Level Interoperability</div>
+        <h3>Direct hardware control.<br />Explicit safety boundaries.</h3>
+        <p>
+          Systems programming demands the ability to speak directly with operating systems,
+          existing C libraries, and custom hardware interfaces.
+        </p>
+        <p>
+          Luna provides clean, unencumbered FFI declarations, first-class raw pointers
+          (`*T` and `*rw T`), and deliberate `unsafe` blocks. Low-level code remains isolated,
+          auditable, and explicit.
+        </p>
+        <ul class="luna-key-points">
+          <li><strong>Direct C ABI:</strong> Direct calling convention mapping without runtime bridging layers.</li>
+          <li><strong>First-Class Pointers:</strong> Distinct immutable (`*T`) and mutable (`*rw T`) raw pointers.</li>
+          <li><strong>Auditable Unsafe:</strong> Unsafe operations are syntactically quarantined.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 6. Interactive Language Showcase ── */}
+  <section class="luna-section">
+    <div class="luna-section-header">
+      <div class="luna-section-tag">Code Showcase</div>
+      <h2 class="luna-section-title">Explore Canonical Luna Syntax</h2>
+      <p class="luna-section-desc">
+        Designed for clarity, expressiveness, and mechanical sympathy.
+      </p>
+    </div>
+
+    <Tabs>
+      <TabItem label="Pattern Matching">
+        <div class="luna-showcase-split">
+          <div class="luna-showcase-code">
+
+```luna
+enum Shape {
+    Circle(f64),
+    Rectangle(f64, f64),
+    Point,
+}
+
+fn calculate_area(shape: &Shape) -> f64 {
+    // Luna pattern match arms use ->
+    match shape {
+        Shape::Circle(radius) -> {
+            return 3.14159265 * radius * radius;
+        },
+        Shape::Rectangle(width, height) -> {
+            return width * height;
+        },
+        Shape::Point -> {
+            return 0.0;
+        }
+    }
+}
+```
+
+          </div>
+          <div class="luna-showcase-info">
+            <h4>Algebraic Types &amp; Exhaustiveness</h4>
+            <p>
+              Pattern matching in Luna supports variant enums, data-carrying variants,
+              and destructuring with compile-time exhaustiveness checking.
+            </p>
+            <ul class="luna-showcase-features">
+              <li><strong>Arrow Arms:</strong> Match cases strictly use <code>-&gt;</code> syntax.</li>
+              <li><strong>Compact Memory Layout:</strong> Unboxed tagged union representation without implicit heap allocation.</li>
+              <li><strong>Exhaustiveness Checked:</strong> Unhandled variants trigger compile errors.</li>
+            </ul>
+            <a href="/language-tour/structs-enums/" class="luna-showcase-link">Explore Structs &amp; Enums &rarr;</a>
+          </div>
+        </div>
+      </TabItem>
+
+      <TabItem label="Generics &amp; Traits">
+        <div class="luna-showcase-split">
+          <div class="luna-showcase-code">
+
+```luna
+trait Container<T> {
+    fn len(self: &Self) -> usize;
+    fn is_empty(self: &Self) -> bool;
+}
+
+struct Stack<T> {
+    items: std::Vec<T>,
+};
+
+impl<T> Container<T> for Stack<T> {
+    fn len(self: &Self) -> usize {
+        return self.items.len();
+    }
+
+    fn is_empty(self: &Self) -> bool {
+        return self.items.len() == 0;
+    }
+}
+
+// Bounded generic function with static dispatch
+fn inspect<C: Container<i32>>(c: &C) {
+    std::io::println("Container size: {}", c.len());
+}
+```
+
+          </div>
+          <div class="luna-showcase-info">
+            <h4>Zero-Cost Static Dispatch</h4>
+            <p>
+              Generics in Luna are monomorphized ahead-of-time, eliminating indirect call
+              overhead while providing clean trait constraints.
+            </p>
+            <ul class="luna-showcase-features">
+              <li><strong>Monomorphization:</strong> Tailored machine code generated per type.</li>
+              <li><strong>Trait Constraints:</strong> Expressive compile-time type bounds.</li>
+              <li><strong>Monomorphized Dispatch:</strong> Predictable runtime performance without dynamic dispatch overhead.</li>
+            </ul>
+            <a href="/language-tour/traits/" class="luna-showcase-link">Explore Traits &amp; Generics &rarr;</a>
+          </div>
+        </div>
+      </TabItem>
+
+      <TabItem label="Async / Await">
+        <div class="luna-showcase-split">
+          <div class="luna-showcase-code">
+
+```luna
+import <net>;
+
+export async fn fetch_telemetry(endpoint: str) -> Result<str, i32> {
+    dec client = net::HttpClient::connect("127.0.0.1:8080").await;
+    dec response = client.get(endpoint).await;
+
+    if response.status == 200 {
+        return Result::Ok(response.body);
+    } else {
+        return Result::Err(response.status);
+    }
+}
+```
+
+          </div>
+          <div class="luna-showcase-info">
+            <h4>Predictable Asynchronous I/O</h4>
+            <p>
+              First-class async functions compile to stackless state machines with postfix
+              <code>.await</code> expressions for seamless mechanical control.
+            </p>
+            <ul class="luna-showcase-features">
+              <li><strong>Postfix <code>.await</code>:</strong> Natural left-to-right method chaining.</li>
+              <li><strong>Standard Return Types:</strong> Integrated with <code>Result&lt;T, E&gt;</code>.</li>
+              <li><strong>Dedicated Provider:</strong> Networking capabilities isolated in <code>&lt;net&gt;</code>.</li>
+            </ul>
+            <a href="/stdlib/option-result/" class="luna-showcase-link">Explore Option &amp; Result &rarr;</a>
+          </div>
+        </div>
+      </TabItem>
+
+      <TabItem label="Modules &amp; Namespaces">
+        <div class="luna-showcase-split">
+          <div class="luna-showcase-code">
+
+```luna
+// Luna separates providers (artifacts) from namespaces (declarations)
+import <alloc>;
+import "engine_math";
+
+// Create local namespace aliases with `using ... as ...`
+using std::collections as col;
+using engine_math::geometry as geom;
+
+fn setup() {
+    dec map = col::HashMap<str, geom::Vec3>::new();
+    dec origin = geom::Vec3 { x: 0.0, y: 0.0, z: 0.0 };
+}
+```
+
+          </div>
+          <div class="luna-showcase-info">
+            <h4>Provider &amp; Namespace Separation</h4>
+            <p>
+              Luna strictly separates physical artifact providers from logical namespaces.
+              Importing brings providers into the compilation without symbol pollution.
+            </p>
+            <ul class="luna-showcase-features">
+              <li><strong>Provider Selection:</strong> <code>import &lt;provider&gt;</code> selects artifacts.</li>
+              <li><strong>Explicit Aliasing:</strong> <code>using ... as ...</code> creates scoped aliases.</li>
+              <li><strong>Private by Default:</strong> Declarations require <code>export</code> for external access.</li>
+            </ul>
+            <a href="/language-tour/modules/" class="luna-showcase-link">Explore Module Architecture &rarr;</a>
+          </div>
+        </div>
+      </TabItem>
+    </Tabs>
+  </section>
+
+  {/* ── 7. Quickstart Onboarding ── */}
+  <section class="luna-section">
+    <div class="luna-section-header">
+      <div class="luna-section-tag">Getting Started</div>
+      <h2 class="luna-section-title">From Source to Binary in Minutes</h2>
+      <p class="luna-section-desc">
+        Luna builds using the standard Rust toolchain and LLVM.
+      </p>
+    </div>
+
+    <div class="luna-quickstart-grid">
+      <div class="luna-step">
+        <div class="luna-step-num">1</div>
+        <h4>Build the Compiler</h4>
+        <p>Clone the Luna repository and build the release binary via Cargo.</p>
+        <pre class="luna-step-code"><code>git clone https://github.com/17thedevv/luna.git
+cd luna/luna-rs &amp;&amp; cargo build --release</code></pre>
+      </div>
+
+      <div class="luna-step">
+        <div class="luna-step-num">2</div>
+        <h4>Write Your Code</h4>
+        <p>Save your first program to a <code>.ln</code> source file.</p>
+        <pre class="luna-step-code"><code>fn main() -&gt; i32 &#123;
+    std::io::println("Hello, Luna!");
+    return 0;
+&#125;</code></pre>
+      </div>
+
+      <div class="luna-step">
+        <div class="luna-step-num">3</div>
+        <h4>Compile &amp; Run</h4>
+        <p>Invoke the Luna compiler CLI to emit native code and run.</p>
+        <pre class="luna-step-code"><code>./target/release/luna run hello.ln
+// Output: Hello, Luna!</code></pre>
+      </div>
+    </div>
+  </section>
+
+  {/* ── 8. Brand Sign-off Footer ── */}
+  <footer class="luna-brand-footer">
+    <div class="luna-footer-lockup">
+      <img src="/brand/luna-lockup-dark.png" alt="Luna Programming Language" class="luna-footer-logo luna-dark-only" />
+      <img src="/brand/luna-lockup-light.png" alt="Luna Programming Language" class="luna-footer-logo luna-light-only" />
+    </div>
+    <p class="luna-footer-desc">
+      A modern systems programming language engineered for memory safety, native performance, and explicit low-level control.
+    </p>
+    <div class="luna-footer-meta">
+      <span>Open Source Developer Tooling</span>
+      <span class="luna-meta-sep">•</span>
+      <a href="https://github.com/17thedevv/luna.git" target="_blank" rel="noopener">github.com/17thedevv/luna</a>
+    </div>
+  </footer>
+
+</div>

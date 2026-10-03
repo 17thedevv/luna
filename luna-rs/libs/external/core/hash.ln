@@ -22,4 +22,19 @@ impl Hash for i16 { fn hash(self: &Self) -> u64 { return *self as u64; } }
 impl Hash for i32 { fn hash(self: &Self) -> u64 { return *self as u64; } }
 impl Hash for i64 { fn hash(self: &Self) -> u64 { return *self as u64; } }
 impl Hash for isize { fn hash(self: &Self) -> u64 { return *self as u64; } }
+impl Hash for u128 {
+    fn hash(self: &Self) -> u64 {
+        dec lo = (*self) as u64;
+        dec hi = ((*self) >> 64u128) as u64;
+        return lo ^ hi;
+    }
+}
+impl Hash for i128 {
+    fn hash(self: &Self) -> u64 {
+        dec u = (*self) as u128;
+        dec lo = u as u64;
+        dec hi = (u >> 64u128) as u64;
+        return lo ^ hi;
+    }
+}
 }

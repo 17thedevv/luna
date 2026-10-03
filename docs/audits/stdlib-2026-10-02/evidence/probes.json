@@ -1,0 +1,798 @@
+[
+  {
+    "mode": "source",
+    "fixture": "baseline.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\baseline.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\baseline.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: num\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06156760000158101
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_inherent_trait_dispatch.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\compiler_inherent_trait_dispatch.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.0604587999987416
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_invalid_char.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_invalid_char.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\compiler_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: invalid integer-to-char cast: value is not a Unicode scalar\n  --> D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_invalid_char.ln:1:1\n   |\n1  | fn main() -> i32 {\n   | ^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_main_args.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_main_args.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\compiler_main_args.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.061095999961253256
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_move_after_call.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\compiler_move_after_call.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3001]: Use of moved value '%v5.0'\n  --> D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln:6:36\n   |\n6  |     if consume(item) { return item.value; }\n   |                                    ^^^^^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_unsigned_cast.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_unsigned_cast.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\compiler_unsigned_cast.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06275490002008155
+  },
+  {
+    "mode": "source",
+    "fixture": "convert_unsigned_widen.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\convert_unsigned_widen.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\convert_unsigned_widen.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: convert\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06487259996356443
+  },
+  {
+    "mode": "source",
+    "fixture": "filter_owned.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\filter_owned.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\filter_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: box\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3001]: Use of moved value '%v14'\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\libs\\external\\core/iter_adapters.ln:49:50\n   |\n49 |                         return std::Option::Some(x);\n   |                                                  ^\n\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\libs\\external\\core/iter_adapters.ln:47:38\n   |\n47 |                     dec p_ptr = self.pred;\n   |                                      ^^^^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "find_owned.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\find_owned.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\find_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: box\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_consumers\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3001]: Use of moved value '%v16'\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\libs\\external\\core/iter_consumers.ln:116:46\n   |\n116|                     return std::Option::Some(x);\n   |                                              ^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "format_unsigned_high_bit.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\format_unsigned_high_bit.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\format_unsigned_high_bit.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "255\n",
+    "stderr": "",
+    "run_seconds": 0.09573370002908632
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_capacity_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_capacity_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\hashmap_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 3,
+    "stdout": "",
+    "stderr": "\nluna: PANIC [L005] explicit panic\n    at <unknown>:0:0\n",
+    "run_seconds": 2.361525999964215
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_collision_pattern.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_collision_pattern.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\hashmap_collision_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.17187109997030348
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_growth_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_growth_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\hashmap_growth_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06911209999816492
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_sequential_pattern.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_sequential_pattern.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\hashmap_sequential_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.07152439997298643
+  },
+  {
+    "mode": "source",
+    "fixture": "range_owned_step.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\range_owned_step.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\range_owned_step.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06975260004401207
+  },
+  {
+    "mode": "source",
+    "fixture": "slice_zst.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\slice_zst.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06848379998700693
+  },
+  {
+    "mode": "source",
+    "fixture": "slice_zst_mut.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst_mut.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\slice_zst_mut.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.070158300048206
+  },
+  {
+    "mode": "source",
+    "fixture": "string_invalid_char.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\string_invalid_char.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\string_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: invalid integer-to-char cast: value is not a Unicode scalar\n  --> D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\string_invalid_char.ln:1:1\n   |\n1  | import <string>;\n   | ^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "try_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\try_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\try_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: try\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06921019998844713
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_capacity_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_capacity_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\vec_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06840950000332668
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_dedup_i32_generic.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_dedup_i32_generic.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\vec_dedup_i32_generic.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.07196450000628829
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_reserve_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_reserve_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\source\\vec_reserve_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 3,
+    "stdout": "",
+    "stderr": "\nluna: PANIC [L005] explicit panic\n    at <unknown>:0:0\n",
+    "run_seconds": 2.156585599994287
+  },
+  {
+    "mode": "artifact",
+    "fixture": "baseline.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\baseline.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\baseline.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: num\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.09025030001066625
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_inherent_trait_dispatch.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\compiler_inherent_trait_dispatch.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06808950001141056
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_invalid_char.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_invalid_char.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\compiler_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: invalid integer-to-char cast: value is not a Unicode scalar\n  --> D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_invalid_char.ln:1:1\n   |\n1  | fn main() -> i32 {\n   | ^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_main_args.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_main_args.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\compiler_main_args.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06945319997612387
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_move_after_call.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\compiler_move_after_call.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3001]: Use of moved value '%v5.0'\n  --> D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln:6:36\n   |\n6  |     if consume(item) { return item.value; }\n   |                                    ^^^^^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_unsigned_cast.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_unsigned_cast.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\compiler_unsigned_cast.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06982630002312362
+  },
+  {
+    "mode": "artifact",
+    "fixture": "convert_unsigned_widen.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\convert_unsigned_widen.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\convert_unsigned_widen.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: convert\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.07788630004506558
+  },
+  {
+    "mode": "artifact",
+    "fixture": "filter_owned.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\filter_owned.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\filter_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: box\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3001]: Use of moved value '%v14'\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\libs\\external\\core/iter_adapters.llib:49:50\n   |\n49 |                         return std::Option::Some(x);\n   |                                                  ^\n\nerror[E3003]: Cannot access '%v0' (root: Value(ValueId(0))) because it is borrowed as &rw (root: Value(ValueId(0)))\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\libs\\external\\core/iter_adapters.llib:47:38\n   |\n47 |                     dec p_ptr = self.pred;\n   |                                      ^^^^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "find_owned.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\find_owned.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\find_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: box\nDEBUG loading package: __alloc_global\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_consumers\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E3001]: Use of moved value '%v16'\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\libs\\external\\core/iter_consumers.llib:116:46\n   |\n116|                     return std::Option::Some(x);\n   |                                              ^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "format_unsigned_high_bit.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\format_unsigned_high_bit.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\format_unsigned_high_bit.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: io\nDEBUG loading package: result\nDEBUG loading package: vec\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "255\n",
+    "stderr": "",
+    "run_seconds": 0.07078629999887198
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_capacity_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_capacity_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\hashmap_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 3,
+    "stdout": "",
+    "stderr": "\nluna: PANIC [L005] explicit panic\n    at <unknown>:0:0\n",
+    "run_seconds": 2.2380568999797106
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_collision_pattern.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_collision_pattern.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\hashmap_collision_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.17808230000082403
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_growth_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_growth_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\hashmap_growth_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.08702490001451224
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_sequential_pattern.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_sequential_pattern.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\hashmap_sequential_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hashmap\nDEBUG loading package: __raw_table\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: hash\nDEBUG loading package: cmp\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: __lang_drop\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.067259399977047
+  },
+  {
+    "mode": "artifact",
+    "fixture": "range_owned_step.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\range_owned_step.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\range_owned_step.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.07246889994712546
+  },
+  {
+    "mode": "artifact",
+    "fixture": "slice_zst.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\slice_zst.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06809229997452348
+  },
+  {
+    "mode": "artifact",
+    "fixture": "slice_zst_mut.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst_mut.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\slice_zst_mut.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.06638099998235703
+  },
+  {
+    "mode": "artifact",
+    "fixture": "string_invalid_char.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\string_invalid_char.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\string_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: string\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: default\nDEBUG loading package: core/panic\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: fmt\nDEBUG loading package: result\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: hash\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror: invalid integer-to-char cast: value is not a Unicode scalar\n  --> D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\string_invalid_char.ln:1:1\n   |\n1  | import <string>;\n   | ^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "try_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\try_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\try_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: result\nDEBUG loading package: try\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.0691592000075616
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_capacity_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_capacity_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\vec_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.07384220004314557
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_dedup_i32_generic.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_dedup_i32_generic.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\vec_dedup_i32_generic.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.07525380002334714
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_reserve_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_reserve_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_stdlib_audit_qx4ncqe1\\artifact\\vec_reserve_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: vec\nDEBUG loading package: __alloc_global\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: slice\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: cmp\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: ptr\nDEBUG loading package: mem\nDEBUG loading package: clone\nDEBUG loading package: cmp\nDEBUG loading package: default\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_drop\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 3,
+    "stdout": "",
+    "stderr": "\nluna: PANIC [L005] explicit panic\n    at <unknown>:0:0\n",
+    "run_seconds": 2.229372100031469
+  }
+]

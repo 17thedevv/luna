@@ -1,0 +1,305 @@
+import <vec>;
+import <string>;
+import <result>;
+import <__lang_option>;
+
+export module std {
+
+    // =========================================================================
+    // Hex Encoding & Decoding
+    // =========================================================================
+
+    export enum HexError {
+        InvalidLength,
+        InvalidChar,
+    }
+
+    impl std::Error for HexError {
+        fn description(self: &Self) -> str {
+            return match *self {
+                HexError::InvalidLength -> "invalid hex string length",
+                HexError::InvalidChar -> "invalid hex character",
+            };
+        }
+    }
+
+    fn hex_nibble_to_byte(nibble: u8, upper: bool) -> u8 {
+        if nibble < (10 as u8) {
+            return (48 as u8) + nibble;
+        }
+        if upper {
+            return (65 as u8) + (nibble - (10 as u8));
+        }
+        return (97 as u8) + (nibble - (10 as u8));
+    }
+
+    fn hex_byte_to_nibble(b: u8) -> std::Option<u8> {
+        if b >= (48 as u8) && b <= (57 as u8) {
+            return std::Option::Some(b - (48 as u8));
+        }
+        if b >= (97 as u8) && b <= (102 as u8) {
+            return std::Option::Some((b - (97 as u8)) + (10 as u8));
+        }
+        if b >= (65 as u8) && b <= (70 as u8) {
+            return std::Option::Some((b - (65 as u8)) + (10 as u8));
+        }
+        return std::Option::None;
+    }
+
+    export fn hex_encode(bytes: &[u8]) -> std::String {
+        dec len = bytes.len as u64;
+        dec rw out = std::vec_with_capacity<u8>(len * (2 as u64));
+        dec rw i: u64 = 0 as u64;
+        while i < len {
+            dec b = bytes[i];
+            dec hi = (b >> (4 as u8)) & (15 as u8);
+            dec lo = b & (15 as u8);
+            out.push(hex_nibble_to_byte(hi, false));
+            out.push(hex_nibble_to_byte(lo, false));
+            i = i + (1 as u64);
+        }
+        return std::string_from_bytes(out.as_slice()).unwrap();
+    }
+
+    export fn hex_encode_upper(bytes: &[u8]) -> std::String {
+        dec len = bytes.len as u64;
+        dec rw out = std::vec_with_capacity<u8>(len * (2 as u64));
+        dec rw i: u64 = 0 as u64;
+        while i < len {
+            dec b = bytes[i];
+            dec hi = (b >> (4 as u8)) & (15 as u8);
+            dec lo = b & (15 as u8);
+            out.push(hex_nibble_to_byte(hi, true));
+            out.push(hex_nibble_to_byte(lo, true));
+            i = i + (1 as u64);
+        }
+        return std::string_from_bytes(out.as_slice()).unwrap();
+    }
+
+    export fn hex_decode(input: &[u8]) -> std::Result<std::Vec<u8>, HexError> {
+        dec len = input.len as u64;
+        if (len % (2 as u64)) != (0 as u64) {
+            return std::Result::Err(HexError::InvalidLength);
+        }
+        dec rw out = std::vec_with_capacity<u8>(len / (2 as u64));
+        dec rw i: u64 = 0 as u64;
+        while i < len {
+            dec hi_opt = hex_byte_to_nibble(input[i]);
+            if hi_opt.is_none() {
+                return std::Result::Err(HexError::InvalidChar);
+            }
+            dec lo_opt = hex_byte_to_nibble(input[i + (1 as u64)]);
+            if lo_opt.is_none() {
+                return std::Result::Err(HexError::InvalidChar);
+            }
+            dec hi = hi_opt.unwrap();
+            dec lo = lo_opt.unwrap();
+            dec byte = (hi << (4 as u8)) | lo;
+            out.push(byte);
+            i = i + (2 as u64);
+        }
+        return std::Result::Ok(out);
+    }
+
+    export fn hex_decode_str(s: &std::String) -> std::Result<std::Vec<u8>, HexError> {
+        return hex_decode(s.as_bytes());
+    }
+
+    // =========================================================================
+    // Base64 Encoding & Decoding (RFC 4648)
+    // =========================================================================
+
+    export enum Base64Error {
+        InvalidLength,
+        InvalidByte,
+        InvalidPadding,
+    }
+
+    impl std::Error for Base64Error {
+        fn description(self: &Self) -> str {
+            return match *self {
+                Base64Error::InvalidLength -> "invalid base64 length",
+                Base64Error::InvalidByte -> "invalid base64 byte",
+                Base64Error::InvalidPadding -> "invalid base64 padding",
+            };
+        }
+    }
+
+    fn b64_char(val: u8, url_safe: bool) -> u8 {
+        if val < (26 as u8) {
+            return (65 as u8) + val;
+        }
+        if val < (52 as u8) {
+            return (97 as u8) + (val - (26 as u8));
+        }
+        if val < (62 as u8) {
+            return (48 as u8) + (val - (52 as u8));
+        }
+        if val == (62 as u8) {
+            if url_safe {
+                return 45 as u8; // '-'
+            }
+            return 43 as u8; // '+'
+        }
+        if val == (63 as u8) {
+            if url_safe {
+                return 95 as u8; // '_'
+            }
+            return 47 as u8; // '/'
+        }
+        return 61 as u8; // '='
+    }
+
+    fn b64_decode_char(c: u8, url_safe: bool) -> std::Option<u8> {
+        if c >= (65 as u8) && c <= (90 as u8) {
+            return std::Option::Some(c - (65 as u8));
+        }
+        if c >= (97 as u8) && c <= (122 as u8) {
+            return std::Option::Some((c - (97 as u8)) + (26 as u8));
+        }
+        if c >= (48 as u8) && c <= (57 as u8) {
+            return std::Option::Some((c - (48 as u8)) + (52 as u8));
+        }
+        if c == (43 as u8) && (url_safe == false) {
+            return std::Option::Some(62 as u8);
+        }
+        if c == (45 as u8) && url_safe {
+            return std::Option::Some(62 as u8);
+        }
+        if c == (47 as u8) && (url_safe == false) {
+            return std::Option::Some(63 as u8);
+        }
+        if c == (95 as u8) && url_safe {
+            return std::Option::Some(63 as u8);
+        }
+        return std::Option::None;
+    }
+
+    fn base64_encode_impl(bytes: &[u8], url_safe: bool) -> std::String {
+        dec len = bytes.len as u64;
+        dec rw out = std::vec_new<u8>();
+        dec rw i: u64 = 0 as u64;
+        while (i + (3 as u64)) <= len {
+            dec b0 = bytes[i];
+            dec b1 = bytes[i + (1 as u64)];
+            dec b2 = bytes[i + (2 as u64)];
+            dec c0 = (b0 >> (2 as u8)) & (63 as u8);
+            dec c1 = (((b0 & (3 as u8)) << (4 as u8)) | ((b1 >> (4 as u8)) & (15 as u8))) & (63 as u8);
+            dec c2 = (((b1 & (15 as u8)) << (2 as u8)) | ((b2 >> (6 as u8)) & (3 as u8))) & (63 as u8);
+            dec c3 = b2 & (63 as u8);
+            out.push(b64_char(c0, url_safe));
+            out.push(b64_char(c1, url_safe));
+            out.push(b64_char(c2, url_safe));
+            out.push(b64_char(c3, url_safe));
+            i = i + (3 as u64);
+        }
+        dec rem = len - i;
+        if rem == (1 as u64) {
+            dec b0 = bytes[i];
+            dec c0 = (b0 >> (2 as u8)) & (63 as u8);
+            dec c1 = ((b0 & (3 as u8)) << (4 as u8)) & (63 as u8);
+            out.push(b64_char(c0, url_safe));
+            out.push(b64_char(c1, url_safe));
+            out.push(61 as u8); // '='
+            out.push(61 as u8); // '='
+        } else if rem == (2 as u64) {
+            dec b0 = bytes[i];
+            dec b1 = bytes[i + (1 as u64)];
+            dec c0 = (b0 >> (2 as u8)) & (63 as u8);
+            dec c1 = (((b0 & (3 as u8)) << (4 as u8)) | ((b1 >> (4 as u8)) & (15 as u8))) & (63 as u8);
+            dec c2 = ((b1 & (15 as u8)) << (2 as u8)) & (63 as u8);
+            out.push(b64_char(c0, url_safe));
+            out.push(b64_char(c1, url_safe));
+            out.push(b64_char(c2, url_safe));
+            out.push(61 as u8); // '='
+        }
+        return std::string_from_bytes(out.as_slice()).unwrap();
+    }
+
+    export fn base64_encode(bytes: &[u8]) -> std::String {
+        return base64_encode_impl(bytes, false);
+    }
+
+    export fn base64_url_encode(bytes: &[u8]) -> std::String {
+        return base64_encode_impl(bytes, true);
+    }
+
+    fn base64_decode_impl(input: &[u8], url_safe: bool) -> std::Result<std::Vec<u8>, Base64Error> {
+        dec len = input.len as u64;
+        if len == (0 as u64) {
+            return std::Result::Ok(std::vec_new<u8>());
+        }
+        if (len % (4 as u64)) != (0 as u64) {
+            return std::Result::Err(Base64Error::InvalidLength);
+        }
+        dec rw out = std::vec_new<u8>();
+        dec rw i: u64 = 0 as u64;
+        while i < len {
+            dec c0 = input[i];
+            dec c1 = input[i + (1 as u64)];
+            dec c2 = input[i + (2 as u64)];
+            dec c3 = input[i + (3 as u64)];
+            
+            dec v0_opt = b64_decode_char(c0, url_safe);
+            dec v1_opt = b64_decode_char(c1, url_safe);
+            if v0_opt.is_none() || v1_opt.is_none() {
+                return std::Result::Err(Base64Error::InvalidByte);
+            }
+            dec v0 = v0_opt.unwrap();
+            dec v1 = v1_opt.unwrap();
+            
+            if c2 == (61 as u8) {
+                if c3 != (61 as u8) || (i + (4 as u64)) != len {
+                    return std::Result::Err(Base64Error::InvalidPadding);
+                }
+                dec b0 = (v0 << (2 as u8)) | ((v1 >> (4 as u8)) & (3 as u8));
+                out.push(b0);
+            } else if c3 == (61 as u8) {
+                if (i + (4 as u64)) != len {
+                    return std::Result::Err(Base64Error::InvalidPadding);
+                }
+                dec v2_opt = b64_decode_char(c2, url_safe);
+                if v2_opt.is_none() {
+                    return std::Result::Err(Base64Error::InvalidByte);
+                }
+                dec v2 = v2_opt.unwrap();
+                dec b0 = (v0 << (2 as u8)) | ((v1 >> (4 as u8)) & (3 as u8));
+                dec b1 = ((v1 & (15 as u8)) << (4 as u8)) | ((v2 >> (2 as u8)) & (15 as u8));
+                out.push(b0);
+                out.push(b1);
+            } else {
+                dec v2_opt = b64_decode_char(c2, url_safe);
+                dec v3_opt = b64_decode_char(c3, url_safe);
+                if v2_opt.is_none() || v3_opt.is_none() {
+                    return std::Result::Err(Base64Error::InvalidByte);
+                }
+                dec v2 = v2_opt.unwrap();
+                dec v3 = v3_opt.unwrap();
+                dec b0 = (v0 << (2 as u8)) | ((v1 >> (4 as u8)) & (3 as u8));
+                dec b1 = ((v1 & (15 as u8)) << (4 as u8)) | ((v2 >> (2 as u8)) & (15 as u8));
+                dec b2 = ((v2 & (3 as u8)) << (6 as u8)) | (v3 & (63 as u8));
+                out.push(b0);
+                out.push(b1);
+                out.push(b2);
+            }
+            i = i + (4 as u64);
+        }
+        return std::Result::Ok(out);
+    }
+
+    export fn base64_decode(input: &[u8]) -> std::Result<std::Vec<u8>, Base64Error> {
+        return base64_decode_impl(input, false);
+    }
+
+    export fn base64_decode_str(s: &std::String) -> std::Result<std::Vec<u8>, Base64Error> {
+        return base64_decode_impl(s.as_bytes(), false);
+    }
+
+    export fn base64_url_decode(input: &[u8]) -> std::Result<std::Vec<u8>, Base64Error> {
+        return base64_decode_impl(input, true);
+    }
+
+    export fn base64_url_decode_str(s: &std::String) -> std::Result<std::Vec<u8>, Base64Error> {
+        return base64_decode_impl(s.as_bytes(), true);
+    }
+}

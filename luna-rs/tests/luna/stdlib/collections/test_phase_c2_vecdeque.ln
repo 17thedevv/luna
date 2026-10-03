@@ -1,0 +1,126 @@
+import <vecdeque>;
+
+fn main() -> i32 {
+    dec rw q: std::VecDeque<i32> = std::vecdeque_new<i32>();
+
+    if q.len() != (0 as u64) { return 1; }
+    if q.is_empty() == false { return 2; }
+
+    // push_back
+    q.push_back(10);
+    q.push_back(20);
+    q.push_back(30);
+
+    if q.len() != (3 as u64) { return 3; }
+    if q.is_empty() == true { return 4; }
+
+    // front & back
+    match q.front() {
+        std::Option::Some(f) -> {
+            if *f != 10 { return 5; }
+        },
+        std::Option::None -> { return 6; },
+    }
+    match q.back() {
+        std::Option::Some(b) -> {
+            if *b != 30 { return 7; }
+        },
+        std::Option::None -> { return 8; },
+    }
+
+    // push_front
+    q.push_front(5);
+    q.push_front(1);
+    // Queue should now be: [1, 5, 10, 20, 30]
+    if q.len() != (5 as u64) { return 9; }
+
+    // get
+    match q.get(0 as u64) {
+        std::Option::Some(v) -> { if *v != 1 { return 10; } },
+        std::Option::None -> { return 11; },
+    }
+    match q.get(1 as u64) {
+        std::Option::Some(v) -> { if *v != 5 { return 12; } },
+        std::Option::None -> { return 13; },
+    }
+    match q.get(4 as u64) {
+        std::Option::Some(v) -> { if *v != 30 { return 14; } },
+        std::Option::None -> { return 15; },
+    }
+
+    // get_mut
+    match q.get_mut(2 as u64) {
+        std::Option::Some(val_ref) -> {
+            *val_ref = 100;
+        },
+        std::Option::None -> { return 16; },
+    }
+    match q.get(2 as u64) {
+        std::Option::Some(v) -> { if *v != 100 { return 17; } },
+        std::Option::None -> { return 18; },
+    }
+
+    // contains
+    dec needle100 = 100;
+    dec needle999 = 999;
+    if q.contains(&needle100) == false { return 19; }
+    if q.contains(&needle999) == true { return 20; }
+
+    // pop_front
+    match q.pop_front() {
+        std::Option::Some(val) -> { if val != 1 { return 21; } },
+        std::Option::None -> { return 22; },
+    }
+
+    // pop_back
+    match q.pop_back() {
+        std::Option::Some(val) -> { if val != 30 { return 23; } },
+        std::Option::None -> { return 24; },
+    }
+
+    // Remaining: [5, 100, 20]
+    if q.len() != (3 as u64) { return 25; }
+
+    // swap
+    q.swap(0 as u64, 2 as u64);
+    // Now: [20, 100, 5]
+    match q.get(0 as u64) {
+        std::Option::Some(v) -> { if *v != 20 { return 26; } },
+        std::Option::None -> { return 27; },
+    }
+    match q.get(2 as u64) {
+        std::Option::Some(v) -> { if *v != 5 { return 28; } },
+        std::Option::None -> { return 29; },
+    }
+
+    // Clone & Eq
+    dec cloned = q.clone();
+    if q.eq(&cloned) == false { return 30; }
+
+    // Ring buffer wrap-around stress:
+    // Repeatedly push and pop across wrap-around boundaries
+    dec rw ring: std::VecDeque<i32> = std::vecdeque_with_capacity<i32>(4 as u64);
+    dec rw k: i32 = 0;
+    while k < 50 {
+        ring.push_back(k);
+        ring.push_front(k * 10);
+        dec back_val = ring.pop_back();
+        dec front_val = ring.pop_front();
+        match back_val {
+            std::Option::Some(v) -> { if v != k { return 31; } },
+            std::Option::None -> { return 32; },
+        }
+        match front_val {
+            std::Option::Some(v) -> { if v != (k * 10) { return 33; } },
+            std::Option::None -> { return 34; },
+        }
+        k = k + 1;
+    }
+
+    // clear
+    q.clear();
+    if q.len() != (0 as u64) { return 35; }
+    if q.is_empty() == false { return 36; }
+
+    return 0;
+}

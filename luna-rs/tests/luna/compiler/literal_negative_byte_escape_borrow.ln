@@ -1,0 +1,2 @@
+fn escape() -> &[u8] { dec data = b"abc"; return &data; }
+fn main() -> i32 { return 0; }

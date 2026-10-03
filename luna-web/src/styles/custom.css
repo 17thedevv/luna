@@ -1,0 +1,1630 @@
+/* ==========================================================================
+   Luna Language Design System
+   "Moonlight in a Dark Technical Environment"
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap');
+
+/* ── Design Tokens ─────────────────────────────────────────────────────── */
+:root {
+  --sl-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Moonlight Palette Tokens */
+  --luna-bg-deep: #07090e;
+  --luna-bg-base: #0c0e14;
+  --luna-surface: #12151e;
+  --luna-surface-raised: #181c28;
+  --luna-surface-overlay: #1e2333;
+  --luna-surface-code: #090b10;
+
+  /* Technical Hairline Borders */
+  --luna-border-subtle: #191e2b;
+  --luna-border-light: #242c3d;
+  --luna-border-focus: rgba(167, 139, 250, 0.4);
+  --luna-border-accent: rgba(167, 139, 250, 0.22);
+  --luna-border-code: #1f2533;
+
+  /* High-legibility Typography */
+  --luna-text-primary: #f0f3f8;
+  --luna-text-secondary: #9aa2b5;
+  --luna-text-muted: #747e94;
+  --luna-text-inverse: #0c0e14;
+
+  /* Editor Chrome Tokens */
+  --luna-editor-header-bg: #11141c;
+  --luna-editor-tab-bg: #090b10;
+  --luna-editor-tab-text: #c5cddb;
+  --luna-editor-status: #78859e;
+  --luna-editor-border: #1f2533;
+  --luna-editor-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+
+  /* Moon Accents (Restrained) */
+  --luna-accent-moon: #a78bfa;
+  --luna-accent-violet: #8b5cf6;
+  --luna-accent-deep: #6d28d9;
+  --luna-accent-dim: rgba(167, 139, 250, 0.08);
+  --luna-accent-glow: rgba(167, 139, 250, 0.12);
+
+  /* Geometry */
+  --luna-radius-sm: 4px;
+  --luna-radius-md: 8px;
+  --luna-radius-lg: 12px;
+
+  /* Starlight Variable Bridges */
+  --sl-color-accent-low: #181c28;
+  --sl-color-accent: #a78bfa;
+  --sl-color-accent-high: #e2d9fc;
+  --sl-color-white: #f0f3f8;
+  --sl-color-gray-1: #dbe0eb;
+  --sl-color-gray-2: #9aa2b5;
+  --sl-color-gray-3: #747e94;
+  --sl-color-gray-4: #333b4e;
+  --sl-color-gray-5: #1c212e;
+  --sl-color-gray-6: #12151e;
+  --sl-color-black: #07090e;
+}
+
+/* ── Visible Focus Indicator (WCAG 2.2 Compliant) ───────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--luna-accent-moon);
+  outline-offset: 3px;
+}
+
+/* ── Dark Theme (Default) ──────────────────────────────────────────────── */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --sl-color-bg: var(--luna-bg-base);
+  --sl-color-bg-nav: rgba(12, 14, 20, 0.92);
+  --sl-color-bg-sidebar: var(--luna-bg-deep);
+  --sl-color-hairline: var(--luna-border-subtle);
+  --sl-color-hairline-light: var(--luna-border-subtle);
+  --sl-color-hairline-shade: var(--luna-border-light);
+  --sl-color-text: var(--luna-text-secondary);
+  --sl-color-text-invert: var(--luna-text-inverse);
+}
+
+/* ── Light Theme ───────────────────────────────────────────────────────── */
+[data-theme='light'] {
+  color-scheme: light;
+  --luna-bg-deep: #f8fafc;
+  --luna-bg-base: #ffffff;
+  --luna-surface: #f8fafc;
+  --luna-surface-raised: #ffffff;
+  --luna-surface-overlay: #f1f5f9;
+  --luna-surface-code: #f8fafc;
+
+  --luna-border-subtle: #e2e8f0;
+  --luna-border-light: #cbd5e1;
+  --luna-border-focus: rgba(124, 58, 237, 0.4);
+  --luna-border-accent: rgba(124, 58, 237, 0.2);
+  --luna-border-code: #e2e8f0;
+
+  --luna-text-primary: #0f172a;
+  --luna-text-secondary: #334155;
+  --luna-text-muted: #596780;
+  --luna-text-inverse: #ffffff;
+
+  --luna-editor-header-bg: #f1f5f9;
+  --luna-editor-tab-bg: #ffffff;
+  --luna-editor-tab-text: #0f172a;
+  --luna-editor-status: #5f6f84;
+  --luna-editor-border: #e2e8f0;
+  --luna-editor-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+
+  --sl-color-accent-low: #f3e8ff;
+  --sl-color-accent: #7c3aed;
+  --sl-color-accent-high: #4c1d95;
+  --sl-color-white: #0f172a;
+  --sl-color-gray-1: #1e293b;
+  --sl-color-gray-2: #334155;
+  --sl-color-gray-3: #596780;
+  --sl-color-gray-4: #94a3b8;
+  --sl-color-gray-5: #cbd5e1;
+  --sl-color-gray-6: #f1f5f9;
+  --sl-color-black: #ffffff;
+  --sl-color-bg: #ffffff;
+  --sl-color-bg-nav: rgba(255, 255, 255, 0.92);
+  --sl-color-bg-sidebar: #f8fafc;
+  --sl-color-hairline: #e2e8f0;
+  --sl-color-hairline-light: #e2e8f0;
+  --sl-color-hairline-shade: #cbd5e1;
+  --sl-color-text: #334155;
+}
+
+h1#_top,
+.content-panel h1 {
+  color: var(--luna-text-primary) !important;
+}
+
+/* ── Global Typography & Foundations ───────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+}
+
+body {
+  background-color: var(--sl-color-bg);
+  color: var(--sl-color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Selection */
+::selection {
+  background: rgba(167, 139, 250, 0.25);
+  color: var(--luna-text-primary);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--luna-border-light);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--luna-text-muted);
+}
+
+/* ── Header / Navigation ───────────────────────────────────────────────── */
+header.header {
+  background: var(--sl-color-bg-nav);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.site-title {
+  gap: 0.75rem;
+  display: flex;
+  align-items: center;
+  text-decoration: none !important;
+}
+
+.site-title img {
+  height: 2.2rem;
+  width: auto;
+  max-width: 145px;
+  object-fit: contain;
+  transition: opacity 0.2s ease, filter 0.2s ease, transform 0.2s ease;
+}
+
+:root[data-theme='dark'] .site-title img,
+:root:not([data-theme='light']) .site-title img {
+  filter: drop-shadow(0 2px 10px rgba(167, 139, 250, 0.2));
+}
+
+:root[data-theme='light'] .site-title img {
+  filter: drop-shadow(0 1px 4px rgba(15, 23, 42, 0.12));
+}
+
+:root[data-theme='dark'] .site-title img.dark\:sl-hidden,
+:root:not([data-theme='light']) .site-title img.dark\:sl-hidden {
+  display: none !important;
+}
+
+:root[data-theme='light'] .site-title img.light\:sl-hidden {
+  display: none !important;
+}
+
+.site-title:hover img {
+  opacity: 0.95;
+  transform: translateY(-0.5px);
+}
+
+/* ── Sidebar (Docs Experience) ─────────────────────────────────────────── */
+nav.sidebar {
+  border-right: 1px solid var(--sl-color-hairline);
+  background-color: var(--sl-color-bg-sidebar);
+}
+
+nav.sidebar .top-level > li + li {
+  margin-top: 1rem;
+}
+
+nav.sidebar summary {
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--luna-text-muted);
+}
+
+nav.sidebar a {
+  border-radius: var(--luna-radius-sm);
+  padding: 0.35rem 0.65rem;
+  font-size: 0.9rem;
+  color: var(--luna-text-secondary);
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+nav.sidebar a:hover {
+  color: var(--luna-text-primary);
+  background: var(--luna-accent-dim);
+}
+
+nav.sidebar a[aria-current='page'] {
+  color: var(--sl-color-accent);
+  background: var(--luna-accent-dim);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--sl-color-accent);
+}
+
+/* ── Content Area & Headings (Docs Pages) ──────────────────────────────── */
+.main-pane:not(:has(.splash-container)) .sl-markdown-content {
+  max-width: 75ch;
+  line-height: 1.7;
+  margin: 0 auto;
+}
+
+.sl-markdown-content h1 {
+  font-size: clamp(1.85rem, 3.5vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--luna-text-primary);
+  margin-bottom: 1.25rem;
+}
+
+.sl-markdown-content h2 {
+  font-size: clamp(1.35rem, 2.5vw, 1.65rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--luna-text-primary);
+  margin-top: 2.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--sl-color-hairline);
+}
+
+.sl-markdown-content h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--luna-text-primary);
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.sl-markdown-content p {
+  margin-bottom: 1.25rem;
+  color: var(--luna-text-secondary);
+}
+
+.sl-markdown-content a {
+  color: var(--sl-color-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(167, 139, 250, 0.4);
+  transition: text-decoration-color 0.15s ease;
+}
+
+.sl-markdown-content a:hover {
+  text-decoration-color: var(--sl-color-accent);
+}
+
+/* ── Code Blocks (Expressive Code Default Styling) ─────────────────────── */
+.expressive-code {
+  margin: 1.5rem 0;
+}
+
+.expressive-code .frame {
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: var(--luna-radius-md);
+  background-color: var(--luna-surface-code);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: border-color 0.2s ease;
+}
+
+.expressive-code .frame:hover {
+  border-color: var(--luna-border-light);
+}
+
+.expressive-code .header {
+  background: var(--luna-surface);
+  border-bottom: 1px solid var(--luna-border-subtle);
+  font-family: var(--sl-font-mono);
+  font-size: 0.8rem;
+  color: var(--luna-text-muted);
+}
+
+.expressive-code pre {
+  padding: 1rem 1.25rem;
+  font-family: var(--sl-font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* Inline Code */
+:not(pre) > code {
+  background: var(--luna-surface-raised);
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-family: var(--sl-font-mono);
+  font-size: 0.85em;
+  color: var(--sl-color-accent);
+}
+
+/* ── Asides / Callouts ─────────────────────────────────────────────────── */
+.starlight-aside {
+  border-radius: var(--luna-radius-md);
+  border: 1px solid var(--luna-border-subtle);
+  border-left: 3px solid var(--sl-color-accent);
+  background: var(--luna-surface);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.starlight-aside__title {
+  color: var(--luna-text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: -0.01em;
+}
+
+.starlight-aside__content {
+  color: var(--luna-text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ── Tables ────────────────────────────────────────────────────────────── */
+/* ── Tables ────────────────────────────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.5rem 0;
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: var(--luna-radius-md);
+  overflow: hidden;
+  font-size: 0.88rem;
+}
+
+th {
+  background: var(--luna-surface-overlay);
+  color: var(--luna-text-primary);
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--luna-border-light);
+  border-right: 1px solid var(--luna-border-subtle);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+th:last-child {
+  border-right: none;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--luna-border-subtle);
+  border-right: 1px solid var(--luna-border-subtle);
+  color: var(--luna-text-secondary);
+}
+
+td:last-child {
+  border-right: none;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:nth-child(even) td {
+  background: var(--luna-surface);
+}
+
+tr:hover td {
+  background: var(--luna-accent-dim);
+}
+
+/* ── Starlight Card & CardGrid Enhancements ───────────────────────────── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.card {
+  background: var(--luna-surface) !important;
+  border: 1px solid var(--luna-border-subtle) !important;
+  border-radius: var(--luna-radius-md) !important;
+  padding: 1.5rem !important;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.card:hover {
+  border-color: var(--luna-border-light) !important;
+  transform: translateY(-2px);
+}
+
+.card .title {
+  color: var(--luna-text-primary) !important;
+  font-weight: 600 !important;
+  font-size: 1.05rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.card .body {
+  color: var(--luna-text-secondary) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6 !important;
+}
+
+/* ==========================================================================
+   HOMEPAGE FULL-WIDTH UNLOCK (Solves Starlight Container Squeeze)
+   ========================================================================== */
+
+/* 1. Hide unwanted duplicate title generated by Starlight on splash pages */
+main:has(.splash-container) > .content-panel:first-child,
+.main-pane:has(.splash-container) main > .content-panel:first-child,
+body:has(.splash-container) #_top,
+body:has(.splash-container) .content-panel:has(#_top) {
+  display: none !important;
+}
+
+.main-pane:has(.splash-container) main {
+  padding-top: 0 !important;
+}
+
+/* Hide right sidebar completely on splash pages */
+.main-pane:has(.splash-container) ~ .right-sidebar,
+:has(.splash-container) .right-sidebar,
+:has(.splash-container) .right-sidebar-panel {
+  display: none !important;
+}
+
+/* 2. Remove padding and border restrictions on splash page containers */
+.main-pane:has(.splash-container) .content-panel {
+  padding: 0 !important;
+  border: none !important;
+}
+
+.main-pane:has(.splash-container) .sl-container {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.main-pane:has(.splash-container) .sl-markdown-content {
+  max-width: 100% !important;
+}
+
+/* 3. The actual centered splash container */
+.splash-container {
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1rem 1.5rem 4rem;
+  box-sizing: border-box;
+}
+
+/* ── MDX Injected Paragraph Resets (Fixes Button and Title Distortions) ── */
+.luna-btn p,
+.luna-hero-title p,
+.luna-hero-subtitle p,
+.luna-section-desc p,
+.luna-triad-card p p,
+.luna-editorial-text p p,
+.luna-step p {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: inline !important;
+  font: inherit !important;
+  color: inherit !important;
+  line-height: inherit !important;
+}
+
+/* ── Intrinsic-Width & Code Overflow Protections (Eliminates Horizontal Bleed) ── */
+.luna-hero > *,
+.luna-showcase-split > *,
+.luna-editorial-grid > *,
+.luna-editor-panel {
+  min-width: 0;
+}
+
+.luna-editor-body,
+.luna-showcase-code,
+.luna-step-code {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+}
+
+.luna-editor-body pre,
+.luna-showcase-code pre {
+  white-space: pre;
+}
+
+/* ── 1. Hero Split Section ─────────────────────────────────────────────── */
+.luna-hero {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+  padding: 3.5rem 0 2rem;
+  position: relative;
+}
+
+/* ── 1b. Differentiator Strip (Systems Distinction) ─────────────────────── */
+.luna-differentiator-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 0 0 3.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--luna-surface);
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: var(--luna-radius-md);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.luna-diff-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.25rem 0.5rem 0.25rem 1rem;
+  border-left: 2px solid var(--luna-accent-moon);
+  min-width: 0;
+}
+
+.luna-diff-badge {
+  font-family: var(--sl-font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--luna-accent-moon);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.luna-diff-desc {
+  font-size: 0.86rem;
+  color: var(--luna-text-secondary);
+  line-height: 1.45;
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  .luna-differentiator-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .luna-differentiator-strip {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    padding: 1rem;
+    margin-bottom: 2.5rem;
+  }
+}
+
+.luna-hero-content {
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Brand Variant Theme Toggles ── */
+.luna-hero-symbol-wrapper img.luna-dark-only,
+.luna-footer-lockup img.luna-dark-only {
+  display: block !important;
+}
+
+.luna-hero-symbol-wrapper img.luna-light-only,
+.luna-footer-lockup img.luna-light-only {
+  display: none !important;
+}
+
+:root[data-theme='light'] .luna-hero-symbol-wrapper img.luna-dark-only,
+:root[data-theme='light'] .luna-footer-lockup img.luna-dark-only {
+  display: none !important;
+}
+
+:root[data-theme='light'] .luna-hero-symbol-wrapper img.luna-light-only,
+:root[data-theme='light'] .luna-footer-lockup img.luna-light-only {
+  display: block !important;
+}
+
+/* ── Hero Brand Emblem ── */
+.luna-hero-brand-emblem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.luna-hero-symbol-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  background: var(--luna-surface-raised);
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: 50%;
+  padding: 3px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+:root[data-theme='dark'] .luna-hero-symbol-wrapper,
+:root:not([data-theme='light']) .luna-hero-symbol-wrapper {
+  background: radial-gradient(circle at center, rgba(167, 139, 250, 0.12) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border-color: rgba(167, 139, 250, 0.28);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(167, 139, 250, 0.18);
+}
+
+:root[data-theme='light'] .luna-hero-symbol-wrapper {
+  background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.luna-hero-symbol-wrapper:hover {
+  transform: scale(1.08);
+  border-color: var(--luna-accent-moon);
+}
+
+.luna-hero-symbol {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.luna-hero-brand-emblem .luna-badge {
+  margin-bottom: 0;
+}
+
+.luna-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  background: var(--luna-surface-raised);
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-family: var(--sl-font-mono);
+  color: var(--luna-accent-moon);
+  margin-bottom: 1.5rem;
+}
+
+.luna-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--luna-accent-moon);
+  box-shadow: 0 0 8px var(--luna-accent-moon);
+}
+
+.luna-break-mobile {
+  display: none;
+}
+
+.luna-hero-title {
+  font-size: clamp(2.2rem, 4vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  color: var(--luna-text-primary);
+  margin: 0 0 1.25rem;
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: none;
+}
+
+.luna-hero-subtitle {
+  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  line-height: 1.65;
+  color: var(--luna-text-secondary);
+  margin: 0 0 2rem;
+  max-width: 52ch;
+}
+
+.luna-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 2rem;
+}
+
+.luna-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--luna-radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.luna-btn-primary {
+  background: var(--luna-text-primary);
+  color: var(--luna-bg-deep) !important;
+  border: 1px solid transparent;
+}
+
+[data-theme='dark'] .luna-btn-primary,
+:root:not([data-theme='light']) .luna-btn-primary {
+  background: #f0f3f8;
+  color: #07090e !important;
+}
+
+[data-theme='dark'] .luna-btn-primary:hover,
+:root:not([data-theme='light']) .luna-btn-primary:hover {
+  background: #ffffff;
+  color: #07090e !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='light'] .luna-btn-primary {
+  background: #0f172a;
+  color: #ffffff !important;
+}
+
+[data-theme='light'] .luna-btn-primary:hover {
+  background: #1e293b;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.25);
+}
+
+.luna-btn-secondary {
+  background: var(--luna-surface);
+  color: var(--luna-text-primary) !important;
+  border: 1px solid var(--luna-border-light);
+}
+
+.luna-btn-secondary:hover {
+  background: var(--luna-surface-raised);
+  border-color: var(--luna-border-focus);
+  transform: translateY(-1px);
+}
+
+/* Quick Install Terminal Box */
+.luna-quick-install {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  background: var(--luna-surface-code) !important;
+  border: 1px solid var(--luna-border-code) !important;
+  border-radius: var(--luna-radius-md);
+  padding: 0.75rem 1.1rem;
+  font-family: var(--sl-font-mono);
+  font-size: 0.8rem;
+  color: var(--luna-editor-tab-text) !important;
+  max-width: 580px;
+  width: fit-content;
+  box-sizing: border-box;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.luna-quick-line {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  white-space: nowrap;
+}
+
+.luna-quick-code {
+  color: var(--luna-editor-tab-text) !important;
+  user-select: all;
+}
+
+.luna-quick-install a {
+  color: inherit !important;
+  text-decoration: none !important;
+  pointer-events: none;
+}
+
+.luna-prompt-symbol {
+  color: var(--luna-accent-moon);
+  font-weight: 600;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+/* ── Code Editor Chrome Panel (Hero Right & Editorials) ────────────────── */
+.luna-editor-panel {
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+  background: var(--luna-surface-code) !important;
+  border: 1px solid var(--luna-border-code) !important;
+  border-radius: var(--luna-radius-md);
+  box-shadow: var(--luna-editor-shadow);
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.luna-editor-panel:hover {
+  border-color: var(--luna-border-focus) !important;
+}
+
+.luna-editor-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: var(--luna-editor-header-bg) !important;
+  border-bottom: 1px solid var(--luna-editor-border) !important;
+  user-select: none;
+}
+
+.luna-editor-dots {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.luna-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #242c3d;
+}
+
+[data-theme='light'] .luna-dot {
+  background: #cbd5e1;
+}
+
+.luna-editor-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--sl-font-mono);
+  font-size: 0.78rem;
+  color: var(--luna-editor-tab-text);
+  background: var(--luna-editor-tab-bg);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--luna-radius-sm);
+  border: 1px solid var(--luna-editor-border);
+  white-space: nowrap;
+}
+
+.luna-editor-status {
+  margin-left: auto;
+  font-family: var(--sl-font-mono);
+  font-size: 0.75rem;
+  color: var(--luna-editor-status);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .luna-editor-status {
+    display: none !important;
+  }
+}
+
+.luna-editor-body {
+  overflow-x: auto;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Remove nested frame and duplicate header generated by ExpressiveCode */
+.luna-editor-panel .expressive-code {
+  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.luna-editor-panel .expressive-code .frame {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+.luna-editor-panel .expressive-code .header {
+  display: none !important;
+}
+
+.luna-editor-panel .expressive-code pre {
+  padding: 1.25rem 1.5rem !important;
+  background: transparent !important;
+  font-size: 0.85rem !important;
+  line-height: 1.65 !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* ── 2. Editorial Alternating Sections ─────────────────────────────────── */
+.luna-section {
+  padding: 4.5rem 0;
+  border-top: 1px solid var(--luna-border-subtle);
+}
+
+.luna-section-header {
+  margin-bottom: 2.5rem;
+}
+
+.luna-section-tag {
+  font-family: var(--sl-font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--luna-accent-moon);
+  margin-bottom: 0.5rem;
+}
+
+.luna-section-title {
+  font-size: clamp(1.6rem, 2.8vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--luna-text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.luna-section-desc {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: var(--luna-text-secondary);
+  max-width: 65ch;
+  margin: 0;
+}
+
+.luna-editorial-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.luna-editorial-text {
+  min-width: 0;
+}
+
+.luna-editorial-text h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--luna-text-primary);
+  margin: 0 0 1rem;
+}
+
+.luna-editorial-text p {
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--luna-text-secondary);
+  margin-bottom: 1.25rem;
+}
+
+.luna-key-points {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+}
+
+.luna-key-points li {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.92rem;
+  color: var(--luna-text-secondary);
+}
+
+.luna-key-points li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--luna-accent-moon);
+  font-weight: 700;
+}
+
+/* ── 3. Triad Principles (3-Column Layout) ─────────────────────────────── */
+.luna-triad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.luna-triad-card {
+  background: var(--luna-surface);
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: var(--luna-radius-md);
+  padding: 1.75rem 1.5rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.luna-triad-card:hover {
+  border-color: var(--luna-border-light);
+  transform: translateY(-2px);
+}
+
+.luna-triad-number {
+  font-family: var(--sl-font-mono);
+  font-size: 0.8rem;
+  color: var(--luna-accent-moon);
+  margin-bottom: 0.75rem;
+}
+
+.luna-triad-card h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--luna-text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.luna-triad-card p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--luna-text-secondary);
+  margin: 0;
+}
+
+/* ── 4. Compiler Pipeline Visual Architecture ─────────────────────────── */
+.luna-pipeline-container {
+  background: var(--luna-surface);
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: var(--luna-radius-md);
+  padding: 2.25rem 2rem;
+  margin: 2.5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.luna-pipeline-flow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1.15rem;
+  align-items: stretch;
+  position: relative;
+}
+
+.luna-stage {
+  background: var(--luna-surface-raised);
+  border: 1px solid var(--luna-border-light);
+  border-radius: var(--luna-radius-sm);
+  padding: 1.25rem 0.85rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.luna-stage:hover {
+  border-color: var(--luna-border-focus);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--luna-accent-glow);
+}
+
+.luna-stage-ir {
+  font-family: var(--sl-font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--luna-accent-moon);
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+.luna-stage-name {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--luna-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.luna-stage-sub {
+  font-size: 0.76rem;
+  color: var(--luna-text-muted);
+  line-height: 1.35;
+}
+
+@media (min-width: 961px) {
+  .luna-stage:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--luna-accent-moon);
+    font-family: var(--sl-font-mono);
+    font-size: 1rem;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.75;
+  }
+}
+
+@media (max-width: 960px) {
+  .luna-pipeline-flow {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding-left: 1.25rem;
+    border-left: 2px solid var(--luna-accent-dim);
+  }
+  .luna-stage {
+    text-align: left;
+    padding: 1rem 1.25rem;
+  }
+  .luna-stage:not(:last-child)::after {
+    display: none;
+  }
+}
+
+/* ── 5. Starlight Tabs Refinement ──────────────────────────────────────── */
+starlight-tabs {
+  border: 1px solid var(--luna-border-code);
+  border-radius: var(--luna-radius-md);
+  background: var(--luna-surface-code);
+  overflow: hidden;
+  margin: 2rem 0;
+  box-shadow: var(--luna-editor-shadow);
+}
+
+starlight-tabs .tablist-wrapper {
+  background: var(--luna-editor-header-bg);
+  border-bottom: 1px solid var(--luna-editor-border);
+}
+
+starlight-tabs [role='tablist'] {
+  border-bottom: none !important;
+  padding: 0 0.5rem;
+  gap: 0.25rem;
+}
+
+starlight-tabs .tab > [role='tab'] {
+  font-family: var(--sl-font-mono);
+  font-size: 0.82rem;
+  padding: 0.65rem 1rem;
+  color: var(--luna-text-muted);
+  border-bottom: 2px solid transparent !important;
+  box-shadow: none !important;
+  transition: all 0.15s ease;
+}
+
+starlight-tabs .tab > [role='tab'][aria-selected='true'] {
+  color: var(--sl-color-accent) !important;
+  border-bottom-color: var(--sl-color-accent) !important;
+  font-weight: 600;
+}
+
+starlight-tabs .tablist-wrapper ~ [role='tabpanel'] {
+  margin-top: 0 !important;
+}
+
+starlight-tabs .expressive-code {
+  margin: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+starlight-tabs .expressive-code .frame {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
+starlight-tabs .expressive-code .header {
+  display: none !important;
+}
+
+starlight-tabs .expressive-code pre {
+  padding: 1.25rem 1.5rem !important;
+  background: transparent !important;
+  font-size: 0.85rem !important;
+  line-height: 1.65 !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+}
+
+/* ── 5b. Code Showcase Split (Side-by-Side Balance) ─────────────────────── */
+.luna-showcase-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(1.5rem, 3.5vw, 2.75rem);
+  align-items: center;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+}
+
+.luna-showcase-code {
+  min-width: 0;
+}
+
+.luna-showcase-info {
+  min-width: 0;
+  padding: 1.25rem 1.5rem 1.25rem 0;
+}
+
+.luna-showcase-info h4 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--luna-text-primary);
+  margin: 0 0 0.65rem;
+}
+
+.luna-showcase-info p {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--luna-text-secondary);
+  margin-bottom: 1.15rem;
+}
+
+.luna-showcase-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+}
+
+.luna-showcase-features li {
+  position: relative;
+  padding-left: 1.35rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--luna-text-secondary);
+  line-height: 1.5;
+}
+
+.luna-showcase-features li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--luna-accent-moon);
+  font-weight: bold;
+}
+
+.luna-showcase-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--sl-color-accent) !important;
+  text-decoration: none !important;
+  transition: gap 0.2s ease;
+}
+
+.luna-showcase-link:hover {
+  gap: 0.6rem;
+  text-decoration: underline !important;
+}
+
+@media (max-width: 900px) {
+  .luna-showcase-split {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0.5rem 1rem 1.5rem;
+  }
+  .luna-showcase-info {
+    padding: 0;
+  }
+}
+
+/* ── 6. Quickstart 3-Step Flow ─────────────────────────────────────────── */
+.luna-quickstart-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+  align-items: stretch;
+}
+
+.luna-step {
+  background: var(--luna-surface);
+  border: 1px solid var(--luna-border-subtle);
+  border-radius: var(--luna-radius-md);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.luna-step:hover {
+  border-color: var(--luna-border-light);
+  transform: translateY(-2px);
+}
+
+.luna-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--luna-surface-raised);
+  border: 1px solid var(--luna-border-light);
+  font-family: var(--sl-font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--luna-accent-moon);
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.luna-step h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--luna-text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.luna-step p {
+  font-size: 0.85rem;
+  color: var(--luna-text-secondary);
+  margin-bottom: 1.25rem;
+  flex-grow: 1;
+}
+
+.luna-step-code {
+  background: var(--luna-surface-code) !important;
+  border: 1px solid var(--luna-border-code) !important;
+  border-radius: var(--luna-radius-sm);
+  padding: 0.65rem 0.85rem;
+  font-family: var(--sl-font-mono);
+  font-size: 0.73rem;
+  color: var(--luna-editor-tab-text) !important;
+  overflow-x: auto;
+  margin-top: auto;
+  line-height: 1.55;
+  min-height: 4.8rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  white-space: pre-wrap;
+}
+
+.luna-step-code code {
+  color: var(--luna-editor-tab-text) !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  font-size: inherit;
+}
+
+.luna-step-code a {
+  color: inherit !important;
+  text-decoration: none !important;
+  pointer-events: none;
+}
+
+/* ── 8. Brand Sign-off Footer ── */
+.luna-brand-footer {
+  margin-top: 5rem;
+  padding-top: 3.5rem;
+  border-top: 1px solid var(--luna-border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.luna-footer-logo {
+  height: 2.85rem;
+  width: auto;
+  max-width: 190px;
+  margin-bottom: 1.25rem;
+  object-fit: contain;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.luna-footer-logo:hover {
+  transform: translateY(-1px);
+}
+
+:root[data-theme='dark'] .luna-footer-logo,
+:root:not([data-theme='light']) .luna-footer-logo {
+  filter: drop-shadow(0 2px 12px rgba(167, 139, 250, 0.2));
+}
+
+:root[data-theme='light'] .luna-footer-logo {
+  filter: drop-shadow(0 1px 4px rgba(15, 23, 42, 0.1));
+}
+
+.luna-footer-desc {
+  font-size: 0.95rem;
+  color: var(--luna-text-secondary);
+  max-width: 52ch;
+  line-height: 1.6;
+  margin: 0 0 1.25rem;
+}
+
+.luna-footer-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--sl-font-mono);
+  font-size: 0.8rem;
+  color: var(--luna-text-muted);
+}
+
+.luna-footer-meta a {
+  color: var(--luna-accent-moon);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.luna-footer-meta a:hover {
+  text-decoration: underline;
+}
+
+.luna-meta-sep {
+  opacity: 0.4;
+}
+
+/* ── Responsive Adaptations ────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .luna-hero {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2.5rem 0 3rem;
+  }
+  .luna-editorial-grid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .luna-triad {
+    grid-template-columns: 1fr;
+  }
+  .luna-quickstart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-pane:has(.splash-container) {
+    padding-inline: 0 !important;
+  }
+  .splash-container {
+    padding: 0.5rem 1rem 3rem !important;
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .luna-section {
+    padding: 2.75rem 0 !important;
+  }
+  .luna-section-title {
+    font-size: clamp(1.35rem, 5vw, 1.7rem) !important;
+    line-height: 1.25 !important;
+    overflow-wrap: break-word !important;
+  }
+  .luna-section-desc {
+    font-size: 0.95rem !important;
+  }
+  .luna-hero {
+    padding: 1.5rem 0 2.5rem !important;
+    gap: 2rem !important;
+  }
+  .luna-break-mobile {
+    display: block;
+  }
+  .luna-hero-title {
+    font-size: clamp(1.4rem, 5.5vw, 1.85rem) !important;
+    line-height: 1.25 !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+  }
+  .luna-hero-subtitle {
+    font-size: 0.95rem !important;
+    margin-bottom: 1.5rem !important;
+  }
+  .luna-hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem !important;
+  }
+  .luna-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.65rem 1.2rem !important;
+  }
+  .luna-quick-install {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 0.72rem !important;
+    padding: 0.65rem 0.85rem !important;
+    overflow-x: auto !important;
+  }
+  .luna-quick-line {
+    font-size: inherit;
+    white-space: normal !important;
+    word-break: break-all !important;
+  }
+  .luna-editor-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .luna-editor-body {
+    max-width: 100% !important;
+  }
+  .luna-stage {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .luna-triad-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .luna-step {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  starlight-tabs {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .site-title img {
+    height: 1.85rem !important;
+    max-width: 120px !important;
+  }
+  .luna-hero-brand-emblem {
+    margin-bottom: 1.25rem !important;
+  }
+  .luna-hero-symbol-wrapper {
+    width: 38px !important;
+    height: 38px !important;
+  }
+  .luna-footer-logo {
+    height: 2.3rem !important;
+  }
+}
+
+/* ── Accessibility: Reduced Motion ─────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,136 @@
+import <file>;
+import <io>;
+import <string>;
+import <vec>;
+import <result>;
+
+fn test_file_stream() -> bool {
+    dec path = std::string_from_str("temp_stream_test.txt");
+
+    // 1. Create and write
+    dec file_res = std::file_create(&path);
+    if file_res.is_err() {
+        return false;
+    }
+    dec rw file = file_res.unwrap();
+    dec bytes = [72 as u8, 101 as u8, 108 as u8, 108 as u8, 111 as u8]; // "Hello"
+    dec write_res = file.write(&bytes);
+    if write_res.is_err() {
+        return false;
+    }
+    if write_res.unwrap() != (5 as usize) {
+        return false;
+    }
+    if file.flush().is_err() {
+        return false;
+    }
+    file.close();
+
+    // 2. Open and read
+    dec open_res = std::file_open(&path);
+    if open_res.is_err() {
+        return false;
+    }
+    dec rw read_file = open_res.unwrap();
+    dec rw buf: [u8; 5] = [0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8];
+    dec r_res = read_file.read(&rw buf);
+    if r_res.is_err() || r_res.unwrap() != (5 as usize) {
+        return false;
+    }
+    if buf[0] != (72 as u8) || buf[1] != (101 as u8) || buf[4] != (111 as u8) {
+        return false;
+    }
+
+    // 3. Seek to beginning and read first byte
+    dec seek_res = read_file.seek(0 as i64, 0 as i32);
+    if seek_res.is_err() || seek_res.unwrap() != (0 as u64) {
+        return false;
+    }
+    dec rw one_buf: [u8; 1] = [0 as u8];
+    dec one_res = read_file.read(&rw one_buf);
+    if one_res.is_err() || one_res.unwrap() != (1 as usize) || one_buf[0] != (72 as u8) {
+        return false;
+    }
+    read_file.close();
+
+    // 4. Metadata verification
+    dec meta_res = std::metadata(&path);
+    if meta_res.is_err() {
+        return false;
+    }
+    dec meta = meta_res.unwrap();
+    if meta.is_dir() {
+        return false;
+    }
+    if meta.is_file() == false {
+        return false;
+    }
+    if meta.len() != (5 as u64) {
+        return false;
+    }
+
+    // Clean up
+    dec rm_res = std::remove_file(&path);
+    if rm_res.is_err() {
+        return false;
+    }
+
+    return true;
+}
+
+fn test_dir_fs() -> bool {
+    dec dir_path = std::string_from_str("temp_test_dir");
+
+    dec cdir_res = std::create_dir(&dir_path);
+    if cdir_res.is_err() {
+        return false;
+    }
+
+    dec meta_res = std::metadata(&dir_path);
+    if meta_res.is_err() {
+        return false;
+    }
+    dec meta = meta_res.unwrap();
+    if meta.is_dir() == false {
+        return false;
+    }
+    if meta.is_file() {
+        return false;
+    }
+
+    dec rmdir_res = std::remove_dir(&dir_path);
+    if rmdir_res.is_err() {
+        return false;
+    }
+
+    return true;
+}
+
+fn test_stdio() -> bool {
+    dec rw out = std::io::stdout();
+    dec msg = [79 as u8, 75 as u8, 10 as u8]; // "OK\n"
+    dec w_res = out.write(&msg);
+    if w_res.is_err() || w_res.unwrap() != (3 as usize) {
+        return false;
+    }
+    if out.flush().is_err() {
+        return false;
+    }
+    return true;
+}
+
+fn main() -> i32 {
+    if test_file_stream() == false {
+        return 1;
+    }
+
+    if test_dir_fs() == false {
+        return 2;
+    }
+
+    if test_stdio() == false {
+        return 3;
+    }
+
+    return 0;
+}

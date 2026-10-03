@@ -14,6 +14,38 @@ struct RawOwner {
 } requires anchor(data) = self;
 ```
 
+For multiple fields, the canonical spelling uses one `requires` and a
+comma-separated list; each entry declares the same independent field anchor:
+
+```luna
+struct RawPair {
+    first: *rw u8,
+    second: *rw u16,
+} requires anchor(first) = self, anchor(second) = self;
+```
+
+This spelling changes no anchor semantics or artifact metadata. Existing
+repeated `requires` groups remain accepted.
+
+The comma-list parser extension was verified on 2026-10-01: the complete
+`luna-parser` suite passed 32 tests (exit 0), including multi-anchor, mixed
+anchor/lifetime and malformed-list cases. The public CLI regression
+`struct_contract_cli_parity` passed (exit 0): a generic user-defined two-field
+owner compiles and executes with source-only and fresh `.llib/.obj`-only
+providers; wrong-owner use of either field, duplicate anchors, a non-pointer
+anchor and an unknown field all reject through both `check` and `build` with
+matching semantic diagnostics. This scoped verification does not claim a new
+full-workspace run.
+
+Compiler Change
+    Capability: comma-separated struct contract entries after one requires.
+    Why stdlib exposed it: a multi-field owner repeated the same keyword.
+    Why it is generic: the parser handles every struct and both contract kinds.
+    User-defined type benefiting: owner_api::Owner<T, U>.
+    Tests: struct_syntax_acceptance_tests; struct_contract_cli_parity.
+    New intrinsic/lang_item?: NO.
+    Stdlib-specific branch?: NO.
+
 This contract is type-level, not a property inferred merely from the address of
 the field slot. It states that the pointer's validity is governed by the
 logical owner instance's permitted lifetime; it does not claim the allocation

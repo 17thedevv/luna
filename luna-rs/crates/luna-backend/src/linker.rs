@@ -179,13 +179,15 @@ pub fn compile_ll_to_exe(ll_file: &str, obj_file: &str, exe_file: &str) -> Resul
     }
 
     let runtime = runtime_library()?;
-    let link_status = Command::new(native_compiler())
-        .arg(obj_file)
-        .arg(runtime)
-        .arg("-o")
-        .arg(exe_file)
-        // Optionally try ASan:
-        // .arg("-fsanitize=address")
+    let mut link_cmd = Command::new(native_compiler());
+    link_cmd.arg(obj_file).arg(runtime);
+    if cfg!(windows) {
+        link_cmd.arg("-lws2_32");
+        link_cmd.arg("-lbcrypt");
+    }
+    link_cmd.arg("-o").arg(exe_file);
+
+    let link_status = link_cmd
         .status()
         .map_err(|e| format!("Failed to invoke native linker: {}", e))?;
 
@@ -209,7 +211,12 @@ pub fn link_objs_to_exe<P: AsRef<std::path::Path>, Q: AsRef<std::path::Path>>(
     for obj in obj_files {
         cmd.arg(obj.as_ref());
     }
-    cmd.arg(runtime).arg("-o").arg(exe_file.as_ref());
+    cmd.arg(runtime);
+    if cfg!(windows) {
+        cmd.arg("-lws2_32");
+        cmd.arg("-lbcrypt");
+    }
+    cmd.arg("-o").arg(exe_file.as_ref());
 
     let output = cmd
         .output()

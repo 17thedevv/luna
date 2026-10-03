@@ -1,0 +1,13 @@
+import <vec>;
+
+struct Empty {};
+
+fn main() -> i32 {
+    dec rw values = std::vec_new<Empty>();
+    values.push(Empty {});
+    values.push(Empty {});
+    if values.len() != (2 as u64) { return 2; }
+    dec rw iterator = values.iter_mut();
+    if iterator.next_mut().is_none() { return 1; }
+    return 0;
+}

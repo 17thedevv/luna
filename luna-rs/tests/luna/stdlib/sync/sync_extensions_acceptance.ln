@@ -1,0 +1,111 @@
+import <sync>;
+
+fn init_routine() {
+    // routine executed once
+}
+
+fn main() -> i32 {
+    // 1. Once verification
+    dec once = std::once_new();
+    if once.is_completed() != false {
+        return 1;
+    }
+
+    once.call_once(init_routine);
+    if once.is_completed() == false {
+        return 2;
+    }
+
+    // Call once again - should remain completed and not re-run
+    once.call_once(init_routine);
+    if once.is_completed() == false {
+        return 3;
+    }
+
+    // 2. RwLock verification
+    dec rwlock = std::rwlock_new<i32>(42);
+
+    // Test read access
+    {
+        dec r1 = rwlock.read();
+        dec r2 = rwlock.read();
+        if (*r1.as_ref()) != 42 {
+            return 5;
+        }
+        if (*r2.as_ref()) != 42 {
+            return 6;
+        }
+    }
+
+    // Test try_read access
+    {
+        dec opt_r = rwlock.try_read();
+        match opt_r {
+            std::Option::Some(r) -> {
+                if (*r.as_ref()) != 42 {
+                    return 7;
+                }
+            },
+            std::Option::None -> {
+                return 8;
+            },
+        }
+    }
+
+    // Test write access & mutation
+    {
+        dec rw w = rwlock.write();
+        *w.as_mut() = 100;
+    }
+
+    // Verify written value via read
+    {
+        dec r = rwlock.read();
+        if (*r.as_ref()) != 100 {
+            return 9;
+        }
+    }
+
+    // Test try_write access
+    {
+        dec opt_w = rwlock.try_write();
+        match opt_w {
+            std::Option::Some(w) -> {
+                dec rw guard = w;
+                *guard.as_mut() = 200;
+            },
+            std::Option::None -> {
+                return 10;
+            },
+        }
+    }
+
+    // Verify written value via try_read
+    {
+        dec opt_r = rwlock.try_read();
+        match opt_r {
+            std::Option::Some(r) -> {
+                if (*r.as_ref()) != 200 {
+                    return 11;
+                }
+            },
+            std::Option::None -> {
+                return 12;
+            },
+        }
+    }
+
+    // 3. Barrier verification (single thread barrier round-trip)
+    dec barrier = std::barrier_new(1 as u32);
+    dec is_leader1 = barrier.wait();
+    if is_leader1 == false {
+        return 13;
+    }
+
+    dec is_leader2 = barrier.wait();
+    if is_leader2 == false {
+        return 14;
+    }
+
+    return 0;
+}

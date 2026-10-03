@@ -1,0 +1,101 @@
+---
+title: Vec & Collections
+description: Mảng động và các cấu trúc dữ liệu bảng băm trong Luna.
+---
+
+## Vec
+
+`Vec<T>` là mảng động có khả năng tự động tăng trưởng, được cấp phát trên bộ nhớ heap.
+
+### Khởi tạo Vector
+
+```luna
+import <alloc>;
+
+dec v: std::Vec<i32> = std::Vec<i32>::new();
+dec v2 = std::Vec<i32>::with_capacity(10);
+```
+
+### Thêm phần tử
+
+```luna
+dec rw v = std::Vec<i32>::new();
+
+v.push(1);
+v.push(2);
+v.push(3);
+
+dec last = v.pop();  // Option::Some(3)
+```
+
+### Truy xuất phần tử
+
+```luna
+dec rw v = std::Vec<i32>::new();
+v.push(10);
+v.push(20);
+
+dec first = v[0];                   // truy cập chỉ mục
+dec item = v.get(0);                // Option::Some(&10)
+dec item5 = v.get(5);               // Option::None
+```
+
+### Lặp qua mảng
+
+```luna
+dec v = std::Vec<i32>::new();
+
+// Lặp bất biến (chỉ đọc)
+for n in &v {
+    std::io::println("{}", n);
+}
+
+// Lặp khả biến (chỉnh sửa phần tử)
+dec rw v_mut = std::Vec<i32>::new();
+for n in &rw v_mut {
+    *n = *n * 2;
+}
+```
+
+## HashMap
+
+Cấu trúc lưu trữ cặp khóa - giá trị với thời gian tra cứu trung bình $O(1)$.
+
+```luna
+import <alloc>;
+using std::collections as col;
+```
+
+### Khởi tạo và Sử dụng
+
+```luna
+dec rw scores = col::HashMap<str, i32>::new();
+
+scores.insert("Alice", 100);
+scores.insert("Bob", 85);
+
+dec score = scores.get("Alice");     // Option::Some(&100)
+dec missing = scores.get("Unknown"); // Option::None
+
+for (name, score) in &scores {
+    std::io::println("{}: {}", name, score);
+}
+```
+
+## HashSet
+
+Tập hợp không theo thứ tự của các giá trị duy nhất.
+
+```luna
+import <alloc>;
+using std::collections as col;
+
+dec rw set = col::HashSet<i32>::new();
+
+set.insert(1);
+set.insert(2);
+set.insert(1);  // Đã tồn tại, không thêm lại
+
+dec has_3 = set.contains(&3);  // false
+dec len = set.len();           // 2
+```

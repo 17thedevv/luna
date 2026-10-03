@@ -1,6 +1,7 @@
 import <__raw_table>;
 import <hash>;
 import <cmp>;
+import <clone>;
 import <default>;
 import <__lang_option>;
 import <__lang_iterator>;
@@ -167,6 +168,49 @@ module std {
             return Values<K, V> {
                 raw: self.table.iter(),
             };
+        }
+    }
+
+    impl<K: std::Clone + std::Hash + std::Eq, V: std::Clone> std::Clone for HashMap<K, V> {
+        fn clone(self: &Self) -> Self {
+            dec rw res = hashmap_new<K, V>();
+            dec rw it = self.iter();
+            while true {
+                dec item = it.next();
+                match item {
+                    std::Option::Some(pair) -> {
+                        res.insert((*pair.0).clone(), (*pair.1).clone());
+                    },
+                    std::Option::None -> { break; },
+                }
+            }
+            return res;
+        }
+    }
+
+    impl<K: std::Hash + std::Eq, V: std::Eq> std::Eq for HashMap<K, V> {
+        fn eq(self: &Self, other: &Self) -> bool {
+            if self.len() != other.len() { return false; }
+            dec rw it = self.iter();
+            while true {
+                dec item = it.next();
+                match item {
+                    std::Option::Some(pair) -> {
+                        match other.get(pair.0) {
+                            std::Option::Some(other_val) -> {
+                                if *pair.1 != *other_val {
+                                    return false;
+                                }
+                            },
+                            std::Option::None -> {
+                                return false;
+                            },
+                        }
+                    },
+                    std::Option::None -> { break; },
+                }
+            }
+            return true;
         }
     }
 

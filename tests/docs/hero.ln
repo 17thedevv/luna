@@ -1,0 +1,26 @@
+import <core>;
+
+export struct Point {
+    export x: f64,
+    export y: f64,
+};
+
+trait Computable {
+    fn magnitude_squared(self: &Self) -> f64;
+}
+
+impl Computable for Point {
+    fn magnitude_squared(self: &Self) -> f64 {
+        return self.x * self.x + self.y * self.y;
+    }
+}
+
+fn main() -> i32 {
+    dec pt = Point { x: 3.0, y: 4.0 };
+    dec dist_sq = pt.magnitude_squared();
+    
+    // Explicit compile-time immutability
+    dec total = dist_sq;
+    std::io::println("Magnitude squared: {}", total);
+    return 0;
+}

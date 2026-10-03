@@ -36,11 +36,14 @@ fn remove_artifacts(dir: &std::path::Path) {
     }
 }
 
+static COUNTER: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
 fn source_sysroot() -> Sysroot {
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let external_dir = manifest_dir.parent().expect("crates directory")
         .parent().expect("workspace root").join("libs").join("external");
-    let root = create_temp_dir("source_sysroot");
+    let id = COUNTER.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+    let root = create_temp_dir(&format!("source_sysroot_{}_{}", std::process::id(), id));
     let source_external = root.join("libs").join("external");
     copy_dir_all(&external_dir, &source_external);
     remove_artifacts(&source_external);

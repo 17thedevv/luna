@@ -1,0 +1,892 @@
+import <ptr>;
+import <mem>;
+import <__lang_drop>;
+import <__lang_option>;
+import <time>;
+
+export extern fn __luna_mutex_create() -> *rw void;
+export extern fn __luna_mutex_destroy(handle: *rw void);
+export extern fn __luna_mutex_lock(handle: *rw void);
+export extern fn __luna_mutex_try_lock(handle: *rw void) -> i32;
+export extern fn __luna_mutex_unlock(handle: *rw void);
+
+export extern fn __luna_condvar_create() -> *rw void;
+export extern fn __luna_condvar_destroy(handle: *rw void);
+export extern fn __luna_condvar_wait(cv: *rw void, mx: *rw void);
+export extern fn __luna_condvar_wait_timeout(cv: *rw void, mx: *rw void, nanoseconds: u64) -> i32;
+export extern fn __luna_condvar_signal(handle: *rw void);
+export extern fn __luna_condvar_broadcast(handle: *rw void);
+
+export extern fn __luna_atomic_load_u32(ptr: *u32) -> u32;
+export extern fn __luna_atomic_store_u32(ptr: *rw u32, val: u32);
+export extern fn __luna_atomic_cas_u32(ptr: *rw u32, expected: u32, desired: u32) -> u32;
+
+extern fn __luna_alloc(size: u64, align: u64) -> *rw u8;
+extern fn __luna_dealloc(ptr: *rw u8, size: u64, align: u64);
+
+export module std {
+    // =========================================================================
+    // MutexGuard<T>
+    // =========================================================================
+    export struct MutexGuard<T> {
+        private ptr: *rw T,
+        private handle: *rw void,
+    } requires anchor(ptr) = self;
+
+    impl<T> std::Drop for MutexGuard<T> {
+        fn drop(self: &rw Self) {
+            if (self.handle as u64) != (0 as u64) {
+                unsafe {
+                    __luna_mutex_unlock(self.handle);
+                }
+                self.handle = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl<T> MutexGuard<T> {
+        export fn as_ref(self: &Self) -> &T life_from(self) {
+            unsafe {
+                return &*self.ptr;
+            }
+        }
+
+        export fn as_mut(self: &rw Self) -> &rw T life_from(self) {
+            unsafe {
+                return &rw *self.ptr;
+            }
+        }
+    }
+
+    // =========================================================================
+    // Mutex<T>
+    // =========================================================================
+    export struct Mutex<T> {
+        private handle: *rw void,
+        private data: T,
+    };
+
+    export fn mutex_new<T>(data: T) -> Mutex<T> {
+        unsafe {
+            dec h = __luna_mutex_create();
+            return Mutex<T> {
+                handle: h,
+                data: data,
+            };
+        }
+    }
+
+    impl<T> std::Drop for Mutex<T> {
+        fn drop(self: &rw Self) {
+            if (self.handle as u64) != (0 as u64) {
+                unsafe {
+                    __luna_mutex_destroy(self.handle);
+                }
+                self.handle = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl<T> Mutex<T> {
+        export fn new(data: T) -> Mutex<T> {
+            return mutex_new<T>(data);
+        }
+
+        export fn lock(self: &Self) -> MutexGuard<T> {
+            unsafe {
+                __luna_mutex_lock(self.handle);
+                dec p_imm = &self.data as *T;
+                dec p_mut = p_imm as *rw T;
+                return MutexGuard<T> {
+                    ptr: p_mut,
+                    handle: self.handle,
+                };
+            }
+        }
+
+        export fn try_lock(self: &Self) -> std::Option<MutexGuard<T>> {
+            unsafe {
+                dec ok = __luna_mutex_try_lock(self.handle);
+                if ok != 0 {
+                    dec p_imm = &self.data as *T;
+                    dec p_mut = p_imm as *rw T;
+                    return std::Option::Some(MutexGuard<T> {
+                        ptr: p_mut,
+                        handle: self.handle,
+                    });
+                }
+                return std::Option::None;
+            }
+        }
+    }
+
+    // =========================================================================
+    // Condvar
+    // =========================================================================
+    export struct Condvar {
+        private handle: *rw void,
+    };
+
+    export fn condvar_new() -> Condvar {
+        unsafe {
+            dec h = __luna_condvar_create();
+            return Condvar {
+                handle: h,
+            };
+        }
+    }
+
+    impl std::Drop for Condvar {
+        fn drop(self: &rw Self) {
+            if (self.handle as u64) != (0 as u64) {
+                unsafe {
+                    __luna_condvar_destroy(self.handle);
+                }
+                self.handle = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl Condvar {
+        export fn new() -> Condvar {
+            return condvar_new();
+        }
+
+        export fn wait<T>(self: &Self, guard: &rw MutexGuard<T>) {
+            unsafe {
+                __luna_condvar_wait(self.handle, guard.handle);
+            }
+        }
+
+        export fn wait_timeout<T>(self: &Self, guard: &rw MutexGuard<T>, dur: &std::Duration) -> bool {
+            dec nanos = dur.as_nanos();
+            unsafe {
+                dec res = __luna_condvar_wait_timeout(self.handle, guard.handle, nanos);
+                return res != 0;
+            }
+        }
+
+        export fn notify_one(self: &Self) {
+            unsafe {
+                __luna_condvar_signal(self.handle);
+            }
+        }
+
+        export fn notify_all(self: &Self) {
+            unsafe {
+                __luna_condvar_broadcast(self.handle);
+            }
+        }
+    }
+
+    // =========================================================================
+    // Once
+    // =========================================================================
+    export struct Once {
+        private state: u32,
+    };
+
+    export fn once_new() -> Once {
+        return Once { state: 0 as u32 };
+    }
+
+    impl Once {
+        export fn new() -> Once {
+            return once_new();
+        }
+
+        export fn is_completed(self: &Self) -> bool {
+            dec p = &self.state as *u32;
+            unsafe {
+                return __luna_atomic_load_u32(p) == (2 as u32);
+            }
+        }
+
+        export fn call_once(self: &Self, f: fn()) {
+            dec p_imm = &self.state as *u32;
+            dec p_mut = p_imm as *rw u32;
+            unsafe {
+                dec current = __luna_atomic_load_u32(p_imm);
+                if current == (2 as u32) {
+                    return;
+                }
+                dec prev = __luna_atomic_cas_u32(p_mut, 0 as u32, 1 as u32);
+                if prev == (0 as u32) {
+                    dec f_ptr = f;
+                    f_ptr();
+                    __luna_atomic_store_u32(p_mut, 2 as u32);
+                    return;
+                } else if prev == (2 as u32) {
+                    return;
+                } else {
+                    while __luna_atomic_load_u32(p_imm) != (2 as u32) {
+                    }
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // RwLockReadGuard<T>
+    // =========================================================================
+    export struct RwLockReadGuard<T> {
+        private ptr: *T,
+        private lock_mx: *rw void,
+        private cv_write: *rw void,
+        private readers_ptr: *rw u32,
+    } requires anchor(ptr) = self;
+
+    impl<T> std::Drop for RwLockReadGuard<T> {
+        fn drop(self: &rw Self) {
+            if (self.lock_mx as u64) != (0 as u64) {
+                unsafe {
+                    __luna_mutex_lock(self.lock_mx);
+                    *self.readers_ptr = (*self.readers_ptr) - (1 as u32);
+                    if (*self.readers_ptr) == (0 as u32) {
+                        __luna_condvar_signal(self.cv_write);
+                    }
+                    __luna_mutex_unlock(self.lock_mx);
+                }
+                self.lock_mx = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl<T> RwLockReadGuard<T> {
+        export fn as_ref(self: &Self) -> &T life_from(self) {
+            unsafe {
+                return &*self.ptr;
+            }
+        }
+    }
+
+    // =========================================================================
+    // RwLockWriteGuard<T>
+    // =========================================================================
+    export struct RwLockWriteGuard<T> {
+        private ptr: *rw T,
+        private lock_mx: *rw void,
+        private cv_read: *rw void,
+        private cv_write: *rw void,
+        private writer_ptr: *rw bool,
+        private write_waiters_ptr: *rw u32,
+    } requires anchor(ptr) = self;
+
+    impl<T> std::Drop for RwLockWriteGuard<T> {
+        fn drop(self: &rw Self) {
+            if (self.lock_mx as u64) != (0 as u64) {
+                unsafe {
+                    __luna_mutex_lock(self.lock_mx);
+                    *self.writer_ptr = false;
+                    if (*self.write_waiters_ptr) > (0 as u32) {
+                        __luna_condvar_signal(self.cv_write);
+                    } else {
+                        __luna_condvar_broadcast(self.cv_read);
+                    }
+                    __luna_mutex_unlock(self.lock_mx);
+                }
+                self.lock_mx = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl<T> RwLockWriteGuard<T> {
+        export fn as_ref(self: &Self) -> &T life_from(self) {
+            unsafe {
+                return &*self.ptr;
+            }
+        }
+
+        export fn as_mut(self: &rw Self) -> &rw T life_from(self) {
+            unsafe {
+                return &rw *self.ptr;
+            }
+        }
+    }
+
+    // =========================================================================
+    // RwLock<T>
+    // =========================================================================
+    export struct RwLock<T> {
+        private lock_mx: *rw void,
+        private cv_read: *rw void,
+        private cv_write: *rw void,
+        private readers: u32,
+        private writer: bool,
+        private write_waiters: u32,
+        private data: T,
+    };
+
+    export fn rwlock_new<T>(data: T) -> RwLock<T> {
+        unsafe {
+            dec mx = __luna_mutex_create();
+            dec cr = __luna_condvar_create();
+            dec cw = __luna_condvar_create();
+            return RwLock<T> {
+                lock_mx: mx,
+                cv_read: cr,
+                cv_write: cw,
+                readers: 0 as u32,
+                writer: false,
+                write_waiters: 0 as u32,
+                data: data,
+            };
+        }
+    }
+
+    impl<T> std::Drop for RwLock<T> {
+        fn drop(self: &rw Self) {
+            if (self.lock_mx as u64) != (0 as u64) {
+                unsafe {
+                    __luna_condvar_destroy(self.cv_read);
+                    __luna_condvar_destroy(self.cv_write);
+                    __luna_mutex_destroy(self.lock_mx);
+                }
+                self.lock_mx = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl<T> RwLock<T> {
+        export fn new(data: T) -> RwLock<T> {
+            return rwlock_new<T>(data);
+        }
+
+        export fn read(self: &Self) -> RwLockReadGuard<T> {
+            unsafe {
+                __luna_mutex_lock(self.lock_mx);
+                dec p_writer = (&self.writer as *bool) as *rw bool;
+                dec p_readers = (&self.readers as *u32) as *rw u32;
+                dec p_write_waiters = (&self.write_waiters as *u32) as *rw u32;
+                while (*p_writer) || ((*p_write_waiters) > (0 as u32)) {
+                    __luna_condvar_wait(self.cv_read, self.lock_mx);
+                }
+                *p_readers = (*p_readers) + (1 as u32);
+                __luna_mutex_unlock(self.lock_mx);
+
+                dec p_imm = &self.data as *T;
+                return RwLockReadGuard<T> {
+                    ptr: p_imm,
+                    lock_mx: self.lock_mx,
+                    cv_write: self.cv_write,
+                    readers_ptr: p_readers,
+                };
+            }
+        }
+
+        export fn try_read(self: &Self) -> std::Option<RwLockReadGuard<T>> {
+            unsafe {
+                dec ok = __luna_mutex_try_lock(self.lock_mx);
+                if ok == 0 {
+                    return std::Option::None;
+                }
+                dec p_writer = (&self.writer as *bool) as *rw bool;
+                dec p_readers = (&self.readers as *u32) as *rw u32;
+                dec p_write_waiters = (&self.write_waiters as *u32) as *rw u32;
+                if (*p_writer) || ((*p_write_waiters) > (0 as u32)) {
+                    __luna_mutex_unlock(self.lock_mx);
+                    return std::Option::None;
+                }
+                *p_readers = (*p_readers) + (1 as u32);
+                __luna_mutex_unlock(self.lock_mx);
+
+                dec p_imm = &self.data as *T;
+                return std::Option::Some(RwLockReadGuard<T> {
+                    ptr: p_imm,
+                    lock_mx: self.lock_mx,
+                    cv_write: self.cv_write,
+                    readers_ptr: p_readers,
+                });
+            }
+        }
+
+        export fn write(self: &Self) -> RwLockWriteGuard<T> {
+            unsafe {
+                __luna_mutex_lock(self.lock_mx);
+                dec p_writer = (&self.writer as *bool) as *rw bool;
+                dec p_readers = (&self.readers as *u32) as *rw u32;
+                dec p_write_waiters = (&self.write_waiters as *u32) as *rw u32;
+                *p_write_waiters = (*p_write_waiters) + (1 as u32);
+                while (*p_writer) || ((*p_readers) > (0 as u32)) {
+                    __luna_condvar_wait(self.cv_write, self.lock_mx);
+                }
+                *p_write_waiters = (*p_write_waiters) - (1 as u32);
+                *p_writer = true;
+                __luna_mutex_unlock(self.lock_mx);
+
+                dec p_imm = &self.data as *T;
+                dec p_mut = p_imm as *rw T;
+                return RwLockWriteGuard<T> {
+                    ptr: p_mut,
+                    lock_mx: self.lock_mx,
+                    cv_read: self.cv_read,
+                    cv_write: self.cv_write,
+                    writer_ptr: p_writer,
+                    write_waiters_ptr: p_write_waiters,
+                };
+            }
+        }
+
+        export fn try_write(self: &Self) -> std::Option<RwLockWriteGuard<T>> {
+            unsafe {
+                dec ok = __luna_mutex_try_lock(self.lock_mx);
+                if ok == 0 {
+                    return std::Option::None;
+                }
+                dec p_writer = (&self.writer as *bool) as *rw bool;
+                dec p_readers = (&self.readers as *u32) as *rw u32;
+                dec p_write_waiters = (&self.write_waiters as *u32) as *rw u32;
+                if (*p_writer) || ((*p_readers) > (0 as u32)) {
+                    __luna_mutex_unlock(self.lock_mx);
+                    return std::Option::None;
+                }
+                *p_writer = true;
+                __luna_mutex_unlock(self.lock_mx);
+
+                dec p_imm = &self.data as *T;
+                dec p_mut = p_imm as *rw T;
+                return std::Option::Some(RwLockWriteGuard<T> {
+                    ptr: p_mut,
+                    lock_mx: self.lock_mx,
+                    cv_read: self.cv_read,
+                    cv_write: self.cv_write,
+                    writer_ptr: p_writer,
+                    write_waiters_ptr: p_write_waiters,
+                });
+            }
+        }
+    }
+
+    // =========================================================================
+    // Barrier
+    // =========================================================================
+    export struct Barrier {
+        private lock_mx: *rw void,
+        private cv: *rw void,
+        private num_threads: u32,
+        private count: u32,
+        private generation: u32,
+    };
+
+    export fn barrier_new(num_threads: u32) -> Barrier {
+        unsafe {
+            dec mx = __luna_mutex_create();
+            dec cv = __luna_condvar_create();
+            return Barrier {
+                lock_mx: mx,
+                cv: cv,
+                num_threads: num_threads,
+                count: 0 as u32,
+                generation: 0 as u32,
+            };
+        }
+    }
+
+    impl std::Drop for Barrier {
+        fn drop(self: &rw Self) {
+            if (self.lock_mx as u64) != (0 as u64) {
+                unsafe {
+                    __luna_condvar_destroy(self.cv);
+                    __luna_mutex_destroy(self.lock_mx);
+                }
+                self.lock_mx = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl Barrier {
+        export fn new(num_threads: u32) -> Barrier {
+            return barrier_new(num_threads);
+        }
+
+        export fn wait(self: &Self) -> bool {
+            dec mx = self.lock_mx;
+            dec cv = self.cv;
+            dec p_count = (&self.count as *u32) as *rw u32;
+            dec p_gen = (&self.generation as *u32) as *rw u32;
+            dec n = self.num_threads;
+
+            unsafe {
+                __luna_mutex_lock(mx);
+                dec local_gen = *p_gen;
+                *p_count = (*p_count) + (1 as u32);
+                if (*p_count) >= n {
+                    *p_count = 0 as u32;
+                    *p_gen = local_gen + (1 as u32);
+                    __luna_condvar_broadcast(cv);
+                    __luna_mutex_unlock(mx);
+                    return true;
+                } else {
+                    while (*p_gen) == local_gen {
+                        __luna_condvar_wait(cv, mx);
+                    }
+                    __luna_mutex_unlock(mx);
+                    return false;
+                }
+            }
+        }
+    }
+
+    // =========================================================================
+    // OnceLock<T>
+    // =========================================================================
+    export struct OnceLock<T> {
+        private once: Once,
+        private value: Option<T>,
+    };
+
+    export fn oncelock_new<T>() -> OnceLock<T> {
+        return OnceLock<T> {
+            once: once_new(),
+            value: Option::None,
+        };
+    }
+
+    impl<T> OnceLock<T> {
+        export fn new() -> OnceLock<T> {
+            return oncelock_new<T>();
+        }
+
+        export fn get(self: &Self) -> Option<&T> life_from(self) {
+            if self.once.is_completed() {
+                return self.value.as_ref();
+            }
+            return Option::None;
+        }
+
+        export fn get_mut(self: &rw Self) -> Option<&rw T> life_from(self) {
+            if self.once.is_completed() {
+                return self.value.as_mut();
+            }
+            return Option::None;
+        }
+
+        export fn set(self: &Self, val: T) -> Option<T> {
+            dec p_state = (&self.once.state as *u32) as *rw u32;
+            dec p_val = (&self.value as *Option<T>) as *rw Option<T>;
+
+            dec rw already_set = false;
+            unsafe {
+                dec current = __luna_atomic_load_u32(p_state as *u32);
+                if current == (2 as u32) {
+                    already_set = true;
+                } else {
+                    dec prev = __luna_atomic_cas_u32(p_state, 0 as u32, 1 as u32);
+                    if prev == (0 as u32) {
+                        *p_val = Option::Some(val);
+                        __luna_atomic_store_u32(p_state, 2 as u32);
+                    } else {
+                        already_set = true;
+                    }
+                }
+            }
+            if already_set {
+                return Option::Some(val);
+            }
+            return Option::None;
+        }
+
+        export fn get_or_init(self: &Self, f: fn() -> T) -> Option<&T> life_from(self) {
+            dec p_state = (&self.once.state as *u32) as *rw u32;
+            dec p_val = (&self.value as *Option<T>) as *rw Option<T>;
+
+            unsafe {
+                dec current = __luna_atomic_load_u32(p_state as *u32);
+                if current != (2 as u32) {
+                    dec prev = __luna_atomic_cas_u32(p_state, 0 as u32, 1 as u32);
+                    if prev == (0 as u32) {
+                        dec f_ptr = f;
+                        dec init_val = f_ptr();
+                        *p_val = Option::Some(init_val);
+                        __luna_atomic_store_u32(p_state, 2 as u32);
+                    } else {
+                        while __luna_atomic_load_u32(p_state as *u32) != (2 as u32) {
+                        }
+                    }
+                }
+            }
+            return self.value.as_ref();
+        }
+    }
+
+    // =========================================================================
+    // MPSC Channel (Multi-Producer Single-Consumer)
+    // =========================================================================
+    struct ChannelNode<T> {
+        value: Option<T>,
+        next: *rw void,
+    };
+
+    struct ChannelInner<T> {
+        lock_mx: *rw void,
+        cv_recv: *rw void,
+        head: *rw void,
+        tail: *rw void,
+        senders: u64,
+        receivers: u64,
+    };
+
+    export struct Sender<T> {
+        private inner: *rw void,
+    };
+
+    export struct Receiver<T> {
+        private inner: *rw void,
+    };
+
+    export struct ChannelPair<T> {
+        tx: Sender<T>,
+        rx: Receiver<T>,
+    };
+
+    export fn channel<T>() -> ChannelPair<T> {
+        unsafe {
+            dec inner_mem = __luna_alloc(std::mem::size_of<ChannelInner<T>>(), std::mem::align_of<ChannelInner<T>>());
+            dec inner = inner_mem as *rw ChannelInner<T>;
+            (*inner).lock_mx = __luna_mutex_create();
+            (*inner).cv_recv = __luna_condvar_create();
+            (*inner).head = 0 as u64 as *rw void;
+            (*inner).tail = 0 as u64 as *rw void;
+            (*inner).senders = 1 as u64;
+            (*inner).receivers = 1 as u64;
+
+            return ChannelPair<T> {
+                tx: Sender<T> { inner: inner as *rw void },
+                rx: Receiver<T> { inner: inner as *rw void },
+            };
+        }
+    }
+
+    impl<T> Sender<T> {
+        export fn clone(self: &Self) -> Sender<T> {
+            dec inner = self.inner as *rw ChannelInner<T>;
+            unsafe {
+                __luna_mutex_lock((*inner).lock_mx);
+                (*inner).senders = (*inner).senders + (1 as u64);
+                __luna_mutex_unlock((*inner).lock_mx);
+                return Sender<T> { inner: self.inner };
+            }
+        }
+
+        export fn send(self: &Self, val: T) -> bool {
+            dec inner = self.inner as *rw ChannelInner<T>;
+            unsafe {
+                __luna_mutex_lock((*inner).lock_mx);
+                if (*inner).receivers == (0 as u64) {
+                    __luna_mutex_unlock((*inner).lock_mx);
+                    return false;
+                }
+                dec node_mem = __luna_alloc(std::mem::size_of<ChannelNode<T>>(), std::mem::align_of<ChannelNode<T>>());
+                dec node = node_mem as *rw ChannelNode<T>;
+                (*node).value = Option::Some(val);
+                (*node).next = 0 as u64 as *rw void;
+
+                if ((*inner).tail as u64) == (0 as u64) {
+                    (*inner).head = node as *rw void;
+                    (*inner).tail = node as *rw void;
+                } else {
+                    dec cur_tail = (*inner).tail as *rw ChannelNode<T>;
+                    (*cur_tail).next = node as *rw void;
+                    (*inner).tail = node as *rw void;
+                }
+                __luna_condvar_signal((*inner).cv_recv);
+                __luna_mutex_unlock((*inner).lock_mx);
+                return true;
+            }
+        }
+    }
+
+    impl<T> std::Drop for Sender<T> {
+        fn drop(self: &rw Self) {
+            if (self.inner as u64) != (0 as u64) {
+                dec inner = self.inner as *rw ChannelInner<T>;
+                unsafe {
+                    __luna_mutex_lock((*inner).lock_mx);
+                    (*inner).senders = (*inner).senders - (1 as u64);
+                    dec should_free = ((*inner).senders == (0 as u64)) && ((*inner).receivers == (0 as u64));
+                    if (*inner).senders == (0 as u64) {
+                        __luna_condvar_broadcast((*inner).cv_recv);
+                    }
+                    __luna_mutex_unlock((*inner).lock_mx);
+
+                    if should_free {
+                        __luna_condvar_destroy((*inner).cv_recv);
+                        __luna_mutex_destroy((*inner).lock_mx);
+                        __luna_dealloc(inner as *rw u8, std::mem::size_of<ChannelInner<T>>(), std::mem::align_of<ChannelInner<T>>());
+                    }
+                }
+                self.inner = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    impl<T> Receiver<T> {
+        export fn recv(self: &Self) -> Option<T> {
+            dec inner = self.inner as *rw ChannelInner<T>;
+            unsafe {
+                __luna_mutex_lock((*inner).lock_mx);
+                while (((*inner).head as u64) == (0 as u64)) && ((*inner).senders > (0 as u64)) {
+                    __luna_condvar_wait((*inner).cv_recv, (*inner).lock_mx);
+                }
+                if ((*inner).head as u64) != (0 as u64) {
+                    dec node = (*inner).head as *rw ChannelNode<T>;
+                    (*inner).head = (*node).next;
+                    if ((*inner).head as u64) == (0 as u64) {
+                        (*inner).tail = 0 as u64 as *rw void;
+                    }
+                    dec raw_node = node as *rw u8;
+                    dec val = (*node).value;
+                    __luna_dealloc(raw_node, std::mem::size_of<ChannelNode<T>>(), std::mem::align_of<ChannelNode<T>>());
+                    __luna_mutex_unlock((*inner).lock_mx);
+                    return val;
+                }
+                __luna_mutex_unlock((*inner).lock_mx);
+                return Option::None;
+            }
+        }
+
+        export fn try_recv(self: &Self) -> Option<T> {
+            dec inner = self.inner as *rw ChannelInner<T>;
+            unsafe {
+                __luna_mutex_lock((*inner).lock_mx);
+                if ((*inner).head as u64) != (0 as u64) {
+                    dec node = (*inner).head as *rw ChannelNode<T>;
+                    (*inner).head = (*node).next;
+                    if ((*inner).head as u64) == (0 as u64) {
+                        (*inner).tail = 0 as u64 as *rw void;
+                    }
+                    dec raw_node = node as *rw u8;
+                    dec val = (*node).value;
+                    __luna_dealloc(raw_node, std::mem::size_of<ChannelNode<T>>(), std::mem::align_of<ChannelNode<T>>());
+                    __luna_mutex_unlock((*inner).lock_mx);
+                    return val;
+                }
+                __luna_mutex_unlock((*inner).lock_mx);
+                return Option::None;
+            }
+        }
+    }
+
+    impl<T> std::Drop for Receiver<T> {
+        fn drop(self: &rw Self) {
+            if (self.inner as u64) != (0 as u64) {
+                dec inner = self.inner as *rw ChannelInner<T>;
+                unsafe {
+                    __luna_mutex_lock((*inner).lock_mx);
+                    (*inner).receivers = (*inner).receivers - (1 as u64);
+                    while ((*inner).head as u64) != (0 as u64) {
+                        dec node = (*inner).head as *rw ChannelNode<T>;
+                        (*inner).head = (*node).next;
+                        dec raw_node = node as *rw u8;
+                        dec _discard = (*node).value;
+                        __luna_dealloc(raw_node, std::mem::size_of<ChannelNode<T>>(), std::mem::align_of<ChannelNode<T>>());
+                    }
+                    dec should_free = ((*inner).senders == (0 as u64));
+                    __luna_mutex_unlock((*inner).lock_mx);
+
+                    if should_free {
+                        __luna_condvar_destroy((*inner).cv_recv);
+                        __luna_mutex_destroy((*inner).lock_mx);
+                        __luna_dealloc(inner as *rw u8, std::mem::size_of<ChannelInner<T>>(), std::mem::align_of<ChannelInner<T>>());
+                    }
+                }
+                self.inner = 0 as u64 as *rw void;
+            }
+        }
+    }
+
+    // =========================================================================
+    // CountingSemaphore: Classic counting semaphore
+    // CountingSemaphore: Classic counting semaphore
+    // =========================================================================
+    struct SemaphoreInner {
+        permits: u64,
+    };
+
+    export struct CountingSemaphore {
+        private inner: *rw SemaphoreInner,
+        private mx: *rw void,
+        private cv: *rw void,
+    };
+
+    export fn semaphore_new(permits: u64) -> CountingSemaphore {
+        unsafe {
+            dec raw = __luna_alloc(std::mem::size_of<SemaphoreInner>(), std::mem::align_of<SemaphoreInner>());
+            dec inner = raw as *rw SemaphoreInner;
+            (*inner).permits = permits;
+            dec mx = __luna_mutex_create();
+            dec cv = __luna_condvar_create();
+            return CountingSemaphore {
+                inner: inner,
+                mx: mx,
+                cv: cv,
+            };
+        }
+    }
+
+    impl CountingSemaphore {
+        export fn new(permits: u64) -> CountingSemaphore {
+            return semaphore_new(permits);
+        }
+
+        export fn acquire(self: &Self) {
+            unsafe {
+                __luna_mutex_lock(self.mx);
+                dec inner = self.inner;
+                while (*inner).permits == (0 as u64) {
+                    __luna_condvar_wait(self.cv, self.mx);
+                }
+                (*inner).permits = (*inner).permits - (1 as u64);
+                __luna_mutex_unlock(self.mx);
+            }
+        }
+
+        export fn try_acquire(self: &Self) -> bool {
+            unsafe {
+                __luna_mutex_lock(self.mx);
+                dec inner = self.inner;
+                if (*inner).permits > (0 as u64) {
+                    (*inner).permits = (*inner).permits - (1 as u64);
+                    __luna_mutex_unlock(self.mx);
+                    return true;
+                }
+                __luna_mutex_unlock(self.mx);
+                return false;
+            }
+        }
+
+        export fn release(self: &Self) {
+            unsafe {
+                __luna_mutex_lock(self.mx);
+                dec inner = self.inner;
+                (*inner).permits = (*inner).permits + (1 as u64);
+                __luna_condvar_signal(self.cv);
+                __luna_mutex_unlock(self.mx);
+            }
+        }
+
+        export fn available_permits(self: &Self) -> u64 {
+            unsafe {
+                __luna_mutex_lock(self.mx);
+                dec p = (*self.inner).permits;
+                __luna_mutex_unlock(self.mx);
+                return p;
+            }
+        }
+    }
+
+    impl std::Drop for CountingSemaphore {
+        fn drop(self: &rw Self) {
+            if (self.inner as u64) != (0 as u64) {
+                unsafe {
+                    __luna_condvar_destroy(self.cv);
+                    __luna_mutex_destroy(self.mx);
+                    __luna_dealloc(self.inner as *rw u8, std::mem::size_of<SemaphoreInner>(), std::mem::align_of<SemaphoreInner>());
+                }
+                self.inner = 0 as u64 as *rw SemaphoreInner;
+            }
+        }
+    }
+}
+
+

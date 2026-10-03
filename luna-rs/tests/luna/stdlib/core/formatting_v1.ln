@@ -41,7 +41,7 @@ fn main() -> i32 {
     output.push_char('|');
     append_display(123456789 as u32, &rw output).unwrap();
     output.push_char('|');
-    append_display(18446744073709551615 as u64, &rw output).unwrap();
+    append_display(18446744073709551615u64, &rw output).unwrap();
     output.push_char('|');
     append_display(123 as u128, &rw output).unwrap();
     output.push_char('|');

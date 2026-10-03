@@ -59,13 +59,13 @@ fn main() -> i32 {
     dec value_4 = (0 as i32) - (2147483647 as i32) - (1 as i32);
     dec expected_4: [char; 11] = ['-', '2', '1', '4', '7', '4', '8', '3', '6', '4', '8'];
     if verify(&value_4, &expected_4) == false { return 5; }
-    dec value_5 = (0 as i64) - (9223372036854775807 as i64) - (1 as i64);
+    dec value_5 = (0 as i64) - (9223372036854775807i64) - (1 as i64);
     dec expected_5: [char; 20] = ['-', '9', '2', '2', '3', '3', '7', '2', '0', '3', '6', '8', '5', '4', '7', '7', '5', '8', '0', '8'];
     if verify(&value_5, &expected_5) == false { return 6; }
     dec value_6 = -((1 as i128) << (126 as i128)) - ((1 as i128) << (126 as i128));
     dec expected_6: [char; 40] = ['-', '1', '7', '0', '1', '4', '1', '1', '8', '3', '4', '6', '0', '4', '6', '9', '2', '3', '1', '7', '3', '1', '6', '8', '7', '3', '0', '3', '7', '1', '5', '8', '8', '4', '1', '0', '5', '7', '2', '8'];
     if verify(&value_6, &expected_6) == false { return 7; }
-    dec value_7 = (0 as isize) - (9223372036854775807 as isize) - (1 as isize);
+    dec value_7 = (0 as isize) - (9223372036854775807isize) - (1 as isize);
     dec expected_7: [char; 20] = ['-', '9', '2', '2', '3', '3', '7', '2', '0', '3', '6', '8', '5', '4', '7', '7', '5', '8', '0', '8'];
     if verify(&value_7, &expected_7) == false { return 8; }
     dec value_8 = 255 as u8;
@@ -74,16 +74,16 @@ fn main() -> i32 {
     dec value_9 = 65535 as u16;
     dec expected_9: [char; 5] = ['6', '5', '5', '3', '5'];
     if verify(&value_9, &expected_9) == false { return 10; }
-    dec value_10 = 4294967295 as u32;
+    dec value_10 = 4294967295u32;
     dec expected_10: [char; 10] = ['4', '2', '9', '4', '9', '6', '7', '2', '9', '5'];
     if verify(&value_10, &expected_10) == false { return 11; }
-    dec value_11 = 18446744073709551615 as u64;
+    dec value_11 = 18446744073709551615u64;
     dec expected_11: [char; 20] = ['1', '8', '4', '4', '6', '7', '4', '4', '0', '7', '3', '7', '0', '9', '5', '5', '1', '6', '1', '5'];
     if verify(&value_11, &expected_11) == false { return 12; }
     dec value_12 = (((1 as u128) << (127 as u128)) - (1 as u128)) * (2 as u128) + (1 as u128);
     dec expected_12: [char; 39] = ['3', '4', '0', '2', '8', '2', '3', '6', '6', '9', '2', '0', '9', '3', '8', '4', '6', '3', '4', '6', '3', '3', '7', '4', '6', '0', '7', '4', '3', '1', '7', '6', '8', '2', '1', '1', '4', '5', '5'];
     if verify(&value_12, &expected_12) == false { return 13; }
-    dec value_13 = 18446744073709551615 as usize;
+    dec value_13 = 18446744073709551615usize;
     dec expected_13: [char; 20] = ['1', '8', '4', '4', '6', '7', '4', '4', '0', '7', '3', '7', '0', '9', '5', '5', '1', '6', '1', '5'];
     if verify(&value_13, &expected_13) == false { return 14; }
     dec value_14 = '界';

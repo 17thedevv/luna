@@ -1,0 +1,62 @@
+import <try>;
+import <core/panic>;
+
+struct ReadyFuture {
+    val: i32,
+};
+
+impl std::Future<i32> for ReadyFuture {
+    fn poll(self: &rw Self, cx: &rw std::Context) -> std::Poll<i32> {
+        return std::Poll::Ready(self.val);
+    }
+}
+
+fn main() -> i32 {
+    // 1. Poll<T> verification
+    dec p1: std::Poll<i32> = std::Poll::Ready(42);
+    if p1.is_ready() == false { return 1; }
+    if p1.is_pending() != false { return 2; }
+
+    match p1 {
+        std::Poll::Ready(v) -> {
+            if v != 42 { return 3; }
+        },
+        std::Poll::Pending -> {
+            return 4;
+        },
+    }
+
+    dec p2: std::Poll<i32> = std::Poll::Pending;
+    if p2.is_pending() == false { return 5; }
+    if p2.is_ready() != false { return 6; }
+
+    // 2. Context & Waker verification
+    dec w = std::Waker { data: 0 as u64 as *rw void };
+    dec rw cx = std::context_from_waker(&w as *std::Waker);
+    if (cx.waker() as u64) == (0 as u64) {
+        return 7;
+    }
+
+    // 3. Future<T> trait polling verification
+    dec rw fut = ReadyFuture { val: 777 };
+    dec poll_res = fut.poll(&rw cx);
+    match poll_res {
+        std::Poll::Ready(val) -> {
+            if val != 777 { return 8; }
+        },
+        std::Poll::Pending -> {
+            return 9;
+        },
+    }
+
+    // 4. Backtrace diagnostics verification
+    dec bt = std::backtrace_capture();
+    if bt.is_empty() != false {
+        return 10;
+    }
+    if bt.frame_count() == (0 as u32) {
+        return 11;
+    }
+
+    return 0;
+}

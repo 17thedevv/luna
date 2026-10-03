@@ -1,0 +1,57 @@
+---
+title: Language Tour
+description: An overview of Luna's syntax and key concepts.
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+<CardGrid>
+  <Card title="Variables & Types" icon="seti:config">
+    Learn about declarations, immutability, and Luna's type system.
+  </Card>
+  <Card title="Functions" icon="seti:function">
+    Functions, methods, and closures.
+  </Card>
+  <Card title="Structs & Enums" icon="seti:json">
+    User-defined types with pattern matching.
+  </Card>
+  <Card title="Ownership & Borrowing" icon="seti:lock">
+    Luna's unique approach to memory safety.
+  </Card>
+  <Card title="Traits & Generics" icon="seti:template">
+    Polymorphism through traits and generic types.
+  </Card>
+  <Card title="Modules" icon="seti:folder">
+    Organizing code with imports and visibility.
+  </Card>
+</CardGrid>
+
+## Quick Example
+
+```luna
+struct Counter {
+    value: i32,
+};
+
+impl Counter {
+    fn new() -> Counter {
+        return Counter { value: 0 };
+    }
+
+    fn increment(self: &rw Counter) {
+        self.value = self.value + 1;
+    }
+
+    fn get(self: &Counter) -> i32 {
+        return self.value;
+    }
+}
+
+fn main() -> i32 {
+    dec rw counter = Counter::new();
+    counter.increment();
+    counter.increment();
+    std::io::println("Count: {}", counter.get());
+    return 0;
+}
+```

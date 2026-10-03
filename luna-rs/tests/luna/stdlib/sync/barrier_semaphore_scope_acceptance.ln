@@ -1,0 +1,97 @@
+import <sync>;
+import <thread>;
+
+fn test_semaphore() -> bool {
+    dec sem = std::semaphore_new(2 as u64);
+    if sem.available_permits() != (2 as u64) { return false; }
+
+    // First acquire
+    dec ok1 = sem.try_acquire();
+    if ok1 == false { return false; }
+    if sem.available_permits() != (1 as u64) { return false; }
+
+    // Second acquire
+    dec ok2 = sem.try_acquire();
+    if ok2 == false { return false; }
+    if sem.available_permits() != (0 as u64) { return false; }
+
+    // Third acquire should fail (0 permits)
+    dec ok3 = sem.try_acquire();
+    if ok3 != false { return false; }
+
+    // Release 1 permit
+    sem.release();
+    if sem.available_permits() != (1 as u64) { return false; }
+
+    // Blocking acquire
+    sem.acquire();
+    if sem.available_permits() != (0 as u64) { return false; }
+
+    return true;
+}
+
+fn test_barrier() -> bool {
+    dec b = std::barrier_new(1 as u32);
+    // With threshold 1, the first caller is immediately the leader
+    dec is_lead = b.wait();
+    if is_lead == false { return false; }
+
+    // Second cycle
+    dec is_lead2 = b.wait();
+    if is_lead2 == false { return false; }
+
+    return true;
+}
+
+struct WorkerData {
+    val1: u64,
+    val2: u64,
+};
+
+fn worker1(arg: *rw WorkerData) {
+    unsafe {
+        (*arg).val1 = 111 as u64;
+    }
+}
+
+fn worker2(arg: *rw WorkerData) {
+    unsafe {
+        (*arg).val2 = 222 as u64;
+    }
+}
+
+fn scope_callback(s: &rw std::Scope, data: *rw WorkerData) {
+    dec r1 = s.spawn_with<WorkerData>(worker1, data);
+    dec r2 = s.spawn_with<WorkerData>(worker2, data);
+}
+
+fn main() -> i32 {
+    // 1. Semaphore verification
+    if test_semaphore() == false {
+        return 1;
+    }
+
+    // 2. Barrier verification
+    if test_barrier() == false {
+        return 2;
+    }
+
+    // 3. Thread Scope verification
+    dec rw data = WorkerData {
+        val1: 0 as u64,
+        val2: 0 as u64,
+    };
+    dec p_data = &rw data as *rw WorkerData;
+
+    std::scope_with<WorkerData>(p_data, scope_callback);
+
+    // Both workers must have completed because std::scope_with joins all threads before returning
+    if data.val1 != (111 as u64) {
+        return 3;
+    }
+    if data.val2 != (222 as u64) {
+        return 4;
+    }
+
+    return 0;
+}

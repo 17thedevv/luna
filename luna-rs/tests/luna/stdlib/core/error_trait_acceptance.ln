@@ -1,0 +1,51 @@
+import <result>;
+import <string>;
+import <file>;
+import <net>;
+import <json>;
+import <encoding>;
+import <time>;
+
+fn error_desc<E: std::Error>(err: &E) -> str {
+    return err.description();
+}
+
+fn matches(actual: str, expected: str) -> bool {
+    dec act = std::string_from_str(actual);
+    dec exp = std::string_from_str(expected);
+    return act.eq(&exp);
+}
+
+fn main() -> i32 {
+    // 1. FileError
+    dec fe = std::FileError::NotFound;
+    if matches(error_desc<std::FileError>(&fe), "file not found") == false { return 1; }
+    if matches(fe.description(), "file not found") == false { return 2; }
+
+    // 2. NetError
+    dec ne = std::NetError::ConnectionRefused;
+    if matches(error_desc<std::NetError>(&ne), "connection refused") == false { return 3; }
+    if matches(ne.description(), "connection refused") == false { return 4; }
+
+    // 3. JsonError
+    dec je = std::json::JsonError::UnexpectedEnd;
+    if matches(error_desc<std::json::JsonError>(&je), "unexpected end of input") == false { return 5; }
+    if matches(je.description(), "unexpected end of input") == false { return 6; }
+
+    // 4. HexError
+    dec he = std::HexError::InvalidLength;
+    if matches(error_desc<std::HexError>(&he), "invalid hex string length") == false { return 7; }
+    if matches(he.description(), "invalid hex string length") == false { return 8; }
+
+    // 5. Base64Error
+    dec b64e = std::Base64Error::InvalidByte;
+    if matches(error_desc<std::Base64Error>(&b64e), "invalid base64 byte") == false { return 9; }
+    if matches(b64e.description(), "invalid base64 byte") == false { return 10; }
+
+    // 6. SystemTimeError
+    dec ste = std::SystemTimeError { duration: std::duration_zero() };
+    if matches(error_desc<std::SystemTimeError>(&ste), "second time provided was earlier than first time") == false { return 11; }
+    if matches(ste.description(), "second time provided was earlier than first time") == false { return 12; }
+
+    return 0;
+}

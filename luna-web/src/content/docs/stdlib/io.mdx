@@ -1,0 +1,86 @@
+---
+title: I/O
+description: Input and output operations.
+---
+
+## Printing
+
+```luna
+import std::io;
+
+// Print with newline
+std::io::println("Hello, Luna!");
+
+// Print without newline
+std::io::print("Enter your name: ");
+
+// Formatted printing
+std::io::println("Values: {}, {}", 1, 2, 3);
+
+dec name = "Luna";
+dec age = 2024;
+std::io::println("{} is {} years old", name, age);
+```
+
+## Format Specifiers
+
+```luna
+// Integers
+std::io::println("{:d}", 42);           // 42
+std::io::println("{:x}", 255);          // ff
+std::io::println("{:b}", 10);           // 1010
+std::io::println("{:o}", 8);            // 10
+
+// Floats
+std::io::println("{:.2f}", 3.14159);     // 3.14
+
+// Strings
+std::io::println("{:s}", "hello");       // hello
+std::io::println("{:>10}", "hi");        //         hi
+std::io::println("{:.<10}", "hi");       // hi........
+```
+
+## Reading Input
+
+```luna
+import <io>;
+
+// Read a line
+dec line = std::io::read_line();
+match line {
+    Option::Some(input) -> {
+        std::io::println("You entered: {}", input);
+    },
+    Option::None -> {
+        std::io::println("Empty input");
+    }
+}
+```
+
+## File I/O
+
+```luna
+import <io>;
+
+// Read entire file
+dec content = std::io::read_file("data.txt");
+match content {
+    Result::Ok(text) -> {
+        std::io::println("{}", text);
+    },
+    Result::Err(e) -> {
+        std::io::println("Error: {}", e);
+    }
+}
+
+// Write to file
+dec result = std::io::write_file("output.txt", "Hello!");
+match result {
+    Result::Ok(()) -> {
+        std::io::println("Written successfully");
+    },
+    Result::Err(e) -> {
+        std::io::println("Error: {}", e);
+    }
+}
+```

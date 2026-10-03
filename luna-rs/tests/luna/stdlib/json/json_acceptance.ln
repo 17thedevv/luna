@@ -1,0 +1,158 @@
+import <io>;
+import <vec>;
+import <string>;
+import <result>;
+import <json>;
+
+
+fn test_primitives() -> i32 {
+    // 1. Null
+    dec null_str = "null";
+    dec null_bytes = null_str.as_bytes();
+    dec null_res = std::json::parse(null_bytes);
+    if null_res.is_err() { return 1; }
+    dec null_val = null_res.ok().unwrap();
+    if null_val.is_null() == false { return 2; }
+
+    // 2. Bool true
+    dec t_str = "  true  ";
+    dec t_res = std::json::parse(t_str.as_bytes());
+    if t_res.is_err() { return 3; }
+    dec t_val = t_res.ok().unwrap();
+    if t_val.is_bool() == false { return 4; }
+    if t_val.as_bool().unwrap() == false { return 5; }
+
+    // 3. Bool false
+    dec f_str = "false";
+    dec f_res = std::json::parse(f_str.as_bytes());
+    if f_res.is_err() { return 6; }
+    dec f_val = f_res.ok().unwrap();
+    if f_val.as_bool().unwrap() == true { return 7; }
+
+    // 4. Number integer
+    dec n_str = "12345";
+    dec n_res = std::json::parse(n_str.as_bytes());
+    if n_res.is_err() { return 8; }
+    dec n_val = n_res.ok().unwrap();
+    if n_val.as_number().unwrap() != 12345.0 { return 9; }
+
+    // 5. Number negative float
+    dec neg_str = "-42.5";
+    dec neg_res = std::json::parse(neg_str.as_bytes());
+    if neg_res.is_err() { return 10; }
+    dec neg_val = neg_res.ok().unwrap();
+    if neg_val.as_number().unwrap() != -42.5 { return 11; }
+
+    // 6. String
+    dec s_str = "\"Hello, Luna!\"";
+    dec s_res = std::json::parse(s_str.as_bytes());
+    if s_res.is_err() { return 12; }
+    dec s_val = s_res.ok().unwrap();
+    if s_val.is_string() == false { return 13; }
+    dec s_bytes = s_val.as_string().unwrap().as_bytes();
+    if s_bytes.len != (12 as usize) { return 14; }
+
+    return 0;
+}
+
+fn test_array() -> i32 {
+    dec arr_str = "[1, 2, true, \"abc\"]";
+    dec res = std::json::parse(arr_str.as_bytes());
+    if res.is_err() { return 20; }
+    dec val = res.ok().unwrap();
+    if val.is_array() == false { return 21; }
+
+    dec arr = val.as_array().unwrap();
+    if arr.len() != (4 as u64) { return 22; }
+
+    // Index 0: 1.0
+    dec item0 = val.get_index(0 as usize).unwrap();
+    if item0.as_number().unwrap() != 1.0 { return 23; }
+
+    // Index 2: true
+    dec item2 = val.get_index(2 as usize).unwrap();
+    if item2.as_bool().unwrap() == false { return 24; }
+
+    // Index 3: "abc"
+    dec item3 = val.get_index(3 as usize).unwrap();
+    if item3.as_string().unwrap().len() != (3 as u64) { return 25; }
+
+    return 0;
+}
+
+fn test_object() -> i32 {
+    dec obj_str = "{\"name\": \"Luna\", \"version\": 1, \"active\": true}";
+    dec res = std::json::parse(obj_str.as_bytes());
+    if res.is_err() { return 30; }
+    dec val = res.ok().unwrap();
+    if val.is_object() == false { return 31; }
+
+    // Get "name"
+    dec key_name: [u8; 4] = [110 as u8, 97 as u8, 109 as u8, 101 as u8];
+    dec name_opt = val.get(&key_name);
+    if name_opt.is_none() { return 32; }
+    dec name_val = name_opt.unwrap();
+    if name_val.is_string() == false { return 33; }
+    if name_val.as_string().unwrap().len() != (4 as u64) { return 34; }
+
+    // Get "version"
+    dec key_ver: [u8; 7] = [118 as u8, 101 as u8, 114 as u8, 115 as u8, 105 as u8, 111 as u8, 110 as u8];
+    dec ver_opt = val.get(&key_ver);
+    if ver_opt.is_none() { return 35; }
+    if ver_opt.unwrap().as_number().unwrap() != 1.0 { return 36; }
+
+    // Get "active"
+    dec key_act: [u8; 6] = [97 as u8, 99 as u8, 116 as u8, 105 as u8, 118 as u8, 101 as u8];
+    dec act_opt = val.get(&key_act);
+    if act_opt.is_none() { return 37; }
+    if act_opt.unwrap().as_bool().unwrap() == false { return 38; }
+
+    // Get non-existent key
+    dec key_none: [u8; 3] = [120 as u8, 121 as u8, 122 as u8];
+    dec none_opt = val.get(&key_none);
+    if none_opt.is_some() { return 39; }
+
+    return 0;
+}
+
+fn test_roundtrip_stringify() -> i32 {
+    dec obj_str = "{\"id\":100,\"valid\":true}";
+    dec res = std::json::parse(obj_str.as_bytes());
+    if res.is_err() { return 40; }
+    dec val = res.ok().unwrap();
+
+    dec serialized = std::json::stringify(&val);
+    dec s_bytes = serialized.as_bytes();
+
+    // Re-parse the serialized string
+    dec res2 = std::json::parse(s_bytes);
+    if res2.is_err() { return 41; }
+    dec val2 = res2.ok().unwrap();
+
+    dec key_id: [u8; 2] = [105 as u8, 100 as u8];
+    dec id_val = val2.get(&key_id);
+    if id_val.is_none() { return 42; }
+    if id_val.unwrap().as_number().unwrap() != 100.0 { return 43; }
+
+    // Test pretty print produces valid output
+    dec pretty = std::json::pretty_print(&val, 2 as usize);
+    if pretty.len() <= serialized.len() { return 44; }
+
+    return 0;
+}
+
+export fn main() -> i32 {
+    dec code1 = test_primitives();
+    if code1 != 0 { return code1; }
+
+    dec code2 = test_array();
+    if code2 != 0 { return code2; }
+
+    dec code3 = test_object();
+    if code3 != 0 { return code3; }
+
+    dec code4 = test_roundtrip_stringify();
+    if code4 != 0 { return code4; }
+
+    return 0;
+}

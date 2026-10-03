@@ -1,0 +1,81 @@
+import <rc>;
+import <arc>;
+
+fn main() -> i32 {
+    // 1. Test Rc and RcWeak
+    dec rc = std::rc_new<i32>(123);
+    if rc.strong_count() != (1 as u64) { return 1; }
+    if rc.weak_count() != (0 as u64) { return 2; }
+
+    dec weak = rc.downgrade();
+    if rc.strong_count() != (1 as u64) { return 3; }
+    if rc.weak_count() != (1 as u64) { return 4; }
+    if weak.strong_count() != (1 as u64) { return 5; }
+    if weak.weak_count() != (1 as u64) { return 6; }
+
+    // Upgrade while Rc is still alive
+    dec opt_upgraded = weak.upgrade();
+    match opt_upgraded {
+        std::Option::Some(rc2) -> {
+            if (*rc2.as_ref()) != 123 { return 7; }
+            if rc2.strong_count() != (2 as u64) { return 8; }
+        },
+        std::Option::None -> {
+            return 9;
+        },
+    }
+
+    // Now let Rc drop in a sub-scope
+    dec rw weak_after = weak.clone();
+    {
+        dec rc_scoped = std::rc_new<i32>(456);
+        weak_after = rc_scoped.downgrade();
+        if weak_after.strong_count() != (1 as u64) { return 10; }
+        // rc_scoped drops at end of block
+    }
+
+    // Upgrade after Rc has dropped -> should be None
+    dec opt_dead = weak_after.upgrade();
+    match opt_dead {
+        std::Option::Some(x) -> { return 11; },
+        std::Option::None -> {},
+    }
+
+    // 2. Test Arc and ArcWeak
+    dec arc = std::arc_new<i32>(789);
+    if arc.strong_count() != (1 as u64) { return 12; }
+    if arc.weak_count() != (0 as u64) { return 13; }
+
+    dec arc_weak = arc.downgrade();
+    if arc.strong_count() != (1 as u64) { return 14; }
+    if arc.weak_count() != (1 as u64) { return 15; }
+
+    // Upgrade while Arc is alive
+    dec opt_arc_up = arc_weak.upgrade();
+    match opt_arc_up {
+        std::Option::Some(arc2) -> {
+            if (*arc2.as_ref()) != 789 { return 16; }
+            if arc2.strong_count() != (2 as u64) { return 17; }
+        },
+        std::Option::None -> {
+            return 18;
+        },
+    }
+
+    // Test Arc dropping in a sub-scope
+    dec rw arc_weak_after = arc_weak.clone();
+    {
+        dec arc_scoped = std::arc_new<i32>(999);
+        arc_weak_after = arc_scoped.downgrade();
+        if arc_weak_after.strong_count() != (1 as u64) { return 19; }
+        // arc_scoped drops here
+    }
+
+    dec opt_arc_dead = arc_weak_after.upgrade();
+    match opt_arc_dead {
+        std::Option::Some(x) -> { return 20; },
+        std::Option::None -> {},
+    }
+
+    return 0;
+}

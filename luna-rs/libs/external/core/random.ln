@@ -1,0 +1,193 @@
+import <ptr>;
+import <mem>;
+import <slice>;
+
+extern fn __luna_random_bytes(buf: *rw void, len: u64) -> i32;
+extern fn __luna_random_entropy() -> u64;
+
+fn splitmix64(state: &rw u64) -> u64 {
+    *state = *state + (11400714819323198485u64);
+    dec rw z = *state;
+    z = (z ^ (z >> (30 as u64))) * (13787848793156543929u64);
+    z = (z ^ (z >> (27 as u64))) * (10723151780598845931u64);
+    return z ^ (z >> (31 as u64));
+}
+
+fn rotl(x: u64, k: u64) -> u64 {
+    return (x << k) | (x >> ((64 as u64) - k));
+}
+
+export module std {
+
+    // =========================================================================
+    // Rng (Xoshiro256** Pseudo-Random Number Generator)
+    // =========================================================================
+    export struct Rng {
+        s0: u64,
+        s1: u64,
+        s2: u64,
+        s3: u64,
+    };
+
+    export fn rng_new(seed: u64) -> Rng {
+        dec rw sm_state = seed;
+        if sm_state == (0 as u64) {
+            sm_state = 11400714819323198485u64;
+        }
+        dec s0 = splitmix64(&rw sm_state);
+        dec s1 = splitmix64(&rw sm_state);
+        dec s2 = splitmix64(&rw sm_state);
+        dec s3 = splitmix64(&rw sm_state);
+        return Rng {
+            s0: s0,
+            s1: s1,
+            s2: s2,
+            s3: s3,
+        };
+    }
+
+    export fn rng_from_entropy() -> Rng {
+        dec entropy = __luna_random_entropy();
+        return rng_new(entropy);
+    }
+
+    impl Rng {
+        export fn next_u64(self: &rw Self) -> u64 {
+            dec result = rotl(self.s1 * (5 as u64), 7 as u64) * (9 as u64);
+            dec t = self.s1 << (17 as u64);
+
+            self.s2 = self.s2 ^ self.s0;
+            self.s3 = self.s3 ^ self.s1;
+            self.s1 = self.s1 ^ self.s2;
+            self.s0 = self.s0 ^ self.s3;
+
+            self.s2 = self.s2 ^ t;
+            self.s3 = rotl(self.s3, 45 as u64);
+
+            return result;
+        }
+
+        export fn next_u32(self: &rw Self) -> u32 {
+            return (self.next_u64() >> (32 as u64)) as u32;
+        }
+
+        export fn next_i64(self: &rw Self) -> i64 {
+            return self.next_u64() as i64;
+        }
+
+        export fn next_i32(self: &rw Self) -> i32 {
+            return self.next_u32() as i32;
+        }
+
+        export fn next_bool(self: &rw Self) -> bool {
+            return (self.next_u64() & (1 as u64)) != (0 as u64);
+        }
+
+        export fn next_f64(self: &rw Self) -> f64 {
+            dec v = self.next_u64() >> (11 as u64);
+            return (v as f64) * 0.00000000000000011102230246251565;
+        }
+
+        export fn gen_range_u64(self: &rw Self, low: u64, high: u64) -> u64 {
+            if high <= low {
+                return low;
+            }
+            dec range = high - low;
+            return low + (self.next_u64() % range);
+        }
+
+        export fn gen_range_i32(self: &rw Self, low: i32, high: i32) -> i32 {
+            if high <= low {
+                return low;
+            }
+            dec range = (high - low) as u32;
+            dec rem = self.next_u32() % range;
+            return low + (rem as i32);
+        }
+
+        export fn fill_bytes(self: &rw Self, buf: &rw [u8]) {
+            dec len = buf.len();
+            dec rw i: usize = 0 as usize;
+            while (i + (8 as usize)) <= len {
+                dec val = self.next_u64();
+                buf[i] = (val & (255 as u64)) as u8;
+                buf[i + (1 as usize)] = ((val >> (8 as u64)) & (255 as u64)) as u8;
+                buf[i + (2 as usize)] = ((val >> (16 as u64)) & (255 as u64)) as u8;
+                buf[i + (3 as usize)] = ((val >> (24 as u64)) & (255 as u64)) as u8;
+                buf[i + (4 as usize)] = ((val >> (32 as u64)) & (255 as u64)) as u8;
+                buf[i + (5 as usize)] = ((val >> (40 as u64)) & (255 as u64)) as u8;
+                buf[i + (6 as usize)] = ((val >> (48 as u64)) & (255 as u64)) as u8;
+                buf[i + (7 as usize)] = ((val >> (56 as u64)) & (255 as u64)) as u8;
+                i = i + (8 as usize);
+            }
+            if i < len {
+                dec rw rem_val = self.next_u64();
+                while i < len {
+                    buf[i] = (rem_val & (255 as u64)) as u8;
+                    rem_val = rem_val >> (8 as u64);
+                    i = i + (1 as usize);
+                }
+            }
+        }
+
+        export fn shuffle<T>(self: &rw Self, slice: &rw [T]) {
+            dec len = slice.len();
+            if len <= (1 as usize) {
+                return;
+            }
+            dec rw i = len - (1 as usize);
+            while i > (0 as usize) {
+                dec j = (self.next_u64() % ((i + (1 as usize)) as u64)) as usize;
+                if i != j {
+                    dec base_ptr = &rw slice[0] as *rw T;
+                    unsafe {
+                        dec p_i = std::ptr::add_mut<T>(base_ptr, i as u64);
+                        dec p_j = std::ptr::add_mut<T>(base_ptr, j as u64);
+                        dec tmp = std::ptr::read<T>(p_i as *T);
+                        std::ptr::write<T>(p_i, std::ptr::read<T>(p_j as *T));
+                        std::ptr::write<T>(p_j, tmp);
+                    }
+                }
+                i = i - (1 as usize);
+            }
+        }
+    }
+
+    // =========================================================================
+    // Free helper functions using thread-safe mixed entropy
+    // =========================================================================
+    export fn random_u64() -> u64 {
+        dec rw rng = rng_from_entropy();
+        return rng.next_u64();
+    }
+
+    export fn random_u32() -> u32 {
+        dec rw rng = rng_from_entropy();
+        return rng.next_u32();
+    }
+
+    export fn random_i32() -> i32 {
+        dec rw rng = rng_from_entropy();
+        return rng.next_i32();
+    }
+
+    export fn random_range_i32(low: i32, high: i32) -> i32 {
+        dec rw rng = rng_from_entropy();
+        return rng.gen_range_i32(low, high);
+    }
+
+    export fn random_range_u64(low: u64, high: u64) -> u64 {
+        dec rw rng = rng_from_entropy();
+        return rng.gen_range_u64(low, high);
+    }
+
+    export fn random_f64() -> f64 {
+        dec rw rng = rng_from_entropy();
+        return rng.next_f64();
+    }
+
+    export fn random_bool() -> bool {
+        dec rw rng = rng_from_entropy();
+        return rng.next_bool();
+    }
+}

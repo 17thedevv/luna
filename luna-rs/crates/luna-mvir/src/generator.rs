@@ -318,6 +318,83 @@ impl<'a> MvirGenerator<'a> {
         }
     }
 
+    /// Comptime may run before unrelated bodies are typechecked. Lower only
+    /// the call graph reachable from this evaluation, not the whole session.
+    pub fn generate_comptime_dependencies(&mut self, root: &Function) {
+        let mut pending = vec![root.clone()];
+        let mut visited = std::collections::HashSet::new();
+        while let Some(function) = pending.pop() {
+            for value in &function.values {
+                let mut callees = Vec::new();
+                match &value.inst {
+                    Instruction::CallDirect { callee, args } => {
+                        callees.push(callee.clone());
+                        for arg in args {
+                            if let Operand::Global(global) = arg { callees.push(global.clone()); }
+                        }
+                    }
+                    Instruction::Assign(Operand::Global(global))
+                    | Instruction::CallIndirect { callee: Operand::Global(global), .. } => {
+                        callees.push(global.clone());
+                    }
+                    Instruction::Drop { callee: Some(global), .. } => callees.push(global.clone()),
+                    Instruction::MakeTraitObject { trait_sym, concrete_sym, .. } => {
+                        let key = luna_semantic::semantic_tables::ImplKey {
+                            trait_id: Some(*trait_sym),
+                            self_type_def: (*concrete_sym).into(),
+                        };
+                        let methods = self.ctx.tables.impl_methods.get(&key).into_iter().flatten()
+                            .copied().chain(self.ctx.tables.drop_impls.get(concrete_sym).copied());
+                        for symbol in methods {
+                            if let Some(&decl) = self.ctx.tables.symbol_decls.get(&symbol) {
+                                let identity = luna_semantic::CanonicalInstanceIdentity {
+                                    kind: luna_semantic::CanonicalInstanceKind::Decl(decl),
+                                    subst: Vec::new(),
+                                };
+                                callees.push(GlobalId {
+                                    name: identity.symbol_name_with_tables(&self.ctx.types,
+                                        &self.ctx.symbol_table, &self.ctx.tables,
+                                        &self.ctx.symbol_table.get_symbol(symbol).name),
+                                    symbol_id: Some(symbol),
+                                });
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+                for callee in callees {
+                    if !visited.insert(callee.name.clone()) { continue; }
+                    if let Some(existing) = self.module.functions.iter().find(|f| f.name.name == callee.name).cloned() {
+                        pending.push(existing);
+                        continue;
+                    }
+                    let instance = self.ctx.instantiated_functions.iter().find(|instance| {
+                        let symbol = self.ctx.tables.decl_symbols.get(&instance.instance.decl_id);
+                        symbol.is_some_and(|symbol| {
+                            let name = &self.ctx.symbol_table.get_symbol(*symbol).name;
+                            let identity = luna_semantic::CanonicalInstanceIdentity {
+                                kind: luna_semantic::CanonicalInstanceKind::Decl(instance.instance.decl_id),
+                                subst: instance.instance.subst.clone(),
+                            };
+                            identity.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, name) == callee.name
+                        })
+                    }).cloned();
+                    let before = self.module.functions.len();
+                    if let Some(instance) = instance {
+                        self.generate_mono_instance(&instance);
+                    } else if let Some(symbol) = callee.symbol_id {
+                        if let Some(decl) = self.ctx.symbol_table.get_symbol(symbol).decl_id {
+                            if matches!(&self.arena.decls[decl.0 as usize], Decl::Function { generic_params, body: Some(_), .. } if generic_params.is_empty()) {
+                                self.generate_function_by_decl_id(decl);
+                            }
+                        }
+                    }
+                    pending.extend(self.module.functions[before..].iter().cloned());
+                }
+            }
+        }
+    }
+
     fn get_drop_glue_global_id(&self, ty_id: luna_semantic::SemanticTypeId) -> Option<GlobalId> {
         let ty_id = self.ctx.types.resolve(ty_id);
         if !self.ctx.needs_drop(ty_id) {
@@ -752,6 +829,13 @@ impl<'a> MvirGenerator<'a> {
                 if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id).copied() {
                     if let Some(&val_id) = self.locals.get(&sym_id) {
                         return Operand::Value(val_id);
+                    }
+                    if let Some(value) = self.ctx.const_values.get(&sym_id).cloned() {
+                        let ty = self.get_expr_type(expr_id);
+                        let value = self.materialize_comptime_value(&value, ty);
+                        let storage = self.push_inst(Instruction::Alloca, ty);
+                        self.push_inst(Instruction::Store { ptr: Operand::Value(storage), value }, ty);
+                        return Operand::Value(storage);
                     }
                     let sym_name = if (sym_id.0 as usize) < self.ctx.symbol_table.symbols.len() {
                         self.ctx.symbol_table.symbols[sym_id.0 as usize].name.clone()
@@ -1458,9 +1542,13 @@ impl<'a> MvirGenerator<'a> {
 
                 let mut returned_sym = None;
                 let val_operand = if let Some(expr_id) = value {
-                    let expr = &self.arena.exprs[expr_id.0 as usize];
+                    let mut curr_expr_id = expr_id;
+                    while let Expr::Member { object, .. } | Expr::TupleIndex { object, .. } = &self.arena.exprs[curr_expr_id.0 as usize] {
+                        curr_expr_id = object;
+                    }
+                    let expr = &self.arena.exprs[curr_expr_id.0 as usize];
                     if let Expr::Identifier { .. } = expr {
-                        if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id).copied() {
+                        if let Some(sym_id) = self.ctx.tables.expr_symbols.get(&curr_expr_id).copied() {
                             if self.locals.contains_key(&sym_id) {
                                 returned_sym = Some(sym_id);
                             }
@@ -1959,7 +2047,31 @@ impl<'a> MvirGenerator<'a> {
             Expr::Literal(tok, text) => {
                 match tok.kind {
                     luna_lexer::TokenKind::IntegerLiteral => {
-                        Operand::Number(text.clone())
+                        let literal = luna_lexer::literal::decode_integer(text)
+                            .expect("semantic analysis validated the integer literal");
+                        let constant = self.push_inst(Instruction::Assign(Operand::Number(literal.magnitude.to_string())), ty_id);
+                        Operand::Value(constant)
+                    }
+                    luna_lexer::TokenKind::ByteLiteral | luna_lexer::TokenKind::ByteStringLiteral => {
+                        let bytes = luna_lexer::literal::decode_bytes(text, tok.kind == luna_lexer::TokenKind::ByteLiteral)
+                            .expect("semantic analysis validated the byte literal");
+                        if tok.kind == luna_lexer::TokenKind::ByteLiteral {
+                            let constant = self.push_inst(Instruction::Assign(Operand::Number(bytes[0].to_string())), ty_id);
+                            Operand::Value(constant)
+                        } else {
+                            let byte_ty = match self.ctx.types.get(ty_id) {
+                                luna_semantic::SemanticType::Array(elem, _) => *elem,
+                                _ => {
+                                    self.diagnostics.push(luna_common::Diagnostic::error("E_UNELABORATED_LITERAL: byte array reached MVIR without its semantic array type").with_span(tok.span));
+                                    return Operand::Number("0".to_string());
+                                }
+                            };
+                            let value = luna_semantic::ComptimeValue::Array {
+                                elements: bytes.into_iter().map(|byte| luna_semantic::ComptimeValue::Int { val: byte as i128, width: luna_semantic::IntWidth::U8 }).collect(),
+                                elem_ty: Some(byte_ty),
+                            };
+                            self.materialize_comptime_value(&value, ty_id)
+                        }
                     }
                     luna_lexer::TokenKind::FloatLiteral => {
                         let ty = self.ctx.types.get(ty_id);
@@ -2906,6 +3018,16 @@ impl<'a> MvirGenerator<'a> {
                 Operand::Value(output_val)
             }
             Expr::Unary { op, operand } => {
+                if *op == luna_ast::expr::UnaryOp::Neg {
+                    if let Expr::Literal(token, text) = &self.arena.exprs[operand.0 as usize] {
+                        if token.kind == luna_lexer::TokenKind::IntegerLiteral {
+                            let literal = luna_lexer::literal::decode_integer(text).expect("validated integer literal");
+                            let negative = (literal.magnitude as i128).wrapping_neg();
+                            let constant = self.push_inst(Instruction::Assign(Operand::Number(negative.to_string())), ty_id);
+                            return Operand::Value(constant);
+                        }
+                    }
+                }
                 use luna_ast::expr::UnaryOp;
                 match op {
                     UnaryOp::Ref => {
@@ -2989,7 +3111,10 @@ impl<'a> MvirGenerator<'a> {
         match val {
             luna_semantic::ComptimeValue::Unit => Operand::Number("0".to_string()),
             luna_semantic::ComptimeValue::Bool(b) => Operand::Boolean(*b),
-            luna_semantic::ComptimeValue::Int { val, .. } => Operand::Number(val.to_string()),
+            luna_semantic::ComptimeValue::Int { val, .. } => {
+                let constant = self.push_inst(Instruction::Assign(Operand::Number(val.to_string())), ty_id);
+                Operand::Value(constant)
+            },
             luna_semantic::ComptimeValue::Float { val, .. } => Operand::Number(val.to_string()),
             luna_semantic::ComptimeValue::Char(c) => Operand::Number((*c as u32).to_string()),
             luna_semantic::ComptimeValue::Str(s) => Operand::StringRef(format!("\"{}\"", s)),
@@ -3018,6 +3143,9 @@ impl<'a> MvirGenerator<'a> {
             }
             luna_semantic::ComptimeValue::Array { elements, elem_ty } => {
                 let alloca_val = self.push_inst(Instruction::Alloca, ty_id);
+                if elements.is_empty() {
+                    self.push_inst(Instruction::MarkInit { value: Operand::Value(alloca_val) }, ty_id);
+                }
                 let e_ty = elem_ty.unwrap_or(luna_semantic::SemanticTypeId(0));
                 for (i, elem) in elements.iter().enumerate() {
                     let elem_op = self.materialize_comptime_value(elem, e_ty);
@@ -3235,6 +3363,12 @@ impl<'a> MvirGenerator<'a> {
                     luna_lexer::TokenKind::KwFalse => Operand::Boolean(false),
                     luna_lexer::TokenKind::StringLiteral => Operand::StringRef(text),
                     luna_lexer::TokenKind::CharLiteral => Operand::Char(text),
+                    luna_lexer::TokenKind::IntegerLiteral => {
+                        let number = luna_lexer::literal::decode_integer(&text).expect("validated integer pattern");
+                        let ty = self.get_pat_type(pat).expect("typed literal pattern");
+                        let constant = self.push_inst(Instruction::Assign(Operand::Number(number.magnitude.to_string())), ty);
+                        Operand::Value(constant)
+                    }
                     _ => Operand::Number(text),
                 };
                 

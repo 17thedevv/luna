@@ -57,4 +57,80 @@ impl<T, E> std::Try for std::Result<T, E> {
         };
     }
 }
+
+impl<T> std::FromResidual<std::Option<std::Infallible> > for std::Option<T> {
+    fn from_residual(residual: std::Option<std::Infallible>) -> Self {
+        return match residual {
+            std::Option::None -> std::Option::None,
+            std::Option::Some(_) -> __luna_panic(),
+        };
+    }
+}
+
+impl<T> std::Try for std::Option<T> {
+    type Output = T;
+    type Residual = std::Option<std::Infallible>;
+    
+    fn from_output(v: T) -> Self {
+        return std::Option::Some(v);
+    }
+    
+    fn branch(self: Self) -> std::ControlFlow<std::Option<std::Infallible>, T> {
+        return match self {
+            std::Option::Some(v) -> std::ControlFlow::Continue(v),
+            std::Option::None -> std::ControlFlow::Break(std::Option::None),
+        };
+    }
+}
+
+    // =========================================================================
+    // Async / Future Primitives
+    // =========================================================================
+
+    export enum Poll<T> {
+        Ready(T),
+        Pending,
+    }
+
+    impl<T> Poll<T> {
+        export fn is_ready(self: &Self) -> bool {
+            return match *self {
+                Poll::Ready(_) -> true,
+                Poll::Pending -> false,
+            };
+        }
+
+        export fn is_pending(self: &Self) -> bool {
+            return match *self {
+                Poll::Ready(_) -> false,
+                Poll::Pending -> true,
+            };
+        }
+    }
+
+    export struct Waker {
+        data: *rw void,
+    };
+
+    export struct Context {
+        waker: *Waker,
+    };
+
+    export fn context_from_waker(w: *Waker) -> Context {
+        return Context { waker: w };
+    }
+
+    impl Context {
+        export fn from_waker(w: *Waker) -> Context {
+            return context_from_waker(w);
+        }
+
+        export fn waker(self: &Self) -> *Waker {
+            return self.waker;
+        }
+    }
+
+    export trait Future<Output> {
+        fn poll(self: &rw Self, cx: &rw Context) -> Poll<Output>;
+    }
 }

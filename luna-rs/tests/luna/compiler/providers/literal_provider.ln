@@ -1,0 +1,9 @@
+module literals {
+    export struct Envelope<T> { value: T, };
+    export fn envelope<T>(value: T) -> Envelope<T> { return Envelope<T> { value: value }; }
+    export fn identity<T>(value: T) -> T { return value; }
+    export fn bytes() -> [u8; 4] { return b"A\0\xFF\n"; }
+    export fn maximum() -> u128 { return 340282366920938463463374607431768211455u128; }
+    export fn minimum() -> i128 { return -170141183460469231731687303715884105728i128; }
+    export fn byte(value: u8) -> u8 { return value + 1; }
+}

@@ -1,0 +1,107 @@
+---
+title: Structs & Enums
+description: User-defined types in Luna.
+---
+
+## Structs
+
+### Named Fields
+
+```luna
+struct Point {
+    x: f64,
+    y: f64,
+};
+
+fn main() -> i32 {
+    dec origin = Point { x: 0.0, y: 0.0 };
+    dec p = Point { x: 3.0, y: 4.0 };
+    return 0;
+}
+```
+
+### Generic Structs
+
+```luna
+struct Box<T> {
+    value: T,
+};
+
+impl<T> Box<T> {
+    fn new(value: T) -> Box<T> {
+        return Box { value: value };
+    }
+
+    fn get(self: &Box<T>) -> &T {
+        return &self.value;
+    }
+}
+```
+
+## Enums
+
+### Basic Enums
+
+```luna
+enum Direction {
+    North,
+    South,
+    East,
+    West,
+}
+
+fn turn_left(d: Direction) -> Direction {
+    match d {
+        Direction::North -> Direction::East,
+        Direction::South -> Direction::West,
+        Direction::East -> Direction::South,
+        Direction::West -> Direction::North,
+    }
+}
+```
+
+### Enums with Data
+
+```luna
+enum Message {
+    Quit,
+    Move { x: i32, y: i32 },
+    Write(str),
+    ChangeColor(u8, u8, u8),
+}
+
+fn process(msg: Message) {
+    match msg {
+        Message::Quit -> {
+            std::io::println("Quit");
+        },
+        Message::Move { x, y } -> {
+            std::io::println("Move to {}, {}", x, y);
+        },
+        Message::Write(s) -> {
+            std::io::println("Write: {}", s);
+        },
+        Message::ChangeColor(r, g, b) -> {
+            std::io::println("Color: {}, {}, {}", r, g, b);
+        },
+    }
+}
+```
+
+## Pattern Matching
+
+Enums are powerful with pattern matching:
+
+```luna
+enum Tree<T> {
+    Leaf(T),
+    Node { left: Box<Tree<T>>, right: Box<Tree<T>> },
+}
+
+fn sum(tree: &Tree<i32>) -> i32 {
+    match tree {
+        Tree::Leaf(n) -> *n,
+        Tree::Node { left, right } -> sum(left) + sum(right),
+    }
+}
+```

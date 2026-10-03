@@ -1,5 +1,6 @@
 import <__lang_option>;
 import <__lang_iterator>;
+import <cmp>;
 
 export module std {
     export module iter {
@@ -313,6 +314,188 @@ export fn iter_sum_isize<SumIter: std::Iterator<isize>>(iter: SumIter) -> isize 
     }
     return acc;
 }
+
+    export fn iter_product_i32<ProdIter: std::Iterator<i32>>(iter: ProdIter) -> i32 {
+        dec rw it = iter;
+        dec rw acc: i32 = 1;
+        while true {
+            dec opt = it.next();
+            match opt {
+                std::Option::Some(x) -> { acc = acc * x; },
+                std::Option::None -> { break; },
+            }
+        }
+        return acc;
+    }
+
+    export fn iter_product_u64<ProdIter: std::Iterator<u64>>(iter: ProdIter) -> u64 {
+        dec rw it = iter;
+        dec rw acc: u64 = 1 as u64;
+        while true {
+            dec opt = it.next();
+            match opt {
+                std::Option::Some(x) -> { acc = acc * x; },
+                std::Option::None -> { break; },
+            }
+        }
+        return acc;
+    }
+
+    export fn iter_reduce<ReduceIter: std::Iterator<ReduceItem>, ReduceItem>(iter: ReduceIter, f: fn(ReduceItem, ReduceItem) -> ReduceItem) -> std::Option<ReduceItem> {
+        dec rw it = iter;
+        dec first_opt = it.next();
+        match first_opt {
+            std::Option::Some(first) -> {
+                dec rw acc = first;
+                while true {
+                    dec next_opt = it.next();
+                    match next_opt {
+                        std::Option::Some(val) -> {
+                            dec f_ptr = f;
+                            acc = f_ptr(acc, val);
+                        },
+                        std::Option::None -> {
+                            break;
+                        },
+                    }
+                }
+                return std::Option::Some(acc);
+            },
+            std::Option::None -> {
+                return std::Option::None;
+            },
+        }
+    }
+
+    export fn iter_min<MinIter: std::Iterator<MinItem>, MinItem: std::Ord>(iter: MinIter) -> std::Option<MinItem> {
+        dec rw it = iter;
+        dec first_opt = it.next();
+        match first_opt {
+            std::Option::Some(first) -> {
+                dec rw best = first;
+                while true {
+                    dec opt = it.next();
+                    match opt {
+                        std::Option::Some(val) -> {
+                            if val.cmp(&best) < 0 {
+                                best = val;
+                            }
+                        },
+                        std::Option::None -> {
+                            break;
+                        },
+                    }
+                }
+                return std::Option::Some(best);
+            },
+            std::Option::None -> {
+                return std::Option::None;
+            },
+        }
+    }
+
+    export fn iter_max<MaxIter: std::Iterator<MaxItem>, MaxItem: std::Ord>(iter: MaxIter) -> std::Option<MaxItem> {
+        dec rw it = iter;
+        dec first_opt = it.next();
+        match first_opt {
+            std::Option::Some(first) -> {
+                dec rw best = first;
+                while true {
+                    dec opt = it.next();
+                    match opt {
+                        std::Option::Some(val) -> {
+                            if val.cmp(&best) > 0 {
+                                best = val;
+                            }
+                        },
+                        std::Option::None -> {
+                            break;
+                        },
+                    }
+                }
+                return std::Option::Some(best);
+            },
+            std::Option::None -> {
+                return std::Option::None;
+            },
+        }
+    }
+
+    export fn iter_find_map<FindIter: std::Iterator<FindItem>, FindItem, B>(iter: FindIter, f: fn(FindItem) -> std::Option<B>) -> std::Option<B> {
+        dec rw it = iter;
+        dec f_ptr = f;
+        while true {
+            dec opt = it.next();
+            match opt {
+                std::Option::Some(x) -> {
+                    dec res = f_ptr(x);
+                    if res.is_some() {
+                        return res;
+                    }
+                },
+                std::Option::None -> {
+                    return std::Option::None;
+                },
+            }
+        }
+        return std::Option::None;
+    }
+
+    export fn iter_min_by<MinIter: std::Iterator<MinItem>, MinItem>(iter: MinIter, compare: fn(&MinItem, &MinItem) -> i32) -> std::Option<MinItem> {
+        dec rw it = iter;
+        dec first_opt = it.next();
+        dec cmp_fn = compare;
+        match first_opt {
+            std::Option::Some(first) -> {
+                dec rw best = first;
+                while true {
+                    dec opt = it.next();
+                    match opt {
+                        std::Option::Some(val) -> {
+                            if cmp_fn(&val, &best) < 0 {
+                                best = val;
+                            }
+                        },
+                        std::Option::None -> {
+                            break;
+                        },
+                    }
+                }
+                return std::Option::Some(best);
+            },
+            std::Option::None -> {
+                return std::Option::None;
+            },
+        }
+    }
+
+    export fn iter_max_by<MaxIter: std::Iterator<MaxItem>, MaxItem>(iter: MaxIter, compare: fn(&MaxItem, &MaxItem) -> i32) -> std::Option<MaxItem> {
+        dec rw it = iter;
+        dec first_opt = it.next();
+        dec cmp_fn = compare;
+        match first_opt {
+            std::Option::Some(first) -> {
+                dec rw best = first;
+                while true {
+                    dec opt = it.next();
+                    match opt {
+                        std::Option::Some(val) -> {
+                            if cmp_fn(&val, &best) > 0 {
+                                best = val;
+                            }
+                        },
+                        std::Option::None -> {
+                            break;
+                        },
+                    }
+                }
+                return std::Option::Some(best);
+            },
+            std::Option::None -> {
+                return std::Option::None;
+            },
+        }
+    }
 
     }
 }

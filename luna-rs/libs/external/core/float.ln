@@ -1,6 +1,42 @@
 import <ptr>;
 import <panic>;
 
+#[link(name = "sin")] extern fn c_sin(x: f64) -> f64;
+#[link(name = "cos")] extern fn c_cos(x: f64) -> f64;
+#[link(name = "tan")] extern fn c_tan(x: f64) -> f64;
+#[link(name = "asin")] extern fn c_asin(x: f64) -> f64;
+#[link(name = "acos")] extern fn c_acos(x: f64) -> f64;
+#[link(name = "atan")] extern fn c_atan(x: f64) -> f64;
+#[link(name = "atan2")] extern fn c_atan2(y: f64, x: f64) -> f64;
+#[link(name = "sqrt")] extern fn c_sqrt(x: f64) -> f64;
+#[link(name = "pow")] extern fn c_pow(base: f64, exp: f64) -> f64;
+#[link(name = "exp")] extern fn c_exp(x: f64) -> f64;
+#[link(name = "log")] extern fn c_log(x: f64) -> f64;
+#[link(name = "log2")] extern fn c_log2(x: f64) -> f64;
+#[link(name = "log10")] extern fn c_log10(x: f64) -> f64;
+#[link(name = "floor")] extern fn c_floor(x: f64) -> f64;
+#[link(name = "ceil")] extern fn c_ceil(x: f64) -> f64;
+#[link(name = "round")] extern fn c_round(x: f64) -> f64;
+#[link(name = "trunc")] extern fn c_trunc(x: f64) -> f64;
+
+#[link(name = "sinf")] extern fn c_sinf(x: f32) -> f32;
+#[link(name = "cosf")] extern fn c_cosf(x: f32) -> f32;
+#[link(name = "tanf")] extern fn c_tanf(x: f32) -> f32;
+#[link(name = "asinf")] extern fn c_asinf(x: f32) -> f32;
+#[link(name = "acosf")] extern fn c_acosf(x: f32) -> f32;
+#[link(name = "atanf")] extern fn c_atanf(x: f32) -> f32;
+#[link(name = "atan2f")] extern fn c_atan2f(y: f32, x: f32) -> f32;
+#[link(name = "sqrtf")] extern fn c_sqrtf(x: f32) -> f32;
+#[link(name = "powf")] extern fn c_powf(base: f32, exp: f32) -> f32;
+#[link(name = "expf")] extern fn c_expf(x: f32) -> f32;
+#[link(name = "logf")] extern fn c_logf(x: f32) -> f32;
+#[link(name = "log2f")] extern fn c_log2f(x: f32) -> f32;
+#[link(name = "log10f")] extern fn c_log10f(x: f32) -> f32;
+#[link(name = "floorf")] extern fn c_floorf(x: f32) -> f32;
+#[link(name = "ceilf")] extern fn c_ceilf(x: f32) -> f32;
+#[link(name = "roundf")] extern fn c_roundf(x: f32) -> f32;
+#[link(name = "truncf")] extern fn c_truncf(x: f32) -> f32;
+
 export module std {
 // Bit-preserving IEEE-754 representation helpers.
 export fn f32_to_bits(val: f32) -> u32 {
@@ -33,10 +69,10 @@ export fn f64_from_bits(bits: u64) -> f64 {
 
 export fn f32_nan() -> f32 { return f32_from_bits(2143289344 as u32); }
 export fn f32_infinity() -> f32 { return f32_from_bits(2139095040 as u32); }
-export fn f32_neg_infinity() -> f32 { return f32_from_bits(4286578688 as u32); }
-export fn f64_nan() -> f64 { return f64_from_bits(9221120237041090560 as u64); }
-export fn f64_infinity() -> f64 { return f64_from_bits(9218868437227405312 as u64); }
-export fn f64_neg_infinity() -> f64 { return f64_from_bits(18442240474082164736 as u64); }
+export fn f32_neg_infinity() -> f32 { return f32_from_bits(4286578688u32); }
+export fn f64_nan() -> f64 { return f64_from_bits(9221120237041090560u64); }
+export fn f64_infinity() -> f64 { return f64_from_bits(9218868437227405312u64); }
+export fn f64_neg_infinity() -> f64 { return f64_from_bits(18442240474082164736u64); }
 
 export trait ToBits<Bits> {
     fn to_bits(self: &Self) -> Bits;
@@ -58,6 +94,23 @@ export trait FloatOps {
     fn min(self: Self, other: Self) -> Self;
     fn max(self: Self, other: Self) -> Self;
     fn clamp(self: Self, min_val: Self, max_val: Self) -> Self;
+    fn floor(self: Self) -> Self;
+    fn ceil(self: Self) -> Self;
+    fn round(self: Self) -> Self;
+    fn trunc(self: Self) -> Self;
+    fn sqrt(self: Self) -> Self;
+    fn pow(self: Self, exp: Self) -> Self;
+    fn exp(self: Self) -> Self;
+    fn log(self: Self) -> Self;
+    fn log2(self: Self) -> Self;
+    fn log10(self: Self) -> Self;
+    fn sin(self: Self) -> Self;
+    fn cos(self: Self) -> Self;
+    fn tan(self: Self) -> Self;
+    fn asin(self: Self) -> Self;
+    fn acos(self: Self) -> Self;
+    fn atan(self: Self) -> Self;
+    fn atan2(self: Self, other: Self) -> Self;
 }
 
 impl ToBits<u32> for f32 {
@@ -87,7 +140,7 @@ impl FloatOps for f32 {
 
     fn is_infinite(self: &Self) -> bool {
         dec b = f32_to_bits(*self);
-        return (b == (2139095040 as u32)) || (b == (4286578688 as u32));
+        return (b == (2139095040 as u32)) || (b == (4286578688u32));
     }
 
     fn is_finite(self: &Self) -> bool {
@@ -95,11 +148,11 @@ impl FloatOps for f32 {
     }
 
     fn is_sign_positive(self: &Self) -> bool {
-        return (f32_to_bits(*self) & (2147483648 as u32)) == (0 as u32);
+        return (f32_to_bits(*self) & (2147483648u32)) == (0 as u32);
     }
 
     fn is_sign_negative(self: &Self) -> bool {
-        return (f32_to_bits(*self) & (2147483648 as u32)) != (0 as u32);
+        return (f32_to_bits(*self) & (2147483648u32)) != (0 as u32);
     }
 
     fn abs(self: Self) -> Self {
@@ -128,6 +181,24 @@ impl FloatOps for f32 {
         if self > max_val { return max_val; }
         return self;
     }
+
+    fn floor(self: Self) -> Self { return c_floorf(self); }
+    fn ceil(self: Self) -> Self { return c_ceilf(self); }
+    fn round(self: Self) -> Self { return c_roundf(self); }
+    fn trunc(self: Self) -> Self { return c_truncf(self); }
+    fn sqrt(self: Self) -> Self { return c_sqrtf(self); }
+    fn pow(self: Self, exp: Self) -> Self { return c_powf(self, exp); }
+    fn exp(self: Self) -> Self { return c_expf(self); }
+    fn log(self: Self) -> Self { return c_logf(self); }
+    fn log2(self: Self) -> Self { return c_log2f(self); }
+    fn log10(self: Self) -> Self { return c_log10f(self); }
+    fn sin(self: Self) -> Self { return c_sinf(self); }
+    fn cos(self: Self) -> Self { return c_cosf(self); }
+    fn tan(self: Self) -> Self { return c_tanf(self); }
+    fn asin(self: Self) -> Self { return c_asinf(self); }
+    fn acos(self: Self) -> Self { return c_acosf(self); }
+    fn atan(self: Self) -> Self { return c_atanf(self); }
+    fn atan2(self: Self, other: Self) -> Self { return c_atan2f(self, other); }
 }
 
 impl FloatOps for f64 {
@@ -135,7 +206,7 @@ impl FloatOps for f64 {
 
     fn is_infinite(self: &Self) -> bool {
         dec b = f64_to_bits(*self);
-        return (b == (9218868437227405312 as u64)) || (b == (18442240474082164736 as u64));
+        return (b == (9218868437227405312u64)) || (b == (18442240474082164736u64));
     }
 
     fn is_finite(self: &Self) -> bool {
@@ -143,15 +214,15 @@ impl FloatOps for f64 {
     }
 
     fn is_sign_positive(self: &Self) -> bool {
-        return (f64_to_bits(*self) & (9223372036854775808 as u64)) == (0 as u64);
+        return (f64_to_bits(*self) & (9223372036854775808u64)) == (0 as u64);
     }
 
     fn is_sign_negative(self: &Self) -> bool {
-        return (f64_to_bits(*self) & (9223372036854775808 as u64)) != (0 as u64);
+        return (f64_to_bits(*self) & (9223372036854775808u64)) != (0 as u64);
     }
 
     fn abs(self: Self) -> Self {
-        return f64_from_bits(f64_to_bits(self) & (9223372036854775807 as u64));
+        return f64_from_bits(f64_to_bits(self) & (9223372036854775807u64));
     }
 
     fn min(self: Self, other: Self) -> Self {
@@ -176,5 +247,62 @@ impl FloatOps for f64 {
         if self > max_val { return max_val; }
         return self;
     }
+
+    fn floor(self: Self) -> Self { return c_floor(self); }
+    fn ceil(self: Self) -> Self { return c_ceil(self); }
+    fn round(self: Self) -> Self { return c_round(self); }
+    fn trunc(self: Self) -> Self { return c_trunc(self); }
+    fn sqrt(self: Self) -> Self { return c_sqrt(self); }
+    fn pow(self: Self, exp: Self) -> Self { return c_pow(self, exp); }
+    fn exp(self: Self) -> Self { return c_exp(self); }
+    fn log(self: Self) -> Self { return c_log(self); }
+    fn log2(self: Self) -> Self { return c_log2(self); }
+    fn log10(self: Self) -> Self { return c_log10(self); }
+    fn sin(self: Self) -> Self { return c_sin(self); }
+    fn cos(self: Self) -> Self { return c_cos(self); }
+    fn tan(self: Self) -> Self { return c_tan(self); }
+    fn asin(self: Self) -> Self { return c_asin(self); }
+    fn acos(self: Self) -> Self { return c_acos(self); }
+    fn atan(self: Self) -> Self { return c_atan(self); }
+    fn atan2(self: Self, other: Self) -> Self { return c_atan2(self, other); }
 }
+
+export fn pi() -> f64 { return 3.14159265358979323846; }
+export fn e() -> f64 { return 2.71828182845904523536; }
+
+export fn sqrt(x: f64) -> f64 { return c_sqrt(x); }
+export fn sin(x: f64) -> f64 { return c_sin(x); }
+export fn cos(x: f64) -> f64 { return c_cos(x); }
+export fn tan(x: f64) -> f64 { return c_tan(x); }
+export fn asin(x: f64) -> f64 { return c_asin(x); }
+export fn acos(x: f64) -> f64 { return c_acos(x); }
+export fn atan(x: f64) -> f64 { return c_atan(x); }
+export fn atan2(y: f64, x: f64) -> f64 { return c_atan2(y, x); }
+export fn pow(base: f64, exp: f64) -> f64 { return c_pow(base, exp); }
+export fn exp(x: f64) -> f64 { return c_exp(x); }
+export fn log(x: f64) -> f64 { return c_log(x); }
+export fn log2(x: f64) -> f64 { return c_log2(x); }
+export fn log10(x: f64) -> f64 { return c_log10(x); }
+export fn floor(x: f64) -> f64 { return c_floor(x); }
+export fn ceil(x: f64) -> f64 { return c_ceil(x); }
+export fn round(x: f64) -> f64 { return c_round(x); }
+export fn trunc(x: f64) -> f64 { return c_trunc(x); }
+
+export fn sqrtf(x: f32) -> f32 { return c_sqrtf(x); }
+export fn sinf(x: f32) -> f32 { return c_sinf(x); }
+export fn cosf(x: f32) -> f32 { return c_cosf(x); }
+export fn tanf(x: f32) -> f32 { return c_tanf(x); }
+export fn asinf(x: f32) -> f32 { return c_asinf(x); }
+export fn acosf(x: f32) -> f32 { return c_acosf(x); }
+export fn atanf(x: f32) -> f32 { return c_atanf(x); }
+export fn atan2f(y: f32, x: f32) -> f32 { return c_atan2f(y, x); }
+export fn powf(base: f32, exp: f32) -> f32 { return c_powf(base, exp); }
+export fn expf(x: f32) -> f32 { return c_expf(x); }
+export fn logf(x: f32) -> f32 { return c_logf(x); }
+export fn log2f(x: f32) -> f32 { return c_log2f(x); }
+export fn log10f(x: f32) -> f32 { return c_log10f(x); }
+export fn floorf(x: f32) -> f32 { return c_floorf(x); }
+export fn ceilf(x: f32) -> f32 { return c_ceilf(x); }
+export fn roundf(x: f32) -> f32 { return c_roundf(x); }
+export fn truncf(x: f32) -> f32 { return c_truncf(x); }
 }

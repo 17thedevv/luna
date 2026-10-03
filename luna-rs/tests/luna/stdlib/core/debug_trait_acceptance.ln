@@ -1,0 +1,73 @@
+import <fmt>;
+import <string>;
+import <result>;
+
+fn debug_to_string<T: std::fmt::Debug>(val: &T) -> std::String {
+    dec rw out = std::string_new();
+    val.fmt(&rw out).unwrap();
+    return out;
+}
+
+fn str_eq(s: &std::String, expected: str) -> bool {
+    dec exp = std::string_from_str(expected);
+    return s.eq(&exp);
+}
+
+struct Point {
+    x: i32,
+    y: i32,
+};
+
+impl std::fmt::Debug for Point {
+    fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, std::fmt::FmtError> {
+        if writer.write_char('P').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if writer.write_char('(').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if self.x.fmt(writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if writer.write_char(',').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if self.y.fmt(writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if writer.write_char(')').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        return std::Result::Ok;
+    }
+}
+
+fn main() -> i32 {
+    // 1. bool
+    dec b_true = true;
+    dec s_bt = debug_to_string<bool>(&b_true);
+    if str_eq(&s_bt, "true") == false { return 1; }
+
+    dec b_false = false;
+    dec s_bf = debug_to_string<bool>(&b_false);
+    if str_eq(&s_bf, "false") == false { return 2; }
+
+    // 2. char
+    dec c = 'A';
+    dec s_c = debug_to_string<char>(&c);
+    if str_eq(&s_c, "'A'") == false { return 3; }
+
+    // 3. integers
+    dec num_i32 = 12345 as i32;
+    dec s_i32 = debug_to_string<i32>(&num_i32);
+    if str_eq(&s_i32, "12345") == false { return 4; }
+
+    dec num_neg = -9876 as i64;
+    dec s_neg = debug_to_string<i64>(&num_neg);
+    if str_eq(&s_neg, "-9876") == false { return 5; }
+
+    dec num_u64 = 42u64;
+    dec s_u64 = debug_to_string<u64>(&num_u64);
+    if str_eq(&s_u64, "42") == false { return 6; }
+
+    // 4. String (quotes included in Debug)
+    dec str_val = std::string_from_str("Luna");
+    dec s_str = debug_to_string<std::String>(&str_val);
+    if str_eq(&s_str, "\"Luna\"") == false { return 7; }
+
+    // 5. Custom struct Point
+    dec pt = Point { x: 10, y: 20 };
+    dec s_pt = debug_to_string<Point>(&pt);
+    if str_eq(&s_pt, "P(10, 20)") == false { return 8; }
+
+    return 0;
+}

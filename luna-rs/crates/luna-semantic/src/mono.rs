@@ -206,6 +206,10 @@ pub struct MonoCollector<'a> {
     
     pub worklist: Vec<MonoInstance>,
     pub instantiated: HashMap<MonoInstance, InstantiatedFunction>,
+    // A rejected instance is terminal for this collection run. Visiting a
+    // recursive body may enqueue it again before the concretization barrier;
+    // retrying it cannot make its already-fixed substitution more concrete.
+    failed_instances: HashSet<MonoInstance>,
     pub drop_glues: Vec<CanonicalInstanceIdentity>,
     pub visited_drop_types: HashSet<SemanticTypeId>,
     
@@ -232,6 +236,7 @@ impl<'a> MonoCollector<'a> {
             source_manager,
             worklist: Vec::new(),
             instantiated: HashMap::new(),
+            failed_instances: HashSet::new(),
             drop_glues: Vec::new(),
             visited_drop_types: HashSet::new(),
             current_instance: None,
@@ -525,7 +530,9 @@ impl<'a> MonoCollector<'a> {
 
     fn process_worklist(&mut self) {
         while let Some(instance) = self.worklist.pop() {
-            if self.instantiated.contains_key(&instance) {
+            if self.instantiated.contains_key(&instance)
+                || self.failed_instances.contains(&instance)
+            {
                 continue;
             }
 
@@ -710,6 +717,7 @@ impl<'a> MonoCollector<'a> {
             }
 
             if !is_concrete {
+                self.failed_instances.insert(instance);
                 continue; // Barrier: do not insert unresolved mono unit
             }
 

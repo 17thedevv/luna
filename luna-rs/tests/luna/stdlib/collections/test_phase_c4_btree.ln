@@ -1,0 +1,160 @@
+import <btreemap>;
+import <btreeset>;
+
+fn main() -> i32 {
+    // =========================================================================
+    // BTreeMap Tests
+    // =========================================================================
+    dec rw map: std::BTreeMap<i32, i32> = std::btreemap_new<i32, i32>();
+
+    if map.len() != (0 as u64) { return 1; }
+    if map.is_empty() == false { return 2; }
+
+    // Insert keys: 50, 20, 70, 10, 30, 60, 80
+    map.insert(50, 500);
+    map.insert(20, 200);
+    map.insert(70, 700);
+    map.insert(10, 100);
+    map.insert(30, 300);
+    map.insert(60, 600);
+    map.insert(80, 800);
+
+    if map.len() != (7 as u64) { return 3; }
+    if map.is_empty() == true { return 4; }
+
+    // contains_key
+    dec k30 = 30;
+    dec k99 = 99;
+    if map.contains_key(&k30) == false { return 5; }
+    if map.contains_key(&k99) == true { return 6; }
+
+    // get
+    match map.get(&k30) {
+        std::Option::Some(v) -> { if *v != 300 { return 7; } },
+        std::Option::None -> { return 8; },
+    }
+    match map.get(&k99) {
+        std::Option::Some(_) -> { return 9; },
+        std::Option::None -> {},
+    }
+
+    // first_key & last_key (min is 10, max is 80)
+    match map.first_key() {
+        std::Option::Some(fk) -> { if *fk != 10 { return 10; } },
+        std::Option::None -> { return 11; },
+    }
+    match map.last_key() {
+        std::Option::Some(lk) -> { if *lk != 80 { return 12; } },
+        std::Option::None -> { return 13; },
+    }
+
+    // first_value & last_value
+    match map.first_value() {
+        std::Option::Some(fv) -> { if *fv != 100 { return 14; } },
+        std::Option::None -> { return 15; },
+    }
+    match map.last_value() {
+        std::Option::Some(lv) -> { if *lv != 800 { return 16; } },
+        std::Option::None -> { return 17; },
+    }
+
+    // get_mut
+    match map.get_mut(&k30) {
+        std::Option::Some(v_ref) -> {
+            *v_ref = 333;
+        },
+        std::Option::None -> { return 18; },
+    }
+    match map.get(&k30) {
+        std::Option::Some(v) -> { if *v != 333 { return 19; } },
+        std::Option::None -> { return 20; },
+    }
+
+    // Update existing key returns old value
+    dec old_opt = map.insert(30, 3000);
+    match old_opt {
+        std::Option::Some(old) -> { if old != 333 { return 21; } },
+        std::Option::None -> { return 22; },
+    }
+    if map.len() != (7 as u64) { return 23; }
+
+    // Clone
+    dec cloned_map = map.clone();
+    if cloned_map.len() != (7 as u64) { return 24; }
+    match cloned_map.get(&k30) {
+        std::Option::Some(v) -> { if *v != 3000 { return 25; } },
+        std::Option::None -> { return 26; },
+    }
+
+    // AVL rotation stress test: strictly ascending insertions trigger repeated rotations
+    dec rw avl_map: std::BTreeMap<i32, i32> = std::btreemap_new<i32, i32>();
+    dec rw i: i32 = 1;
+    while i <= 20 {
+        avl_map.insert(i, i * 10);
+        i = i + 1;
+    }
+    if avl_map.len() != (20 as u64) { return 27; }
+    match avl_map.first_key() {
+        std::Option::Some(k) -> { if *k != 1 { return 28; } },
+        std::Option::None -> { return 29; },
+    }
+    match avl_map.last_key() {
+        std::Option::Some(k) -> { if *k != 20 { return 30; } },
+        std::Option::None -> { return 31; },
+    }
+    // Verify all keys 1..20 can be found
+    dec rw check_i: i32 = 1;
+    while check_i <= 20 {
+        match avl_map.get(&check_i) {
+            std::Option::Some(val) -> { if *val != (check_i * 10) { return 32; } },
+            std::Option::None -> { return 33; },
+        }
+        check_i = check_i + 1;
+    }
+
+    map.clear();
+    if map.len() != (0 as u64) { return 34; }
+    if map.is_empty() == false { return 35; }
+
+    // =========================================================================
+    // BTreeSet Tests
+    // =========================================================================
+    dec rw set: std::BTreeSet<i32> = std::btreeset_new<i32>();
+
+    if set.len() != (0 as u64) { return 36; }
+    if set.is_empty() == false { return 37; }
+
+    if set.insert(42) == false { return 38; }
+    if set.insert(17) == false { return 39; }
+    if set.insert(99) == false { return 40; }
+    // Duplicate insertion returns false
+    if set.insert(42) == true { return 41; }
+
+    if set.len() != (3 as u64) { return 42; }
+
+    dec item17 = 17;
+    dec item50 = 50;
+    if set.contains(&item17) == false { return 43; }
+    if set.contains(&item50) == true { return 44; }
+
+    // min & max
+    match set.first() {
+        std::Option::Some(min_elem) -> { if *min_elem != 17 { return 45; } },
+        std::Option::None -> { return 46; },
+    }
+    match set.last() {
+        std::Option::Some(max_elem) -> { if *max_elem != 99 { return 47; } },
+        std::Option::None -> { return 48; },
+    }
+
+    // Clone
+    dec cloned_set = set.clone();
+    if cloned_set.len() != (3 as u64) { return 49; }
+    if cloned_set.contains(&item17) == false { return 50; }
+
+    set.clear();
+    if set.len() != (0 as u64) { return 51; }
+    if set.is_empty() == false { return 52; }
+
+    return 0;
+}

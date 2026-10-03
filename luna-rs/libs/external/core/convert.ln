@@ -89,7 +89,7 @@ impl TryConvert<u16, TryConvertError> for u64 {
 
 impl TryConvert<u32, TryConvertError> for u64 {
     fn try_convert(self: Self) -> Result<u32, TryConvertError> {
-        if self <= (4294967295 as u64) { return Result::Ok(self as u32); }
+        if self <= (4294967295u64) { return Result::Ok(self as u32); }
         return Result::Err(TryConvertError::Overflow);
     }
 }
@@ -136,8 +136,8 @@ impl TryConvert<i16, TryConvertError> for i64 {
 
 impl TryConvert<i32, TryConvertError> for i64 {
     fn try_convert(self: Self) -> Result<i32, TryConvertError> {
-        if (self >= ((0 as i64) - (2147483648 as i64))) && (self <= (2147483647 as i64)) { return Result::Ok(self as i32); }
-        if self < ((0 as i64) - (2147483648 as i64)) { return Result::Err(TryConvertError::Underflow); }
+        if (self >= ((0 as i64) - (2147483648i64))) && (self <= (2147483647 as i64)) { return Result::Ok(self as i32); }
+        if self < ((0 as i64) - (2147483648i64)) { return Result::Err(TryConvertError::Underflow); }
         return Result::Err(TryConvertError::Overflow);
     }
 }
@@ -194,7 +194,7 @@ impl TryConvert<u64, TryConvertError> for i64 {
 
 impl TryConvert<i64, TryConvertError> for u64 {
     fn try_convert(self: Self) -> Result<i64, TryConvertError> {
-        if self <= (9223372036854775807 as u64) { return Result::Ok(self as i64); }
+        if self <= (9223372036854775807u64) { return Result::Ok(self as i64); }
         return Result::Err(TryConvertError::Overflow);
     }
 }

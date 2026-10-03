@@ -1,0 +1,101 @@
+---
+title: Vec & Collections
+description: Dynamic arrays and hash collections.
+---
+
+## Vec
+
+`Vec<T>` is a growable, heap-allocated array.
+
+### Creating Vectors
+
+```luna
+import <alloc>;
+
+dec v: std::Vec<i32> = std::Vec<i32>::new();
+dec v2 = std::Vec<i32>::with_capacity(10);
+```
+
+### Adding Elements
+
+```luna
+dec rw v = std::Vec<i32>::new();
+
+v.push(1);
+v.push(2);
+v.push(3);
+
+dec last = v.pop();  // Option::Some(3)
+```
+
+### Accessing Elements
+
+```luna
+dec rw v = std::Vec<i32>::new();
+v.push(10);
+v.push(20);
+
+dec first = v[0];                   // element access
+dec item = v.get(0);                // Option::Some(&10)
+dec item5 = v.get(5);               // Option::None
+```
+
+### Iterating
+
+```luna
+dec v = std::Vec<i32>::new();
+
+// Immutable iteration
+for n in &v {
+    std::io::println("{}", n);
+}
+
+// Mutable iteration
+dec rw v_mut = std::Vec<i32>::new();
+for n in &rw v_mut {
+    *n = *n * 2;
+}
+```
+
+## HashMap
+
+Key-value storage with O(1) average lookup.
+
+```luna
+import <alloc>;
+using std::collections as col;
+```
+
+### Creating and Using
+
+```luna
+dec rw scores = col::HashMap<str, i32>::new();
+
+scores.insert("Alice", 100);
+scores.insert("Bob", 85);
+
+dec score = scores.get("Alice");     // Option::Some(&100)
+dec missing = scores.get("Unknown"); // Option::None
+
+for (name, score) in &scores {
+    std::io::println("{}: {}", name, score);
+}
+```
+
+## HashSet
+
+Unordered collection of unique values.
+
+```luna
+import <alloc>;
+using std::collections as col;
+
+dec rw set = col::HashSet<i32>::new();
+
+set.insert(1);
+set.insert(2);
+set.insert(1);  // Already exists, no effect
+
+dec has_3 = set.contains(&3);  // false
+dec len = set.len();           // 2
+```

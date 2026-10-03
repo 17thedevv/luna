@@ -8,8 +8,11 @@ struct_decl = { annotation }, [ "export" ], "struct", identifier,
 struct_field_list = struct_field, { ",", struct_field }, [ "," ] ;
 struct_field = [ "export" ], identifier, ":", type ;
 
-struct_contract_clause = "requires", lifetime_constraint_list
-                       | "requires", raw_storage_anchor ;
+(* Canonical spelling uses one requires group. Repeated groups remain accepted
+   for existing source; every comma-separated entry has the same semantics. *)
+struct_contract_clause = "requires", struct_contract_entry,
+                         { ",", struct_contract_entry } ;
+struct_contract_entry = lifetime_constraint | raw_storage_anchor ;
 lifetime_constraint_list = lifetime_constraint, { ",", lifetime_constraint } ;
 lifetime_constraint = life_target, ( ">=" | "<=" ), life_target ;
 

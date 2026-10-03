@@ -1,0 +1,107 @@
+import <string>;
+import <result>;
+
+fn main() -> i32 {
+    // 1. CString & CStr basic creation
+    dec exp_hello = std::string_from_str("Hello, Luna C-ABI!");
+    dec cs_res = std::cstring_new("Hello, Luna C-ABI!");
+    match cs_res {
+        std::Result::Ok(cs) -> {
+            dec s = cs.to_string();
+            if s.eq(&exp_hello) == false { return 1; }
+            
+            dec c_str = cs.as_c_str();
+            dec b = c_str.to_bytes();
+            if b.len != (18 as usize) { return 2; }
+            
+            dec b_nul = c_str.to_bytes_with_nul();
+            if b_nul.len != (19 as usize) { return 3; }
+            if b_nul[18 as usize] != (0 as u8) { return 4; }
+            
+            dec cloned = cs.clone();
+            dec cloned_s = cloned.to_string();
+            if cloned_s.eq(&exp_hello) == false { return 5; }
+        },
+        std::Result::Err(_) -> {
+            return 6;
+        },
+    }
+
+    // 2. cstr_from_bytes_with_nul validation
+    dec exp_lun = std::string_from_str("LUN");
+    dec valid_bytes: [u8; 4] = [76 as u8, 85 as u8, 78 as u8, 0 as u8]; // "LUN\0"
+    dec valid_cstr = std::cstr_from_bytes_with_nul(&valid_bytes);
+    match valid_cstr {
+        std::Result::Ok(cstr) -> {
+            if cstr.to_bytes().len != (3 as usize) { return 7; }
+            dec s = cstr.to_string();
+            if s.eq(&exp_lun) == false { return 8; }
+        },
+        std::Result::Err(_) -> {
+            return 9;
+        },
+    }
+
+    // Missing null byte rejection
+    dec no_nul_bytes: [u8; 3] = [65 as u8, 66 as u8, 67 as u8];
+    dec no_nul_res = std::cstr_from_bytes_with_nul(&no_nul_bytes);
+    match no_nul_res {
+        std::Result::Ok(_) -> {
+            return 10;
+        },
+        std::Result::Err(err) -> {
+            match err {
+                std::NulError::NotNulTerminated -> {},
+                std::NulError::InteriorNul(_) -> {
+                    return 11;
+                },
+            }
+        },
+    }
+
+    // Interior null byte rejection
+    dec interior_bytes: [u8; 4] = [65 as u8, 0 as u8, 66 as u8, 0 as u8];
+    dec interior_res = std::cstr_from_bytes_with_nul(&interior_bytes);
+    match interior_res {
+        std::Result::Ok(_) -> {
+            return 12;
+        },
+        std::Result::Err(err) -> {
+            match err {
+                std::NulError::InteriorNul(pos) -> {
+                    if pos != (1 as u64) { return 13; }
+                },
+                std::NulError::NotNulTerminated -> {
+                    return 14;
+                },
+            }
+        },
+    }
+
+    // 3. CowStr (Borrowed and Owned)
+    dec exp_borrowed = std::string_from_str("borrowed text");
+    dec cow_borrowed = std::CowStr::Borrowed("borrowed text");
+    dec cow_borrowed_s = cow_borrowed.to_string();
+    if cow_borrowed_s.eq(&exp_borrowed) == false { return 15; }
+    dec owned_from_borrowed = cow_borrowed.into_owned();
+    if owned_from_borrowed.eq(&exp_borrowed) == false { return 16; }
+
+    dec exp_owned = std::string_from_str("owned text");
+    dec cow_owned = std::CowStr::Owned(std::string_from_str("owned text"));
+    dec cow_owned_s = cow_owned.to_string();
+    if cow_owned_s.eq(&exp_owned) == false { return 17; }
+    dec owned_from_owned = cow_owned.into_owned();
+    if owned_from_owned.eq(&exp_owned) == false { return 18; }
+
+    // 4. Generic Cow<T>
+    dec orig_num: i32 = 42;
+    dec cow_num_borrowed = std::Cow::Borrowed(&orig_num);
+    dec num_out = cow_num_borrowed.into_owned();
+    if num_out != 42 { return 19; }
+
+    dec cow_num_owned = std::Cow::Owned(100);
+    dec num_out2 = cow_num_owned.into_owned();
+    if num_out2 != 100 { return 20; }
+
+    return 0;
+}

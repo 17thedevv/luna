@@ -1,0 +1,576 @@
+import <vec>;
+import <string>;
+import <encoding>;
+import <slice>;
+import <result>;
+
+export module std {
+
+    // =========================================================================
+    // Security Helper: Constant-Time Comparison
+    // =========================================================================
+
+    export fn constant_time_eq(a: &[u8], b: &[u8]) -> bool {
+        if a.len != b.len {
+            return false;
+        }
+        dec len = a.len;
+        dec rw diff: u8 = 0 as u8;
+        dec rw i: usize = 0 as usize;
+        while i < len {
+            diff = diff | (a[i] ^ b[i]);
+            i = i + (1 as usize);
+        }
+        return diff == (0 as u8);
+    }
+
+    // =========================================================================
+    // SHA-256 Cryptographic Hash (FIPS 180-4)
+    // =========================================================================
+
+    fn rotr32(x: u32, n: u32) -> u32 {
+        return (x >> n) | (x << ((32 as u32) - n));
+    }
+
+    fn rotl32(x: u32, n: u32) -> u32 {
+        return (x << n) | (x >> ((32 as u32) - n));
+    }
+
+    fn sha256_ch(x: u32, y: u32, z: u32) -> u32 {
+        return z ^ (x & (y ^ z));
+    }
+
+    fn sha256_maj(x: u32, y: u32, z: u32) -> u32 {
+        return (x & y) ^ (z & (x ^ y));
+    }
+
+    fn sha256_sigma0(x: u32) -> u32 {
+        return rotr32(x, 2 as u32) ^ rotr32(x, 13 as u32) ^ rotr32(x, 22 as u32);
+    }
+
+    fn sha256_sigma1(x: u32) -> u32 {
+        return rotr32(x, 6 as u32) ^ rotr32(x, 11 as u32) ^ rotr32(x, 25 as u32);
+    }
+
+    fn sha256_gamma0(x: u32) -> u32 {
+        return rotr32(x, 7 as u32) ^ rotr32(x, 18 as u32) ^ (x >> (3 as u32));
+    }
+
+    fn sha256_gamma1(x: u32) -> u32 {
+        return rotr32(x, 17 as u32) ^ rotr32(x, 19 as u32) ^ (x >> (10 as u32));
+    }
+
+    fn be_bytes_to_u32(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
+        return ((b0 as u32) << (24 as u32)) | ((b1 as u32) << (16 as u32)) | ((b2 as u32) << (8 as u32)) | (b3 as u32);
+    }
+
+    fn sha256_k(round: usize) -> u32 {
+        match round {
+            0 -> 1116352408 as u32, 1 -> 1899447441 as u32, 2 -> 3049323471u32, 3 -> 3921009573u32,
+            4 -> 961987163 as u32, 5 -> 1508970993 as u32, 6 -> 2453635748u32, 7 -> 2870763221u32,
+            8 -> 3624381080u32, 9 -> 310598401 as u32, 10 -> 607225278 as u32, 11 -> 1426881987 as u32,
+            12 -> 1925078388 as u32, 13 -> 2162078206u32, 14 -> 2614888103u32, 15 -> 3248222580u32,
+            16 -> 3835390401u32, 17 -> 4022224774u32, 18 -> 264347078 as u32, 19 -> 604807628 as u32,
+            20 -> 770255983 as u32, 21 -> 1249150122 as u32, 22 -> 1555081692 as u32, 23 -> 1996064986 as u32,
+            24 -> 2554220882u32, 25 -> 2821834349u32, 26 -> 2952996808u32, 27 -> 3210313671u32,
+            28 -> 3336571891u32, 29 -> 3584528711u32, 30 -> 113926993 as u32, 31 -> 338241895 as u32,
+            32 -> 666307205 as u32, 33 -> 773529912 as u32, 34 -> 1294757372 as u32, 35 -> 1396182291 as u32,
+            36 -> 1695183700 as u32, 37 -> 1986661051 as u32, 38 -> 2177026350u32, 39 -> 2456956037u32,
+            40 -> 2730485921u32, 41 -> 2820302411u32, 42 -> 3259730800u32, 43 -> 3345764771u32,
+            44 -> 3516065817u32, 45 -> 3600352804u32, 46 -> 4094571909u32, 47 -> 275423344 as u32,
+            48 -> 430227734 as u32, 49 -> 506948616 as u32, 50 -> 659060556 as u32, 51 -> 883997877 as u32,
+            52 -> 958139571 as u32, 53 -> 1322822218 as u32, 54 -> 1537002063 as u32, 55 -> 1747873779 as u32,
+            56 -> 1955562222 as u32, 57 -> 2024104815 as u32, 58 -> 2227730452u32, 59 -> 2361852424u32,
+            60 -> 2428436474u32, 61 -> 2756734187u32, 62 -> 3204031479u32, _ -> 3329325298u32,
+        }
+    }
+
+    export struct Sha256 {
+        h0: u32,
+        h1: u32,
+        h2: u32,
+        h3: u32,
+        h4: u32,
+        h5: u32,
+        h6: u32,
+        h7: u32,
+        buffer: std::Vec<u8>,
+        total_len: u64,
+    };
+
+    export fn sha256_new() -> Sha256 {
+        return Sha256 {
+            h0: 1779033703 as u32, // 0x6a09e667
+            h1: 3144134277u32, // 0xbb67ae85
+            h2: 1013904242 as u32, // 0x3c6ef372
+            h3: 2773480762u32, // 0xa54ff53a
+            h4: 1359893119 as u32, // 0x510e527f
+            h5: 2600822924u32, // 0x9b05688c
+            h6: 528734635 as u32,  // 0x1f83d9ab
+            h7: 1541459225 as u32, // 0x5be0cd19
+            buffer: std::vec_with_capacity<u8>(64 as u64),
+            total_len: 0 as u64,
+        };
+    }
+
+    fn sha256_process_block(
+        h0: &rw u32, h1: &rw u32, h2: &rw u32, h3: &rw u32,
+        h4: &rw u32, h5: &rw u32, h6: &rw u32, h7: &rw u32,
+        block: &[u8]
+    ) {
+        dec rw w = std::vec_with_capacity<u32>(64 as u64);
+        dec rw i: usize = 0 as usize;
+        while i < (16 as usize) {
+            dec offset = i * (4 as usize);
+            dec word = be_bytes_to_u32(block[offset], block[offset + (1 as usize)], block[offset + (2 as usize)], block[offset + (3 as usize)]);
+            w.push(word);
+            i = i + (1 as usize);
+        }
+        while i < (64 as usize) {
+            dec w_slice = w.as_slice();
+            dec s0 = sha256_gamma0(w_slice[i - (15 as usize)]);
+            dec s1 = sha256_gamma1(w_slice[i - (2 as usize)]);
+            dec word = s1 + w_slice[i - (7 as usize)] + s0 + w_slice[i - (16 as usize)];
+            w.push(word);
+            i = i + (1 as usize);
+        }
+
+        dec rw a = *h0;
+        dec rw b = *h1;
+        dec rw c = *h2;
+        dec rw d = *h3;
+        dec rw e = *h4;
+        dec rw f = *h5;
+        dec rw g = *h6;
+        dec rw h = *h7;
+
+        dec w_all = w.as_slice();
+        dec rw j: usize = 0 as usize;
+        while j < (64 as usize) {
+            dec s1 = sha256_sigma1(e);
+            dec ch = sha256_ch(e, f, g);
+            dec temp1 = h + s1 + ch + sha256_k(j) + w_all[j];
+            dec s0 = sha256_sigma0(a);
+            dec maj = sha256_maj(a, b, c);
+            dec temp2 = s0 + maj;
+
+            h = g;
+            g = f;
+            f = e;
+            e = d + temp1;
+            d = c;
+            c = b;
+            b = a;
+            a = temp1 + temp2;
+
+            j = j + (1 as usize);
+        }
+
+        *h0 = *h0 + a;
+        *h1 = *h1 + b;
+        *h2 = *h2 + c;
+        *h3 = *h3 + d;
+        *h4 = *h4 + e;
+        *h5 = *h5 + f;
+        *h6 = *h6 + g;
+        *h7 = *h7 + h;
+    }
+
+    impl Sha256 {
+        // v1 borrows the owner as one domain. Work on independent scalar
+        // state, then commit it after the borrowed block is no longer live.
+        fn process_pending_block(self: &rw Self) {
+            dec rw h0 = self.h0;
+            dec rw h1 = self.h1;
+            dec rw h2 = self.h2;
+            dec rw h3 = self.h3;
+            dec rw h4 = self.h4;
+            dec rw h5 = self.h5;
+            dec rw h6 = self.h6;
+            dec rw h7 = self.h7;
+            sha256_process_block(
+                &rw h0, &rw h1, &rw h2, &rw h3,
+                &rw h4, &rw h5, &rw h6, &rw h7,
+                self.buffer.as_slice()
+            );
+            self.h0 = h0;
+            self.h1 = h1;
+            self.h2 = h2;
+            self.h3 = h3;
+            self.h4 = h4;
+            self.h5 = h5;
+            self.h6 = h6;
+            self.h7 = h7;
+        }
+
+        export fn update(self: &rw Self, data: &[u8]) {
+            dec len = data.len;
+            dec rw i: usize = 0 as usize;
+            self.total_len = self.total_len + (len as u64);
+
+            while i < len {
+                self.buffer.push(data[i]);
+                if self.buffer.len() == (64 as u64) {
+                    self.process_pending_block();
+                    self.buffer.clear();
+                }
+                i = i + (1 as usize);
+            }
+        }
+
+        export fn finish(self: &rw Self) -> [u8; 32] {
+            // Padding
+            self.buffer.push(128 as u8); // 0x80
+
+            if self.buffer.len() > (56 as u64) {
+                while self.buffer.len() < (64 as u64) {
+                    self.buffer.push(0 as u8);
+                }
+                self.process_pending_block();
+                self.buffer.clear();
+            }
+
+            while self.buffer.len() < (56 as u64) {
+                self.buffer.push(0 as u8);
+            }
+
+            // Append 64-bit length in bits (big-endian)
+            dec bit_len = self.total_len * (8 as u64);
+            self.buffer.push(((bit_len >> (56 as u64)) & (255 as u64)) as u8);
+            self.buffer.push(((bit_len >> (48 as u64)) & (255 as u64)) as u8);
+            self.buffer.push(((bit_len >> (40 as u64)) & (255 as u64)) as u8);
+            self.buffer.push(((bit_len >> (32 as u64)) & (255 as u64)) as u8);
+            self.buffer.push(((bit_len >> (24 as u64)) & (255 as u64)) as u8);
+            self.buffer.push(((bit_len >> (16 as u64)) & (255 as u64)) as u8);
+            self.buffer.push(((bit_len >> (8 as u64)) & (255 as u64)) as u8);
+            self.buffer.push((bit_len & (255 as u64)) as u8);
+
+            self.process_pending_block();
+
+            return [
+                ((self.h0 >> (24 as u32)) & (255 as u32)) as u8,
+                ((self.h0 >> (16 as u32)) & (255 as u32)) as u8,
+                ((self.h0 >> (8 as u32)) & (255 as u32)) as u8,
+                (self.h0 & (255 as u32)) as u8,
+
+                ((self.h1 >> (24 as u32)) & (255 as u32)) as u8,
+                ((self.h1 >> (16 as u32)) & (255 as u32)) as u8,
+                ((self.h1 >> (8 as u32)) & (255 as u32)) as u8,
+                (self.h1 & (255 as u32)) as u8,
+
+                ((self.h2 >> (24 as u32)) & (255 as u32)) as u8,
+                ((self.h2 >> (16 as u32)) & (255 as u32)) as u8,
+                ((self.h2 >> (8 as u32)) & (255 as u32)) as u8,
+                (self.h2 & (255 as u32)) as u8,
+
+                ((self.h3 >> (24 as u32)) & (255 as u32)) as u8,
+                ((self.h3 >> (16 as u32)) & (255 as u32)) as u8,
+                ((self.h3 >> (8 as u32)) & (255 as u32)) as u8,
+                (self.h3 & (255 as u32)) as u8,
+
+                ((self.h4 >> (24 as u32)) & (255 as u32)) as u8,
+                ((self.h4 >> (16 as u32)) & (255 as u32)) as u8,
+                ((self.h4 >> (8 as u32)) & (255 as u32)) as u8,
+                (self.h4 & (255 as u32)) as u8,
+
+                ((self.h5 >> (24 as u32)) & (255 as u32)) as u8,
+                ((self.h5 >> (16 as u32)) & (255 as u32)) as u8,
+                ((self.h5 >> (8 as u32)) & (255 as u32)) as u8,
+                (self.h5 & (255 as u32)) as u8,
+
+                ((self.h6 >> (24 as u32)) & (255 as u32)) as u8,
+                ((self.h6 >> (16 as u32)) & (255 as u32)) as u8,
+                ((self.h6 >> (8 as u32)) & (255 as u32)) as u8,
+                (self.h6 & (255 as u32)) as u8,
+
+                ((self.h7 >> (24 as u32)) & (255 as u32)) as u8,
+                ((self.h7 >> (16 as u32)) & (255 as u32)) as u8,
+                ((self.h7 >> (8 as u32)) & (255 as u32)) as u8,
+                (self.h7 & (255 as u32)) as u8
+            ];
+        }
+    }
+
+    export fn sha256_digest(data: &[u8]) -> [u8; 32] {
+        dec rw hasher = sha256_new();
+        hasher.update(data);
+        return hasher.finish();
+    }
+
+    export fn sha256_hex(data: &[u8]) -> std::String {
+        dec digest = sha256_digest(data);
+        return std::hex_encode(&digest);
+    }
+
+    // =========================================================================
+    // HMAC-SHA256 (RFC 2104)
+    // =========================================================================
+
+    export struct HmacSha256 {
+        inner_hasher: Sha256,
+        outer_key: [u8; 64],
+    };
+
+    export fn hmac_sha256_new(key: &[u8]) -> HmacSha256 {
+        dec rw k_pad: [u8; 64] = [
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8
+        ];
+
+        if key.len > (64 as usize) {
+            dec key_hash = sha256_digest(key);
+            dec rw i: usize = 0 as usize;
+            while i < (32 as usize) {
+                k_pad[i] = key_hash[i];
+                i = i + (1 as usize);
+            }
+        } else {
+            dec rw i: usize = 0 as usize;
+            while i < key.len {
+                k_pad[i] = key[i];
+                i = i + (1 as usize);
+            }
+        }
+
+        dec rw ipad: [u8; 64] = [
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8
+        ];
+        dec rw opad: [u8; 64] = [
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8
+        ];
+
+        dec rw j: usize = 0 as usize;
+        while j < (64 as usize) {
+            ipad[j] = k_pad[j] ^ (54 as u8); // 0x36
+            opad[j] = k_pad[j] ^ (92 as u8); // 0x5c
+            j = j + (1 as usize);
+        }
+
+        dec rw inner = sha256_new();
+        inner.update(&ipad);
+
+        return HmacSha256 {
+            inner_hasher: inner,
+            outer_key: opad,
+        };
+    }
+
+    impl HmacSha256 {
+        export fn update(self: &rw Self, data: &[u8]) {
+            self.inner_hasher.update(data);
+        }
+
+        export fn finish(self: &rw Self) -> [u8; 32] {
+            dec inner_hash = self.inner_hasher.finish();
+            dec rw outer = sha256_new();
+            outer.update(&self.outer_key);
+            outer.update(&inner_hash);
+            return outer.finish();
+        }
+    }
+
+    export fn hmac_sha256(key: &[u8], data: &[u8]) -> [u8; 32] {
+        dec rw hmac = hmac_sha256_new(key);
+        hmac.update(data);
+        return hmac.finish();
+    }
+
+    export fn hmac_sha256_hex(key: &[u8], data: &[u8]) -> std::String {
+        dec tag = hmac_sha256(key, data);
+        return std::hex_encode(&tag);
+    }
+
+    export fn hmac_sha256_verify(key: &[u8], data: &[u8], expected_tag: &[u8]) -> bool {
+        dec computed = hmac_sha256(key, data);
+        return constant_time_eq(&computed, expected_tag);
+    }
+
+    // =========================================================================
+    // ChaCha20 Stream Cipher (RFC 8439)
+    // =========================================================================
+
+    fn le_bytes_to_u32(b0: u8, b1: u8, b2: u8, b3: u8) -> u32 {
+        return (b0 as u32) | ((b1 as u32) << (8 as u32)) | ((b2 as u32) << (16 as u32)) | ((b3 as u32) << (24 as u32));
+    }
+
+    fn u32_to_le_bytes(val: u32) -> [u8; 4] {
+        return [
+            (val & (255 as u32)) as u8,
+            ((val >> (8 as u32)) & (255 as u32)) as u8,
+            ((val >> (16 as u32)) & (255 as u32)) as u8,
+            ((val >> (24 as u32)) & (255 as u32)) as u8
+        ];
+    }
+
+    export struct ChaCha20 {
+        state: [u32; 16],
+    };
+
+    export fn chacha20_new(key: &[u8], nonce: &[u8], counter: u32) -> ChaCha20 {
+        dec rw st: [u32; 16] = [
+            1634760805 as u32, // 0x61707865 "expa"
+            857760878 as u32,  // 0x3320646e "nd 3"
+            2036477234 as u32, // 0x79622d32 "2-by"
+            1797285236 as u32, // 0x6b206574 "te k"
+            0 as u32, 0 as u32, 0 as u32, 0 as u32,
+            0 as u32, 0 as u32, 0 as u32, 0 as u32,
+            counter,
+            0 as u32, 0 as u32, 0 as u32
+        ];
+
+        // Key: 8 words little-endian
+        dec rw k: usize = 0 as usize;
+        while k < (8 as usize) {
+            dec off = k * (4 as usize);
+            st[(4 as usize) + k] = le_bytes_to_u32(key[off], key[off + (1 as usize)], key[off + (2 as usize)], key[off + (3 as usize)]);
+            k = k + (1 as usize);
+        }
+
+        // Nonce: 3 words little-endian
+        st[13] = le_bytes_to_u32(nonce[0], nonce[1], nonce[2], nonce[3]);
+        st[14] = le_bytes_to_u32(nonce[4], nonce[5], nonce[6], nonce[7]);
+        st[15] = le_bytes_to_u32(nonce[8], nonce[9], nonce[10], nonce[11]);
+
+        return ChaCha20 { state: st };
+    }
+
+    fn chacha20_block(initial: &[u32]) -> [u8; 64] {
+        dec rw x: [u32; 16] = [
+            initial[0], initial[1], initial[2], initial[3],
+            initial[4], initial[5], initial[6], initial[7],
+            initial[8], initial[9], initial[10], initial[11],
+            initial[12], initial[13], initial[14], initial[15]
+        ];
+
+        dec rw r: usize = 0 as usize;
+        while r < (10 as usize) {
+            // Column rounds
+            // QR(0, 4, 8, 12)
+            x[0] = x[0] + x[4]; x[12] = rotl32(x[12] ^ x[0], 16 as u32);
+            x[8] = x[8] + x[12]; x[4] = rotl32(x[4] ^ x[8], 12 as u32);
+            x[0] = x[0] + x[4]; x[12] = rotl32(x[12] ^ x[0], 8 as u32);
+            x[8] = x[8] + x[12]; x[4] = rotl32(x[4] ^ x[8], 7 as u32);
+
+            // QR(1, 5, 9, 13)
+            x[1] = x[1] + x[5]; x[13] = rotl32(x[13] ^ x[1], 16 as u32);
+            x[9] = x[9] + x[13]; x[5] = rotl32(x[5] ^ x[9], 12 as u32);
+            x[1] = x[1] + x[5]; x[13] = rotl32(x[13] ^ x[1], 8 as u32);
+            x[9] = x[9] + x[13]; x[5] = rotl32(x[5] ^ x[9], 7 as u32);
+
+            // QR(2, 6, 10, 14)
+            x[2] = x[2] + x[6]; x[14] = rotl32(x[14] ^ x[2], 16 as u32);
+            x[10] = x[10] + x[14]; x[6] = rotl32(x[6] ^ x[10], 12 as u32);
+            x[2] = x[2] + x[6]; x[14] = rotl32(x[14] ^ x[2], 8 as u32);
+            x[10] = x[10] + x[14]; x[6] = rotl32(x[6] ^ x[10], 7 as u32);
+
+            // QR(3, 7, 11, 15)
+            x[3] = x[3] + x[7]; x[15] = rotl32(x[15] ^ x[3], 16 as u32);
+            x[11] = x[11] + x[15]; x[7] = rotl32(x[7] ^ x[11], 12 as u32);
+            x[3] = x[3] + x[7]; x[15] = rotl32(x[15] ^ x[3], 8 as u32);
+            x[11] = x[11] + x[15]; x[7] = rotl32(x[7] ^ x[11], 7 as u32);
+
+            // Diagonal rounds
+            // QR(0, 5, 10, 15)
+            x[0] = x[0] + x[5]; x[15] = rotl32(x[15] ^ x[0], 16 as u32);
+            x[10] = x[10] + x[15]; x[5] = rotl32(x[5] ^ x[10], 12 as u32);
+            x[0] = x[0] + x[5]; x[15] = rotl32(x[15] ^ x[0], 8 as u32);
+            x[10] = x[10] + x[15]; x[5] = rotl32(x[5] ^ x[10], 7 as u32);
+
+            // QR(1, 6, 11, 12)
+            x[1] = x[1] + x[6]; x[12] = rotl32(x[12] ^ x[1], 16 as u32);
+            x[11] = x[11] + x[12]; x[6] = rotl32(x[6] ^ x[11], 12 as u32);
+            x[1] = x[1] + x[6]; x[12] = rotl32(x[12] ^ x[1], 8 as u32);
+            x[11] = x[11] + x[12]; x[6] = rotl32(x[6] ^ x[11], 7 as u32);
+
+            // QR(2, 7, 8, 13)
+            x[2] = x[2] + x[7]; x[13] = rotl32(x[13] ^ x[2], 16 as u32);
+            x[8] = x[8] + x[13]; x[7] = rotl32(x[7] ^ x[8], 12 as u32);
+            x[2] = x[2] + x[7]; x[13] = rotl32(x[13] ^ x[2], 8 as u32);
+            x[8] = x[8] + x[13]; x[7] = rotl32(x[7] ^ x[8], 7 as u32);
+
+            // QR(3, 4, 9, 14)
+            x[3] = x[3] + x[4]; x[14] = rotl32(x[14] ^ x[3], 16 as u32);
+            x[9] = x[9] + x[14]; x[4] = rotl32(x[4] ^ x[9], 12 as u32);
+            x[3] = x[3] + x[4]; x[14] = rotl32(x[14] ^ x[3], 8 as u32);
+            x[9] = x[9] + x[14]; x[4] = rotl32(x[4] ^ x[9], 7 as u32);
+
+            r = r + (1 as usize);
+        }
+
+        dec rw out: [u8; 64] = [
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8,
+            0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8, 0 as u8
+        ];
+
+        dec rw i: usize = 0 as usize;
+        while i < (16 as usize) {
+            dec sum = x[i] + initial[i];
+            dec bytes = u32_to_le_bytes(sum);
+            dec off = i * (4 as usize);
+            out[off] = bytes[0];
+            out[off + (1 as usize)] = bytes[1];
+            out[off + (2 as usize)] = bytes[2];
+            out[off + (3 as usize)] = bytes[3];
+            i = i + (1 as usize);
+        }
+        return out;
+    }
+
+    impl ChaCha20 {
+        export fn apply_keystream(self: &rw Self, data: &rw [u8]) {
+            dec len = data.len;
+            dec rw pos: usize = 0 as usize;
+
+            while pos < len {
+                dec block_buf = chacha20_block(&self.state);
+                self.state[12] = self.state[12] + (1 as u32);
+
+                dec rw j: usize = 0 as usize;
+                while j < (64 as usize) && (pos + j) < len {
+                    data[pos + j] = data[pos + j] ^ block_buf[j];
+                    j = j + (1 as usize);
+                }
+                pos = pos + (64 as usize);
+            }
+        }
+    }
+
+    export fn chacha20_crypt(key: &[u8], nonce: &[u8], counter: u32, data: &[u8]) -> std::Vec<u8> {
+        dec rw buf = std::vec_with_capacity<u8>(data.len as u64);
+        dec rw i: usize = 0 as usize;
+        while i < data.len {
+            buf.push(data[i]);
+            i = i + (1 as usize);
+        }
+
+        dec rw cipher = chacha20_new(key, nonce, counter);
+        cipher.apply_keystream(buf.as_mut_slice());
+        return buf;
+    }
+}

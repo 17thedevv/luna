@@ -1,0 +1,101 @@
+import <atomic>;
+import <arc>;
+import <result>;
+
+struct TreeNode {
+    val: i32,
+    parent: std::Option<std::Arc<TreeNode>>,
+};
+
+fn main() -> i32 {
+    // 1. Test AtomicU64 operations
+    dec atom = std::atomic_u64_new(10 as u64);
+    if atom.load() != (10 as u64) {
+        return 1;
+    }
+    dec prev1 = atom.fetch_add(5 as u64);
+    if prev1 != (10 as u64) {
+        return 2;
+    }
+    if atom.load() != (15 as u64) {
+        return 3;
+    }
+    dec prev2 = atom.fetch_sub(3 as u64);
+    if prev2 != (15 as u64) {
+        return 4;
+    }
+    if atom.load() != (12 as u64) {
+        return 5;
+    }
+    atom.store(100 as u64);
+    if atom.load() != (100 as u64) {
+        return 6;
+    }
+
+    // 2. Test Arc<i32> basic ownership
+    dec a1 = std::arc_new<i32>(500);
+    if a1.strong_count() != (1 as u64) {
+        return 7;
+    }
+    if *a1.as_ref() != 500 {
+        return 8;
+    }
+
+    // 3. Test Arc::clone
+    dec a2 = a1.clone();
+    if a1.strong_count() != (2 as u64) {
+        return 9;
+    }
+    if a2.strong_count() != (2 as u64) {
+        return 10;
+    }
+    if *a2.as_ref() != 500 {
+        return 11;
+    }
+
+    // 4. Inner scope drop
+    {
+        dec a3 = a2.clone();
+        if a1.strong_count() != (3 as u64) {
+            return 12;
+        }
+        if *a3.as_ref() != 500 {
+            return 13;
+        }
+    }
+    // a3 dropped, strong count back to 2
+    if a1.strong_count() != (2 as u64) {
+        return 14;
+    }
+
+    // 5. Arc::try_unwrap
+    dec unwrap_res = a1.try_unwrap();
+    match unwrap_res {
+        std::Result::Ok(_) -> {
+            return 15; // Should fail because a2 still holds a strong reference!
+        },
+        std::Result::Err(_) -> {},
+    };
+
+    // 6. Test nested Arc drop
+    dec root = std::arc_new<TreeNode>(TreeNode {
+        val: 1,
+        parent: std::Option::None,
+    });
+    dec child = std::arc_new<TreeNode>(TreeNode {
+        val: 2,
+        parent: std::Option::Some(root.clone()),
+    });
+
+    if root.strong_count() != (2 as u64) {
+        return 16;
+    }
+    if child.strong_count() != (1 as u64) {
+        return 17;
+    }
+    if (*child.as_ref()).val != 2 {
+        return 18;
+    }
+
+    return 0;
+}

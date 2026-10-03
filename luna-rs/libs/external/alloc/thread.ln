@@ -1,0 +1,226 @@
+import <__alloc_global>;
+import <ptr>;
+import <mem>;
+import <result>;
+import <time>;
+
+export extern fn __luna_thread_spawn(f: fn(*rw void) -> void, arg: *rw void) -> *rw void;
+export extern fn __luna_thread_join(handle: *rw void);
+export extern fn __luna_thread_yield();
+export extern fn __luna_thread_sleep(nanoseconds: u64);
+export extern fn __luna_thread_current_id() -> u64;
+
+struct ThreadVoidPacket {
+    func: fn() -> void,
+};
+
+fn __luna_thread_void_worker(arg: *rw void) {
+    dec pkt = arg as *rw ThreadVoidPacket;
+    unsafe {
+        dec f = (*pkt).func;
+        f();
+        __luna_dealloc(arg as *rw u8, 8 as u64, 8 as u64);
+    }
+}
+
+struct ThreadArgPacket {
+    func: fn(*rw void) -> void,
+    arg: *rw void,
+};
+
+fn __luna_thread_arg_worker(raw: *rw void) {
+    dec pkt = raw as *rw ThreadArgPacket;
+    unsafe {
+        dec f = (*pkt).func;
+        dec a = (*pkt).arg;
+        f(a);
+        __luna_dealloc(raw as *rw u8, 16 as u64, 8 as u64);
+    }
+}
+
+export module std {
+    export enum ThreadError {
+        SpawnFailed,
+        JoinFailed,
+    }
+
+    export struct ThreadId {
+        private id: u64,
+    };
+
+    impl ThreadId {
+        export fn as_u64(self: &Self) -> u64 {
+            return self.id;
+        }
+
+        export fn equals(self: &Self, other: &ThreadId) -> bool {
+            return self.id == other.id;
+        }
+    }
+
+    export fn current_id() -> ThreadId {
+        unsafe {
+            return ThreadId { id: __luna_thread_current_id() };
+        }
+    }
+
+    export fn yield_now() {
+        unsafe {
+            __luna_thread_yield();
+        }
+    }
+
+    export fn thread_sleep(dur: &std::Duration) {
+        dec nanos = dur.as_nanos();
+        unsafe {
+            __luna_thread_sleep(nanos);
+        }
+    }
+
+    export struct JoinHandle {
+        private handle: *rw void,
+    };
+
+    impl JoinHandle {
+        export fn join(self: Self) -> std::Result<void, ThreadError> {
+            if (self.handle as u64) == (0 as u64) {
+                return std::Result::Err(ThreadError::JoinFailed);
+            }
+            unsafe {
+                __luna_thread_join(self.handle);
+            }
+            return std::Result::Ok(());
+        }
+
+        export fn as_raw(self: &Self) -> *rw void {
+            return self.handle;
+        }
+
+        export fn id(self: &Self) -> ThreadId {
+            return ThreadId { id: self.handle as u64 };
+        }
+    }
+
+    export fn spawn(f: fn() -> void) -> std::Result<JoinHandle, ThreadError> {
+        unsafe {
+            dec mem = __luna_alloc(8 as u64, 8 as u64) as *rw ThreadVoidPacket;
+            if (mem as u64) == (0 as u64) {
+                return std::Result::Err(ThreadError::SpawnFailed);
+            }
+            (*mem).func = f;
+            dec h = __luna_thread_spawn(__luna_thread_void_worker, mem as *rw void);
+            if (h as u64) == (0 as u64) {
+                __luna_dealloc(mem as *rw u8, 8 as u64, 8 as u64);
+                return std::Result::Err(ThreadError::SpawnFailed);
+            }
+            return std::Result::Ok(JoinHandle { handle: h });
+        }
+    }
+
+    export fn spawn_with<T>(f: fn(*rw T) -> void, arg: *rw T) -> std::Result<JoinHandle, ThreadError> {
+        unsafe {
+            dec mem = __luna_alloc(16 as u64, 8 as u64) as *rw ThreadArgPacket;
+            if (mem as u64) == (0 as u64) {
+                return std::Result::Err(ThreadError::SpawnFailed);
+            }
+            (*mem).func = f as fn(*rw void) -> void;
+            (*mem).arg = arg as *rw void;
+            dec h = __luna_thread_spawn(__luna_thread_arg_worker, mem as *rw void);
+            if (h as u64) == (0 as u64) {
+                __luna_dealloc(mem as *rw u8, 16 as u64, 8 as u64);
+                return std::Result::Err(ThreadError::SpawnFailed);
+            }
+            return std::Result::Ok(JoinHandle { handle: h });
+        }
+    }
+
+    // =========================================================================
+    // Scope: Scoped thread execution
+    // =========================================================================
+    struct ScopeNode {
+        handle: *rw void,
+        next: *rw ScopeNode,
+    };
+
+    export struct Scope {
+        private head: *rw ScopeNode,
+    };
+
+    impl Scope {
+        export fn spawn(self: &rw Self, f: fn() -> void) -> std::Result<void, ThreadError> {
+            dec res = std::spawn(f);
+            match res {
+                std::Result::Ok(h) -> {
+                    unsafe {
+                        dec node = __luna_alloc(std::mem::size_of<ScopeNode>(), std::mem::align_of<ScopeNode>()) as *rw ScopeNode;
+                        if (node as u64) == (0 as u64) {
+                            return std::Result::Err(ThreadError::SpawnFailed);
+                        }
+                        (*node).handle = h.as_raw();
+                        (*node).next = self.head;
+                        self.head = node;
+                    }
+                    return std::Result::Ok(());
+                },
+                std::Result::Err(e) -> {
+                    return std::Result::Err(e);
+                },
+            }
+        }
+
+        export fn spawn_with<T>(self: &rw Self, f: fn(*rw T) -> void, arg: *rw T) -> std::Result<void, ThreadError> {
+            dec res = std::spawn_with<T>(f, arg);
+            match res {
+                std::Result::Ok(h) -> {
+                    unsafe {
+                        dec node = __luna_alloc(std::mem::size_of<ScopeNode>(), std::mem::align_of<ScopeNode>()) as *rw ScopeNode;
+                        if (node as u64) == (0 as u64) {
+                            return std::Result::Err(ThreadError::SpawnFailed);
+                        }
+                        (*node).handle = h.as_raw();
+                        (*node).next = self.head;
+                        self.head = node;
+                    }
+                    return std::Result::Ok(());
+                },
+                std::Result::Err(e) -> {
+                    return std::Result::Err(e);
+                },
+            }
+        }
+    }
+
+    export fn scope(f: fn(&rw Scope) -> void) {
+        dec rw s = Scope { head: 0 as u64 as *rw ScopeNode };
+        f(&rw s);
+        dec rw curr = s.head;
+        unsafe {
+            while (curr as u64) != (0 as u64) {
+                dec next = (*curr).next;
+                dec h = (*curr).handle;
+                if (h as u64) != (0 as u64) {
+                    __luna_thread_join(h);
+                }
+                __luna_dealloc(curr as *rw u8, std::mem::size_of<ScopeNode>(), std::mem::align_of<ScopeNode>());
+                curr = next;
+            }
+        }
+    }
+
+    export fn scope_with<T>(arg: *rw T, f: fn(&rw Scope, *rw T) -> void) {
+        dec rw s = Scope { head: 0 as u64 as *rw ScopeNode };
+        f(&rw s, arg);
+        dec rw curr = s.head;
+        unsafe {
+            while (curr as u64) != (0 as u64) {
+                dec next = (*curr).next;
+                dec h = (*curr).handle;
+                if (h as u64) != (0 as u64) {
+                    __luna_thread_join(h);
+                }
+                __luna_dealloc(curr as *rw u8, std::mem::size_of<ScopeNode>(), std::mem::align_of<ScopeNode>());
+                curr = next;
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-const INVALID: char = 4294967295 as u32 as char;
+const INVALID: char = 4294967295u32 as char;
 
 fn main() -> i32 {
     return 0;

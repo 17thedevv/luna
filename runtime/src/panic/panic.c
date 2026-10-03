@@ -102,3 +102,33 @@ LUNA_NORETURN void __luna_overflow_fail(const char* file, uint32_t line) {
         line, 0
     );
 }
+
+// --- Diagnostic Backtrace Implementation -------------------------------------
+
+#ifdef _WIN32
+#include <windows.h>
+uint32_t __luna_backtrace_capture(void** frames, uint32_t max_frames) {
+    if (!frames || max_frames == 0) return 0;
+    return (uint32_t)CaptureStackBackTrace(0, max_frames, frames, NULL);
+}
+
+uint32_t __luna_backtrace_symbol(void* addr, char* buf, uint32_t max_len) {
+    if (!buf || max_len == 0) return 0;
+    int n = snprintf(buf, max_len, "<frame: %p>", addr);
+    if (n < 0) return 0;
+    return (uint32_t)n;
+}
+#else
+#include <execinfo.h>
+uint32_t __luna_backtrace_capture(void** frames, uint32_t max_frames) {
+    if (!frames || max_frames == 0) return 0;
+    return (uint32_t)backtrace(frames, (int)max_frames);
+}
+
+uint32_t __luna_backtrace_symbol(void* addr, char* buf, uint32_t max_len) {
+    if (!buf || max_len == 0) return 0;
+    int n = snprintf(buf, max_len, "<frame: %p>", addr);
+    if (n < 0) return 0;
+    return (uint32_t)n;
+}
+#endif
