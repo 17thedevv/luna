@@ -85,9 +85,14 @@ if results_path.exists():
     for case in ('basic_reference', 'macro_name_independent', 'public_field_default', 'reject_private_field'):
         selected = [row for row in results if row['fixture'] == case]
         assert len(selected) == 2 and all(row['contract_met'] for row in selected)
-    # Known gaps remain failures in the evidence; do not rewrite expectations.
+    # Known gaps remain failures in the historical evidence; do not rewrite historical expectations.
     for case in ('reject_semicolon_fields', 'foreach_parenthesized_contract', 'receiver_shorthand_contract'):
         assert all(not row['contract_met'] for row in results if row['fixture'] == case)
+
+repair_results_path = ROOT / 'docs/audits/repair-0.1/evidence/cli-examples.json'
+if repair_results_path.exists():
+    repair_results = json.loads(repair_results_path.read_text(encoding='utf-8'))
+    assert isinstance(repair_results, list)
 
 summary = dict(documents=len(inventory), site_pages=len(pages), checked_local_links=checked_links,
                errors=errors)

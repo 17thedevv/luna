@@ -3,7 +3,7 @@ import <vec>;
 fn main() -> i32 {
     dec rw values = std::vec_new<u64>();
     values.push(1 as u64);
-    values.push(4294967297 as u64);
+    values.push(4294967297u64);
     values.dedup_i32();
     // Distinct u64 values have identical low 32 bits.
     if values.len() != (2 as u64) { return 1; }
