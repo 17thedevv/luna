@@ -406,6 +406,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 .and_then(|s| s.to_str())
                 .unwrap_or("");
             semantic_ctx.current_provider_name = Some(base_name.to_string());
+            semantic_ctx.is_slice_authorized = options.is_sysroot_build && (base_name == "slice" || base_name == "core");
             if !options.is_sysroot_build && base_name != "core" {
                 if let Err(e) = driver_session.bootstrap_lang_contracts(&mut arena) {
                     return Err(e.into_diagnostics());

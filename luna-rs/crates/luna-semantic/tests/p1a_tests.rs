@@ -527,7 +527,7 @@ fn test_case_19_orphan_slice_inherent_in_user_module_fail() {
     );
 }
 
-// Case 20: Inherent impl on slice type in core/slice provider -> PASS
+// Case 20: Inherent impl on slice type in authorized slice provider -> PASS
 #[test]
 fn test_case_20_slice_inherent_in_slice_provider_pass() {
     let source = r#"
@@ -536,11 +536,32 @@ fn test_case_20_slice_inherent_in_slice_provider_pass() {
         }
     "#;
     let (ctx, success) = run_semantic_with_setup(source, |ctx| {
-        ctx.current_provider_name = Some("slice".to_string());
+        ctx.is_slice_authorized = true;
     });
     assert!(
         success,
         "Expected slice inherent methods in slice provider to pass, got: {:?}",
+        ctx.diagnostics
+    );
+}
+
+// Case 21: Name impersonation ("slice" or "core") without driver capability authorization -> REJECT E_ORPHAN_IMPL
+#[test]
+fn test_case_21_slice_inherent_name_impersonation_fails() {
+    let source = r#"
+        impl<T> [T] {
+            fn iter(self: &[T]) -> i32 { return 0; }
+        }
+    "#;
+    // Even if provider name claims to be "slice" or "core", if capability is false, must reject
+    let (ctx, success) = run_semantic_with_setup(source, |ctx| {
+        ctx.current_provider_name = Some("slice".to_string());
+        ctx.is_slice_authorized = false;
+    });
+    assert!(!success, "Expected failure when provider impersonates 'slice' name without capability");
+    assert!(
+        ctx.diagnostics.iter().any(|d| d.message.contains("E_ORPHAN_IMPL")),
+        "Expected E_ORPHAN_IMPL, got: {:?}",
         ctx.diagnostics
     );
 }

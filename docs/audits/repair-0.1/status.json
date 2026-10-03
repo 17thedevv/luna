@@ -123,7 +123,7 @@
     "first_failing_stage": "luna-semantic typechecker.rs",
     "repro": "luna-semantic typechecker slice iterator lowering",
     "fix_commit": "6aa260d",
-    "evidence": "SliceIter compiler synthesis removed; coherence.rs restricts slice inherent impls strictly to core::slice sysroot provider; crates/luna-semantic/tests/p1a_tests.rs Cases 19 & 20 pass"
+    "evidence": "SliceIter compiler synthesis removed; SemanticContext.is_slice_authorized capability securely restricts slice inherent impls to authorized sysroot build context; rejects impersonation attempts (e.g. user provider slice.ln); crates/luna-semantic/tests/p1a_tests.rs Cases 19, 20 & 21 pass; crates/luna-cli/tests/v01_grammar_acceptance_tests.rs Case 7 verifies CLI rejection with error[E2006]"
   },
   {
     "id": "S-03",
@@ -186,7 +186,7 @@
     "first_failing_stage": "luna-parser and diagnostic emission",
     "repro": "tests/luna/language/spec_v01 parser error rendering",
     "fix_commit": "41484c2",
-    "evidence": "Typed diagnostic codes E0001..E0003 (parser), E2026 (typechecker invalid cast), E2006 (coherence orphan) verified across compiler phases in crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+    "evidence": "Typed diagnostic codes E0001..E0003 (parser), E1001 (unresolved symbol/method), E2001 (type mismatch in local/global var decl, call args, binary ops, returns), E2006 (coherence orphan & slice impersonation), E2026 (typechecker invalid cast) verified in crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
   },
   {
     "id": "W7-COMPTIME",
@@ -200,11 +200,11 @@
   {
     "id": "W8-ALL-PROVIDERS",
     "contract": "Verification matrix for all 49 providers and adopted language contracts",
-    "status": "PASS",
+    "status": "PARTIAL",
     "first_failing_stage": "provider test coverage",
     "repro": "luna-rs/libs/external/sysroot.toml",
     "fix_commit": "8fa8429",
-    "evidence": "luna build-sysroot passes DAG compile for 49 providers; crates/luna-driver/tests/test_sysroot_build_invariants.rs passes 6/6 tests; provider matrix in docs/audits/repair-0.1/provider_matrix.md"
+    "evidence": "Inventory & build infrastructure: 49/49 providers build successfully under sysroot DAG and pass test_sysroot_build_invariants (6/6). Tier-1 Core/Alloc containers (Box, Vec, String, RawTable, HashMap, HashSet, Slice, Iterators) achieve CERTIFIED status with positive/negative/ownership/CLI parity. Full API-level fixture matrix for remaining Tier-2/3 providers is mapped in docs/audits/repair-0.1/provider_matrix.md and remains in progress."
   },
   {
     "id": "W9-PERF",
@@ -213,6 +213,6 @@
     "first_failing_stage": "benchmarks",
     "repro": "tests/luna/stdlib/audit_2026_10_02/hashmap_collision_pattern.ln",
     "fix_commit": null,
-    "evidence": "SplitMix64 bit mixer implemented in core/hash.ln and alloc/raw_table.ln; raw_table overwrite and clear optimized; benchmark in docs/audits/repair-0.1/evidence/hashmap-benchmark.json shows 132x speedup on low_bits_collision n=12000 (0.0259s vs 3.4264s)"
+    "evidence": "SplitMix64 bit mixer in core/hash.ln and alloc/raw_table.ln; raw_table insert/insert_if_absent/get_or_insert probe first before grow, eliminating redundant rehash/growth on overwrite and hits (verified by test_hashmap_overwrite_no_growth_stress with 10k overwrites); clear() retains capacity; benchmark in docs/audits/repair-0.1/evidence/hashmap-benchmark.json shows 132x speedup on low_bits_collision n=12000 (0.0259s vs 3.4264s)"
   }
 ]

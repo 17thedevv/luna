@@ -986,3 +986,101 @@ import <iter_collect>;
 
     assert_eq!(code, 0, "Parity test failed with code {} (stderr: {})", code, stderr);
 }
+
+/// 14. Overwrite & Hit Stress: Ensure no redundant rehash or capacity growth on hit
+#[test]
+fn test_hashmap_overwrite_no_growth_stress() {
+    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
+    let dir = create_temp_dir("map_overwrite_stress");
+
+    let src = r#"
+        import <core/panic>;
+        import <mem>;
+        import <slice>;
+        import <copy>;
+        import <clone>;
+        import <ptr>;
+        import <iter_adapters>;
+        import <iter_consumers>;
+        import <box>;
+        import <vec>;
+        import <string>;
+        import <hashmap>;
+        import <hashset>;
+        import <iter_collect>;
+
+        fn main() -> i32 {
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            // Insert 5 elements (load factor: 5/8 < 0.75, so cap remains 8)
+            map.insert(1, 10);
+            map.insert(2, 20);
+            map.insert(3, 30);
+            map.insert(4, 40);
+            map.insert(5, 50);
+
+            dec init_cap = map.capacity();
+            if init_cap != (8 as u64) {
+                return 1;
+            }
+            if map.len() != (5 as u64) {
+                return 2;
+            }
+
+            // Overwrite key 1 10,000 times
+            dec rw i: i32 = 0;
+            while i < 10000 {
+                dec ins = map.insert(1, i);
+                if ins == true {
+                    return 3; // Must be false (overwrite)
+                }
+                i = i + 1;
+            }
+
+            // Verify capacity and length have NOT grown
+            if map.capacity() != init_cap {
+                return 4;
+            }
+            if map.len() != (5 as u64) {
+                return 5;
+            }
+
+            // Test insert_if_absent on existing key 2 1,000 times
+            dec rw j: i32 = 0;
+            while j < 1000 {
+                dec ins_absent = map.insert_if_absent(2, 9999);
+                if ins_absent == true {
+                    return 6; // Must be false (key 2 already exists)
+                }
+                j = j + 1;
+            }
+
+            if map.capacity() != init_cap {
+                return 7;
+            }
+            if map.len() != (5 as u64) {
+                return 8;
+            }
+
+            // Test get_or_insert on existing key 3
+            dec val_ref = map.get_or_insert(3, 7777);
+            if *val_ref != 30 {
+                return 9;
+            }
+
+            if map.capacity() != init_cap {
+                return 10;
+            }
+
+            return 0;
+        }
+    "#;
+
+    let mut opts = CompilerOptions::default();
+    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
+
+    let (code, _stdout, stderr) = run_binary_with_output(&dir, src, &opts)
+        .expect("Execution must succeed");
+
+    assert_eq!(code, 0, "Overwrite stress test failed with code {} (stderr: {})", code, stderr);
+}
+

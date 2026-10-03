@@ -169,12 +169,59 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         }
 
         export fn insert(self: &rw Self, key: K, val: V) -> bool {
-            if self.cap == (0 as u64) || ((self.len + self.tombstones + (1 as u64)) * (4 as u64) >= self.cap * (3 as u64)) {
-                self.grow();
-            }
             dec hash = key.hash();
+            if self.cap > (0 as u64) {
+                dec probe = self.find(&key, hash);
+                match probe {
+                    ProbeResult::Found(idx) -> {
+                        unsafe {
+                            dec val_dst = std::ptr::add_mut<V>(self.values, idx);
+                            std::ptr::drop_in_place<V>(val_dst);
+                            std::ptr::write<V>(val_dst, val);
+                        }
+                        return false;
+                    },
+                    ProbeResult::Vacant(idx) -> {
+                        if (self.len + self.tombstones + (1 as u64)) * (4 as u64) < self.cap * (3 as u64) {
+                            unsafe {
+                                dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
+                                if *state_ptr == (2 as u8) {
+                                    self.tombstones = self.tombstones - (1 as u64);
+                                }
+                                *state_ptr = 1 as u8;
+                                dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
+                                *hash_ptr = hash;
+                                dec key_dst = std::ptr::add_mut<K>(self.keys, idx);
+                                std::ptr::write<K>(key_dst, key);
+                                dec val_dst = std::ptr::add_mut<V>(self.values, idx);
+                                std::ptr::write<V>(val_dst, val);
+                            }
+                            self.len = self.len + (1 as u64);
+                            return true;
+                        }
+                    },
+                }
+            }
+            self.grow();
             dec probe = self.find(&key, hash);
             match probe {
+                ProbeResult::Vacant(idx) -> {
+                    unsafe {
+                        dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
+                        if *state_ptr == (2 as u8) {
+                            self.tombstones = self.tombstones - (1 as u64);
+                        }
+                        *state_ptr = 1 as u8;
+                        dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
+                        *hash_ptr = hash;
+                        dec key_dst = std::ptr::add_mut<K>(self.keys, idx);
+                        std::ptr::write<K>(key_dst, key);
+                        dec val_dst = std::ptr::add_mut<V>(self.values, idx);
+                        std::ptr::write<V>(val_dst, val);
+                    }
+                    self.len = self.len + (1 as u64);
+                    return true;
+                },
                 ProbeResult::Found(idx) -> {
                     unsafe {
                         dec val_dst = std::ptr::add_mut<V>(self.values, idx);
@@ -183,36 +230,41 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                     }
                     return false;
                 },
-                ProbeResult::Vacant(idx) -> {
-                    unsafe {
-                        dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
-                        if *state_ptr == (2 as u8) {
-                            self.tombstones = self.tombstones - (1 as u64);
-                        }
-                        *state_ptr = 1 as u8;
-                        dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
-                        *hash_ptr = hash;
-                        dec key_dst = std::ptr::add_mut<K>(self.keys, idx);
-                        std::ptr::write<K>(key_dst, key);
-                        dec val_dst = std::ptr::add_mut<V>(self.values, idx);
-                        std::ptr::write<V>(val_dst, val);
-                    }
-                    self.len = self.len + (1 as u64);
-                    return true;
-                },
             }
         }
 
         export fn insert_if_absent(self: &rw Self, key: K, val: V) -> bool {
-            if self.cap == (0 as u64) || ((self.len + self.tombstones + (1 as u64)) * (4 as u64) >= self.cap * (3 as u64)) {
-                self.grow();
-            }
             dec hash = key.hash();
+            if self.cap > (0 as u64) {
+                dec probe = self.find(&key, hash);
+                match probe {
+                    ProbeResult::Found(_) -> {
+                        return false;
+                    },
+                    ProbeResult::Vacant(idx) -> {
+                        if (self.len + self.tombstones + (1 as u64)) * (4 as u64) < self.cap * (3 as u64) {
+                            unsafe {
+                                dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
+                                if *state_ptr == (2 as u8) {
+                                    self.tombstones = self.tombstones - (1 as u64);
+                                }
+                                *state_ptr = 1 as u8;
+                                dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
+                                *hash_ptr = hash;
+                                dec key_dst = std::ptr::add_mut<K>(self.keys, idx);
+                                std::ptr::write<K>(key_dst, key);
+                                dec val_dst = std::ptr::add_mut<V>(self.values, idx);
+                                std::ptr::write<V>(val_dst, val);
+                            }
+                            self.len = self.len + (1 as u64);
+                            return true;
+                        }
+                    },
+                }
+            }
+            self.grow();
             dec probe = self.find(&key, hash);
             match probe {
-                ProbeResult::Found(_) -> {
-                    return false;
-                },
                 ProbeResult::Vacant(idx) -> {
                     unsafe {
                         dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
@@ -229,23 +281,51 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                     }
                     self.len = self.len + (1 as u64);
                     return true;
+                },
+                ProbeResult::Found(_) -> {
+                    return false;
                 },
             }
         }
 
         export fn get_or_insert(self: &rw Self, key: K, default_val: V) -> &rw V life_from(self) {
-            if self.cap == (0 as u64) || ((self.len + self.tombstones + (1 as u64)) * (4 as u64) >= self.cap * (3 as u64)) {
-                self.grow();
-            }
             dec hash = key.hash();
+            if self.cap > (0 as u64) {
+                dec probe = self.find(&key, hash);
+                match probe {
+                    ProbeResult::Found(idx) -> {
+                        unsafe {
+                            dec val_ptr = std::ptr::add_mut<V>(self.values, idx);
+                            return &rw *val_ptr;
+                        }
+                    },
+                    ProbeResult::Vacant(idx) -> {
+                        if (self.len + self.tombstones + (1 as u64)) * (4 as u64) < self.cap * (3 as u64) {
+                            unsafe {
+                                dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
+                                if *state_ptr == (2 as u8) {
+                                    self.tombstones = self.tombstones - (1 as u64);
+                                }
+                                *state_ptr = 1 as u8;
+                                dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
+                                *hash_ptr = hash;
+                                dec key_dst = std::ptr::add_mut<K>(self.keys, idx);
+                                std::ptr::write<K>(key_dst, key);
+                                dec val_dst = std::ptr::add_mut<V>(self.values, idx);
+                                std::ptr::write<V>(val_dst, default_val);
+                            }
+                            self.len = self.len + (1 as u64);
+                            unsafe {
+                                dec val_ptr = std::ptr::add_mut<V>(self.values, idx);
+                                return &rw *val_ptr;
+                            }
+                        }
+                    },
+                }
+            }
+            self.grow();
             dec probe = self.find(&key, hash);
             match probe {
-                ProbeResult::Found(idx) -> {
-                    unsafe {
-                        dec val_ptr = std::ptr::add_mut<V>(self.values, idx);
-                        return &rw *val_ptr;
-                    }
-                },
                 ProbeResult::Vacant(idx) -> {
                     unsafe {
                         dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
@@ -261,6 +341,12 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                         std::ptr::write<V>(val_dst, default_val);
                     }
                     self.len = self.len + (1 as u64);
+                    unsafe {
+                        dec val_ptr = std::ptr::add_mut<V>(self.values, idx);
+                        return &rw *val_ptr;
+                    }
+                },
+                ProbeResult::Found(idx) -> {
                     unsafe {
                         dec val_ptr = std::ptr::add_mut<V>(self.values, idx);
                         return &rw *val_ptr;
