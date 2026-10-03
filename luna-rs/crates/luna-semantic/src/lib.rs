@@ -84,6 +84,7 @@ pub struct SemanticContext {
     pub external_module_scopes: HashMap<String, ScopeId>,
     pub current_provider: Option<symbol::ProviderId>,
     pub current_provider_name: Option<String>,
+    pub is_slice_authorized: bool,
 }
 
 impl SemanticContext {
@@ -108,6 +109,7 @@ impl SemanticContext {
             external_module_scopes: HashMap::new(),
             current_provider: None,
             current_provider_name: None,
+            is_slice_authorized: false,
         }
     }
 

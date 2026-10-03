@@ -13,12 +13,8 @@ impl SemanticContext {
         self.symbol_table.is_symbol_foreign(sym_id, self.current_provider)
     }
 
-    pub fn is_slice_provider(&self) -> bool {
-        if let Some(ref name) = self.current_provider_name {
-            name == "slice" || name == "core/slice" || name == "core" || name.ends_with("/slice")
-        } else {
-            false
-        }
+    pub fn is_slice_authorized(&self) -> bool {
+        self.is_slice_authorized
     }
 
     pub fn nominal_head(&self, ty_id: SemanticTypeId) -> Option<SymbolId> {
@@ -69,7 +65,7 @@ impl SemanticContext {
         } else {
             // Inherent impl: allowed for local nominal heads or primitive slice types in the slice provider
             let is_slice = matches!(self.types.get(self_ty_res), SemanticType::Slice(_));
-            let is_slice_authorized = is_slice && self.is_slice_provider();
+            let is_slice_authorized = is_slice && self.is_slice_authorized();
             let is_inherent_allowed = is_head_local || is_slice_authorized;
             if !is_inherent_allowed {
                 let self_name = nominal_head

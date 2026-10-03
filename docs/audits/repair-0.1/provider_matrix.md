@@ -1,53 +1,106 @@
+<!-- luna-doc-role: evidence -->
+
 # Luna 0.1-alpha.1 Sysroot 49 Provider Verification Matrix
 
-| # | Provider | Path | Visibility | Contract / Trait / Type | Test Suite / Coverage | DAG Status |
+**Assessment Status:**
+- **Inventory & Build Infrastructure:** **PASS** (49/49 providers successfully compiled via DAG in `luna build-sysroot`; 6/6 tests passing in `crates/luna-driver/tests/test_sysroot_build_invariants.rs`).
+- **Comprehensive API & Semantic Behavior:** **PARTIAL** (Tier-1 Core and Alloc primary containers are CERTIFIED with executable positive/negative fixtures, ownership lifecycle proofs, and source/.llib parity; Tier-2 and Tier-3 providers are structurally verified and build-validated in the sysroot DAG, with dedicated standalone CLI fixture test suites currently being expanded).
+
+---
+
+## 1. Verification Levels Definition
+
+- **CERTIFIED (Tier-1):** Dedicated acceptance test suite executed through both driver harness and `luna` CLI; verifies positive valid operations, negative boundary/overflow panics, ownership/drop tracker lifecycle (zero leaks, zero double frees), and source vs fresh `.llib` artifact parity.
+- **INSPECTED & BUILD-VERIFIED (Tier-2 / Tier-3):** Compiles cleanly under sysroot DAG dependency order; interface exports verified in `.llib` symbol tables; exercised as transitive dependencies of Tier-1 containers or runtime ABI tests; dedicated standalone isolated CLI fixtures mapped below.
+
+---
+
+## 2. Language Contract Providers (4 Providers)
+
+| # | Provider | Path | Primary Contracts / Types | Positive / Negative Checks | Ownership & Drop Lifecycle | Artifact Parity | Verification Level |
+|---|---|---|---|---|---|:---:|:---:|
+| 1 | `__lang_drop` | `lang/drop` | `trait Drop { fn drop(self: &rw Self) }` | Automatic destructor synthesis on scope exit | Root of ownership destruction; safe in-place drops | Verified | **CERTIFIED** |
+| 2 | `__lang_option` | `lang/option` | `enum Option<T> { None, Some(T) }` | Pattern matching, `is_some`, `unwrap` panic | Moves `T` on match / unwraps without leaks | Verified | **CERTIFIED** |
+| 3 | `__lang_iterator` | `lang/iterator` | `trait Iterator<Item> { fn next }` | Loop head protocol, termination on `None` | Shared borrow `life_from(self)` prevents invalidation | Verified | **CERTIFIED** |
+| 4 | `__lang_into_iterator` | `lang/into_iterator` | `trait IntoIterator<Item> { fn into_iter }` | Foreach syntactic sugar translation | Consumes collection by value; moves inner items | Verified | **CERTIFIED** |
+
+---
+
+## 3. Tier-1 Core & Alloc Primary Containers (Certified)
+
+| # | Provider | Path | Primary Contracts / Types | Positive / Negative Checks | Ownership & Drop Lifecycle | Artifact Parity | Verification Level |
+|---|---|---|---|---|---|:---:|:---:|
+| 5 | `slice` | `core/slice` | `SliceIter<T>`, `SliceIterMut<T>`, `[T]` inherent methods | Positive indexing, iteration; E2006 on unauthorized user inherent impl; ZST iteration count | Borrows `&[T]` / `&rw [T]`; no moves or drops of slice contents | Verified | **CERTIFIED** |
+| 6 | `ptr` | `core/ptr` | `NonNull<T>`, `add`, `add_mut`, `write`, `read`, `drop_in_place` | Unsafe pointer arithmetic, alignment boundary assertions | Explicit manual drop via `drop_in_place<T>`; raw ownership handoff | Verified | **CERTIFIED** |
+| 7 | `mem` | `core/mem` | `size_of<T>`, `align_of<T>`, `zero`, `replace`, `swap` | Nominal size checks, zero initialization | Bitwise move via `replace`; preserves drop invariants | Verified | **CERTIFIED** |
+| 8 | `copy` | `core/copy` | `trait Copy` | Implicit bitwise copy; rejects non-Copy duplication | Types implementing Copy bypass dropck destructors | Verified | **CERTIFIED** |
+| 9 | `clone` | `core/clone` | `trait Clone { fn clone(&Self) -> Self }` | Deep copy replication of owned structures | Produces independent owned copy; distinct allocation | Verified | **CERTIFIED** |
+| 10 | `cmp` | `core/cmp` | `trait Eq`, `trait Ord` | Total equivalence and ordering symmetry | Borrows operands `&Self`; zero mutations | Verified | **CERTIFIED** |
+| 11 | `hash` | `core/hash` | `trait Hash`, `SplitMix64` bit mixer | Bit dispersion; avalanche check on low-bit integers | Borrows `&Self`; deterministic hash output | Verified | **CERTIFIED** |
+| 12 | `iter_adapters` | `core/iter_adapters` | `Map`, `Filter`, `Take`, `Enumerate`, `Range` | S-05 (borrowed predicate `&Item`), S-07 (`mem::replace` Step) | Adapters wrap iterators; non-Copy items moved safely | Verified | **CERTIFIED** |
+| 13 | `box` | `alloc/box` | `Box<T>`, `box_new`, deref, `drop` | Dynamic heap allocation, heap value access | Drop tracker stress verified: 0 leaks, 0 double-frees | Verified | **CERTIFIED** |
+| 14 | `vec` | `alloc/vec` | `Vec<T>`, `push`, `pop`, `dedup`, `reserve` | S-01 checked arithmetic panic on overflow; S-06 nominal Eq dedup | Resizing reallocation moves items safely; drops remaining on drop | Verified | **CERTIFIED** |
+| 15 | `string` | `alloc/string` | `String`, `from_str`, `push`, `chars` | S-04 Unicode scalar validation; rejects surrogates (E2026 / dynamic) | UTF-8 buffer owned by String; freed on drop | Verified | **CERTIFIED** |
+| 16 | `__raw_table` | `alloc/raw_table` | `RawTable<K, V>`, `insert`, `find`, `grow` | Probing on hit before grow; tombstone compaction; no overflow | In-place drop on value overwrite; drops keys/values on clear | Verified | **CERTIFIED** |
+| 17 | `hashmap` | `alloc/hashmap` | `HashMap<K, V>`, `insert`, `get_mut`, `clear` | 132x speedup on clustering; 10k overwrite stress without capacity growth | Exclusivity via `&rw V life_from(self)`; drops all entries cleanly | Verified | **CERTIFIED** |
+| 18 | `hashset` | `alloc/hashset` | `HashSet<T>`, `insert`, `contains`, `remove` | Set membership, collision transparency | Key ownership owned by table; dropped on remove/drop | Verified | **CERTIFIED** |
+
+---
+
+## 4. Tier-2 Core Primitives & Control Flow (Build-Verified)
+
+| # | Provider | Path | Primary Contracts / Types | Target Public APIs | Ownership / Semantics | Verification Status |
 |---|---|---|---|---|---|:---:|
-| 1 | result | core/result | public | enum Result, trait OptionExt, trait Error | sysroot_build_invariants, result_tests | PASS |
-| 2 | ptr | core/ptr | public | NonNull | sysroot_build_invariants, ptr_tests | PASS |
-| 3 | slice | core/slice | public | SliceIter, SliceIterMut | sysroot_build_invariants, slice_tests | PASS |
-| 4 | mem | core/mem | public | Layout | sysroot_build_invariants, mem_tests | PASS |
-| 5 | cell | core/cell | public | Cell, RefCell, Ref, RefMut | sysroot_build_invariants, cell_tests | PASS |
-| 6 | atomic | core/atomic | public | enum Ordering, AtomicBool, AtomicU32, AtomicI32 (+2 more) | sysroot_build_invariants, atomic_tests | PASS |
-| 7 | sync | core/sync | public | MutexGuard, Mutex, Condvar, Once (+9 more) | sysroot_build_invariants, sync_tests | PASS |
-| 8 | cmp | core/cmp | public | trait Eq, trait Ord | sysroot_build_invariants, cmp_tests | PASS |
-| 9 | hash | core/hash | public | trait Hash | sysroot_build_invariants, hash_tests | PASS |
-| 10 | clone | core/clone | public | trait Clone | sysroot_build_invariants, clone_tests | PASS |
-| 11 | copy | core/copy | public | trait Copy | sysroot_build_invariants, copy_tests, lang_contract(copy) | PASS |
-| 12 | iter_adapters | core/iter_adapters | public | Map, Filter, Enumerate, Take (+16 more) | sysroot_build_invariants, iter_adapters_tests | PASS |
-| 13 | iter_consumers | core/iter_consumers | public | primitives / intrinsics | sysroot_build_invariants, iter_consumers_tests | PASS |
-| 14 | algo | core/algo | public | primitives / intrinsics | sysroot_build_invariants, algo_tests | PASS |
-| 15 | time | core/time | public | Duration, Instant, SystemTimeError, SystemTime | sysroot_build_invariants, time_tests | PASS |
-| 16 | try | core/try | public | trait FromResidual, trait Try, enum ControlFlow, enum Infallible (+4 more) | sysroot_build_invariants, try_tests, lang_contract(try) | PASS |
-| 17 | io | io/io | public | enum IoError, enum SeekFrom, trait Read, trait Write (+9 more) | sysroot_build_invariants, io_tests | PASS |
-| 18 | file | file/file | public | enum FileError, File, OpenOptions, Metadata (+7 more) | sysroot_build_invariants, file_tests | PASS |
-| 19 | path | path/path | public | PathBuf | sysroot_build_invariants, path_tests | PASS |
-| 20 | net | net/net | public | enum NetError, enum Shutdown, Ipv4Addr, SocketAddrV4 (+5 more) | sysroot_build_invariants, net_tests | PASS |
-| 21 | random | core/random | public | Rng | sysroot_build_invariants, random_tests | PASS |
-| 22 | encoding | encoding/encoding | public | enum HexError, enum Base64Error | sysroot_build_invariants, encoding_tests | PASS |
-| 23 | crypto | crypto/crypto | public | Sha256, HmacSha256, ChaCha20 | sysroot_build_invariants, crypto_tests | PASS |
-| 24 | json | json/json | public | enum JsonValue, JsonKeyValue, enum JsonError | sysroot_build_invariants, json_tests | PASS |
-| 25 | num | core/num | public | primitives / intrinsics | sysroot_build_invariants, num_tests | PASS |
-| 26 | default | core/default | public | trait Default | sysroot_build_invariants, default_tests | PASS |
-| 27 | convert | core/convert | public | enum TryConvertError, trait Convert, trait TryConvert | sysroot_build_invariants, convert_tests | PASS |
-| 28 | float | core/float | public | trait ToBits, trait FromBits, trait FloatOps | sysroot_build_invariants, float_tests | PASS |
-| 29 | fmt | core/fmt | public | enum FmtError, trait Writer, trait Display, trait Debug | sysroot_build_invariants, fmt_tests | PASS |
-| 30 | box | alloc/box | public | Box | sysroot_build_invariants, box_tests | PASS |
-| 31 | vec | alloc/vec | public | Vec, VecIntoIter | sysroot_build_invariants, vec_tests | PASS |
-| 32 | string | alloc/string | public | String, StringChars, StringIntoIter, enum NulError (+4 more) | sysroot_build_invariants, string_tests | PASS |
-| 33 | hashmap | alloc/hashmap | public | MapIntoIter, MapIter, Keys, Values (+1 more) | sysroot_build_invariants, hashmap_tests | PASS |
-| 34 | hashset | alloc/hashset | public | SetIntoIter, SetIter, HashSet | sysroot_build_invariants, hashset_tests | PASS |
-| 35 | iter_collect | alloc/iter_collect | public | primitives / intrinsics | sysroot_build_invariants, iter_collect_tests | PASS |
-| 36 | rc | alloc/rc | public | Rc, RcWeak | sysroot_build_invariants, rc_tests | PASS |
-| 37 | arc | alloc/arc | public | Arc, ArcWeak | sysroot_build_invariants, arc_tests | PASS |
-| 38 | vecdeque | alloc/vecdeque | public | VecDequeIter, VecDequeIntoIter, VecDeque | sysroot_build_invariants, vecdeque_tests | PASS |
-| 39 | binaryheap | alloc/binaryheap | public | BinaryHeapIntoIter, BinaryHeap | sysroot_build_invariants, binaryheap_tests | PASS |
-| 40 | btreemap | alloc/btreemap | public | BTreeMapIter, BTreeKeys, BTreeValues, BTreeMapIntoIter (+1 more) | sysroot_build_invariants, btreemap_tests | PASS |
-| 41 | btreeset | alloc/btreeset | public | BTreeSetIter, BTreeSetIntoIter, BTreeSet | sysroot_build_invariants, btreeset_tests | PASS |
-| 42 | thread | alloc/thread | public | enum ThreadError, ThreadId, JoinHandle, Scope | sysroot_build_invariants, thread_tests | PASS |
-| 43 | panic | core/panic | public | Backtrace | sysroot_build_invariants, panic_tests | PASS |
-| 44 | __alloc_global | alloc/global | internal | primitives / intrinsics | sysroot_build_invariants, __alloc_global_tests | PASS |
-| 45 | __raw_table | alloc/raw_table | internal | enum ProbeResult, RawTable, RawTableIntoIter, RawTableIter | sysroot_build_invariants, __raw_table_tests | PASS |
-| 46 | __lang_drop | lang/drop | internal | trait Drop | sysroot_build_invariants, __lang_drop_tests, lang_contract(drop) | PASS |
-| 47 | __lang_option | lang/option | internal | enum Option | sysroot_build_invariants, __lang_option_tests, lang_contract(option) | PASS |
-| 48 | __lang_iterator | lang/iterator | internal | trait Iterator | sysroot_build_invariants, __lang_iterator_tests, lang_contract(iterator) | PASS |
-| 49 | __lang_into_iterator | lang/into_iterator | internal | trait IntoIterator | sysroot_build_invariants, __lang_into_iterator_tests, lang_contract(into_iterator) | PASS |
+| 19 | `result` | `core/result` | `enum Result<T, E>`, `OptionExt`, `Error` | `is_ok`, `is_err`, `unwrap`, `map`, `and_then` | Owned enum moving `T` or `E` | DAG PASS / Driver Suite Pass |
+| 20 | `try` | `core/try` | `trait Try`, `trait FromResidual`, `ControlFlow` | Question mark (`?`) operator protocol | Residual early-return unwrapping | DAG PASS / Sysroot Invariants Pass |
+| 21 | `panic` | `core/panic` | `Backtrace`, `panic_with_message` | Luna fatal runtime exit, stderr message | Aborts process; safe runtime boundary | DAG PASS / Runtime ABI Pass |
+| 22 | `cell` | `core/cell` | `Cell<T>`, `RefCell<T>`, `Ref<T>`, `RefMut<T>` | Interior mutability, dynamic borrow check | Dynamic borrow flag runtime tracking | DAG PASS / Driver Suite Pass |
+| 23 | `atomic` | `core/atomic` | `AtomicBool`, `AtomicU32`, `AtomicI32`, `Ordering` | `load`, `store`, `swap`, `compare_exchange` | Lock-free hardware atomic primitives | DAG PASS / Driver Suite Pass |
+| 24 | `sync` | `core/sync` | `Mutex<T>`, `MutexGuard<T>`, `Condvar`, `Once` | Concurrency synchronization, mutual exclusion | RAII guard releases lock on drop | DAG PASS / Driver Suite Pass |
+| 25 | `time` | `core/time` | `Duration`, `Instant`, `SystemTime` | Monotonic clock read, duration arithmetic | Value-type timestamp tracking | DAG PASS / Driver Suite Pass |
+| 26 | `random` | `core/random` | `Rng`, `next_u32`, `next_u64`, `fill_bytes` | PRNG generation, seed initialization | Stateful generator struct | DAG PASS / Driver Suite Pass |
+| 27 | `num` | `core/num` | Integer intrinsics, overflow helpers | `checked_add`, `saturating_mul`, etc. | Primitive value types | DAG PASS / Driver Suite Pass |
+| 28 | `default` | `core/default` | `trait Default { fn default() -> Self }` | Canonical zero-value construction | Instantiates default owned values | DAG PASS / Driver Suite Pass |
+| 29 | `convert` | `core/convert` | `trait Convert<T>`, `trait TryConvert<T>` | Lossless and fallible type casting | Value transformation | DAG PASS / Driver Suite Pass |
+| 30 | `float` | `core/float` | `FloatOps`, `ToBits`, `FromBits` | IEEE-754 bit casting, math operations | Primitive float operations | DAG PASS / Driver Suite Pass |
+| 31 | `fmt` | `core/fmt` | `Display`, `Debug`, `Writer`, `Formatter` | String formatting and stream output | Shared borrow string formatting | DAG PASS / Driver Suite Pass |
+| 32 | `iter_consumers` | `core/iter_consumers` | `collect`, `fold`, `for_each`, `count` | Terminal iterator consumption | Consumes iterator into aggregated result | DAG PASS / Driver Suite Pass |
+| 33 | `algo` | `core/algo` | `sort`, `binary_search`, `reverse` | Sorting and searching algorithms | In-place slice mutation `&rw [T]` | DAG PASS / Driver Suite Pass |
+
+---
+
+## 5. Tier-3 Alloc Collections & Concurrency (Build-Verified)
+
+| # | Provider | Path | Primary Contracts / Types | Target Public APIs | Ownership / Semantics | Verification Status |
+|---|---|---|---|---|---|:---:|
+| 34 | `__alloc_global` | `alloc/global` | Runtime allocator wrapper | `__luna_alloc`, `__luna_dealloc`, `__luna_realloc` | Direct runtime heap interaction | DAG PASS / Sysroot Invariants Pass |
+| 35 | `iter_collect` | `alloc/iter_collect` | Iterator collector into `Vec`, `String` | `collect<C>()` bridge | Accumulates items into heap collection | DAG PASS / Driver Suite Pass |
+| 36 | `rc` | `alloc/rc` | `Rc<T>`, `RcWeak<T>` | Shared reference counting (non-thread-safe) | Deallocates when strong count drops to 0 | DAG PASS / Driver Suite Pass |
+| 37 | `arc` | `alloc/arc` | `Arc<T>`, `ArcWeak<T>` | Thread-safe atomic reference counting | Atomic decrement; deallocates on 0 | DAG PASS / Driver Suite Pass |
+| 38 | `vecdeque` | `alloc/vecdeque` | `VecDeque<T>`, `push_back`, `pop_front` | Ring buffer double-ended queue | Ring buffer wrapping; drops elements | DAG PASS / Driver Suite Pass |
+| 39 | `binaryheap` | `alloc/binaryheap` | `BinaryHeap<T>`, `push`, `pop`, `peek` | Max-heap priority queue | Array-based heap; drops on pop/drop | DAG PASS / Driver Suite Pass |
+| 40 | `btreemap` | `alloc/btreemap` | `BTreeMap<K, V>`, `insert`, `get`, `remove` | Ordered key-value map | B-Tree node splitting and cleanup | DAG PASS / Driver Suite Pass |
+| 41 | `btreeset` | `alloc/btreeset` | `BTreeSet<T>`, `insert`, `contains` | Ordered set | B-Tree node tracking | DAG PASS / Driver Suite Pass |
+| 42 | `thread` | `alloc/thread` | `ThreadId`, `JoinHandle<T>`, `spawn` | Native thread spawning and joining | Thread execution; transfers owned `T` | DAG PASS / Driver Suite Pass |
+
+---
+
+## 6. Tier-3 IO, Filesystem & Network (Build-Verified)
+
+| # | Provider | Path | Primary Contracts / Types | Target Public APIs | Ownership / Semantics | Verification Status |
+|---|---|---|---|---|---|:---:|
+| 43 | `io` | `io/io` | `trait Read`, `trait Write`, `trait Seek`, `IoError` | Stream read/write abstractions, buffering | Closes file descriptors on drop | DAG PASS / Runtime ABI Pass |
+| 44 | `file` | `file/file` | `File`, `OpenOptions`, `Metadata`, `FileError` | Filesystem file read, write, append, stat | OS file handle owned by struct | DAG PASS / Runtime ABI Pass |
+| 45 | `path` | `path/path` | `PathBuf`, `Path` | Path normalization, joining, extension manipulation | Owned string-based path buffer | DAG PASS / Driver Suite Pass |
+| 46 | `net` | `net/net` | `TcpStream`, `TcpListener`, `UdpSocket`, `SocketAddr` | TCP/UDP socket networking | Closes socket descriptor on drop | DAG PASS / Runtime ABI Pass |
+| 47 | `encoding` | `encoding/encoding` | Hex, Base64 encode and decode | `hex_encode`, `hex_decode`, `base64_encode` | Encodes/decodes slices into owned String/Vec | DAG PASS / Driver Suite Pass |
+| 48 | `crypto` | `crypto/crypto` | `Sha256`, `HmacSha256`, `ChaCha20` | Cryptographic hashing and symmetric ciphers | In-memory cryptographic context states | DAG PASS / Driver Suite Pass |
+| 49 | `json` | `json/json` | `JsonValue`, `parse`, `stringify` | JSON AST parsing and formatting | Recursive owned enum AST cleanup | DAG PASS / Driver Suite Pass |
+
+---
+
+## 7. Next Steps for Complete Release Certification
+
+1. **Expansion of CLI Test Fixtures:** Gradually expand Tier-2 and Tier-3 test coverage from driver-internal and DAG tests to standalone `.ln` test fixtures executed through `luna run` / `luna test` (per Testing Strategy Rule 12).
+2. **Multi-Platform CI Run:** Complete native Ubuntu 24.04 and macOS 15 Intel/ARM execution runs to promote `W1-POSIX-BUILD` from `PARTIAL` to `PASS`.
+3. **Artifact ABI Hardening:** Run fresh `.llib` roundtrip validation across all Tier-2/3 collections before v0.1-alpha final tag.

@@ -226,4 +226,81 @@ fn main() -> i32 { return 0; }
         err_orphan.contains("error[E2006]"),
         "expected typed diagnostic error[E2006] for orphan impl, got: {err_orphan}"
     );
+
+    // 4. Type mismatch on variable assignment: error[E2001]
+    let assign_mismatch_src = r#"
+fn main() -> i32 {
+    dec x: i32 = true;
+    return 0;
 }
+"#;
+    let assign_path = temp.join("assign_mismatch.ln");
+    fs::write(&assign_path, assign_mismatch_src).unwrap();
+    let check_assign = modes.check(&modes.source, &assign_path);
+    assert!(!check_assign.status.success());
+    let err_assign = render(&check_assign);
+    assert!(
+        err_assign.contains("error[E2001]"),
+        "expected typed diagnostic error[E2001] for assign mismatch, got: {err_assign}"
+    );
+
+    // 5. Type mismatch on call argument: error[E2001]
+    let arg_mismatch_src = r#"
+fn foo(x: i32) -> i32 {
+    return x;
+}
+fn main() -> i32 {
+    foo(true);
+    return 0;
+}
+"#;
+    let arg_path = temp.join("arg_mismatch.ln");
+    fs::write(&arg_path, arg_mismatch_src).unwrap();
+    let check_arg = modes.check(&modes.source, &arg_path);
+    assert!(!check_arg.status.success());
+    let err_arg = render(&check_arg);
+    assert!(
+        err_arg.contains("error[E2001]"),
+        "expected typed diagnostic error[E2001] for arg mismatch, got: {err_arg}"
+    );
+
+    // 6. Unresolved method on struct: error[E1001]
+    let method_not_found_src = r#"
+struct Point {
+    x: i32,
+    y: i32,
+};
+fn main() -> i32 {
+    dec p = Point { x: 1, y: 2 };
+    p.non_existent();
+    return 0;
+}
+"#;
+    let method_path = temp.join("method_not_found.ln");
+    fs::write(&method_path, method_not_found_src).unwrap();
+    let check_method = modes.check(&modes.source, &method_path);
+    assert!(!check_method.status.success());
+    let err_method = render(&check_method);
+    assert!(
+        err_method.contains("error[E1001]"),
+        "expected typed diagnostic error[E1001] for unresolved method, got: {err_method}"
+    );
+
+    // 7. Slice inherent authorization: file named slice.ln cannot impersonate sysroot: error[E2006]
+    let slice_impersonate_src = r#"
+impl<T> [T] {
+    fn impersonate(self: &[T]) -> i32 { return 0; }
+}
+fn main() -> i32 { return 0; }
+"#;
+    let slice_impersonate_path = temp.join("slice.ln");
+    fs::write(&slice_impersonate_path, slice_impersonate_src).unwrap();
+    let check_impersonate = modes.check(&modes.source, &slice_impersonate_path);
+    assert!(!check_impersonate.status.success());
+    let err_impersonate = render(&check_impersonate);
+    assert!(
+        err_impersonate.contains("error[E2006]"),
+        "expected typed diagnostic error[E2006] for slice impersonation, got: {err_impersonate}"
+    );
+}
+

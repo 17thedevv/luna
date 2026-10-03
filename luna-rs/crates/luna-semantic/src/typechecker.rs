@@ -2095,7 +2095,7 @@ impl<'a> TypeChecker<'a> {
                         let annot_ty = self.lower_type(annot);
                         if let Err(e) = self.unify(annot_ty, init_ty) {
                             let span = self.get_expr_span_for_diag(&init).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
+                            self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                         }
                         annot_ty
                     } else {
@@ -3162,7 +3162,7 @@ impl<'a> TypeChecker<'a> {
                                 if !self.try_coerce(*init, init_ty, expected_ty) {
                                     if let Err(e) = self.unify(expected_ty, init_ty) {
                                         let span = self.get_expr_span_for_diag(init).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                        self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
+                                        self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                                     } else {
                                         init_ty = expected_ty;
                                     }
@@ -3780,7 +3780,7 @@ impl<'a> TypeChecker<'a> {
                 let cond_ty = self.typecheck_expr(condition);
                 let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                 if self.unify(bool_ty, cond_ty).is_err() {
-                    self.ctx.diagnostics.push(Diagnostic::error("if condition must be a boolean"));
+                    self.ctx.diagnostics.push(Diagnostic::error("if condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
                 }
                 self.typecheck_stmt(then_branch);
                 if let Some(else_br) = else_branch {
@@ -3791,7 +3791,7 @@ impl<'a> TypeChecker<'a> {
                 let cond_ty = self.typecheck_expr(condition);
                 let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                 if self.unify(bool_ty, cond_ty).is_err() {
-                    self.ctx.diagnostics.push(Diagnostic::error("while condition must be a boolean"));
+                    self.ctx.diagnostics.push(Diagnostic::error("while condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
                 }
                 self.loop_depth += 1;
                 self.typecheck_stmt(body);
@@ -3803,7 +3803,7 @@ impl<'a> TypeChecker<'a> {
                     let cond_ty = self.typecheck_expr(c); 
                     let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                     if self.unify(bool_ty, cond_ty).is_err() {
-                        self.ctx.diagnostics.push(Diagnostic::error("for condition must be a boolean"));
+                        self.ctx.diagnostics.push(Diagnostic::error("for condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
                     }
                 }
                 if let Some(s) = step { self.typecheck_expr(s); }
@@ -3839,15 +3839,14 @@ impl<'a> TypeChecker<'a> {
                     if !self.try_coerce(*val, val_ty, expected_ty) {
                         if let Err(e) = self.unify(expected_ty, val_ty) {
                             let span = self.get_expr_span_for_diag(val).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
+                            self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                         }
                     }
                 } else {
                     let void_ty = self.ctx.types.intern(SemanticType::Void);
                     if let Err(e) = self.unify(expected_ty, void_ty) {
-                                    // stmt_id span is not easily available, fallback to 0
-                                    self.ctx.diagnostics.push(Diagnostic::error(e).with_span(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
-                                }
+                        self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
+                    }
                 }
             }
             Stmt::Unsafe { body } => {
@@ -4202,9 +4201,9 @@ impl<'a> TypeChecker<'a> {
                 
                 // For simplified logic: require left and right to be same
                 if let Err(e) = self.unify(l_ty, r_ty) {
-                                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                    self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
-                                } 
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                    self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
+                } 
                 
                 if let Some(message) = crate::operators::PrimitiveOperator::Binary(*op)
                     .error_for_type(&self.ctx.types, l_ty)
@@ -4360,7 +4359,7 @@ impl<'a> TypeChecker<'a> {
                             if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                 if let Err(e) = self.unify(expected_p, arg_ty) {
                                     let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                    self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
+                                    self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                                 }
                             }
                         }
@@ -4440,7 +4439,7 @@ impl<'a> TypeChecker<'a> {
                                         if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                             if let Err(e) = self.unify(expected_p, arg_ty) {
                                                 let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                                self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
+                                                self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                                             }
                                         }
                                     }
@@ -4521,9 +4520,9 @@ impl<'a> TypeChecker<'a> {
                 }
                 if !self.try_coerce(*value, r_ty, l_ty) {
                     if let Err(e) = self.unify(l_ty, r_ty) {
-                                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                    self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
-                                }
+                        let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                        self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
+                    }
                 }
                 self.ctx.types.intern(SemanticType::Void)
             }
@@ -4943,11 +4942,11 @@ impl<'a> TypeChecker<'a> {
                         self.check_field_visibility(symbol, declared.visibility, field_name, field.name);
                         let value_ty = self.typecheck_expr_expected(&field.value, field_tys[index]);
                         if self.unify(field_tys[index], value_ty).is_err() {
-                            self.ctx.diagnostics.push(Diagnostic::error(format!("Type mismatch for field '{}'", field_name)).with_span(field.name));
+                            self.ctx.diagnostics.push(Diagnostic::error(format!("Type mismatch for field '{}'", field_name)).with_code(DiagnosticCode::TypeMismatch).with_span(field.name));
                         }
                         init_indices.push(index as u32);
                     } else {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("Unknown field '{}' for struct '{}'", field_name, full_name)).with_span(field.name));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("Unknown field '{}' for struct '{}'", field_name, full_name)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(field.name));
                         self.typecheck_expr(&field.value);
                         init_indices.push(u32::MAX); // Error recovery
                     }
@@ -4958,7 +4957,7 @@ impl<'a> TypeChecker<'a> {
                     let declared_name = self.get_span_text(declared.name);
                     let provided = fields.iter().any(|f| self.get_span_text(f.name) == declared_name);
                     if !provided {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("Missing field `{}` in initializer of `{}`", declared_name, full_name)).with_span(span));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("Missing field `{}` in initializer of `{}`", declared_name, full_name)).with_code(DiagnosticCode::MissingField).with_span(span));
                     }
                 }
                 self.ctx.tables.expr_struct_init_indices.insert(*expr_id, init_indices);
@@ -4976,7 +4975,7 @@ impl<'a> TypeChecker<'a> {
                     if i == 0 {
                         elem_ty = ty;
                     } else if self.unify(elem_ty, ty).is_err() {
-                        self.ctx.diagnostics.push(Diagnostic::error("Array literal elements must have the same type"));
+                        self.ctx.diagnostics.push(Diagnostic::error("Array literal elements must have the same type").with_code(DiagnosticCode::TypeMismatch));
                     }
                 }
                 self.ctx.types.intern(SemanticType::Array(elem_ty, elements.len() as u64))
@@ -5134,9 +5133,9 @@ impl<'a> TypeChecker<'a> {
                                             if let Some(&expected_p) = expected_params.get(i) {
                                                 if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                                     if let Err(e) = self.unify(expected_p, arg_ty) {
-                                    let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                    self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
-                                }
+                                                        let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                                                        self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
+                                                    }
                                                 }
                                             }
                                         }
@@ -5299,7 +5298,7 @@ impl<'a> TypeChecker<'a> {
                                         if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                             if let Err(e) = self.unify(expected_p, arg_ty) {
                                                 let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                                self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
+                                                self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                                             }
                                         }
                                     }
@@ -5636,7 +5635,7 @@ impl<'a> TypeChecker<'a> {
                                         if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                             if let Err(e) = self.unify(expected_p, arg_ty) {
                                                 let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                                self.ctx.diagnostics.push(Diagnostic::error(e).with_span(span));
+                                                self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                                             }
                                         }
                                     }
@@ -5693,6 +5692,7 @@ impl<'a> TypeChecker<'a> {
                             "Method `{}` not found for type `{:?}`",
                             member_name, obj_ty
                         ))
+                        .with_code(DiagnosticCode::UnresolvedSymbol)
                         .with_span(*method_name),
                     );
                 }

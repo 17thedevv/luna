@@ -1842,6 +1842,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             "Symbol '{}' not found",
                             name_str
                         ))
+                        .with_code(luna_common::DiagnosticCode::UnresolvedSymbol)
                         .with_span(*segments.first().unwrap());
                         self.ctx.diagnostics.push(diag);
                     }
@@ -1978,6 +1979,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             "no macro named '{}' in scope",
                             macro_name
                         ))
+                        .with_code(luna_common::DiagnosticCode::UnresolvedSymbol)
                         .with_span(*span),
                     );
                 }
