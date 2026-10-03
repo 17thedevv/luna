@@ -185,7 +185,7 @@
     "status": "PASS",
     "first_failing_stage": "luna-llib and comptime preparation",
     "repro": "tests/luna/language/literal_comptime_provider_gap.ln",
-    "fix_commit": "PENDING_COMMIT",
+    "fix_commit": "6e8d278",
     "evidence": "crates/luna-cli/tests/literal_typing_cli_parity.rs (comptime_provider_gap)"
   },
   {
