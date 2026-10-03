@@ -205,6 +205,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/repair-0.1/README.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/stdlib-2026-10-02-d-worktree/README.md",
     "role": "evidence",
     "owner": "stdlib"
@@ -427,6 +432,21 @@
   {
     "path": "docs/project/rename-luna-v1.md",
     "role": "adopted-contract",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/proposals/entry-argv-policy.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/proposals/v01-design-01-method-collision.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/proposals/v01-filter-step-dedup-api.md",
+    "role": "historical",
     "owner": "conformance"
   },
   {

@@ -1,7 +1,8 @@
 use crate::Parser;
-use luna_ast::{Annotation, AnnotationArg, Decl, DeclId, Item, Visibility, GenericParam, GenericParamKind, FnLifetimeSignature, LifetimeExpr, LifetimeTargetAst, LifetimeConstraintAst};
+use luna_ast::{Type, Annotation, AnnotationArg, Decl, DeclId, Item, Visibility, GenericParam, GenericParamKind, FnLifetimeSignature, LifetimeExpr, LifetimeTargetAst, LifetimeConstraintAst};
 use luna_lexer::{Token, TokenKind};
 use luna_common::ids::Span;
+use luna_common::DiagnosticCode;
 
 impl<'a> Parser<'a> {
     pub fn parse_annotations(&mut self) -> Result<Vec<Annotation>, ()> {
@@ -233,21 +234,58 @@ impl<'a> Parser<'a> {
 
                 let p_annotations = self.parse_annotations()?;
 
-                let is_self = self.check(TokenKind::KwSelfVal);
-                let p_name = if self.check(TokenKind::Identifier) || self.check(TokenKind::KwSelfVal) {
-                    let span = self.peek().span;
-                    self.advance();
-                    span
+                let (p_name, ty, is_self) = if self.match_token(TokenKind::BitAnd) {
+                    let is_mutable = self.match_token(TokenKind::KwRw);
+                    if self.check(TokenKind::KwSelfVal) {
+                        let self_tok = self.advance();
+                        let self_ty = self.arena.alloc_type(Type::Named {
+                            segments: vec![self_tok.span],
+                            generic_args: Vec::new(),
+                            associated_bindings: Vec::new(),
+                        });
+                        let ref_ty = self.arena.alloc_type(Type::Reference {
+                            is_mutable,
+                            lifetime: None,
+                            inner: self_ty,
+                        });
+                        (self_tok.span, Some(ref_ty), true)
+                    } else {
+                        let span = self.peek().span;
+                        self.error_with_code(DiagnosticCode::ExpectedToken, "Expected 'self' after '&'", span);
+                        return Err(());
+                    }
+                } else if self.check(TokenKind::KwSelfVal) {
+                    let self_tok = self.advance();
+                    let ty = if self.match_token(TokenKind::Colon) {
+                        Some(self.parse_type()?)
+                    } else {
+                        let self_ty = self.arena.alloc_type(Type::Named {
+                            segments: vec![self_tok.span],
+                            generic_args: Vec::new(),
+                            associated_bindings: Vec::new(),
+                        });
+                        Some(self_ty)
+                    };
+                    (self_tok.span, ty, true)
+                } else if self.check(TokenKind::Identifier) {
+                    let id_tok = self.advance();
+                    self.consume(TokenKind::Colon, "Expected ':' after parameter name")?;
+                    let ty = self.parse_type()?;
+                    (id_tok.span, Some(ty), false)
                 } else {
                     let span = self.peek().span;
-                    self.error_at_current("Expected parameter name", span);
+                    self.error_with_code(DiagnosticCode::ExpectedToken, "Expected parameter name", span);
                     return Err(());
                 };
-                let ty = if self.match_token(TokenKind::Colon) {
-                    Some(self.parse_type()?)
-                } else {
-                    None
-                };
+
+                if is_self && !params.is_empty() {
+                    self.error_with_code(
+                        DiagnosticCode::InvalidSyntax,
+                        "Receiver parameter 'self' must be the first parameter",
+                        p_name,
+                    );
+                    return Err(());
+                }
 
                 params.push(self.arena.alloc_decl(Decl::Param {
                     annotations: p_annotations,
@@ -331,10 +369,25 @@ impl<'a> Parser<'a> {
                 ty,
                 visibility: f_vis,
             });
-            if !self.match_token(TokenKind::Semi) && !self.match_token(TokenKind::Comma) {
-                if !self.check(TokenKind::RBrace) {
-                    self.consume(TokenKind::Semi, "Expected ';' or ',' after struct field")?;
-                }
+            if self.check(TokenKind::Semi) {
+                let span = self.peek().span;
+                self.error_with_code(
+                    DiagnosticCode::UnexpectedToken,
+                    "Struct fields must be separated by commas (','); semicolons (';') are forbidden in Luna 0.1",
+                    span,
+                );
+                return Err(());
+            }
+            if self.match_token(TokenKind::Comma) {
+                // optional trailing comma before '}'
+            } else if !self.check(TokenKind::RBrace) {
+                let span = self.peek().span;
+                self.error_with_code(
+                    DiagnosticCode::ExpectedToken,
+                    "Expected ',' or '}' after struct field",
+                    span,
+                );
+                return Err(());
             }
         }
         self.consume(TokenKind::RBrace, "Expected '}'")?;
