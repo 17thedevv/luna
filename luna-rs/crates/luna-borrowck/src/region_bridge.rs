@@ -111,29 +111,30 @@ impl RegionFailure {
         match self {
             RegionFailure::PointDomainViolation { span, .. } => {
                 let mut diag = Diagnostic::error(
-                    "error[E3005]: LocalBorrowEscape: Reference used outside its validity domain",
+                    "LocalBorrowEscape: Reference used outside its validity domain",
                 )
-                .with_code(DiagnosticCode::BorrowConflict);
+                .with_code(DiagnosticCode::LocalBorrowEscape);
                 diag.span = span;
                 diag
             }
             RegionFailure::BoundaryViolation { span, .. } => {
                 let mut diag = Diagnostic::error(
-                    "error[E3005]: LocalBorrowEscape: Reference to iteration-local variable escapes loop iteration",
+                    "LocalBorrowEscape: Reference to iteration-local variable escapes loop iteration",
                 )
-                .with_code(DiagnosticCode::BorrowConflict);
+                .with_code(DiagnosticCode::LocalBorrowEscape);
                 diag.span = span;
                 diag
             }
             RegionFailure::ReturnEscape { reason, span, .. } => {
                 let mut diag = match reason {
                     ReturnEscapeReason::ClosureCapturesLocalBorrow => {
-                        Diagnostic::error("error[E3005]: LocalBorrowEscape: Cannot return a closure that captures a local borrow")
+                        Diagnostic::error("LocalBorrowEscape: Cannot return a closure that captures a local borrow")
                     }
                     ReturnEscapeReason::LocalVariableEscapes { .. } => {
-                        Diagnostic::error("error[E3005]: LocalBorrowEscape: Reference to local variable escapes function scope")
+                        Diagnostic::error("LocalBorrowEscape: Reference to local variable escapes function scope")
                     }
                 };
+                diag.code = Some(DiagnosticCode::LocalBorrowEscape);
                 diag.span = span;
                 diag
             }
@@ -141,13 +142,13 @@ impl RegionFailure {
                 let mut diag = match reason {
                     ContractViolationReason::ParameterNotContracted { param_index } => {
                         Diagnostic::error(format!(
-                            "error[E2016]: LifetimeConstraintViolation: return value has provenance from parameter (index {}), which does not satisfy declared lifetime contract",
+                            "LifetimeConstraintViolation: return value has provenance from parameter (index {}), which does not satisfy declared lifetime contract",
                             param_index
                         ))
                     }
                     ContractViolationReason::DirectReturnWithoutProvenance => {
                         Diagnostic::error(
-                            "error[E2016]: LifetimeConstraintViolation: return expression does not satisfy declared lifetime contract",
+                            "LifetimeConstraintViolation: return expression does not satisfy declared lifetime contract",
                         )
                     }
                     ContractViolationReason::OutlivesPreconditionFailed {
@@ -174,7 +175,7 @@ impl RegionFailure {
                             _ => format!("{:?}", shorter_subject),
                         };
                         Diagnostic::error(format!(
-                            "error[E2016]: LifetimeConstraintViolation: argument for {} does not outlive {}",
+                            "LifetimeConstraintViolation: argument for {} does not outlive {}",
                             longer_desc, shorter_desc
                         ))
                     }
@@ -185,7 +186,7 @@ impl RegionFailure {
                             "field".to_string()
                         };
                         Diagnostic::error(format!(
-                            "error[E2016]: LifetimeConstraintViolation: {} does not outlive container instance",
+                            "LifetimeConstraintViolation: {} does not outlive container instance",
                             field_desc
                         ))
                     }

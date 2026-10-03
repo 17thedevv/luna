@@ -51,7 +51,7 @@ impl Sysroot {
         &self.external_dir
     }
 
-    /// Checks if a source file corresponds to a canonical sysroot provider entry
+    /// Checks if a file corresponds to a canonical sysroot provider entry
     /// and returns its declared capabilities if so.
     pub fn get_canonical_provider_capabilities(
         &self,
@@ -59,23 +59,50 @@ impl Sysroot {
     ) -> Option<Vec<crate::sysroot_manifest::ProviderCapability>> {
         let manifest = self.manifest();
         let canon_file = std::fs::canonicalize(file_path).ok()?;
+        let canon_root = std::fs::canonicalize(self.external_dir()).ok()?;
+        // A provider entry or directory symlink cannot confer authority on a
+        // file outside the selected sysroot.
+        if !canon_file.starts_with(&canon_root) {
+            return None;
+        }
         for entry in manifest.providers() {
-            let entry_rel = format!("{}.ln", entry.path);
-            let expected_file = self.external_dir().join(&entry_rel);
-            if let Ok(canon_entry) = std::fs::canonicalize(&expected_file) {
-                if canon_file == canon_entry {
-                    return Some(entry.capabilities.clone());
-                }
-            }
-            let entry_rel_ms = format!("{}.ms", entry.path);
-            let expected_file_ms = self.external_dir().join(&entry_rel_ms);
-            if let Ok(canon_entry) = std::fs::canonicalize(&expected_file_ms) {
-                if canon_file == canon_entry {
-                    return Some(entry.capabilities.clone());
+            let stem = self.external_dir().join(&entry.path);
+            for candidate in [
+                self.external_dir().join(format!("{}.ln", entry.path)),
+                self.external_dir().join(format!("{}.llib", entry.path)),
+                self.external_dir().join(format!("{}.ms", entry.path)),
+                self.external_dir().join(format!("{}.mlib", entry.path)),
+                stem.join("package.ln"),
+                stem.join("package.ms"),
+            ] {
+                if let Ok(canon_entry) = std::fs::canonicalize(candidate) {
+                    if canon_file == canon_entry {
+                        return Some(entry.capabilities.clone());
+                    }
                 }
             }
         }
         None
+    }
+
+    /// Discover a candidate and authenticate it against this selected sysroot.
+    /// Search-path copies retain ordinary project provenance, even when they
+    /// carry a sysroot provider name or a valid sysroot artifact.
+    pub fn discover_provider(
+        &self,
+        search_dir: &Path,
+        name: &str,
+        context: crate::resolution_context::ProviderResolutionContext,
+    ) -> Result<crate::discovery::ExternalComponentDescriptor, crate::error::ExternalComponentError> {
+        let mut descriptor = crate::discovery::ExternalComponentDiscovery::discover(
+            search_dir, name, self.manifest(), context,
+        )?;
+        if let Some(capabilities) = self.get_canonical_provider_capabilities(&descriptor.entry_file) {
+            descriptor.provenance = crate::discovery::ComponentProvenance::SysrootCanonical {
+                capabilities,
+            };
+        }
+        Ok(descriptor)
     }
 
     pub fn validate(&self) -> Result<(), SysrootError> {

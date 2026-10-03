@@ -24,15 +24,20 @@ impl SourceFile {
         }
     }
 
-    /// Returns (line, column), 1-indexed.
+    /// Returns (line, Unicode scalar column), 1-indexed. Spans remain byte-based.
     pub fn get_line_col(&self, byte_offset: u32) -> (u32, u32) {
+        let mut byte_offset = (byte_offset as usize).min(self.source.len());
+        while !self.source.is_char_boundary(byte_offset) {
+            byte_offset -= 1;
+        }
+        let byte_offset = byte_offset as u32;
         let line_idx = match self.line_starts.binary_search(&byte_offset) {
             Ok(idx) => idx,
             Err(idx) => idx - 1,
         };
         let line_start = self.line_starts[line_idx];
-        let col = byte_offset - line_start;
-        (line_idx as u32 + 1, col + 1)
+        let col = self.source[line_start as usize..byte_offset as usize].chars().count();
+        (line_idx as u32 + 1, col as u32 + 1)
     }
 
     pub fn get_line_str(&self, line_idx: u32) -> Option<&str> {
@@ -105,5 +110,16 @@ mod tests {
         assert_eq!(file.get_line_col(6), (2, 1)); // 'w'
 
         assert_eq!(file.get_line_str(2), Some("world"));
+    }
+
+    #[test]
+    fn columns_count_unicode_scalars_while_spans_use_bytes() {
+        let file = SourceFile::new(FileId(0), "unicode.ln".into(), "é漢\r\nnope".into());
+        assert_eq!(file.get_line_col(5), (1, 3));
+        assert_eq!(file.get_line_col(7), (2, 1));
+        assert_eq!(file.get_line_str(1), Some("é漢"));
+        // Malformed/out-of-range diagnostic offsets must not panic in rendering.
+        assert_eq!(file.get_line_col(1), (1, 1));
+        assert_eq!(file.get_line_col(999), (2, 5));
     }
 }

@@ -140,7 +140,7 @@ impl ExternalComponentLoader {
                     luna_common::Diagnostic::error(format!(
                         "Cyclic module dependency detected involving external component `{}`",
                         descriptor.name
-                    )),
+                    )).with_code(luna_common::DiagnosticCode::CyclicModuleDependency),
                 ]));
             }
             driver_session.registry.start_loading(&descriptor.name);
@@ -403,7 +403,7 @@ impl ExternalComponentLoader {
                 luna_common::Diagnostic::error(format!(
                     "Cyclic module dependency detected involving external component `{}`",
                     descriptor.name
-                )),
+                )).with_code(luna_common::DiagnosticCode::CyclicModuleDependency),
             ]));
         }
 
@@ -443,7 +443,8 @@ impl ExternalComponentLoader {
                     luna_common::Diagnostic::error(format!(
                         "Failed to parse external component `{}`",
                         descriptor.entry_file.display()
-                    )),
+                    )).with_code(luna_common::DiagnosticCode::InvalidSyntax)
+                        .with_span(luna_common::Span::new(file_id, 0, input.len() as u32)),
                 ]));
             }
         };

@@ -1,0 +1,2 @@
+import <slice>;
+fn main() -> i32 { dec p = application::Point { x: 42 }; return p.value() - 42; }

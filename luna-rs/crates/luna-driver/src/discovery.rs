@@ -44,9 +44,9 @@ impl ExternalComponentDiscovery {
             return Err(ExternalComponentError::NotFound { name: name.to_string(), searched_dir: external_dir.to_path_buf() });
         }
 
-        let provenance = ComponentProvenance::SysrootCanonical {
-            capabilities: provider.capabilities.clone(),
-        };
+        // A manifest maps names to candidates; it does not authenticate the
+        // directory being searched. Only the selected Sysroot may grant trust.
+        let provenance = ComponentProvenance::LocalProject;
 
         let path_str = provider.path.as_str();
 

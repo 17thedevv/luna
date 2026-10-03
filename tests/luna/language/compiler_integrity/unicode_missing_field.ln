@@ -1,0 +1,2 @@
+struct Thing { x: i32, };
+fn main() -> i32 { dec t = Thing { x: 1 }; /* é */ return t.nope; }

@@ -365,7 +365,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
     {
         return Err(vec![Diagnostic::error(
             "The legacy .mlib artifact format is read-only; emit canonical .llib instead".to_string(),
-        )]);
+        ).with_code(luna_common::DiagnosticCode::InvalidArtifactOutput)]);
     }
 
     let file_id = session
@@ -540,7 +540,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                         "Failed to write MVIR output '{}': {}",
                         mvir_file.display(),
                         error
-                    ))]
+                    )).with_code(luna_common::DiagnosticCode::OutputWriteFailure)]
                 })?;
             }
             
@@ -650,7 +650,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             
             if let Err(e) = backend.compile() {
                 if !options.quiet { println!("Backend Error: {}", e); }
-                return Err(vec![Diagnostic::error(format!("Backend Error: {}", e))]);
+                return Err(vec![Diagnostic::error(format!("Backend Error: {}", e)).with_code(luna_common::DiagnosticCode::BackendInvariantViolation)]);
             }
             
             let base_name = std::path::Path::new(file_name)
@@ -704,7 +704,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             })();
             if let Err(e) = emit_obj_res {
                 if !options.quiet { println!("Failed to emit .obj: {}", e); }
-                return Err(vec![Diagnostic::error(e)]);
+                return Err(vec![Diagnostic::error(e).with_code(luna_common::DiagnosticCode::ObjectEmissionFailure)]);
             } else {
                 if !options.quiet { println!("Successfully wrote {}", obj_file); }
             }
@@ -831,7 +831,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     }
                     Err(e) => {
                         if !options.quiet { println!("Link failed: {}", e); }
-                        return Err(vec![Diagnostic::error(format!("Link Error: {}", e))]);
+                        return Err(vec![Diagnostic::error(format!("Link Error: {}", e)).with_code(luna_common::DiagnosticCode::LinkerFailure)]);
                     }
                 }
             }

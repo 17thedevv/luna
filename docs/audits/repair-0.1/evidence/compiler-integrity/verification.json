@@ -1,0 +1,107 @@
+{
+  "date": "2026-10-03",
+  "base_commit": "6a3ec9f787523b26489e4b51531471896d4d67b2",
+  "branch": "codex/antigravity-repair-0.1",
+  "revision_kind": "uncommitted repair patch on the recorded base; no commit, push or merge in this task",
+  "platform": "Windows x86_64 GNU",
+  "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
+  "llvm": "18.1.8",
+  "compiler_sha256": "af696e117143fa6ce1da19b10b26da31cb0a1ce04066d43101dbc85459bebb8c",
+  "runtime_path": "D:/fdlang/build/runtime-win/libluna-runtime.a",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "environment": {
+    "LLVM_SYS_180_PREFIX": "D:/Programs/LLVM-DEV",
+    "LUNA_RUNTIME_LIB": "D:/fdlang/build/runtime-win/libluna-runtime.a",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "commands": [
+    {
+      "command": "cargo test -p luna-common -p luna-borrowck -p luna-semantic -j 2",
+      "cwd": "D:/fdlang/luna-rs",
+      "exit_code": 0,
+      "passed_tests": 258,
+      "log": "semantic-borrowck.txt",
+      "sha256": "a80394513a54db8df037672b29882cd6dd3a7388b053f910afb9c164fa65de82"
+    },
+    {
+      "command": "cargo test -p luna-driver --test provider_authority_tests --test test_resolver_precedence --test test_sysroot_manifest_resolution --test sysroot_tests --test test_strict_artifact_rejection --test test_sysroot_build_invariants --test provider_module_contract_acceptance_tests --test compiler_gap_c_gap_12_safe_loan_effect_tests --test sem_maturity_phase2d_b_tests -j 2 -- --test-threads=1",
+      "cwd": "D:/fdlang/luna-rs",
+      "exit_code": 0,
+      "passed_tests": 60,
+      "log": "driver.txt",
+      "sha256": "80dab26787f65d02fd7e5f0238eaa96106ea67714eb3f6edb312cbb5a03e42f7"
+    },
+    {
+      "command": "cargo test -p luna-cli --test v01_grammar_acceptance_tests --test compiler_trust_diagnostics_cli_parity -j 2 -- --test-threads=1",
+      "cwd": "D:/fdlang/luna-rs",
+      "exit_code": 0,
+      "passed_tests": 7,
+      "log": "cli-regression.txt",
+      "sha256": "755c0d63ae324c7e5b282b3850fd5dcd12b385bc80b79b8acc2d8fc893b9959b"
+    },
+    {
+      "command": "cargo check --workspace -j 2",
+      "cwd": "D:/fdlang/luna-rs",
+      "exit_code": 0,
+      "passed_tests": 0,
+      "log": "workspace-check.txt",
+      "sha256": "1ddcf06c6b43bb55d47960eae58b76d395dda8ae51e5b5a6717e1ea28a0bd41c"
+    }
+  ],
+  "total_passed_tests": 325,
+  "documentation_validation": {
+    "documents": 161,
+    "site_pages": 24,
+    "checked_local_links": 939,
+    "errors": []
+  },
+  "registry_review": {
+    "implemented_codes": 66,
+    "unique_numbers": true,
+    "spec_names_and_numbers_match": true
+  },
+  "fixes": {
+    "search_path_authority_bypass": "VERIFIED",
+    "uncoded_uninitialized_diagnostic": "VERIFIED: E3006, location 3:12, both modes",
+    "unicode_caret": "VERIFIED: E1001, line 2 column 61, both modes"
+  },
+  "artifact_freshness": "CLI harness builds all providers from source through build-sysroot; separate source roots without .llib/.obj and artifact roots without .ln; positive consumer builds and runs in both modes",
+  "implementation_file_sha256": {
+    "luna-rs/Cargo.lock": "be31b4b487c3d69c64e43b5bd4e57764266c3e4bebfb72254029ecf50e5af5f9",
+    "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs": "8038f39d06a34770f7758f156e08838ce921d033481bb7db24d66095cb788297",
+    "luna-rs/crates/luna-borrowck/src/move_analysis.rs": "86efd205e9b3fd573167dcf3ac75d9db84fae7b27dbe47577b5a7d343349f5dd",
+    "luna-rs/crates/luna-borrowck/src/region_bridge.rs": "0011ebbd1d7dd40cfc0e73d2bb368321faf8c1df421dfa5f63e70fb6d4872090",
+    "luna-rs/crates/luna-borrowck/src/return_analysis.rs": "8c483e2ce8c6865cf03fa5d8d480b004c8e6a1ec745bfeb82f303fb6b8bdac20",
+    "luna-rs/crates/luna-borrowck/tests/region_callsite_cutover_tests.rs": "b7f725fbbd0e2581c236298d143001181c326726603e1034b85fe7b08582d516",
+    "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs": "995a1ce60f9ad1cde65e0d49de3048ccc01b1514d671c09d2d44113faef95738",
+    "luna-rs/crates/luna-cli/tests/compiler_trust_diagnostics_cli_parity.rs": "19e55bf60635ff930a0764a93ff8575ea94c9128182c45b3cb3425096d7f1246",
+    "luna-rs/crates/luna-common/Cargo.toml": "792825fde301b4bc97cd099bf60f43637147d655aed8351ccb6c08626f723e1f",
+    "luna-rs/crates/luna-common/src/diagnostic.rs": "efa42344b4feab59305261e415bf0195e8097f8491ca5064ae7296ce0a54e79a",
+    "luna-rs/crates/luna-common/src/source.rs": "cce0e86871c2ce7c1079858bf5be2caebe44476866d043b464e6fc4843986335",
+    "luna-rs/crates/luna-driver/src/discovery.rs": "bd48456933d130e129dc37229d73e9f052e157a9776eb9a3dd9bee48280f9193",
+    "luna-rs/crates/luna-driver/src/error.rs": "8cd4e65f353005303f0d165328389061f750ba64c58313afdb2e7ff9e8800cb9",
+    "luna-rs/crates/luna-driver/src/external.rs": "a1a9f17a8319bd820b3c132294c56ccc7ff3c6b1b5fa4c2735a766f65af05327",
+    "luna-rs/crates/luna-driver/src/lib.rs": "4c9a6be8ec15dba947a95a62c5ad3c9cd28f7b73c4225f911748cabd9155d9d6",
+    "luna-rs/crates/luna-driver/src/session.rs": "6eb82ef68670c4d8b89dc516cf0f73d1c67de845bef63fa699a00e479cd81320",
+    "luna-rs/crates/luna-driver/src/sysroot.rs": "2a9c49d031af337deae885fa9a65d28a5ae3a3f5ec5cc3e9d822373f6ddfc901",
+    "luna-rs/crates/luna-driver/tests/provider_authority_tests.rs": "1f9fe98f862120e4373b0706ad8825243c843d89032447ae1cd7cf6bb467daea",
+    "luna-rs/crates/luna-driver/tests/sem_maturity_phase2d_b_tests.rs": "6ef69f80e95138a2f4a2f97db17e25cf34512f31c2a2bc0a823b8b6d4bc73ceb",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "3ed7923ed1145f10dac6801f772829d1dc9d5b92894e8286e820aca84f2344e9",
+    "tests/luna/language/compiler_integrity/nominal_consumer.ln": "cb661c381d4abb85238a49c3253794e374d8dc00f88b97946be294e2fa003421",
+    "tests/luna/language/compiler_integrity/nominal_provider.ln": "daac02f173612eed2c03aa28ff44215e04bb068044bb7a28ceee730a6672d42b",
+    "tests/luna/language/compiler_integrity/rogue_slice.ln": "6436f1b12359e327437c2ec88a36ecb1ad8907c61a9fef856ff8c4e4aec5ce15",
+    "tests/luna/language/compiler_integrity/slice_consumer.ln": "649d7dc51616b33c3b94c01e6f789250087b78b9fcaea5ca343d5348e5a927b3",
+    "tests/luna/language/compiler_integrity/slice_iteration.ln": "711f15d8c2b819d9e4018375e2760161cda4e4ca01a4e0e3158082bea17d6982",
+    "tests/luna/language/compiler_integrity/unicode_missing_field.ln": "ff219c9f193f7ff97397c80c45f16d6c6d2d7df4ba4c7772374031180973007a",
+    "tests/luna/language/compiler_integrity/uninitialized.ln": "d1a4fcf4a78c2436672cb57d64d887048951adfd05872482ba60ff58c97fd323"
+  },
+  "limitations": [
+    "Full workspace tests not run",
+    "Native POSIX/Darwin validation not performed",
+    "Unix symlink negative test not run on this Windows host",
+    "Full DIAG-1..10 remains PARTIAL",
+    "W8 remains PARTIAL",
+    "using/luna.toml deferred at maintainer request"
+  ]
+}

@@ -1,0 +1,4 @@
+export module application {
+    export struct Point { x: i32, };
+    impl Point { export fn value(&self) -> i32 { return self.x; } }
+}
