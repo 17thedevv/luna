@@ -39,7 +39,7 @@ All work adheres to the Luna 0.1 architectural principles:
 | V01-GRAMMAR-02 | Parenthesized foreach head per Rule K.4 | PASS | `luna-parser` | `tests/luna/language/spec_v01/foreach_parenthesized_contract.ln` | `41484c2` | `crates/luna-cli/tests/v01_grammar_acceptance_tests.rs` |
 | V01-GRAMMAR-03 | Receiver shorthand `&self`, `&rw self`, `self` | PASS | `luna-parser` | `tests/luna/language/spec_v01/receiver_shorthand_contract.ln` | `41484c2` | `crates/luna-cli/tests/v01_grammar_acceptance_tests.rs` |
 | V01-DIAG-01 | Typed diagnostic codes DIAG-1..10 across compiler phases | PASS | `luna-parser` / error emitter | `tests/luna/language/spec_v01/` error reporting | `41484c2` | `crates/luna-cli/tests/v01_grammar_acceptance_tests.rs` |
-| W7-COMPTIME | Portable comptime artifact without host session leakage | PASS | `luna-llib` / `luna-mvir` interp | `tests/luna/language/literal_comptime_provider_gap.ln` | pending | `crates/luna-cli/tests/literal_typing_cli_parity.rs` |
+| W7-COMPTIME | Portable comptime artifact without host session leakage | PASS | `luna-llib` / `luna-mvir` interp | `tests/luna/language/literal_comptime_provider_gap.ln` | `6e8d278` | `crates/luna-cli/tests/literal_typing_cli_parity.rs` |
 | W8-ALL-PROVIDERS | 49 stdlib providers contract & API audit matrix | OPEN | provider coverage | `luna-rs/libs/external/sysroot.toml` | - | - |
 | W9-PERF | Profiling and evidence-backed optimization | OPEN | benchmarks | `tests/luna/stdlib/audit_2026_10_02/hashmap_collision_pattern.ln` | - | - |
 
