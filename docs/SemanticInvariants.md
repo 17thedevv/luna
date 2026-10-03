@@ -1,22 +1,21 @@
-# FDLang Semantic Invariants
+<!-- luna-doc-role: guidance -->
 
-This document outlines the core semantic invariants that the Mellis compiler enforces during the Middle-End phases.
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](spec/0.1/README.md).
 
-## 1. Borrow Checking & CFG Joins
-- **Exclusive Mutation**: A value cannot be mutated if it is currently borrowed by any active reference (immutable or mutable).
-- **CFG State Merging**: At Control Flow Graph (CFG) join points, a reference variable may alias multiple places depending on the executed path. The borrow checker maintains a multi-path alias set (`std::vector<Place>`) to ensure that modifying *any* potentially aliased place correctly flags a borrow violation.
+# Luna 0.1 semantic invariants
 
-## 2. Initialization Tracking
-- **Definite Initialization Before Use**: A variable must be definitively initialized on all possible execution paths before its value can be read or moved.
-- **Weak Updates at CFG Joins**: If a variable is initialized in one branch but uninitialized in another, it is considered **uninitialized** at the join point.
+Authority: [semantics](spec/0.1/semantics.md) and [retained detailed rules](normative-rules-p0-p1.md).
+These are requirements, not claims that every current path already conforms.
 
-## 3. Slice Representation
-- **Fat Pointers**: Slices are natively represented as fat pointers `{ ptr: *T, len: uint_64 }`.
-- **Length Extraction**: Slice length is extracted uniformly as `uint_64` to simplify backend lowering, array bounds checking, and pointer arithmetic.
+- Definite initialization and moves are checked across all reachable CFG paths.
+- Shared/exclusive capabilities remain distinct; CFG joins retain every possible origin.
+- Copy and Drop are mutually exclusive for concrete types; proper subplace moves under Drop are forbidden.
+- Safe indexing enforces bounds; cleanup destroys each initialized owned value once.
+- Associated projections and generic/inference state resolve before concrete codegen.
+- Lifetime, safe-loan provenance, raw address origins and owner anchors are distinct channels.
+- FFI preserves its explicit reference/raw-pointer and recursive aggregate restrictions.
+- Macro expansion and generic dispatch do not recognize stdlib container/printing names.
+- Canonical artifact identities preserve contracts across source/.llib boundaries.
+- Implementation layouts are target details, not language-wide u64/pointer assumptions.
 
-## 4. Array and Slice Bounds Checking
-- **Defined Behavior**: Out-of-bounds accesses on arrays and slices do not produce Undefined Behavior (UB). Instead, they are explicitly checked at runtime using the `@__mellis_bounds_fail` intrinsic, guaranteeing a controlled panic or defined error state.
-
-## 5. Exhaustive Pattern Matching
-- **Match Coverage**: All possible variants of an `enum` must be covered in a `match` expression.
-- **Decision Tree Construction**: The semantic analyzer uses a decision tree and pattern matrix to formally prove exhaustiveness and detect unreachable patterns before MVIR lowering.
+Current counterexamples and unverified areas are listed in [gaps](spec/0.1/gaps.md).

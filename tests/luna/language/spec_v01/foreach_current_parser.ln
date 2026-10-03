@@ -1,0 +1,9 @@
+// Implementation characterization, not adoption of a replacement contract.
+import <vec>;
+fn main() -> i32 {
+    dec rw values = std::vec_new<i32>();
+    values.push(42);
+    dec rw total: i32 = 0;
+    for value in values { total = total + value; }
+    return total - 42;
+}

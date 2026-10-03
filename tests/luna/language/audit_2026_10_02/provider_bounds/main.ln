@@ -1,0 +1,2 @@
+import "p12";
+fn main() -> i32 { return probe12::tag() - 12; }

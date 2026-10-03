@@ -1,0 +1,146 @@
+[
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 0,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 1,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 2,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 3,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 4,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 3221225725,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 5,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 6,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 3221225725,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "attempt": 7,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 3221225725,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 0,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 3221225725,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 1,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 2,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 3221225725,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 3,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 4,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 5,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 6,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 3221225725,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "fixture": "hashmap_owned_iteration.ln",
+    "attempt": 7,
+    "compile_exit": 0,
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

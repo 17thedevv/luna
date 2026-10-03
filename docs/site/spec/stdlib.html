@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 — standard library contracts</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01--standard-library-contracts">Luna 0.1 — standard library contracts</h1>
+<p>The stdlib is an ordinary consumer of Luna semantics. The baseline manifest has 32 component providers; its generated <a href="stdlib-inventory.html">inventory</a> is derived from <code>luna-rs/libs/external/sysroot.toml</code>, not a second hand-maintained manifest. Provider counts describe this baseline and may change only with an explicit manifest/spec update. Public APIs are not implicitly complete because all providers build.</p>
+<h2 id="required-invariants">Required invariants</h2>
+<table>
+<tr><th>Capability</th><th>Contract</th></tr>
+<tr><td>Box and owning containers</td><td>Transfer ownership exactly once; clean initialized values; use generic allocation/drop primitives</td></tr>
+<tr><td>Vec</td><td><code>len &lt;= capacity</code>; storage must cover every admitted initialized element; check allocation/growth arithmetic before updating metadata</td></tr>
+<tr><td>String</td><td>Every safe text-producing operation preserves valid UTF-8; byte validation rejects invalid encodings</td></tr>
+<tr><td>Slice iteration</td><td>Yield exactly the logical element count, including zero-size element types; shared/mutable capabilities remain distinct</td></tr>
+<tr><td>HashMap / HashSet</td><td>Equal keys obey the Hash/Eq contract; insert/replace/remove/growth preserve values and exact ownership cleanup</td></tr>
+<tr><td>Iterators</td><td>next advances the logical stream; adapters/consumers respect their declared generic ownership and borrowing requirements</td></tr>
+<tr><td>Generic predicates</td><td>A predicate must not consume a non-Copy value that the API subsequently returns or uses unless the contract explicitly allows duplication</td></tr>
+<tr><td>Formatting</td><td>Ordinary Display/Writer dispatch, error propagation, UTF-8 text output; no compiler-selected library callees</td></tr>
+<tr><td>Whole-file I/O</td><td>Preserve bytes, report the defined failures, honor buffer ownership and path preconditions</td></tr>
+<tr><td>Path</td><td>Retain the defined lexical slash-based semantics; do not import Windows drive/UNC behavior into that contract implicitly</td></tr>
+</table>
+<p>An allocation size overflow must not produce usable container metadata for storage that was not allocated. Library preconditions must distinguish unsafe raw operations from safe public methods. Generic helpers must not reinterpret arbitrary <code>T</code> storage as i32 or another particular library element type.</p>
+<h2 id="numeric-text-and-optimization-boundaries">Numeric, text and optimization boundaries</h2>
+<p>Convert and Display inherit correct generic integer widening; they must not mask a compiler defect independently in every API. The existing char-to-text boundary has unresolved scalar-domain debt: String/Writer text invariants remain requirements while a decision about every integer-to-char cast is tracked separately. No new cast semantics are frozen by this documentation refresh.</p>
+<p>Optimization cannot weaken ownership, lifetime, overflow, text, ABI or parity contracts. Identity hashes with low-bit masking have a measured clustering problem; this does not redefine equality or promise a universal constant complexity bound absent a specified hashing model. Enum niche layout changes, buffer adoption and new allocator strategies require explicit compatibility contracts and measurements.</p>
+<h2 id="conformance-snapshot">Conformance snapshot</h2>
+<p>The <a href="../../audits/stdlib-2026-10-02/README.md">2026-10-02 audit</a> records 32 provider builds, existing suites, CLI source/artifact probes and repeated benchmarks. Its verdict is <strong>BROKEN correctness / PARTIAL optimization and verification</strong>. The gap register retains seven confirmed library defects and compiler defects that affect library behavior. Historical component freeze reports cannot be used as current blanket release acceptance.</p>
+<p>Float formatting, Debug, format-string macros and general streaming formatting are not introduced by the formatting foundation. Rc/Arc, general threading wrappers and other future APIs are not promised merely because runtime support or a roadmap entry exists.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

@@ -3,6 +3,10 @@ name: luna-lang-contracts
 description: Defines the architecture for compiler-required language contracts stored in the Luna stdlib.
 ---
 
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../../docs/spec/0.1/README.md).
+
 # Luna Language Contract Architecture
 
 ## Purpose
@@ -15,6 +19,10 @@ Current contracts:
 - Option
 - Iterator
 - IntoIterator
+- Copy
+- Try / FromResidual / ControlFlow
+
+The result provider additionally contributes controlled qualified std::OptionExt visibility; it is not a seventh compiler-contract family.
 
 These contracts are represented by normal Luna source/artifacts but participate in language semantics.
 
@@ -58,20 +66,20 @@ import <core>;
 merely to declare:
 
 ```text
-dec x: Option<i32>;
+dec x: std::Option<i32>;
 ```
 
 or implement:
 
 ```text
-impl Iterator for MyIterator {
+impl std::Iterator for MyIterator {
     ...
 }
 ```
 
 This is NOT general implicit prelude behavior.
 
-Only explicitly registered language contracts are auto-loaded.
+Only explicitly registered language-contract and controlled-prelude providers are auto-loaded. Bindings remain qualified under std; no unqualified root prelude is implied.
 
 ## 3. Contract Manifest
 
@@ -85,6 +93,8 @@ drop = "lang/drop"
 option = "lang/option"
 iterator = "lang/iterator"
 into_iterator = "lang/into_iterator"
+copy = "core/copy"
+try = "core/try"
 ```
 
 The compiler MUST NOT scan arbitrary files for `#[lang(...)]` and automatically load them.
@@ -157,6 +167,8 @@ Defines iterator protocol.
 IntoIterator
 
 Defines the conversion from an iterable value into an iterator.
+
+Copy and Try/FromResidual/ControlFlow are also current families, represented by core/copy and core/try. Controlled std::OptionExt visibility is supplied by result. Exact hook and qualified path lists live in luna-driver/src/lang_contracts.rs.
 
 Do NOT add Clone to lang/ as part of this migration.
 

@@ -1,0 +1,109 @@
+// Public-API equivalent of HT6; expects exactly 34 drops.
+
+        import <core/panic>;
+        import <mem>;
+        import <slice>;
+        import <copy>;
+        import <clone>;
+        import <ptr>;
+        import <cmp>;
+        import <hash>;
+        import <iter_adapters>;
+        import <iter_consumers>;
+        import <box>;
+import <vec>;
+import <string>;
+import <hashmap>;
+import <hashset>;
+import <iter_collect>;
+
+
+        struct TrackedItem {
+            id: i32,
+            drop_ptr: *rw i32,
+        };
+
+        impl std::Drop for TrackedItem {
+            fn drop(self: &rw Self) {
+                if (self.drop_ptr as u64) != (0 as u64) {
+                    unsafe {
+                        *self.drop_ptr = *self.drop_ptr + 1;
+                    }
+                }
+            }
+        }
+
+        impl std::Hash for TrackedItem {
+            fn hash(self: &Self) -> u64 {
+                return self.id as u64;
+            }
+        }
+
+        impl std::Eq for TrackedItem {
+            fn eq(self: &Self, other: &Self) -> bool {
+                return self.id == other.id;
+            }
+        }
+
+        fn run_stress_lifecycle(drop_count_ptr: *rw i32) -> i32 {
+            dec rw table = std::hashmap_with_capacity<TrackedItem, TrackedItem>(8 as u64);
+            
+            // Insert 6 key-value pairs (12 tracked items)
+            dec rw i: i32 = 1;
+            while i <= 6 {
+                dec k = TrackedItem { id: i, drop_ptr: drop_count_ptr };
+                dec v = TrackedItem { id: i * 10, drop_ptr: drop_count_ptr };
+                table.insert(k, v);
+                i = i + 1;
+            }
+
+            // Overwrite 2 entries (+4 items created, 2 old values dropped in-place)
+            dec k_ow1 = TrackedItem { id: 1, drop_ptr: drop_count_ptr };
+            dec v_ow1 = TrackedItem { id: 111, drop_ptr: drop_count_ptr };
+            table.insert(k_ow1, v_ow1);
+
+            dec k_ow2 = TrackedItem { id: 2, drop_ptr: drop_count_ptr };
+            dec v_ow2 = TrackedItem { id: 222, drop_ptr: drop_count_ptr };
+            table.insert(k_ow2, v_ow2);
+
+            // Remove 2 entries (2 keys + 2 values dropped in-place = 4 items dropped)
+            dec q_rem1 = TrackedItem { id: 3, drop_ptr: drop_count_ptr };
+            table.remove(&q_rem1);
+
+            dec q_rem2 = TrackedItem { id: 4, drop_ptr: drop_count_ptr };
+            table.remove(&q_rem2);
+
+            // Trigger table resize by inserting 8 more entries (causes growth from 8 -> 16 -> 32)
+            dec rw j: i32 = 10;
+            while j <= 17 {
+                dec k = TrackedItem { id: j, drop_ptr: drop_count_ptr };
+                dec v = TrackedItem { id: j * 10, drop_ptr: drop_count_ptr };
+                table.insert(k, v);
+                j = j + 1;
+            }
+
+            // Table goes out of scope here: all remaining live items in table are dropped
+            return 0;
+        }
+
+        fn main() -> i32 {
+            dec rw drop_count: i32 = 0;
+            dec res = run_stress_lifecycle(&rw drop_count);
+            if res != 0 {
+                return 1;
+            }
+
+            // Total created TrackedItem instances throughout test:
+            // Initial 6 pairs: 12 items
+            // Overwrites 2 pairs: 4 items
+            // Search temporary queries: 2 items (q_rem1, q_rem2 dropped when going out of scope)
+            // Resize batch 8 pairs: 16 items
+            // Total created = 12 + 4 + 2 + 16 = 34 items.
+            // If drop is exact with zero leaks and zero double-frees, drop_count MUST equal exactly 34.
+            if drop_count != 34 {
+                return 2;
+            }
+
+            return 0;
+        }
+    

@@ -1,0 +1,5 @@
+export module probe0 {
+    export trait Mark { fn mark(self: &Self) -> i32; }
+    export fn constrained<T: Mark>(value: &T) -> i32 { return value.mark(); }
+    export fn tag() -> i32 { return 0; }
+}

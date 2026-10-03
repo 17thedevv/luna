@@ -3,6 +3,10 @@ name: luna-testing-strategy
 description: Canonical testing strategy for the Luna language, compiler, and standard library. Enforces testing at the highest public abstraction boundary, preferring Luna CLI + .ln fixtures for language/stdlib behavior, while reserving cargo test for compiler-internal invariants.
 ---
 
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../../docs/spec/0.1/README.md).
+
 # Luna Testing Strategy
 
 ## Purpose

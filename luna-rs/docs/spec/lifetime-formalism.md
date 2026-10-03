@@ -1,3 +1,7 @@
+<!-- luna-doc-role: adopted-contract -->
+
+> **Luna 0.1 — adopted-contract.** Retained detailed contract. Prior acceptance and freeze claims remain dated evidence; current release conformance is tracked separately. See the [versioned specification](../../../docs/spec/0.1/README.md).
+
 # Luna Lifetime Relation Formal Specification (REGION-SPEC-01)
 
 This document represents the normative mathematical and logical specification of Luna's Lifetime Relation System. While `docs/design/lifetime-model.md` defines the philosophical and architectural foundation (the "why" and the "what"), this document defines the formal constraints and solving rules (the "how"). It serves as the blueprint for the `REGION-01` compiler engine.

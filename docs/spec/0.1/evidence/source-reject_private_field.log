@@ -1,0 +1,6 @@
+error[E1003]: Field `value` of struct `Item` is private and cannot be accessed from this scope
+  --> C:\Users\84387\.codex\worktrees\a250\fdlang\tests\luna\language\spec_v01\reject_private_field.ln:7:17
+   |
+7  |     return item.value - 42;
+   |                 ^^^^^
+

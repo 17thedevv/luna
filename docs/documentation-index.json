@@ -1,0 +1,712 @@
+[
+  {
+    "path": ".agents/AGENTS.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": ".agents/rules/mellis-core.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": ".agents/skills/luna-lang-contracts/SKILL.md",
+    "role": "guidance",
+    "owner": "modules"
+  },
+  {
+    "path": ".agents/skills/luna-language-capability-validation/SKILL.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": ".agents/skills/luna-semantic-compliance/SKILL.md",
+    "role": "guidance",
+    "owner": "semantics"
+  },
+  {
+    "path": ".agents/skills/luna-semantic-compliance/references/lle_v1_rfc.md",
+    "role": "adopted-contract",
+    "owner": "semantics"
+  },
+  {
+    "path": ".agents/skills/luna-semantic-compliance/references/visibility-02-public-field-default-rfc.md",
+    "role": "adopted-contract",
+    "owner": "syntax"
+  },
+  {
+    "path": ".agents/skills/luna-skill-maintenance/SKILL.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": ".agents/skills/luna-stdlib-architecture/SKILL.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": ".agents/skills/luna-stdlib-compiler-boundary/SKILL.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": ".agents/skills/luna-stdlib-design/SKILL.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": ".agents/skills/luna-stdlib-migration/SKILL.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": ".agents/skills/luna-testing-strategy/SKILL.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": ".agents/skills/mellis-audit/SKILL.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": ".agents/skills/mellis-grammar/SKILL.md",
+    "role": "guidance",
+    "owner": "syntax"
+  },
+  {
+    "path": ".agents/skills/mellis-research/SKILL.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": ".commandcode/taste/taste.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "CLAUDE.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "INCOMPLETE_FEATURES_PLAN.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "README.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "ROADMAP.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "Status.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/LanguageReference.md",
+    "role": "guidance",
+    "owner": "syntax"
+  },
+  {
+    "path": "docs/MVIR.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/PROJECT_STATUS.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/Phase13_dyn_Trait_Plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/Phase14B_Attribute_System_Plan.md",
+    "role": "historical",
+    "owner": "macros"
+  },
+  {
+    "path": "docs/Phase14_Macros_Design.md",
+    "role": "historical",
+    "owner": "macros"
+  },
+  {
+    "path": "docs/Phase14_Macros_Plan.md",
+    "role": "historical",
+    "owner": "macros"
+  },
+  {
+    "path": "docs/Phase15_async_await_Plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/Phase16.5_IntrinsicDispatch_Plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/Phase16_comptime_Plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/Phase5_Module_System_Plan.md",
+    "role": "historical",
+    "owner": "modules"
+  },
+  {
+    "path": "docs/Phase6_Advanced_Features_Plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/Phase6_Core_Completion_Plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/RoadMap.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/SemanticInvariants.md",
+    "role": "guidance",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/VISION.MD",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/agent-handoff/phase-15-completion-audit.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/architecture.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/ast.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/stdlib-2026-10-02/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/borrowck/NLL_spec.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/borrowck/call_effect_model.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/core-language-contract.md",
+    "role": "guidance",
+    "owner": "modules"
+  },
+  {
+    "path": "docs/design_note_object_safety.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/diagnostics/diagnostics-v1.md",
+    "role": "adopted-contract",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/documentation-index.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/final_mvir_architecture_audit.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/final_semantic_freeze_audit.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/freeze_audit_stdlib_05_4b_vec_into_iterator.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/freeze_audit_stdlib_05_4c_hashmap_hashset_iterators.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/freeze_audit_stdlib_05_4f_artifact_graph_closure.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/grammar.md",
+    "role": "guidance",
+    "owner": "syntax"
+  },
+  {
+    "path": "docs/history/pre-0.1/README.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/history/pre-0.1/ROADMAP.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/history/pre-0.1/Status.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/history/pre-0.1/docs--LanguageReference.md",
+    "role": "historical",
+    "owner": "syntax"
+  },
+  {
+    "path": "docs/history/pre-0.1/docs--PROJECT_STATUS.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/history/pre-0.1/docs--RoadMap.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/history/pre-0.1/docs--architecture.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/history/pre-0.1/docs--core-language-contract.md",
+    "role": "historical",
+    "owner": "modules"
+  },
+  {
+    "path": "docs/history/pre-0.1/docs--grammar.md",
+    "role": "historical",
+    "owner": "syntax"
+  },
+  {
+    "path": "docs/implementation_plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/implementation_plan_mvir.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/lang-item-roadmap-catalog.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/luna_artifact_identity_refactoring.md",
+    "role": "historical",
+    "owner": "modules"
+  },
+  {
+    "path": "docs/mellis-language-semantic-audit.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/mellis_constitution.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/memory/allocator-contract-rfc.md",
+    "role": "historical",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/memory/borrowck-ownership-rfc.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/memory/e2e-conformance-rfc.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/memory/layout-model-rfc.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/memory/memory-model-rfc.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/memory/mvir-memory-ops-rfc.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/memory/pointer-provenance-rfc.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/memory/runtime-abi-rfc.md",
+    "role": "historical",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/normative-rules-p0-p1.md",
+    "role": "adopted-contract",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/phase12_plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/phase16-comptime-plan.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/phase17-semantic-hardening-plan.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/phase17_audit_report.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/project/rename-luna-v1.md",
+    "role": "adopted-contract",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/runtime/MELLIS_RUNTIME_SPEC.md",
+    "role": "historical",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/runtime/abi-v1.md",
+    "role": "adopted-contract",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/runtime/architecture.md",
+    "role": "historical",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/runtime/boundary-audit.md",
+    "role": "historical",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/runtime/invariants.md",
+    "role": "historical",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/rust_bootstrap_strategy.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/semantic-maturity/phase0-baseline.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/semantic_audit_matrix.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/site/README.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/spec/0.1/README.md",
+    "role": "canonical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/spec/0.1/conformance.md",
+    "role": "canonical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/spec/0.1/gaps.md",
+    "role": "canonical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/spec/0.1/macros.md",
+    "role": "canonical",
+    "owner": "macros"
+  },
+  {
+    "path": "docs/spec/0.1/modules.md",
+    "role": "canonical",
+    "owner": "modules"
+  },
+  {
+    "path": "docs/spec/0.1/runtime.md",
+    "role": "canonical",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/spec/0.1/semantics.md",
+    "role": "canonical",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/spec/0.1/stdlib-inventory.md",
+    "role": "canonical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/spec/0.1/stdlib.md",
+    "role": "canonical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/spec/0.1/syntax.md",
+    "role": "canonical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/std-arch-01-compatibility-matrix.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/std-arch-01-final-acceptance.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/walkthrough.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/zen.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/MEMORY.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/crates/luna-borrowck/docs/nll_spec.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/crates/luna-driver/tests/ui/README.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/LifetimeSystem.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/audit_tasks.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/compiler_gap_c_gap_12_safe_loan_effects.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/design/lifetime-model.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/diagnostic_audit.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/drop_implementation_architecture.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_compiler_gaps_04_05_06.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_02b_box.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_02c_vec_io.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_04c_rawtable.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_04d_hashmap.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_04e_hashset.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_04f_collection_iterators.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_05a_iterator_adapters.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_05b_terminal_consumers.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_05c_collect.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/freeze_audit_stdlib_phase4c.md",
+    "role": "historical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/master_semantic_audit.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/memory/raw-pointer-unsafe-semantics.md",
+    "role": "adopted-contract",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/phase17_completion.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/phase18_lifetime_impl_plan.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/phase19_macro_production_plan.md",
+    "role": "historical",
+    "owner": "macros"
+  },
+  {
+    "path": "luna-rs/docs/phase6_core_formatting_v1.md",
+    "role": "adopted-contract",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/raw_storage_anchor_v1.md",
+    "role": "adopted-contract",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/sem-maturity-phase2b-correction.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/sem-maturity-phase2b-results.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/sem-maturity-phase2c-results.md",
+    "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/sem_gap_21_raw_storage_anchor_contract.md",
+    "role": "historical",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/spec-hardening-borrow-closure.md",
+    "role": "adopted-contract",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/spec-hardening-ffi-contracts.md",
+    "role": "adopted-contract",
+    "owner": "conformance"
+  },
+  {
+    "path": "luna-rs/docs/spec/lifetime-formalism.md",
+    "role": "adopted-contract",
+    "owner": "semantics"
+  },
+  {
+    "path": "luna-rs/docs/std_namespace_01_canonical_namespace.md",
+    "role": "adopted-contract",
+    "owner": "stdlib"
+  },
+  {
+    "path": "luna-rs/docs/whole_file_io_v1.md",
+    "role": "adopted-contract",
+    "owner": "stdlib"
+  }
+]

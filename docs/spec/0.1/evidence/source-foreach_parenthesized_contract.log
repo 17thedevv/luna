@@ -1,0 +1,18 @@
+error: Expected ')' for tuple pattern
+  --> C:\Users\84387\.codex\worktrees\a250\fdlang\tests\luna\language\spec_v01\foreach_parenthesized_contract.ln:7:16
+   |
+7  |     for (value in values) { total = total + value; }
+   |                ^^
+
+error: Expected expression.
+  --> C:\Users\84387\.codex\worktrees\a250\fdlang\tests\luna\language\spec_v01\foreach_parenthesized_contract.ln:7:52
+   |
+7  |     for (value in values) { total = total + value; }
+   |                                                    ^
+
+error: Expected expression.
+  --> C:\Users\84387\.codex\worktrees\a250\fdlang\tests\luna\language\spec_v01\foreach_parenthesized_contract.ln:9:1
+   |
+9  | }
+   | ^
+

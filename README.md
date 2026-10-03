@@ -1,40 +1,65 @@
-# Luna Compiler & Toolchain
+<!-- luna-doc-role: guidance -->
 
-**Luna** (trước đây có tên lịch sử là *Mellis* / *fdlang*) là ngôn ngữ lập trình hệ thống hiện đại, hướng tới hiệu năng cao, an toàn bộ nhớ tĩnh và khả năng kiểm soát chặt chẽ tài nguyên. Trình biên dịch canonical của Luna được hiện thực hoàn toàn bằng **Rust** (nằm tại `luna-rs/`), sinh mã trung gian MVIR và dịch sang mã máy native thông qua **LLVM**.
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](docs/spec/0.1/README.md).
 
-## ✨ Kiến trúc cốt lõi
+# Luna 0.1 compiler and toolchain
 
-- **Trình biên dịch Canonical (`luna`)**: Được tổ chức thành workspace modular bằng Rust tại `luna-rs/crates/*` (`luna-lexer`, `luna-parser`, `luna-semantic`, `luna-mvir`, `luna-backend`, `luna-borrowck`, `luna-llib`, `luna-driver`, `luna-cli`).
-- **Thư viện chuẩn Component-level (STD-ARCH-01 FROZEN)**: Hệ thống 25 provider module hóa độc lập (`alloc`, `core`, `io`, `lang`) nằm tại `luna-rs/libs/external/`. Mỗi provider sở hữu bộ ba hoàn chỉnh: `.ln` (mã nguồn), `.llib` (metadata & MVIR), `.obj` (mã máy native).
-- **Nguyên lý Định danh Artifact ("Luna trusts identity, never existence")**: Hệ thống nhận diện artifact dựa trên typed fingerprint (source identity, interface identity, target contract) đảm bảo không có rò rỉ hay stale artifact fallback.
-- **Hệ thống Kiểm tra An toàn Bộ nhớ**: Tích hợp Borrow Checker, Liveness Analysis, Escape Analysis và quy tắc Lifetime rõ ràng (`where outlives`, `life_from`).
-- **Runtime Canonical (`__luna_*`, RUNTIME-RENAME-01 FROZEN)**: Native C runtime nằm tại `runtime/` (`luna-runtime.lib`) cung cấp các hàm nền tảng (`__luna_alloc`, `__luna_dealloc`, `__luna_print`, `__luna_println`, `__luna_panic`, `__luna_startup`, `__luna_shutdown`) theo chuẩn ABI prefix `__luna_*` và headers `luna/runtime/*`.
+Luna is a systems language with a Rust compiler, MVIR, an LLVM backend, explicit
+ownership/lifetime contracts and a native C runtime. The canonical compiler is
+`luna-rs/`; source uses `.ln`, library artifacts use `.llib`, runtime identity uses
+`__luna_*`. Mellis/fdlang are historical names.
 
-## 📁 Cấu trúc Dự án
+## Specification and readiness
 
-- `luna-rs/`: Toàn bộ mã nguồn Rust của trình biên dịch Luna và sysroot canonical.
-  - `crates/`: 12 crate thành viên của workspace Luna compiler.
-  - `libs/external/`: Thư viện chuẩn canonical 25 component-level providers (`sysroot.toml`).
-- `runtime/`: Thư viện native C runtime (`luna-runtime.lib`) và các bài kiểm tra ABI conformance.
-- `docs/`: Tài liệu kiến trúc, ngôn ngữ tham chiếu và các báo cáo freeze (STD-ARCH-01, RUNTIME-RENAME-01).
-- `tests/`: Bộ test fixtures ngôn ngữ của Luna.
+Start at [Luna 0.1 specification](docs/spec/0.1/README.md),
+[Vietnamese reference](docs/LanguageReference.md), [gap register](docs/spec/0.1/gaps.md),
+and [document inventory](docs/documentation-index.md).
 
-## 🛠️ Hướng dẫn Build & Test
+The baseline retains defined contracts even where implementation is incomplete.
+**Release conformance is blocked**, not certified by historical FROZEN labels.
+The [2026-10-02 audit](docs/audits/stdlib-2026-10-02/README.md) found compiler and
+stdlib defects. This documentation refresh does not repair those defects.
 
-Yêu cầu: Rust (Cargo 1.80+), LLVM và MinGW GCC/Clang hoặc MSVC (cho native runtime).
+The sysroot currently contains **32 component providers**. Six language-contract
+families and controlled OptionExt visibility are bootstrapped; ordinary library
+APIs require their specified imports. Stdlib is a language consumer: compiler
+macro names, stream prefixes and newline suffixes must not select stdlib callees.
 
-### 1. Build Trình biên dịch Luna (Rust)
-```bash
-cd luna-rs
-cargo build -p luna-cli
+## Build and verify
+
+The audited target is Windows x86_64 GNU with LLVM 18 and a Release C runtime.
+Set `LLVM_SYS_180_PREFIX` to the LLVM 18 installation and configure the target C
+compiler/linker in PATH. Other targets require their own evidence.
+
+```powershell
+cargo build --manifest-path luna-rs/Cargo.toml -p luna-cli
+cmake -S . -B build/host
+cmake --build build/host --config Release
 ```
 
-### 2. Chạy Kiểm thử Toàn bộ Workspace
-```bash
-cd luna-rs
-cargo test --workspace
+CMake output paths and runtime library suffixes depend on generator/target.
+Point `LUNA_RUNTIME_LIB` to the matching runtime artifact and `LUNA_SYSROOT` to
+`luna-rs`. With the built CLI on PATH:
+
+```powershell
+luna build-sysroot
+luna build program.ln -o program.exe
+cargo test --manifest-path luna-rs/Cargo.toml --workspace
+python docs/tools/validate_v01_docs.py
 ```
 
-## 📜 Ghi chú Lịch sử
-- **Mellis** và **fdlang** là tên lịch sử của dự án trước khi đổi tên sang **Luna**.
-- Mọi mã nguồn production, runtime ABI (`__luna_*`), headers (`luna/runtime/*`), thư viện (`luna-runtime.lib`), artifact (`.llib`) và biến môi trường (`LUNA_*`) tuân thủ nghiêm ngặt định danh Luna duy nhất theo RUNTIME-RENAME-01.
+A full workspace test is a required implementation check, not a command verified
+by this documentation-only update. The documentation validator performs local
+consistency checks; CLI example checks are recorded separately.
+
+## Repository
+
+- `luna-rs/crates/`: 12 canonical compiler workspace crates.
+- `luna-rs/libs/external/`: component source, manifest and canonical artifacts.
+- `runtime/`: C runtime and ABI conformance tests.
+- `docs/spec/0.1/`: versioned contract, conformance requirements and gaps.
+- `docs/site/`: static bilingual entry pages and generated spec mirrors.
+- `tests/luna/` and `luna-rs/tests/luna/`: public-language acceptance fixtures.
+
+No optimization, platform support or release completion is inferred solely from
+successful provider builds. See [status](Status.md) and [roadmap](ROADMAP.md).

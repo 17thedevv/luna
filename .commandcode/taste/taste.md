@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 - Prefers communication in Vietnamese. Confidence: 0.98
 - Prefers implementation work to be grounded in the repository's referenced planning and audit documents before coding. Confidence: 0.95
 - Prefers explicit, truthful status updates that distinguish active work or background execution from a paused/incomplete TODO item, including what quota/time was actually spent and avoiding any implication that work is continuing when it has stopped. Confidence: 0.97

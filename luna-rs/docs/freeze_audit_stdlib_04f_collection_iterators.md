@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # Freeze Audit: Stdlib-04.6 Collection Iterators (`RawTableIter`, `MapIter`, `Keys`, `Values`, `SetIter`)
 
 > Historical API-path note: this 2026-09-14 report records the pre-STD-NAMESPACE-01

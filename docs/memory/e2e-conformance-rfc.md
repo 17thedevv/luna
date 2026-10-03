@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../spec/0.1/README.md).
+
 # Mellis Compiler RFC: End-to-End Conformance & Executable Verification (P7 Hardened v2)
 
 - **Status**: FROZEN SPECIFICATION CANDIDATE (P7 Hardened v2)

@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # SEM-GAP-21: Type-Level Raw Storage Anchor Contract
 
 **Status:** RESOLVED & FROZEN — 2026-09-26.

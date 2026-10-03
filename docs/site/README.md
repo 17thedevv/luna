@@ -1,41 +1,22 @@
-# Luna docs site
+<!-- luna-doc-role: guidance -->
 
-This starter uses a lightweight bilingual static layout built around the documentation already present in the repo.
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../spec/0.1/README.md).
 
-## Structure
+# Luna 0.1 documentation site
 
-```text
-docs/site/
-├── index.html
-├── assets/
-│   └── styles.css
-├── vi/
-│   ├── index.html
-│   ├── language.html
-│   ├── compiler.html
-│   └── docs.html
-├── en/
-│   ├── index.html
-│   ├── language.html
-│   ├── compiler.html
-│   └── docs.html
-└── README.md
-```
+Static bilingual entry pages and generated HTML mirrors of docs/spec/0.1.
+The versioned Markdown is authoritative; generated pages must not be edited as
+an independent specification. Existing page URLs are preserved.
 
-## Local preview
+Regenerate from repository root:
 
-```bash
-cd docs/site
+```powershell
+python docs/tools/build_v01_docs.py
+python docs/tools/validate_v01_docs.py
 python -m http.server 8000
 ```
 
-Then open:
-
-- http://localhost:8000/vi/index.html
-- http://localhost:8000/en/index.html
-
-## Notes
-
-- The site is centered on the documentation already in the project, instead of a public roadmap.
-- Technical terms such as `MVIR`, `Trait`, `Lifetime`, `LLVM`, `Monomorphization`, and `Borrow Checker` stay in English for precision.
-- This is intentionally a simple static approach until the project grows enough to justify a full Markdown/SSG migration.
+Serve the repository root so links to adopted contracts/source files resolve.
+Open /docs/site/vi/index.html or /docs/site/en/index.html. The language contract
+is retained despite incomplete implementation; every page identifies release
+conformance as blocked/unverified. Website publication is not part of this task.

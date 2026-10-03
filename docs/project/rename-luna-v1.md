@@ -1,3 +1,7 @@
+<!-- luna-doc-role: adopted-contract -->
+
+> **Luna 0.1 — adopted-contract.** Retained detailed contract. Prior acceptance and freeze claims remain dated evidence; current release conformance is tracked separately. See the [versioned specification](../spec/0.1/README.md).
+
 # Luna v1.0 — Rename Compatibility Contract
 
 **Status**: FROZEN & ADOPTED  

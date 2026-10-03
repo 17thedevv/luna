@@ -1,0 +1,1738 @@
+{
+  "providers": [
+    {
+      "source": "luna-rs/libs/external/alloc/box.ln",
+      "lines": 62,
+      "sha256": "129694643740c2eb59e54ef6b73970b52ec032d897735fbc5103f00c1032200b"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/global.ln",
+      "lines": 7,
+      "sha256": "bee987b47d62710d808c2a2ca7c47e55540591a9cacce15447f60a18d68792d9"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/hashmap.ln",
+      "lines": 181,
+      "sha256": "db39d7ee2a2846aea5ecd6074db2b2957ccc8d18e7c08550689ca15457fecf31"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/hashset.ln",
+      "lines": 197,
+      "sha256": "bf8251f4e3d35fcea7a0f4d069280cfe1e0c212dce9eb2edb952ae1020619e3e"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/iter_collect.ln",
+      "lines": 65,
+      "sha256": "436458621c9ee68306f6884a5b289df02a22b0a794733842a3f077d2e01ce9d6"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/raw_table.ln",
+      "lines": 569,
+      "sha256": "ee7d1cc2366684d8e70ec829765de0dabcc6e45c4e2a5501a4b3c7d6b40c3570"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "lines": 312,
+      "sha256": "30f2acc7a36e68b8cd958fce45d1ceb1f79035f3484150be474a26d1fe1e077d"
+    },
+    {
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "lines": 603,
+      "sha256": "c5d8941034ed2af06f6464e9cdb453d62f77af63b710dfc46407db45d22d2c1d"
+    },
+    {
+      "source": "luna-rs/libs/external/core/clone.ln",
+      "lines": 18,
+      "sha256": "986f47291cfe70594c5e5346c5dc422bb091c086ff53f03683d25d84d20917a9"
+    },
+    {
+      "source": "luna-rs/libs/external/core/cmp.ln",
+      "lines": 167,
+      "sha256": "aaf60ca6033a3ab723b64dd61ad0e5502d16b24f41e70d0a245faf1a36e48392"
+    },
+    {
+      "source": "luna-rs/libs/external/core/convert.ln",
+      "lines": 273,
+      "sha256": "4f064e3e87c75b87ae6e02e8ae22ae0688fda4d637dd1ef4a295074a73bf13c7"
+    },
+    {
+      "source": "luna-rs/libs/external/core/copy.ln",
+      "lines": 20,
+      "sha256": "4b5b306d7dc31d21f15eedd53c4352eff157c9e5ab18f51166ba02e5b576acf7"
+    },
+    {
+      "source": "luna-rs/libs/external/core/default.ln",
+      "lines": 25,
+      "sha256": "047100a84932b70d99f823fe80bdb525be62f7583f1e38ceec893b8ba053e134"
+    },
+    {
+      "source": "luna-rs/libs/external/core/float.ln",
+      "lines": 180,
+      "sha256": "0970e6b28bcf87bfcecd223a87787d03e265a673cadb2106c91a469bb36c3ac9"
+    },
+    {
+      "source": "luna-rs/libs/external/core/fmt.ln",
+      "lines": 165,
+      "sha256": "6688b187b307175ee434f1bc434ae687ba197ec398dd5f1a6743817f1dd8f84d"
+    },
+    {
+      "source": "luna-rs/libs/external/core/hash.ln",
+      "lines": 25,
+      "sha256": "26356f58a5cb3da739d475097b529bfea26e5b1d1fb3cb04e891421dfc8be4fa"
+    },
+    {
+      "source": "luna-rs/libs/external/core/iter_adapters.ln",
+      "lines": 494,
+      "sha256": "4f464970d1bbe3c654c8d442be15aff5bab482c3b87bca4c13e4855d3666ff56"
+    },
+    {
+      "source": "luna-rs/libs/external/core/iter_consumers.ln",
+      "lines": 319,
+      "sha256": "b1142ee8fe0c7e27a4fc1209ae0b7430143d37b3ce086ad0e03d86b8f53dd5a4"
+    },
+    {
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "lines": 61,
+      "sha256": "fd309d306467722449fe0aa38fc7b3c405a62e5148c45e9a245c64852b684339"
+    },
+    {
+      "source": "luna-rs/libs/external/core/num.ln",
+      "lines": 693,
+      "sha256": "158737cb582a7506dd15fc4c10976b7411785cfd3e6a0104bec77f0ffcef8763"
+    },
+    {
+      "source": "luna-rs/libs/external/core/panic.ln",
+      "lines": 9,
+      "sha256": "8d578fba62142bdf80505a32d4d955cddfa797cd19a8d5e2d11a8e3eda9b178b"
+    },
+    {
+      "source": "luna-rs/libs/external/core/ptr.ln",
+      "lines": 60,
+      "sha256": "8cb0ae95604b39ab11c8bc7922b12eb55c8233f502e25e455dbef2aed76b2783"
+    },
+    {
+      "source": "luna-rs/libs/external/core/result.ln",
+      "lines": 150,
+      "sha256": "8b2629d80cdfbf8a10dfa66103d27f0d7e898307ec01104b695fa9171cc2a9c7"
+    },
+    {
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "lines": 684,
+      "sha256": "ad77d80098a080359e980dbceac84bcdd2a911b2b2e9eb8d553d32dff67569f6"
+    },
+    {
+      "source": "luna-rs/libs/external/core/try.ln",
+      "lines": 60,
+      "sha256": "2975f99b93a82189dd119321241a6865cabf48395e6c17c46310276faf183283"
+    },
+    {
+      "source": "luna-rs/libs/external/file/file.ln",
+      "lines": 185,
+      "sha256": "242cdacdda276cc82530b5aec3fa27418ee80d5b0aa39f080d41d320a09da21f"
+    },
+    {
+      "source": "luna-rs/libs/external/io/io.ln",
+      "lines": 25,
+      "sha256": "f941c8a4676e9cfbd6db047355e2c82777dda37f01d5cf39c23678667ed83f96"
+    },
+    {
+      "source": "luna-rs/libs/external/lang/drop.ln",
+      "lines": 7,
+      "sha256": "b9358bcc04e2c9bdb1966524fb2dbbcec12d76fece26494c79e95ea11e2ac923"
+    },
+    {
+      "source": "luna-rs/libs/external/lang/into_iterator.ln",
+      "lines": 6,
+      "sha256": "2e61d4f690c7cb17cef7ffa1b0f10e1ca211ed7f37b48b60c02cd12451a91a4e"
+    },
+    {
+      "source": "luna-rs/libs/external/lang/iterator.ln",
+      "lines": 8,
+      "sha256": "8b90e3ec65f64eaea86af67c381465b75816b8992db5e39842e0a41ebc12e8a6"
+    },
+    {
+      "source": "luna-rs/libs/external/lang/option.ln",
+      "lines": 115,
+      "sha256": "52c78fd24b385a0284bd3c6335c083f0cceee8c3f2c426d67bb123fdad1fe519"
+    },
+    {
+      "source": "luna-rs/libs/external/path/path.ln",
+      "lines": 181,
+      "sha256": "2ca8eb6344fb1e568517d249e5b52f48c91dd02ea24250fa31e9f335ca691f29"
+    }
+  ],
+  "provider_count": 32,
+  "source_lines": 5926,
+  "git_head": "3dac3ac0e85204411bd80fac15b3294dd812e1be",
+  "artifacts": [
+    {
+      "path": "luna-rs/libs/external/alloc/box.llib",
+      "sha256": "150e0d311759e1ffe27c8bed5124f5844dfcd34f6ef523d238ed7b298837ab0c"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/box.obj",
+      "sha256": "926e8f50dc388f990ac04d594459a467c6e8051b62adfc5219c9a3d73991eafe"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/global.llib",
+      "sha256": "f3a8fa58e9e26282d16f3fb23b73fad6250270af44ca6c0b0e2044b126d8991d"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/global.obj",
+      "sha256": "a305b83ca889cf4f7db7a1bc9c4ad259675146966d69f97e56d48516e896d3b5"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/hashmap.llib",
+      "sha256": "a26eb59b16b6a347db8b94e41b36c3548aac5f763b85d0dda8e74bad3f0eddc9"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/hashmap.obj",
+      "sha256": "d98b5dc989bc03d54984fbf4cb8b7a0d97b49ea9725d8ee8bcb58fbeb82a3bd5"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/hashset.llib",
+      "sha256": "7bc6611fe2d657baea97d6a71d769a4f4c88bbb7ce332a0786e10f38a0f272a7"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/hashset.obj",
+      "sha256": "c3e38ab4974deb7065fb87ee69e57fa5c6ec3ff1e23a2ed28d5d0e2176665ac1"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/iter_collect.llib",
+      "sha256": "6f8a7c4b6c59eb642b0df15834e08bfa5eaf7a053b5ff03c865e4bb781a557c6"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/iter_collect.obj",
+      "sha256": "8dcf26c881617aa52fab61c89c91f41be6dfe186fc635cc707d4ad9bfdcaf409"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/raw_table.llib",
+      "sha256": "167f413a9abc6ccb209ca7c070f50298cc557d898001123b9e8e655484430209"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/raw_table.obj",
+      "sha256": "7bcbe288b75bd0d2d43b391da4f73d98db52a25c554bc638a408b1ea2cc369be"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/string.llib",
+      "sha256": "36ddcbd680463f7bcf68962732ade0289e34619e34515663f0e451b9a64095f5"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/string.obj",
+      "sha256": "5846df4a4c0a35ffcb981991c4b9e1b42abc89fbc3f07c9eb9c75beef5e70bc3"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/vec.llib",
+      "sha256": "39e3ede4dbcc9e51e2230ec09e36afc1c027d94b0aa4c29725e85d2b5b78d5eb"
+    },
+    {
+      "path": "luna-rs/libs/external/alloc/vec.obj",
+      "sha256": "64eb494789e7117079eca540e81e0fd6f67c2f5910e130b5595bb415cc2e18bd"
+    },
+    {
+      "path": "luna-rs/libs/external/core/clone.llib",
+      "sha256": "9be5c4917f3a378321f19bc4bf42b0ea9c3c7bc16030ffa1dda8f37c7247b2dd"
+    },
+    {
+      "path": "luna-rs/libs/external/core/clone.obj",
+      "sha256": "f17d6c21208a7ef627045968b21d4b0423edb94a9919ac030533375b0c16fc2c"
+    },
+    {
+      "path": "luna-rs/libs/external/core/cmp.llib",
+      "sha256": "99698b0d7441ba73a51299957580585ad066185017edc4c49354812cbd7546cc"
+    },
+    {
+      "path": "luna-rs/libs/external/core/cmp.obj",
+      "sha256": "32c9fb6a7a298b91b149825f530a080ed87527b3d6e288caf1328eecc7308d62"
+    },
+    {
+      "path": "luna-rs/libs/external/core/convert.llib",
+      "sha256": "1a18a3f0592402bb6ba7732d070182ae203c81757a4cf976e362a90a62e6ad29"
+    },
+    {
+      "path": "luna-rs/libs/external/core/convert.obj",
+      "sha256": "2d0538d8066350f776a4cc1c5a047917fd7af6d489c24fd0ca1f43b188aaeb01"
+    },
+    {
+      "path": "luna-rs/libs/external/core/copy.llib",
+      "sha256": "5fa512d1d8df42cfbcb023151ab9255827d03c0b1e31038f48aeff30567321cf"
+    },
+    {
+      "path": "luna-rs/libs/external/core/copy.obj",
+      "sha256": "84a40161d15b775ec4948ac18c4ef4200335305e446258534800b9a25b95d33f"
+    },
+    {
+      "path": "luna-rs/libs/external/core/default.llib",
+      "sha256": "45d9e2de5ee105163a83d793e66288548c414c92af2397126ba51ebeae5f811f"
+    },
+    {
+      "path": "luna-rs/libs/external/core/default.obj",
+      "sha256": "f17d509a064ddb45871c0a520d4b6a7d707b6af522ab9a61f8837be34b7e9f29"
+    },
+    {
+      "path": "luna-rs/libs/external/core/float.llib",
+      "sha256": "b28edab7efbfb336787f951486678f6aceca1f32b02402fc0916f6f1e4540066"
+    },
+    {
+      "path": "luna-rs/libs/external/core/float.obj",
+      "sha256": "bdc1857c2b782c5adc5f45df08dea9dc06c9e0bcb60472603bb04d0f94eed14e"
+    },
+    {
+      "path": "luna-rs/libs/external/core/fmt.llib",
+      "sha256": "2e8c3af8a7ea767bc95a89f99e5bd6408b964cdd20a6c7f9c7aabce4bd858aee"
+    },
+    {
+      "path": "luna-rs/libs/external/core/fmt.obj",
+      "sha256": "2880427bc9f10b3adf3cde9ed202911f74001ae5d033c805290465ce86b37af4"
+    },
+    {
+      "path": "luna-rs/libs/external/core/hash.llib",
+      "sha256": "1371c8c4ef5461037410d62e989726f11cf895b876aae7fa5bd2cccedebcce52"
+    },
+    {
+      "path": "luna-rs/libs/external/core/hash.obj",
+      "sha256": "1c7852c8de33dc1cf2979d52d2ba6e2d907a508ad495bb962894cc20cf329d55"
+    },
+    {
+      "path": "luna-rs/libs/external/core/iter_adapters.llib",
+      "sha256": "792ec3f5e6c5726be012081b78f4654e548221cbbef245c798892ad8d44e56ab"
+    },
+    {
+      "path": "luna-rs/libs/external/core/iter_adapters.obj",
+      "sha256": "a75cf69ba824847520f6456be2b278adeb4a5a3c687f99f56f94684e96e7a67c"
+    },
+    {
+      "path": "luna-rs/libs/external/core/iter_consumers.llib",
+      "sha256": "2c511ee894358f7c63b4d4f9ba7f34809957d4c42db210cde6df6bb668c66d08"
+    },
+    {
+      "path": "luna-rs/libs/external/core/iter_consumers.obj",
+      "sha256": "63844c72553760887a3d2955501b3eb865f9821d9be013a02f23e838f4ae51d6"
+    },
+    {
+      "path": "luna-rs/libs/external/core/mem.llib",
+      "sha256": "5a174a6cc9ed4d9aa5566a4fb6b847ecebca3e03407e4f40b9bcf8782c0e9462"
+    },
+    {
+      "path": "luna-rs/libs/external/core/mem.obj",
+      "sha256": "e202fbeb3424518df68cde336f6aaf91b2966d4664aee4bb02fa7a06c9291105"
+    },
+    {
+      "path": "luna-rs/libs/external/core/num.llib",
+      "sha256": "4ce886b0fb5107a5b093afb53fe460c87472f127017d60063bc3dc3ef42847d8"
+    },
+    {
+      "path": "luna-rs/libs/external/core/num.obj",
+      "sha256": "5c2a62aff107ecf7f7793a8e729cf38d71c7b06a072eb38f97c863ec902d0fad"
+    },
+    {
+      "path": "luna-rs/libs/external/core/panic.llib",
+      "sha256": "4ae0e14b850c7eafb8e56b83a10db248e9df6d64beb68746b0d952ddcf54f224"
+    },
+    {
+      "path": "luna-rs/libs/external/core/panic.obj",
+      "sha256": "d83712eb100b758122c4e30e5fa1978bdc2d716b28fd348ea455a436eb701a41"
+    },
+    {
+      "path": "luna-rs/libs/external/core/ptr.llib",
+      "sha256": "dd71cb513f747f9edecdb7109637f30eb08aa8a24a19f77e9de2ac013b0e129e"
+    },
+    {
+      "path": "luna-rs/libs/external/core/ptr.obj",
+      "sha256": "fe4babcd5078a986e9b1acc1c6f9847d0383d682a218137da777dc5dabfb90d1"
+    },
+    {
+      "path": "luna-rs/libs/external/core/result.llib",
+      "sha256": "eb5b29a7e813532e6cf52b8617c35f3813836fa68514c756ecd0a3da3848fd44"
+    },
+    {
+      "path": "luna-rs/libs/external/core/result.obj",
+      "sha256": "9b35246c5c0a78407d16640a2712673495e36e0f65ad4f41dd974993532b258b"
+    },
+    {
+      "path": "luna-rs/libs/external/core/slice.llib",
+      "sha256": "0bd0cebbba28b2c4f231f1f15dd2edfb3239db199d3739d1c245711bad51e430"
+    },
+    {
+      "path": "luna-rs/libs/external/core/slice.obj",
+      "sha256": "ec57941cdd03afbd241696e04d13e3efeae91ccc9512a07e08710a07e2307798"
+    },
+    {
+      "path": "luna-rs/libs/external/core/try.llib",
+      "sha256": "202b6adbc6161b118ce0b3f0c306cf8e0ecf7ddedb5e9125906b25da357b005d"
+    },
+    {
+      "path": "luna-rs/libs/external/core/try.obj",
+      "sha256": "a533aa56cf152e533a68c6fdc77e8943d6ec6bedd5b6c309c2b87ddb3240c953"
+    },
+    {
+      "path": "luna-rs/libs/external/file/file.llib",
+      "sha256": "14293f7613c2519b11ad495d5a160e229896056ca14dbf655d02675feef43f95"
+    },
+    {
+      "path": "luna-rs/libs/external/file/file.obj",
+      "sha256": "7e0b4aee2f0ee299f587031b4aee46fc76acd48eb8561dd7db8c8d46dca9ac99"
+    },
+    {
+      "path": "luna-rs/libs/external/io/io.llib",
+      "sha256": "d2a95dc5ed7778da224e229c80b16443b68d34b40fea589a314d00d868f293bd"
+    },
+    {
+      "path": "luna-rs/libs/external/io/io.obj",
+      "sha256": "320f851c8dc90b0ec98bb747644152a1700b50db7e14506a972c271161726d17"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/drop.llib",
+      "sha256": "4f2226f242a6c3380047fad929aa92b348d91cea47c1e27a8765d70ca94fb458"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/drop.obj",
+      "sha256": "42f32a165786ca315e14278fb47fdce68d1abb05608d2fcba06697e35c18fb99"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/into_iterator.llib",
+      "sha256": "03a1dd2e2dca1622adbc6da679b14d5553f962686d9e1be6c839dbdee2326b65"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/into_iterator.obj",
+      "sha256": "d7d020e2a8c468f13ba85351c28527462539ee3029d7c34b7c089308d94e0026"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/iterator.llib",
+      "sha256": "b1804507e1ba222d7355fc2b6c606c50d91f1d1d248a1de7652b656fefd79abe"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/iterator.obj",
+      "sha256": "797ce00b26a0c805e7dd40f04e91d9d63d94b5d6cbc46dea8bb2d266eae8f5bf"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/option.llib",
+      "sha256": "ad1d93766009a3559b7c296809c695f5a60d8353bd6c1b134ebbbf024789d98e"
+    },
+    {
+      "path": "luna-rs/libs/external/lang/option.obj",
+      "sha256": "e570a63d3e3580f8dfd662c7a4d3fc8215d009a751c48c1b0cfd1200be8eab6b"
+    },
+    {
+      "path": "luna-rs/libs/external/path/path.llib",
+      "sha256": "6abbf1ff5b3df6718dddfa988049d1b81fd7ffe78ef802abf24e0492a18de5a9"
+    },
+    {
+      "path": "luna-rs/libs/external/path/path.obj",
+      "sha256": "9586fc71ea531d75ee73a5b1bf9b469a4f34b494136743c78bca925420553b45"
+    }
+  ],
+  "existing-suites": {
+    "count": 34,
+    "passed": 33,
+    "timeout": 1,
+    "failed": 0,
+    "individual_passed": 258
+  },
+  "cli-regressions": {
+    "count": 116,
+    "passed": 109,
+    "positive": 52,
+    "negative": 64,
+    "failed": [
+      {
+        "mode": "source",
+        "fixture": "phase3\\hash_collections_behavior.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "",
+        "pass": false,
+        "run_exit": 3221225725,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "phase3\\hashset_owned_iteration.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "",
+        "pass": false,
+        "run_exit": 3221225725,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "source",
+        "fixture": "phase3\\public_surface.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "error: Symbol 'root_map' not found\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:28:8\n   |\n28 |     if root_map.len() != (0 as u64) || std_map.len() != (0 as u64) {\n   |        ^^^^^^^^\n\nerror: Symbol 'std_map' not found\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:28:40\n   |\n28 |     if root_map.len() != (0 as u64) || std_map.len() != (0 as u64) {\n   |                                        ^^^^^^^\n\nerror: Symbol 'root_set' not found\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:31:8\n   |\n31 |     if root_set.len() != (0 as u64) || std_set.len() != (0 as u64) {\n   |        ^^^^^^^^\n\nerror: Symbol 'std_set' not found\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:31:40\n   |\n31 |     if root_set.len() != (0 as u64) || std_set.len() != (0 as u64) {\n   |                                        ^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "source",
+        "fixture": "phase3\\reject_std_vec.ln",
+        "negative": true,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "phase3\\hashset_owned_iteration.ln",
+        "negative": false,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "",
+        "pass": false,
+        "run_exit": 3221225725,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "mode": "artifact",
+        "fixture": "phase3\\public_surface.ln",
+        "negative": false,
+        "compile_exit": 1,
+        "compile_stdout": "",
+        "compile_stderr": "error: Symbol 'root_map' not found\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:28:8\n   |\n28 |     if root_map.len() != (0 as u64) || std_map.len() != (0 as u64) {\n   |        ^^^^^^^^\n\nerror: Symbol 'std_map' not found\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:28:40\n   |\n28 |     if root_map.len() != (0 as u64) || std_map.len() != (0 as u64) {\n   |                                        ^^^^^^^\n\nerror: Symbol 'root_set' not found\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:31:8\n   |\n31 |     if root_set.len() != (0 as u64) || std_set.len() != (0 as u64) {\n   |        ^^^^^^^^\n\nerror: Symbol 'std_set' not found\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\stdlib\\phase3\\public_surface.ln:31:40\n   |\n31 |     if root_set.len() != (0 as u64) || std_set.len() != (0 as u64) {\n   |                                        ^^^^^^^\n\n",
+        "pass": false
+      },
+      {
+        "mode": "artifact",
+        "fixture": "phase3\\reject_std_vec.ln",
+        "negative": true,
+        "compile_exit": 0,
+        "compile_stdout": "",
+        "compile_stderr": "",
+        "pass": false
+      }
+    ]
+  },
+  "probes": {
+    "count": 50,
+    "outcomes": [
+      {
+        "mode": "source",
+        "fixture": "baseline.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.02717989997472614
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.01999399997293949
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_invalid_char.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.030151700018905103
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_main_args.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.027370499970857054
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_move_after_call.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "compiler_unsigned_cast.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.019771199964452535
+      },
+      {
+        "mode": "source",
+        "fixture": "convert_unsigned_widen.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.028312999987974763
+      },
+      {
+        "mode": "source",
+        "fixture": "filter_owned.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "find_owned.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_capacity_overflow.ln",
+        "compile_exit": 0,
+        "timeout": "Command '['D:\\\\tmp\\\\luna-audit-2026-10-02\\\\luna_stdlib_audit_quyx5b72\\\\source\\\\hashmap_capacity_overflow.exe', 'audit-argument']' timed out after 10 seconds"
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_collision_pattern.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.14950610004598275
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_sequential_pattern.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.029738200013525784
+      },
+      {
+        "mode": "source",
+        "fixture": "slice_zst.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.02724540000781417
+      },
+      {
+        "mode": "source",
+        "fixture": "string_invalid_char.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.028210799966473132
+      },
+      {
+        "mode": "source",
+        "fixture": "vec_capacity_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.01990239997394383
+      },
+      {
+        "mode": "source",
+        "fixture": "vec_reserve_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.028232600016053766
+      },
+      {
+        "mode": "artifact",
+        "fixture": "baseline.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.027314300008583814
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.018892499967478216
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_invalid_char.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.019088700006250292
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_main_args.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.029281600029207766
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_move_after_call.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "compiler_unsigned_cast.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.028590200003236532
+      },
+      {
+        "mode": "artifact",
+        "fixture": "convert_unsigned_widen.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.028368700004648417
+      },
+      {
+        "mode": "artifact",
+        "fixture": "filter_owned.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "find_owned.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_capacity_overflow.ln",
+        "compile_exit": 0,
+        "timeout": "Command '['D:\\\\tmp\\\\luna-audit-2026-10-02\\\\luna_stdlib_audit_quyx5b72\\\\artifact\\\\hashmap_capacity_overflow.exe', 'audit-argument']' timed out after 10 seconds"
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_collision_pattern.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.13143399998079985
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_sequential_pattern.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.028763000038452446
+      },
+      {
+        "mode": "artifact",
+        "fixture": "slice_zst.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.030602000013459474
+      },
+      {
+        "mode": "artifact",
+        "fixture": "string_invalid_char.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.02854579995619133
+      },
+      {
+        "mode": "artifact",
+        "fixture": "vec_capacity_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.02004480001050979
+      },
+      {
+        "mode": "artifact",
+        "fixture": "vec_reserve_overflow.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.030514799989759922
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_growth_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.028225699963513762
+      },
+      {
+        "mode": "source",
+        "fixture": "vec_dedup_i32_generic.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.030796299979556352
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_growth_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.0226999000296928
+      },
+      {
+        "mode": "artifact",
+        "fixture": "vec_dedup_i32_generic.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.02402729995083064
+      },
+      {
+        "mode": "source",
+        "fixture": "format_unsigned_high_bit.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "18446744073709551615\n",
+        "run_seconds": 0.028155900014098734
+      },
+      {
+        "mode": "artifact",
+        "fixture": "format_unsigned_high_bit.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "18446744073709551615\n",
+        "run_seconds": 0.031222399964462966
+      },
+      {
+        "mode": "source",
+        "fixture": "range_owned_step.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "source",
+        "fixture": "slice_zst_mut.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.03974860004382208
+      },
+      {
+        "mode": "source",
+        "fixture": "try_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.03308560000732541
+      },
+      {
+        "mode": "artifact",
+        "fixture": "range_owned_step.ln",
+        "compile_exit": 1
+      },
+      {
+        "mode": "artifact",
+        "fixture": "slice_zst_mut.ln",
+        "compile_exit": 0,
+        "run_exit": 1,
+        "stdout": "",
+        "run_seconds": 0.030093799985479563
+      },
+      {
+        "mode": "artifact",
+        "fixture": "try_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.034687899984419346
+      },
+      {
+        "mode": "source",
+        "fixture": "try_codegen_canonical_std_try.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.019549399963580072
+      },
+      {
+        "mode": "source",
+        "fixture": "try_codegen_generic_cross_module_std_try.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.02812219999032095
+      },
+      {
+        "mode": "artifact",
+        "fixture": "try_codegen_canonical_std_try.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.036153300025034696
+      },
+      {
+        "mode": "artifact",
+        "fixture": "try_codegen_generic_cross_module_std_try.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.023698899953160435
+      },
+      {
+        "mode": "source",
+        "fixture": "hashmap_drop_stress_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.028974799963179976
+      },
+      {
+        "mode": "artifact",
+        "fixture": "hashmap_drop_stress_control.ln",
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": "",
+        "run_seconds": 0.030196300009265542
+      }
+    ]
+  },
+  "dispatch-repeat": {
+    "count": 16,
+    "outcomes": [
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 0,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 1,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 2,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 3,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 4,
+        "compile_exit": 0,
+        "run_exit": 3221225725,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 5,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 6,
+        "compile_exit": 0,
+        "run_exit": 3221225725,
+        "stdout": ""
+      },
+      {
+        "fixture": "compiler_inherent_trait_dispatch.ln",
+        "attempt": 7,
+        "compile_exit": 0,
+        "run_exit": 3221225725,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 0,
+        "compile_exit": 0,
+        "run_exit": 3221225725,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 1,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 2,
+        "compile_exit": 0,
+        "run_exit": 3221225725,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 3,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 4,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 5,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 6,
+        "compile_exit": 0,
+        "run_exit": 3221225725,
+        "stdout": ""
+      },
+      {
+        "fixture": "hashmap_owned_iteration.ln",
+        "attempt": 7,
+        "compile_exit": 0,
+        "run_exit": 0,
+        "stdout": ""
+      }
+    ]
+  },
+  "storage-retry": {
+    "count": 3,
+    "outcomes": [
+      {
+        "test": "test_ht5_resize_growth_and_relocation",
+        "timeout": true
+      },
+      {
+        "test": "test_ht6_drop_tracker_stress_soundness",
+        "timeout": true
+      },
+      {
+        "test": "test_ht7_source_vs_llib_parity",
+        "exit": 0
+      }
+    ]
+  },
+  "phase-probe": {
+    "count": 10,
+    "outcomes": [
+      {
+        "mode": "source",
+        "case": "raw_create_only",
+        "internal": true,
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.031146799970884,
+        "log": "phase-source-raw_create_only.log",
+        "last_phase": "bootstrap"
+      },
+      {
+        "mode": "source",
+        "case": "raw_growth_without_get",
+        "internal": true,
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.022868699976243,
+        "log": "phase-source-raw_growth_without_get.log",
+        "last_phase": "bootstrap"
+      },
+      {
+        "mode": "source",
+        "case": "raw_ht5_exact",
+        "internal": true,
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.02192939998349,
+        "log": "phase-source-raw_ht5_exact.log",
+        "last_phase": "bootstrap"
+      },
+      {
+        "mode": "source",
+        "case": "public_ht5_equivalent",
+        "internal": false,
+        "timeout_seconds": 30,
+        "exit": 0,
+        "seconds": 9.279132700001355,
+        "log": "phase-source-public_ht5_equivalent.log",
+        "last_phase": "monomorphized"
+      },
+      {
+        "mode": "source",
+        "case": "raw_ht6_exact",
+        "internal": true,
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.026932700013276,
+        "log": "phase-source-raw_ht6_exact.log",
+        "last_phase": "bootstrap"
+      },
+      {
+        "mode": "artifact",
+        "case": "raw_create_only",
+        "internal": true,
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.031410299998242,
+        "log": "phase-artifact-raw_create_only.log",
+        "last_phase": "bootstrap"
+      },
+      {
+        "mode": "artifact",
+        "case": "raw_growth_without_get",
+        "internal": true,
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.02112509997096,
+        "log": "phase-artifact-raw_growth_without_get.log",
+        "last_phase": "bootstrap"
+      },
+      {
+        "mode": "artifact",
+        "case": "raw_ht5_exact",
+        "internal": true,
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.03239810001105,
+        "log": "phase-artifact-raw_ht5_exact.log",
+        "last_phase": "bootstrap"
+      },
+      {
+        "mode": "artifact",
+        "case": "public_ht5_equivalent",
+        "internal": false,
+        "timeout_seconds": 30,
+        "exit": 0,
+        "seconds": 8.79569379996974,
+        "log": "phase-artifact-public_ht5_equivalent.log",
+        "last_phase": "monomorphized"
+      },
+      {
+        "mode": "artifact",
+        "case": "raw_ht6_exact",
+        "internal": true,
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.02754300000379,
+        "log": "phase-artifact-raw_ht6_exact.log",
+        "last_phase": "bootstrap"
+      }
+    ]
+  },
+  "phase-bootstrap-comparison": {
+    "count": 4,
+    "outcomes": [
+      {
+        "mode": "source",
+        "case": "raw_ht5_without_bootstrap",
+        "internal": "internal",
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.029738700017333,
+        "log": "phase-source-raw_ht5_without_bootstrap.log",
+        "last_phase": "load_hashset_begin"
+      },
+      {
+        "mode": "source",
+        "case": "raw_ht5_with_bootstrap",
+        "internal": "internal-bootstrap",
+        "timeout_seconds": 30,
+        "exit": 0,
+        "seconds": 10.781545799982268,
+        "log": "phase-source-raw_ht5_with_bootstrap.log",
+        "last_phase": "monomorphized"
+      },
+      {
+        "mode": "artifact",
+        "case": "raw_ht5_without_bootstrap",
+        "internal": "internal",
+        "timeout_seconds": 30,
+        "timeout": true,
+        "seconds": 30.0484284000122,
+        "log": "phase-artifact-raw_ht5_without_bootstrap.log",
+        "last_phase": "load_hashset_begin"
+      },
+      {
+        "mode": "artifact",
+        "case": "raw_ht5_with_bootstrap",
+        "internal": "internal-bootstrap",
+        "timeout_seconds": 30,
+        "exit": 0,
+        "seconds": 8.557741600030567,
+        "log": "phase-artifact-raw_ht5_with_bootstrap.log",
+        "last_phase": "monomorphized"
+      }
+    ]
+  },
+  "provider-bounds": {
+    "count": 7,
+    "outcomes": [
+      {
+        "depth": 0,
+        "mode": "source",
+        "metadata": [
+          {
+            "provider": "p0",
+            "bounds": 1,
+            "unique": 1,
+            "local": 1,
+            "foreign": 0
+          }
+        ],
+        "phase_exit": 0,
+        "phase_diagnostics": [
+          "0"
+        ],
+        "compile_exit": 0,
+        "compile_seconds": 0.22662959998706356,
+        "run_exit": 0
+      },
+      {
+        "depth": 4,
+        "mode": "source",
+        "metadata": [
+          {
+            "provider": "p0",
+            "bounds": 1,
+            "unique": 1,
+            "local": 1,
+            "foreign": 0
+          },
+          {
+            "provider": "p1",
+            "bounds": 1,
+            "unique": 1,
+            "local": 0,
+            "foreign": 1
+          },
+          {
+            "provider": "p2",
+            "bounds": 2,
+            "unique": 1,
+            "local": 0,
+            "foreign": 2
+          },
+          {
+            "provider": "p3",
+            "bounds": 4,
+            "unique": 1,
+            "local": 0,
+            "foreign": 4
+          },
+          {
+            "provider": "p4",
+            "bounds": 8,
+            "unique": 1,
+            "local": 0,
+            "foreign": 8
+          }
+        ],
+        "phase_exit": 0,
+        "phase_diagnostics": [
+          "0"
+        ],
+        "compile_exit": 0,
+        "compile_seconds": 0.2523852000012994,
+        "run_exit": 0
+      },
+      {
+        "depth": 8,
+        "mode": "source",
+        "metadata": [
+          {
+            "provider": "p0",
+            "bounds": 1,
+            "unique": 1,
+            "local": 1,
+            "foreign": 0
+          },
+          {
+            "provider": "p1",
+            "bounds": 1,
+            "unique": 1,
+            "local": 0,
+            "foreign": 1
+          },
+          {
+            "provider": "p2",
+            "bounds": 2,
+            "unique": 1,
+            "local": 0,
+            "foreign": 2
+          },
+          {
+            "provider": "p3",
+            "bounds": 4,
+            "unique": 1,
+            "local": 0,
+            "foreign": 4
+          },
+          {
+            "provider": "p4",
+            "bounds": 8,
+            "unique": 1,
+            "local": 0,
+            "foreign": 8
+          },
+          {
+            "provider": "p5",
+            "bounds": 16,
+            "unique": 1,
+            "local": 0,
+            "foreign": 16
+          },
+          {
+            "provider": "p6",
+            "bounds": 32,
+            "unique": 1,
+            "local": 0,
+            "foreign": 32
+          },
+          {
+            "provider": "p7",
+            "bounds": 64,
+            "unique": 1,
+            "local": 0,
+            "foreign": 64
+          },
+          {
+            "provider": "p8",
+            "bounds": 128,
+            "unique": 1,
+            "local": 0,
+            "foreign": 128
+          }
+        ],
+        "phase_exit": 0,
+        "phase_diagnostics": [
+          "0"
+        ],
+        "compile_exit": 0,
+        "compile_seconds": 0.23834500001976267,
+        "run_exit": 0
+      },
+      {
+        "depth": 12,
+        "mode": "source",
+        "metadata": [
+          {
+            "provider": "p0",
+            "bounds": 1,
+            "unique": 1,
+            "local": 1,
+            "foreign": 0
+          },
+          {
+            "provider": "p1",
+            "bounds": 1,
+            "unique": 1,
+            "local": 0,
+            "foreign": 1
+          },
+          {
+            "provider": "p10",
+            "bounds": 512,
+            "unique": 1,
+            "local": 0,
+            "foreign": 512
+          },
+          {
+            "provider": "p11",
+            "bounds": 1024,
+            "unique": 1,
+            "local": 0,
+            "foreign": 1024
+          },
+          {
+            "provider": "p12",
+            "bounds": 2048,
+            "unique": 1,
+            "local": 0,
+            "foreign": 2048
+          },
+          {
+            "provider": "p2",
+            "bounds": 2,
+            "unique": 1,
+            "local": 0,
+            "foreign": 2
+          },
+          {
+            "provider": "p3",
+            "bounds": 4,
+            "unique": 1,
+            "local": 0,
+            "foreign": 4
+          },
+          {
+            "provider": "p4",
+            "bounds": 8,
+            "unique": 1,
+            "local": 0,
+            "foreign": 8
+          },
+          {
+            "provider": "p5",
+            "bounds": 16,
+            "unique": 1,
+            "local": 0,
+            "foreign": 16
+          },
+          {
+            "provider": "p6",
+            "bounds": 32,
+            "unique": 1,
+            "local": 0,
+            "foreign": 32
+          },
+          {
+            "provider": "p7",
+            "bounds": 64,
+            "unique": 1,
+            "local": 0,
+            "foreign": 64
+          },
+          {
+            "provider": "p8",
+            "bounds": 128,
+            "unique": 1,
+            "local": 0,
+            "foreign": 128
+          },
+          {
+            "provider": "p9",
+            "bounds": 256,
+            "unique": 1,
+            "local": 0,
+            "foreign": 256
+          }
+        ],
+        "phase_exit": 0,
+        "phase_diagnostics": [
+          "0"
+        ],
+        "compile_exit": 0,
+        "compile_seconds": 0.3190182000398636,
+        "run_exit": 0
+      },
+      {
+        "depth": 0,
+        "mode": "artifact",
+        "metadata": [
+          {
+            "provider": "p0",
+            "bounds": 1,
+            "unique": 1,
+            "local": 1,
+            "foreign": 0
+          }
+        ],
+        "phase_exit": 0,
+        "phase_diagnostics": [
+          "0"
+        ],
+        "compile_exit": 0,
+        "compile_seconds": 0.20914640004048124,
+        "run_exit": 0
+      },
+      {
+        "depth": 4,
+        "mode": "artifact",
+        "metadata": [
+          {
+            "provider": "p0",
+            "bounds": 1,
+            "unique": 1,
+            "local": 1,
+            "foreign": 0
+          },
+          {
+            "provider": "p1",
+            "bounds": 1,
+            "unique": 1,
+            "local": 0,
+            "foreign": 1
+          },
+          {
+            "provider": "p2",
+            "bounds": 2,
+            "unique": 1,
+            "local": 0,
+            "foreign": 2
+          },
+          {
+            "provider": "p3",
+            "bounds": 4,
+            "unique": 1,
+            "local": 0,
+            "foreign": 4
+          },
+          {
+            "provider": "p4",
+            "bounds": 8,
+            "unique": 1,
+            "local": 0,
+            "foreign": 8
+          }
+        ],
+        "phase_exit": 0,
+        "phase_diagnostics": [
+          "0"
+        ],
+        "compile_exit": 0,
+        "compile_seconds": 0.37815379997482523,
+        "run_exit": 0
+      },
+      {
+        "depth": 8,
+        "mode": "artifact",
+        "metadata": [
+          {
+            "provider": "p0",
+            "bounds": 1,
+            "unique": 1,
+            "local": 1,
+            "foreign": 0
+          },
+          {
+            "provider": "p1",
+            "bounds": 1,
+            "unique": 1,
+            "local": 0,
+            "foreign": 1
+          },
+          {
+            "provider": "p2",
+            "bounds": 2,
+            "unique": 1,
+            "local": 0,
+            "foreign": 2
+          },
+          {
+            "provider": "p3",
+            "bounds": 4,
+            "unique": 1,
+            "local": 0,
+            "foreign": 4
+          },
+          {
+            "provider": "p4",
+            "bounds": 8,
+            "unique": 1,
+            "local": 0,
+            "foreign": 8
+          },
+          {
+            "provider": "p5",
+            "bounds": 16,
+            "unique": 1,
+            "local": 0,
+            "foreign": 16
+          },
+          {
+            "provider": "p6",
+            "bounds": 32,
+            "unique": 1,
+            "local": 0,
+            "foreign": 32
+          },
+          {
+            "provider": "p7",
+            "bounds": 64,
+            "unique": 1,
+            "local": 0,
+            "foreign": 64
+          },
+          {
+            "provider": "p8",
+            "bounds": 128,
+            "unique": 1,
+            "local": 0,
+            "foreign": 128
+          }
+        ],
+        "phase_exit": 0,
+        "phase_diagnostics": [
+          "0"
+        ],
+        "compile_exit": 0,
+        "compile_seconds": 2.5585989999817684,
+        "run_exit": 0
+      }
+    ]
+  },
+  "hashmap-benchmark": {
+    "count": 18,
+    "timed_samples": 126,
+    "outcomes": [
+      {
+        "mode": "source",
+        "pattern": "sequential",
+        "n": 1500,
+        "rounds": 8,
+        "median_seconds": 0.017358799988869578,
+        "minimum_seconds": 0.016392999968957156,
+        "maximum_seconds": 0.01935120002599433
+      },
+      {
+        "mode": "source",
+        "pattern": "low_bits_collision",
+        "n": 1500,
+        "rounds": 8,
+        "median_seconds": 0.07353019999573007,
+        "minimum_seconds": 0.06984279997413978,
+        "maximum_seconds": 0.09099290001904592
+      },
+      {
+        "mode": "source",
+        "pattern": "sequential",
+        "n": 3000,
+        "rounds": 8,
+        "median_seconds": 0.01792449998902157,
+        "minimum_seconds": 0.01769159996183589,
+        "maximum_seconds": 0.01885789999505505
+      },
+      {
+        "mode": "source",
+        "pattern": "low_bits_collision",
+        "n": 3000,
+        "rounds": 8,
+        "median_seconds": 0.226790799992159,
+        "minimum_seconds": 0.2248550999793224,
+        "maximum_seconds": 0.23109489999478683
+      },
+      {
+        "mode": "source",
+        "pattern": "sequential",
+        "n": 6000,
+        "rounds": 8,
+        "median_seconds": 0.020419900014530867,
+        "minimum_seconds": 0.0200314000248909,
+        "maximum_seconds": 0.02199739997740835
+      },
+      {
+        "mode": "source",
+        "pattern": "low_bits_collision",
+        "n": 6000,
+        "rounds": 8,
+        "median_seconds": 0.8655253000324592,
+        "minimum_seconds": 0.8522142999572679,
+        "maximum_seconds": 0.8937630000291392
+      },
+      {
+        "mode": "source",
+        "pattern": "sequential",
+        "n": 12000,
+        "rounds": 8,
+        "median_seconds": 0.02383309998549521,
+        "minimum_seconds": 0.022928399965167046,
+        "maximum_seconds": 0.027517099981196225
+      },
+      {
+        "mode": "source",
+        "pattern": "low_bits_collision",
+        "n": 12000,
+        "rounds": 8,
+        "median_seconds": 3.426413599983789,
+        "minimum_seconds": 3.3418862000107765,
+        "maximum_seconds": 3.4471041000215337
+      },
+      {
+        "mode": "source",
+        "pattern": "startup_control",
+        "n": 0,
+        "rounds": 0,
+        "median_seconds": 0.01620600000023842,
+        "minimum_seconds": 0.015632700000423938,
+        "maximum_seconds": 0.016917600005399436
+      },
+      {
+        "mode": "artifact",
+        "pattern": "sequential",
+        "n": 1500,
+        "rounds": 8,
+        "median_seconds": 0.017954800045117736,
+        "minimum_seconds": 0.016568400023970753,
+        "maximum_seconds": 0.01922359998570755
+      },
+      {
+        "mode": "artifact",
+        "pattern": "low_bits_collision",
+        "n": 1500,
+        "rounds": 8,
+        "median_seconds": 0.0707047000178136,
+        "minimum_seconds": 0.06865299999481067,
+        "maximum_seconds": 0.07402230001753196
+      },
+      {
+        "mode": "artifact",
+        "pattern": "sequential",
+        "n": 3000,
+        "rounds": 8,
+        "median_seconds": 0.018070499994792044,
+        "minimum_seconds": 0.017732200038153678,
+        "maximum_seconds": 0.02014239999698475
+      },
+      {
+        "mode": "artifact",
+        "pattern": "low_bits_collision",
+        "n": 3000,
+        "rounds": 8,
+        "median_seconds": 0.23827060003532097,
+        "minimum_seconds": 0.22663630003808066,
+        "maximum_seconds": 0.2543093000422232
+      },
+      {
+        "mode": "artifact",
+        "pattern": "sequential",
+        "n": 6000,
+        "rounds": 8,
+        "median_seconds": 0.02061659999890253,
+        "minimum_seconds": 0.020040999981574714,
+        "maximum_seconds": 0.021845900046173483
+      },
+      {
+        "mode": "artifact",
+        "pattern": "low_bits_collision",
+        "n": 6000,
+        "rounds": 8,
+        "median_seconds": 0.8650654999655671,
+        "minimum_seconds": 0.8527981000370346,
+        "maximum_seconds": 0.9362957000266761
+      },
+      {
+        "mode": "artifact",
+        "pattern": "sequential",
+        "n": 12000,
+        "rounds": 8,
+        "median_seconds": 0.02452799997990951,
+        "minimum_seconds": 0.023545000003650784,
+        "maximum_seconds": 0.025348499999381602
+      },
+      {
+        "mode": "artifact",
+        "pattern": "low_bits_collision",
+        "n": 12000,
+        "rounds": 8,
+        "median_seconds": 3.4160262999939732,
+        "minimum_seconds": 3.3583966000005603,
+        "maximum_seconds": 3.8119329000473954
+      },
+      {
+        "mode": "artifact",
+        "pattern": "startup_control",
+        "n": 0,
+        "rounds": 0,
+        "median_seconds": 0.01624420000007376,
+        "minimum_seconds": 0.01576589996693656,
+        "maximum_seconds": 0.016419799998402596
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+export module geometry {
+    export struct Item { private value: i32, };
+    export fn item() -> Item { return Item { value: 42 }; }
+}
+fn main() -> i32 {
+    dec item = geometry::item();
+    return item.value - 42;
+}

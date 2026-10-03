@@ -1,0 +1,42 @@
+[
+  {
+    "mode": "source",
+    "case": "raw_ht5_without_bootstrap",
+    "internal": "internal",
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.029738700017333,
+    "log": "phase-source-raw_ht5_without_bootstrap.log",
+    "last_phase": "load_hashset_begin"
+  },
+  {
+    "mode": "source",
+    "case": "raw_ht5_with_bootstrap",
+    "internal": "internal-bootstrap",
+    "timeout_seconds": 30,
+    "exit": 0,
+    "seconds": 10.781545799982268,
+    "log": "phase-source-raw_ht5_with_bootstrap.log",
+    "last_phase": "monomorphized"
+  },
+  {
+    "mode": "artifact",
+    "case": "raw_ht5_without_bootstrap",
+    "internal": "internal",
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.0484284000122,
+    "log": "phase-artifact-raw_ht5_without_bootstrap.log",
+    "last_phase": "load_hashset_begin"
+  },
+  {
+    "mode": "artifact",
+    "case": "raw_ht5_with_bootstrap",
+    "internal": "internal-bootstrap",
+    "timeout_seconds": 30,
+    "exit": 0,
+    "seconds": 8.557741600030567,
+    "log": "phase-artifact-raw_ht5_with_bootstrap.log",
+    "last_phase": "monomorphized"
+  }
+]

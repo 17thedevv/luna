@@ -1,12 +1,31 @@
-(* Canonical struct contract productions for Luna grammar.md.
-   The repository did not previously contain a standalone grammar.ebnf. *)
+(* Luna 0.1 consolidated formal productions.
+   Authority: spec/0.1/README.md and its adopted contracts.
+   Coverage is intentionally explicit: this is not yet an exhaustive grammar
+   for all literals, expressions, patterns, attributes and macro fragments.
+   Missing formal coverage and parser disagreements are recorded in
+   spec/0.1/gaps.md. Parser acceptance does not amend the contract. *)
+
+binding = "dec", [ "rw" ], identifier, [ ":", type ],
+          [ "=", expression ], ";" ;
+constant = "const", identifier, [ ":", type ], "=", expression, ";" ;
+function_decl = { annotation }, [ "export" ], [ "extern" ], [ "unsafe" ],
+                [ "async" ], [ "comptime" ], "fn", identifier,
+                [ generic_params ], "(", [ parameters ], ")",
+                [ "->", type ], { function_contract }, ( block | ";" ) ;
+parameters = parameter, { ",", parameter } ;
+parameter = identifier, ":", type | "self" | "&", [ "rw" ], "self" ;
+generic_params = "<", generic_param, { ",", generic_param }, ">" ;
+generic_param = identifier, [ ":", type_path, { "+", type_path } ] ;
+generic_arguments = "<", type, { ",", type }, ">" ;
 
 struct_decl = { annotation }, [ "export" ], "struct", identifier,
               [ generic_params ], "{", [ struct_field_list ], "}",
               { struct_contract_clause }, ";" ;
 
 struct_field_list = struct_field, { ",", struct_field }, [ "," ] ;
-struct_field = [ "export" ], identifier, ":", type ;
+struct_field = [ "export" | "private" ], identifier, ":", type ;
+(* Visibility-02: unmodified fields are public; containing type accessibility
+   is checked independently. Semicolon field delimiters are not canonical. *)
 
 struct_contract_clause = "requires", lifetime_constraint_list
                        | "requires", raw_storage_anchor ;
@@ -23,3 +42,45 @@ raw_storage_anchor = "anchor", "(", identifier, ")", "=", "self" ;
    monomorphized; object-safety rules separately prohibit them on dyn traits. *)
 trait_method = "fn", identifier, [ generic_params ], "(", [ parameters ], ")",
                [ "->", type ], ";" ;
+
+function_contract = "life_from", "(", identifier, { "|", identifier }, ")"
+                  | "requires", lifetime_constraint_list ;
+life_target = "life", "(", ( identifier | "self" | "return" ),
+              { ".", identifier }, ")" ;
+module_decl = [ "export" ], "module", identifier, "{", { declaration }, "}" ;
+import_decl = "import", ( string_literal | "<", provider_name, ">" ), ";" ;
+using_decl = "using", namespace_path, "as", identifier, ";" ;
+namespace_path = identifier, { "::", identifier } ;
+type_path = ( identifier | "Self" ), [ generic_arguments ],
+            { "::", identifier, [ generic_arguments ] } ;
+reference_type = "&", [ "rw" ], type ;
+pointer_type = "*", [ "rw" ], type ;
+array_type = "[", type, ";", expression, "]" ;
+slice_type = "[", type, "]" ;
+function_type = [ "unsafe" ], "fn", "(", [ type, { ",", type } ], ")",
+                [ "->", type ] ;
+
+(* Retained Rule K.4; current unparenthesized foreach parsing is a gap. *)
+foreach_statement = "for", "(", pattern, "in", expression, ")", block ;
+cstyle_for_statement = "for", "(", ( binding | ";" ), [ expression ], ";",
+                       [ expression ], ")", block ;
+await_postfix = expression, ".", "await" ;
+match_arm = pattern, "->", expression ;
+macro_decl = [ "export" ], "macro", identifier, "{", { macro_rule }, "}" ;
+macro_rule = token_group, "=>", token_group ;
+macro_capture = "@", identifier, ":", fragment_kind ;
+macro_invocation = namespace_path, "!", token_group ;
+
+(* Metavariables below delegate to adopted subcontracts; they do not admit
+   arbitrary syntax. Complete formal expansion remains V01-DESIGN-04. *)
+identifier = ? canonical identifier token ? ;
+provider_name = ? logical provider name without file extension ? ;
+string_literal = ? admitted string literal token ? ;
+type = ? admitted type forms described in spec/0.1/syntax.md ? ;
+expression = ? adopted expression and precedence contract ? ;
+pattern = ? adopted pattern contract ? ;
+annotation = ? admitted #[...] annotation token structure ? ;
+fragment_kind = ? supported macro matcher fragment contract ? ;
+token_group = ? balanced (), [] or {} matcher/transcriber token group ? ;
+declaration = ? adopted declaration forms ? ;
+block = ? adopted braced declaration/statement block ? ;

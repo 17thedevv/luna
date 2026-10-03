@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 — macros and compiler/library boundary</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01--macros-and-compilerlibrary-boundary">Luna 0.1 — macros and compiler/library boundary</h1>
+<h2 id="generic-declarative-expansion">Generic declarative expansion</h2>
+<p>A declarative macro is a resolved declaration with matcher/transcriber rules, not a keyword selected by its short name. Expansion must respect scopes, qualified paths, hygiene, fragment parsing, repetitions, recursion limits and structured diagnostics. Captured expressions are parsed using language syntax, not guessed from regular-expression replacements.</p>
+<pre><code>macro twice {
+    (@value: expr) =&gt; { @value * 2 }
+}
+fn main() -&gt; i32 { return twice!(21) - 42; }</code></pre>
+<p>Matcher fragment kinds and repetition syntax follow the existing macro contracts and parser tests. A proposed procedural or formatting macro feature is not established merely because an annotation can be parsed.</p>
+<h2 id="prohibited-stdlib-mappings">Prohibited stdlib mappings</h2>
+<p>The compiler MUST NOT trigger formatting because a macro is called <code>out</code>, <code>outln</code>, <code>err</code>, <code>errln</code>, <code>print</code>, <code>println</code>, <code>eprint</code> or <code>eprintln</code>. It MUST NOT infer an output stream from <code>err</code>/<code>eprint</code> prefixes, infer a newline from an <code>ln</code> suffix, search library declarations by <code>print_val</code>/<code>eprint_val</code> spelling, or fall back to an invented <code>std::io</code> callee path.</p>
+<p>The same restriction applies at <strong>all</strong> pipeline stages, including AST macro desugaring. Absence of a backend opcode does not make an AST library-name mapping generic. An annotation such as <code>#[format_macro]</code> would not remove the coupling if the compiler still chooses library-specific callees.</p>
+<p>A library macro owns its output target, emission policy and newline policy. Display/Writer are ordinary traits; user-defined types and sinks use ordinary resolution, type checking, monomorphization and ownership checking.</p>
+<h2 id="formatting-status-and-extension-boundary">Formatting status and extension boundary</h2>
+<p>The adopted formatting foundation defines Writer, Display, FmtError and ordinary implementations. It explicitly excludes formatting macros, format-string parsing, width/alignment/precision syntax and general streaming writers from that phase. Those exclusions remain in effect for the 0.1 baseline unless amended explicitly. The current checkout contains no implementation of the eight-name mapping or <code>#[format_macro]</code> described in the earlier discussion.</p>
+<p>If <code>{expr}</code> interpolation is added, its language/macro capability must specify literal/expression segmentation, escaping, evaluation order, evaluation count, borrowing and temporary lifetimes, source spans, hygiene, failure behavior and source/artifact parity. It must work with arbitrary library-defined names and sinks. This document does not invent a new intrinsic or lang item to implement that proposal.</p>
+<h2 id="other-compiler-facing-mechanisms">Other compiler-facing mechanisms</h2>
+<p>Only explicitly defined language primitives, generic intrinsics, and lang-item contracts may carry compiler semantics. Recognition uses canonical semantic identity, not the names/layouts of Vec, Box, String, HashMap, HashSet or a custom container. Slice iterator implementation names/layouts are library-owned; the existing compiler coupling is recorded as an architecture gap.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

@@ -1,3 +1,7 @@
+<!-- luna-doc-role: adopted-contract -->
+
+> **Luna 0.1 — adopted-contract.** Retained detailed contract. Prior acceptance and freeze claims remain dated evidence; current release conformance is tracked separately. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # SPEC-HARDENING-01: Borrow, Path-Join, and Closure Non-Lexical Semantic Rules
 
 **Status:** FROZEN & NORMATIVE  

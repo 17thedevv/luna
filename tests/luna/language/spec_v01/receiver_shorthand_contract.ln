@@ -1,0 +1,7 @@
+// Retained Rule K.5 shorthand-equivalence contract.
+struct Item { value: i32, };
+impl Item { fn read(&self) -> i32 { return self.value; } }
+fn main() -> i32 {
+    dec item = Item { value: 42 };
+    return item.read() - 42;
+}

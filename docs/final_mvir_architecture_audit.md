@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](spec/0.1/README.md).
+
 # MVIR Architecture Audit Report: Actual Implementation vs. P0–P6 SSOT
 
 - **Audited Target**: Mellis Compiler Intermediate Representation (`mellis-mvir`), Optimizer Verifier & DCE (`mellis-optimizer`), Borrowck Engine (`mellis-borrowck`), Binary IR Serialization (`mellis-mlib`), and LLVM Codegen (`mellis-backend`)

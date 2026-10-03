@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](spec/0.1/README.md).
+
 # Phase 8: Ecosystem, Standard Library & Advanced Features Plan
 
 Tài liệu này vạch ra kiến trúc và lộ trình triển khai chi tiết cho các tính năng nâng cao còn thiếu ở Backend (LLVM IR Generation) và Middle-End của FD-Lang. Các tính năng này đã được Parser hỗ trợ nhưng cần chuyển đổi thành mã máy LLVM.

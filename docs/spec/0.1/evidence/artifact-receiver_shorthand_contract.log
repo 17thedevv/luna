@@ -1,0 +1,12 @@
+error: Expected parameter name
+  --> C:\Users\84387\.codex\worktrees\a250\fdlang\tests\luna\language\spec_v01\receiver_shorthand_contract.ln:3:21
+   |
+3  | impl Item { fn read(&self) -> i32 { return self.value; } }
+   |                     ^
+
+error: Expected expression.
+  --> C:\Users\84387\.codex\worktrees\a250\fdlang\tests\luna\language\spec_v01\receiver_shorthand_contract.ln:3:56
+   |
+3  | impl Item { fn read(&self) -> i32 { return self.value; } }
+   |                                                        ^
+

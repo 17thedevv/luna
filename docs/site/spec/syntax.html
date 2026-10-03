@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 — syntax</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01--syntax">Luna 0.1 — syntax</h1>
+<p>This is the source-level contract. Formal productions are in <a href="../../grammar.ebnf">grammar.ebnf</a>; coverage limitations are stated there. Parser deviations are tracked separately in <a href="gaps.html">gaps.md</a>.</p>
+<h2 id="identity-names-and-literals">Identity, names and literals</h2>
+<p>Canonical source files use <code>.ln</code>; libraries use <code>.llib</code>. Legacy <code>.ms</code> and <code>.mlib</code> reads are compatibility behavior, not the spelling for new examples. Names are case-sensitive. <code>Self</code> is the current implementing type; <code>self</code> is a receiver value. Literals include integers, floats, booleans, characters, strings, byte literals/strings, and raw strings. Numeric separators and bases follow the lexer contract. Literal acceptance does not prove complete backend support for extreme 128-bit values.</p>
+<p>Primitive types: <code>i8</code>, <code>i16</code>, <code>i32</code>, <code>i64</code>, <code>i128</code>, <code>isize</code>, <code>u8</code>, <code>u16</code>, <code>u32</code>, <code>u64</code>, <code>u128</code>, <code>usize</code>, <code>f32</code>, <code>f64</code>, <code>bool</code>, <code>char</code>, <code>str</code>, and <code>void</code>. Pointer-sized integer width follows the target. Types also include references <code>&amp;T</code>/<code>&amp;rw T</code>, pointers <code>*T</code>/<code>*rw T</code>, arrays <code>[T; N]</code>, slices <code>[T]</code>, tuples, function types <code>fn(T) -&gt; U</code>, nominal generic types and restricted <code>dyn Trait</code>. Unsized types are subject to the semantic value-position restrictions.</p>
+<h2 id="bindings-and-functions">Bindings and functions</h2>
+<pre><code>dec value: i32 = 10;
+dec rw counter: i32 = 0;
+counter = counter + 1;
+const LIMIT: i32 = 20;
+
+fn add(a: i32, b: i32) -&gt; i32 {
+    return a + b;
+}
+
+fn identity&lt;T&gt;(value: T) -&gt; T { return value; }</code></pre>
+<p><code>dec</code> creates a binding; <code>rw</code> grants reassignment. Omitted annotations use type inference where the language permits it. <code>const</code> requires compile-time admission and evaluation; it is not a synonym for an immutable runtime binding. Blocks and declarations use braces; statement terminators use <code>;</code>.</p>
+<h2 id="structs-enums-and-visibility">Structs, enums and visibility</h2>
+<pre><code>export struct Point {
+    x: i32,
+    y: i32,
+    private cache: i32,
+};
+
+enum State { Ready, Value(i32), }
+
+impl Point {
+    fn sum(self: &amp;Self) -&gt; i32 { return self.x + self.y; }
+}</code></pre>
+<p>Struct fields SHALL be separated by commas. A struct declaration ends with one semicolon after its contracts. A declaration is private unless exported. Under the approved <strong>Visibility-02</strong> amendment, a field without a modifier is public; <code>export</code> explicitly says public and <code>private</code> says private. Access requires accessibility of both the containing type and the field. A public field does not make its containing private type accessible. Construction and destructuring must respect private-field restrictions.</p>
+<p>Receivers <code>self</code>, <code>&amp;self</code>, and <code>&amp;rw self</code> retain the defined equivalence to <code>self: Self</code>, <code>self: &amp;Self</code>, and <code>self: &amp;rw Self</code>; a current parser limitation must not silently remove that contract.</p>
+<h2 id="traits-and-generics">Traits and generics</h2>
+<pre><code>trait Measure { fn measure(self: &amp;Self) -&gt; i32; }
+struct Item { amount: i32, };
+impl Measure for Item {
+    fn measure(self: &amp;Self) -&gt; i32 { return self.amount; }
+}
+fn read&lt;T: Measure&gt;(value: &amp;T) -&gt; i32 { return value.measure(); }</code></pre>
+<p>Both type and value generic arguments use <code>&lt;...&gt;</code>, e.g. <code>identity&lt;i32&gt;(3)</code>. Associated types and method-level generics follow the retained trait contract; their symbolic projections must resolve before concrete code generation. Trait object restrictions are stated in <a href="semantics.html">semantics.md</a>.</p>
+<h2 id="control-flow-and-expressions">Control flow and expressions</h2>
+<p><code>if</code>/<code>else</code>, <code>while</code>, <code>for</code>, <code>match</code>, <code>return</code>, <code>break</code>, and <code>continue</code> have their ordinary structured control-flow roles. Match arms use <code>-&gt;</code>, not <code>=&gt;</code>. The retained dual-loop contract defines:</p>
+<pre><code>for (pattern in expression) { ... }
+for (dec rw i = 0; i &lt; limit; i = i + 1) { ... }</code></pre>
+<p><strong>Known parser gap:</strong> current accepted fixtures use <code>for pattern in expression</code> without the surrounding parentheses; the previously defined parenthesized foreach form is not implemented correctly. The baseline retains that contract pending reconciliation rather than claiming both forms are supported.</p>
+<p>Calls, member/index access, qualified paths, arithmetic, comparisons, boolean operations, assignments, pointer/reference operators, casts, aggregate construction, closures, and <code>?</code> are governed by their type/ownership rules. Async suspension is postfix <code>future.await</code>. <code>unsafe { ... }</code> and <code>unsafe fn</code> mark unsafe operations; they do not disable other semantic checks.</p>
+<h2 id="modules-macros-and-contracts">Modules, macros and contracts</h2>
+<pre><code>import &lt;vec&gt;;
+import &quot;geometry&quot;;
+using std as library;
+
+module application { export fn answer() -&gt; i32 { return 42; } }
+
+macro twice { (@value: expr) =&gt; { @value * 2 } }
+
+fn borrow(value: &amp;i32) -&gt; &amp;i32 life_from(value) { return value; }
+struct View { value: &amp;i32, } requires life(value) &gt;= life(self);
+struct Owner { private data: *rw u8, } requires anchor(data) = self;</code></pre>
+<p>Import selects a provider, never a synthetic namespace. Macros use <code>@</code> captures, <code>=&gt;</code> rule separators, and <code>!</code> invocations. Attributes use <code>#[...]</code>; parsing an attribute is not a promise that any arbitrary attribute has executable meaning. Supported attribute contracts must be stated independently.</p>
+<p><code>life_from(a | b)</code> supplies alternative provenance. Relations use <code>requires life(a) &gt;= life(b)</code> or the equivalent <code>&lt;=</code> spelling. A projected <code>life(...)</code> target does not grant a raw pointer a safe origin. Anchor contracts apply to direct pointer fields, separately from lifetime relations.</p>
+<h2 id="rejected-spellings">Rejected spellings</h2>
+<p>New Luna 0.1 code MUST NOT use <code>let</code>, <code>mut</code>, <code>use</code>, <code>mod</code>, Rust lifetime generic parameters, <code>::&lt;&gt;</code>, <code>@&lt;...&gt;</code> generics, <code>$</code> macro captures, prefix <code>await</code>, bare <code>using path;</code>, <code>using namespace</code>, <code>export using</code>, <code>export import</code>, or file-level <code>module name;</code>. <code>where outlives(...)</code> is a removed surface spelling; its relation is written using <code>requires life(...)</code>. Imports omit source/artifact extensions. Historical examples using these spellings are not current examples.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

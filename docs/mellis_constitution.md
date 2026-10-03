@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](spec/0.1/README.md).
+
 # Mellis Constitution (Hiến pháp Mellis)
 
 Mellis is a **Large-Scale Systems Language**, designed for architectures spanning hundreds of thousands to millions of lines of code. It does not aim to replace Rust or optimize for quick scripting (Luna handles that), but rather to combine the philosophies of three distinct languages into a unique reason to exist.

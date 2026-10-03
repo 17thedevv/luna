@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # Compiler Gap Freeze Audit: C-GAP-04, C-GAP-05, C-GAP-06
 
 **Date:** 2026-09-15  

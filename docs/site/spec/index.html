@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 specification</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01-specification">Luna 0.1 specification</h1>
+<p>Contract baseline: <strong>0.1</strong>. Release conformance: <strong>BLOCKED / NOT VERIFIED</strong>. Consolidated 2026-10-03 at compiler revision <code>3dac3ac</code>.</p>
+<p>This specification retains previously defined language contracts even where the implementation is incomplete. Compiler acceptance, a historical freeze report, and successful execution of one program do not redefine a contract. Known failures and remaining design questions belong in <a href="gaps.html">gaps.md</a>. This consolidation does not declare the compiler or the release frozen.</p>
+<h2 id="authority-and-document-roles">Authority and document roles</h2>
+<p class="list-item">1. The versioned specification and the adopted contract documents listed below</p>
+<p>   define the Luna 0.1 contract. MUST, MUST NOT, and SHALL are requirements.</p>
+<p class="list-item">2. Implementation and executable tests establish conformance or a gap; a</p>
+<p>   conflicting implementation is not automatically the specification.</p>
+<p class="list-item">3. Reference pages, agent skills, and website pages explain these requirements.</p>
+<p class="list-item">4. Plans, RFC proposals without adoption, old status pages, and audit reports</p>
+<p>   record history or evidence. They cannot independently add a 0.1 feature or    establish current release readiness.</p>
+<p>Where retained contracts disagree and no subsequent adopted amendment resolves the conflict, the decision remains explicit in the gap register. Do not choose a convenient interpretation silently.</p>
+<p>Language version <strong>0.1</strong> is distinct from runtime ABI revision, artifact format version, and contract identifiers such as REGION-SPEC-01 or RAW-STORAGE-ANCHOR-v1. Their existing revision numbers and prior adoption decisions remain meaningful; they are not claims that Luna language version 1.0 has shipped.</p>
+<h2 id="chapters">Chapters</h2>
+<table>
+<tr><th>Chapter</th><th>Scope</th></tr>
+<tr><td><a href="syntax.html">Syntax</a></td><td>Canonical spelling, declarations, expressions, rejected legacy syntax</td></tr>
+<tr><td><a href="semantics.html">Semantics</a></td><td>Types, ownership, traits, lifetime relations, unsafe, FFI, async, comptime</td></tr>
+<tr><td><a href="macros.html">Macros and compiler boundary</a></td><td>Generic expansion; prohibition of library-name mappings</td></tr>
+<tr><td><a href="modules.html">Modules and artifacts</a></td><td>Providers, namespaces, visibility, bootstrap, identity and parity</td></tr>
+<tr><td><a href="stdlib.html">Standard library</a></td><td>Component inventory, public contracts and invariant requirements</td></tr>
+<tr><td><a href="runtime.html">Runtime</a></td><td>ABI identity, allocation, process entry, I/O and target evidence</td></tr>
+<tr><td><a href="conformance.html">Conformance</a></td><td>Diagnostics, evidence levels and release gates</td></tr>
+<tr><td><a href="gaps.html">Gaps</a></td><td>Confirmed defects, unavailable evidence and unresolved specification debt</td></tr>
+<tr><td><a href="../../documentation-index.md">Document inventory</a></td><td>Role and owning chapter of repository documentation</td></tr>
+</table>
+<h2 id="adopted-detailed-contracts">Adopted detailed contracts</h2>
+<p>These documents retain their detailed rules as part of the baseline. Statements about past test runs or implementation completion remain dated evidence.</p>
+<table>
+<tr><th>Contract</th><th>Detailed source</th></tr>
+<tr><td>Core semantic rules A–K</td><td><a href="../../normative-rules-p0-p1.md">Normative rules</a></td></tr>
+<tr><td>Lifetime relation algebra</td><td><a href="../../../luna-rs/docs/spec/lifetime-formalism.md">REGION-SPEC-01</a></td></tr>
+<tr><td>Borrow joins, carried references, closure escape</td><td><a href="../../../luna-rs/docs/spec-hardening-borrow-closure.md">SPEC-HARDENING-01</a></td></tr>
+<tr><td>FFI reference and aggregate restrictions</td><td><a href="../../../luna-rs/docs/spec-hardening-ffi-contracts.md">SPEC-HARDENING-02</a></td></tr>
+<tr><td>Raw pointer validity and unsafe</td><td><a href="../../../luna-rs/docs/memory/raw-pointer-unsafe-semantics.md">Raw-pointer semantics</a></td></tr>
+<tr><td>Logical owner storage anchors</td><td><a href="../../../luna-rs/docs/raw_storage_anchor_v1.md">RAW-STORAGE-ANCHOR-v1</a></td></tr>
+<tr><td>Lifetime elision</td><td><a href="../../../.agents/skills/luna-semantic-compliance/references/lle_v1_rfc.md">LLE-v1</a></td></tr>
+<tr><td>Independent type/field visibility</td><td><a href="../../../.agents/skills/luna-semantic-compliance/references/visibility-02-public-field-default-rfc.md">Approved Visibility-02 amendment</a></td></tr>
+<tr><td>Logical standard namespace</td><td><a href="../../../luna-rs/docs/std_namespace_01_canonical_namespace.md">STD-NAMESPACE-01</a></td></tr>
+<tr><td>Whole-file APIs</td><td><a href="../../../luna-rs/docs/whole_file_io_v1.md">Whole-file I/O v1</a></td></tr>
+<tr><td>Formatting foundation</td><td><a href="../../../luna-rs/docs/phase6_core_formatting_v1.md">Formatting v1</a></td></tr>
+<tr><td>Canonical identity and legacy reads</td><td><a href="../../project/rename-luna-v1.md">Rename compatibility contract</a></td></tr>
+<tr><td>Diagnostic identity and structure</td><td><a href="../../diagnostics/diagnostics-v1.md">Diagnostics contract</a></td></tr>
+<tr><td>Core runtime ABI</td><td><a href="../../runtime/abi-v1.md">ABI contract</a></td></tr>
+</table>
+<p>New behavior requires an explicit contract amendment, implementation, and appropriate conformance evidence. A roadmap entry or a new annotation alone is insufficient.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

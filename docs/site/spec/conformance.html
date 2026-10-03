@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 — conformance and release gates</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01--conformance-and-release-gates">Luna 0.1 — conformance and release gates</h1>
+<p>Contract status and implementation status are separate. An adopted rule remains a requirement while its implementation can be partial, broken or unverified. This specification refresh is not a compiler repair or a release certification.</p>
+<h2 id="status-vocabulary">Status vocabulary</h2>
+<table>
+<tr><th>Status</th><th>Meaning</th></tr>
+<tr><td>ADOPTED CONTRACT</td><td>Requirement retained from an approved/frozen rule or this explicitly requested baseline consolidation</td></tr>
+<tr><td>PROPOSED / DECISION REQUIRED</td><td>A contract amendment or unresolved choice; not silently a release requirement</td></tr>
+<tr><td>CONFORMANT IN TESTED SCOPE</td><td>Named positive/negative behavior verified on stated target and source/artifact paths</td></tr>
+<tr><td>PARTIAL</td><td>Some required cases/stages have evidence; the whole contract does not</td></tr>
+<tr><td>BROKEN</td><td>A reproduced defect contradicts a requirement</td></tr>
+<tr><td>UNVERIFIED</td><td>Evidence is absent or could not finish</td></tr>
+<tr><td>DEFERRED</td><td>Explicitly outside the adopted capability scope</td></tr>
+</table>
+<p>Historical FROZEN labels record previous decisions and dated acceptance, not blanket current release completion. READY FOR DESIGN/FREEZE REVIEW is not FROZEN.</p>
+<h2 id="diagnostics">Diagnostics</h2>
+<p>Retain DIAG-1–DIAG-10: typed stable codes, source spans for source errors, structured related spans, poison containment, deterministic order/deduplication, phase ownership, origin traceability and registry parity. Rendering wording is not diagnostic identity. A timeout or stack overflow is not an appropriate substitute for a source rejection. Registry documentation must distinguish normative coverage requirements from a claim that every current error path already satisfies them.</p>
+<h2 id="required-acceptance-boundaries">Required acceptance boundaries</h2>
+<p class="list-item">1. Language and library behavior: real <code>.ln</code> fixtures via the public Luna CLI,</p>
+<p>   checking exit, stdout/stderr and appropriate rejection.</p>
+<p class="list-item">2. Provider parity: source-only and freshly built artifact-only roots with no</p>
+<p>   relevant source fallback. Invalid artifact selection must reject.</p>
+<p class="list-item">3. Compiler invariants: focused Rust tests may inspect semantic/MVIR/backend</p>
+<p>   state. They complement, not replace, executable evidence.</p>
+<p class="list-item">4. Ownership: positive cleanup counts plus negative move, borrow, escape and</p>
+<p>   initialization cases. A single successful compilation is insufficient.</p>
+<p class="list-item">5. Determinism: repeated compilation for collision/order-sensitive cases,</p>
+<p>   including user-defined types independent of the original stdlib trigger.</p>
+<p class="list-item">6. Target claims: runtime ABI, linker and executable evidence per advertised</p>
+<p>   target/profile. A Windows pass cannot certify POSIX or freestanding behavior.</p>
+<h2 id="release-01-gate">Release 0.1 gate</h2>
+<p>Before declaring the release conformant, address confirmed compiler/library and architecture gaps; resolve normative disagreements without silent syntax changes; regenerate sysroot artifacts through the official path; run required focused and relevant workspace regressions; verify diagnostics and parity; and publish the exact supported target matrix and any accepted deferrals.</p>
+<p>Current readiness is <strong>BLOCKED</strong> by <a href="gaps.html">gaps.md</a>. The latest audit built all providers and completed substantial checks, but did not complete all compiler tests, sanitizer/fuzzing, all targets or all generic/data domains. Historical green test counts do not supersede a later counterexample.</p>
+<h2 id="documentation-refresh-validation">Documentation refresh validation</h2>
+<p>Local documentation consistency is checked with <code>python docs/tools/validate_v01_docs.py</code>. It validates current links, authority roles, provider/hook inventories and generated pages. <code>python docs/tools/check_v01_examples.py</code> records CLI examples and known grammar failures in both source/artifact modes. These two commands intentionally separate documentation consistency from compiler conformance; known failures are retained in their evidence, not converted into success expectations.</p>
+<p>The CLI recorder defaults to the Windows debug executable and the audited GNU runtime archive. Other build locations can be selected with <code>LUNA_DOCS_CLI</code> and <code>LUNA_RUNTIME_LIB</code>; <code>LUNA_DOCS_TOOLCHAIN_PATH</code> optionally prepends toolchain directories to PATH, and <code>LUNA_DOCS_TEMP</code> selects temporary storage. Rebuild the matching CLI, runtime and sysroot artifacts before collecting new evidence.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

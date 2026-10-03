@@ -1,8 +1,14 @@
-# Mellis Normative Language Rules: Foundations (P0 & P1)
+<!-- luna-doc-role: adopted-contract -->
 
-## Status: FROZEN (v1.0)
-**Context**: Finalized following *Mellis Language Semantic Audit (Specification-Level)*.  
-**Purpose**: Establish four foundational, mathematically sound normative rules to serve as the unshakeable source of truth for the Mellis type system, borrow checker, and compiler architecture.
+> **Luna 0.1 — adopted-contract.** Retained detailed contract. Prior acceptance and freeze claims remain dated evidence; current release conformance is tracked separately. See the [versioned specification](spec/0.1/README.md).
+
+# Luna 0.1 — retained normative language rules A–K
+
+## Status: retained adopted contracts; current conformance tracked separately
+
+Language baseline: [Luna 0.1](spec/0.1/README.md). Prior freeze decisions remain contract history, not a blanket certification of the current implementation. See [gaps](spec/0.1/gaps.md).
+**Context**: Finalized following *Luna Language Semantic Audit (Specification-Level)*.
+**Purpose**: Establish four foundational, mathematically sound normative rules to serve as the unshakeable source of truth for the Luna type system, borrow checker, and compiler architecture.
 
 ---
 
@@ -25,7 +31,7 @@ A concrete type cannot satisfy both `Copy` and `Drop`.
    - A composite type (struct, enum, tuple) cannot satisfy or derive `Copy` if any transitive field $f_i$ satisfies `Drop`.
 4. **Separation from Generic Bounds**:
    - The invariant applies strictly to **concrete types**.
-   - A generic bound such as `fn foo<T: Copy + Drop>(x: T)` specifies an impossible constraint for any valid Mellis type. Whether the compiler rejects this bound at definition-time (via an optional bound-consistency checker) or at instantiation-time (when no concrete type can satisfy both) is a diagnostic design choice, and does not alter the core invariant.
+   - A generic bound such as `fn foo<T: Copy + Drop>(x: T)` specifies an impossible constraint for any valid Luna type. Whether the compiler rejects this bound at definition-time (via an optional bound-consistency checker) or at instantiation-time (when no concrete type can satisfy both) is a diagnostic design choice, and does not alter the core invariant.
 
 ---
 
@@ -136,7 +142,7 @@ $$\forall \text{Future } F, \forall \text{Place } p, q \in \text{Env}(F), \quad 
 3. **Future Loan Lifecycle**:
    - A `FutureLoan` attached to a future remains active while the future place/value is live under NLL.
    - Moving a future (`fut1 -> fut2`) transfers the `FutureLoan` obligation and provenance to `fut2`.
-   - When the future terminates (via normal completion / consumption `await fut`, explicit destruction `drop(fut)`, or scope exit), the loan terminates.
+   - When the future terminates (via normal completion / consumption `fut.await`, explicit destruction `drop(fut)`, or scope exit), the loan terminates.
 
 ---
 
@@ -145,7 +151,7 @@ $$\forall \text{Future } F, \forall \text{Place } p, q \in \text{Env}(F), \quad 
 ### F.1 Core Invariant
 $$\forall T, \quad \text{needs\_drop}(\text{Future}<T>) = \text{true}$$
 
-Every Mellis `Future<T>` owns a runtime execution environment (`EnvStruct`) whose destruction requires a specialized future destructor `{func}_drop`, regardless of whether $T$ implements `Drop`.
+Every Luna `Future<T>` owns a runtime execution environment (`EnvStruct`) whose destruction requires a specialized future destructor `{func}_drop`, regardless of whether $T$ implements `Drop`.
 
 ### F.2 State-Dispatched Cleanup Protocol
 Future destruction is dispatched based on the dynamic state discriminant stored in the environment:
@@ -294,9 +300,9 @@ $$\text{InUnsafeContext} \not\implies \text{BypassBorrowck}$$
 $$\forall T \in \text{Types}, \quad \text{is\_unsized}(T) \iff T \in \{\text{dyn Trait}, [U]\}$$
 $$\forall v \in \text{ValuePositions}, \quad \text{type\_of}(v) = T \land \text{is\_unsized}(T) \implies \text{Error}(\text{E\_UNSIZED\_TYPE\_IN\_VALUE\_POSITION})$$
 
-1. **Unsized Types in Mellis v1**:
+1. **Unsized Types in Luna v1**:
    - `dyn Trait` (trait object dynamically sized type) and `[T]` (dynamically sized slice type) are unsized.
-   - Mellis v1 does **not** introduce an implicit `T: Sized` trait solver bound. Instead, the type checker directly rejects unsized types in all value positions:
+   - Luna v1 does **not** introduce an implicit `T: Sized` trait solver bound. Instead, the type checker directly rejects unsized types in all value positions:
      - Variable declarations (`dec x: dyn Trait`, `dec x: [T]`)
      - Function parameters (`fn f(x: dyn Trait)`)
      - Function return types (`fn f() -> dyn Trait`)
@@ -331,7 +337,7 @@ $$\text{Representation}(\&\text{dyn Trait}) = \text{Representation}(*\text{dyn T
 2. **Trait Object Fat Pointers**:
    A 2-word aggregate `{ data: ptr, vtable: ptr }`. `data` points to the concrete payload; `vtable` points to the statically initialized global vtable for that `(Trait, ConcreteType)` pair.
 
-### I.4 Mellis Trait Object ABI v1
+### I.4 Luna Trait Object ABI v1
 $$\text{VtableLayout} = [ \text{drop\_glue}: *\text{Void}, \, \text{size}: \text{usize}, \, \text{align}: \text{usize}, \, \text{method}_0, \, \text{method}_1, \dots ]$$
 
 1. **Slot Allocation**:
@@ -403,13 +409,13 @@ All compiler phases must recursively traverse `Decl::Module` subtrees:
 ### J.4 Rule M3: Multi-Provider Namespace Aggregation
 $$\text{Provider}(P_1) \cup \text{Provider}(P_2) \longrightarrow \text{Namespace}(N)$$
 
-Per Mellis Rule 7, providers and module namespaces are orthogonal:
+Per Luna Rule 7, providers and module namespaces are orthogonal:
 1. Multiple providers (e.g. `alloc.ms` and `core.ms`) may contribute declarations to the same public module namespace (e.g. `module std { ... }`).
 2. Provider export extraction (`extract_scope`) recurses into `SymbolKind::Module` without filtering on `provider_id`. Child declarations retain individual provider ownership.
 3. Symbol injection merges contributions into existing module scopes without overwriting or discarding declarations from preceding providers.
 
 ### J.5 Rule M5: Syntax Containment & Re-Export Diagnostics
-1. Mellis v1 does not support re-exporting modules via imports or aliases.
+1. Luna v1 does not support re-exporting modules via imports or aliases.
 2. `export using` and `export import` are strictly prohibited and must emit clear compile-time diagnostics. Neither construct may silently succeed or silently no-op.
 
 ### J.6 Negative Pipeline Invariant
@@ -423,20 +429,20 @@ Any failure during module resolution, file parsing, cyclic detection, or visibil
 ### K.1 Core Invariant: Grammar Authority & Isomorphism
 $$\text{AST accepted by parser} \iff \text{Exactly defined by grammar.ebnf} \iff \text{Exactly supported by parser} \iff \text{No accepted syntax silently ignored}$$
 
-The `mellis-grammar` skill and `grammar.ebnf` are the canonical Single Source of Truth for Mellis syntax. No syntax may be accepted by the parser unless formalized in `grammar.ebnf`, and no accepted syntax may be silently ignored or discarded.
+The versioned Luna 0.1 syntax chapter, adopted detailed contracts, and `grammar.ebnf` define the syntax contract; `mellis-grammar` is operational guidance referencing them. No syntax may be accepted by the parser unless formalized in `grammar.ebnf`, and no accepted syntax may be silently ignored or discarded.
 
 ### K.2 Struct Field Delimiter Invariant
 $$\text{struct\_body} ::= \text{"\{" } (\text{struct\_field } (\text{"," } \text{struct\_field})^* \text{","}? )? \text{ "\}"}$$
 
-Struct fields strictly use comma `,` delimiters (`struct Point { x: f64, y: f64 }`). Semicolons `;` as struct field separators are excluded from the v1.0 standard syntax to ensure unambiguous formatting, macro expansion, and syntax tooling.
+Struct fields strictly use comma `,` delimiters (`struct Point { x: f64, y: f64 };`). Semicolons `;` as struct field separators are excluded from the 0.1 standard syntax to ensure unambiguous formatting, macro expansion, and syntax tooling.
 
 ### K.3 Postfix Await Operator Invariant
 $$\text{postfix\_op} ::= \dots \mid \text{"." } \text{KW\_AWAIT}$$
 
-Mellis v1.0 strictly standardizes on postfix `.await` (`expr.await`). Prefix `await expr` is forbidden to eliminate operator precedence ambiguities (e.g. `await foo().bar()`) and align with the postfix member-access hierarchy (`.field`, `.method()`, `[i]`, `.await`).
+Luna 0.1 strictly standardizes on postfix `.await` (`expr.await`). Prefix `await expr` is forbidden to eliminate operator precedence ambiguities (e.g. `await foo().bar()`) and align with the postfix member-access hierarchy (`.field`, `.method()`, `[i]`, `.await`).
 
 ### K.4 Dual Loop Invariant (Foreach & C-style)
-Mellis supports two complementary loop constructs:
+Luna supports two complementary loop constructs:
 1. **Foreach Loop**: `for ( <pattern> in <expression> ) block_stmt`
 2. **C-style Index Loop**: `for ( <for_init>? ; <expression>? ; <expression>? ) block_stmt`
 The two loop forms have disjoint syntactic heads and are parsed without ambiguous heuristics.
@@ -461,3 +467,12 @@ $$\text{Provider(Artifact/File)} \ne \text{Namespace(Module)}$$
 $$\text{using\_decl} ::= \text{"using" } \text{module\_path } \text{"as" } \text{IDENTIFIER } \text{";"}$$
 
 `using` creates a compilation-local alias to a qualified module namespace path. It does not export (`export using` is a syntax error), does not glob, and does not load providers.
+
+
+## Adopted amendments and current gaps
+
+Visibility-02 independently declares unmodified fields public, export fields public, and private fields private; containing type accessibility is checked first. The approved amendment supersedes older field-private-default guidance.
+
+Rule K.4 retains the parenthesized foreach contract; the current parser uses an unparenthesized head. Rule K.5 shorthand equivalence remains required even where implementation evidence is incomplete. Struct field semicolons currently parse despite Rule K.2. These are tracked in the 0.1 gap register, not resolved by weakening this document.
+
+The consolidated EBNF is explicitly incomplete; K.1 is a target conformance invariant, not a claim that the current grammar and parser are already isomorphic.

@@ -1,0 +1,3 @@
+macro outln { (@value: expr) => { @value } }
+macro twice { (@value: expr) => { @value * 2 } }
+fn main() -> i32 { return outln!(twice!(21)) - 42; }

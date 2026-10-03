@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](spec/0.1/README.md).
+
 # Implementation Plan: MVIR Architecture & Memory Lifecycle Resolution (P0–P6 SSOT v3)
 
 Resolve the 3 architectural blockers and 4 refinements identified in the reviewer audit to achieve complete, mathematically sound conformance across `luna-mvir`, `luna-optimizer`, `luna-borrowck`, and `luna-backend`.

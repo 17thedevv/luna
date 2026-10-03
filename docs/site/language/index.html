@@ -1,106 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Language · Luna Docs</title>
-    <link rel="stylesheet" href="../styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="container nav-wrap">
-        <div class="brand">Luna</div>
-        <nav class="nav" aria-label="Main navigation">
-          <a href="../index.html">Home</a>
-          <a href="index.html">Language</a>
-          <a href="../compiler/index.html">Compiler</a>
-          <a href="../stdlib/index.html">Standard Library</a>
-          <a href="../examples/index.html">Examples</a>
-          <a href="../design/index.html">Design Decisions</a>
-          <a href="../roadmap/index.html">Roadmap</a>
-        </nav>
-      </div>
-    </header>
-
-    <main>
-      <section class="section">
-        <div class="container">
-          <div class="section-heading">
-            <p class="eyebrow">Language</p>
-            <h1>Overview</h1>
-          </div>
-
-          <div class="card strip">
-            <p>
-              Luna is a systems-oriented language designed around explicit ownership,
-              expression-oriented syntax, strong static typing, and compiler-driven code
-              generation. The language is intended to be fast, predictable, and readable
-              while still retaining the low-level control needed for systems work.
-            </p>
-          </div>
-
-          <div class="grid two-col">
-            <article class="card">
-              <h3>Syntax</h3>
-              <p>
-                The syntax favors compact declarations, block expressions, and direct
-                control flow. Function bodies can express values implicitly and keep the
-                reading model close to the compiler’s internal AST.
-              </p>
-            </article>
-
-            <article class="card">
-              <h3>Types</h3>
-              <p>
-                Luna includes primitives, arrays, tuples, structs, enums, closures, and
-                generic abstractions. Type inference is used where it helps readability,
-                while explicit annotations remain available when needed.
-              </p>
-            </article>
-
-            <article class="card">
-              <h3>Ownership &amp; Borrowing</h3>
-              <p>
-                Ownership keeps the lifetime story explicit. Borrowing allows temporary,
-                non-owning access with compiler checks that preserve memory safety without
-                introducing a heavy runtime model.
-              </p>
-            </article>
-
-            <article class="card">
-              <h3>Generics &amp; Traits</h3>
-              <p>
-                Generic programming is powered by type parameters and trait constraints,
-                allowing code reuse without inheritance-heavy object modeling.
-              </p>
-            </article>
-
-            <article class="card">
-              <h3>Closures</h3>
-              <p>
-                Closures capture environment state and behave like first-class values,
-                enabling functional style patterns while preserving static analysis.
-              </p>
-            </article>
-
-            <article class="card">
-              <h3>Pattern Matching</h3>
-              <p>
-                Pattern matching is a core form of control flow. It is used for enum
-                handling, tuple destructuring, and structured value analysis with exhaustive
-                checks.
-              </p>
-            </article>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="footer">
-      <div class="container footer-inner">
-        <span>Luna Docs</span>
-        <span>Language</span>
-      </div>
-    </footer>
-  </body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 documentation</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="../spec/index.html">Spec 0.1</a> <a href="../spec/gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1>Luna 0.1 documentation</h1><p>Defined contracts are retained. Implementation failures and missing evidence are tracked separately; the baseline is not release certification.</p><p><a href="../spec/syntax.html">Syntax</a></p><p><a href="../spec/semantics.html">Semantics</a></p><p><a href="../spec/macros.html">Macros</a></p><p><a href="../spec/modules.html">Modules</a></p><p><a href="../spec/stdlib.html">Stdlib</a></p><p><a href="../spec/runtime.html">Runtime</a></p><p><a href="../spec/conformance.html">Conformance</a></p><p><a href="../spec/gaps.html">Gaps</a></p><h2>Canonical example</h2><pre><code>struct Point { x: i32, y: i32, };
+fn main() -&gt; i32 {
+    dec p = Point { x: 10, y: 20 };
+    dec rw value = p.x + p.y;
+    value = value + 12;
+    return value - 42;
+}</code></pre><p>Field default: public under Visibility-02; containing type accessibility is independent. Removed spellings and current grammar disagreements are documented in Syntax/Gaps.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

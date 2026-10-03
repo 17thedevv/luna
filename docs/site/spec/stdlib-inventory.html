@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 provider inventory</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01-provider-inventory">Luna 0.1 provider inventory</h1>
+<p>Generated from <a href="../../../luna-rs/libs/external/sysroot.toml">sysroot.toml</a>. Provider identity is not a namespace or a completeness claim.</p>
+<p>Baseline: <strong>32 providers</strong>. Public/internal visibility controls import access, separately from exported declarations.</p>
+<table>
+<tr><th>Provider</th><th>Source component</th><th>Import visibility</th><th>Contract family</th></tr>
+<tr><td><code>result</code></td><td><a href="../../../luna-rs/libs/external/core/result.ln">core/result.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>ptr</code></td><td><a href="../../../luna-rs/libs/external/core/ptr.ln">core/ptr.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>slice</code></td><td><a href="../../../luna-rs/libs/external/core/slice.ln">core/slice.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>mem</code></td><td><a href="../../../luna-rs/libs/external/core/mem.ln">core/mem.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>cmp</code></td><td><a href="../../../luna-rs/libs/external/core/cmp.ln">core/cmp.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>hash</code></td><td><a href="../../../luna-rs/libs/external/core/hash.ln">core/hash.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>clone</code></td><td><a href="../../../luna-rs/libs/external/core/clone.ln">core/clone.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>copy</code></td><td><a href="../../../luna-rs/libs/external/core/copy.ln">core/copy.ln</a></td><td>public</td><td>copy</td></tr>
+<tr><td><code>iter_adapters</code></td><td><a href="../../../luna-rs/libs/external/core/iter_adapters.ln">core/iter_adapters.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>iter_consumers</code></td><td><a href="../../../luna-rs/libs/external/core/iter_consumers.ln">core/iter_consumers.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>try</code></td><td><a href="../../../luna-rs/libs/external/core/try.ln">core/try.ln</a></td><td>public</td><td>try</td></tr>
+<tr><td><code>io</code></td><td><a href="../../../luna-rs/libs/external/io/io.ln">io/io.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>file</code></td><td><a href="../../../luna-rs/libs/external/file/file.ln">file/file.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>path</code></td><td><a href="../../../luna-rs/libs/external/path/path.ln">path/path.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>num</code></td><td><a href="../../../luna-rs/libs/external/core/num.ln">core/num.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>default</code></td><td><a href="../../../luna-rs/libs/external/core/default.ln">core/default.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>convert</code></td><td><a href="../../../luna-rs/libs/external/core/convert.ln">core/convert.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>float</code></td><td><a href="../../../luna-rs/libs/external/core/float.ln">core/float.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>fmt</code></td><td><a href="../../../luna-rs/libs/external/core/fmt.ln">core/fmt.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>box</code></td><td><a href="../../../luna-rs/libs/external/alloc/box.ln">alloc/box.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>vec</code></td><td><a href="../../../luna-rs/libs/external/alloc/vec.ln">alloc/vec.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>string</code></td><td><a href="../../../luna-rs/libs/external/alloc/string.ln">alloc/string.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>hashmap</code></td><td><a href="../../../luna-rs/libs/external/alloc/hashmap.ln">alloc/hashmap.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>hashset</code></td><td><a href="../../../luna-rs/libs/external/alloc/hashset.ln">alloc/hashset.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>iter_collect</code></td><td><a href="../../../luna-rs/libs/external/alloc/iter_collect.ln">alloc/iter_collect.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>panic</code></td><td><a href="../../../luna-rs/libs/external/core/panic.ln">core/panic.ln</a></td><td>public</td><td>ordinary provider</td></tr>
+<tr><td><code>__alloc_global</code></td><td><a href="../../../luna-rs/libs/external/alloc/global.ln">alloc/global.ln</a></td><td>internal</td><td>ordinary provider</td></tr>
+<tr><td><code>__raw_table</code></td><td><a href="../../../luna-rs/libs/external/alloc/raw_table.ln">alloc/raw_table.ln</a></td><td>internal</td><td>ordinary provider</td></tr>
+<tr><td><code>__lang_drop</code></td><td><a href="../../../luna-rs/libs/external/lang/drop.ln">lang/drop.ln</a></td><td>internal</td><td>drop</td></tr>
+<tr><td><code>__lang_option</code></td><td><a href="../../../luna-rs/libs/external/lang/option.ln">lang/option.ln</a></td><td>internal</td><td>option</td></tr>
+<tr><td><code>__lang_iterator</code></td><td><a href="../../../luna-rs/libs/external/lang/iterator.ln">lang/iterator.ln</a></td><td>internal</td><td>iterator</td></tr>
+<tr><td><code>__lang_into_iterator</code></td><td><a href="../../../luna-rs/libs/external/lang/into_iterator.ln">lang/into_iterator.ln</a></td><td>internal</td><td>into_iterator</td></tr>
+</table>
+<p>Component builds and API conformance are separate. See <a href="stdlib.html">stdlib.md</a> and <a href="gaps.html">gaps.md</a>.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

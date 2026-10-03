@@ -1,0 +1,7 @@
+export module geometry {
+    export struct Point { x: i32, y: i32, };
+}
+fn main() -> i32 {
+    dec point = geometry::Point { x: 10, y: 32 };
+    return point.x + point.y - 42;
+}

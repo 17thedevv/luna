@@ -1,0 +1,4 @@
+fn main(args: [str]) -> i32 {
+    if args.len() == (0 as usize) { return 1; }
+    return 0;
+}

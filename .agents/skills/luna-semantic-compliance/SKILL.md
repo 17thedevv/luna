@@ -3,6 +3,10 @@ name: luna-semantic-compliance
 description: Mandatory semantic compliance protocol for Luna language. Enforces writing canonical Luna syntax and genuine Luna semantic contracts instead of Rust/C++/LLVM assumptions.
 ---
 
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../../docs/spec/0.1/README.md).
+
 # Luna Semantic Compliance Protocol
 
 ## Purpose
@@ -53,7 +57,7 @@ When determining Luna behavior, consult sources in this order:
 Normative language specification and frozen design documents.
 - Surface syntax specification
 - Semantic core specification
-- Lifetime relation model specification (`life_from`, `where outlives`)
+- Lifetime relation model specification (`life_from`, `requires life(...)`)
 - Module/import specification (Provider vs Namespace)
 - Runtime ABI specification
 - MVIR memory lifecycle specification
@@ -178,7 +182,7 @@ No prefix `await expression`.
 Struct field visibility is independent from struct type visibility. The semantic contracts are strictly frozen:
 
 - **VIS-STRUCT-1**: Field visibility is independent from struct visibility.
-- **VIS-STRUCT-2**: A private struct cannot export fields (`Struct field cannot be declared 'export' in a private struct`).
+- **VIS-STRUCT-2**: Superseded by approved Visibility-02; private types may declare public fields, but containing type accessibility remains mandatory.
 - **VIS-STRUCT-3**: Private field access is permitted only from the field's defining module scope and allowed descendants (ancestor rule).
 - **VIS-STRUCT-4**: Struct type visibility is checked before field visibility.
 - **VIS-STRUCT-5**: External construction requires access to every required/private field. Struct literals cannot be constructed from an external scope if the struct contains any private fields.
@@ -189,11 +193,12 @@ Struct field visibility is independent from struct type visibility. The semantic
   4. Struct literal construction: `User { name: ..., password: ... }`
   5. Destructuring / pattern match: `match u { User { password, .. } -> { ... } }`
   6. Nested field projection: `acc.user.password`
+- **VIS-STRUCT-8**: Unmodified fields are public; `private` makes a field private.
 - **VIS-STRUCT-7**: Source `.ln` and `.llib` preserve identical field visibility semantics across binary boundaries.
 
 Key Regression Matrix:
 - `export struct + private field`: Valid declaration; private fields accessible within defining module/descendants, rejected externally.
-- `struct + export field`: Rejected at resolver phase (`VIS-STRUCT-2`).
+- `struct + export field`: Valid declaration under Visibility-02; a private containing type still blocks inaccessible external use.
 - `nested module access`: Allowed if accessing scope is a descendant of the defining module scope; rejected for sibling or parent modules without permission.
 - `external provider`: Private fields strictly rejected across provider boundaries.
 
@@ -251,7 +256,7 @@ fn pick(a: &i32, b: &i32) -> &i32 life_from(a | b) {
 // Outlives constraint (longer >= shorter)
 fn merge(a: &i32, b: &i32) -> &i32
     life_from(a)
-    where outlives(a, b)
+    requires life(a) >= life(b)
 {
     return a;
 }
@@ -265,14 +270,14 @@ Semantic interpretation:
 When implementing lifetime-aware stdlib APIs, the agent MUST use these relations. Do not rely on implicit lifetime assumptions merely because an API "looks like" a Rust equivalent.
 
 > [!NOTE]
-> **Lifetime Elision (LLE-v1)** is frozen. When `life_from` or `where outlives` can be unambiguously inferred from a single legal provenance candidate, the programmer may omit the annotation. See [LLE-v1 RFC](file:///d:/fdlang/.agents/skills/luna-semantic-compliance/references/lle_v1_rfc.md) for the complete inference rules and per-dimension suppression semantics.
+> **Lifetime Elision (LLE-v1)** is frozen. When `life_from` or `requires life(...)` can be unambiguously inferred from a single legal provenance candidate, the programmer may omit the annotation. See [LLE-v1 RFC](references/lle_v1_rfc.md) for the complete inference rules and per-dimension suppression semantics.
 
 ---
 
 # 6. Provenance Is Semantic Contract, Not Borrowck Implementation Detail
 
 The agent must distinguish:
-- **Semantic contract**: `life_from(...)`, `where outlives(...)`, `CanonicalLifetimeContract`.
+- **Semantic contract**: `life_from(...)`, `requires life(a) >= life(b)`, `CanonicalLifetimeContract`.
 - **Derived implementation analysis**: `ReturnEffect`, `CallEffectSummary`, `Loan`, `direct_provenance`, `carried_provenance`.
 
 Never make an ABI or `.llib` public contract depend directly on Borrowck internal implementation structures. `.llib` preserves canonical semantic lifetime contracts (`CanonicalLifetimeContract`), not internal Borrowck objects.
@@ -294,7 +299,7 @@ Any Luna API returning a reference MUST answer:
   ```
 - If a required lifetime ordering exists:
   ```rust
-  where outlives(longer, shorter)
+  requires life(longer) >= life(shorter)
   ```
 
 Do NOT silently return borrowed values without checking whether the language contract requires an explicit relation.
@@ -341,7 +346,7 @@ The source and binary path must preserve identical semantics.
 
 For lifetime-aware signatures, verify:
 - `life_from(...)`
-- `where outlives(...)`
+- `requires life(a) >= life(b)`
 - return reference type
 - 0-indexed parameter positions
 - trait method lifetime contracts
