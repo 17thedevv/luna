@@ -116,6 +116,9 @@ impl InterfaceDecoder {
                 SemanticType::Primitive(b) => {
                     crate::registry::ExternalImplSelfTypeKey::Primitive(*b)
                 }
+                SemanticType::Slice(_) => {
+                    crate::registry::ExternalImplSelfTypeKey::Slice
+                }
                 _ => {
                     crate::registry::ExternalImplSelfTypeKey::Nominal(trait_id.clone().unwrap_or_else(|| CanonicalSymbolId {
                         provider_id: self.provider_id,

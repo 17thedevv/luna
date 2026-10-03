@@ -33,19 +33,19 @@ impl<I: std::Iterator<Item>, Item, Out> std::Iterator<Out> for Map<I, Item, Out>
 
 export struct Filter<I, Item> {
     private iter: I,
-    // Predicate takes Item directly (borrowed iterators: Item=&T, owned: Item=T)
-    private pred: fn(Item) -> bool,
+    // Predicate borrows Item (&Item) so non-Copy items are not moved
+    private pred: fn(&Item) -> bool,
 };
 
 impl<I: std::Iterator<Item>, Item> std::Iterator<Item> for Filter<I, Item> {
     fn next(self: &rw Self) -> std::Option<Item> life_from(self) {
         dec rw running = true;
+        dec p_ptr = self.pred;
         while running {
             dec opt = self.iter.next();
             match opt {
                 std::Option::Some(x) -> {
-                    dec p_ptr = self.pred;
-                    if p_ptr(x) {
+                    if p_ptr(&x) {
                         return std::Option::Some(x);
                     }
                 },
@@ -157,7 +157,7 @@ export fn iter_map<I: std::Iterator<Item>, Item, Out>(iter: I, f: fn(Item) -> Ou
     };
 }
 
-export fn iter_filter<I: std::Iterator<Item>, Item>(iter: I, pred: fn(Item) -> bool) -> Filter<I, Item> life_from(iter) {
+export fn iter_filter<I: std::Iterator<Item>, Item>(iter: I, pred: fn(&Item) -> bool) -> Filter<I, Item> life_from(iter) {
     return Filter<I, Item> {
         iter: iter,
         pred: pred,

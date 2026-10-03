@@ -149,8 +149,8 @@ fn test_iter_filter_basic() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn is_even(x: &i32) -> bool {
-            return (*x % 2) == 0;
+        fn is_even(x: & &i32) -> bool {
+            return (**x % 2) == 0;
         }
 
         fn main() -> i32 {
@@ -463,8 +463,8 @@ fn test_iter_adapter_pipeline_chaining() {
         import <iter_adapters>;
         import <iter_consumers>;
 
-        fn is_even(x: &i32) -> bool {
-            return (*x % 2) == 0;
+        fn is_even(x: & &i32) -> bool {
+            return (**x % 2) == 0;
         }
 
         fn square(x: &i32) -> i32 {
@@ -611,8 +611,8 @@ import <iter_collect>;
             }
         }
 
-        fn is_even(item: &TrackedItem) -> bool {
-            return (item.val % 2) == 0;
+        fn is_even(item: & &TrackedItem) -> bool {
+            return ((*item).val % 2) == 0;
         }
 
         fn main() -> i32 {
@@ -817,7 +817,7 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-        fn pred(pair: (&i32, &i32)) -> bool {
+        fn pred(pair: &(&i32, &i32)) -> bool {
             return true;
         }
 

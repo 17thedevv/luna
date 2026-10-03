@@ -60,6 +60,7 @@ impl<'a> MetadataBuilder<'a> {
         enum SelfTypeSort {
             Primitive(u8),
             Nominal(String, String),
+            Slice,
         }
         #[derive(PartialEq, Eq, PartialOrd, Ord)]
         struct ImplSortKey {
@@ -77,6 +78,7 @@ impl<'a> MetadataBuilder<'a> {
             });
             let self_type = match &k.self_type_def {
                 crate::registry::ExternalImplSelfTypeKey::Primitive(b) => SelfTypeSort::Primitive(*b as u8),
+                crate::registry::ExternalImplSelfTypeKey::Slice => SelfTypeSort::Slice,
                 crate::registry::ExternalImplSelfTypeKey::Nominal(n) => {
                     let stable = self.convert_symbol_id(n);
                     SelfTypeSort::Nominal(stable.provider_name, stable.symbol_path)
@@ -101,6 +103,16 @@ impl<'a> MetadataBuilder<'a> {
                     crate::registry::ExternalImplSelfTypeKey::Primitive(b) => {
                         let ty = self.canonical_types.len() as u32;
                         self.canonical_types.push(CanonicalType::Primitive(*b));
+                        ty
+                    }
+                    crate::registry::ExternalImplSelfTypeKey::Slice => {
+                        let ty = self.canonical_types.len() as u32;
+                        let inner_gp = self.canonical_types.len() as u32 + 1;
+                        self.canonical_types.push(CanonicalType::Slice(inner_gp));
+                        self.canonical_types.push(CanonicalType::GenericParam(luna_llib::metadata::StableSymbolId {
+                            provider_name: self.provider.name.clone(),
+                            symbol_path: "T".to_string(),
+                        }));
                         ty
                     }
                 }
@@ -134,6 +146,7 @@ impl<'a> MetadataBuilder<'a> {
                         } else {
                             let self_type_def = match self.provider.types.get(e.self_type) {
                                 SemanticType::Primitive(b) => crate::registry::ExternalImplSelfTypeKey::Primitive(*b),
+                                SemanticType::Slice(_) => crate::registry::ExternalImplSelfTypeKey::Slice,
                                 _ => crate::registry::ExternalImplSelfTypeKey::Nominal(
                                     self.get_canonical_from_type(e.self_type).unwrap_or_else(|| e.trait_id.clone())
                                 ),
@@ -164,6 +177,7 @@ impl<'a> MetadataBuilder<'a> {
             for entry in sorted_trait_entries {
                 let self_type_def = match self.provider.types.get(entry.self_type) {
                     SemanticType::Primitive(b) => crate::registry::ExternalImplSelfTypeKey::Primitive(*b),
+                    SemanticType::Slice(_) => crate::registry::ExternalImplSelfTypeKey::Slice,
                     _ => crate::registry::ExternalImplSelfTypeKey::Nominal(
                         self.get_canonical_from_type(entry.self_type).unwrap_or_else(|| entry.trait_id.clone())
                     ),

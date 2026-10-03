@@ -122,6 +122,16 @@ export module std {
             };
         }
     }
+
+    impl<T> [T] {
+        export fn iter(self: &[T]) -> SliceIter<T> life_from(self) {
+            return slice_iter<T>(self);
+        }
+
+        export fn iter_mut(self: &rw [T]) -> SliceIterMut<T> life_from(self) {
+            return slice_iter_mut<T>(self);
+        }
+    }
 // =========================================================================
 // Slice utility functions
 // =========================================================================

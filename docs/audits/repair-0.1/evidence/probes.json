@@ -7,15 +7,399 @@
       "build",
       "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\baseline.ln",
       "-o",
-      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_2mhg61ni\\source\\baseline.exe",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\baseline.exe",
       "-q"
     ],
     "compile_exit": 0,
-    "compile_seconds": 5.910287100006826,
+    "compile_seconds": 5.687111899955198,
     "run_exit": 0,
-    "run_seconds": 0.08524869999382645,
+    "run_seconds": 0.076617700047791,
     "stdout": "",
     "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_inherent_trait_dispatch.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\compiler_inherent_trait_dispatch.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.1560693000210449,
+    "run_exit": 0,
+    "run_seconds": 0.061177700059488416,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_invalid_char.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_invalid_char.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\compiler_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_seconds": 0.06162779999431223
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_main_args.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_main_args.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\compiler_main_args.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.15224659990053624,
+    "run_exit": 0,
+    "run_seconds": 0.059088799986056983,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_move_after_call.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\compiler_move_after_call.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_seconds": 0.0638590999878943
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_unsigned_cast.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_unsigned_cast.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\compiler_unsigned_cast.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.15154460002668202,
+    "run_exit": 0,
+    "run_seconds": 0.06255229993257672,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "convert_unsigned_widen.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\convert_unsigned_widen.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\convert_unsigned_widen.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.2689397999783978,
+    "run_exit": 0,
+    "run_seconds": 0.0623749999795109,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "filter_owned.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\filter_owned.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\filter_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.6528998999856412,
+    "run_exit": 0,
+    "run_seconds": 0.06833319994620979,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "find_owned.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\find_owned.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\find_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.5669463999802247,
+    "run_exit": 0,
+    "run_seconds": 0.06296949996612966,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "format_unsigned_high_bit.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\format_unsigned_high_bit.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\format_unsigned_high_bit.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 3.529357200022787,
+    "run_exit": 0,
+    "run_seconds": 0.07371139992028475,
+    "stdout": "255\n",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_capacity_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_capacity_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\hashmap_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.7176875999430194,
+    "run_exit": 3,
+    "run_seconds": 2.38559780002106,
+    "stdout": "",
+    "stderr": "\nluna: PANIC [L005] explicit panic\n    at <unknown>:0:0\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_collision_pattern.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_collision_pattern.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\hashmap_collision_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.8718600999563932,
+    "run_exit": 0,
+    "run_seconds": 0.1803129999898374,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_drop_stress_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_drop_stress_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\hashmap_drop_stress_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 6.584232599940151,
+    "run_exit": 0,
+    "run_seconds": 0.061129999929107726,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_growth_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_growth_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\hashmap_growth_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.9417014999780804,
+    "run_exit": 0,
+    "run_seconds": 0.075438900035806,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_sequential_pattern.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_sequential_pattern.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\hashmap_sequential_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.8844086000462994,
+    "run_exit": 0,
+    "run_seconds": 0.06679850001819432,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "range_owned_step.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\range_owned_step.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\range_owned_step.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.4441902000689879,
+    "run_exit": 0,
+    "run_seconds": 0.07441810006275773,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "slice_zst.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\slice_zst.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.0007471999851987,
+    "run_exit": 0,
+    "run_seconds": 0.06772769999224693,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "slice_zst_mut.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst_mut.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\slice_zst_mut.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.04606069996953,
+    "run_exit": 0,
+    "run_seconds": 0.06978629995137453,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "string_invalid_char.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\string_invalid_char.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\string_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_seconds": 2.2631069000344723
+  },
+  {
+    "mode": "source",
+    "fixture": "try_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\try_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\try_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.16990420001093298,
+    "run_exit": 0,
+    "run_seconds": 0.06867820001207292,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_capacity_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_capacity_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\vec_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.0710876999655738,
+    "run_exit": 0,
+    "run_seconds": 0.06385180004872382,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_dedup_i32_generic.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_dedup_i32_generic.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\vec_dedup_i32_generic.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.003032499924302,
+    "run_exit": 0,
+    "run_seconds": 0.07612159999553114,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_reserve_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_reserve_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\source\\vec_reserve_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.9982368999626487,
+    "run_exit": 3,
+    "run_seconds": 2.465489999973215,
+    "stdout": "",
+    "stderr": "\nluna: PANIC [L005] explicit panic\n    at <unknown>:0:0\n"
   },
   {
     "mode": "artifact",
@@ -25,14 +409,398 @@
       "build",
       "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\baseline.ln",
       "-o",
-      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_2mhg61ni\\artifact\\baseline.exe",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\baseline.exe",
       "-q"
     ],
     "compile_exit": 0,
-    "compile_seconds": 2.927020300005097,
+    "compile_seconds": 5.9891872999724,
     "run_exit": 0,
-    "run_seconds": 0.0840135999605991,
+    "run_seconds": 0.06771570001728833,
     "stdout": "",
     "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_inherent_trait_dispatch.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\compiler_inherent_trait_dispatch.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.20349829993210733,
+    "run_exit": 0,
+    "run_seconds": 0.06777289998717606,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_invalid_char.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_invalid_char.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\compiler_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_seconds": 0.07692050002515316
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_main_args.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_main_args.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\compiler_main_args.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.20196480001322925,
+    "run_exit": 0,
+    "run_seconds": 0.06339659995865077,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_move_after_call.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\compiler_move_after_call.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_seconds": 0.08026680001057684
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_unsigned_cast.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_unsigned_cast.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\compiler_unsigned_cast.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.18854489992372692,
+    "run_exit": 0,
+    "run_seconds": 0.06838760001119226,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "convert_unsigned_widen.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\convert_unsigned_widen.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\convert_unsigned_widen.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.33475959999486804,
+    "run_exit": 0,
+    "run_seconds": 0.07017479999922216,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "filter_owned.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\filter_owned.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\filter_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.7285550000378862,
+    "run_exit": 0,
+    "run_seconds": 0.06572369998320937,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "find_owned.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\find_owned.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\find_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.5929094000020996,
+    "run_exit": 0,
+    "run_seconds": 0.06572890002280474,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "format_unsigned_high_bit.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\format_unsigned_high_bit.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\format_unsigned_high_bit.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 3.4441452000755817,
+    "run_exit": 0,
+    "run_seconds": 0.07130019995383918,
+    "stdout": "255\n",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_capacity_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_capacity_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\hashmap_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.7998507999582216,
+    "run_exit": 3,
+    "run_seconds": 2.466668299981393,
+    "stdout": "",
+    "stderr": "\nluna: PANIC [L005] explicit panic\n    at <unknown>:0:0\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_collision_pattern.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_collision_pattern.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\hashmap_collision_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.91044939996209,
+    "run_exit": 0,
+    "run_seconds": 0.1773168999934569,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_drop_stress_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_drop_stress_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\hashmap_drop_stress_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 6.935245499946177,
+    "run_exit": 0,
+    "run_seconds": 0.06068160000722855,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_growth_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_growth_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\hashmap_growth_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.9455320999259129,
+    "run_exit": 0,
+    "run_seconds": 0.07101229997351766,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_sequential_pattern.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_sequential_pattern.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\hashmap_sequential_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.9288718999596313,
+    "run_exit": 0,
+    "run_seconds": 0.06688409997150302,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "range_owned_step.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\range_owned_step.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\range_owned_step.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.49741790001280606,
+    "run_exit": 0,
+    "run_seconds": 0.07226070004981011,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "slice_zst.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\slice_zst.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.052252999972552,
+    "run_exit": 0,
+    "run_seconds": 0.05610679998062551,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "slice_zst_mut.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst_mut.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\slice_zst_mut.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.073146800044924,
+    "run_exit": 0,
+    "run_seconds": 0.06395819992758334,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "string_invalid_char.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\string_invalid_char.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\string_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_seconds": 2.3480458999983966
+  },
+  {
+    "mode": "artifact",
+    "fixture": "try_control.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\try_control.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\try_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 0.19395029998850077,
+    "run_exit": 0,
+    "run_seconds": 0.06530499993823469,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_capacity_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_capacity_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\vec_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.0375570999458432,
+    "run_exit": 0,
+    "run_seconds": 0.06545730005018413,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_dedup_i32_generic.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_dedup_i32_generic.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\vec_dedup_i32_generic.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.0789072000188753,
+    "run_exit": 0,
+    "run_seconds": 0.06982189998961985,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_reserve_overflow.ln",
+    "command": [
+      "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "D:\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_reserve_overflow.ln",
+      "-o",
+      "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_repair_probe_69byz66o\\artifact\\vec_reserve_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_seconds": 1.1631874999729916,
+    "run_exit": 3,
+    "run_seconds": 2.5252822000766173,
+    "stdout": "",
+    "stderr": "\nluna: PANIC [L005] explicit panic\n    at <unknown>:0:0\n"
   }
 ]

@@ -1782,6 +1782,7 @@ impl<'a> TypeChecker<'a> {
                                 let self_key_opt: Option<crate::semantic_tables::ImplSelfTypeKey> = match self.ctx.types.get(self_sem_ty) {
                                     SemanticType::Primitive(b) => Some(crate::semantic_tables::ImplSelfTypeKey::Primitive(*b)),
                                     SemanticType::Struct(s, ..) | SemanticType::Enum(s, ..) => Some(crate::semantic_tables::ImplSelfTypeKey::Nominal(*s)),
+                                    SemanticType::Slice(_) => Some(crate::semantic_tables::ImplSelfTypeKey::Slice),
                                     _ => self_sym_opt.map(crate::semantic_tables::ImplSelfTypeKey::Nominal),
                                 };
 
@@ -1830,6 +1831,7 @@ impl<'a> TypeChecker<'a> {
                             let self_key_opt: Option<crate::semantic_tables::ImplSelfTypeKey> = match self.ctx.types.get(self_sem_ty) {
                                 SemanticType::Primitive(b) => Some(crate::semantic_tables::ImplSelfTypeKey::Primitive(*b)),
                                 SemanticType::Struct(s, ..) | SemanticType::Enum(s, ..) => Some(crate::semantic_tables::ImplSelfTypeKey::Nominal(*s)),
+                                SemanticType::Slice(_) => Some(crate::semantic_tables::ImplSelfTypeKey::Slice),
                                 _ => self_sym_opt.map(crate::semantic_tables::ImplSelfTypeKey::Nominal),
                             };
                             if let Some(self_key) = self_key_opt {
@@ -2421,6 +2423,7 @@ impl<'a> TypeChecker<'a> {
                                 let type_name = concrete_self_key.map(|concrete_key| match concrete_key {
                                     crate::semantic_tables::ImplSelfTypeKey::Nominal(s) => self.ctx.symbol_table.get_symbol(s).name.clone(),
                                     crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => format!("{:?}", b).to_lowercase(),
+                                    crate::semantic_tables::ImplSelfTypeKey::Slice => "slice".to_string(),
                                 }).unwrap_or_else(|| {
                                     crate::comptime::reflect::ComptimeReflection::type_name(resolved_ty, &self.ctx)
                                 });
@@ -2454,6 +2457,7 @@ impl<'a> TypeChecker<'a> {
                                     let type_name = match concrete_key {
                                         crate::semantic_tables::ImplSelfTypeKey::Nominal(s) => self.ctx.symbol_table.get_symbol(s).name.clone(),
                                         crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => format!("{:?}", b).to_lowercase(),
+                                        crate::semantic_tables::ImplSelfTypeKey::Slice => "slice".to_string(),
                                     };
                                     self.ctx.diagnostics.push(
                                         Diagnostic::error(format!(
@@ -5340,6 +5344,7 @@ impl<'a> TypeChecker<'a> {
                     SemanticType::Struct(sym_id, struct_args, _) => Some((crate::semantic_tables::ImplSelfTypeKey::Nominal(*sym_id), struct_args.clone(), Some(*sym_id))),
                     SemanticType::Enum(sym_id, enum_args, _) => Some((crate::semantic_tables::ImplSelfTypeKey::Nominal(*sym_id), enum_args.clone(), Some(*sym_id))),
                     SemanticType::Primitive(b) => Some((crate::semantic_tables::ImplSelfTypeKey::Primitive(*b), Vec::new(), None)),
+                    SemanticType::Slice(elem) => Some((crate::semantic_tables::ImplSelfTypeKey::Slice, vec![*elem], None)),
                     _ => None,
                 };
 

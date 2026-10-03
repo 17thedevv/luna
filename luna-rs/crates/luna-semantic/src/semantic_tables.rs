@@ -26,6 +26,7 @@ pub struct CaptureBinding {
 pub enum ImplSelfTypeKey {
     Nominal(SymbolId),
     Primitive(crate::ty::BuiltinType),
+    Slice,
 }
 
 impl From<SymbolId> for ImplSelfTypeKey {
