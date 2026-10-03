@@ -252,8 +252,12 @@ impl ModuleRegistry {
                     Some(global_scope),
                 );
                 
-                for root in prov_interface.exported_symbols.values() {
-                    // Inject into provider scope for `import <name>;`
+                let mut sorted_roots: Vec<_> = prov_interface.exported_symbols.values().collect();
+                sorted_roots.sort_by_key(|root| {
+                    (root.sym.decl_id.map(|d| d.0).unwrap_or(u32::MAX), root.sym.name.clone())
+                });
+                for root in sorted_roots {
+                    // Inject into provider scope for import <name>;
                     Self::inject_symbol(root, prov_scope, ctx, &mut provider_symbol_maps);
                 }
                 ctx.provider_scopes.insert(pid, prov_scope);
@@ -596,7 +600,11 @@ impl ModuleRegistry {
             }
 
             // Inject impl methods
-            for (old_impl_key, old_canon_ids) in &interface.impl_methods {
+            let mut sorted_impl_methods: Vec<_> = interface.impl_methods.iter().collect();
+            sorted_impl_methods.sort_by_key(|(_, old_canon_ids)| {
+                old_canon_ids.iter().filter_map(|c| c.decl_id.map(|d| d.0)).min().unwrap_or(u32::MAX)
+            });
+            for (old_impl_key, old_canon_ids) in sorted_impl_methods {
                 let new_trait_id = old_impl_key.trait_id.as_ref().and_then(resolve_canonical);
                 if let Some(new_self_type) = resolve_self_type(&old_impl_key.self_type_def) {
                     let new_impl_key = luna_semantic::semantic_tables::ImplKey {
@@ -976,7 +984,11 @@ impl ModuleRegistry {
                 ctx.tables.decl_scopes.insert(did, inner_scope);
             }
 
-            for child in ext_sym.children.values() {
+            let mut sorted_children: Vec<_> = ext_sym.children.values().collect();
+            sorted_children.sort_by_key(|c| {
+                (c.sym.decl_id.map(|d| d.0).unwrap_or(u32::MAX), c.sym.name.clone())
+            });
+            for child in sorted_children {
                 Self::inject_symbol(child, inner_scope, ctx, provider_symbol_maps);
             }
         }
@@ -1033,8 +1045,16 @@ impl ModuleRegistry {
                     .collect(),
             );
         }
+        let mut sorted_impl_methods: Vec<_> = ctx.tables.impl_methods.iter().collect();
+        sorted_impl_methods.sort_by_key(|(_, method_syms)| {
+            method_syms
+                .iter()
+                .filter_map(|&s| ctx.symbol_table.get_symbol(s).decl_id.map(|d| d.0))
+                .min()
+                .unwrap_or(u32::MAX)
+        });
         let mut impl_method_symbols = Vec::new();
-        for method_syms in ctx.tables.impl_methods.values() {
+        for (_, method_syms) in sorted_impl_methods {
             for &sym_id in method_syms {
                 let mut sym = ctx.symbol_table.get_symbol(sym_id).clone();
                 if sym.provider_id.is_some() {

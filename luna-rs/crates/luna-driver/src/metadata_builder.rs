@@ -63,12 +63,14 @@ impl<'a> MetadataBuilder<'a> {
         }
         #[derive(PartialEq, Eq, PartialOrd, Ord)]
         struct ImplSortKey {
+            min_method_id: u32,
             trait_path: Option<(String, String)>,
             self_type: SelfTypeSort,
         }
 
         let mut sorted_impls: Vec<_> = self.provider.impl_methods.iter().collect();
-        sorted_impls.sort_by_key(|(k, _)| {
+        sorted_impls.sort_by_key(|(k, methods)| {
+            let min_method_id = methods.iter().filter_map(|m| m.decl_id.map(|d| d.0)).min().unwrap_or(u32::MAX);
             let trait_path = k.trait_id.as_ref().map(|t| {
                 let stable = self.convert_symbol_id(t);
                 (stable.provider_name, stable.symbol_path)
@@ -80,7 +82,7 @@ impl<'a> MetadataBuilder<'a> {
                     SelfTypeSort::Nominal(stable.provider_name, stable.symbol_path)
                 }
             };
-            ImplSortKey { trait_path, self_type }
+            ImplSortKey { min_method_id, trait_path, self_type }
         });
 
         for (impl_key, method_canons) in sorted_impls {
