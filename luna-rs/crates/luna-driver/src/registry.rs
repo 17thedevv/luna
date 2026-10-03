@@ -494,11 +494,15 @@ impl ModuleRegistry {
                         }
                     }
                     if !resolved_bounds.is_empty() {
-                        ctx.tables
+                        let existing = ctx.tables
                             .trait_bounds
                             .entry(new_param_sym)
-                            .or_default()
-                            .extend(resolved_bounds);
+                            .or_default();
+                        for bound in resolved_bounds {
+                            if !existing.iter().any(|b| b.trait_id == bound.trait_id && b.trait_args == bound.trait_args) {
+                                existing.push(bound);
+                            }
+                        }
                     }
                 }
             }
@@ -518,11 +522,15 @@ impl ModuleRegistry {
                         }
                     }
                     if !resolved_bounds.is_empty() {
-                        ctx.tables
+                        let existing = ctx.tables
                             .assoc_type_bounds
                             .entry(new_param_sym)
-                            .or_default()
-                            .extend(resolved_bounds);
+                            .or_default();
+                        for bound in resolved_bounds {
+                            if !existing.iter().any(|b| b.0 == bound.0 && b.1 == bound.1 && b.2 == bound.2) {
+                                existing.push(bound);
+                            }
+                        }
                     }
                 }
             }
@@ -1005,6 +1013,10 @@ impl ModuleRegistry {
         let mut generic_param_symbols = HashMap::new();
         for (&(decl_id, idx), &gp_sym) in &ctx.tables.generic_param_symbols {
             if let Some(&sym_id) = ctx.tables.decl_symbols.get(&decl_id) {
+                let canon_sym = Self::get_canonical(sym_id, ctx, provider_id);
+                if canon_sym.provider_id != provider_id {
+                    continue;
+                }
                 generic_param_symbols
                     .entry(sym_id)
                     .or_insert_with(Vec::new)
@@ -1285,6 +1297,9 @@ impl ModuleRegistry {
         let mut trait_bounds = HashMap::new();
         for (&gp_sym, bounds) in &ctx.tables.trait_bounds {
             let canon_gp = Self::get_canonical(gp_sym, ctx, provider_id);
+            if canon_gp.provider_id != provider_id {
+                continue;
+            }
             let mut ext_bounds = Vec::new();
             for b in bounds {
                 let canon_param = Self::get_canonical(b.param, ctx, provider_id);
@@ -1301,6 +1316,9 @@ impl ModuleRegistry {
         let mut assoc_type_bounds = HashMap::new();
         for (&gp_sym, bounds) in &ctx.tables.assoc_type_bounds {
             let canon_gp = Self::get_canonical(gp_sym, ctx, provider_id);
+            if canon_gp.provider_id != provider_id {
+                continue;
+            }
             let mut ext_bounds = Vec::new();
             for &(trait_id, assoc_sym, target_ty) in bounds {
                 let canon_trait = Self::get_canonical(trait_id, ctx, provider_id);
