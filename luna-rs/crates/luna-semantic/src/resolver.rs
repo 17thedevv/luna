@@ -266,7 +266,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         );
                         self.ctx.symbol_table.set_inner_scope(sym_id, target_scope);
                     } else {
-                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("unresolved module or path `{}`", alias_str)).with_span(*alias));
+                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("unresolved module or path `{}`", alias_str)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(*alias));
                     }
                 }
                 Decl::Import { name, kind, .. } => {
@@ -344,6 +344,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                 "E1002: conflicting imported symbol `{}`: symbol already defined or imported from another provider",
                                 sym_name
                             ))
+                            .with_code(DiagnosticCode::DuplicateDefinition)
                             .with_span(*name),
                         );
                     }
@@ -366,6 +367,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute can only be used in trusted compiler/core contexts",
                         )
+                        .with_code(DiagnosticCode::InvalidAnnotation)
                         .with_span(annot.name),
                     );
                     continue;
@@ -375,6 +377,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute requires exactly one argument: `#[lang(\"name\")]`",
                         )
+                        .with_code(DiagnosticCode::InvalidAnnotation)
                         .with_span(annot.name),
                     );
                     continue;
@@ -387,6 +390,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                 luna_common::diagnostic::Diagnostic::error(
                                     "`#[lang(...)]` argument must be a string literal",
                                 )
+                                .with_code(DiagnosticCode::InvalidAnnotation)
                                 .with_span(tok.span),
                             );
                             continue;
@@ -398,6 +402,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             luna_common::diagnostic::Diagnostic::error(
                                 "`#[lang(...)]` argument must be a string literal",
                             )
+                            .with_code(DiagnosticCode::InvalidAnnotation)
                             .with_span(annot.name),
                         );
                         continue;
@@ -410,6 +415,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             "unknown language item `{}`",
                             arg_str
                         ))
+                        .with_code(DiagnosticCode::InvalidAnnotation)
                         .with_span(tok_span),
                     );
                     continue;
@@ -439,6 +445,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute can only be used in trusted compiler/core contexts",
                         )
+                        .with_code(DiagnosticCode::InvalidAnnotation)
                         .with_span(annot.name),
                     );
                     continue;
@@ -448,6 +455,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         "`#[lang]` cannot be applied to {} declarations",
                         decl_kind
                     ))
+                    .with_code(DiagnosticCode::InvalidAnnotation)
                     .with_span(annot.name),
                 );
             }
@@ -1223,7 +1231,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             );
                             self.ctx.symbol_table.set_inner_scope(sym_id, target_scope);
                         } else {
-                            self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("unresolved module or path `{}`", alias_str)).with_span(*alias));
+                            self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("unresolved module or path `{}`", alias_str)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(*alias));
                         }
                     }
                     Decl::Import { name, kind, .. } => {
@@ -1802,6 +1810,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                     "macro '{}' cannot be used as a value",
                                     name_str
                                 ))
+                                .with_code(DiagnosticCode::InvalidSyntax)
                                 .with_span(span),
                             );
                             return;
@@ -2037,6 +2046,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                 "lifetime '{}' does not refer to any parameter in scope",
                                 name
                             ))
+                            .with_code(DiagnosticCode::LifetimeConstraintViolation)
                             .with_span(*span),
                         );
                     }
@@ -2055,6 +2065,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                     "lifetime '{}' does not refer to any parameter in scope",
                                     name
                                 ))
+                                .with_code(DiagnosticCode::LifetimeConstraintViolation)
                                 .with_span(*span),
                             );
                         }
@@ -2074,6 +2085,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                     "lifetime '{}' does not refer to any parameter in scope",
                                     name
                                 ))
+                                .with_code(DiagnosticCode::LifetimeConstraintViolation)
                                 .with_span(*span),
                             );
                         }
@@ -2084,6 +2096,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                 luna_common::Diagnostic::error(
                                     "lifetime 'self' does not refer to any parameter in scope",
                                 )
+                                .with_code(DiagnosticCode::LifetimeConstraintViolation)
                                 .with_span(*span),
                             );
                         }
@@ -2093,6 +2106,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             luna_common::Diagnostic::error(
                                 "unsupported lifetime contract relation: generic Return lifetime relations in 'requires' are not supported in Lifetime Contract v1; if the intended contract describes return provenance, use 'life_from(...)'",
                             )
+                            .with_code(DiagnosticCode::LifetimeConstraintViolation)
                             .with_span(*span),
                         );
                     }
@@ -2102,6 +2116,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                 "unsupported lifetime contract relation: lifetime projection '{}.{}' in 'requires' is not supported in Lifetime Contract v1",
                                 base, field
                             ))
+                            .with_code(DiagnosticCode::LifetimeConstraintViolation)
                             .with_span(*span),
                         );
                     }
@@ -2181,6 +2196,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                     "field '{}' not found in struct '{}'",
                                     f_name, struct_name
                                 ))
+                                .with_code(DiagnosticCode::LifetimeConstraintViolation)
                                 .with_span(*span),
                             );
                             None
@@ -2191,6 +2207,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             luna_common::Diagnostic::error(
                                 "unsupported lifetime contract relation: generic Return lifetime relations in 'requires' are not supported in struct lifetime contracts",
                             )
+                            .with_code(DiagnosticCode::LifetimeConstraintViolation)
                             .with_span(*span),
                         );
                         None
@@ -2201,6 +2218,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                 "unsupported lifetime contract relation: lifetime projection '{}.{}' in 'requires' is not supported in Lifetime Contract v1",
                                 base, field
                             ))
+                            .with_code(DiagnosticCode::LifetimeConstraintViolation)
                             .with_span(*span),
                         );
                         None
@@ -2239,6 +2257,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::Diagnostic::error(
                             "unsupported lifetime contract relation: struct lifetime contract does not admit 'SelfVal >= Field' in Lifetime Contract v1 (only 'Field >= Self' is supported)",
                         )
+                        .with_code(DiagnosticCode::LifetimeConstraintViolation)
                         .with_span(constraint.span),
                     );
                     has_error = true;
@@ -2248,6 +2267,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::Diagnostic::error(
                             "unsupported lifetime contract relation: field-to-field lifetime relations are not supported in Lifetime Contract v1",
                         )
+                        .with_code(DiagnosticCode::LifetimeConstraintViolation)
                         .with_span(constraint.span),
                     );
                     has_error = true;
@@ -2293,7 +2313,9 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                     luna_common::Diagnostic::error(format!(
                         "duplicate raw storage anchor for field '{}' in struct '{}'",
                         anchor.field_name, struct_name
-                    )).with_span(anchor.span),
+                    ))
+                    .with_code(DiagnosticCode::RawStorageAnchorViolation)
+                    .with_span(anchor.span),
                 );
                 has_error = true;
                 continue;
@@ -2309,7 +2331,9 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::Diagnostic::error(format!(
                             "raw storage anchor field '{}' not found in struct '{}'",
                             anchor.field_name, struct_name
-                        )).with_span(anchor.span),
+                        ))
+                        .with_code(DiagnosticCode::RawStorageAnchorMismatch)
+                        .with_span(anchor.span),
                     );
                     has_error = true;
                 }

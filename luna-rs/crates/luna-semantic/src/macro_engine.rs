@@ -393,6 +393,7 @@ impl<'a> MacroEngine<'a> {
                 let Some(macro_sym) = self.symbol_table.lookup_macro(&path_strs, self.current_scope) else {
                     self.diagnostics.push(
                         Diagnostic::error(format!("no macro named `{}` in scope", macro_name))
+                            .with_code(DiagnosticCode::UnresolvedSymbol)
                             .with_span(span),
                     );
                     return ty_id;
@@ -423,6 +424,7 @@ impl<'a> MacroEngine<'a> {
                             "recursion limit reached while expanding macro `{}`",
                             macro_name
                         ))
+                        .with_code(DiagnosticCode::InvalidSyntax)
                         .with_span(span),
                     );
                     return ty_id;
@@ -468,6 +470,7 @@ impl<'a> MacroEngine<'a> {
                     }
                     self.diagnostics.push(
                         Diagnostic::error(format!("macro `{}` expected {}", macro_name, failure.expected))
+                            .with_code(DiagnosticCode::InvalidSyntax)
                             .with_span(diag_span)
                     );
                 } else {
@@ -476,6 +479,7 @@ impl<'a> MacroEngine<'a> {
                             "no rule in macro `{}` matched the invocation arguments",
                             macro_name
                         ))
+                        .with_code(DiagnosticCode::InvalidSyntax)
                         .with_span(span),
                     );
                 }
@@ -533,6 +537,7 @@ impl<'a> MacroEngine<'a> {
         let Some(macro_sym) = self.symbol_table.lookup_macro(&path_strs, self.current_scope) else {
             self.diagnostics.push(
                 Diagnostic::error(format!("no macro named `{}` in scope", macro_name))
+                    .with_code(DiagnosticCode::UnresolvedSymbol)
                     .with_span(if !path.is_empty() {
                         Span::new(
                             path[0].file_id,
@@ -558,6 +563,7 @@ impl<'a> MacroEngine<'a> {
         let Some(&decl_id) = self.tables.macro_decls.get(&macro_sym) else {
             self.diagnostics.push(
                 Diagnostic::error(format!("no macro declaration found for `{}`", macro_name))
+                    .with_code(DiagnosticCode::UnresolvedSymbol)
                     .with_span(name),
             );
             return self.arena.alloc_expr(Expr::Literal(Token::new(TokenKind::IntegerLiteral, call_span), "0".to_string()));
@@ -575,6 +581,7 @@ impl<'a> MacroEngine<'a> {
                     "recursion limit reached while expanding macro `{}`",
                     macro_name
                 ))
+                .with_code(DiagnosticCode::InvalidSyntax)
                 .with_span(call_span),
             );
             return self.arena.alloc_expr(Expr::Literal(Token::new(TokenKind::IntegerLiteral, call_span), "0".to_string()));
@@ -624,6 +631,7 @@ impl<'a> MacroEngine<'a> {
             }
             self.diagnostics.push(
                 Diagnostic::error(format!("macro `{}` expected {}", macro_name, failure.expected))
+                    .with_code(DiagnosticCode::InvalidSyntax)
                     .with_span(diag_span)
             );
         } else {
@@ -632,6 +640,7 @@ impl<'a> MacroEngine<'a> {
                     "no rule in macro `{}` matched the invocation arguments",
                     macro_name
                 ))
+                .with_code(DiagnosticCode::InvalidSyntax)
                 .with_span(call_span),
             );
         }
@@ -676,6 +685,7 @@ impl<'a> MacroEngine<'a> {
                     "recursion limit reached while expanding macro `{}`",
                     macro_name
                 ))
+                .with_code(DiagnosticCode::InvalidSyntax)
                 .with_span(call_span),
             );
             return None;
@@ -753,6 +763,7 @@ impl<'a> MacroEngine<'a> {
             }
             self.diagnostics.push(
                 Diagnostic::error(format!("macro `{}` expected {}", macro_name, failure.expected))
+                    .with_code(DiagnosticCode::InvalidSyntax)
                     .with_span(diag_span)
             );
         }
@@ -1063,6 +1074,7 @@ impl<'a> MacroEngine<'a> {
                     } else {
                         self.diagnostics.push(
                             Diagnostic::error(format!("variable `@{}` is not bound in pattern", var_name))
+                                .with_code(DiagnosticCode::UnresolvedSymbol)
                                 .with_span(*name)
                         );
                     }

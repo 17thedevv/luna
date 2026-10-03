@@ -144,6 +144,7 @@ impl SymbolTable {
                             "Duplicate definition of symbol `{}` in the same scope",
                             name
                         ))
+                        .with_code(luna_common::DiagnosticCode::DuplicateDefinition)
                         .with_span(span),
                     );
                 }

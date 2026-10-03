@@ -117,7 +117,9 @@ impl SemanticContext {
                             Diagnostic::error(format!(
                                 "E_CONFLICTING_TRAIT_IMPL: conflicting implementations for trait `{}` for `{}`",
                                 trait_name, self_type_str
-                            )).with_span(span)
+                            ))
+                            .with_code(DiagnosticCode::ConflictingTraitImpl)
+                            .with_span(span)
                         );
                         return Err(());
                     }

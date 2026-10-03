@@ -236,11 +236,13 @@ pub trait AstMapping {
             }Stmt::Return { value } => {
                 if let Some(v) = value { *v = self.shift_expr_id(*v); }
             }
-            Stmt::Break { label } => {
+            Stmt::Break { label, span } => {
                 if let Some(l) = label { self.shift_span(l); }
+                self.shift_span(span);
             }
-            Stmt::Continue { label } => {
+            Stmt::Continue { label, span } => {
                 if let Some(l) = label { self.shift_span(l); }
+                self.shift_span(span);
             }
             Stmt::Unsafe { body } => *body = self.shift_stmt_id(*body),
             Stmt::Comptime { body } => *body = self.shift_stmt_id(*body),

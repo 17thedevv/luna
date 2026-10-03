@@ -304,3 +304,229 @@ fn main() -> i32 { return 0; }
     );
 }
 
+#[test]
+fn test_v01_grammar_06_a01_slice_authorization_impersonation_prevention() {
+    let modes = ProviderModes::fresh();
+    let temp = modes.source.join("test_grammar_06");
+    fs::create_dir_all(&temp).unwrap();
+
+    // 1. Positive: Official sysroot slice provider works in source mode with .iter()
+    let pos_slice_src = r#"
+import <slice>;
+
+fn total(xs: &[i32]) -> i32 {
+    dec rw sum = 0;
+    dec rw it = xs.iter();
+    dec rw going = true;
+    while going {
+        match it.next() {
+            std::Option::Some(item) -> { sum = sum + *item; },
+            std::Option::None -> { going = false; },
+        }
+    }
+    return sum;
+}
+
+fn bump(xs: &rw [i32]) -> i32 {
+    dec rw it = xs.iter_mut();
+    dec rw going = true;
+    while going {
+        match it.next() {
+            std::Option::Some(item) -> { *item = *item + 1; },
+            std::Option::None -> { going = false; },
+        }
+    }
+    return 0;
+}
+
+fn main() -> i32 {
+    dec rw arr = [10, 20, 30];
+    if total(&arr) != 60 { return 1; }
+    bump(&rw arr);
+    if total(&arr) != 63 { return 2; }
+    return 0;
+}
+"#;
+    let pos_path = temp.join("pos_slice.ln");
+    fs::write(&pos_path, pos_slice_src).unwrap();
+    let (exe_src, build_src) = modes.build(&modes.source, &pos_path, "pos_slice_src_exe");
+    assert!(build_src.status.success(), "source slice iter build failed: {}", render(&build_src));
+    let run_src = Command::new(exe_src).output().unwrap();
+    assert_eq!(run_src.status.code(), Some(0));
+
+    // 2. Positive: Fresh artifact mode consumer runs without source fallback
+    let (exe_art, build_art) = modes.build(&modes.artifact, &pos_path, "pos_slice_art_exe");
+    assert!(build_art.status.success(), "artifact slice iter build failed: {}", render(&build_art));
+    let run_art = Command::new(exe_art).output().unwrap();
+    assert_eq!(run_art.status.code(), Some(0));
+
+    // 3. Positive: User-defined nominal type has inherent impl
+    let pos_nominal_src = r#"
+struct MyPoint {
+    x: i32,
+    y: i32,
+};
+impl MyPoint {
+    fn sum(self: &MyPoint) -> i32 {
+        return self.x + self.y;
+    }
+}
+fn main() -> i32 {
+    dec p = MyPoint { x: 12, y: 30 };
+    return p.sum() - 42;
+}
+"#;
+    let pos_nom_path = temp.join("pos_nominal.ln");
+    fs::write(&pos_nom_path, pos_nominal_src).unwrap();
+    let (exe_nom, build_nom) = modes.build(&modes.source, &pos_nom_path, "pos_nom_exe");
+    assert!(build_nom.status.success(), "nominal inherent impl failed: {}", render(&build_nom));
+    let run_nom = Command::new(exe_nom).output().unwrap();
+    assert_eq!(run_nom.status.code(), Some(0));
+
+    // Common hack snippet trying to define inherent impl on [T]
+    let user_hack_src = r#"
+impl<T> [T] {
+    export fn user_hack(self: &[T]) -> i32 {
+        return 0;
+    }
+}
+"#;
+
+    // 4. Negative: User provider named `user_provider.ln` imported via `import "user_provider";` -> reject E2006
+    let user_provider_path = temp.join("user_provider.ln");
+    fs::write(&user_provider_path, user_hack_src).unwrap();
+    let consumer_user_src = r#"
+import "user_provider";
+fn main() -> i32 {
+    return 0;
+}
+"#;
+    let consumer_user_path = temp.join("consumer_user.ln");
+    fs::write(&consumer_user_path, consumer_user_src).unwrap();
+    let check_user = modes.check(&modes.source, &consumer_user_path);
+    assert!(!check_user.status.success(), "import user_provider must be rejected");
+    let err_user = render(&check_user);
+    assert!(err_user.contains("error[E2006]"), "expected error[E2006] for user_provider, got: {err_user}");
+
+    // 5. Negative: User provider named `slice.ln` imported via `import "slice";` -> MUST reject E2006 (no impersonation)
+    let slice_provider_path = temp.join("slice.ln");
+    fs::write(&slice_provider_path, user_hack_src).unwrap();
+    let consumer_slice_src = r#"
+import "slice";
+fn main() -> i32 {
+    return 0;
+}
+"#;
+    let consumer_slice_path = temp.join("consumer_slice.ln");
+    fs::write(&consumer_slice_path, consumer_slice_src).unwrap();
+    let check_slice = modes.check(&modes.source, &consumer_slice_path);
+    assert!(!check_slice.status.success(), "import slice must be rejected");
+    let err_slice = render(&check_slice);
+    assert!(err_slice.contains("error[E2006]"), "expected error[E2006] for slice impersonation, got: {err_slice}");
+
+    // 6. Negative: User provider named `core.ln` imported via `import "core";` -> MUST reject E2006 (no impersonation)
+    let core_provider_path = temp.join("core.ln");
+    fs::write(&core_provider_path, user_hack_src).unwrap();
+    let consumer_core_src = r#"
+import "core";
+fn main() -> i32 {
+    return 0;
+}
+"#;
+    let consumer_core_path = temp.join("consumer_core.ln");
+    fs::write(&consumer_core_path, consumer_core_src).unwrap();
+    let check_core = modes.check(&modes.source, &consumer_core_path);
+    assert!(!check_core.status.success(), "import core must be rejected");
+    let err_core = render(&check_core);
+    assert!(err_core.contains("error[E2006]"), "expected error[E2006] for core impersonation, got: {err_core}");
+}
+
+#[test]
+fn test_v01_grammar_07_diag_counterexamples_span_and_typed_code() {
+    let modes = ProviderModes::fresh();
+    let temp = modes.source.join("test_grammar_07");
+    fs::create_dir_all(&temp).unwrap();
+
+    // Counterexample A: Missing field on struct -> error[E1001] with primary span
+    let missing_field_src = r#"
+struct Thing {
+    x: i32,
+};
+
+fn main() -> i32 {
+    dec t = Thing { x: 1 };
+    return t.nope;
+}
+"#;
+    let missing_path = temp.join("missing_field.ln");
+    fs::write(&missing_path, missing_field_src).unwrap();
+    let check_missing = modes.check(&modes.source, &missing_path);
+    assert!(!check_missing.status.success());
+    let err_missing = render(&check_missing);
+    assert!(
+        err_missing.contains("error[E1001]"),
+        "expected typed diagnostic error[E1001] for missing field, got: {err_missing}"
+    );
+    assert!(
+        err_missing.contains("Unknown field or method 'nope'"),
+        "expected Unknown field message, got: {err_missing}"
+    );
+    // DIAG-2: Check that primary span underline is rendered
+    assert!(
+        err_missing.contains("return t.nope;") && err_missing.contains("^"),
+        "expected primary span underline on missing field, got: {err_missing}"
+    );
+
+    // Counterexample B1: break outside loop -> error[E2029] with primary span on break
+    let break_outside_src = r#"
+fn main() -> i32 {
+    break;
+    return 0;
+}
+"#;
+    let break_path = temp.join("break_outside.ln");
+    fs::write(&break_path, break_outside_src).unwrap();
+    let check_break = modes.check(&modes.source, &break_path);
+    assert!(!check_break.status.success());
+    let err_break = render(&check_break);
+    assert!(
+        err_break.contains("error[E2029]"),
+        "expected typed diagnostic error[E2029] for break outside loop, got: {err_break}"
+    );
+    assert!(
+        err_break.contains("`break` outside of a loop"),
+        "expected break outside loop message, got: {err_break}"
+    );
+    // Primary span underlines `break`
+    assert!(
+        err_break.contains("break;") && err_break.contains("^^^^^"),
+        "expected primary span underline on `break`, got: {err_break}"
+    );
+
+    // Counterexample B2: continue outside loop -> error[E2029] with primary span on continue
+    let continue_outside_src = r#"
+fn main() -> i32 {
+    continue;
+    return 0;
+}
+"#;
+    let continue_path = temp.join("continue_outside.ln");
+    fs::write(&continue_path, continue_outside_src).unwrap();
+    let check_continue = modes.check(&modes.source, &continue_path);
+    assert!(!check_continue.status.success());
+    let err_continue = render(&check_continue);
+    assert!(
+        err_continue.contains("error[E2029]"),
+        "expected typed diagnostic error[E2029] for continue outside loop, got: {err_continue}"
+    );
+    assert!(
+        err_continue.contains("`continue` outside of a loop"),
+        "expected continue outside loop message, got: {err_continue}"
+    );
+    assert!(
+        err_continue.contains("continue;") && err_continue.contains("^^^^^^^^"),
+        "expected primary span underline on `continue`, got: {err_continue}"
+    );
+}
+
+

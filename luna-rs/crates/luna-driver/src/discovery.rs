@@ -11,11 +11,20 @@ pub enum ComponentFormat {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ComponentProvenance {
+    SysrootCanonical {
+        capabilities: Vec<crate::sysroot_manifest::ProviderCapability>,
+    },
+    LocalProject,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExternalComponentDescriptor {
     pub name: String,
     pub root_dir: PathBuf,
     pub entry_file: PathBuf,
     pub format: ComponentFormat,
+    pub provenance: ComponentProvenance,
 }
 
 pub struct ExternalComponentDiscovery;
@@ -35,6 +44,10 @@ impl ExternalComponentDiscovery {
             return Err(ExternalComponentError::NotFound { name: name.to_string(), searched_dir: external_dir.to_path_buf() });
         }
 
+        let provenance = ComponentProvenance::SysrootCanonical {
+            capabilities: provider.capabilities.clone(),
+        };
+
         let path_str = provider.path.as_str();
 
         let llib_path = external_dir.join(format!("{}.llib", path_str));
@@ -44,6 +57,7 @@ impl ExternalComponentDiscovery {
                 root_dir: external_dir.to_path_buf(),
                 entry_file: llib_path,
                 format: ComponentFormat::Llib,
+                provenance,
             });
         }
 
@@ -54,6 +68,7 @@ impl ExternalComponentDiscovery {
                 root_dir: external_dir.to_path_buf(),
                 entry_file: ln_path,
                 format: ComponentFormat::Source,
+                provenance,
             });
         }
 
@@ -65,6 +80,7 @@ impl ExternalComponentDiscovery {
                 root_dir: pkg_root,
                 entry_file: pkg_ln_entry,
                 format: ComponentFormat::Package,
+                provenance,
             });
         }
 
@@ -76,6 +92,7 @@ impl ExternalComponentDiscovery {
                 root_dir: external_dir.to_path_buf(),
                 entry_file: mlib_path,
                 format: ComponentFormat::Llib,
+                provenance,
             });
         }
 
@@ -87,6 +104,7 @@ impl ExternalComponentDiscovery {
                 root_dir: external_dir.to_path_buf(),
                 entry_file: ms_path,
                 format: ComponentFormat::Source,
+                provenance,
             });
         }
 
@@ -97,6 +115,7 @@ impl ExternalComponentDiscovery {
                 root_dir: pkg_root,
                 entry_file: pkg_ms_entry,
                 format: ComponentFormat::Package,
+                provenance,
             });
         }
 

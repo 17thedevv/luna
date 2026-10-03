@@ -1528,25 +1528,33 @@ impl<'a> MonoCollector<'a> {
             self.ctx.diagnostics.push(
                 luna_common::Diagnostic::error(
                     "E_UNRESOLVED_PROJECTION: Associated type projection could not be normalized at monomorphization barrier"
-                ).with_span(span)
+                )
+                .with_code(luna_common::DiagnosticCode::MonomorphizationBarrier)
+                .with_span(span)
             );
         } else if flags.0 {
             self.ctx.diagnostics.push(
                 luna_common::Diagnostic::error(
                     "E_UNCONSTRAINED_INFERENCE: Unconstrained type inference variable reached monomorphization barrier"
-                ).with_span(span)
+                )
+                .with_code(luna_common::DiagnosticCode::MonomorphizationBarrier)
+                .with_span(span)
             );
         } else if flags.1 {
             self.ctx.diagnostics.push(
                 luna_common::Diagnostic::error(
                     "E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier"
-                ).with_span(span)
+                )
+                .with_code(luna_common::DiagnosticCode::MonomorphizationBarrier)
+                .with_span(span)
             );
         } else if flags.2 && self.ctx.diagnostics.is_empty() {
             self.ctx.diagnostics.push(
                 luna_common::Diagnostic::error(
                     "E_CANNOT_MONOMORPHIZE: Semantic error type reached monomorphization barrier"
-                ).with_span(span)
+                )
+                .with_code(luna_common::DiagnosticCode::MonomorphizationBarrier)
+                .with_span(span)
             );
         }
     }
@@ -1578,7 +1586,11 @@ impl<'a> MonoCollector<'a> {
             if let Some(message) = op.error_for_type(&self.ctx.types, ty) {
                 let span = self.get_expr_span_for_diag(operand)
                     .unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                self.ctx.diagnostics.push(luna_common::Diagnostic::error(message).with_span(span));
+                self.ctx.diagnostics.push(
+                    luna_common::Diagnostic::error(message)
+                        .with_code(luna_common::DiagnosticCode::TypeMismatch)
+                        .with_span(span)
+                );
             }
         }
     }

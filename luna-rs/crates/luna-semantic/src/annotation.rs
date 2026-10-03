@@ -172,6 +172,7 @@ impl<'a> AttributeProcessor<'a> {
                     // For now, we report unknown attributes as errors.
                     self.diagnostics.push(
                         Diagnostic::error(format!("unknown attribute `{}`", attr_name))
+                            .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                             .with_span(annot.name),
                     );
                 }
@@ -188,11 +189,13 @@ impl<'a> AttributeProcessor<'a> {
                     } else if !COMPILER_ATTRS.contains(&attr_name) && attr_name != "derive" {
                         self.diagnostics.push(
                             Diagnostic::error(format!("unknown attribute `{}`", attr_name))
+                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                 .with_span(annot.name),
                         );
                     } else {
                         self.diagnostics.push(
                             Diagnostic::error(format!("`#[{}]` cannot be applied to enum variants", attr_name))
+                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                 .with_span(annot.name),
                         );
                     }
@@ -211,11 +214,13 @@ impl<'a> AttributeProcessor<'a> {
                         } else if !COMPILER_ATTRS.contains(&attr_name) && attr_name != "derive" {
                             self.diagnostics.push(
                                 Diagnostic::error(format!("unknown attribute `{}`", attr_name))
+                                    .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                     .with_span(annot.name),
                             );
                         } else {
                             self.diagnostics.push(
                                 Diagnostic::error(format!("`#[{}]` cannot be applied to parameters", attr_name))
+                                    .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                     .with_span(annot.name),
                             );
                         }
@@ -236,11 +241,13 @@ impl<'a> AttributeProcessor<'a> {
                             } else if !COMPILER_ATTRS.contains(&attr_name) && attr_name != "derive" {
                                 self.diagnostics.push(
                                     Diagnostic::error(format!("unknown attribute `{}`", attr_name))
+                                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                         .with_span(annot.name),
                                 );
                             } else {
                                 self.diagnostics.push(
                                     Diagnostic::error(format!("`#[{}]` cannot be applied to parameters", attr_name))
+                                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                         .with_span(annot.name),
                                 );
                             }
@@ -264,6 +271,7 @@ impl<'a> AttributeProcessor<'a> {
                     _ => {
                         self.diagnostics.push(
                             Diagnostic::error("`#[repr]` can only be applied to structs or enums")
+                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                 .with_span(annot.name),
                         );
                     }
@@ -275,6 +283,7 @@ impl<'a> AttributeProcessor<'a> {
                     _ => {
                         self.diagnostics.push(
                             Diagnostic::error("`#[test]` can only be applied to functions")
+                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                 .with_span(annot.name),
                         );
                     }
@@ -286,6 +295,7 @@ impl<'a> AttributeProcessor<'a> {
                     _ => {
                         self.diagnostics.push(
                             Diagnostic::error("`#[inline]` can only be applied to functions")
+                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                 .with_span(annot.name),
                         );
                     }
@@ -297,6 +307,7 @@ impl<'a> AttributeProcessor<'a> {
                     _ => {
                         self.diagnostics.push(
                             Diagnostic::error("`#[no_mangle]` can only be applied to functions")
+                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                 .with_span(annot.name),
                         );
                     }
@@ -309,6 +320,7 @@ impl<'a> AttributeProcessor<'a> {
                     _ => {
                         self.diagnostics.push(
                             Diagnostic::error("`#[link]` can only be applied to functions or extern blocks")
+                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                                 .with_span(annot.name),
                         );
                     }
@@ -321,6 +333,7 @@ impl<'a> AttributeProcessor<'a> {
             "sync_noescape" => {
                 self.diagnostics.push(
                     Diagnostic::error("`#[sync_noescape]` can only be applied to parameters")
+                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                         .with_span(annot.name),
                 );
             }
@@ -335,6 +348,7 @@ impl<'a> AttributeProcessor<'a> {
             _ => {
                 self.diagnostics.push(
                     Diagnostic::error("`#[repr]` can only be applied to structs or enums")
+                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                         .with_span(annot.name),
                 );
                 return;
@@ -351,6 +365,7 @@ impl<'a> AttributeProcessor<'a> {
                     let span = self.get_expr_span(arg.value).unwrap_or(annot.name);
                     self.diagnostics.push(
                         Diagnostic::error(format!("invalid repr argument `{}`", arg_text))
+                            .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                             .with_span(span),
                     );
                 }
@@ -365,6 +380,7 @@ impl<'a> AttributeProcessor<'a> {
             _ => {
                 self.diagnostics.push(
                     Diagnostic::error("`#[test]` can only be applied to functions")
+                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                         .with_span(annot.name),
                 );
             }
@@ -382,6 +398,7 @@ impl<'a> AttributeProcessor<'a> {
             _ => {
                 self.diagnostics.push(
                     Diagnostic::error("`#[derive]` can only be applied to structs or enums")
+                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
                         .with_span(annot.name),
                 );
                 return Vec::new();
@@ -410,7 +427,7 @@ impl<'a> AttributeProcessor<'a> {
                         available.join(", ")
                     )
                 };
-                self.diagnostics.push(Diagnostic::error(msg).with_span(span));
+                self.diagnostics.push(Diagnostic::error(msg).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(span));
                 continue;
             }
 

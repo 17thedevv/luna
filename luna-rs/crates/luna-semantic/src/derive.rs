@@ -127,8 +127,8 @@ impl<'arena> DeriveContext<'arena> {
     /// Report a diagnostic error.
     pub fn error(&mut self, message: String, span: Option<Span>) {
         let diag = match span {
-            Some(s) => Diagnostic::error(message).with_span(s),
-            None => Diagnostic::error(message).with_span(self.derive_span),
+            Some(s) => Diagnostic::error(message).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(s),
+            None => Diagnostic::error(message).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(self.derive_span),
         };
         self.diagnostics.push(diag);
     }
@@ -288,7 +288,7 @@ impl DeriveRegistry {
             let type_name = &input.name;
             let code = format!("impl std::Copy for {} {{}}", type_name);
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Copy for `{}`", type_name)).with_span(ctx.derive_span))
+                .map_err(|_| Diagnostic::error(format!("failed to parse generated Copy for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
         });
         self.register("Copy", copy_derive);
 
@@ -309,7 +309,7 @@ impl DeriveRegistry {
             );
 
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Debug for `{}`", type_name)).with_span(ctx.derive_span))
+                .map_err(|_| Diagnostic::error(format!("failed to parse generated Debug for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
         });
         self.register("Debug", debug);
 
@@ -367,7 +367,7 @@ impl DeriveRegistry {
 
 
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Clone for `{}`", type_name)).with_span(ctx.derive_span))
+                .map_err(|_| Diagnostic::error(format!("failed to parse generated Clone for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
         });
         self.register("Clone", clone);
 
@@ -426,7 +426,7 @@ impl DeriveRegistry {
             };
 
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated PartialEq for `{}`", type_name)).with_span(ctx.derive_span))
+                .map_err(|_| Diagnostic::error(format!("failed to parse generated PartialEq for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
         });
         self.register("PartialEq", partial_eq);
 
@@ -442,7 +442,7 @@ impl DeriveRegistry {
 
             let code = format!("impl Eq for {} {{}}", type_name);
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Eq for `{}`", type_name)).with_span(ctx.derive_span))
+                .map_err(|_| Diagnostic::error(format!("failed to parse generated Eq for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
         });
         self.register("Eq", eq);
 
@@ -506,13 +506,13 @@ impl DeriveRegistry {
                             format!("cannot derive Default for empty enum `{}`", type_name),
                             Some(input.name_span)
                         );
-                        return Err(Diagnostic::error(format!("cannot derive Default for empty enum `{}`", type_name)));
+                        return Err(Diagnostic::error(format!("cannot derive Default for empty enum `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation));
                     }
                 }
             };
 
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Default for `{}`", type_name)).with_span(ctx.derive_span))
+                .map_err(|_| Diagnostic::error(format!("failed to parse generated Default for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
         });
         self.register("Default", default);
     }
