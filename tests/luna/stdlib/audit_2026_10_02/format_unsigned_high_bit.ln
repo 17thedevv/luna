@@ -1,0 +1,13 @@
+import <fmt>;
+import <string>;
+import <io>;
+
+fn main() -> i32 {
+    dec value: u8 = 255 as u8;
+    dec rw output = std::string_new();
+    value.fmt(&rw output).unwrap();
+    std::io::println(output.as_bytes());
+    dec expected = std::string_from_str("255");
+    if output.eq(&expected) == false { return 1; }
+    return 0;
+}

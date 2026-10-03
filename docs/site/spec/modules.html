@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 — modules, bootstrap and artifacts</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01--modules-bootstrap-and-artifacts">Luna 0.1 — modules, bootstrap and artifacts</h1>
+<h2 id="providers-and-namespaces">Providers and namespaces</h2>
+<p><code>import</code> acquires a provider. <code>module</code> creates an inline namespace. <code>::</code> resolves a namespace path. <code>using path as alias;</code> creates a local namespace alias. None of these operations implies another: a filename does not create a module, an import does not introduce arbitrary unqualified bindings, and an alias does not load a dependency. Multiple providers may contribute exported declarations to the same explicit namespace, subject to duplicate/coherence rules.</p>
+<p>Canonical stdlib APIs live under <code>std::</code>, including the explicitly defined <code>std::fmt</code> and <code>std::io</code> subnamespaces. A physical <code>alloc/</code> or <code>core/</code> directory does not imply <code>std::alloc</code> or <code>std::core</code>. Container namespaces such as <code>std::collections::Vec</code> must not be inferred from another language&#x27;s conventions.</p>
+<p>Private declarations follow module ancestry rules. Field visibility is independent of containing type visibility under Visibility-02. Exported declarations and all generic/lifetime/ownership contracts must cross provider boundaries without bypassing privacy or coherence.</p>
+<h2 id="controlled-language-bootstrap">Controlled language bootstrap</h2>
+<p>The baseline has six compiler-required contract families and one controlled standard-prelude contribution. The manifest is explicit; no arbitrary directory scan may make a new file automatically visible.</p>
+<table>
+<tr><th>Family</th><th>Provider</th><th>Selected logical surface</th></tr>
+<tr><td>Drop</td><td><code>__lang_drop</code></td><td><code>std::Drop</code> and its language hook identity</td></tr>
+<tr><td>Option</td><td><code>__lang_option</code></td><td><code>std::Option</code>, Some/None identities, <code>std::option_flatten</code></td></tr>
+<tr><td>Iterator</td><td><code>__lang_iterator</code></td><td><code>std::Iterator</code></td></tr>
+<tr><td>IntoIterator</td><td><code>__lang_into_iterator</code></td><td><code>std::IntoIterator</code></td></tr>
+<tr><td>Copy</td><td><code>copy</code></td><td><code>std::Copy</code></td></tr>
+<tr><td>Try / FromResidual / ControlFlow</td><td><code>try</code></td><td>Selected <code>std::</code> protocol declarations and hooks</td></tr>
+<tr><td>Controlled standard prelude</td><td><code>result</code></td><td><code>std::OptionExt</code>, not general Result auto-visibility</td></tr>
+</table>
+<p>Auto-visible paths remain qualified under <code>std</code>; they do not create unqualified root Option, Iterator or Drop bindings. Other ordinary APIs require explicit provider imports. <code>Result</code> remains an ordinary library type implementing generic Try contracts; it is not a compiler-native container.</p>
+<p>Exact language hook mappings are documented in <a href="../../core-language-contract.md">core-language-contract.md</a> and represented by <code>luna-driver/src/lang_contracts.rs</code>. Provider names choose acquisition, while canonical declaration identities identify semantics.</p>
+<h2 id="artifact-discovery-validity-and-parity">Artifact discovery, validity and parity</h2>
+<p>Discovery finds candidates; validation checks identity. Canonical <code>.llib</code> takes precedence over <code>.ln</code>; canonical candidates take precedence over legacy reads. Directory-package discovery has its specified order in the compatibility contract; local relative imports have their own supported lookup scope. An invalid selected artifact must be rejected, not silently replaced by source.</p>
+<p>Identity includes source, canonical public interface, dependency interfaces, compiler, target, feature/configuration and artifact-kind information as defined by the artifact contract. Mere file existence is not validity. Private changes and public interface changes must not be confused. The writer emits <code>LLIB</code>; legacy <code>MLIB</code> reads do not authorize legacy artifact emission.</p>
+<p>Portable metadata must not serialize session-local IDs as stable semantic identity. It must preserve generic bodies, canonical instances, trait impls, lifetimes, anchors, raw-pointer effects and other required public contracts. Importing an interface must not multiply an identical bound for each dependency path. Source-only and freshly rebuilt artifact-only consumers must agree on acceptance, rejection, behavior and relevant diagnostics.</p>
+<p>The compiler resolves and validates providers. The package/build tool orchestrates rebuild, caching, acquisition and invalidation policy. The compiler must not silently adopt package-manager policy or rebuild a stale library on import.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

@@ -3,6 +3,10 @@ name: luna-language-capability-validation
 description: Validate whether a claimed Luna language or compiler capability satisfies its complete contract across relevant pipeline stages, negative cases, codegen, and source/.llib modes. Use for feature work, compiler semantic bug fixes, support audits, and completion or freeze claims; not for trivial edits.
 ---
 
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../../docs/spec/0.1/README.md).
+
 # Luna Language Capability Validation
 
 ## Purpose

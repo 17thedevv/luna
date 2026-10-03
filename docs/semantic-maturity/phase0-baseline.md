@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../spec/0.1/README.md).
+
 # SEM-MATURITY-01 Phase 0 — Semantic Coverage Audit & Conformance Baseline
 
 > Phase 1A update (2026-09-18): after rebasing onto hygiene-complete `main`

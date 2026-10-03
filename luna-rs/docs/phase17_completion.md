@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # Phase 17 Completion Report: Master Semantic Audit & Hardening
 
 Phase 17 successfully closed all remaining gaps identified in the Semantic Master Audit, resulting in a significantly more robust compiler frontend, typechecker, and MVIR generation pipeline.

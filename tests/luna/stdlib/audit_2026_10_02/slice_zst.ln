@@ -1,0 +1,12 @@
+import <vec>;
+struct Empty {};
+fn main() -> i32 {
+    dec rw v = std::vec_new<Empty>();
+    v.push(Empty {});
+    v.push(Empty {});
+    dec rw it = v.iter();
+    if it.next_ref().is_none() { return 1; }
+    if it.next_ref().is_none() { return 2; }
+    if it.next_ref().is_some() { return 3; }
+    return 0;
+}

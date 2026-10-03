@@ -1,0 +1,160 @@
+[
+  {
+    "mode": "source",
+    "fixture": "basic_reference",
+    "expectation": "accept",
+    "compile_exit": 0,
+    "compile_seconds": 0.20615049998741597,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": true
+  },
+  {
+    "mode": "source",
+    "fixture": "foreach_current_parser",
+    "expectation": "characterization",
+    "compile_exit": 0,
+    "compile_seconds": 0.7423975999699906,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": null
+  },
+  {
+    "mode": "source",
+    "fixture": "foreach_parenthesized_contract",
+    "expectation": "accept",
+    "compile_exit": 1,
+    "compile_seconds": 0.021118199976626784,
+    "contract_met": false
+  },
+  {
+    "mode": "source",
+    "fixture": "macro_name_independent",
+    "expectation": "accept",
+    "compile_exit": 0,
+    "compile_seconds": 0.1724747999687679,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": true
+  },
+  {
+    "mode": "source",
+    "fixture": "public_field_default",
+    "expectation": "accept",
+    "compile_exit": 0,
+    "compile_seconds": 0.16561430000001565,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": true
+  },
+  {
+    "mode": "source",
+    "fixture": "receiver_shorthand_contract",
+    "expectation": "accept",
+    "compile_exit": 1,
+    "compile_seconds": 0.021889499970711768,
+    "contract_met": false
+  },
+  {
+    "mode": "source",
+    "fixture": "reject_private_field",
+    "expectation": "reject",
+    "compile_exit": 1,
+    "compile_seconds": 0.05427460005739704,
+    "contract_met": true
+  },
+  {
+    "mode": "source",
+    "fixture": "reject_semicolon_fields",
+    "expectation": "reject",
+    "compile_exit": 0,
+    "compile_seconds": 0.1821821999619715,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": false
+  },
+  {
+    "mode": "artifact",
+    "fixture": "basic_reference",
+    "expectation": "accept",
+    "compile_exit": 0,
+    "compile_seconds": 0.21032209997065365,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": true
+  },
+  {
+    "mode": "artifact",
+    "fixture": "foreach_current_parser",
+    "expectation": "characterization",
+    "compile_exit": 0,
+    "compile_seconds": 0.6772525000269525,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": null
+  },
+  {
+    "mode": "artifact",
+    "fixture": "foreach_parenthesized_contract",
+    "expectation": "accept",
+    "compile_exit": 1,
+    "compile_seconds": 0.021107300010044128,
+    "contract_met": false
+  },
+  {
+    "mode": "artifact",
+    "fixture": "macro_name_independent",
+    "expectation": "accept",
+    "compile_exit": 0,
+    "compile_seconds": 0.19144570000935346,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": true
+  },
+  {
+    "mode": "artifact",
+    "fixture": "public_field_default",
+    "expectation": "accept",
+    "compile_exit": 0,
+    "compile_seconds": 0.18680730002233759,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": true
+  },
+  {
+    "mode": "artifact",
+    "fixture": "receiver_shorthand_contract",
+    "expectation": "accept",
+    "compile_exit": 1,
+    "compile_seconds": 0.0247710999683477,
+    "contract_met": false
+  },
+  {
+    "mode": "artifact",
+    "fixture": "reject_private_field",
+    "expectation": "reject",
+    "compile_exit": 1,
+    "compile_seconds": 0.06671889999415725,
+    "contract_met": true
+  },
+  {
+    "mode": "artifact",
+    "fixture": "reject_semicolon_fields",
+    "expectation": "reject",
+    "compile_exit": 0,
+    "compile_seconds": 0.19917780003743246,
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "contract_met": false
+  }
+]

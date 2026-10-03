@@ -1,0 +1,3 @@
+import "p11";
+export module probe12 { export fn tag() -> i32 { return 12; } }
+

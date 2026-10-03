@@ -1,0 +1,344 @@
+[
+  {
+    "mode": "source",
+    "pattern": "sequential",
+    "n": 1500,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 1500 { map.insert(i * 1, i); i = i + 1; }\n        if map.len() != (1500 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.018473799980711192,
+      0.017358799988869578,
+      0.01713639998342842,
+      0.01723089994629845,
+      0.017936800024472177,
+      0.01935120002599433,
+      0.016392999968957156
+    ],
+    "median_seconds": 0.017358799988869578,
+    "minimum_seconds": 0.016392999968957156,
+    "maximum_seconds": 0.01935120002599433
+  },
+  {
+    "mode": "source",
+    "pattern": "low_bits_collision",
+    "n": 1500,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 1500 { map.insert(i * 65536, i); i = i + 1; }\n        if map.len() != (1500 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.07558660005452111,
+      0.07353019999573007,
+      0.07069969997974113,
+      0.07014239998534322,
+      0.07386569998925552,
+      0.06984279997413978,
+      0.09099290001904592
+    ],
+    "median_seconds": 0.07353019999573007,
+    "minimum_seconds": 0.06984279997413978,
+    "maximum_seconds": 0.09099290001904592
+  },
+  {
+    "mode": "source",
+    "pattern": "sequential",
+    "n": 3000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 3000 { map.insert(i * 1, i); i = i + 1; }\n        if map.len() != (3000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.017805200011935085,
+      0.01769159996183589,
+      0.017879299994092435,
+      0.01792449998902157,
+      0.01885789999505505,
+      0.018531600013375282,
+      0.01816139998845756
+    ],
+    "median_seconds": 0.01792449998902157,
+    "minimum_seconds": 0.01769159996183589,
+    "maximum_seconds": 0.01885789999505505
+  },
+  {
+    "mode": "source",
+    "pattern": "low_bits_collision",
+    "n": 3000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 3000 { map.insert(i * 65536, i); i = i + 1; }\n        if map.len() != (3000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.22666490002302453,
+      0.2248550999793224,
+      0.226790799992159,
+      0.23109489999478683,
+      0.23031199997058138,
+      0.22497109998948872,
+      0.2272503999993205
+    ],
+    "median_seconds": 0.226790799992159,
+    "minimum_seconds": 0.2248550999793224,
+    "maximum_seconds": 0.23109489999478683
+  },
+  {
+    "mode": "source",
+    "pattern": "sequential",
+    "n": 6000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 6000 { map.insert(i * 1, i); i = i + 1; }\n        if map.len() != (6000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.020190700015518814,
+      0.020620599971152842,
+      0.0200314000248909,
+      0.02199739997740835,
+      0.020419900014530867,
+      0.021481400006450713,
+      0.02014839998446405
+    ],
+    "median_seconds": 0.020419900014530867,
+    "minimum_seconds": 0.0200314000248909,
+    "maximum_seconds": 0.02199739997740835
+  },
+  {
+    "mode": "source",
+    "pattern": "low_bits_collision",
+    "n": 6000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 6000 { map.insert(i * 65536, i); i = i + 1; }\n        if map.len() != (6000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.8655253000324592,
+      0.8522142999572679,
+      0.8937630000291392,
+      0.8750219999928959,
+      0.8580538000096567,
+      0.865815199969802,
+      0.8642650000401773
+    ],
+    "median_seconds": 0.8655253000324592,
+    "minimum_seconds": 0.8522142999572679,
+    "maximum_seconds": 0.8937630000291392
+  },
+  {
+    "mode": "source",
+    "pattern": "sequential",
+    "n": 12000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 12000 { map.insert(i * 1, i); i = i + 1; }\n        if map.len() != (12000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.02383309998549521,
+      0.023616000020410866,
+      0.023882600013166666,
+      0.024482299981173128,
+      0.027517099981196225,
+      0.022928399965167046,
+      0.02344499999890104
+    ],
+    "median_seconds": 0.02383309998549521,
+    "minimum_seconds": 0.022928399965167046,
+    "maximum_seconds": 0.027517099981196225
+  },
+  {
+    "mode": "source",
+    "pattern": "low_bits_collision",
+    "n": 12000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 12000 { map.insert(i * 65536, i); i = i + 1; }\n        if map.len() != (12000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      3.358842299960088,
+      3.426413599983789,
+      3.423804099962581,
+      3.3418862000107765,
+      3.436100799997803,
+      3.4471041000215337,
+      3.42786590004107
+    ],
+    "median_seconds": 3.426413599983789,
+    "minimum_seconds": 3.3418862000107765,
+    "maximum_seconds": 3.4471041000215337
+  },
+  {
+    "mode": "source",
+    "pattern": "startup_control",
+    "n": 0,
+    "rounds": 0,
+    "source": "fn main() -> i32 { return 0; }",
+    "samples_seconds": [
+      0.015892600000370294,
+      0.015632700000423938,
+      0.01629759999923408,
+      0.01620600000023842,
+      0.016917600005399436,
+      0.01684449997264892,
+      0.01575839996803552
+    ],
+    "median_seconds": 0.01620600000023842,
+    "minimum_seconds": 0.015632700000423938,
+    "maximum_seconds": 0.016917600005399436
+  },
+  {
+    "mode": "artifact",
+    "pattern": "sequential",
+    "n": 1500,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 1500 { map.insert(i * 1, i); i = i + 1; }\n        if map.len() != (1500 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.01840330002596602,
+      0.017954800045117736,
+      0.016778799996245652,
+      0.018943400005809963,
+      0.01703230000566691,
+      0.01922359998570755,
+      0.016568400023970753
+    ],
+    "median_seconds": 0.017954800045117736,
+    "minimum_seconds": 0.016568400023970753,
+    "maximum_seconds": 0.01922359998570755
+  },
+  {
+    "mode": "artifact",
+    "pattern": "low_bits_collision",
+    "n": 1500,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 1500 { map.insert(i * 65536, i); i = i + 1; }\n        if map.len() != (1500 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.07272320002084598,
+      0.0707047000178136,
+      0.06865299999481067,
+      0.06947270000819117,
+      0.0709950000164099,
+      0.07402230001753196,
+      0.06964299996616319
+    ],
+    "median_seconds": 0.0707047000178136,
+    "minimum_seconds": 0.06865299999481067,
+    "maximum_seconds": 0.07402230001753196
+  },
+  {
+    "mode": "artifact",
+    "pattern": "sequential",
+    "n": 3000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 3000 { map.insert(i * 1, i); i = i + 1; }\n        if map.len() != (3000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.017732200038153678,
+      0.018782700004521757,
+      0.018348500016145408,
+      0.01793480000924319,
+      0.02014239999698475,
+      0.017993399989791214,
+      0.018070499994792044
+    ],
+    "median_seconds": 0.018070499994792044,
+    "minimum_seconds": 0.017732200038153678,
+    "maximum_seconds": 0.02014239999698475
+  },
+  {
+    "mode": "artifact",
+    "pattern": "low_bits_collision",
+    "n": 3000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 3000 { map.insert(i * 65536, i); i = i + 1; }\n        if map.len() != (3000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.2543093000422232,
+      0.22663630003808066,
+      0.24238559999503195,
+      0.23384850000729784,
+      0.2529237000271678,
+      0.2283441000035964,
+      0.23827060003532097
+    ],
+    "median_seconds": 0.23827060003532097,
+    "minimum_seconds": 0.22663630003808066,
+    "maximum_seconds": 0.2543093000422232
+  },
+  {
+    "mode": "artifact",
+    "pattern": "sequential",
+    "n": 6000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 6000 { map.insert(i * 1, i); i = i + 1; }\n        if map.len() != (6000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.021845900046173483,
+      0.02007119997870177,
+      0.02063149999594316,
+      0.020040999981574714,
+      0.021180399984586984,
+      0.02061659999890253,
+      0.020267400017473847
+    ],
+    "median_seconds": 0.02061659999890253,
+    "minimum_seconds": 0.020040999981574714,
+    "maximum_seconds": 0.021845900046173483
+  },
+  {
+    "mode": "artifact",
+    "pattern": "low_bits_collision",
+    "n": 6000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 6000 { map.insert(i * 65536, i); i = i + 1; }\n        if map.len() != (6000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.9362957000266761,
+      0.855241000012029,
+      0.8527981000370346,
+      0.8650654999655671,
+      0.8675479999510571,
+      0.8866447000182234,
+      0.8594086999655701
+    ],
+    "median_seconds": 0.8650654999655671,
+    "minimum_seconds": 0.8527981000370346,
+    "maximum_seconds": 0.9362957000266761
+  },
+  {
+    "mode": "artifact",
+    "pattern": "sequential",
+    "n": 12000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 12000 { map.insert(i * 1, i); i = i + 1; }\n        if map.len() != (12000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      0.025072299991734326,
+      0.023974200012162328,
+      0.024174799968022853,
+      0.023545000003650784,
+      0.025185600039549172,
+      0.02452799997990951,
+      0.025348499999381602
+    ],
+    "median_seconds": 0.02452799997990951,
+    "minimum_seconds": 0.023545000003650784,
+    "maximum_seconds": 0.025348499999381602
+  },
+  {
+    "mode": "artifact",
+    "pattern": "low_bits_collision",
+    "n": 12000,
+    "rounds": 8,
+    "source": "import <hashmap>;\nfn main() -> i32 {\n    dec rw round: i32 = 0;\n    while round < 8 {\n        dec rw map = std::hashmap_new<i32, i32>();\n        dec rw i: i32 = 0;\n        while i < 12000 { map.insert(i * 65536, i); i = i + 1; }\n        if map.len() != (12000 as u64) { return 1; }\n        round = round + 1;\n    }\n    return 0;\n}",
+    "samples_seconds": [
+      3.8119329000473954,
+      3.525217100046575,
+      3.3808012999943458,
+      3.35975469998084,
+      3.495865100005176,
+      3.4160262999939732,
+      3.3583966000005603
+    ],
+    "median_seconds": 3.4160262999939732,
+    "minimum_seconds": 3.3583966000005603,
+    "maximum_seconds": 3.8119329000473954
+  },
+  {
+    "mode": "artifact",
+    "pattern": "startup_control",
+    "n": 0,
+    "rounds": 0,
+    "source": "fn main() -> i32 { return 0; }",
+    "samples_seconds": [
+      0.016329099948052317,
+      0.016419799998402596,
+      0.01624420000007376,
+      0.01576589996693656,
+      0.016415200021583587,
+      0.015779799956362695,
+      0.01623529999051243
+    ],
+    "median_seconds": 0.01624420000007376,
+    "minimum_seconds": 0.01576589996693656,
+    "maximum_seconds": 0.016419799998402596
+  }
+]

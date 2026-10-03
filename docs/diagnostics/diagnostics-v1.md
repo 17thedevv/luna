@@ -1,4 +1,8 @@
-# Mellis Compiler Diagnostic System v1.0 — Architecture & Contract Specification
+<!-- luna-doc-role: adopted-contract -->
+
+> **Luna 0.1 — adopted-contract.** Retained detailed contract. Prior acceptance and freeze claims remain dated evidence; current release conformance is tracked separately. See the [versioned specification](../spec/0.1/README.md).
+
+# Luna Compiler Diagnostic System v1.0 — Architecture & Contract Specification
 
 **Status**: FROZEN / CANONICAL SPECIFICATION  
 **Scope**: All Compiler Phases (Parser, Resolver, TypeChecker, Borrowck, Async/Comptime, Mono, Driver/Backend)  
@@ -8,7 +12,7 @@
 
 ## 1. Overview & Architectural Principles
 
-The Mellis Compiler diagnostic subsystem is a first-class compiler boundary responsible for reporting all syntactic, semantic, borrow-checking, capability, monomorphization, and backend errors.
+The Luna Compiler diagnostic subsystem is a first-class compiler boundary responsible for reporting all syntactic, semantic, borrow-checking, capability, monomorphization, and backend errors.
 
 Ad-hoc error strings and unformatted diagnostic messages are strictly forbidden. Every compiler diagnostic is a structured, strongly-typed machine-readable object governed by the invariants defined below.
 
@@ -28,7 +32,7 @@ Ad-hoc error strings and unformatted diagnostic messages are strictly forbidden.
 
 ## 2. Diagnostic Invariants Contract (DIAG-1 to DIAG-10)
 
-All diagnostics emitted by the Mellis compiler must strictly uphold the following 10 invariants:
+All diagnostics emitted by the Luna compiler must strictly uphold the following 10 invariants:
 
 - **DIAG-1 (Code Mandatory)**: Every user-visible compiler error MUST have a strongly-typed `DiagnosticCode`. Ad-hoc diagnostics without a code are prohibited.
 - **DIAG-2 (Primary Span Mandatory for Source Errors)**: Every source-originated diagnostic (`< 6000`) MUST have a primary source `Span` attached at construction time via `Diagnostic::source_error` or `source_warning`. `Diagnostic::global_error` is forbidden for phases 0–5.
@@ -117,7 +121,7 @@ The error code namespace is statically partitioned into non-overlapping ranges b
 
 ## 5. Canonical Diagnostic Code Registry
 
-The following table lists every stable `DiagnosticCode` recognized by Mellis v1.0.
+The following table lists every stable `DiagnosticCode` recognized by Luna v1.0.
 
 | Code | Value | Name | Owning Phase | Description / Invariant |
 |:---|:---|:---|:---|:---|
@@ -132,7 +136,7 @@ The following table lists every stable `DiagnosticCode` recognized by Mellis v1.
 | `E1004` | 1004 | UnresolvedModuleProvider | Resolver | Module provider not found in search paths or registry |
 | `E1005` | 1005 | CyclicModuleDependency | Resolver | Circular import cycle detected between providers |
 | `E1006` | 1006 | InvalidVisibility | Resolver | Visibility modifier used on invalid declaration |
-| `E1007` | 1007 | WildcardImportProhibited | Resolver | Wildcard glob import prohibited by Mellis contract |
+| `E1007` | 1007 | WildcardImportProhibited | Resolver | Wildcard glob import prohibited by Luna contract |
 | `E2001` | 2001 | TypeMismatch | TypeChecker | Incompatible types in assignment, call, or binary op |
 | `E2002` | 2002 | CannotDereference | TypeChecker | Dereference operator applied to non-pointer/reference |
 | `E2003` | 2003 | CannotIndex | TypeChecker | Index operator applied to non-indexable type |
@@ -189,12 +193,12 @@ The terminal renderer outputs multi-label diagnostic reports adhering to this st
 
 ```text
 error[E3001]: UseAfterMove: Use of moved value `x`
-  --> src/main.ms:12:9
+  --> src/main.ln:12:9
    |
 12 |     foo(x);
    |         ^ value used here after move
    |
-  ::: src/main.ms:8:9
+  ::: src/main.ln:8:9
    |
  8 |     bar(x);
    |         - value previously moved here

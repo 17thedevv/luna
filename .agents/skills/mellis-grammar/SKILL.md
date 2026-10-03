@@ -1,11 +1,15 @@
 ---
 name: mellis-grammar
-description: Canonical Single Source of Truth (SSOT) for Luna Language Grammar and Syntax (formerly Mellis). Provides strict guidelines, forbidden syntax, and canonical examples for the language surface.
+description: Operational guidance for the versioned Luna Language Grammar and Syntax (formerly Mellis). Provides strict guidelines, forbidden syntax, and canonical examples for the language surface.
 ---
+
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../../docs/spec/0.1/README.md).
 
 # Luna Grammar and Syntax Guidelines
 
-This skill is the **Single Source of Truth** for Luna syntax (formerly Mellis). Do not infer Luna syntax from Rust, C++, or any other language. Always refer to this document and the accompanying `grammar.ebnf` when modifying the parser, AST, or semantic analysis, or when writing `.ln` code.
+This skill is operational guidance for the versioned Luna 0.1 syntax and adopted contracts; it is not an independent specification. Do not infer Luna syntax from Rust, C++, or any other language. Always refer to this document and the accompanying `grammar.ebnf` when modifying the parser, AST, or semantic analysis, or when writing `.ln` code.
 
 ## Grammar Authority Rule
 
@@ -30,7 +34,7 @@ The following keywords and syntax constructs are strictly **FORBIDDEN** in Luna:
 - `export using` / `export import`: Luna v1.0 does not support module re-export. Both are hard syntax errors.
 - `import <a::b>`: Mellis `import <...>` only accepts a single logical provider name. No `::`.
 - `import "foo.ms"` or `import "foo.mlib"`: File paths in local imports must not contain extensions (use `import "foo";`).
-- Prefix `await`: Mellis v1.0 strictly uses postfix `.await` (e.g. `fut.await`). Prefix `await fut` is forbidden.
+- Prefix `await`: Luna 0.1 strictly uses postfix `.await` (e.g. `fut.await`). Prefix `await fut` is forbidden.
 - Semicolons `;` as struct field delimiters: Struct fields must strictly use comma `,` delimiters (e.g. `struct Point { x: f64, y: f64 }`).
 - `=>`: Mellis uses `->` for match arms and lambda return types. Note: `=>` is strictly used as the macro rule separator (`macro foo { (pattern) => { template } }`).
 - `$`: Mellis uses `@` for macro placeholders/metavariables (`@name: expr`). `$` is forbidden in Mellis macro definitions.
@@ -102,7 +106,7 @@ dec y = identity<i32>(42);
 ```
 
 ### Struct Declarations
-Struct fields **strictly use comma `,` delimiters**. Semicolons `;` are forbidden inside the field list in v1.0. Trailing comma is permitted.
+Struct fields **strictly use comma `,` delimiters**. Semicolons `;` are forbidden inside the field list in Luna 0.1. Trailing comma is permitted.
 
 **Struct Declaration Terminator Invariant**:
 A struct declaration is terminated by exactly one `;` after all postfix type-level contracts.
@@ -110,7 +114,7 @@ A struct declaration is terminated by exactly one `;` after all postfix type-lev
 - `;` closes the struct declaration.
 Therefore, `struct A {};` and `struct B { field: &T } requires life(field) >= life(self);` are canonical.
 
-Fields are **private by default**. Prefixing a field with `export` makes it public (only valid on exported structs, per `VIS-STRUCT-2`):
+Fields are **public by default** under approved Visibility-02. `export` explicitly means public; `private` means private. Containing type accessibility remains independently required:
 ```rust
 export struct Point {
     export x: f64,
@@ -122,7 +126,7 @@ export struct User {
     password_hash: str, // private field
 };
 
-// In a private struct, all fields are private; 'export' on fields is rejected (VIS-STRUCT-2)
+// A private containing type remains inaccessible externally, independently of its field visibility.
 struct InternalBuffer {
     capacity: usize,
     len: usize,
@@ -156,17 +160,17 @@ Mellis strictly separates **artifact providers** from **module namespaces**:
 - Multiple providers can contribute to the same module namespace (e.g. `alloc` and `core` contributing to `module std`).
 
 ```rust
-// In math.ms (provider = "math"):
+// In math.ln (provider = "math"):
 module geometry {
     export struct Point {
         x: f64,
         y: f64,
-    }
+    };
 }
 
-// In consumer.ms:
-import "math";     // Provider loaded (finds math.ms / math.mlib)
-import <core>;     // External sysroot provider loaded
+// In consumer.ln:
+import "math";     // Provider loaded (finds math.ln / math.llib)
+import <mem>;     // External sysroot provider loaded
 
 // Accessed via namespace, NOT provider name:
 dec pt = geometry::Point { x: 1.0, y: 2.0 };
@@ -179,18 +183,18 @@ dec pt = geometry::Point { x: 1.0, y: 2.0 };
 
 **Rules:**
 - Target must be a qualified module/namespace path, not a leaf symbol (type, function, etc.)
-- `using` aliases are compilation-local — they are NOT exported via MLib
+- `using` aliases are compilation-local — they are NOT exported via .llib
 - `export using` is a compile-time syntax error
 - `using <path>;` without `as` is a syntax error
 - Standard duplicate-scope rules apply
 
 ```rust
-import <alloc>;
+import <vec>;
 
 // Alias a namespace
-using std::collections as col;
+using std as library;
 
-dec v: col::Vec<i32>;       // Same as std::collections::Vec<i32>
+dec v: library::Vec<i32>;       // Same as std::Vec<i32>
 
 // Deep path alias
 using application::network::protocol as proto;
@@ -202,7 +206,7 @@ dec s: proto::Response;
 // using std::Vec as V;       // ERROR
 
 // INVALID — missing 'as':
-// using std::collections;    // ERROR
+// using std;    // ERROR
 
 // INVALID — cannot export:
 // export using std as s;     // ERROR
@@ -301,14 +305,14 @@ dec c = foo!{30};
 
 ## Module System Primitives
 
-Mellis v1 has exactly 4 module system primitives:
+Luna 0.1 has exactly 4 module system primitives:
 
 | Primitive | Purpose | Example |
 |-----------|---------|---------|
-| `import`  | Make an artifact provider available | `import <alloc>;` / `import "math";` |
+| `import`  | Make an artifact provider available | `import <vec>;` / `import "math";` |
 | `module`  | Define an inline namespace container | `module std { ... }` |
-| `using`   | Local namespace alias | `using std::collections as col;` |
-| `::`      | Qualified namespace lookup | `col::Vec<i32>` |
+| `using`   | Local namespace alias | `using std as library;` |
+| `::`      | Qualified namespace lookup | `library::Vec<i32>` |
 
 ## Lifetime Contracts (REGION-DESIGN-01)
 
@@ -322,10 +326,14 @@ Luna uses explicit lifetime relation contracts rather than lifetime generic para
 
 These contracts are appended at the end of function, struct, and extern declarations before the block/semicolon.
 
+## Known current conformance disagreements
+
+The retained parenthesized foreach and receiver-equivalence contracts are not fully implemented; struct field semicolons still parse. Formal EBNF coverage is explicitly partial. See the versioned gap register. Do not infer completeness from the invariant below.
+
 ## Grammar Layer Invariant
 
 $$\text{AST accepted by parser} \iff \text{Exactly defined by grammar.ebnf} \iff \text{Exactly supported by parser} \iff \text{No accepted syntax silently ignored}$$
 
 ## Related Documents
-- [grammar.ebnf](./grammar.ebnf): Machine-readable formal EBNF definition of the Mellis syntax.
+- [grammar.ebnf](../../../docs/grammar.ebnf): Machine-readable formal EBNF definition of the Mellis syntax.
 - [docs/grammar.md](../../../docs/grammar.md): Original comprehensive grammar specification.

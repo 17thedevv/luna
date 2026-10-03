@@ -3,6 +3,10 @@ name: luna-stdlib-design
 description: Canonical architectural authority for designing and implementing Luna's standard library. Enforces designing outward from Luna semantics rather than translating Rust/C++ inward, preserving provider vs namespace boundaries, ownership contracts, runtime separation, and source/.llib parity.
 ---
 
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../../docs/spec/0.1/README.md).
+
 # Luna Standard Library Design Protocol (luna-stdlib-design)
 
 ## Purpose
@@ -46,7 +50,7 @@ This is a permanent, non-negotiable Luna invariant:
 - **Correct Usage**:
   - `std::Vec<T>`
   - `std::String`
-  - `std::println(...)`
+  - `std::io::println(...)`
   - `std::read(...)`
 - **Forbidden Usage** (unless explicitly mandated by a frozen specification):
   - `io::read(...)`
@@ -366,7 +370,7 @@ If any of the following thoughts occur, **STOP immediately** — they are archit
 
 | Anti-Pattern Smell | Why It Is Forbidden in Luna | Correct Luna Architecture |
 |---|---|---|
-| *"The file is `io.ln`, so create `module io`."* | Providers do not define namespaces. Physical file organization is an internal package/sysroot concern. | Contribute declarations to `module std` (`std::read`, `std::println`). |
+| *"The file is `io.ln`, so create `module io`."* | Providers do not define namespaces. Physical file organization is an internal package/sysroot concern. | Contribute APIs under the adopted logical namespace (`std::io::print`, `std::io::println`); the provider path does not decide that namespace. |
 | *"Rust has `Entry`, so let's add `Entry`."* | Borrow-carrying intermediate enums are blocked by `LANGUAGE-GAP-05`. | Use direct sound methods on the container (`get_or_insert`, `insert_if_absent`). |
 | *"The compiler rejects this stdlib method; let's patch the typechecker to accept it."* | Stdlib is a client of the language. Compiler special-casing violates language invariants. | Determine if language-blocked or compiler bug. If bug, isolate reproducer and follow C-GAP protocol. |
 | *"Tests pass with `i32`, so generic container ownership is verified."* | Primitives are `Copy` and never run destructors. Leaks and double-drops are invisible. | Always test with non-`Copy` types containing a `DropProbe`. |

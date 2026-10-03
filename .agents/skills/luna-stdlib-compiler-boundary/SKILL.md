@@ -3,6 +3,10 @@ name: luna-stdlib-compiler-boundary
 description: Architectural boundary protocol between Luna standard library and the compiler. Enforces that stdlib is a consumer of the language, not an extension of the compiler's type system, prohibiting type-specific compiler branches, opcodes, or magic.
 ---
 
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../../docs/spec/0.1/README.md).
+
 # Luna Stdlib–Compiler Boundary
 
 ## Purpose
@@ -471,3 +475,12 @@ LangItem
 ```
 
 and both are language-level contracts, not shortcuts for individual stdlib implementations.
+
+
+## Luna 0.1 macro boundary clarification
+
+The prohibition of library-specific compiler knowledge includes MacroEngine and
+AST desugaring. Do not match printing macro short names, infer streams/newlines
+from prefixes/suffixes, or select fallback stdlib callee paths. An annotation
+alone does not remove the coupling. The library macro owns its emission target
+and policy; any interpolation capability requires a separate generic contract.

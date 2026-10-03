@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](spec/0.1/README.md).
+
 # Mellis Compiler Rewrite v2 — Rust Bootstrap Strategy
 
 Tài liệu này định nghĩa chiến lược chính thức cho việc viết lại (rewrite) Mellis Compiler sang Rust, với mục tiêu xây dựng một trình biên dịch hoàn thiện, ổn định và an toàn, biến Rust thành nền tảng chính thức của hệ sinh thái Mellis.

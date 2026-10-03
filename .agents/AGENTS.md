@@ -1,3 +1,11 @@
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../docs/spec/0.1/README.md).
+
+# Luna 0.1 contract baseline
+
+Use [the versioned specification](../docs/spec/0.1/README.md). Adopted contracts remain requirements despite implementation gaps; historical status and agent skills do not independently establish release conformance. No printing macro-name/callee mappings may be introduced in any compiler phase.
+
 # Luna Compiler Architecture Rules
 
 1. Every phase owns exactly one responsibility.
@@ -11,7 +19,7 @@
    - LLVM IR  -> Backend
 
 6. Luna Artifact Identity Principle ("Luna trusts identity, never existence"):
-   - **Existence is not validity**: The presence of an artifact (`.llib` or `.mlib`) does not imply it is valid for the current compilation context. The compiler must validate its identity before loading it. If invalid, the compiler rejects it (it does not silently recompile).
+   - **Existence is not validity**: The presence of a `.llib` artifact does not imply it is valid for the current compilation context. The compiler must validate its identity before loading it. If invalid, the compiler rejects it (it does not silently recompile).
    - **Discovery vs. Validation**: Discovery merely locates a provider candidate. Validation determines if its identity matches the current context. Package management (`mpm`) handles rebuilding if invalid.
    - **Identity is a Tuple**: Artifact identity is not just a source hash. It encompasses Source Identity, Dependency Interface Identity, Compiler Identity, Target Identity, Feature Identity, and Artifact Kind.
    - **Source Identity ≠ Interface Identity**: Private implementation changes affect source identity but not interface identity (canonical public contract). The compiler must use a deterministic serialization of the public interface for the `interface_hash`.
@@ -21,17 +29,17 @@
 
 7. Compiler vs Package Manager Boundary & Module Architecture:
    - **Provider ≠ Module namespace:** `import` selects a *provider*, `module` defines a *namespace*, and `::` accesses a *namespace*.
-     - Examples of providers: `alloc.ms` (source) or `alloc.mlib` (artifact). Both are providers of the same logical module.
+     - Examples of providers: `alloc.ln` (source) or `alloc.llib` (artifact). Both are providers of the same logical module.
      - Provider Resolution: `import <alloc>` searches for provider "alloc". `import "foo"` searches for local project provider "foo".
      - Namespace: A provider file can define namespaces via `module std { export struct Vec<T> ... }`.
-     - Symbol usage: Symbols are accessed via their namespace (`std::Vec<int>`), not their provider. `import` does NOT bring symbols into scope.
-     - Multiple providers can contribute to the same public namespace (e.g., `alloc.ms` -> `std::`, `core.ms` -> `std::`).
+     - Symbol usage: Symbols are accessed via their namespace (`std::Vec<i32>`), not their provider. `import` does NOT bring symbols into scope.
+     - Multiple providers can contribute to the same public namespace (e.g., `alloc.ln` -> `std::`, `core.ln` -> `std::`).
    - **Compiler Boundary:** `luna` is fully standalone. It resolves `import <foo>` using search paths and understands module semantics. It does not know about projects, versions, or caching.
    - **Project Boundary (MPM):** `mpm` manages packages, dependency graphs, versions, incremental rebuilds, and artifacts. It determines *which* providers/artifacts to feed to the compiler.
-   - **Artifact Boundary:** `.mlib` is a compiler-defined artifact containing Manifest, ImplTable, GenericMVIR, ObjectCode, etc. It is functionally identical to a `.ms` source file from the language's perspective.
+   - **Artifact Boundary:** `.llib` is a compiler-defined artifact containing Manifest, ImplTable, GenericMVIR, ObjectCode, etc. It is functionally identical to a `.ln` source file from the language's perspective.
 
 8. Grammar Authority Rule (mellis-grammar):
-   - **Single Source of Truth:** `mellis-grammar` skill is the canonical source of truth for source-level syntax.
+   - **Contract Authority:** The versioned specification and adopted amendments define source-level syntax. `mellis-grammar` provides operational guidance; parser disagreements remain conformance gaps.
    - **Enforcement:** Agents MUST read the `mellis-grammar` skill before modifying parser, AST, or semantic syntax.
    - **No Inference:** Never infer Luna syntax from Rust/C++ syntax (e.g., using `mut` instead of `rw`, `use` instead of `import`, `let` instead of `dec`).
    - **No Unapproved Additions:** Never introduce a new keyword without updating the grammar in `grammar.ebnf` and the skill.
@@ -39,9 +47,9 @@
    - **Workflow:** When coding a new feature: (1) Search grammar skill. (2) Search parser tests. (3) Search existing accepted examples. (4) Only then propose changes. If syntax exists, reuse. If it doesn't, propose a grammar change before implementation.
 
 9. Semantic Compliance Rule (luna-semantic-compliance):
-   - **Mandatory Alignment:** Agents MUST follow `luna-semantic-compliance` before writing `.ln`/`.ms` code, Core, Alloc, Stdlib, ABI-facing APIs, compiler-generated code, or semantic tests.
+   - **Mandatory Alignment:** Agents MUST follow `luna-semantic-compliance` before writing `.ln` code, Core, Alloc, Stdlib, ABI-facing APIs, compiler-generated code, or semantic tests.
    - **No Foreign Semantics:** Never substitute Rust, C++, or LLVM semantic models or syntax (e.g. `'a`, turbofish, `let`, `mut`).
-   - **Semantic Contract Enforcement:** Ensure explicit lifetime relations (`life_from`, `where outlives`), proper `rw` mutability, and `.llib` ABI parity are preserved and actively utilized.
+   - **Semantic Contract Enforcement:** Ensure explicit lifetime relations (`life_from`, `requires life(...)`), proper `rw` mutability, and `.llib` ABI parity are preserved and actively utilized.
 
 10. Ownership Abstraction Guard Rule (BOX-FROZEN):
    - **Generic Ownership Parity:** Any future ownership abstraction (e.g., `Rc<T>`, `Arc<T>`, custom smart pointers, allocator containers) must be expressible strictly through existing generic ownership, move, drop, borrow, lifetime, and memory primitives (`ptr`/`mem`/`HeapFree`).

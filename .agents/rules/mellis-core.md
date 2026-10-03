@@ -1,3 +1,7 @@
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Architecture guidance references the versioned contract; historical terminology does not independently establish release readiness. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # Luna Core Agent Rules
 
 RULE 1

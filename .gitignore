@@ -81,3 +81,18 @@ luna-rs/std.ln
 luna-rs/trait_lib.ln
 test_*.ln
 luna-cli-old-backup/
+
+# Persistent audit runners and evidence
+!/docs/audits/stdlib-2026-10-02/*.py
+!/docs/tools/check_v01_examples.py
+!/docs/spec/0.1/evidence/*.log
+!/luna-rs/tests/luna/stdlib/collections/test_phase_*.ln
+
+# Local build, browser and parity scratch output
+/temp/
+/runtime/build-*/
+/luna-web/.edge-temp/
+/luna-web/snap*.png
+/luna-web/edge*.png
+/luna-web/test_logo_*.png
+/luna-web/dev_output.*

@@ -1,3 +1,7 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../spec/0.1/README.md).
+
 # Non-Lexical Lifetimes (NLL) & Region Computation Specification
 
 Mellis uses a Non-Lexical Lifetime (NLL) system based on the control-flow graph (CFG) of the Mellis Virtual Intermediate Representation (MVIR). This document serves as the formal specification for how regions are assigned, how liveness is computed, and how aliases interact.

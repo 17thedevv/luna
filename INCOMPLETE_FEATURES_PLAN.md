@@ -1,5 +1,7 @@
-# Superseded
+<!-- luna-doc-role: guidance -->
 
-This document has been superseded by the official `ROADMAP.md` in the root directory.
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](docs/spec/0.1/README.md).
 
-Please refer to [ROADMAP.md](./ROADMAP.md) for the latest priorities, task checklists, and scopes for the Mellis v1.0 Public Release Gate.
+# Luna 0.1 outstanding work
+
+See the [gap register](docs/spec/0.1/gaps.md) and [roadmap](ROADMAP.md). Existing contracts remain requirements; implementation gaps are not silently removed from the specification.

@@ -1,6 +1,10 @@
+<!-- luna-doc-role: adopted-contract -->
+
+> **Luna 0.1 — adopted-contract.** Retained detailed contract. Prior acceptance and freeze claims remain dated evidence; current release conformance is tracked separately. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # Stage 7 — Phase 6: Core Formatting Foundation v1
 
-Status: IMPLEMENTATION COMPLETE — READY FOR DESIGN/FREEZE REVIEW — NOT FROZEN
+Status: retained formatting contract — NOT FROZEN; current conformance has known unsigned Display and UTF-8 gaps. Historical acceptance below is dated evidence.
 
 ## Boundary
 

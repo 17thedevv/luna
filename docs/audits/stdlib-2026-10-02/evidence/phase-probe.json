@@ -1,0 +1,102 @@
+[
+  {
+    "mode": "source",
+    "case": "raw_create_only",
+    "internal": true,
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.031146799970884,
+    "log": "phase-source-raw_create_only.log",
+    "last_phase": "bootstrap"
+  },
+  {
+    "mode": "source",
+    "case": "raw_growth_without_get",
+    "internal": true,
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.022868699976243,
+    "log": "phase-source-raw_growth_without_get.log",
+    "last_phase": "bootstrap"
+  },
+  {
+    "mode": "source",
+    "case": "raw_ht5_exact",
+    "internal": true,
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.02192939998349,
+    "log": "phase-source-raw_ht5_exact.log",
+    "last_phase": "bootstrap"
+  },
+  {
+    "mode": "source",
+    "case": "public_ht5_equivalent",
+    "internal": false,
+    "timeout_seconds": 30,
+    "exit": 0,
+    "seconds": 9.279132700001355,
+    "log": "phase-source-public_ht5_equivalent.log",
+    "last_phase": "monomorphized"
+  },
+  {
+    "mode": "source",
+    "case": "raw_ht6_exact",
+    "internal": true,
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.026932700013276,
+    "log": "phase-source-raw_ht6_exact.log",
+    "last_phase": "bootstrap"
+  },
+  {
+    "mode": "artifact",
+    "case": "raw_create_only",
+    "internal": true,
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.031410299998242,
+    "log": "phase-artifact-raw_create_only.log",
+    "last_phase": "bootstrap"
+  },
+  {
+    "mode": "artifact",
+    "case": "raw_growth_without_get",
+    "internal": true,
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.02112509997096,
+    "log": "phase-artifact-raw_growth_without_get.log",
+    "last_phase": "bootstrap"
+  },
+  {
+    "mode": "artifact",
+    "case": "raw_ht5_exact",
+    "internal": true,
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.03239810001105,
+    "log": "phase-artifact-raw_ht5_exact.log",
+    "last_phase": "bootstrap"
+  },
+  {
+    "mode": "artifact",
+    "case": "public_ht5_equivalent",
+    "internal": false,
+    "timeout_seconds": 30,
+    "exit": 0,
+    "seconds": 8.79569379996974,
+    "log": "phase-artifact-public_ht5_equivalent.log",
+    "last_phase": "monomorphized"
+  },
+  {
+    "mode": "artifact",
+    "case": "raw_ht6_exact",
+    "internal": true,
+    "timeout_seconds": 30,
+    "timeout": true,
+    "seconds": 30.02754300000379,
+    "log": "phase-artifact-raw_ht6_exact.log",
+    "last_phase": "bootstrap"
+  }
+]

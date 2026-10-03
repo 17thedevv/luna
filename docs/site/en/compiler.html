@@ -1,53 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Compiler · Luna Docs</title>
-    <link rel="stylesheet" href="../assets/styles.css" />
-  </head>
-  <body>
-    <header class="topbar">
-      <div class="container nav-wrap">
-        <div class="brand">Luna</div>
-        <nav class="nav" aria-label="Main navigation">
-          <a href="index.html">Home</a>
-          <a href="language.html">Language</a>
-          <a href="compiler.html">Compiler</a>
-          <a href="../vi/compiler.html" class="lang-switch">VI</a>
-        </nav>
-      </div>
-    </header>
-
-    <main class="section">
-      <div class="container">
-        <p class="eyebrow">Compiler</p>
-        <h1>Architecture</h1>
-
-        <div class="grid three-col">
-          <article class="card">
-            <h3>Frontend</h3>
-            <p class="muted">Lexer, parser, and AST construction.</p>
-          </article>
-
-          <article class="card">
-            <h3>Middle-end</h3>
-            <p class="muted">Type checking, borrow checking, semantic analysis, and MVIR lowering.</p>
-          </article>
-
-          <article class="card">
-            <h3>Backend</h3>
-            <p class="muted">LLVM IR generation and native code emission.</p>
-          </article>
-        </div>
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="container footer-inner">
-        <span>Luna Docs</span>
-        <span>English</span>
-      </div>
-    </footer>
-  </body>
-</html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 documentation</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="../spec/index.html">Spec 0.1</a> <a href="../spec/gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1>Luna 0.1 documentation</h1><p>Defined contracts are retained. Implementation failures and missing evidence are tracked separately; the baseline is not release certification.</p><p><a href="../spec/syntax.html">Syntax</a></p><p><a href="../spec/semantics.html">Semantics</a></p><p><a href="../spec/macros.html">Macros</a></p><p><a href="../spec/modules.html">Modules</a></p><p><a href="../spec/stdlib.html">Stdlib</a></p><p><a href="../spec/runtime.html">Runtime</a></p><p><a href="../spec/conformance.html">Conformance</a></p><p><a href="../spec/gaps.html">Gaps</a></p><p>No compiler mapping of library macro names, output prefixes, newline suffixes, container names or library-owned layouts is permitted. Generic language mechanisms and explicit adopted contracts define the boundary.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

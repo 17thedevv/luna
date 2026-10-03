@@ -3,6 +3,10 @@ name: luna-skill-maintenance
 description: Maintain Luna repository agent skills using confirmed reusable knowledge, minimal edits, and explicit conflict checks. Use at the end of substantial compiler/language/stdlib work or when a skill is stale or contradictory; not for routine edits.
 ---
 
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../../docs/spec/0.1/README.md).
+
 # Luna Skill Maintenance
 
 ## Purpose

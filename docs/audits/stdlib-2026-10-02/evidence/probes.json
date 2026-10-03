@@ -1,0 +1,914 @@
+[
+  {
+    "mode": "source",
+    "fixture": "baseline.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\baseline.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\baseline.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.02717989997472614
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_inherent_trait_dispatch.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\compiler_inherent_trait_dispatch.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.01999399997293949
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_invalid_char.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_invalid_char.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\compiler_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.030151700018905103
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_main_args.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_main_args.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\compiler_main_args.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.027370499970857054
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_move_after_call.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\compiler_move_after_call.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "error[E3001]: Use of moved value '%v4.0'\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln:6:36\n   |\n6  |     if consume(item) { return item.value; }\n   |                                    ^^^^^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "compiler_unsigned_cast.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_unsigned_cast.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\compiler_unsigned_cast.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.019771199964452535
+  },
+  {
+    "mode": "source",
+    "fixture": "convert_unsigned_widen.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\convert_unsigned_widen.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\convert_unsigned_widen.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.028312999987974763
+  },
+  {
+    "mode": "source",
+    "fixture": "filter_owned.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\filter_owned.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\filter_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "error[E3001]: Use of moved value '%v14'\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\libs\\external\\core/iter_adapters.ln:48:50\n   |\n48 |                         return std::Option::Some(x);\n   |                                                  ^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "find_owned.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\find_owned.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\find_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "error[E3001]: Use of moved value '%v16'\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\libs\\external\\core/iter_consumers.ln:115:46\n   |\n115|                     return std::Option::Some(x);\n   |                                              ^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_capacity_overflow.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_capacity_overflow.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\hashmap_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "timeout": "Command '['D:\\\\tmp\\\\luna-audit-2026-10-02\\\\luna_stdlib_audit_quyx5b72\\\\source\\\\hashmap_capacity_overflow.exe', 'audit-argument']' timed out after 10 seconds"
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_collision_pattern.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_collision_pattern.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\hashmap_collision_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.14950610004598275
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_sequential_pattern.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_sequential_pattern.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\hashmap_sequential_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.029738200013525784
+  },
+  {
+    "mode": "source",
+    "fixture": "slice_zst.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\slice_zst.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.02724540000781417
+  },
+  {
+    "mode": "source",
+    "fixture": "string_invalid_char.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\string_invalid_char.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\string_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.028210799966473132
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_capacity_overflow.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_capacity_overflow.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\vec_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.01990239997394383
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_reserve_overflow.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_reserve_overflow.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\source\\vec_reserve_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.028232600016053766
+  },
+  {
+    "mode": "artifact",
+    "fixture": "baseline.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\baseline.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\baseline.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.027314300008583814
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_inherent_trait_dispatch.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_inherent_trait_dispatch.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\compiler_inherent_trait_dispatch.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.018892499967478216
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_invalid_char.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_invalid_char.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\compiler_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.019088700006250292
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_main_args.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_main_args.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\compiler_main_args.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.029281600029207766
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_move_after_call.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\compiler_move_after_call.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "error[E3001]: Use of moved value '%v4.0'\n  --> C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_move_after_call.ln:6:36\n   |\n6  |     if consume(item) { return item.value; }\n   |                                    ^^^^^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "compiler_unsigned_cast.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\compiler_unsigned_cast.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\compiler_unsigned_cast.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.028590200003236532
+  },
+  {
+    "mode": "artifact",
+    "fixture": "convert_unsigned_widen.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\convert_unsigned_widen.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\convert_unsigned_widen.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.028368700004648417
+  },
+  {
+    "mode": "artifact",
+    "fixture": "filter_owned.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\filter_owned.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\filter_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "error[E3001]: Use of moved value '%v14'\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\libs\\external\\core/iter_adapters.llib:48:50\n   |\n48 |                         return std::Option::Some(x);\n   |                                                  ^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "find_owned.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\find_owned.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\find_owned.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "error[E3001]: Use of moved value '%v16'\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\libs\\external\\core/iter_consumers.llib:115:46\n   |\n115|                     return std::Option::Some(x);\n   |                                              ^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_capacity_overflow.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_capacity_overflow.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\hashmap_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "timeout": "Command '['D:\\\\tmp\\\\luna-audit-2026-10-02\\\\luna_stdlib_audit_quyx5b72\\\\artifact\\\\hashmap_capacity_overflow.exe', 'audit-argument']' timed out after 10 seconds"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_collision_pattern.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_collision_pattern.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\hashmap_collision_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.13143399998079985
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_sequential_pattern.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_sequential_pattern.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\hashmap_sequential_pattern.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.028763000038452446
+  },
+  {
+    "mode": "artifact",
+    "fixture": "slice_zst.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\slice_zst.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.030602000013459474
+  },
+  {
+    "mode": "artifact",
+    "fixture": "string_invalid_char.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\string_invalid_char.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\string_invalid_char.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.02854579995619133
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_capacity_overflow.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_capacity_overflow.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\vec_capacity_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.02004480001050979
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_reserve_overflow.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_reserve_overflow.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_quyx5b72\\artifact\\vec_reserve_overflow.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.030514799989759922
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_growth_control.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_growth_control.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_yjx_8_y9\\source\\hashmap_growth_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.028225699963513762
+  },
+  {
+    "mode": "source",
+    "fixture": "vec_dedup_i32_generic.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_dedup_i32_generic.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_yjx_8_y9\\source\\vec_dedup_i32_generic.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.030796299979556352
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_growth_control.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_growth_control.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_yjx_8_y9\\artifact\\hashmap_growth_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.0226999000296928
+  },
+  {
+    "mode": "artifact",
+    "fixture": "vec_dedup_i32_generic.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\vec_dedup_i32_generic.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_yjx_8_y9\\artifact\\vec_dedup_i32_generic.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.02402729995083064
+  },
+  {
+    "mode": "source",
+    "fixture": "format_unsigned_high_bit.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\format_unsigned_high_bit.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_qtqlt2j5\\source\\format_unsigned_high_bit.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "18446744073709551615\n",
+    "stderr": "",
+    "run_seconds": 0.028155900014098734
+  },
+  {
+    "mode": "artifact",
+    "fixture": "format_unsigned_high_bit.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\format_unsigned_high_bit.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_qtqlt2j5\\artifact\\format_unsigned_high_bit.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "18446744073709551615\n",
+    "stderr": "",
+    "run_seconds": 0.031222399964462966
+  },
+  {
+    "mode": "source",
+    "fixture": "range_owned_step.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\range_owned_step.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\source\\range_owned_step.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "error[E3001]: Use of partially moved value '%v0'\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\source\\libs\\external\\core/iter_adapters.ln:458:18\n   |\n458|             self.current = self.current.step_forward();\n   |                  ^^^^^^^\n\nerror[E3001]: Use of moved value '%v0.0'\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\source\\libs\\external\\core/iter_adapters.ln:458:41\n   |\n458|             self.current = self.current.step_forward();\n   |                                         ^^^^^^^^^^^^\n\n"
+  },
+  {
+    "mode": "source",
+    "fixture": "slice_zst_mut.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst_mut.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\source\\slice_zst_mut.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.03974860004382208
+  },
+  {
+    "mode": "source",
+    "fixture": "try_control.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\try_control.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\source\\try_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.03308560000732541
+  },
+  {
+    "mode": "artifact",
+    "fixture": "range_owned_step.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\range_owned_step.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\artifact\\range_owned_step.exe",
+      "-q"
+    ],
+    "compile_exit": 1,
+    "compile_stdout": "",
+    "compile_stderr": "error[E3001]: Use of partially moved value '%v0'\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\artifact\\libs\\external\\core/iter_adapters.llib:458:18\n   |\n458|             self.current = self.current.step_forward();\n   |                  ^^^^^^^\n\nerror[E3001]: Use of moved value '%v0.0'\n  --> D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\artifact\\libs\\external\\core/iter_adapters.llib:458:41\n   |\n458|             self.current = self.current.step_forward();\n   |                                         ^^^^^^^^^^^^\n\n"
+  },
+  {
+    "mode": "artifact",
+    "fixture": "slice_zst_mut.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\slice_zst_mut.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\artifact\\slice_zst_mut.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 1,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.030093799985479563
+  },
+  {
+    "mode": "artifact",
+    "fixture": "try_control.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\try_control.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_vytc25no\\artifact\\try_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.034687899984419346
+  },
+  {
+    "mode": "source",
+    "fixture": "try_codegen_canonical_std_try.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\language\\try_codegen_canonical_std_try.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_ajtaw5vt\\source\\try_codegen_canonical_std_try.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.019549399963580072
+  },
+  {
+    "mode": "source",
+    "fixture": "try_codegen_generic_cross_module_std_try.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\language\\try_codegen_generic_cross_module_std_try.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_ajtaw5vt\\source\\try_codegen_generic_cross_module_std_try.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.02812219999032095
+  },
+  {
+    "mode": "artifact",
+    "fixture": "try_codegen_canonical_std_try.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\language\\try_codegen_canonical_std_try.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_ajtaw5vt\\artifact\\try_codegen_canonical_std_try.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.036153300025034696
+  },
+  {
+    "mode": "artifact",
+    "fixture": "try_codegen_generic_cross_module_std_try.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\tests\\luna\\language\\try_codegen_generic_cross_module_std_try.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_ajtaw5vt\\artifact\\try_codegen_generic_cross_module_std_try.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.023698899953160435
+  },
+  {
+    "mode": "source",
+    "fixture": "hashmap_drop_stress_control.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_drop_stress_control.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_l8nmwyz4\\source\\hashmap_drop_stress_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.028974799963179976
+  },
+  {
+    "mode": "artifact",
+    "fixture": "hashmap_drop_stress_control.ln",
+    "command": [
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+      "build",
+      "C:\\Users\\84387\\.codex\\worktrees\\a250\\fdlang\\tests\\luna\\stdlib\\audit_2026_10_02\\hashmap_drop_stress_control.ln",
+      "-o",
+      "D:\\tmp\\luna-audit-2026-10-02\\luna_stdlib_audit_l8nmwyz4\\artifact\\hashmap_drop_stress_control.exe",
+      "-q"
+    ],
+    "compile_exit": 0,
+    "compile_stdout": "",
+    "compile_stderr": "",
+    "run_exit": 0,
+    "stdout": "",
+    "stderr": "",
+    "run_seconds": 0.030196300009265542
+  }
+]

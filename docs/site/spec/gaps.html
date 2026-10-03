@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1 — implementation gaps and specification debt</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01--implementation-gaps-and-specification-debt">Luna 0.1 — implementation gaps and specification debt</h1>
+<p>Baseline date: 2026-10-02; implementation revision: <code>3dac3ac</code>. Audit IDs below are local to <a href="../../audits/stdlib-2026-10-02/README.md">stdlib-2026-10-02</a>, not substitutes for earlier compiler-gap IDs from unrelated phases. Existing contracts are retained. No row here grants permission to weaken them.</p>
+<h2 id="confirmed-audit-defects">Confirmed audit defects</h2>
+<table>
+<tr><th>Audit ID</th><th>Priority</th><th>Requirement violated / observed failure</th></tr>
+<tr><td>C-GAP-01</td><td>P1</td><td>Deterministic method resolution: forwarding trait/inherent collisions can compile into recursion and stack overflow</td></tr>
+<tr><td>C-GAP-02</td><td>P1</td><td>Source-aware integer widening: dynamic 255u8 widens by sign extension; Convert/Display inherit incorrect values</td></tr>
+<tr><td>C-GAP-03</td><td>P2</td><td>Entry argument bridge: main receives an empty slice despite argv input</td></tr>
+<tr><td>C-GAP-04</td><td>P2</td><td>Import metadata identity: one bound becomes 2,048 copies over a 12-level provider chain; storage import can timeout</td></tr>
+<tr><td>S-01</td><td>P1</td><td>Vec allocation/reserve arithmetic can wrap while preserving invalid usable capacity metadata</td></tr>
+<tr><td>S-02</td><td>P2</td><td>RawTable capacity round-up can wrap to zero and loop indefinitely</td></tr>
+<tr><td>S-03</td><td>P2</td><td>Shared/mutable slice iterators return no elements for a nonempty ZST slice</td></tr>
+<tr><td>S-04</td><td>P1</td><td>Safe String char encoding can violate the UTF-8 invariant</td></tr>
+<tr><td>S-05</td><td>P2</td><td>Filter/find consume non-Copy Item through the predicate and subsequently use it; borrow checker correctly rejects</td></tr>
+<tr><td>S-06</td><td>P1</td><td>Generic Vec.dedup_i32 reinterprets arbitrary T as i32 and produces wrong results</td></tr>
+<tr><td>S-07</td><td>P2</td><td>Range&lt;T: Step&gt; moves a non-Copy current value before using it to advance</td></tr>
+<tr><td>A-01</td><td>P2</td><td>Semantic compiler code recognizes SliceIter/SliceIterMut names and fabricates stdlib layout</td></tr>
+</table>
+<p>Exact triggers, code locations, logs and limits remain in the audit report. Potential heap corruption inferred from invalid storage is distinct from a deliberately executed invalid write. Timeout attribution is limited to the instrumented pipeline evidence, not a claimed full profile of every old suite.</p>
+<h2 id="grammar-and-document-inconsistencies">Grammar and document inconsistencies</h2>
+<table>
+<tr><th>ID</th><th>Contract / correction</th><th>Current implementation or documentation</th></tr>
+<tr><td>V01-GRAMMAR-01</td><td>Comma-separated struct fields; reject semicolon delimiters</td><td>CLI confirms both modes accept and execute semicolon-delimited fields despite the rejection requirement</td></tr>
+<tr><td>V01-GRAMMAR-02</td><td>Retained parenthesized foreach head from normative Rule K.4</td><td>CLI confirms both modes reject the contract head and accept the unparenthesized implementation form; reconciliation must retain an explicit decision</td></tr>
+<tr><td>V01-GRAMMAR-03</td><td>Receiver shorthand equivalence from Rule K.5</td><td>CLI confirms both modes reject &amp;self shorthand; the complete equivalence contract remains a requirement</td></tr>
+<tr><td>V01-DIAG-01</td><td>DIAG-1 requires typed diagnostic codes for every compiler error</td><td>The foreach/receiver parser failures render <code>error:</code> without a code in both modes; the private-field rejection correctly renders E1003. Code identity/propagation still needs a focused diagnostic audit</td></tr>
+<tr><td>V01-DOC-01</td><td>Visibility-02: fields default public independently of type accessibility</td><td>Old grammar skill/reference says private by default; corrected to the approved amendment</td></tr>
+<tr><td>V01-DOC-02</td><td><code>requires life(...)</code> is the current relation spelling</td><td>Older docs/skills use removed <code>where outlives</code>; current guidance is corrected without changing the relation model</td></tr>
+<tr><td>V01-DOC-03</td><td>Luna .ln/.llib, 32 providers, six language contract families plus OptionExt contribution</td><td>Old overview/bootstrap pages claim Mellis core.ms, 25 providers or four families; current entry points are replaced</td></tr>
+</table>
+<p>V01-GRAMMAR rows are conformance gaps or unverified contracts, not new parser fixes made by this documentation task. Historical plans retain their original examples under a historical-role notice.</p>
+<h2 id="decisions-still-required">Decisions still required</h2>
+<table>
+<tr><th>ID</th><th>Question / boundary</th></tr>
+<tr><td>V01-DESIGN-01</td><td>Exact inherent/trait method collision precedence or ambiguity policy; hash iteration cannot decide it</td></tr>
+<tr><td>V01-DESIGN-02</td><td>Domain of char and failure policy for invalid literal/dynamic integer-to-char conversion; UTF-8 text sinks must remain valid meanwhile</td></tr>
+<tr><td>V01-DESIGN-03</td><td>Runtime integer overflow policy outside defined checked/compile-time operations; avoid declaring current LLVM wrapping normative</td></tr>
+<tr><td>V01-DESIGN-04</td><td>Complete formal grammar beyond the consolidated productions; parser acceptance of legacy/uncontracted syntax is not adoption</td></tr>
+</table>
+<p>No new format-macro hook, interpolation syntax, runtime opcode or container language item is adopted. These require their own complete generic contract.</p>
+<h2 id="evidence-not-completed">Evidence not completed</h2>
+<p class="list-item">- All compiler integration tests, exhaustive input/generic domains, sanitizers</p>
+<p>  and fuzzing have not been verified by the stdlib audit.</p>
+<p class="list-item">- Storage HT5/HT6 internal suites still timeout; public growth and 34-drop</p>
+<p>  controls pass in both modes. Import metadata inflation is reproduced.</p>
+<p class="list-item">- Async cancellation, all comptime/resource boundaries, dynamic dispatch and</p>
+<p>  every adopted lifetime contract need their own current acceptance matrix;   old freeze decisions remain contract authority, not new test evidence.</p>
+<p class="list-item">- Extreme 128-bit construction/formatting, POSIX whole-file behavior and the</p>
+<p>  full hosted/freestanding target matrix remain limited/unverified.</p>
+<p class="list-item">- HashMap has measured collision scaling; allocation counts, optimizer pipeline</p>
+<p>  effects and broad stdlib performance are not fully characterized.</p>
+<p class="list-item">- Existing public_surface and reject_std_vec fixtures contain stale expectations;</p>
+<p>  they must be corrected as tests, not treated as reasons to alter valid APIs.</p>
+<h2 id="documentation-cli-characterization--2026-10-03">Documentation CLI characterization — 2026-10-03</h2>
+<p><a href="../../spec/0.1/evidence/cli-examples.json">evidence/cli-examples.json</a> records eight standalone fixtures in source-only and artifact-only sysroots, 16 attempts total. Eight attempts meet their positive/negative requirements; six expose the three grammar gaps above; two characterize the accepted unparenthesized implementation form. The custom outln macro returns a value and emits no output, demonstrating that this name currently uses ordinary expansion. These checks are not a certification of every macro, field visibility or language capability.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

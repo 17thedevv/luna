@@ -1,3 +1,7 @@
+<!-- luna-doc-role: adopted-contract -->
+
+> **Luna 0.1 — adopted-contract.** Retained detailed contract. Prior acceptance and freeze claims remain dated evidence; current release conformance is tracked separately. See the [versioned specification](../../../../docs/spec/0.1/README.md).
+
 # RFC: Luna Lifetime Elision v1 (LLE-v1)
 
 **Status**: FROZEN (approved 2026-09-13)
@@ -8,9 +12,9 @@
 
 ## Motivation
 
-Luna's lifetime system (`life_from`, `where outlives`) is explicit-by-design and semantically correct. However, for the majority of stdlib APIs — single-provenance, single-receiver patterns — the annotation is mechanically derivable and syntactically noisy.
+Luna's lifetime system (`life_from`, `requires life(...)`) is explicit-by-design and semantically correct. However, for the majority of stdlib APIs — single-provenance, single-receiver patterns — the annotation is mechanically derivable and syntactically noisy.
 
-LLE-v1 introduces a **compiler elaboration phase** that infers lifetime contracts when unambiguous, allowing programmers to omit `life_from(...)` and `where outlives(...)` in trivial cases while preserving full explicit control for complex signatures.
+LLE-v1 introduces a **compiler elaboration phase** that infers lifetime contracts when unambiguous, allowing programmers to omit `life_from(...)` and `requires life(a) >= life(b)` in trivial cases while preserving full explicit control for complex signatures.
 
 ```
            Surface Syntax
@@ -112,10 +116,10 @@ This aligns with the Ownership Abstraction Guard and Luna's design principle: `s
 
 ### LLE-3: Outlives Inference — Conservative Only
 
-LLE-v1 infers `where outlives(a, b)` constraints **only when the relationship is directly and unambiguously entailed by the function signature**.
+LLE-v1 infers `requires life(a) >= life(b)` constraints **only when the relationship is directly and unambiguously entailed by the function signature**.
 
 > [!WARNING]
-> LLE-v1 does **NOT** infer outlives from nested/aggregate type structure. If a relationship requires semantic entailment reasoning beyond direct signature analysis, the programmer must write `where outlives(...)` explicitly.
+> LLE-v1 does **NOT** infer outlives from nested/aggregate type structure. If a relationship requires semantic entailment reasoning beyond direct signature analysis, the programmer must write `requires life(a) >= life(b)` explicitly.
 
 **Example — no inference needed (trivially satisfied):**
 ```rust
@@ -127,7 +131,7 @@ fn foo(a: &A) -> &A
 ```rust
 fn merge(a: &A, b: &A) -> &A
     life_from(a)
-    where outlives(a, b)
+    requires life(a) >= life(b)
 // programmer explicitly states a outlives b
 ```
 
@@ -150,7 +154,7 @@ error: returned reference has no legal provenance source
 
 ### LLE-5: Explicit Contract Always Overrides Inference
 
-When the programmer writes an explicit `life_from(...)` or `where outlives(...)`, the explicit declaration is the final semantic contract. LLE does not second-guess, weaken, or strengthen an explicit annotation.
+When the programmer writes an explicit `life_from(...)` or `requires life(a) >= life(b)`, the explicit declaration is the final semantic contract. LLE does not second-guess, weaken, or strengthen an explicit annotation.
 
 ```rust
 fn foo(a: &A) -> &A life_from(a)
@@ -166,24 +170,24 @@ fn foo(a: &A) -> &A life_from(a)
 
 LLE operates on two independent inference dimensions:
 1. **Provenance inference** — deducing `life_from(...)`
-2. **Outlives inference** — deducing `where outlives(...)`
+2. **Outlives inference** — deducing `requires life(a) >= life(b)`
 
 Each dimension is independently suppressible:
 
 | Explicit declaration | Inference suppressed | Inference active |
 | :--- | :--- | :--- |
 | `life_from(...)` | return provenance | outlives constraints |
-| `where outlives(...)` | outlives constraints | return provenance |
+| `requires life(a) >= life(b)` | outlives constraints | return provenance |
 | both | both | neither |
 | neither | — | infer both (if unambiguous) |
 
 **Example — explicit outlives does NOT suppress provenance inference:**
 ```rust
 fn foo(a: &A, b: &B) -> &A
-    where outlives(a, b)
+    requires life(a) >= life(b)
 // explicit: outlives(a, b) → suppresses outlives inference
 // but: provenance candidates for return &A = [a] (single) → LLE infers life_from(a)
-// result: life_from(a), where outlives(a, b)
+// result: life_from(a), requires life(a) >= life(b)
 ```
 
 **Example — explicit provenance does NOT suppress outlives inference:**
@@ -199,7 +203,7 @@ fn foo(a: &A, b: &B) -> &A
 ```rust
 fn merge(a: &A, b: &A) -> &A
     life_from(a)
-    where outlives(a, b)
+    requires life(a) >= life(b)
 // both dimensions explicit → LLE produces exactly what programmer wrote
 ```
 
@@ -249,7 +253,7 @@ Current Luna stdlib is predominantly categories A and B, which means LLE-v1 will
 
 ## Compatibility & Non-Breaking Guarantee
 
-- Programs with explicit `life_from(...)` and `where outlives(...)` continue to work identically.
+- Programs with explicit `life_from(...)` and `requires life(a) >= life(b)` continue to work identically.
 - Programs omitting annotations that were previously rejected may now compile (if LLE can infer).
 - No existing valid program changes behavior.
 - `.llib` serialization is unaffected — it always stores `CanonicalLifetimeContract`.

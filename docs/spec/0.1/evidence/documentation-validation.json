@@ -1,0 +1,10 @@
+{
+  "documents": 142,
+  "site_pages": 24,
+  "checked_local_links": 844,
+  "errors": [],
+  "generator_idempotent": true,
+  "http_pages_ok": 24,
+  "visual_preview": "unverified: browser tool could not initialize",
+  "cli_attempts": 16
+}

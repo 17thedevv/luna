@@ -1,0 +1,5 @@
+import <hashmap>;
+fn main() -> i32 {
+    dec map = std::hashmap_with_capacity<i32, i32>(9223372036854775809 as u64);
+    return 1;
+}

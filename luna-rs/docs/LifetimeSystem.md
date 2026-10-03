@@ -1,8 +1,12 @@
+<!-- luna-doc-role: historical -->
+
+> **Luna 0.1 — historical.** Historical design, plan, or evidence. Original wording is preserved for context; it does not independently define current syntax, capability scope or release readiness. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # Lifetime System
 
 > Safe memory through explicit provenance tracking at compile time.
 
-Mellis's lifetime system ensures that references never outlive the data they point to, preventing use-after-free and dangling pointer errors. Mellis uses **relation model** — explicit provenance expressions that read like natural language, without requiring lifetime annotations like Rust's `'a`, `'b`.
+Luna's lifetime system ensures that references never outlive the data they point to, preventing use-after-free and dangling pointer errors. Luna uses **relation model** — explicit provenance expressions that read like natural language, without requiring lifetime annotations like Rust's `'a`, `'b`.
 
 ## Table of Contents
 
@@ -27,7 +31,7 @@ fn dangling() -> &i32 {
 }
 ```
 
-The compiler must ensure that references are valid for their entire lifetime. Mellis tracks **provenance** — where a reference came from — and verifies that return values don't outlive their sources.
+The compiler must ensure that references are valid for their entire lifetime. Luna tracks **provenance** — where a reference came from — and verifies that return values don't outlive their sources.
 
 ---
 
@@ -111,7 +115,7 @@ fn merge(a: &i32, b: &i32) -> &i32
 }
 ```
 
-> **Migration Note**: Legacy `where outlives(a, b)` syntax has been removed. The compiler emits a targeted diagnostic:
+> **Migration Note**: Legacy `requires life(a) >= life(b)` syntax has been removed. The compiler emits a targeted diagnostic:
 > `'where outlives(...)' has been removed; use canonical 'requires life(a) >= life(b)'`.
 
 ### Why?
@@ -184,7 +188,7 @@ fn create_span(a: &i32, b: &i32) -> Span life_from(a | b) {
 }
 ```
 
-> **Note:** Mellis does NOT use lifetime annotations like Rust's `'a`, `'b`. 
+> **Note:** Luna does NOT use lifetime annotations like Rust's `'a`, `'b`.
 > Lifetime relationships are expressed through `life_from()` and `requires life(...) >= life(...)` only.
 > The compiler infers actual lifetimes internally.
 
@@ -328,4 +332,4 @@ The solver uses constraint propagation to find valid lifetime assignments, check
 
 - [Language Reference](../LanguageReference.md) — Full language specification
 - [Borrow Checker](../borrowck/) — Ownership and move semantics
-- [Memory Model](../docs/MemoryModel.md) — How Mellis manages memory safely
+- [Memory Model](../docs/MemoryModel.md) — How Luna manages memory safely
