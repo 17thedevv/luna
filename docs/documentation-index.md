@@ -49,6 +49,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/agent-handoff/phase-15-completion-audit.md](agent-handoff/phase-15-completion-audit.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/architecture.md](architecture.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/ast.md](ast.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/repair-0.1/README.md](audits/repair-0.1/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/stdlib-2026-10-02-d-worktree/README.md](audits/stdlib-2026-10-02-d-worktree/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-2026-10-02/README.md](audits/stdlib-2026-10-02/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/borrowck/NLL_spec.md](borrowck/NLL_spec.md) | historical | [semantics](spec/0.1/semantics.md) |
@@ -94,6 +95,9 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/phase17-semantic-hardening-plan.md](phase17-semantic-hardening-plan.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/phase17_audit_report.md](phase17_audit_report.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/project/rename-luna-v1.md](project/rename-luna-v1.md) | adopted-contract | [conformance](spec/0.1/conformance.md) |
+| [docs/proposals/entry-argv-policy.md](proposals/entry-argv-policy.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/proposals/v01-design-01-method-collision.md](proposals/v01-design-01-method-collision.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/proposals/v01-filter-step-dedup-api.md](proposals/v01-filter-step-dedup-api.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/runtime/MELLIS_RUNTIME_SPEC.md](runtime/MELLIS_RUNTIME_SPEC.md) | historical | [runtime](spec/0.1/runtime.md) |
 | [docs/runtime/abi-v1.md](runtime/abi-v1.md) | adopted-contract | [runtime](spec/0.1/runtime.md) |
 | [docs/runtime/architecture.md](runtime/architecture.md) | historical | [runtime](spec/0.1/runtime.md) |

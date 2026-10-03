@@ -1,5 +1,5 @@
 use luna_ast::{AstArena, DeclId, ExprId, PatId, StmtId, TypeId};
-use luna_common::{Diagnostic, Span};
+use luna_common::{Diagnostic, DiagnosticCode, Span};
 use luna_lexer::{Lexer, Token, TokenKind};
 
 pub mod decl;
@@ -32,10 +32,10 @@ impl<'a> Parser<'a> {
                 let text = &source[token.span.start as usize..token.span.end as usize];
                 if text == "#" {
                     diagnostics
-                        .push(Diagnostic::error("unexpected '#'; expected '#[' for an annotation").with_span(token.span));
+                        .push(Diagnostic::error("unexpected '#'; expected '#[' for an annotation").with_code(DiagnosticCode::InvalidAnnotation).with_span(token.span));
                 } else {
                     diagnostics
-                        .push(Diagnostic::error("Invalid token encountered").with_span(token.span));
+                        .push(Diagnostic::error("Invalid token encountered").with_code(DiagnosticCode::UnexpectedToken).with_span(token.span));
                 }
             } else {
                 tokens.push(token);
@@ -190,14 +190,18 @@ impl<'a> Parser<'a> {
             Ok(self.advance())
         } else {
             let span = self.peek().span;
-            self.error_at_current(message, span);
+            self.error_with_code(DiagnosticCode::ExpectedToken, message, span);
             Err(())
         }
     }
 
     pub fn error_at_current(&mut self, message: &str, span: Span) {
+        self.error_with_code(DiagnosticCode::InvalidSyntax, message, span);
+    }
+
+    pub fn error_with_code(&mut self, code: DiagnosticCode, message: &str, span: Span) {
         self.diagnostics
-            .push(Diagnostic::error(message).with_span(span));
+            .push(Diagnostic::error(message).with_code(code).with_span(span));
     }
 
     pub fn get_token_text(&self, span: Span) -> &str {

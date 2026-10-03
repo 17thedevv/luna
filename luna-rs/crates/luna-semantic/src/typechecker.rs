@@ -2675,7 +2675,7 @@ impl<'a> TypeChecker<'a> {
             }
             Type::Named { segments, generic_args, .. } => {
                 let name = segments.last().map(|span| self.get_span_text(*span));
-                if let Some("Self") = name {
+                if let Some("Self" | "self") = name {
                     if let Some(self_ty) = self.current_self_type {
                         return self_ty;
                     } else {
@@ -2684,7 +2684,7 @@ impl<'a> TypeChecker<'a> {
                 }
                 if segments.len() >= 2 {
                     let first_seg = self.get_span_text(segments[0]);
-                    if first_seg == "Self" {
+                    if first_seg == "Self" || first_seg == "self" {
                         // Associated type projection like Self::Output or Self::Residual
                         return self.ctx.types.new_inference_var();
                     }
@@ -2819,7 +2819,7 @@ impl<'a> TypeChecker<'a> {
                         ctxt: segments[0].ctxt,
                     };
 
-                    let prefix_ty: Option<SemanticTypeId> = if prefix_segments.len() == 1 && self.get_span_text(prefix_segments[0]) == "Self" {
+                    let prefix_ty: Option<SemanticTypeId> = if prefix_segments.len() == 1 && (self.get_span_text(prefix_segments[0]) == "Self" || self.get_span_text(prefix_segments[0]) == "self") {
                         self.current_self_type
                     } else {
                         let mut scope = self.current_scope;

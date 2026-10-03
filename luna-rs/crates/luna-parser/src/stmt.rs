@@ -126,6 +126,29 @@ impl<'a> Parser<'a> {
         false
     }
 
+    fn is_parenthesized_foreach(&self) -> bool {
+        if self.pos >= self.tokens.len() || self.tokens[self.pos].kind != TokenKind::LParen {
+            return false;
+        }
+        let mut p = self.pos;
+        let mut depth = 0;
+        while p < self.tokens.len() {
+            let k = self.tokens[p].kind;
+            if k == TokenKind::LParen {
+                depth += 1;
+            } else if k == TokenKind::RParen {
+                depth -= 1;
+                if depth == 0 {
+                    break;
+                }
+            } else if k == TokenKind::KwIn && depth == 1 {
+                return true;
+            }
+            p += 1;
+        }
+        false
+    }
+
     fn parse_for_stmt(&mut self) -> Result<StmtId, ()> {
         self.consume(TokenKind::KwFor, "Expected 'for'")?;
 
@@ -160,6 +183,12 @@ impl<'a> Parser<'a> {
                 step = Some(self.parse_expression(true)?);
             }
             self.consume(TokenKind::RParen, "Expected ')' after step")?;
+        } else if self.is_parenthesized_foreach() {
+            self.consume(TokenKind::LParen, "Expected '('")?;
+            pattern = Some(self.parse_pattern()?);
+            self.consume(TokenKind::KwIn, "Expected 'in' after loop pattern")?;
+            iterable = Some(self.parse_expression(true)?);
+            self.consume(TokenKind::RParen, "Expected ')' after foreach head")?;
         } else {
             pattern = Some(self.parse_pattern()?);
             self.consume(TokenKind::KwIn, "Expected 'in' after loop pattern")?;
