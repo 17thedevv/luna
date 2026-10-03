@@ -5,7 +5,9 @@
 Baseline Commit: `97d5e8402cefca4cd7f99ffb031a5917d73acb1c`  
 Branch: `codex/antigravity-repair-0.1`  
 Executor: Antigravity  
-Status: **PARTIAL — IN PROGRESS (Pending Multi-Platform Native CI Run)**  
+Status: **PARTIAL — IN PROGRESS (Full diagnostic contract and native multi-platform CI pending)**
+
+Latest compiler integrity follow-up: [2026-10-03 repair and verification](compiler-integrity-repair-2026-10-03.md). The three independently reproduced defects are addressed there; this does not certify the whole diagnostic contract or all provider APIs.
 
 ## Scope & Mandate
 This ledger tracks the systematic repair, compiler decoupling, stdlib verification, and release gating specified in `docs/agent-handoff/antigravity-repair-plan-2026-10-03.md`.
@@ -39,7 +41,7 @@ All work adheres to the Luna 0.1 architectural principles:
 | V01-GRAMMAR-01 | Comma-separated struct fields; semicolon rejected | PASS | `luna-parser` | `tests/luna/language/spec_v01/reject_semicolon_fields.ln` | `41484c2` | `v01_grammar_acceptance_tests.rs` pass |
 | V01-GRAMMAR-02 | Parenthesized foreach head per Rule K.4 | PASS | `luna-parser` | `tests/luna/language/spec_v01/foreach_parenthesized_contract.ln` | `41484c2` | `v01_grammar_acceptance_tests.rs` pass |
 | V01-GRAMMAR-03 | Receiver shorthand `&self`, `&rw self`, `self` | PASS | `luna-parser` | `tests/luna/language/spec_v01/receiver_shorthand_contract.ln` | `41484c2` | `v01_grammar_acceptance_tests.rs` pass |
-| V01-DIAG-01 | Typed diagnostic codes DIAG-1..10 across compiler phases | PASS | `luna-parser` / error emitter | `tests/luna/language/spec_v01/` error reporting | `41484c2` | Typed diagnostic codes E0001..E0003 (parser), E1001 (unresolved method), E2001 (type mismatch), E2006 (coherence orphan), E2026 (invalid cast) verified across compiler phases in `v01_grammar_acceptance_tests.rs` |
+| V01-DIAG-01 | Typed diagnostic codes DIAG-1..10 across compiler phases | PARTIAL | `luna-parser` / error emitter | `tests/luna/language/spec_v01/` error reporting | `41484c2` | Typed diagnostic codes E0001..E0003 (parser), E1001 (unresolved method), E2001 (type mismatch), E2006 (coherence orphan), E2026 (invalid cast) verified across compiler phases in `v01_grammar_acceptance_tests.rs` |
 | W7-COMPTIME | Portable comptime artifact without host session leakage | PASS | `luna-llib` / `luna-mvir` interp | `literal_comptime_provider_gap.ln` | `6e8d278` | `literal_typing_cli_parity.rs` pass |
 | W8-ALL-PROVIDERS | 49 stdlib providers contract & API audit matrix | PARTIAL | provider coverage | `luna-rs/libs/external/sysroot.toml` | `8fa8429` | Inventory & build infrastructure: 49/49 providers build in sysroot DAG; `test_sysroot_build_invariants.rs` pass (6/6); Tier-1 Core/Alloc certified; Tier-2/3 detailed API mapping in `docs/audits/repair-0.1/provider_matrix.md` |
 | W9-PERF | Profiling and evidence-backed optimization | PASS | benchmarks | `hashmap_collision_pattern.ln` | - | SplitMix64 bit mixer in `core/hash.ln` and `alloc/raw_table.ln`; raw_table insert/insert_if_absent/get_or_insert probe first before grow, eliminating redundant rehash/growth on overwrite and hits; clear() retains capacity; benchmark in `docs/audits/repair-0.1/evidence/hashmap-benchmark.json` shows 132x speedup on low_bits_collision n=12000 (0.0259s vs 3.4264s) |

@@ -169,7 +169,7 @@ fn callsite_01_reordering_unrelated_values_preserves_satisfaction() {
     let diags_bad = BorrowAnalyzer::analyze_with_shadow(&func_bad, None, Some(&ctx)).0;
     assert!(!diags_bad.is_empty(), "Inverted call MUST be rejected!");
     assert!(
-        diags_bad.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        diags_bad.iter().any(|d| d.code == Some(DiagnosticCode::LifetimeConstraintViolation) || d.message.contains("LifetimeConstraintViolation")),
         "Expected E2016 LifetimeConstraintViolation, got: {:?}",
         diags_bad
     );
@@ -338,7 +338,7 @@ fn callsite_03_caller_contract_assumptions_satisfy_callee_obligations_and_transi
     };
     let (diags_bad, _, _) = borrow_check_function_with_shadow(&func_bad, &ctx, &HashMap::new());
     assert!(!diags_bad.is_empty(), "Inverted transitive call MUST be rejected!");
-    assert!(diags_bad.iter().any(|d| d.message.contains("E2016")));
+    assert!(diags_bad.iter().any(|d| d.code == Some(DiagnosticCode::LifetimeConstraintViolation)));
 }
 
 /// CALLSITE-04: Callee obligation is queried against immutable RegionSolution and NEVER inserted into caller graph.
@@ -448,7 +448,7 @@ fn callsite_05_direct_contract_violation_emits_canonical_e2016() {
     assert_eq!(diag.span, call_span, "Diagnostic span must match call instruction span");
     assert_eq!(
         diag.message,
-        "error[E2016]: LifetimeConstraintViolation: argument for parameter (index 0) does not outlive parameter (index 1)"
+        "LifetimeConstraintViolation: argument for parameter (index 0) does not outlive parameter (index 1)"
     );
 }
 
@@ -535,7 +535,7 @@ fn callsite_06_method_receiver_subject_mapping() {
     assert_eq!(diag.span, call_span, "Diagnostic span must match call instruction span");
     assert_eq!(
         diag.message,
-        "error[E2016]: LifetimeConstraintViolation: argument for receiver 'self' does not outlive parameter (index 0)"
+        "LifetimeConstraintViolation: argument for receiver 'self' does not outlive parameter (index 0)"
     );
 }
 

@@ -5560,7 +5560,7 @@ impl<'a> TypeChecker<'a> {
                         {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                             self.ctx.diagnostics.push(Diagnostic::error("Explicit calls to drop() are forbidden. Values are dropped automatically at end of scope.")
-                                .with_span(span));
+                                .with_code(DiagnosticCode::ExplicitDropCall).with_span(span));
                         }
                         if self.ctx.tables.unsafe_functions.contains(&m_sym) && !self.is_unsafe_context {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));

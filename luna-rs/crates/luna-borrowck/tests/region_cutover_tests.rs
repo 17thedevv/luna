@@ -119,7 +119,7 @@ fn cutover_01_region_verdict_is_sole_lifetime_authority() {
     // Authority requirement: exactly one E3005 error emitted
     assert_eq!(diags.len(), 1, "Expected exactly 1 diagnostic from Region authority");
     assert!(
-        diags[0].message.contains("E3005") && diags[0].message.contains("Reference to local variable escapes function scope"),
+        diags[0].code == Some(DiagnosticCode::LocalBorrowEscape) && diags[0].message.contains("Reference to local variable escapes function scope"),
         "Diagnostic must be the canonical LocalBorrowEscape: {}",
         diags[0].message
     );
@@ -190,7 +190,7 @@ fn cutover_02_legacy_lifetime_oracle_does_not_emit_diagnostic() {
 
     // No extra legacy oracle emissions; exactly 1 diagnostic from Region authority
     assert_eq!(diags.len(), 1);
-    assert!(diags[0].message.contains("error[E3005]"));
+    assert!(diags[0].code == Some(DiagnosticCode::LocalBorrowEscape));
 }
 
 #[test]
@@ -248,7 +248,7 @@ fn cutover_03_no_duplicate_e3005_on_same_failure() {
     let summaries = HashMap::new();
     let (diags, _) = borrow_check_function(&func, &ctx, &summaries);
 
-    let e3005_count = diags.iter().filter(|d| d.message.contains("E3005")).count();
+    let e3005_count = diags.iter().filter(|d| d.code == Some(DiagnosticCode::LocalBorrowEscape)).count();
     assert_eq!(e3005_count, 1, "Must not emit duplicate E3005 for the same escape");
 }
 
@@ -334,13 +334,13 @@ fn cutover_04_simultaneous_lifetime_and_capability_failure_preserves_precedence(
     // E3005: LocalBorrowEscape (from Region Engine authority)
     assert!(diags.len() >= 2, "Expected both capability and lifetime errors, got {}", diags.len());
     let has_conflict = diags.iter().any(|d| d.code == Some(DiagnosticCode::BorrowConflict) || d.message.contains("Cannot borrow"));
-    let has_escape = diags.iter().any(|d| d.message.contains("E3005") || d.message.contains("LocalBorrowEscape"));
+    let has_escape = diags.iter().any(|d| d.code == Some(DiagnosticCode::LocalBorrowEscape) || d.message.contains("LocalBorrowEscape"));
     assert!(has_conflict, "Borrowck capability exclusivity check must be preserved");
     assert!(has_escape, "Region Engine lifetime escape check must be preserved");
 
     // Verify ordering: borrow conflict occurs at instruction v4 before return terminator E3005
     let idx_conflict = diags.iter().position(|d| d.code == Some(DiagnosticCode::BorrowConflict) || d.message.contains("Cannot borrow")).unwrap();
-    let idx_escape = diags.iter().position(|d| d.message.contains("E3005") || d.message.contains("LocalBorrowEscape")).unwrap();
+    let idx_escape = diags.iter().position(|d| d.code == Some(DiagnosticCode::LocalBorrowEscape) || d.message.contains("LocalBorrowEscape")).unwrap();
     assert!(idx_conflict < idx_escape, "Instruction borrow conflict must precede terminator return escape");
 }
 
@@ -379,7 +379,7 @@ fn cutover_05_incomplete_unsupported_bridge_state_does_not_silently_accept() {
 fn cutover_06_region_failure_preserves_expected_code_message_span() {
     let test_span = Some(Span::new(FileId(1), 120, 135));
 
-    // 1. BoundaryViolation -> E3005 with BorrowConflict code
+    // 1. BoundaryViolation -> typed E3005
     let failure_boundary = RegionFailure::BoundaryViolation {
         carrier: ValueId(10),
         edge: luna_semantic::region::CfgEdgeId::from_raw(0),
@@ -389,8 +389,8 @@ fn cutover_06_region_failure_preserves_expected_code_message_span() {
         span: test_span.clone(),
     };
     let diag_boundary = failure_boundary.into_diagnostic();
-    assert_eq!(diag_boundary.code, Some(DiagnosticCode::BorrowConflict));
-    assert!(diag_boundary.message.contains("error[E3005]: LocalBorrowEscape: Reference to iteration-local variable escapes loop iteration"));
+    assert_eq!(diag_boundary.code, Some(DiagnosticCode::LocalBorrowEscape));
+    assert!(diag_boundary.message.contains("LocalBorrowEscape: Reference to iteration-local variable escapes loop iteration"));
     assert_eq!(diag_boundary.span, test_span);
 
     // 2. ReturnEscape -> E3005
@@ -400,7 +400,8 @@ fn cutover_06_region_failure_preserves_expected_code_message_span() {
         span: test_span.clone(),
     };
     let diag_return = failure_return.into_diagnostic();
-    assert!(diag_return.message.contains("error[E3005]: LocalBorrowEscape: Cannot return a closure that captures a local borrow"));
+    assert_eq!(diag_return.code, Some(DiagnosticCode::LocalBorrowEscape));
+    assert!(diag_return.message.contains("LocalBorrowEscape: Cannot return a closure that captures a local borrow"));
     assert_eq!(diag_return.span, test_span);
 
     // 3. UnsatisfiedContract -> E2016
@@ -410,7 +411,7 @@ fn cutover_06_region_failure_preserves_expected_code_message_span() {
         span: test_span.clone(),
     };
     let diag_contract = failure_contract.into_diagnostic();
-    assert!(diag_contract.message.contains("error[E2016]: LifetimeConstraintViolation: return value has provenance from parameter (index 2)"));
+    assert!(diag_contract.message.contains("LifetimeConstraintViolation: return value has provenance from parameter (index 2)"));
     assert_eq!(diag_contract.span, test_span);
 }
 
@@ -569,7 +570,7 @@ fn cutover_10_loop_dynamic_instance_gap17_passes_with_legacy_heuristic_removed()
     let summaries = HashMap::new();
     let (diags, _) = borrow_check_function(&func_escape, &ctx, &summaries);
     assert!(!diags.is_empty(), "Escaping iteration-local reference must be rejected by Region authority");
-    assert!(diags.iter().any(|d| d.message.contains("E3005") || d.message.contains("escapes loop")), "Must emit E3005 for escaping iteration local: {:?}", diags);
+    assert!(diags.iter().any(|d| d.code == Some(DiagnosticCode::LocalBorrowEscape) || d.message.contains("escapes loop")), "Must emit E3005 for escaping iteration local: {:?}", diags);
 
     // 2. Reference borrowing OUTER data across loop break -> BOUNDARY-01 must be accepted!
     let mut func_outer = make_test_function("test_boundary01_outer");

@@ -1,0 +1,1 @@
+impl<T> [T] { export fn user_hack(self: &[T]) -> i32 { return 0; } }

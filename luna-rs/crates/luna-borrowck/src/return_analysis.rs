@@ -1,4 +1,4 @@
-﻿use luna_common::Diagnostic;
+use luna_common::{Diagnostic, DiagnosticCode};
 use luna_mvir::{Function, Terminator};
 use std::collections::{HashMap, HashSet};
 
@@ -41,7 +41,7 @@ pub fn analyze_returns(func: &Function) -> Vec<Diagnostic> {
                     }
                 }
                 Terminator::MissingReturn => {
-                    let diag = Diagnostic::error("Function expects a return value, but control flow reaches the end without returning.".to_string());
+                    let diag = Diagnostic::error("Function expects a return value, but control flow reaches the end without returning.".to_string()).with_code(DiagnosticCode::MissingReturnValue);
                     diagnostics.push(diag);
                 }
                 Terminator::Ret { .. } | Terminator::Unreachable => {}

@@ -123,7 +123,7 @@
     "first_failing_stage": "luna-semantic typechecker.rs",
     "repro": "luna-semantic typechecker slice iterator lowering",
     "fix_commit": "6aa260d",
-    "evidence": "SliceIter compiler synthesis removed; SemanticContext.is_slice_authorized capability securely restricts slice inherent impls to authorized sysroot build context; rejects impersonation attempts (e.g. user provider slice.ln); crates/luna-semantic/tests/p1a_tests.rs Cases 19, 20 & 21 pass; crates/luna-cli/tests/v01_grammar_acceptance_tests.rs Case 7 verifies CLI rejection with error[E2006]"
+    "evidence": "SliceIter compiler synthesis removed; SemanticContext.is_slice_authorized capability securely restricts slice inherent impls to authorized sysroot build context; rejects impersonation attempts (e.g. user provider slice.ln); crates/luna-semantic/tests/p1a_tests.rs Cases 19, 20 & 21 pass; crates/luna-cli/tests/v01_grammar_acceptance_tests.rs Case 7 verifies CLI rejection with error[E2006]; 2026-10-03 follow-up: canonical file containment/authentication gates provenance for both .ln and .llib, including -I candidates. Permanent CLI and provider_authority_tests controls; see compiler-integrity-repair-2026-10-03.md."
   },
   {
     "id": "S-03",
@@ -182,11 +182,11 @@
   {
     "id": "V01-DIAG-01",
     "contract": "Typed diagnostic codes across compiler phases conforming to DIAG-1..10",
-    "status": "PASS",
+    "status": "PARTIAL",
     "first_failing_stage": "luna-parser and diagnostic emission",
     "repro": "tests/luna/language/spec_v01 parser error rendering",
     "fix_commit": "41484c2",
-    "evidence": "Typed diagnostic codes E0001..E0003 (parser), E1001 (unresolved symbol/method), E2001 (type mismatch in local/global var decl, call args, binary ops, returns), E2006 (coherence orphan & slice impersonation), E2026 (typechecker invalid cast) verified in crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+    "evidence": "Typed diagnostic codes E0001..E0003 (parser), E1001 (unresolved symbol/method), E2001 (type mismatch in local/global var decl, call args, binary ops, returns), E2006 (coherence orphan & slice impersonation), E2026 (typechecker invalid cast) verified in crates/luna-cli/tests/v01_grammar_acceptance_tests.rs; 2026-10-03 follow-up repairs previously uncoded production constructors, typed escape identity and Unicode/tab caret rendering. Full DIAG-1..10 remains PARTIAL: optional code/span fields, structural related labels, constructor enforcement and complete registry coverage are not implemented by this repair. See compiler-integrity-repair-2026-10-03.md."
   },
   {
     "id": "W7-COMPTIME",

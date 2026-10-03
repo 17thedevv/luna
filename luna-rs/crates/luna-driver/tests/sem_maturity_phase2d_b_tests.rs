@@ -109,7 +109,7 @@ fn sem_loop_05_iteration_local_assigned_to_outer_ref_rejected() {
     let res = test_check("sem_loop_05", src);
     assert!(res.is_err(), "Borrow of iteration-local assigned to outer reference must be rejected");
     let diags = res.err().unwrap();
-    let has_escape = diags.iter().any(|d| d.message.contains("E3005") && d.message.contains("escapes loop iteration"));
+    let has_escape = diags.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LocalBorrowEscape) && d.message.contains("escapes loop iteration"));
     assert!(has_escape, "Expected E3005 LocalBorrowEscape across loop iteration, got: {:?}", diags);
 }
 

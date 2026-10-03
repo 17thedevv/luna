@@ -167,11 +167,14 @@ The following table lists every stable `DiagnosticCode` recognized by Luna v1.0.
 | `E2028` | 2028 | InvalidTryOperator | TypeChecker | `?` operator applied to type not implementing `Try` |
 | `E2029` | 2029 | LoopControlOutsideLoop | TypeChecker | `break` or `continue` used outside loop body |
 | `E2030` | 2030 | NonFfiSafeType | TypeChecker | Extern function signature contains non-FFI-safe types |
+| `E2031` | 2031 | ExplicitDropCall | TypeChecker | Explicit call to a compiler-managed destructor is prohibited |
 | `E3001` | 3001 | UseAfterMove | Borrowck | Value accessed or borrowed after having been moved |
 | `E3002` | 3002 | PartialMoveUnderDrop | Borrowck | Partial move attempted out of a type implementing Drop |
 | `E3003` | 3003 | BorrowConflict | Borrowck | Aliasing violation (multiple mutable or mut/immut loans) |
 | `E3004` | 3004 | MissingReturnValue | Borrowck | Non-void function reaches end without returning value |
 | `E3005` | 3005 | LocalBorrowEscape | Borrowck | Reference to local variable escapes function scope |
+| `E3006` | 3006 | UseOfUninitializedValue | Borrowck | Value is accessed before initialization |
+| `E3007` | 3007 | UseAfterDrop | Borrowck | Value is accessed after destruction |
 | `E3010` | 3010 | RawStorageAnchorMismatch | Borrowck | Store into an anchored raw-pointer field does not prove compatibility with the declared owner |
 | `E3011` | 3011 | RawStorageAnchorViolation | Borrowck | Raw-to-safe reference conversion lacks a unique valid anchor or compatible mutability |
 | `E4001` | 4001 | AsyncBorrowAcrossAwait | Async/Comptime | Borrow active across `.await` point in async function |
@@ -184,6 +187,17 @@ The following table lists every stable `DiagnosticCode` recognized by Luna v1.0.
 | `E6001` | 6001 | BackendInvariantViolation | Infrastructure | Internal compiler or backend code generation invariant failed |
 | `E6002` | 6002 | ObjectEmissionFailure | Infrastructure | LLVM object file emission failure |
 | `E6003` | 6003 | LinkerFailure | Infrastructure | System linker invocation failed |
+| `E6004` | 6004 | SysrootConfigurationFailure | Infrastructure | Selected sysroot is missing or its configuration cannot be loaded |
+| `E6005` | 6005 | ProviderReadFailure | Infrastructure | Discovered provider cannot be read |
+| `E6006` | 6006 | OutputWriteFailure | Infrastructure | Requested compiler output cannot be written |
+| `E6007` | 6007 | InvalidArtifactOutput | Infrastructure | Requested artifact output format is read-only or invalid |
+
+Registry extension, 2026-10-03: E2031, E3006–E3007 and E6004–E6007 fill
+previously uncoded error categories. Existing numerical identities are unchanged.
+This extension does not certify implementation of all DIAG-1–10 invariants.
+Source spans remain UTF-8 byte offsets; rendered locations use one-based Unicode
+scalar columns. Snippets and underlines use Unicode display width and four-column
+tab stops, and a multi-line primary underline is clipped to its first line.
 
 ---
 

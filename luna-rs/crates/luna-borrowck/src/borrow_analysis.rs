@@ -3481,7 +3481,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                             let mut diag = Diagnostic::error(format!(
                                 "Borrow of local variable '{}' is held across an 'await' point [E_ASYNC_LOCAL_BORROW_ACROSS_AWAIT]. Self-referential futures are not permitted.",
                                 place_name
-                            ));
+                            )).with_code(DiagnosticCode::AsyncBorrowAcrossAwait);
                             diag.span = self.func.values[val_id.0 as usize].span.clone();
                             if !self.diagnostics.iter().any(|d| d.message == diag.message) {
                                 self.diagnostics.push(diag);

@@ -1,0 +1,35 @@
+
+import <slice>;
+
+fn total(xs: &[i32]) -> i32 {
+    dec rw sum = 0;
+    dec rw it = xs.iter();
+    dec rw going = true;
+    while going {
+        match it.next() {
+            std::Option::Some(item) -> { sum = sum + *item; },
+            std::Option::None -> { going = false; },
+        }
+    }
+    return sum;
+}
+
+fn bump(xs: &rw [i32]) -> i32 {
+    dec rw it = xs.iter_mut();
+    dec rw going = true;
+    while going {
+        match it.next() {
+            std::Option::Some(item) -> { *item = *item + 1; },
+            std::Option::None -> { going = false; },
+        }
+    }
+    return 0;
+}
+
+fn main() -> i32 {
+    dec rw arr = [10, 20, 30];
+    if total(&arr) != 60 { return 1; }
+    bump(&rw arr);
+    if total(&arr) != 63 { return 2; }
+    return 0;
+}

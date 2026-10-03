@@ -121,14 +121,14 @@ impl<'a> MoveAnalyzer<'a> {
         } else if loc_state == MoveState::Dropped {
             let msg = format!("Use of dropped value '{}'", formatted_name);
             if !self.diagnostics.iter().any(|d| d.message == msg) {
-                let mut diag = Diagnostic::error(msg);
+                let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterDrop);
                 diag.span = span.clone();
                 self.diagnostics.push(diag);
             }
         } else if loc_state == MoveState::Uninitialized {
             let msg = format!("Use of uninitialized value '{}'", formatted_name);
             if !self.diagnostics.iter().any(|d| d.message == msg) {
-                let mut diag = Diagnostic::error(msg);
+                let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseOfUninitializedValue);
                 diag.span = span.clone();
                 self.diagnostics.push(diag);
             }
@@ -557,7 +557,7 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                                 if loc_state == MoveState::ConditionallyMoved {
                                     let msg = format!("Cannot drop conditionally moved value");
                                     if !self.diagnostics.iter().any(|d| d.message == msg) {
-                                        let mut diag = Diagnostic::error(msg);
+                                        let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterMove);
                                         diag.span = self.func.values[val.0 as usize].span.clone();
                                         self.diagnostics.push(diag);
                                     }

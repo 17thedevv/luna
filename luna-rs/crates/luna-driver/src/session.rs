@@ -4,7 +4,6 @@ use luna_common::CompilerSession;
 use luna_semantic::symbol::ProviderId;
 use crate::sysroot::Sysroot;
 use crate::registry::ModuleRegistry;
-use crate::discovery::ExternalComponentDiscovery;
 use crate::error::{BootstrapError, ExternalComponentError};
 use crate::resolution_context::ProviderResolutionContext;
 use crate::external::ExternalComponentLoader;
@@ -100,18 +99,15 @@ impl<'a> DriverSession<'a> {
 
             let mut desc = None;
             for path in &self.search_paths {
-                // If it's a sysroot search path or normal path, try to use manifest if available.
-                // Note: To support purely custom `-L` paths (non-sysroot), we might need a fallback,
-                // but for now we follow the strict Phase 2.5 blueprint.
-                if let Some(manifest) = sysroot_manifest {
-                    if let Ok(d) = ExternalComponentDiscovery::discover(path, name, manifest, context) {
+                if sysroot_manifest.is_some() {
+                    if let Ok(d) = self.sysroot.discover_provider(path, name, context) {
                         desc = Some(d);
                         break;
                     }
                 }
             }
             if desc.is_none() && sysroot_manifest.is_some() {
-                desc = ExternalComponentDiscovery::discover(self.sysroot.external_dir(), name, sysroot_manifest.unwrap(), context).ok();
+                desc = self.sysroot.discover_provider(self.sysroot.external_dir(), name, context).ok();
             }
             desc
         };

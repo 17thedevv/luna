@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use luna_common::Diagnostic;
+use luna_common::{Diagnostic, DiagnosticCode};
 
 #[derive(Debug)]
 pub enum SysrootError {
@@ -37,7 +37,7 @@ impl SysrootError {
                 format!("failed to load sysroot manifest `{}`: {}", path.display(), error)
             }
         };
-        vec![Diagnostic::error(msg)]
+        vec![Diagnostic::error(msg).with_code(DiagnosticCode::SysrootConfigurationFailure)]
     }
 }
 
@@ -67,7 +67,7 @@ impl ExternalComponentError {
                     "failed to read external component at `{}`: {}",
                     path.display(),
                     error
-                ))]
+                )).with_code(DiagnosticCode::ProviderReadFailure)]
             }
             ExternalComponentError::ParseFailed(diags) => diags,
             ExternalComponentError::ImportFailed(diags) => diags,
