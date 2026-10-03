@@ -179,7 +179,7 @@ fn test_v01_diag_01_typed_diagnostics_rendered() {
     let temp = modes.source.join("test_diag_01");
     fs::create_dir_all(&temp).unwrap();
 
-    // Check that parser errors format with stable diagnostic codes like error[E0001]
+    // 1. Parser error format with stable diagnostic codes like error[E0001]
     let missing_brace_src = r#"
 fn broken(x: i32 -> i32 { return x; }
 "#;
@@ -191,5 +191,39 @@ fn broken(x: i32 -> i32 { return x; }
     assert!(
         err.contains("error[E0001]") || err.contains("error[E0002]") || err.contains("error[E0003]"),
         "expected typed diagnostic error[E000X], got: {err}"
+    );
+
+    // 2. Semantic typechecker error with typed code error[E2026] (InvalidCast)
+    let invalid_char_src = r#"
+fn main() -> i32 {
+    dec invalid: char = 55296 as char;
+    return 0;
+}
+"#;
+    let invalid_char_path = temp.join("invalid_char.ln");
+    fs::write(&invalid_char_path, invalid_char_src).unwrap();
+    let check_char = modes.check(&modes.source, &invalid_char_path);
+    assert!(!check_char.status.success());
+    let err_char = render(&check_char);
+    assert!(
+        err_char.contains("error[E2026]"),
+        "expected typed diagnostic error[E2026] for invalid char cast, got: {err_char}"
+    );
+
+    // 3. Semantic coherence error with typed code error[E2006] (OrphanImpl)
+    let orphan_src = r#"
+impl<T> [T] {
+    fn user_hack(self: &[T]) -> i32 { return 0; }
+}
+fn main() -> i32 { return 0; }
+"#;
+    let orphan_path = temp.join("orphan.ln");
+    fs::write(&orphan_path, orphan_src).unwrap();
+    let check_orphan = modes.check(&modes.source, &orphan_path);
+    assert!(!check_orphan.status.success());
+    let err_orphan = render(&check_orphan);
+    assert!(
+        err_orphan.contains("error[E2006]"),
+        "expected typed diagnostic error[E2006] for orphan impl, got: {err_orphan}"
     );
 }

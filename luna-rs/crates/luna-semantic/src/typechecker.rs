@@ -5118,7 +5118,7 @@ impl<'a> TypeChecker<'a> {
                                                 };
                                                 if obj_is_immutable {
                                                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call method requiring mutable receiver (&rw self) through immutable reference or pointer")
+                                                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call method requiring mutable receiver (&rw self) through immutable reference or pointer").with_code(DiagnosticCode::CannotMutateImmutable)
                                                         .with_span(span));
                                                 }
                                             }
@@ -5282,7 +5282,7 @@ impl<'a> TypeChecker<'a> {
                                             .get_expr_span_for_diag(expr_id)
                                             .unwrap_or_else(luna_common::Span::default);
                                         self.ctx.diagnostics.push(
-                                            Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call method requiring mutable receiver (&rw self) through immutable reference or pointer")
+                                            Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call method requiring mutable receiver (&rw self) through immutable reference or pointer").with_code(DiagnosticCode::CannotMutateImmutable)
                                                 .with_span(span),
                                         );
                                     }
@@ -5486,7 +5486,7 @@ impl<'a> TypeChecker<'a> {
                         }
                         if self.ctx.tables.unsafe_functions.contains(&m_sym) && !self.is_unsafe_context {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error("E_CALL_UNSAFE_FN_OUTSIDE_UNSAFE: Call to unsafe method requires an unsafe block")
+                            self.ctx.diagnostics.push(Diagnostic::error("E_CALL_UNSAFE_FN_OUTSIDE_UNSAFE: Call to unsafe method requires an unsafe block").with_code(DiagnosticCode::UnsafeOperationOutsideUnsafe)
                                 .with_span(span));
                         }
                         if let Some(&m_ty) = self.ctx.tables.symbol_types.get(&m_sym) {
@@ -5618,7 +5618,7 @@ impl<'a> TypeChecker<'a> {
                                             .get_expr_span_for_diag(expr_id)
                                             .unwrap_or_else(luna_common::Span::default);
                                         self.ctx.diagnostics.push(
-                                            Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call method requiring mutable receiver (&rw self) through immutable reference or pointer")
+                                            Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call method requiring mutable receiver (&rw self) through immutable reference or pointer").with_code(DiagnosticCode::CannotMutateImmutable)
                                                 .with_span(span),
                                         );
                                     }
@@ -5738,6 +5738,7 @@ impl<'a> TypeChecker<'a> {
                                         Diagnostic::error(
                                             "invalid integer-to-char cast: value is not a Unicode scalar",
                                         )
+                                        .with_code(DiagnosticCode::InvalidCast)
                                         .with_span(span),
                                     );
                                 }
@@ -5748,6 +5749,7 @@ impl<'a> TypeChecker<'a> {
                             Diagnostic::error(
                                 "invalid cast to char: source must be an integer or char",
                             )
+                            .with_code(DiagnosticCode::InvalidCast)
                             .with_span(span),
                         );
                     }
@@ -5763,6 +5765,7 @@ impl<'a> TypeChecker<'a> {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
                             self.ctx.diagnostics.push(
                                 Diagnostic::error("numeric conversion out of range in float-to-integer cast")
+                                    .with_code(DiagnosticCode::InvalidCast)
                                     .with_span(span),
                             );
                         }
@@ -5799,12 +5802,14 @@ impl<'a> TypeChecker<'a> {
                 if source_is_fat && (target_is_thin || matches!(target_ty, SemanticType::Primitive(_))) {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                     self.ctx.diagnostics.push(Diagnostic::error("E_INVALID_CAST: Cannot cast fat pointer (pointer to unsized type) to thin pointer or integer; this would silently strip metadata (vtable or length)")
+                        .with_code(DiagnosticCode::InvalidCast)
                         .with_span(span));
                 }
                 // Rule: Cannot cast thin pointer to fat pointer (fabricates metadata)
                 if (source_is_thin || matches!(source_ty, SemanticType::Primitive(_))) && target_is_fat {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                     self.ctx.diagnostics.push(Diagnostic::error("E_INVALID_CAST: Cannot cast thin pointer or integer to fat pointer (pointer to unsized type); metadata (vtable or length) cannot be fabricated from thin representation")
+                        .with_code(DiagnosticCode::InvalidCast)
                         .with_span(span));
                 }
                 // Rule: Cannot cast directly to unsized value type
@@ -6161,7 +6166,7 @@ impl<'a> TypeChecker<'a> {
                 }
                 
                 if !found_from_residual_impl {
-                    let mut diag = Diagnostic::error("The `?` operator cannot be used in a function that returns this type, as it does not implement `FromResidual` for the residual type");
+                    let mut diag = Diagnostic::error("The `?` operator cannot be used in a function that returns this type, as it does not implement `FromResidual` for the residual type").with_code(DiagnosticCode::InvalidTryOperator);
                     diag.span = Some(try_span);
                     self.ctx.diagnostics.push(diag);
                 }
@@ -6170,7 +6175,7 @@ impl<'a> TypeChecker<'a> {
             }
             Expr::Await { expr } => {
                 if self.current_async_fn.is_none() {
-                    let mut diag = Diagnostic::error("`await` is only allowed inside `async` functions");
+                    let mut diag = Diagnostic::error("`await` is only allowed inside `async` functions").with_code(DiagnosticCode::AwaitOutsideAsync);
                     if let Some(span) = self.get_expr_span_for_diag(expr) {
                         diag.span = Some(span);
                     }
@@ -6247,25 +6252,25 @@ impl<'a> TypeChecker<'a> {
                         match inner_ty_kind {
                             SemanticType::Pointer(mutability, pointee) => {
                                 if !self.is_unsafe_context {
-                                    self.ctx.diagnostics.push(Diagnostic::error("E_UNSAFE_DEREF_OUTSIDE_UNSAFE: Dereference of raw pointer requires an unsafe block")
+                                    self.ctx.diagnostics.push(Diagnostic::error("E_UNSAFE_DEREF_OUTSIDE_UNSAFE: Dereference of raw pointer requires an unsafe block").with_code(DiagnosticCode::UnsafeOperationOutsideUnsafe)
                                         .with_span(span));
                                 }
                                 if *op == UnaryOp::DerefMut && mutability == crate::ty::Mutability::Immutable {
-                                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot perform mutable dereference on immutable raw pointer `*T`")
+                                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot perform mutable dereference on immutable raw pointer `*T`").with_code(DiagnosticCode::CannotMutateImmutable)
                                         .with_span(span));
                                 }
                                 pointee
                             }
                             SemanticType::Reference(_, mutability, pointee) => {
                                 if *op == UnaryOp::DerefMut && mutability == crate::ty::Mutability::Immutable {
-                                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot perform mutable dereference on immutable reference `&T`")
+                                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot perform mutable dereference on immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
                                         .with_span(span));
                                 }
                                 pointee
                             }
                             SemanticType::Error => self.ctx.types.error_id(),
                             _ => {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_CANNOT_DEREFERENCE: Type `{:?}` cannot be dereferenced", self.ctx.types.get(inner_ty)))
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_CANNOT_DEREFERENCE: Type `{:?}` cannot be dereferenced", self.ctx.types.get(inner_ty))).with_code(DiagnosticCode::CannotDereference)
                                     .with_span(span));
                                 self.ctx.types.error_id()
                             }
@@ -6277,7 +6282,7 @@ impl<'a> TypeChecker<'a> {
                         // But we should ban Neg on bools
                         if self.ctx.types.get(inner_ty) == &SemanticType::Primitive(crate::ty::BuiltinType::Bool) {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error("E_INVALID_UNARY_OP: Cannot apply unary operator `-` to type `bool`").with_span(span));
+                            self.ctx.diagnostics.push(Diagnostic::error("E_INVALID_UNARY_OP: Cannot apply unary operator `-` to type `bool`").with_code(DiagnosticCode::InvalidUnaryOp).with_span(span));
                             self.ctx.types.intern(SemanticType::Error)
                         } else {
                             inner_ty
@@ -6427,7 +6432,7 @@ impl<'a> TypeChecker<'a> {
                 match self.ctx.types.get(obj_ty) {
                     SemanticType::Reference(_, crate::ty::Mutability::Immutable, _) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`")
+                        self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
                             .with_span(span));
                     }
                     SemanticType::Reference(_, crate::ty::Mutability::Mutable, _) => {
@@ -6444,7 +6449,7 @@ impl<'a> TypeChecker<'a> {
                 match self.ctx.types.get(base_ty) {
                     SemanticType::Reference(_, crate::ty::Mutability::Immutable, _) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`")
+                        self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
                             .with_span(span));
                     }
                     SemanticType::Reference(_, crate::ty::Mutability::Mutable, _) => {}
@@ -6457,12 +6462,12 @@ impl<'a> TypeChecker<'a> {
                 let ptr_ty = self.ctx.tables.expr_types.get(operand).copied().unwrap_or(crate::ty::SemanticTypeId(0));
                 if let SemanticType::Pointer(crate::ty::Mutability::Immutable, _) = self.ctx.types.get(ptr_ty) {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot borrow through an immutable raw pointer as mutable")
+                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot borrow through an immutable raw pointer as mutable").with_code(DiagnosticCode::CannotMutateImmutable)
                         .with_span(span));
                 }
                 if let SemanticType::Reference(_, crate::ty::Mutability::Immutable, _) = self.ctx.types.get(ptr_ty) {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`")
+                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
                         .with_span(span));
                 }
             }

@@ -221,7 +221,8 @@ impl ExternalComponentLoader {
             // Perform semantic analysis
             let provider_id = driver_session.registry.allocate_id();
             let mut semantic_ctx = luna_semantic::SemanticContext::new();
-            semantic_ctx.current_provider = Some(provider_id);
+            semantic_ctx.current_provider = Some(provider_id);
+            semantic_ctx.current_provider_name = Some(descriptor.name.clone());
             semantic_ctx.allow_internal_lang_items = true; // External libs can use internal lang items
             driver_session.registry.inject_into_ctx(&mut semantic_ctx);
 
@@ -495,7 +496,8 @@ impl ExternalComponentLoader {
         // Perform semantic analysis
         let provider_id = driver_session.registry.allocate_id();
         let mut semantic_ctx = luna_semantic::SemanticContext::new();
-        semantic_ctx.current_provider = Some(provider_id);
+        semantic_ctx.current_provider = Some(provider_id);
+            semantic_ctx.current_provider_name = Some(descriptor.name.clone());
         semantic_ctx.allow_internal_lang_items = true; // External libs can use internal lang items
         driver_session.registry.inject_into_ctx(&mut semantic_ctx);
 

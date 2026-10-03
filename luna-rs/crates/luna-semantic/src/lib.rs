@@ -83,6 +83,7 @@ pub struct SemanticContext {
     pub provider_lookup: HashMap<String, symbol::ProviderId>,
     pub external_module_scopes: HashMap<String, ScopeId>,
     pub current_provider: Option<symbol::ProviderId>,
+    pub current_provider_name: Option<String>,
 }
 
 impl SemanticContext {
@@ -106,6 +107,7 @@ impl SemanticContext {
             provider_lookup: HashMap::new(),
             external_module_scopes: HashMap::new(),
             current_provider: None,
+            current_provider_name: None,
         }
     }
 

@@ -503,3 +503,44 @@ fn test_case_18_local_trait_reference_head_pass() {
         ctx.diagnostics
     );
 }
+
+// Case 19: Inherent impl on slice type in foreign/user module -> FAIL (E_ORPHAN_IMPL)
+#[test]
+fn test_case_19_orphan_slice_inherent_in_user_module_fail() {
+    let source = r#"
+        impl<T> [T] {
+            fn user_method(self: &[T]) -> i32 { return 0; }
+        }
+    "#;
+    let (ctx, success) = run_semantic_with_setup(source, |ctx| {
+        ctx.current_provider_name = Some("user_app".to_string());
+    });
+    assert!(!success, "Expected failure for inherent impl on [T] in user module");
+    let has_orphan_err = ctx
+        .diagnostics
+        .iter()
+        .any(|d| d.message.contains("E_ORPHAN_IMPL"));
+    assert!(
+        has_orphan_err,
+        "Expected E_ORPHAN_IMPL diagnostic, got: {:?}",
+        ctx.diagnostics
+    );
+}
+
+// Case 20: Inherent impl on slice type in core/slice provider -> PASS
+#[test]
+fn test_case_20_slice_inherent_in_slice_provider_pass() {
+    let source = r#"
+        impl<T> [T] {
+            fn iter(self: &[T]) -> i32 { return 0; }
+        }
+    "#;
+    let (ctx, success) = run_semantic_with_setup(source, |ctx| {
+        ctx.current_provider_name = Some("slice".to_string());
+    });
+    assert!(
+        success,
+        "Expected slice inherent methods in slice provider to pass, got: {:?}",
+        ctx.diagnostics
+    );
+}

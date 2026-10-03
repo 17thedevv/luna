@@ -1832,9 +1832,15 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 let align = self.layout_align(*ty);
                 Ok(self.context.i64_type().const_int(align, false).into())
             }
-            _ => {
-                // Fallback for unimplemented instructions in backend drift
+            Instruction::MarkInit { .. } | Instruction::Nop => {
+                // Marker instructions for borrow-checking and cleanup; no runtime effect.
                 Ok(self.context.i32_type().const_zero().into())
+            }
+            unhandled => {
+                return Err(BackendError::InvariantViolation(format!(
+                    "Unhandled MVIR instruction in LLVM backend: {:?}",
+                    unhandled
+                )));
             }
         }
     }
@@ -2019,3 +2025,4 @@ fn parse_char_literal(c: &str) -> char {
         '\0'
     }
 }
+

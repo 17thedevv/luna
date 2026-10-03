@@ -405,6 +405,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 .file_stem()
                 .and_then(|s| s.to_str())
                 .unwrap_or("");
+            semantic_ctx.current_provider_name = Some(base_name.to_string());
             if !options.is_sysroot_build && base_name != "core" {
                 if let Err(e) = driver_session.bootstrap_lang_contracts(&mut arena) {
                     return Err(e.into_diagnostics());
@@ -879,6 +880,16 @@ pub(crate) fn create_sibling_temp(
             Err(e) => return Err(e),
         }
     }
+}
+
+pub fn test_backend_compile(
+    module: &luna_mvir::Module,
+    semantic_ctx: &SemanticContext,
+) -> Result<(), luna_backend::BackendError> {
+    let config = TargetConfig::default();
+    let llvm_context = inkwell::context::Context::create();
+    let mut backend = LLVMBackend::new(&llvm_context, module, semantic_ctx, "test", &config);
+    backend.compile()
 }
 
 #[cfg(test)]

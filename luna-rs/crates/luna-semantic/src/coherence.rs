@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use luna_common::ids::SymbolId;
-use luna_common::{Diagnostic, Span};
+use luna_common::{Diagnostic, DiagnosticCode, Span};
 use crate::ty::{SemanticType, SemanticTypeId, Substitution};
 use crate::SemanticContext;
 
@@ -11,6 +11,14 @@ impl SemanticContext {
 
     pub fn is_symbol_foreign(&self, sym_id: SymbolId) -> bool {
         self.symbol_table.is_symbol_foreign(sym_id, self.current_provider)
+    }
+
+    pub fn is_slice_provider(&self) -> bool {
+        if let Some(ref name) = self.current_provider_name {
+            name == "slice" || name == "core/slice" || name == "core" || name.ends_with("/slice")
+        } else {
+            false
+        }
     }
 
     pub fn nominal_head(&self, ty_id: SemanticTypeId) -> Option<SymbolId> {
@@ -52,13 +60,17 @@ impl SemanticContext {
                     Diagnostic::error(format!(
                         "E_ORPHAN_IMPL: Cannot implement foreign trait `{}` for foreign type `{}`. Either the trait or the target type nominal head must be defined in the current module.",
                         trait_name, self_name
-                    )).with_span(span)
+                    ))
+                    .with_code(DiagnosticCode::OrphanImpl)
+                    .with_span(span)
                 );
                 return Err(());
             }
         } else {
-            // Inherent impl: allowed for local nominal heads or slice types in the stdlib
-            let is_inherent_allowed = is_head_local || matches!(self.types.get(self_ty_res), SemanticType::Slice(_));
+            // Inherent impl: allowed for local nominal heads or primitive slice types in the slice provider
+            let is_slice = matches!(self.types.get(self_ty_res), SemanticType::Slice(_));
+            let is_slice_authorized = is_slice && self.is_slice_provider();
+            let is_inherent_allowed = is_head_local || is_slice_authorized;
             if !is_inherent_allowed {
                 let self_name = nominal_head
                     .map(|s| self.symbol_table.get_symbol(s).name.clone())
@@ -67,7 +79,9 @@ impl SemanticContext {
                     Diagnostic::error(format!(
                         "E_ORPHAN_IMPL: Cannot define inherent methods for foreign type `{}`. The target type must be defined in the current module.",
                         self_name
-                    )).with_span(span)
+                    ))
+                    .with_code(DiagnosticCode::OrphanImpl)
+                    .with_span(span)
                 );
                 return Err(());
             }
