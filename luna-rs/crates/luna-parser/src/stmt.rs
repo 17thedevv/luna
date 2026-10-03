@@ -7,9 +7,11 @@ impl<'a> Parser<'a> {
         let stmt = if self.match_token(TokenKind::KwReturn) {
             self.parse_return_stmt()?
         } else if self.match_token(TokenKind::KwBreak) {
-            self.parse_break_stmt()?
+            let kw_span = self.previous().span;
+            self.parse_break_stmt(kw_span)?
         } else if self.match_token(TokenKind::KwContinue) {
-            self.parse_continue_stmt()?
+            let kw_span = self.previous().span;
+            self.parse_continue_stmt(kw_span)?
         } else if self.check(TokenKind::LBrace) {
             self.parse_block_stmt()?
         } else if self.check(TokenKind::KwIf) {
@@ -218,24 +220,24 @@ impl<'a> Parser<'a> {
         Ok(self.arena.alloc_stmt(Stmt::Return { value }))
     }
 
-    fn parse_break_stmt(&mut self) -> Result<StmtId, ()> {
+    fn parse_break_stmt(&mut self, span: luna_common::Span) -> Result<StmtId, ()> {
         let label = if self.check(TokenKind::Lifetime) {
             Some(self.advance().span)
         } else {
             None
         };
         self.consume(TokenKind::Semi, "Expected ';' after break")?;
-        Ok(self.arena.alloc_stmt(Stmt::Break { label }))
+        Ok(self.arena.alloc_stmt(Stmt::Break { label, span }))
     }
 
-    fn parse_continue_stmt(&mut self) -> Result<StmtId, ()> {
+    fn parse_continue_stmt(&mut self, span: luna_common::Span) -> Result<StmtId, ()> {
         let label = if self.check(TokenKind::Lifetime) {
             Some(self.advance().span)
         } else {
             None
         };
         self.consume(TokenKind::Semi, "Expected ';' after continue")?;
-        Ok(self.arena.alloc_stmt(Stmt::Continue { label }))
+        Ok(self.arena.alloc_stmt(Stmt::Continue { label, span }))
     }
 
     fn parse_unsafe_stmt(&mut self) -> Result<StmtId, ()> {

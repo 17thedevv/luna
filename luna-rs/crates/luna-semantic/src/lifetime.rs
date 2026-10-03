@@ -465,40 +465,41 @@ impl LifetimeError {
                 luna_common::Diagnostic::error(format!(
                     "lifetime constraint '{} ≤ {}' cannot be satisfied: {}",
                     c.constraint.shorter.0, c.constraint.longer.0, c.reason
-                ))
+                )).with_code(luna_common::DiagnosticCode::LifetimeConstraintViolation)
             }
             LifetimeError::TypeInconsistency { expected, found, span } => {
                 luna_common::Diagnostic::error(format!(
                     "type mismatch in lifetime alternatives: expected {}, found {}",
                     expected, found
-                )).with_span(span)
+                )).with_code(luna_common::DiagnosticCode::TypeMismatch).with_span(span)
             }
             LifetimeError::UnresolvedLifetime { name, span } => {
                 luna_common::Diagnostic::error(format!(
                     "lifetime '{}' does not refer to any parameter in scope",
                     name
-                )).with_span(span)
+                )).with_code(luna_common::DiagnosticCode::LifetimeConstraintViolation).with_span(span)
             }
             LifetimeError::AnalysisTimeout => {
                 luna_common::Diagnostic::error("lifetime analysis exceeded resource limit")
+                    .with_code(luna_common::DiagnosticCode::LifetimeConstraintViolation)
             }
             LifetimeError::ReturnProvenanceMismatch { expected, found, span } => {
                 luna_common::Diagnostic::error(format!(
                     "return value provenance mismatch: expected '{}', found '{}'",
                     expected, found
-                )).with_span(span)
+                )).with_code(luna_common::DiagnosticCode::LifetimeConstraintViolation).with_span(span)
             }
             LifetimeError::ConstraintViolation { callee, constraint, span } => {
                 luna_common::Diagnostic::error(format!(
                     "function '{}' requires {}, but condition not satisfied",
                     callee, constraint
-                )).with_span(span)
+                )).with_code(luna_common::DiagnosticCode::LifetimeConstraintViolation).with_span(span)
             }
             LifetimeError::UnsupportedContractRelation { reason, span } => {
                 luna_common::Diagnostic::error(format!(
                     "unsupported lifetime contract relation: {}",
                     reason
-                )).with_span(span)
+                )).with_code(luna_common::DiagnosticCode::LifetimeConstraintViolation).with_span(span)
             }
         }
     }

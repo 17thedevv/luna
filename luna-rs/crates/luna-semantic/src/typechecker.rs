@@ -543,7 +543,9 @@ impl<'a> TypeChecker<'a> {
                 Diagnostic::error(format!(
                     "E_ASSOC_TYPE_CYCLE: Cycle detected while normalizing associated type projection `<_ as {}>::{}`",
                     trait_name, assoc_name
-                )).with_span(span)
+                ))
+                .with_code(DiagnosticCode::AssociatedTypeCycle)
+                .with_span(span)
             );
             return self.ctx.types.intern(SemanticType::Error);
         }
@@ -575,7 +577,9 @@ impl<'a> TypeChecker<'a> {
                     Diagnostic::error(format!(
                         "E_UNRESOLVED_TRAIT_IMPL: Type `{:?}` does not implement trait `{}` for projection `{}`",
                         sem_ty, trait_name, assoc_name
-                    )).with_span(span)
+                    ))
+                    .with_code(DiagnosticCode::UnresolvedTraitImpl)
+                    .with_span(span)
                 );
                 return self.ctx.types.intern(SemanticType::Error);
             }
@@ -602,9 +606,11 @@ impl<'a> TypeChecker<'a> {
             let assoc_name = self.ctx.symbol_table.get_symbol(assoc_type).name.clone();
             self.ctx.diagnostics.push(
                 Diagnostic::error(format!(
-                    "E_AMBIGUOUS_IMPL: Multiple conflicting implementations found for associated type projection `<_ as {}>::{}`",
+                    "E_AMBIGUOUS_ASSOCIATED_TYPE: Multiple conflicting implementations found for associated type projection `<_ as {}>::{}`",
                     trait_name, assoc_name
-                )).with_span(span)
+                ))
+                .with_code(DiagnosticCode::AmbiguousAssociatedType)
+                .with_span(span)
             );
             return self.ctx.types.intern(SemanticType::Error);
         }
@@ -629,7 +635,9 @@ impl<'a> TypeChecker<'a> {
                         Diagnostic::error(format!(
                             "E_UNRESOLVED_TRAIT_IMPL: Trait implementation `{}` not found for associated type projection `{}`",
                             trait_name, assoc_name
-                        )).with_span(span)
+                        ))
+                        .with_code(DiagnosticCode::UnresolvedTraitImpl)
+                        .with_span(span)
                     );
                     return self.ctx.types.intern(SemanticType::Error);
                 }
@@ -640,9 +648,11 @@ impl<'a> TypeChecker<'a> {
                 let assoc_name = self.ctx.symbol_table.get_symbol(assoc_type).name.clone();
                 self.ctx.diagnostics.push(
                     Diagnostic::error(format!(
-                        "E_AMBIGUOUS_IMPL: Multiple conflicting implementations found for associated type projection `<_ as {}>::{}`",
+                        "E_AMBIGUOUS_ASSOCIATED_TYPE: Multiple conflicting implementations found for associated type projection `<_ as {}>::{}`",
                         trait_name, assoc_name
-                    )).with_span(span)
+                    ))
+                    .with_code(DiagnosticCode::AmbiguousAssociatedType)
+                    .with_span(span)
                 );
                 return self.ctx.types.intern(SemanticType::Error);
             }
@@ -664,7 +674,9 @@ impl<'a> TypeChecker<'a> {
                     Diagnostic::error(format!(
                         "E_NO_ASSOCIATED_TYPE: Associated type `{}` is not defined in matching impl of `{}`",
                         assoc_name, trait_name
-                    )).with_span(span)
+                    ))
+                    .with_code(DiagnosticCode::NoAssociatedType)
+                    .with_span(span)
                 );
                 return self.ctx.types.intern(SemanticType::Error);
             }
@@ -828,6 +840,7 @@ impl<'a> TypeChecker<'a> {
             if let Err(e) = self.unify(norm_proj, norm_target) {
                 self.ctx.diagnostics.push(
                     Diagnostic::error(format!("Associated type obligation failed: {}", e))
+                        .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                         .with_span(obl.span)
                 );
             }
@@ -899,7 +912,9 @@ impl<'a> TypeChecker<'a> {
                 Diagnostic::error(format!(
                     "E_AMBIGUOUS_ASSOCIATED_TYPE: Associated type `{}` is ambiguous between multiple candidate traits",
                     assoc_name
-                )).with_span(span)
+                ))
+                .with_code(DiagnosticCode::AmbiguousAssociatedType)
+                .with_span(span)
             );
             return self.ctx.types.intern(SemanticType::Error);
         }
@@ -907,9 +922,11 @@ impl<'a> TypeChecker<'a> {
         if candidate_traits.is_empty() {
             self.ctx.diagnostics.push(
                 Diagnostic::error(format!(
-                    "E_NO_ASSOCIATED_TYPE: No candidate trait defines associated type `{}` for this type",
+                    "E_UNRESOLVED_TRAIT_IMPL: No candidate trait defines associated type `{}` for this type",
                     assoc_name
-                )).with_span(span)
+                ))
+                .with_code(DiagnosticCode::UnresolvedTraitImpl)
+                .with_span(span)
             );
             return self.ctx.types.intern(SemanticType::Error);
         }
@@ -1024,8 +1041,10 @@ impl<'a> TypeChecker<'a> {
                             };
                             self.ctx.diagnostics.push(
                                 luna_common::Diagnostic::error(
-                                    "E_RAW_STORAGE_ANCHOR_COPY: a type with raw storage anchors cannot implement Copy in RAW-STORAGE-ANCHOR-v1"
-                                ).with_span(span),
+                                    "a type with raw storage anchors cannot implement Copy in RAW-STORAGE-ANCHOR-v1"
+                                )
+                                .with_code(DiagnosticCode::RawStorageAnchorViolation)
+                                .with_span(span),
                             );
                         }
                     }
@@ -1043,7 +1062,9 @@ impl<'a> TypeChecker<'a> {
                                 self.ctx.diagnostics.push(
                                     luna_common::Diagnostic::error(
                                         "E_COPY_DROP_CONFLICT: A composite type cannot satisfy or derive Copy if any transitive field satisfies Drop"
-                                    ).with_span(span)
+                                    )
+                                    .with_code(DiagnosticCode::CopyDropConflict)
+                                    .with_span(span)
                                 );
                             }
                         }
@@ -1075,7 +1096,9 @@ impl<'a> TypeChecker<'a> {
                         // Prevent duplicate errors for the same concrete type
                         let diag = luna_common::Diagnostic::error(
                             "E_COPY_DROP_CONFLICT: A composite type cannot satisfy or derive Copy if any transitive field satisfies Drop (in generic instantiation)"
-                        ).with_span(span);
+                        )
+                        .with_code(DiagnosticCode::CopyDropConflict)
+                        .with_span(span);
                         
                         if !self.ctx.diagnostics.contains(&diag) {
                             self.ctx.diagnostics.push(diag);
@@ -1139,7 +1162,11 @@ impl<'a> TypeChecker<'a> {
                     luna_ast::Decl::TypeAlias { name, .. } => *name,
                     _ => luna_common::Span::new(luna_common::ids::FileId(0), 0, 0),
                 };
-                self.ctx.diagnostics.push(Diagnostic::error("Recursive type has infinite size".to_string()).with_span(span));
+                self.ctx.diagnostics.push(
+                    Diagnostic::error("Recursive type has infinite size".to_string())
+                        .with_code(DiagnosticCode::InfiniteSizeRecursiveType)
+                        .with_span(span)
+                );
                 return;
             }
         }
@@ -1409,7 +1436,7 @@ impl<'a> TypeChecker<'a> {
                         for field in fields {
                             let field_name = self.get_span_text(field.name);
                             if !seen_fields.insert(field_name) {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("Duplicate field `{}` in struct", field_name)).with_span(field.name));
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("Duplicate field `{}` in struct", field_name)).with_code(DiagnosticCode::DuplicateDefinition).with_span(field.name));
                             }
                             let f_ty = self.lower_type(field.ty);
                             if self.ctx.types.is_unsized(f_ty) {
@@ -1418,7 +1445,9 @@ impl<'a> TypeChecker<'a> {
                                         "E_UNSIZED_TYPE_IN_VALUE_POSITION: Field `{}` has unsized type `{:?}` which cannot be stored directly in a struct without indirection",
                                         field_name,
                                         self.ctx.types.get(f_ty)
-                                    )).with_span(field.name)
+                                    ))
+                                    .with_code(DiagnosticCode::TypeMismatch)
+                                    .with_span(field.name)
                                 );
                             }
                             field_tys.push(f_ty);
@@ -1441,9 +1470,10 @@ impl<'a> TypeChecker<'a> {
                                                         let field_name = self.ctx.symbol_table.get_symbol(field_sym).name.clone();
                                                         self.ctx.diagnostics.push(
                                                             Diagnostic::error(format!(
-                                                                "error[E2016]: LifetimeConstraintViolation: field '{}' in struct '{}' has non-reference type, but struct lifetime contracts only admit reference fields (&T or &rw T)",
+                                                                "field '{}' in struct '{}' has non-reference type, but struct lifetime contracts only admit reference fields (&T or &rw T)",
                                                                 field_name, struct_name
                                                             ))
+                                                            .with_code(DiagnosticCode::LifetimeConstraintViolation)
                                                             .with_span(constraint.span),
                                                         );
                                                         has_admissibility_error = true;
@@ -1469,9 +1499,11 @@ impl<'a> TypeChecker<'a> {
                                         let field_name = self.ctx.symbol_table.get_symbol(field_sym).name.clone();
                                         self.ctx.diagnostics.push(
                                             Diagnostic::error(format!(
-                                                "E_RAW_STORAGE_ANCHOR_FIELD: anchored field '{}' in struct '{}' must have a direct raw pointer type (*T or *rw T)",
+                                                "anchored field '{}' in struct '{}' must have a direct raw pointer type (*T or *rw T)",
                                                 field_name, self.ctx.symbol_table.get_symbol(sym_id).name
-                                            )).with_span(self.ctx.symbol_table.get_symbol(field_sym).span),
+                                            ))
+                                            .with_code(DiagnosticCode::RawStorageAnchorViolation)
+                                            .with_span(self.ctx.symbol_table.get_symbol(field_sym).span),
                                         );
                                         invalid = true;
                                     }
@@ -1506,7 +1538,7 @@ impl<'a> TypeChecker<'a> {
                         for variant in variants {
                             let variant_name = self.get_span_text(variant.name);
                             if !seen_variants.insert(variant_name) {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("Duplicate variant `{}` in enum", variant_name)).with_span(variant.name));
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("Duplicate variant `{}` in enum", variant_name)).with_code(DiagnosticCode::DuplicateDefinition).with_span(variant.name));
                             }
                             // Each variant's type is based on its fields
                             let mut field_tys = Vec::new();
@@ -2072,7 +2104,7 @@ impl<'a> TypeChecker<'a> {
         let mut valid_const_inits = Vec::new();
         for (decl_id, init, name_span) in const_inits {
             if let Err(msg) = crate::const_eval::is_const_evaluable(self.arena, self.ctx, self.source_manager, init) {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", msg)).with_span(name_span));
+                self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", msg)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(name_span));
             } else {
                 valid_const_inits.push((decl_id, init, name_span));
             }
@@ -2113,7 +2145,7 @@ impl<'a> TypeChecker<'a> {
                         }
                         Err(e) => {
                             let span = self.get_expr_span_for_diag(&init).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_span(span));
+                            self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
                         }
                     }
                 }
@@ -2122,7 +2154,7 @@ impl<'a> TypeChecker<'a> {
                 self.ctx.diagnostics.push(Diagnostic::error(format!(
                     "cycle detected in constant evaluation: {}",
                     cycle_err.cycle.join(" -> ")
-                )).with_span(cycle_err.span));
+                )).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(cycle_err.span));
             }
         }
 
@@ -2291,6 +2323,7 @@ impl<'a> TypeChecker<'a> {
                                     "error[E2016]: LifetimeConstraintViolation: method '{}' in trait impl omits declared lifetime return contract 'life_from' from trait",
                                     meth_name
                                 ))
+                                .with_code(DiagnosticCode::LifetimeConstraintViolation)
                                 .with_span(decl_span),
                             );
                         }
@@ -2304,6 +2337,7 @@ impl<'a> TypeChecker<'a> {
                                             "error[E2016]: LifetimeConstraintViolation: method '{}' in trait impl has weaker return provenance (parameter index {}) than trait contract",
                                             meth_name, idx
                                         ))
+                                        .with_code(DiagnosticCode::LifetimeConstraintViolation)
                                         .with_span(decl_span),
                                     );
                                     break;
@@ -2318,6 +2352,7 @@ impl<'a> TypeChecker<'a> {
                                 "error[E2016]: LifetimeConstraintViolation: method '{}' in trait impl declares return provenance not present in trait method",
                                 meth_name
                             ))
+                            .with_code(DiagnosticCode::LifetimeConstraintViolation)
                             .with_span(decl_span),
                         );
                     }
@@ -2329,6 +2364,7 @@ impl<'a> TypeChecker<'a> {
                             "error[E2016]: LifetimeConstraintViolation: method '{}' in trait impl declares return provenance not present in trait method",
                             meth_name
                         ))
+                        .with_code(DiagnosticCode::LifetimeConstraintViolation)
                         .with_span(decl_span),
                     );
                 }
@@ -2345,9 +2381,10 @@ impl<'a> TypeChecker<'a> {
                     if !satisfied {
                         self.ctx.diagnostics.push(
                             luna_common::Diagnostic::error(format!(
-                                "error[E2016]: LifetimeConstraintViolation: method '{}' in trait impl requires outlives constraint between parameter {} and {} not guaranteed by trait",
+                                "method '{}' in trait impl requires outlives constraint between parameter {} and {} not guaranteed by trait",
                                 meth_name, constraint.longer, constraint.shorter
                             ))
+                            .with_code(DiagnosticCode::LifetimeConstraintViolation)
                             .with_span(decl_span),
                         );
                     }
@@ -2432,7 +2469,9 @@ impl<'a> TypeChecker<'a> {
                                     Diagnostic::error(format!(
                                         "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`)",
                                         type_name, trait_name, gp_name
-                                    )).with_span(span)
+                                    ))
+                                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
+                                    .with_span(span)
                                 );
                             } else if let Some((entry, test_subst)) = matched_entry {
                                 if !bound.trait_args.is_empty() {
@@ -2463,7 +2502,9 @@ impl<'a> TypeChecker<'a> {
                                         Diagnostic::error(format!(
                                             "E_ASSOCIATED_TYPE_MISMATCH: The type `{}` implements `{}` with associated type `{}` = `{:?}`, but `{:?}` was expected: {}",
                                             type_name, trait_name, assoc_name, self.ctx.types.get(norm_ty), self.ctx.types.get(expected_ty), e
-                                        )).with_span(span)
+                                        ))
+                                        .with_code(DiagnosticCode::TypeMismatch)
+                                        .with_span(span)
                                     );
                                 }
                             }
@@ -2483,7 +2524,7 @@ impl<'a> TypeChecker<'a> {
             let mut diag = Diagnostic::error(format!(
                 "E_TRAIT_NOT_OBJECT_SAFE: Trait `{}` cannot be made into an object because destructor methods cannot be called directly",
                 self.ctx.symbol_table.get_symbol(trait_sym).name
-            ));
+            )).with_code(DiagnosticCode::NonObjectSafeTrait);
             if let Some(sp) = span { diag = diag.with_span(sp); }
             self.ctx.diagnostics.push(diag);
             return false;
@@ -2501,7 +2542,7 @@ impl<'a> TypeChecker<'a> {
             let mut diag = Diagnostic::error(format!(
                 "E_DYN_ASSOCIATED_TYPE_UNSUPPORTED: Trait `{}` cannot be made into an object because it has associated types (v1 restriction)",
                 self.ctx.symbol_table.get_symbol(trait_sym).name
-            ));
+            )).with_code(DiagnosticCode::NonObjectSafeTrait);
             if let Some(sp) = span { diag = diag.with_span(sp); }
             self.ctx.diagnostics.push(diag);
             return false;
@@ -2512,7 +2553,7 @@ impl<'a> TypeChecker<'a> {
             let mut diag = Diagnostic::error(format!(
                 "E_DYN_SUPERTRAIT_UNSUPPORTED: Trait `{}` cannot be made into an object because supertrait dyn composition is unsupported in v1",
                 self.ctx.symbol_table.get_symbol(trait_sym).name
-            ));
+            )).with_code(DiagnosticCode::NonObjectSafeTrait);
             if let Some(sp) = span { diag = diag.with_span(sp); }
             self.ctx.diagnostics.push(diag);
             return false;
@@ -2529,7 +2570,7 @@ impl<'a> TypeChecker<'a> {
                         "E_TRAIT_NOT_OBJECT_SAFE: Trait `{}` cannot be made into an object because method `{}` is async (v1 restriction)",
                         self.ctx.symbol_table.get_symbol(trait_sym).name,
                         method_name
-                    ));
+                    )).with_code(DiagnosticCode::NonObjectSafeTrait);
                     if let Some(sp) = span { diag = diag.with_span(sp); }
                     self.ctx.diagnostics.push(diag);
                     return false;
@@ -2541,7 +2582,7 @@ impl<'a> TypeChecker<'a> {
                         "E_TRAIT_NOT_OBJECT_SAFE: Trait `{}` cannot be made into an object because method `{}` has generic type parameters",
                         self.ctx.symbol_table.get_symbol(trait_sym).name,
                         method_name
-                    ));
+                    )).with_code(DiagnosticCode::NonObjectSafeTrait);
                     if let Some(sp) = span { diag = diag.with_span(sp); }
                     self.ctx.diagnostics.push(diag);
                     return false;
@@ -2553,7 +2594,7 @@ impl<'a> TypeChecker<'a> {
                         "E_TRAIT_NOT_OBJECT_SAFE: Trait `{}` cannot be made into an object because method `{}` has no `self` receiver",
                         self.ctx.symbol_table.get_symbol(trait_sym).name,
                         method_name
-                    ));
+                    )).with_code(DiagnosticCode::NonObjectSafeTrait);
                     if let Some(sp) = span { diag = diag.with_span(sp); }
                     self.ctx.diagnostics.push(diag);
                     return false;
@@ -2565,7 +2606,7 @@ impl<'a> TypeChecker<'a> {
                             "E_TRAIT_NOT_OBJECT_SAFE: Trait `{}` cannot be made into an object because method `{}` has no `self` receiver",
                             self.ctx.symbol_table.get_symbol(trait_sym).name,
                             method_name
-                        ));
+                        )).with_code(DiagnosticCode::NonObjectSafeTrait);
                         if let Some(sp) = span { diag = diag.with_span(sp); }
                         self.ctx.diagnostics.push(diag);
                         return false;
@@ -2583,7 +2624,7 @@ impl<'a> TypeChecker<'a> {
                                     "E_TRAIT_NOT_OBJECT_SAFE: Trait `{}` cannot be made into an object because method `{}` returns `Self`",
                                     self.ctx.symbol_table.get_symbol(trait_sym).name,
                                     method_name
-                                ));
+                                )).with_code(DiagnosticCode::NonObjectSafeTrait);
                                 if let Some(sp) = span { diag = diag.with_span(sp); }
                                 self.ctx.diagnostics.push(diag);
                                 return false;
@@ -2605,7 +2646,7 @@ impl<'a> TypeChecker<'a> {
                                         "E_TRAIT_NOT_OBJECT_SAFE: Trait `{}` cannot be made into an object because method `{}` has `Self` in parameter position",
                                         self.ctx.symbol_table.get_symbol(trait_sym).name,
                                         method_name
-                                    ));
+                                    )).with_code(DiagnosticCode::NonObjectSafeTrait);
                                     if let Some(sp) = span { diag = diag.with_span(sp); }
                                     self.ctx.diagnostics.push(diag);
                                     return false;
@@ -2875,7 +2916,7 @@ impl<'a> TypeChecker<'a> {
                         self.lower_associated_type_projection(self_ty, &assoc_name, span)
                     } else {
                         let name_str = segments.iter().map(|s| self.get_span_text(*s)).collect::<Vec<_>>().join("::");
-                        self.ctx.diagnostics.push(luna_common::Diagnostic::error(format!("cannot find type `{}` in this scope", name_str)).with_span(span));
+                        self.ctx.diagnostics.push(luna_common::Diagnostic::error(format!("cannot find type `{}` in this scope", name_str)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(span));
                         self.ctx.types.intern(SemanticType::Error)
                     }
                 } else {
@@ -2886,7 +2927,7 @@ impl<'a> TypeChecker<'a> {
                         end: segments.last().unwrap().end,
                         ctxt: segments[0].ctxt,
                     };
-                    self.ctx.diagnostics.push(luna_common::Diagnostic::error(format!("cannot find type `{}` in this scope", name_str)).with_span(span));
+                    self.ctx.diagnostics.push(luna_common::Diagnostic::error(format!("cannot find type `{}` in this scope", name_str)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(span));
                     self.ctx.types.intern(SemanticType::Error)
                 }
             }
@@ -2920,7 +2961,7 @@ impl<'a> TypeChecker<'a> {
                     Ok(val) => val.as_usize().unwrap_or(0) as u64,
                     Err(e) => {
                         let span = self.get_expr_span_for_diag(size).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate array size in comptime: {}", e)).with_span(span));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate array size in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
                         0
                     }
                 };
@@ -2941,7 +2982,7 @@ impl<'a> TypeChecker<'a> {
                 if let Type::Named { segments, generic_args, associated_bindings } = trait_ast {
                     let last_span = segments.last().copied();
                     if !generic_args.is_empty() || !associated_bindings.is_empty() {
-                        let mut diag = Diagnostic::error("E_DYN_ASSOCIATED_TYPE_UNSUPPORTED: dyn Trait with associated type bindings or type arguments is unsupported in v1");
+                        let mut diag = Diagnostic::error("E_DYN_ASSOCIATED_TYPE_UNSUPPORTED: dyn Trait with associated type bindings or type arguments is unsupported in v1").with_code(DiagnosticCode::NonObjectSafeTrait);
                         if let Some(sp) = last_span { diag = diag.with_span(sp); }
                         self.ctx.diagnostics.push(diag);
                         return self.ctx.types.intern(SemanticType::Error);
@@ -2986,7 +3027,7 @@ impl<'a> TypeChecker<'a> {
                         }
                         self.ctx.types.intern(SemanticType::DynTrait(trait_sym))
                     } else {
-                        let mut diag = Diagnostic::error("Trait not found for dyn Trait");
+                        let mut diag = Diagnostic::error("Trait not found for dyn Trait").with_code(DiagnosticCode::UnresolvedSymbol);
                         if let Some(sp) = last_span { diag = diag.with_span(sp); }
                         self.ctx.diagnostics.push(diag);
                         self.ctx.types.intern(SemanticType::Error)
@@ -2996,7 +3037,7 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             Type::MacroCall { span, .. } => {
-                self.ctx.diagnostics.push(Diagnostic::error("internal compiler error: unexpanded macro call in type position").with_span(*span));
+                self.ctx.diagnostics.push(Diagnostic::error("internal compiler error: unexpanded macro call in type position").with_code(DiagnosticCode::InvalidSyntax).with_span(*span));
                 self.ctx.types.intern(SemanticType::Error)
             }
             Type::Typeof { expr } => {
@@ -3006,7 +3047,7 @@ impl<'a> TypeChecker<'a> {
                 self.ctx.types.intern(SemanticType::Never)
             }
             other => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("Unsupported or unrecognized type construct in semantic phase: {:?}", other)));
+                self.ctx.diagnostics.push(Diagnostic::error(format!("Unsupported or unrecognized type construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax));
                 self.ctx.types.intern(SemanticType::Error)
             }
         };
@@ -3089,6 +3130,7 @@ impl<'a> TypeChecker<'a> {
                             if !is_valid_main {
                                 self.ctx.diagnostics.push(
                                     Diagnostic::error("E_INVALID_MAIN_SIGNATURE: main must match one of: fn main() -> void, fn main() -> i32, fn main(args: [str]) -> i32")
+                                        .with_code(DiagnosticCode::InvalidMainSignature)
                                         .with_span(*name)
                                 );
                             }
@@ -3099,7 +3141,9 @@ impl<'a> TypeChecker<'a> {
                                 Diagnostic::error(format!(
                                     "E_UNSIZED_TYPE_IN_VALUE_POSITION: Return type `{:?}` is unsized and cannot be returned by value",
                                     self.ctx.types.get(ret_ty)
-                                )).with_span(*name)
+                                ))
+                                .with_code(DiagnosticCode::TypeMismatch)
+                                .with_span(*name)
                             );
                         }
 
@@ -3118,7 +3162,9 @@ impl<'a> TypeChecker<'a> {
                                                 "E_UNSIZED_TYPE_IN_VALUE_POSITION: Parameter `{}` has unsized type `{:?}` which cannot be passed by value",
                                                 self.get_span_text(*param_name),
                                                 self.ctx.types.get(sem_param_ty)
-                                            )).with_span(*param_name)
+                                            ))
+                                            .with_code(DiagnosticCode::TypeMismatch)
+                                            .with_span(*param_name)
                                         );
                                     }
                                 }
@@ -3155,7 +3201,9 @@ impl<'a> TypeChecker<'a> {
                                     Diagnostic::error(format!(
                                         "E_UNSIZED_TYPE_IN_VALUE_POSITION: Type `{:?}` is unsized and cannot appear in value position",
                                         self.ctx.types.get(expected_ty)
-                                    )).with_span(*name)
+                                    ))
+                                    .with_code(DiagnosticCode::TypeMismatch)
+                                    .with_span(*name)
                                 );
                             }
                             if let Some(init) = initializer {
@@ -3179,7 +3227,9 @@ impl<'a> TypeChecker<'a> {
                                     Diagnostic::error(format!(
                                         "E_UNSIZED_TYPE_IN_VALUE_POSITION: Type `{:?}` is unsized and cannot appear in value position",
                                         self.ctx.types.get(init_ty)
-                                    )).with_span(span)
+                                    ))
+                                    .with_code(DiagnosticCode::TypeMismatch)
+                                    .with_span(span)
                                 );
                             }
                         }
@@ -3187,17 +3237,17 @@ impl<'a> TypeChecker<'a> {
                         if *is_const {
                             if let Some(init) = initializer {
                                 if let Err(msg) = crate::const_eval::is_const_evaluable(self.arena, self.ctx, self.source_manager, *init) {
-                                    self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", msg)).with_span(*name));
+                                    self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", msg)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(*name));
                                 } else {
                                     match self.eval_comptime_expr(*init) {
                                         Ok(val) => {
-                                            self.ctx.comptime_values.insert(*init, val.clone());
+                                             self.ctx.comptime_values.insert(*init, val.clone());
                                             if let Some(sym_id) = self.ctx.tables.decl_symbols.get(decl_id).copied() {
                                                 self.ctx.const_values.insert(sym_id, val);
                                             }
                                         }
                                         Err(e) => {
-                                            self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_span(*name));
+                                            self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(*name));
                                         }
                                     }
                                 }
@@ -3324,14 +3374,14 @@ impl<'a> TypeChecker<'a> {
                 let literal_ty = self.typecheck_integer_literal_at(token.span, &text, false);
                 self.expected_expr_type.pop();
                 if let Err(message) = self.unify(ty, literal_ty) {
-                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(token.span));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_code(DiagnosticCode::TypeMismatch).with_span(token.span));
                 }
             }
             luna_ast::Pattern::Tuple { elements, .. } => {
                 let resolved_ty = self.ctx.types.get(ty).clone();
                 if let SemanticType::Tuple(elem_tys) = resolved_ty {
                     if elements.len() != elem_tys.len() {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("Tuple pattern has {} elements, but tuple type has {}", elements.len(), elem_tys.len())));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("Tuple pattern has {} elements, but tuple type has {}", elements.len(), elem_tys.len())).with_code(DiagnosticCode::TypeMismatch));
                     }
                     for (i, elem) in elements.iter().enumerate() {
                         if i < elem_tys.len() {
@@ -3361,7 +3411,7 @@ impl<'a> TypeChecker<'a> {
                                         if field_name_str == struct_field_name { provided = true; break; }
                                     }
                                     if !provided {
-                                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("Pattern requires field `{}` but it was not provided", struct_field_name)).with_span(pat_span));
+                                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("Pattern requires field `{}` but it was not provided", struct_field_name)).with_code(DiagnosticCode::MissingField).with_span(pat_span));
                                         missing_fields = true;
                                     }
                                 }
@@ -3386,7 +3436,7 @@ impl<'a> TypeChecker<'a> {
                                 }
                                 
                                 if !found {
-                                    self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("Struct has no field named `{}`", field_name_str)).with_span(field.name));
+                                    self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("Struct has no field named `{}`", field_name_str)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(field.name));
                                 }
                                 
                                 if let Some(field_pat) = field.pattern {
@@ -3428,7 +3478,7 @@ impl<'a> TypeChecker<'a> {
                                     }
                                     let fresh_enum_ty = self.ctx.types.intern(SemanticType::Enum(e_sym, fresh_args, instantiated_var_tys));
                                     if let Err(err) = self.unify(fresh_enum_ty, ty) {
-                                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(err).with_span(pat_span));
+                                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(err).with_code(DiagnosticCode::TypeMismatch).with_span(pat_span));
                                     }
                                 }
                             }
@@ -3453,7 +3503,7 @@ impl<'a> TypeChecker<'a> {
                 }
                 
                 if fields.len() != variant_payload_tys.len() {
-                    self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("Enum variant expects {} fields, but {} were provided", variant_payload_tys.len(), fields.len())).with_span(pat_span));
+                    self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("Enum variant expects {} fields, but {} were provided", variant_payload_tys.len(), fields.len())).with_code(DiagnosticCode::TypeMismatch).with_span(pat_span));
                     return;
                 }
 
@@ -3522,6 +3572,7 @@ impl<'a> TypeChecker<'a> {
                         self.ctx.types.get(self_ty),
                         trait_name,
                     ))
+                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                     .with_span(span),
                 );
                 None
@@ -3534,6 +3585,7 @@ impl<'a> TypeChecker<'a> {
                         trait_name,
                         self.ctx.types.get(self_ty),
                     ))
+                    .with_code(DiagnosticCode::ConflictingTraitImpl)
                     .with_span(span),
                 );
                 None
@@ -3557,6 +3609,7 @@ impl<'a> TypeChecker<'a> {
         if required_methods.len() != 1 {
             self.ctx.diagnostics.push(
                 Diagnostic::error("Iterator language protocols must define exactly one required method")
+                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                     .with_span(span),
             );
             return None;
@@ -3608,6 +3661,7 @@ impl<'a> TypeChecker<'a> {
                 "Implementation of language protocol method `{}` is missing",
                 required_name,
             ))
+            .with_code(DiagnosticCode::UnresolvedTraitImpl)
             .with_span(span),
         );
         None
@@ -3625,6 +3679,7 @@ impl<'a> TypeChecker<'a> {
         let Some(into_iterator_trait) = self.ctx.lang_items.get(LangItem::IntoIterator) else {
             self.ctx.diagnostics.push(
                 Diagnostic::error("language item `into_iterator` is required for `for-in`")
+                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                     .with_span(span),
             );
             return;
@@ -3632,13 +3687,16 @@ impl<'a> TypeChecker<'a> {
         let Some(iterator_trait) = self.ctx.lang_items.get(LangItem::Iterator) else {
             self.ctx.diagnostics.push(
                 Diagnostic::error("language item `iterator` is required for `for-in`")
+                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                     .with_span(span),
             );
             return;
         };
         let Some(option_sym) = self.ctx.lang_items.get(LangItem::Option) else {
             self.ctx.diagnostics.push(
-                Diagnostic::error("language item `option` is required for `for-in`").with_span(span),
+                Diagnostic::error("language item `option` is required for `for-in`")
+                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
+                    .with_span(span),
             );
             return;
         };
@@ -3651,6 +3709,7 @@ impl<'a> TypeChecker<'a> {
         if into_entry.trait_args.len() != 2 {
             self.ctx.diagnostics.push(
                 Diagnostic::error("IntoIterator language protocol requires item and iterator type arguments")
+                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                     .with_span(span),
             );
             return;
@@ -3671,13 +3730,14 @@ impl<'a> TypeChecker<'a> {
         if iterator_entry.trait_args.len() != 1 {
             self.ctx.diagnostics.push(
                 Diagnostic::error("Iterator language protocol requires one item type argument")
+                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                     .with_span(span),
             );
             return;
         }
         let next_item_ty = self.ctx.types.subst(iterator_entry.trait_args[0], &next_subst);
         if let Err(error) = self.unify(item_ty, next_item_ty) {
-            self.ctx.diagnostics.push(Diagnostic::error(error).with_span(span));
+            self.ctx.diagnostics.push(Diagnostic::error(error).with_code(DiagnosticCode::TypeMismatch).with_span(span));
             return;
         }
         let Some(next_method) = self.protocol_impl_method(iterator_trait, &iterator_entry, span)
@@ -3688,6 +3748,7 @@ impl<'a> TypeChecker<'a> {
         let Some(&next_fn_ty) = self.ctx.tables.symbol_types.get(&next_method) else {
             self.ctx.diagnostics.push(
                 Diagnostic::error("Iterator protocol method has no semantic function type")
+                    .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                     .with_span(span),
             );
             return;
@@ -3701,6 +3762,7 @@ impl<'a> TypeChecker<'a> {
                 _ => {
                     self.ctx.diagnostics.push(
                         Diagnostic::error("Iterator protocol method must have a receiver")
+                            .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                             .with_span(span),
                     );
                     return;
@@ -3709,13 +3771,14 @@ impl<'a> TypeChecker<'a> {
         match self.ctx.types.get(option_type).clone() {
             SemanticType::Enum(sym, args, _) if sym == option_sym && args.len() == 1 => {
                 if let Err(error) = self.unify(item_ty, args[0]) {
-                    self.ctx.diagnostics.push(Diagnostic::error(error).with_span(span));
+                    self.ctx.diagnostics.push(Diagnostic::error(error).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                     return;
                 }
             }
             _ => {
                 self.ctx.diagnostics.push(
                     Diagnostic::error("Iterator protocol method must return the Option language contract")
+                        .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                         .with_span(span),
                 );
                 return;
@@ -3753,7 +3816,7 @@ impl<'a> TypeChecker<'a> {
                 // their return legality is checked by the control-flow rules.
                 if !matches!(self.ctx.types.get(actual), SemanticType::Void) && !self.try_coerce(*tail, actual, expected) {
                     if let Err(message) = self.unify(expected, actual) {
-                        self.ctx.diagnostics.push(Diagnostic::error(message).with_span(self.get_expr_span_for_diag(tail).unwrap_or_default()));
+                        self.ctx.diagnostics.push(Diagnostic::error(message).with_code(DiagnosticCode::TypeMismatch).with_span(self.get_expr_span_for_diag(tail).unwrap_or_default()));
                     }
                 }
             }
@@ -3855,18 +3918,26 @@ impl<'a> TypeChecker<'a> {
                 self.typecheck_stmt(body);
                 self.is_unsafe_context = old;
             }
-            Stmt::Break { .. } => {
+            Stmt::Break { span, .. } => {
                 if self.loop_depth == 0 {
-                    self.ctx.diagnostics.push(Diagnostic::error("`break` outside of a loop"));
+                    self.ctx.diagnostics.push(
+                        Diagnostic::error("`break` outside of a loop")
+                            .with_code(DiagnosticCode::LoopControlOutsideLoop)
+                            .with_span(*span),
+                    );
                 }
             }
-            Stmt::Continue { .. } => {
+            Stmt::Continue { span, .. } => {
                 if self.loop_depth == 0 {
-                    self.ctx.diagnostics.push(Diagnostic::error("`continue` outside of a loop"));
+                    self.ctx.diagnostics.push(
+                        Diagnostic::error("`continue` outside of a loop")
+                            .with_code(DiagnosticCode::LoopControlOutsideLoop)
+                            .with_span(*span),
+                    );
                 }
             }
             other => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("Unsupported or unrecognized statement construct in semantic phase: {:?}", other)));
+                self.ctx.diagnostics.push(Diagnostic::error(format!("Unsupported or unrecognized statement construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax));
             }
         }
     }
@@ -3933,7 +4004,7 @@ impl<'a> TypeChecker<'a> {
         let decoded = match luna_lexer::literal::decode_integer(text) {
             Ok(value) => value,
             Err(message) => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INTEGER_LITERAL: {message}")).with_span(span));
+                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INTEGER_LITERAL: {message}")).with_code(DiagnosticCode::InvalidSyntax).with_span(span));
                 return self.ctx.types.error_id();
             }
         };
@@ -3958,7 +4029,7 @@ impl<'a> TypeChecker<'a> {
             self.ctx.target_pointer_bits
         } else { width.bit_width() };
         if !luna_lexer::literal::magnitude_fits(decoded.magnitude, negative, bits, width.is_signed()) {
-            self.ctx.diagnostics.push(Diagnostic::error(format!("E_INTEGER_LITERAL_RANGE: literal `{}` is outside {:?}", text, builtin)).with_span(span));
+            self.ctx.diagnostics.push(Diagnostic::error(format!("E_INTEGER_LITERAL_RANGE: literal `{}` is outside {:?}", text, builtin)).with_code(DiagnosticCode::TypeMismatch).with_span(span));
             return self.ctx.types.error_id();
         }
         self.ctx.types.intern(SemanticType::Primitive(builtin))
@@ -3982,7 +4053,7 @@ impl<'a> TypeChecker<'a> {
                                 return ty;
                             }
                             Err(message) => {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_BYTE_LITERAL: {message}")).with_span(tok.span));
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_BYTE_LITERAL: {message}")).with_code(DiagnosticCode::InvalidSyntax).with_span(tok.span));
                                 return self.ctx.types.error_id();
                             }
                         }
@@ -4000,7 +4071,7 @@ impl<'a> TypeChecker<'a> {
                     TokenKind::CharLiteral => SemanticType::Primitive(BuiltinType::Char),
                     TokenKind::KwTrue | TokenKind::KwFalse => SemanticType::Primitive(BuiltinType::Bool),
                     _ => {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("Unrecognized literal token '{:?}'", tok.kind)).with_span(tok.span));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("Unrecognized literal token '{:?}'", tok.kind)).with_code(DiagnosticCode::InvalidSyntax).with_span(tok.span));
                         SemanticType::Error
                     },
                 };
@@ -4170,6 +4241,7 @@ impl<'a> TypeChecker<'a> {
                         if self.ctx.types.is_unsized(elem_l) {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                             self.ctx.diagnostics.push(Diagnostic::error("E_UNSIZED_POINTER_ARITHMETIC: Cannot perform pointer arithmetic on unsized pointee type (dyn Trait or [T] has no compile-time size)")
+                                .with_code(DiagnosticCode::TypeMismatch)
                                 .with_span(span));
                             self.ctx.tables.expr_types.insert(*expr_id, self.ctx.types.intern(SemanticType::Error));
                             return self.ctx.types.intern(SemanticType::Error);
@@ -4177,6 +4249,7 @@ impl<'a> TypeChecker<'a> {
                         if !self.is_unsafe_context {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                             self.ctx.diagnostics.push(Diagnostic::error("E_POINTER_ARITHMETIC_OUTSIDE_UNSAFE: Pointer arithmetic requires an unsafe block")
+                                .with_code(DiagnosticCode::UnsafeOperationOutsideUnsafe)
                                 .with_span(span));
                         }
                         let ptr_result_ty = match op {
@@ -4185,7 +4258,7 @@ impl<'a> TypeChecker<'a> {
                                 if let SemanticType::Pointer(_, elem_r) = r_sem_ty {
                                     if elem_l != elem_r {
                                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                                        self.ctx.diagnostics.push(Diagnostic::error("Cannot subtract pointers to different pointee types").with_span(span));
+                                        self.ctx.diagnostics.push(Diagnostic::error("Cannot subtract pointers to different pointee types").with_code(DiagnosticCode::TypeMismatch).with_span(span));
                                     }
                                     self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Isize))
                                 } else {
@@ -4209,7 +4282,7 @@ impl<'a> TypeChecker<'a> {
                     .error_for_type(&self.ctx.types, l_ty)
                 {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                     return self.ctx.types.error_id();
                 }
 
@@ -4220,7 +4293,7 @@ impl<'a> TypeChecker<'a> {
                     }
                     BinaryOp::Range | BinaryOp::RangeInc => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("E_UNSUPPORTED_FEATURE: Binary operator `{:?}` is not yet supported in the backend", op)).with_span(span));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("E_UNSUPPORTED_FEATURE: Binary operator `{:?}` is not yet supported in the backend", op)).with_code(DiagnosticCode::InvalidBinaryOp).with_span(span));
                         self.ctx.types.intern(SemanticType::Error)
                     }
                     _ => l_ty
@@ -4240,7 +4313,7 @@ impl<'a> TypeChecker<'a> {
                 
                 if let Some(&callee_sym) = self.ctx.tables.expr_symbols.get(callee) {
                     if Some(callee_sym) == self.ctx.lang_items.get(crate::lang_item::LangItem::DropFn) {
-                        let diag = Diagnostic::error("Explicit calls to drop() are forbidden. Values are dropped automatically at end of scope.".to_string());
+                        let diag = Diagnostic::error("Explicit calls to drop() are forbidden. Values are dropped automatically at end of scope.".to_string()).with_code(DiagnosticCode::TypeMismatch);
                         let diag = if let Some(span) = self.get_expr_span_for_diag(callee) { diag.with_span(span) } else { diag };
                         self.ctx.diagnostics.push(diag);
                     }
@@ -4331,7 +4404,8 @@ impl<'a> TypeChecker<'a> {
 
                 if is_callee_unsafe && !self.is_unsafe_context {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error("E_CALL_UNSAFE_FN_OUTSIDE_UNSAFE: Call to unsafe function requires an unsafe block")
+                    self.ctx.diagnostics.push(Diagnostic::error("E_CALL_UNSAFE_FN_OUTSIDE_UNSAFE: call to unsafe function requires an unsafe block")
+                        .with_code(DiagnosticCode::UnsafeOperationOutsideUnsafe)
                         .with_span(span));
                 }
 
@@ -4429,7 +4503,7 @@ impl<'a> TypeChecker<'a> {
                             };
                             if args.len() != field_tys.len() {
                                 let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("Enum variant expects {} fields, but {} were provided", field_tys.len(), args.len())).with_span(span));
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("Enum variant expects {} fields, but {} were provided", field_tys.len(), args.len())).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                             }
                             {
                                 for (i, arg) in args.iter().enumerate() {
@@ -4482,7 +4556,7 @@ impl<'a> TypeChecker<'a> {
                     let span = self.get_expr_span_for_diag(lvalue).unwrap_or_else(|| self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
                     self.ctx.diagnostics.push(Diagnostic::error(
                         "E_INVALID_LVALUE: Left-hand side of assignment must be an assignable place"
-                    ).with_span(span));
+                    ).with_code(DiagnosticCode::InvalidLvalue).with_span(span));
                     self.typecheck_expr(value);
                     return self.ctx.types.error_id();
                 }
@@ -4502,6 +4576,7 @@ impl<'a> TypeChecker<'a> {
                             if *mutability == crate::ty::Mutability::Immutable {
                                 let span = self.get_expr_span_for_diag(lvalue).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                                 self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot assign through immutable raw pointer '*T'")
+                                    .with_code(DiagnosticCode::CannotMutateImmutable)
                                     .with_span(span));
                             }
                         }
@@ -4515,7 +4590,7 @@ impl<'a> TypeChecker<'a> {
                     .error_for_type(&self.ctx.types, l_ty)
                 {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                     return self.ctx.types.error_id();
                 }
                 if !self.try_coerce(*value, r_ty, l_ty) {
@@ -4556,7 +4631,7 @@ impl<'a> TypeChecker<'a> {
                             }
                         }
                     }
-                    self.ctx.diagnostics.push(Diagnostic::error(format!("Trait does not contain method '{}'", member_name)).with_span(*member));
+                    self.ctx.diagnostics.push(Diagnostic::error(format!("Trait does not contain method '{}'", member_name)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(*member));
                     let infer = self.ctx.types.new_inference_var();
                     self.ctx.tables.expr_types.insert(*expr_id, infer);
                     return infer;
@@ -4710,7 +4785,7 @@ impl<'a> TypeChecker<'a> {
                         }
                     }
 
-                    self.ctx.diagnostics.push(Diagnostic::error(format!("Unknown field or method '{}'", member_name)).with_span(*member));
+                    self.ctx.diagnostics.push(Diagnostic::error(format!("Unknown field or method '{}'", member_name)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(*member));
                     let infer = self.ctx.types.new_inference_var();
                     self.ctx.tables.expr_types.insert(*expr_id, infer);
                     return infer;
@@ -4824,7 +4899,7 @@ impl<'a> TypeChecker<'a> {
                         }
                     }
                 }
-                self.ctx.diagnostics.push(Diagnostic::error("Member access requires a struct or trait object").with_span(*member));
+                self.ctx.diagnostics.push(Diagnostic::error("Member access requires a struct or trait object").with_code(DiagnosticCode::TypeMismatch).with_span(*member));
                 self.ctx.types.new_inference_var()
             }
             Expr::StructInit { path, fields, .. } => {
@@ -4871,7 +4946,7 @@ impl<'a> TypeChecker<'a> {
                 };
 
                 let Some(symbol) = symbol else {
-                    self.ctx.diagnostics.push(Diagnostic::error(format!("Unknown struct '{}'", full_name)).with_span(span));
+                    self.ctx.diagnostics.push(Diagnostic::error(format!("Unknown struct '{}'", full_name)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(span));
                     return self.ctx.types.new_inference_var();
                 };
 
@@ -4882,7 +4957,7 @@ impl<'a> TypeChecker<'a> {
 
                 let base_ty = self.ctx.tables.symbol_types.get(&symbol).copied().unwrap_or_else(|| self.ctx.types.new_inference_var());
                 let SemanticType::Struct(sym_id, _, original_field_tys) = self.ctx.types.get(base_ty).clone() else {
-                    self.ctx.diagnostics.push(Diagnostic::error(format!("'{}' is not a struct", full_name)).with_span(span));
+                    self.ctx.diagnostics.push(Diagnostic::error(format!("'{}' is not a struct", full_name)).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                     return self.ctx.types.new_inference_var();
                 };
                 let Some(decl_id) = self.ctx.tables.symbol_decls.get(&symbol).copied() else {
@@ -4998,14 +5073,14 @@ impl<'a> TypeChecker<'a> {
                 match base_ty {
                     SemanticType::Tuple(elem_tys) => {
                         if *index as usize >= elem_tys.len() {
-                            self.ctx.diagnostics.push(Diagnostic::error(format!("Tuple index {} out of bounds (tuple has {} elements)", index, elem_tys.len())));
+                            self.ctx.diagnostics.push(Diagnostic::error(format!("Tuple index {} out of bounds (tuple has {} elements)", index, elem_tys.len())).with_code(DiagnosticCode::CannotIndex));
                             self.ctx.types.new_inference_var()
                         } else {
                             elem_tys[*index as usize]
                         }
                     }
                     _ => {
-                        self.ctx.diagnostics.push(Diagnostic::error("Cannot index into a non-tuple type"));
+                        self.ctx.diagnostics.push(Diagnostic::error("Cannot index into a non-tuple type").with_code(DiagnosticCode::CannotIndex));
                         self.ctx.types.new_inference_var()
                     }
                 }
@@ -5025,7 +5100,7 @@ impl<'a> TypeChecker<'a> {
                         let usize_id = self.ctx.types.usize_id();
                         if let Err(e) = self.unify(index_ty_id, usize_id) {
                             let span = self.get_expr_span_for_diag(index).unwrap_or_else(|| self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
-                            self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INDEX_TYPE: {}", e)).with_span(span));
+                            self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INDEX_TYPE: {}", e)).with_code(DiagnosticCode::CannotIndex).with_span(span));
                             has_err = true;
                         }
                     }
@@ -5034,7 +5109,7 @@ impl<'a> TypeChecker<'a> {
                     }
                     _ => {
                         let span = self.get_expr_span_for_diag(index).unwrap_or_else(|| self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INDEX_TYPE: Expected integer index type, found `{:?}`", index_ty)).with_span(span));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INDEX_TYPE: Expected integer index type, found `{:?}`", index_ty)).with_code(DiagnosticCode::CannotIndex).with_span(span));
                         has_err = true;
                     }
                 }
@@ -5054,7 +5129,7 @@ impl<'a> TypeChecker<'a> {
                     }
                     _ => {
                         let span = self.get_expr_span_for_diag(base).unwrap_or_else(|| self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("E_CANNOT_INDEX: Type `{:?}` cannot be indexed", base_ty)).with_span(span));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("E_CANNOT_INDEX: Type `{:?}` cannot be indexed", base_ty)).with_code(DiagnosticCode::CannotIndex).with_span(span));
                         has_err = true;
                         self.ctx.types.error_id()
                     }
@@ -5094,11 +5169,13 @@ impl<'a> TypeChecker<'a> {
                                 {
                                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                                     self.ctx.diagnostics.push(Diagnostic::error("Explicit calls to drop() are forbidden. Values are dropped automatically at end of scope.")
+                                        .with_code(DiagnosticCode::TypeMismatch)
                                         .with_span(span));
                                 }
                                 if self.ctx.tables.unsafe_functions.contains(&m_sym) && !self.is_unsafe_context {
                                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                                     self.ctx.diagnostics.push(Diagnostic::error("E_CALL_UNSAFE_FN_OUTSIDE_UNSAFE: Call to unsafe trait method requires an unsafe block")
+                                        .with_code(DiagnosticCode::UnsafeOperationOutsideUnsafe)
                                         .with_span(span));
                                 }
                                 // G1 Vector 5: Check receiver mutability.
@@ -5160,7 +5237,7 @@ impl<'a> TypeChecker<'a> {
                     if member_name == "len" || member_name == "length" {
                         if !args.is_empty() {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error("`len()` on slice takes no arguments").with_span(span));
+                            self.ctx.diagnostics.push(Diagnostic::error("`len()` on slice takes no arguments").with_code(DiagnosticCode::TypeMismatch).with_span(span));
                         }
                         let usize_ty = self.ctx.types.intern(SemanticType::Primitive(BuiltinType::Usize));
                         self.ctx.tables.expr_types.insert(*expr_id, usize_ty);
@@ -5169,7 +5246,7 @@ impl<'a> TypeChecker<'a> {
                     } else if member_name == "is_empty" {
                         if !args.is_empty() {
                             let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error("`is_empty()` on slice takes no arguments").with_span(span));
+                            self.ctx.diagnostics.push(Diagnostic::error("`is_empty()` on slice takes no arguments").with_code(DiagnosticCode::TypeMismatch).with_span(span));
                         }
                         let bool_ty = self.ctx.types.bool_id();
                         self.ctx.tables.expr_types.insert(*expr_id, bool_ty);
@@ -5245,6 +5322,7 @@ impl<'a> TypeChecker<'a> {
                                             method_gp_syms.len(),
                                             generic_args.len()
                                         ))
+                                        .with_code(DiagnosticCode::TypeMismatch)
                                         .with_span(*method_name),
                                     );
                                 }
@@ -5313,6 +5391,7 @@ impl<'a> TypeChecker<'a> {
                                             Diagnostic::error(
                                                 "E_UNCONSTRAINED_INFERENCE: Generic trait method type parameter could not be inferred from arguments or expected result",
                                             )
+                                            .with_code(DiagnosticCode::TypeMismatch)
                                             .with_span(*method_name),
                                         );
                                     }
@@ -5580,6 +5659,7 @@ impl<'a> TypeChecker<'a> {
                                             method_gp_syms.len(),
                                             generic_args.len()
                                         ))
+                                        .with_code(DiagnosticCode::TypeMismatch)
                                         .with_span(*method_name),
                                     );
                                 }
@@ -5652,6 +5732,7 @@ impl<'a> TypeChecker<'a> {
                                                 Diagnostic::error(
                                                     "E_UNCONSTRAINED_INFERENCE: Generic trait method type parameter could not be inferred from arguments or expected result",
                                                 )
+                                                .with_code(DiagnosticCode::TypeMismatch)
                                                 .with_span(*method_name),
                                             );
                                         }
@@ -5816,6 +5897,7 @@ impl<'a> TypeChecker<'a> {
                 if self.ctx.types.is_unsized(target_ty_id) {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                     self.ctx.diagnostics.push(Diagnostic::error("E_UNSIZED_TYPE_IN_VALUE_POSITION: Cannot cast to unsized type in value position")
+                        .with_code(DiagnosticCode::TypeMismatch)
                         .with_span(span));
                 }
 
@@ -5879,7 +5961,7 @@ impl<'a> TypeChecker<'a> {
                     }
                     
                     if let Err(err) = self.unify(result_ty, arm_ty) {
-                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(err).with_span(*match_span));
+                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(err).with_code(DiagnosticCode::TypeMismatch).with_span(*match_span));
                     }
                 }
                 
@@ -5890,6 +5972,7 @@ impl<'a> TypeChecker<'a> {
                             if !covered_bools.contains(&true) || !covered_bools.contains(&false) {
                                 self.ctx.diagnostics.push(
                                     luna_common::diagnostic::Diagnostic::error("Match is not exhaustive. Missing boolean values.")
+                                        .with_code(DiagnosticCode::NonExhaustivePattern)
                                         .with_span(*match_span)
                                 );
                             }
@@ -5901,6 +5984,7 @@ impl<'a> TypeChecker<'a> {
                                     if covered_variants.len() < variants.len() {
                                         self.ctx.diagnostics.push(
                                             luna_common::diagnostic::Diagnostic::error(format!("Match is not exhaustive. Covered {}/{} enum variants.", covered_variants.len(), variants.len()))
+                                                .with_code(DiagnosticCode::NonExhaustivePattern)
                                                 .with_span(*match_span)
                                         );
                                     }
@@ -5911,6 +5995,7 @@ impl<'a> TypeChecker<'a> {
                         _ => {
                             self.ctx.diagnostics.push(
                                 luna_common::diagnostic::Diagnostic::error("Match is not exhaustive. A wildcard pattern `_` or variable binding is required for this type.")
+                                    .with_code(DiagnosticCode::NonExhaustivePattern)
                                     .with_span(*match_span)
                             );
                         }
@@ -5949,7 +6034,11 @@ impl<'a> TypeChecker<'a> {
                 self.active_lambdas.pop();
                 if let Some(body_ty) = self.infer_stmt_value_type(body) {
                     if let Err(_) = self.unify(ret_ty_id, body_ty) {
-                        self.ctx.diagnostics.push(Diagnostic::error("Lambda return type mismatch"));
+                        let mut diag = Diagnostic::error("Lambda return type mismatch").with_code(DiagnosticCode::TypeMismatch);
+                        if let Some(span) = self.get_expr_span_for_diag(expr_id) {
+                            diag.span = Some(span);
+                        }
+                        self.ctx.diagnostics.push(diag);
                     }
                 }
                 let ret_ty_id = self.ctx.types.resolve_inference(ret_ty_id);
@@ -5985,7 +6074,11 @@ impl<'a> TypeChecker<'a> {
                             _ => None,
                         }).unwrap_or(false);
                         if is_mutated && !is_mutable {
-                            self.ctx.diagnostics.push(Diagnostic::error("Cannot mutably capture immutable variable"));
+                            let mut diag = Diagnostic::error("Cannot mutably capture immutable variable").with_code(DiagnosticCode::CannotMutateImmutable);
+                            if let Some(span) = self.get_expr_span_for_diag(expr_id) {
+                                diag.span = Some(span);
+                            }
+                            self.ctx.diagnostics.push(diag);
                         }
                         capture_bindings.push(crate::semantic_tables::CaptureBinding {
                             symbol: sym_id,
@@ -6019,7 +6112,7 @@ impl<'a> TypeChecker<'a> {
                 let from_residual_sym = self.ctx.lang_items.get(crate::lang_item::LangItem::FromResidual);
                 
                 if try_sym.is_none() || from_residual_sym.is_none() {
-                    let mut diag = Diagnostic::error("Missing language item: `Try` or `FromResidual`");
+                    let mut diag = Diagnostic::error("Missing language item: `Try` or `FromResidual`").with_code(DiagnosticCode::InvalidTryOperator);
                     diag.span = Some(try_span);
                     self.ctx.diagnostics.push(diag);
                     return self.ctx.types.intern(SemanticType::Error);
@@ -6092,7 +6185,7 @@ impl<'a> TypeChecker<'a> {
                 
                 let mut resolved_residual_ty = None;
                 let output_ty = if !found_try_impl {
-                    let mut diag = Diagnostic::error("The `?` operator can only be applied to types that implement `Try`");
+                    let mut diag = Diagnostic::error("The `?` operator can only be applied to types that implement `Try`").with_code(DiagnosticCode::InvalidTryOperator);
                     if let Some(span) = self.get_expr_span_for_diag(e) {
                         diag.span = Some(span);
                     }
@@ -6187,7 +6280,7 @@ impl<'a> TypeChecker<'a> {
                     SemanticType::Future(out_ty) => {
                         let resolved_out = self.ctx.types.resolve_inference(out_ty);
                         if self.ctx.types.is_unsized(resolved_out) {
-                            let mut diag = Diagnostic::error("E_UNSIZED_TYPE_IN_VALUE_POSITION: Cannot await a future yielding unsized type in value position");
+                            let mut diag = Diagnostic::error("E_UNSIZED_TYPE_IN_VALUE_POSITION: Cannot await a future yielding unsized type in value position").with_code(DiagnosticCode::TypeMismatch);
                             if let Some(span) = self.get_expr_span_for_diag(expr_id) {
                                 diag.span = Some(span);
                             }
@@ -6205,7 +6298,7 @@ impl<'a> TypeChecker<'a> {
                     }
                     SemanticType::Error => self.ctx.types.intern(SemanticType::Error),
                     _ => {
-                        let mut diag = Diagnostic::error("Cannot await a non-future type");
+                        let mut diag = Diagnostic::error("Cannot await a non-future type").with_code(DiagnosticCode::TypeMismatch);
                         if let Some(span) = self.get_expr_span_for_diag(expr) {
                             diag.span = Some(span);
                         }
@@ -6235,7 +6328,7 @@ impl<'a> TypeChecker<'a> {
                     .error_for_type(&self.ctx.types, inner_ty)
                 {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error(message).with_span(span));
+                    self.ctx.diagnostics.push(Diagnostic::error(message).with_code(DiagnosticCode::TypeMismatch).with_span(span));
                     return self.ctx.types.error_id();
                 }
 
@@ -6256,14 +6349,14 @@ impl<'a> TypeChecker<'a> {
                                         .with_span(span));
                                 }
                                 if *op == UnaryOp::DerefMut && mutability == crate::ty::Mutability::Immutable {
-                                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot perform mutable dereference on immutable raw pointer `*T`").with_code(DiagnosticCode::CannotMutateImmutable)
+                                    self.ctx.diagnostics.push(Diagnostic::error("Cannot perform mutable dereference on immutable raw pointer `*T`").with_code(DiagnosticCode::CannotMutateImmutable)
                                         .with_span(span));
                                 }
                                 pointee
                             }
                             SemanticType::Reference(_, mutability, pointee) => {
                                 if *op == UnaryOp::DerefMut && mutability == crate::ty::Mutability::Immutable {
-                                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot perform mutable dereference on immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
+                                    self.ctx.diagnostics.push(Diagnostic::error("Cannot perform mutable dereference on immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
                                         .with_span(span));
                                 }
                                 pointee
@@ -6290,10 +6383,9 @@ impl<'a> TypeChecker<'a> {
                     }
                     UnaryOp::Not | UnaryOp::BitNot | UnaryOp::PostInc | UnaryOp::PostDec => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("E_UNSUPPORTED_FEATURE: Unary operator `{:?}` is not yet supported", op)).with_span(span));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("Unary operator `{:?}` is not yet supported", op)).with_code(DiagnosticCode::InvalidUnaryOp).with_span(span));
                         self.ctx.types.intern(SemanticType::Error)
                     }
-                    _ => inner_ty,
                 }
             }
             Expr::Comptime { body } => {
@@ -6303,13 +6395,13 @@ impl<'a> TypeChecker<'a> {
                     Ok(v) => { self.ctx.comptime_values.insert(*expr_id, v); }
                     Err(e) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate comptime block: {}", e)).with_span(span));
+                        self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate comptime block: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
                     }
                 }
                 ty
             }
             other => {
-                let mut diag = Diagnostic::error(format!("Unsupported or unrecognized expression construct in semantic phase: {:?}", other));
+                let mut diag = Diagnostic::error(format!("Unsupported or unrecognized expression construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax);
                 if let Some(span) = self.get_expr_span_for_diag(expr_id) {
                     diag.span = Some(span);
                 }
@@ -6419,7 +6511,7 @@ impl<'a> TypeChecker<'a> {
                 if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id) {
                     let symbol = self.ctx.symbol_table.get_symbol(*sym_id);
                     if matches!(symbol.kind, crate::symbol::SymbolKind::Constant) {
-                        let mut diag = luna_common::diagnostic::Diagnostic::error("Cannot mutate immutable variable");
+                        let mut diag = luna_common::diagnostic::Diagnostic::error("Cannot mutate immutable variable").with_code(DiagnosticCode::CannotMutateImmutable);
                         if let Some(&span) = segments.first() {
                             diag.span = Some(span);
                         }
@@ -6432,7 +6524,7 @@ impl<'a> TypeChecker<'a> {
                 match self.ctx.types.get(obj_ty) {
                     SemanticType::Reference(_, crate::ty::Mutability::Immutable, _) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
+                        self.ctx.diagnostics.push(Diagnostic::error("Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
                             .with_span(span));
                     }
                     SemanticType::Reference(_, crate::ty::Mutability::Mutable, _) => {
@@ -6449,7 +6541,7 @@ impl<'a> TypeChecker<'a> {
                 match self.ctx.types.get(base_ty) {
                     SemanticType::Reference(_, crate::ty::Mutability::Immutable, _) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
+                        self.ctx.diagnostics.push(Diagnostic::error("Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
                             .with_span(span));
                     }
                     SemanticType::Reference(_, crate::ty::Mutability::Mutable, _) => {}
@@ -6467,7 +6559,7 @@ impl<'a> TypeChecker<'a> {
                 }
                 if let SemanticType::Reference(_, crate::ty::Mutability::Immutable, _) = self.ctx.types.get(ptr_ty) {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_REFERENCE: Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
+                    self.ctx.diagnostics.push(Diagnostic::error("Cannot mutate through an immutable reference `&T`").with_code(DiagnosticCode::CannotMutateImmutable)
                         .with_span(span));
                 }
             }

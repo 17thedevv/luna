@@ -9,6 +9,12 @@ pub enum ProviderVisibility {
     Internal,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ProviderCapability {
+    SliceInherentImpl,
+}
+
 #[derive(Debug, Clone, Deserialize)]
 pub struct ProviderEntry {
     pub name: String,
@@ -17,6 +23,8 @@ pub struct ProviderEntry {
     pub lang_contract: Option<String>,
     #[serde(default)]
     pub aliases: Vec<String>,
+    #[serde(default)]
+    pub capabilities: Vec<ProviderCapability>,
 }
 
 #[derive(Debug, Deserialize)]

@@ -111,19 +111,19 @@ fn test_generic_trait_dispatch_hash_primitives() {
             dec h_bool_f: u64 = hash_val<bool>(false);
             dec h_char: u64 = hash_val<char>('A');
 
-            if h_u64 != (42 as u64) {
+            if h_u64 != (42 as u64).hash() {
                 return 1;
             }
-            if h_i32 != (100 as u64) {
+            if h_i32 != (100 as i32).hash() {
                 return 2;
             }
-            if h_bool_t != (1 as u64) {
+            if h_bool_t != true.hash() {
                 return 3;
             }
-            if h_bool_f != (0 as u64) {
+            if h_bool_f != false.hash() {
                 return 4;
             }
-            if h_char != (65 as u64) {
+            if h_char != 'A'.hash() {
                 return 5;
             }
 

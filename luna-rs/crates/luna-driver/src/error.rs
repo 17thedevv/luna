@@ -60,7 +60,7 @@ impl ExternalComponentError {
                     "external component `{}` not found in `{}`",
                     name,
                     searched_dir.display()
-                ))]
+                )).with_code(luna_common::DiagnosticCode::UnresolvedModuleProvider)]
             }
             ExternalComponentError::ReadFailed { path, error } => {
                 vec![Diagnostic::error(format!(
@@ -72,8 +72,8 @@ impl ExternalComponentError {
             ExternalComponentError::ParseFailed(diags) => diags,
             ExternalComponentError::ImportFailed(diags) => diags,
             ExternalComponentError::SemanticFailed(diags) => diags,
-            ExternalComponentError::InvalidLibraryInterface { name, path, reason } => vec![Diagnostic::error(format!("Invalid binary library interface for '{}' at `{}`: {}", name, path.display(), reason))],
-            ExternalComponentError::InvalidArtifact { name, path, reason } => vec![Diagnostic::error(format!("Strict Rejection: Invalid artifact for '{}' at `{}`: {}", name, path.display(), reason))],
+            ExternalComponentError::InvalidLibraryInterface { name, path, reason } => vec![Diagnostic::error(format!("Invalid binary library interface for '{}' at `{}`: {}", name, path.display(), reason)).with_code(luna_common::DiagnosticCode::BackendInvariantViolation)],
+            ExternalComponentError::InvalidArtifact { name, path, reason } => vec![Diagnostic::error(format!("Strict Rejection: Invalid artifact for '{}' at `{}`: {}", name, path.display(), reason)).with_code(luna_common::DiagnosticCode::BackendInvariantViolation)],
         }
     }
 }
@@ -106,7 +106,7 @@ impl BootstrapError {
                 vec![Diagnostic::error(format!(
                     "fatal error: required component `{}` could not be bootstrapped. Luna requires `{}` for language primitives and runtime items.",
                     name, name
-                ))]
+                )).with_code(luna_common::DiagnosticCode::UnresolvedModuleProvider)]
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿use crate::{DeclId, ExprId, PatId};
+use crate::{DeclId, ExprId, PatId};
 use luna_common::Span;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, Copy, PartialEq, Eq)]
@@ -48,9 +48,11 @@ pub enum Stmt {
     },
     Break {
         label: Option<Span>,
+        span: Span,
     },
     Continue {
         label: Option<Span>,
+        span: Span,
     },
     Unsafe {
         body: crate::StmtId, // BlockStmt

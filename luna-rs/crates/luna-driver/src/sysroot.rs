@@ -51,6 +51,33 @@ impl Sysroot {
         &self.external_dir
     }
 
+    /// Checks if a source file corresponds to a canonical sysroot provider entry
+    /// and returns its declared capabilities if so.
+    pub fn get_canonical_provider_capabilities(
+        &self,
+        file_path: &Path,
+    ) -> Option<Vec<crate::sysroot_manifest::ProviderCapability>> {
+        let manifest = self.manifest();
+        let canon_file = std::fs::canonicalize(file_path).ok()?;
+        for entry in manifest.providers() {
+            let entry_rel = format!("{}.ln", entry.path);
+            let expected_file = self.external_dir().join(&entry_rel);
+            if let Ok(canon_entry) = std::fs::canonicalize(&expected_file) {
+                if canon_file == canon_entry {
+                    return Some(entry.capabilities.clone());
+                }
+            }
+            let entry_rel_ms = format!("{}.ms", entry.path);
+            let expected_file_ms = self.external_dir().join(&entry_rel_ms);
+            if let Ok(canon_entry) = std::fs::canonicalize(&expected_file_ms) {
+                if canon_file == canon_entry {
+                    return Some(entry.capabilities.clone());
+                }
+            }
+        }
+        None
+    }
+
     pub fn validate(&self) -> Result<(), SysrootError> {
         if !self.external_dir.exists() {
             return Err(SysrootError::ExternalRootMissing(self.external_dir.clone()));

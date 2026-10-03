@@ -1,5 +1,5 @@
 use luna_common::ids::SymbolId;
-use luna_common::diagnostic::Diagnostic;
+use luna_common::diagnostic::{Diagnostic, DiagnosticCode};
 use luna_common::Span;
 use std::collections::HashMap;
 
@@ -109,7 +109,7 @@ impl LangItemRegistry {
         if let Some(sym) = self.items[item.as_usize()] {
             Ok(sym)
         } else {
-            diagnostics.push(Diagnostic::error(format!("language item `{}` is required, but it is not defined", item.name())).with_span(span));
+            diagnostics.push(Diagnostic::error(format!("language item `{}` is required, but it is not defined", item.name())).with_code(DiagnosticCode::UnresolvedSymbol).with_span(span));
             Err(())
         }
     }
@@ -133,17 +133,17 @@ impl LangItemRegistry {
     pub fn register(&mut self, item: LangItem, sym: SymbolId, actual_target: LangItemTarget, span: Span, diagnostics: &mut Vec<Diagnostic>) {
         let expected_target = item.target();
         if actual_target != expected_target {
-            diagnostics.push(Diagnostic::error(format!("language item `{}` requires target {:?}, but found {:?}", item.name(), expected_target, actual_target)).with_span(span));
+            diagnostics.push(Diagnostic::error(format!("language item `{}` requires target {:?}, but found {:?}", item.name(), expected_target, actual_target)).with_code(DiagnosticCode::InvalidAnnotation).with_span(span));
             return;
         }
 
         if let Some(&existing_item) = self.reverse.get(&sym) {
-            diagnostics.push(Diagnostic::error(format!("symbol is already registered as language item `{}`", existing_item.name())).with_span(span));
+            diagnostics.push(Diagnostic::error(format!("symbol is already registered as language item `{}`", existing_item.name())).with_code(DiagnosticCode::DuplicateDefinition).with_span(span));
             return;
         }
 
         if let Some(_old_sym) = self.items[item.as_usize()] {
-            diagnostics.push(Diagnostic::error(format!("language item `{}` is defined multiple times", item.name())).with_span(span));
+            diagnostics.push(Diagnostic::error(format!("language item `{}` is defined multiple times", item.name())).with_code(DiagnosticCode::DuplicateDefinition).with_span(span));
             return;
         }
 

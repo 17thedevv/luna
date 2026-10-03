@@ -1811,9 +1811,9 @@ impl<'a> MvirGenerator<'a> {
                                 (mono_loop, semantic_loop)
                             else {
                                 self.diagnostics.push(luna_common::Diagnostic::error(
-                                    "E6001: MVIR invariant violated: resolved for-in protocol plan is missing"
+                                    "MVIR invariant violated: resolved for-in protocol plan is missing"
                                         .to_string(),
-                                ));
+                                ).with_code(luna_common::DiagnosticCode::BackendInvariantViolation));
                                 return;
                             };
 
@@ -1823,18 +1823,18 @@ impl<'a> MvirGenerator<'a> {
                                 .get(luna_semantic::lang_item::LangItem::OptionSome)
                             else {
                                 self.diagnostics.push(luna_common::Diagnostic::error(
-                                    "E6001: MVIR invariant violated: Option::Some language item is missing"
+                                    "MVIR invariant violated: Option::Some language item is missing"
                                         .to_string(),
-                                ));
+                                ).with_code(luna_common::DiagnosticCode::BackendInvariantViolation));
                                 return;
                             };
                             let some_variant = match self.ctx.symbol_table.get_symbol(some_sym).kind {
                                 luna_semantic::SymbolKind::EnumVariant(index) => index,
                                 _ => {
                                     self.diagnostics.push(luna_common::Diagnostic::error(
-                                        "E6001: MVIR invariant violated: Option::Some is not an enum variant"
+                                        "MVIR invariant violated: Option::Some is not an enum variant"
                                             .to_string(),
-                                    ));
+                                    ).with_code(luna_common::DiagnosticCode::BackendInvariantViolation));
                                     return;
                                 }
                             };
@@ -2101,7 +2101,7 @@ impl<'a> MvirGenerator<'a> {
                             let byte_ty = match self.ctx.types.get(ty_id) {
                                 luna_semantic::SemanticType::Array(elem, _) => *elem,
                                 _ => {
-                                    self.diagnostics.push(luna_common::Diagnostic::error("E_UNELABORATED_LITERAL: byte array reached MVIR without its semantic array type").with_span(tok.span));
+                                    self.diagnostics.push(luna_common::Diagnostic::error("byte array reached MVIR without its semantic array type").with_code(luna_common::DiagnosticCode::BackendInvariantViolation).with_span(tok.span));
                                     return Operand::Number("0".to_string());
                                 }
                             };
@@ -2766,9 +2766,10 @@ impl<'a> MvirGenerator<'a> {
                 let method_text = self.get_span_text(*method_name);
                 self.diagnostics.push(
                     luna_common::Diagnostic::error(format!(
-                        "E6001: MVIR invariant violated: unresolved method `{}` reached lowering",
+                        "MVIR invariant violated: unresolved method `{}` reached lowering",
                         method_text
                     ))
+                    .with_code(luna_common::DiagnosticCode::BackendInvariantViolation)
                     .with_span(*method_name),
                 );
                 Operand::Number("0".to_string())

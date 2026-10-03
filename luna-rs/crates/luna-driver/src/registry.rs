@@ -810,7 +810,7 @@ impl ModuleRegistry {
                 if parts.len() != 2 || parts[0] != "std" {
                     ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
                         "Invalid auto-visible stdlib path `{canonical_path}`; expected `std::Name`"
-                    )));
+                    )).with_code(luna_common::DiagnosticCode::InvalidSyntax));
                     continue;
                 }
                 let Some(symbol_id) = Self::resolve_logical_path(ctx, provider_scope, canonical_path)
@@ -818,7 +818,7 @@ impl ModuleRegistry {
                     ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
                         "Provider `{}` is missing auto-visible canonical path `{canonical_path}`",
                         entry.provider_id
-                    )));
+                    )).with_code(luna_common::DiagnosticCode::UnresolvedSymbol));
                     continue;
                 };
 
@@ -859,7 +859,7 @@ impl ModuleRegistry {
                     let existing_name = ctx.symbol_table.symbols[existing.0 as usize].name.clone();
                     ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
                         "Conflicting canonical stdlib export `{canonical_path}` (existing `{existing_name}`)"
-                    )));
+                    )).with_code(luna_common::DiagnosticCode::DuplicateDefinition));
                 }
             }
 
@@ -869,7 +869,7 @@ impl ModuleRegistry {
                     ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
                         "Unknown language item `{}` in canonical stdlib manifest",
                         binding.lang_item
-                    )));
+                    )).with_code(luna_common::DiagnosticCode::UnresolvedSymbol));
                     continue;
                 };
                 let Some(symbol_id) = Self::resolve_logical_path(ctx, provider_scope, binding.canonical_path)
@@ -877,7 +877,7 @@ impl ModuleRegistry {
                     ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
                         "Provider `{}` is missing language-item path `{}` for `{}`",
                         entry.provider_id, binding.canonical_path, binding.lang_item
-                    )));
+                    )).with_code(luna_common::DiagnosticCode::UnresolvedSymbol));
                     continue;
                 };
                 ctx.lang_items.inject_raw(item, symbol_id);

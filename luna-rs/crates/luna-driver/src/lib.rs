@@ -226,6 +226,12 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
 
 pub fn check(file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     let mut session = CompilerSession::new();
+    check_with_session(&mut session, file_name, input, options)
+}
+
+/// Runs `check` against a caller-owned session so rendered diagnostics can
+/// resolve their source spans through the same `SourceManager`.
+pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     let file_id = session.source_manager.add_file(file_name.to_string(), input.clone());
     let lexer = Lexer::new(&input, file_id);
     let mut arena = AstArena::new();
@@ -242,18 +248,25 @@ pub fn check(file_name: &str, input: String, options: &CompilerOptions) -> Resul
         .or_else(|| crate::sysroot::Sysroot::discover(None).ok())
         .or_else(|| crate::sysroot::Sysroot::discover_for_test().ok())
         .unwrap_or_else(|| crate::sysroot::Sysroot::from_root(search_paths_buf.first().cloned().unwrap_or_else(|| std::path::PathBuf::from("."))).expect("Failed to initialize sysroot"));
-    let mut driver_session = crate::session::DriverSession::new(sysroot, &mut session, options.search_paths.as_slice());
+    let mut driver_session = crate::session::DriverSession::new(sysroot, session, options.search_paths.as_slice());
     
-    let base_name = std::path::Path::new(file_name)
-        .file_stem()
-        .and_then(|s| s.to_str())
-        .unwrap_or("");
-    if !options.is_sysroot_build && base_name != "core" {
+    let is_slice_authorized = if options.is_sysroot_build {
+        driver_session.sysroot.get_canonical_provider_capabilities(std::path::Path::new(file_name))
+            .map(|caps| caps.contains(&crate::sysroot_manifest::ProviderCapability::SliceInherentImpl))
+            .unwrap_or(false)
+    } else {
+        false
+    };
+    semantic_ctx.is_slice_authorized = is_slice_authorized;
+
+    if !options.is_sysroot_build {
         if let Err(e) = driver_session.bootstrap_lang_contracts(&mut arena) {
             return Err(e.into_diagnostics());
         }
     } else {
-        semantic_ctx.allow_internal_lang_items = true;
+        semantic_ctx.allow_internal_lang_items = driver_session.sysroot
+            .get_canonical_provider_capabilities(std::path::Path::new(file_name))
+            .is_some();
     }
     
     let context = if options.is_sysroot_build {
@@ -331,8 +344,8 @@ pub fn compile(file_name: &str, input: String, options: &CompilerOptions) -> Res
 }
 
 pub fn check_and_render(file_name: &str, input: String, options: &CompilerOptions) -> Result<(), String> {
-    let session = CompilerSession::new();
-    match check(file_name, input, options) {
+    let mut session = CompilerSession::new();
+    match check_with_session(&mut session, file_name, input, options) {
         Ok(()) => Ok(()),
         Err(diags) => Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n")),
     }
@@ -406,13 +419,23 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 .and_then(|s| s.to_str())
                 .unwrap_or("");
             semantic_ctx.current_provider_name = Some(base_name.to_string());
-            semantic_ctx.is_slice_authorized = options.is_sysroot_build && (base_name == "slice" || base_name == "core");
-            if !options.is_sysroot_build && base_name != "core" {
+            let is_slice_authorized = if options.is_sysroot_build {
+                driver_session.sysroot.get_canonical_provider_capabilities(std::path::Path::new(file_name))
+                    .map(|caps| caps.contains(&crate::sysroot_manifest::ProviderCapability::SliceInherentImpl))
+                    .unwrap_or(false)
+            } else {
+                false
+            };
+            semantic_ctx.is_slice_authorized = is_slice_authorized;
+
+            if !options.is_sysroot_build {
                 if let Err(e) = driver_session.bootstrap_lang_contracts(&mut arena) {
                     return Err(e.into_diagnostics());
                 }
             } else {
-                semantic_ctx.allow_internal_lang_items = true;
+                semantic_ctx.allow_internal_lang_items = driver_session.sysroot
+                    .get_canonical_provider_capabilities(std::path::Path::new(file_name))
+                    .is_some();
             }
             
             let context = if options.is_sysroot_build {

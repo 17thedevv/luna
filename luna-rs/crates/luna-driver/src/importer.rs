@@ -44,7 +44,7 @@ pub fn resolve_collected_imports(
             eprintln!("DEBUG loading package: {}", name);
             // External package import: import <pkg>; -> delegates to session.load_package
             if session.registry.is_loading(&name) {
-                diagnostics.push(Diagnostic::error(format!("Cyclic module dependency detected involving '{}'", name)).with_span(span));
+                diagnostics.push(Diagnostic::error(format!("Cyclic module dependency detected involving '{}'", name)).with_code(luna_common::DiagnosticCode::CyclicModuleDependency).with_span(span));
                 continue;
             }
             match session.load_package(&name, arena, context) {
@@ -62,7 +62,7 @@ pub fn resolve_collected_imports(
                 continue;
             }
             if session.registry.is_loading(&name) {
-                diagnostics.push(Diagnostic::error(format!("Cyclic module dependency detected involving '{}'", name)).with_span(span));
+                diagnostics.push(Diagnostic::error(format!("Cyclic module dependency detected involving '{}'", name)).with_code(luna_common::DiagnosticCode::CyclicModuleDependency).with_span(span));
                 continue;
             }
 
@@ -106,6 +106,7 @@ pub fn resolve_collected_imports(
                     } else {
                         crate::discovery::ComponentFormat::Source
                     },
+                    provenance: crate::discovery::ComponentProvenance::LocalProject,
                 };
                 match crate::external::ExternalComponentLoader::load_component(&descriptor, arena, session) {
                     Ok(_) => {
@@ -118,7 +119,7 @@ pub fn resolve_collected_imports(
                     }
                 }
             } else {
-                diagnostics.push(Diagnostic::error(format!("Could not resolve module provider '{}'", name)).with_span(span));
+                diagnostics.push(Diagnostic::error(format!("Could not resolve module provider '{}'", name)).with_code(luna_common::DiagnosticCode::UnresolvedModuleProvider).with_span(span));
             }
         }
     }
