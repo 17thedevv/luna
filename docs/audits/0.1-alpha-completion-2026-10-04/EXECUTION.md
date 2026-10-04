@@ -594,6 +594,10 @@ bodies reject explicitly; no automatic rebuilding is added. The
 providers. Public metadata grouping/fingerprint identity still needs a separate
 per-impl-header audit; portable AST reconstruction passing does not close it.
 
+Follow-up implementation `c268372` is pinned by the
+[checkpoint](evidence/method-proof-checkpoint.json), with source blobs and
+evidence/binary hashes.
+
 Verification at the follow-up source state:
 
 - [Final CLI suites](evidence/r2-method-proof-final-cli.txt): five targets PASS;
