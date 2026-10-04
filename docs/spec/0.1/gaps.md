@@ -186,3 +186,24 @@ now execute/build correctly across source and relocated artifacts. Compiler
 artifact identity is 8, with other schema versions unchanged. This does not
 rewrite the full run as PASS. The changed-public-bound fingerprint reducer and
 Windows manifest/object-format mismatch remain open in the execution ledger.
+
+
+## Public generic metadata checkpoint — 2026-10-05, still PARTIAL
+
+The subsequent compiler9 / metadata4 checkpoint retains individual checked
+impl headers and declaration-owned constraints for exported functions,
+nominals, traits and methods. Associated equalities/definitions and trait
+arguments survive decoding. Binder spelling, declaration order and body-local
+variables no longer affect the tested public interface identities. Changes to
+public constraints reject stale dependent artifacts. Forward impl lookup and
+inferred struct-constructor bounds have source/relocated-artifact controls.
+See the [execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md)
+for failed controls, corrected reruns and bounded final evidence.
+
+This closes the changed-bound fingerprint reducer above, not all canonical
+public ABI/layout or generic well-formedness domains. Nominal constraints in
+all type positions, trait argument premises, associated-projection fallback,
+recursive canonical types and closure metadata need further audit. The
+Windows manifest/object-format mismatch remains open. The last full workspace
+run remains FAIL at de9977d; no full compiler9 candidate has been certified.
+Closure capture cleanup, named/default calls and R3–R5 remain open.

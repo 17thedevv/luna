@@ -3,13 +3,13 @@ use std::io::{Read, Write};
 pub const LLIB_MAGIC: [u8; 4] = *b"LLIB";
 pub const MLIB_MAGIC: [u8; 4] = *b"MLIB";
 pub const LLIB_FORMAT_VERSION: u16 = 2;
-pub const LLIB_COMPILER_VERSION: u16 = 8; // Method ABI identity includes the checked concrete self type and independent binders.
+pub const LLIB_COMPILER_VERSION: u16 = 9; // Canonical interfaces retain declaration-owned generic constraints and impls.
 pub const LLIB_MVIR_VERSION: u16 = 4; // Portable StaticAddress data, without semantic-session IDs.
 
 pub const MLIB_FORMAT_VERSION: u16 = LLIB_FORMAT_VERSION;
 pub const MLIB_COMPILER_VERSION: u16 = LLIB_COMPILER_VERSION;
 pub const MLIB_MVIR_VERSION: u16 = LLIB_MVIR_VERSION;
-pub const SEMANTIC_METADATA_VERSION: u16 = 3;
+pub const SEMANTIC_METADATA_VERSION: u16 = 4;
 
 use serde::{Serialize, Deserialize};
 use sha2::{Sha256, Digest};

@@ -1,7 +1,11 @@
-use crate::registry::{CanonicalSymbolId, ExternalImplKey, ExternalSymbol, ExternalTraitImplEntry, ProviderInterface};
-use luna_llib::metadata::{CanonicalInterface, CanonicalType, CanonicalLifetime, SemanticMetadata, StableSymbolId};
-use luna_semantic::ty::{BuiltinType, Mutability, SemanticType, SemanticTypeId, TypeContext};
+use crate::registry::{
+    CanonicalSymbolId, ExternalImplKey, ExternalSymbol, ExternalTraitImplEntry, ProviderInterface,
+};
+use luna_llib::metadata::{
+    CanonicalInterface, CanonicalLifetime, CanonicalType, SemanticMetadata, StableSymbolId,
+};
 use luna_semantic::symbol::ProviderId;
+use luna_semantic::ty::{BuiltinType, Mutability, SemanticType, SemanticTypeId, TypeContext};
 use std::collections::HashMap;
 
 pub struct InterfaceDecoder {
@@ -17,10 +21,16 @@ pub struct InterfaceDecoder {
     impl_method_symbols: Vec<ExternalSymbol>,
     impl_generic_param_symbols: Vec<ExternalSymbol>,
     allocated_generic_params: std::collections::HashSet<luna_common::ids::SymbolId>,
-    symbol_lifetime_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalLifetimeContract>,
-    symbol_type_lifetime_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalTypeLifetimeContract>,
-    symbol_raw_storage_anchor_contracts: HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalRawStorageAnchorContract>,
+    raw_generic_param_symbols: HashMap<(luna_ast::DeclId, usize), luna_common::ids::SymbolId>,
+    symbol_lifetime_contracts:
+        HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalLifetimeContract>,
+    symbol_type_lifetime_contracts:
+        HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalTypeLifetimeContract>,
+    symbol_raw_storage_anchor_contracts:
+        HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalRawStorageAnchorContract>,
     unsafe_functions: std::collections::HashSet<luna_common::ids::SymbolId>,
+    trait_bounds: HashMap<CanonicalSymbolId, Vec<crate::registry::ExternalTraitBound>>,
+    assoc_type_bounds: HashMap<CanonicalSymbolId, Vec<crate::registry::ExternalAssocTypeBound>>,
     known_providers: HashMap<String, ProviderId>,
 }
 
@@ -45,10 +55,13 @@ impl InterfaceDecoder {
             impl_method_symbols: Vec::new(),
             impl_generic_param_symbols: Vec::new(),
             allocated_generic_params: std::collections::HashSet::new(),
+            raw_generic_param_symbols: HashMap::new(),
             symbol_lifetime_contracts: HashMap::new(),
             symbol_type_lifetime_contracts: HashMap::new(),
             symbol_raw_storage_anchor_contracts: HashMap::new(),
             unsafe_functions: std::collections::HashSet::new(),
+            trait_bounds: HashMap::new(),
+            assoc_type_bounds: HashMap::new(),
             known_providers,
         }
     }
@@ -74,6 +87,7 @@ impl InterfaceDecoder {
     pub fn decode(mut self) -> Result<ProviderInterface, luna_llib::MlibError> {
         luna_llib::reader::validate_raw_storage_anchor_contracts(&self.interface)?;
         luna_llib::reader::validate_raw_pointer_effects(&self.interface)?;
+        luna_llib::reader::validate_generic_contracts(&self.interface)?;
         // Decode all types to populate type context first
         for i in 0..self.interface.types.len() {
             self.decode_type_index(i as u32);
@@ -90,8 +104,16 @@ impl InterfaceDecoder {
         }
 
         let mut trait_methods = HashMap::new();
+        let mut trait_associated_types = HashMap::new();
+        let mut decl_symbols = HashMap::new();
         for ext_sym in exported_symbols.values() {
             Self::collect_trait_methods(ext_sym, &self.canonical_syms, &mut trait_methods);
+            Self::collect_declaration_contracts(
+                ext_sym,
+                &self.canonical_syms,
+                &mut trait_associated_types,
+                &mut decl_symbols,
+            );
         }
 
         let mut trait_impl_entries = Vec::new();
@@ -99,8 +121,15 @@ impl InterfaceDecoder {
         let mut impl_generic_params = HashMap::new();
         let mut impl_self_types = HashMap::new();
         let mut method_impls = HashMap::new();
+        let mut checked_impl_headers = HashMap::new();
+        let mut decl_associated_types = HashMap::new();
+        let mut impl_associated_types = HashMap::new();
+        let mut method_to_impl_decl = HashMap::new();
+        let mut raw_generic_param_symbols = self.raw_generic_param_symbols.clone();
 
         for impl_header in self.interface.impl_headers.clone() {
+            let owner = self.allocate_sym(&impl_header.identity);
+            let declaration = luna_ast::DeclId(owner.0);
             let trait_id = impl_header.trait_id.as_ref().map(|t| {
                 let local_t = self.allocate_sym(t);
                 self.canonical_syms[&local_t].clone()
@@ -111,21 +140,21 @@ impl InterfaceDecoder {
             let sem_self_ty = self.types.get(self_type).clone();
             let self_type_def = match &sem_self_ty {
                 SemanticType::Struct(sym_id, _, _) | SemanticType::Enum(sym_id, _, _) => {
-                    crate::registry::ExternalImplSelfTypeKey::Nominal(self.canonical_syms[sym_id].clone())
+                    crate::registry::ExternalImplSelfTypeKey::Nominal(
+                        self.canonical_syms[sym_id].clone(),
+                    )
                 }
                 SemanticType::Primitive(b) => {
                     crate::registry::ExternalImplSelfTypeKey::Primitive(*b)
                 }
-                SemanticType::Slice(_) => {
-                    crate::registry::ExternalImplSelfTypeKey::Slice
-                }
-                _ => {
-                    crate::registry::ExternalImplSelfTypeKey::Nominal(trait_id.clone().unwrap_or_else(|| CanonicalSymbolId {
+                SemanticType::Slice(_) => crate::registry::ExternalImplSelfTypeKey::Slice,
+                _ => crate::registry::ExternalImplSelfTypeKey::Nominal(
+                    trait_id.clone().unwrap_or_else(|| CanonicalSymbolId {
                         provider_id: self.provider_id,
                         decl_id: None,
                         name: "unknown".to_string(),
-                    }))
-                }
+                    }),
+                ),
             };
 
             let key = ExternalImplKey {
@@ -140,10 +169,36 @@ impl InterfaceDecoder {
                 canon_gps.push(self.canonical_syms[&local_gp].clone());
             }
 
-            let trait_args: Vec<_> = impl_header.trait_args.iter().map(|t_idx| self.type_map[t_idx]).collect();
+            let parameters: Vec<_> = impl_header
+                .generic_params
+                .iter()
+                .map(|gp| self.allocate_sym(gp))
+                .collect();
+            for (index, &parameter) in parameters.iter().enumerate() {
+                raw_generic_param_symbols.insert((declaration, index), parameter);
+            }
+            checked_impl_headers.insert(
+                declaration,
+                luna_semantic::semantic_tables::CheckedImplHeader {
+                    self_type,
+                    generic_params: parameters,
+                },
+            );
+            self.decode_constraints(&impl_header.constraints);
+            for (associated, &ty) in &impl_header.associated_types {
+                let symbol = self.allocate_sym(associated);
+                let canonical = self.canonical_syms[&symbol].clone();
+                decl_associated_types.insert((declaration, canonical.clone()), self.type_map[&ty]);
+                impl_associated_types.insert((key.clone(), canonical), self.type_map[&ty]);
+            }
+            let trait_args: Vec<_> = impl_header
+                .trait_args
+                .iter()
+                .map(|t_idx| self.type_map[t_idx])
+                .collect();
             if let Some(t_id) = trait_id {
                 trait_impl_entries.push(ExternalTraitImplEntry {
-                    decl_id: None,
+                    decl_id: Some(declaration),
                     trait_id: t_id,
                     self_type,
                     generic_params: canon_gps.clone(),
@@ -152,33 +207,26 @@ impl InterfaceDecoder {
             }
 
             let mut method_canons = Vec::new();
-            for (m_name, m_ty_idx) in impl_header.methods {
-                let m_stable = StableSymbolId {
-                    provider_name: self.provider_name.clone(),
-                    symbol_path: m_name.clone(),
-                };
-                let m_sym = self.allocate_sym(&m_stable);
+            for (m_name, contract) in impl_header.method_contracts {
+                let ext_sym = self.decode_symbol(&m_name, &contract);
+                let m_sym = ext_sym.sym.id;
                 let m_canon = self.canonical_syms[&m_sym].clone();
-                if let Some(&m_sem_ty) = self.type_map.get(&m_ty_idx) {
-                    symbol_types.insert(m_sym, m_sem_ty);
+                self.collect_symbol_data(&contract, &mut symbol_types, &mut generic_param_symbols);
+                let method_declaration = luna_ast::DeclId(m_sym.0);
+                method_to_impl_decl.insert(method_declaration, declaration);
+                decl_symbols.insert(method_declaration, m_sym);
+                for (index, gp) in contract.generic_params.iter().enumerate() {
+                    raw_generic_param_symbols
+                        .insert((method_declaration, index), self.allocate_sym(gp));
                 }
-                let ext_sym = ExternalSymbol::new(luna_semantic::symbol::Symbol {
-                    id: m_sym,
-                    name: m_name,
-                    ctxt: luna_common::ids::SyntaxContext(0),
-                    kind: luna_semantic::symbol::SymbolKind::Function,
-                    scope: luna_semantic::symbol::ScopeId(0),
-                    span: luna_common::Span::new(luna_common::ids::FileId(0), 0, 0),
-                    visibility: luna_ast::Visibility::Public,
-                    decl_id: Some(luna_ast::DeclId(m_sym.0)),
-                    inner_scope: None,
-                    provider_id: Some(self.provider_id),
-                });
                 self.impl_method_symbols.push(ext_sym);
                 method_impls.insert(m_canon.clone(), key.clone());
                 method_canons.push(m_canon);
             }
-            impl_methods.entry(key.clone()).or_insert_with(Vec::new).extend(method_canons);
+            impl_methods
+                .entry(key.clone())
+                .or_insert_with(Vec::new)
+                .extend(method_canons);
             if !canon_gps.is_empty() {
                 impl_generic_params.insert(key.clone(), canon_gps);
             }
@@ -203,10 +251,11 @@ impl InterfaceDecoder {
             method_impls,
             impl_method_symbols: self.impl_method_symbols,
             symbol_canonicals: self.canonical_syms,
-            trait_associated_types: HashMap::new(),
-            impl_associated_types: HashMap::new(),
+            trait_associated_types,
+            impl_associated_types,
             impl_self_types,
-            checked_impl_headers: HashMap::new(),
+            checked_impl_headers,
+            decl_associated_types,
             impl_generic_params,
             impl_generic_param_symbols: self.impl_generic_param_symbols,
             trait_associated_type_symbols: Vec::new(),
@@ -215,7 +264,7 @@ impl InterfaceDecoder {
             const_values: Default::default(),
             comptime_values: Default::default(),
             module_constants: Default::default(),
-            decl_symbols: HashMap::new(),
+            decl_symbols,
             expr_symbols: HashMap::new(),
             pat_symbols: HashMap::new(),
             pat_types: HashMap::new(),
@@ -223,7 +272,7 @@ impl InterfaceDecoder {
             expr_substs: HashMap::new(),
             expr_struct_init_indices: HashMap::new(),
             expr_member_indices: HashMap::new(),
-            raw_generic_param_symbols: HashMap::new(),
+            raw_generic_param_symbols,
             symbol_lifetime_contracts: self.symbol_lifetime_contracts,
             symbol_type_lifetime_contracts: self.symbol_type_lifetime_contracts,
             symbol_raw_storage_anchor_contracts: self.symbol_raw_storage_anchor_contracts,
@@ -231,9 +280,9 @@ impl InterfaceDecoder {
             symbol_ffi_sync_noescape: HashMap::new(),
             trait_methods,
             unsafe_functions: self.unsafe_functions,
-            trait_bounds: HashMap::new(),
-            assoc_type_bounds: HashMap::new(),
-            method_to_impl_decl: HashMap::new(),
+            trait_bounds: self.trait_bounds,
+            assoc_type_bounds: self.assoc_type_bounds,
+            method_to_impl_decl,
         })
     }
 
@@ -244,12 +293,17 @@ impl InterfaceDecoder {
     ) {
         if ext_sym.sym.kind == luna_semantic::symbol::SymbolKind::Trait {
             if let Some(canon_trait) = canonical_syms.get(&ext_sym.sym.id) {
-                let mut meths: Vec<&ExternalSymbol> = ext_sym.children.values().filter(|c| {
-                    c.sym.kind == luna_semantic::symbol::SymbolKind::TraitMethod
-                        || c.sym.kind == luna_semantic::symbol::SymbolKind::Function
-                }).collect();
+                let mut meths: Vec<&ExternalSymbol> = ext_sym
+                    .children
+                    .values()
+                    .filter(|c| {
+                        c.sym.kind == luna_semantic::symbol::SymbolKind::TraitMethod
+                            || c.sym.kind == luna_semantic::symbol::SymbolKind::Function
+                    })
+                    .collect();
                 meths.sort_by_key(|m| m.sym.id.0);
-                let canon_meths: Vec<CanonicalSymbolId> = meths.iter()
+                let canon_meths: Vec<CanonicalSymbolId> = meths
+                    .iter()
                     .filter_map(|m| canonical_syms.get(&m.sym.id).cloned())
                     .collect();
                 trait_methods.insert(canon_trait.clone(), canon_meths);
@@ -260,7 +314,35 @@ impl InterfaceDecoder {
         }
     }
 
-    fn decode_symbol(&mut self, name: &str, exported: &luna_llib::metadata::ExportedSymbol) -> ExternalSymbol {
+    fn collect_declaration_contracts(
+        symbol: &ExternalSymbol,
+        canonicals: &HashMap<luna_common::ids::SymbolId, CanonicalSymbolId>,
+        associated: &mut HashMap<CanonicalSymbolId, Vec<CanonicalSymbolId>>,
+        declarations: &mut HashMap<luna_ast::DeclId, luna_common::ids::SymbolId>,
+    ) {
+        if let Some(declaration) = symbol.sym.decl_id {
+            declarations.insert(declaration, symbol.sym.id);
+        }
+        if symbol.sym.kind == luna_semantic::symbol::SymbolKind::Trait {
+            let mut types: Vec<_> = symbol
+                .children
+                .values()
+                .filter(|child| child.sym.kind == luna_semantic::symbol::SymbolKind::AssociatedType)
+                .map(|child| canonicals[&child.sym.id].clone())
+                .collect();
+            types.sort_by(|a, b| a.name.cmp(&b.name));
+            associated.insert(canonicals[&symbol.sym.id].clone(), types);
+        }
+        for child in symbol.children.values() {
+            Self::collect_declaration_contracts(child, canonicals, associated, declarations);
+        }
+    }
+
+    fn decode_symbol(
+        &mut self,
+        name: &str,
+        exported: &luna_llib::metadata::ExportedSymbol,
+    ) -> ExternalSymbol {
         let sym_id = self.allocate_sym(&exported.symbol_id);
         let kind = match exported.kind.as_str() {
             "Function" => luna_semantic::symbol::SymbolKind::Function,
@@ -317,19 +399,23 @@ impl InterfaceDecoder {
         generic_param_symbols: &mut HashMap<CanonicalSymbolId, Vec<CanonicalSymbolId>>,
     ) {
         let sym_id = self.allocate_sym(&exported.symbol_id);
+        self.decode_constraints(&exported.constraints);
         if exported.is_unsafe {
             self.unsafe_functions.insert(sym_id);
         }
         if let Some(contract) = &exported.lifetime_contract {
-            self.symbol_lifetime_contracts.insert(sym_id, contract.clone());
+            self.symbol_lifetime_contracts
+                .insert(sym_id, contract.clone());
         }
         if let Some(contract) = &exported.type_lifetime_contract {
-            self.symbol_type_lifetime_contracts.insert(sym_id, contract.clone());
+            self.symbol_type_lifetime_contracts
+                .insert(sym_id, contract.clone());
         }
         if let Some(contract) = &exported.raw_storage_anchor_contract {
             // `decode` validates the complete canonical interface first; do
             // not silently discard an unsupported semantic contract version.
-            self.symbol_raw_storage_anchor_contracts.insert(sym_id, contract.clone());
+            self.symbol_raw_storage_anchor_contracts
+                .insert(sym_id, contract.clone());
         }
         if let Some(ty_idx) = exported.ty_index {
             if let Some(&sem_ty_id) = self.type_map.get(&ty_idx) {
@@ -339,8 +425,10 @@ impl InterfaceDecoder {
         if !exported.generic_params.is_empty() {
             let canon = self.canonical_syms[&sym_id].clone();
             let mut params = Vec::new();
-            for gp in &exported.generic_params {
+            for (index, gp) in exported.generic_params.iter().enumerate() {
                 let local_gp = self.allocate_sym(gp);
+                self.raw_generic_param_symbols
+                    .insert((luna_ast::DeclId(sym_id.0), index), local_gp);
                 self.ensure_generic_param_symbol(local_gp, &gp.symbol_path);
                 params.push(self.canonical_syms[&local_gp].clone());
             }
@@ -348,6 +436,41 @@ impl InterfaceDecoder {
         }
         for child in exported.children.values() {
             self.collect_symbol_data(child, symbol_types, generic_param_symbols);
+        }
+    }
+
+    fn decode_constraints(&mut self, constraints: &luna_llib::metadata::GenericConstraints) {
+        for bound in &constraints.traits {
+            let param = self.allocate_sym(&bound.param);
+            let trait_id = self.allocate_sym(&bound.trait_id);
+            let canonical = self.canonical_syms[&param].clone();
+            self.trait_bounds
+                .entry(canonical.clone())
+                .or_default()
+                .push(crate::registry::ExternalTraitBound {
+                    param: canonical,
+                    trait_id: self.canonical_syms[&trait_id].clone(),
+                    trait_args: bound
+                        .trait_args
+                        .iter()
+                        .map(|ty| self.type_map[ty])
+                        .collect(),
+                });
+        }
+        for bound in &constraints.associated_equalities {
+            let param = self.allocate_sym(&bound.param);
+            let trait_id = self.allocate_sym(&bound.trait_id);
+            let assoc = self.allocate_sym(&bound.associated_type);
+            let canonical = self.canonical_syms[&param].clone();
+            self.assoc_type_bounds
+                .entry(canonical.clone())
+                .or_default()
+                .push(crate::registry::ExternalAssocTypeBound {
+                    param: canonical,
+                    trait_id: self.canonical_syms[&trait_id].clone(),
+                    assoc_sym: self.canonical_syms[&assoc].clone(),
+                    target_ty: self.type_map[&bound.target_type],
+                });
         }
     }
 
@@ -393,26 +516,47 @@ impl InterfaceDecoder {
             CanonicalType::Primitive(b) => SemanticType::Primitive(b),
             CanonicalType::Struct(sym, args, _) => {
                 let s_id = self.allocate_sym(&sym);
-                let s_args = args.into_iter().map(|a| self.decode_type_index(a)).collect();
+                let s_args = args
+                    .into_iter()
+                    .map(|a| self.decode_type_index(a))
+                    .collect();
                 SemanticType::Struct(s_id, s_args, vec![])
             }
             CanonicalType::Enum(sym, args, _) => {
                 let s_id = self.allocate_sym(&sym);
-                let s_args = args.into_iter().map(|a| self.decode_type_index(a)).collect();
+                let s_args = args
+                    .into_iter()
+                    .map(|a| self.decode_type_index(a))
+                    .collect();
                 SemanticType::Enum(s_id, s_args, vec![])
             }
             CanonicalType::Tuple(args) => {
-                let s_args = args.into_iter().map(|a| self.decode_type_index(a)).collect();
+                let s_args = args
+                    .into_iter()
+                    .map(|a| self.decode_type_index(a))
+                    .collect();
                 SemanticType::Tuple(s_args)
             }
             CanonicalType::Array(t, len) => SemanticType::Array(self.decode_type_index(t), len),
             CanonicalType::Slice(t) => SemanticType::Slice(self.decode_type_index(t)),
-            CanonicalType::Function { params, return_type } => SemanticType::Function {
-                params: params.into_iter().map(|p| self.decode_type_index(p)).collect(),
+            CanonicalType::Function {
+                params,
+                return_type,
+            } => SemanticType::Function {
+                params: params
+                    .into_iter()
+                    .map(|p| self.decode_type_index(p))
+                    .collect(),
                 return_type: self.decode_type_index(return_type),
             },
-            CanonicalType::Pointer(mutability, t) => SemanticType::Pointer(mutability, self.decode_type_index(t)),
-            CanonicalType::Reference(_, mutability, t) => SemanticType::Reference(luna_semantic::ty::LifetimeId(0), mutability, self.decode_type_index(t)),
+            CanonicalType::Pointer(mutability, t) => {
+                SemanticType::Pointer(mutability, self.decode_type_index(t))
+            }
+            CanonicalType::Reference(_, mutability, t) => SemanticType::Reference(
+                luna_semantic::ty::LifetimeId(0),
+                mutability,
+                self.decode_type_index(t),
+            ),
             CanonicalType::Void => SemanticType::Void,
             CanonicalType::Never => SemanticType::Never,
             CanonicalType::Error => SemanticType::Error,
@@ -422,13 +566,24 @@ impl InterfaceDecoder {
                 SemanticType::GenericParam(local)
             }
             CanonicalType::Closure(expr_id, caps, ret) => {
-                let c_caps = caps.into_iter().map(|c| self.decode_type_index(c)).collect();
-                SemanticType::Closure(luna_ast::ExprId(expr_id as u32), c_caps, self.decode_type_index(ret))
+                let c_caps = caps
+                    .into_iter()
+                    .map(|c| self.decode_type_index(c))
+                    .collect();
+                SemanticType::Closure(
+                    luna_ast::ExprId(expr_id as u32),
+                    c_caps,
+                    self.decode_type_index(ret),
+                )
             }
             CanonicalType::DynTrait(sym) => SemanticType::DynTrait(self.allocate_sym(&sym)),
             CanonicalType::Future(t) => SemanticType::Future(self.decode_type_index(t)),
             CanonicalType::Range(t) => SemanticType::Range(self.decode_type_index(t)),
-            CanonicalType::Projection { self_type, trait_id, assoc_type } => SemanticType::Projection {
+            CanonicalType::Projection {
+                self_type,
+                trait_id,
+                assoc_type,
+            } => SemanticType::Projection {
                 self_type: self.decode_type_index(self_type),
                 trait_id: self.allocate_sym(&trait_id),
                 assoc_type: self.allocate_sym(&assoc_type),
@@ -436,8 +591,8 @@ impl InterfaceDecoder {
         };
 
         let real_id = self.types.intern(sem_ty);
-        
-        // We update type_map. This does NOT replace the Error type in the interner, but 
+
+        // We update type_map. This does NOT replace the Error type in the interner, but
         // subsequent references to this index will use the real_id.
         // For actual self-referential types, we might have a problem if it resolves to temp_id.
         // But SemanticType Struct/Enum breaks cyclic reference because it doesn't store SemanticTypeId.

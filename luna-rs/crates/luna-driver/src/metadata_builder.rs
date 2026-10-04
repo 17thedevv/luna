@@ -1,13 +1,15 @@
-use crate::registry::{CanonicalSymbolId, ExternalImplKey, ExternalSymbol, ExternalTraitImplEntry, ModuleRegistry, ProviderInterface};
-use luna_llib::metadata::{
-    CanonicalInterface, CanonicalLifetime, CanonicalRawPointerAnchor, CanonicalRawPointerAnchorSource,
-    CanonicalRawPointerEffect, CanonicalRawPointerEffects, CanonicalRawPointerOrigin,
-    CanonicalType, ExportedSymbol, ImplHeader,
-    SemanticMetadata, StableSymbolId, TraitDefinition,
+use crate::registry::{CanonicalSymbolId, ExternalSymbol, ModuleRegistry, ProviderInterface};
+use luna_borrowck::effect::{
+    CallEffectSummary, RawPointerAnchorReturnEffect, RawPointerAnchorSource, RawPointerReturnEffect,
 };
-use luna_semantic::ty::{SemanticType, SemanticTypeId, TypeContext};
-use luna_borrowck::effect::{CallEffectSummary, RawPointerAnchorReturnEffect, RawPointerAnchorSource, RawPointerReturnEffect};
+use luna_llib::metadata::{
+    CanonicalAssociatedEquality, CanonicalInterface, CanonicalLifetime, CanonicalRawPointerAnchor,
+    CanonicalRawPointerAnchorSource, CanonicalRawPointerEffect, CanonicalRawPointerEffects,
+    CanonicalRawPointerOrigin, CanonicalTraitBound, CanonicalType, ExportedSymbol,
+    GenericConstraints, ImplHeader, SemanticMetadata, StableSymbolId, TraitDefinition,
+};
 use luna_mvir::GlobalId;
+use luna_semantic::ty::{SemanticType, SemanticTypeId};
 use std::collections::HashMap;
 
 pub struct MetadataBuilder<'a> {
@@ -15,6 +17,8 @@ pub struct MetadataBuilder<'a> {
     provider: &'a ProviderInterface,
     type_map: HashMap<SemanticTypeId, u32>,
     canonical_types: Vec<CanonicalType>,
+    canonical_type_indices: HashMap<CanonicalType, u32>,
+    scoped_symbols: HashMap<CanonicalSymbolId, StableSymbolId>,
     raw_summaries: &'a HashMap<GlobalId, CallEffectSummary>,
 }
 
@@ -29,205 +33,496 @@ impl<'a> MetadataBuilder<'a> {
             provider,
             type_map: HashMap::new(),
             canonical_types: Vec::new(),
+            canonical_type_indices: HashMap::new(),
+            scoped_symbols: HashMap::new(),
             raw_summaries,
         }
     }
 
     pub fn build(mut self) -> SemanticMetadata {
-        // Pre-allocate to prevent infinite recursion on self-referential types
-        // Actually we should traverse and build
+        // Assign binder identities before any type is interned in the public
+        // registry. A binder belongs to a declaration and an ordinal, not T.
+        for symbol in self.provider.exported_symbols.values() {
+            self.scope_export_binders(symbol);
+        }
+        let mut owned_impls = Vec::new();
+        for (&declaration, header) in &self.provider.checked_impl_headers {
+            let trait_entry = self
+                .provider
+                .trait_impl_entries
+                .iter()
+                .find(|entry| entry.decl_id == Some(declaration));
+            if trait_entry.is_none()
+                && !self.provider.impl_method_symbols.iter().any(|method| {
+                    method.sym.visibility != luna_ast::Visibility::Private
+                        && method
+                            .sym
+                            .decl_id
+                            .and_then(|d| self.provider.method_to_impl_decl.get(&d))
+                            == Some(&declaration)
+                })
+            {
+                continue;
+            }
+            let identity = StableSymbolId {
+                provider_name: self.provider.name.clone(),
+                symbol_path: format!(
+                    "$impl/{}",
+                    luna_llib::format::Fingerprint::from_slice(
+                        self.impl_shape(declaration, header, trait_entry).as_bytes()
+                    )
+                ),
+            };
+            self.scope_parameters(&identity, &header.generic_params);
+            for method in &self.provider.impl_method_symbols {
+                if method
+                    .sym
+                    .decl_id
+                    .and_then(|d| self.provider.method_to_impl_decl.get(&d))
+                    == Some(&declaration)
+                {
+                    let canonical = &self.provider.symbol_canonicals[&method.sym.id];
+                    let method_id = StableSymbolId {
+                        provider_name: self.provider.name.clone(),
+                        symbol_path: format!("{}::{}", identity.symbol_path, method.sym.name),
+                    };
+                    self.scoped_symbols
+                        .insert(canonical.clone(), method_id.clone());
+                    self.scope_parameters(&method_id, &self.parameters(method.sym.decl_id));
+                }
+            }
+            owned_impls.push((identity, declaration, header, trait_entry));
+        }
+        owned_impls.sort_by(|a, b| a.0.cmp(&b.0));
 
         let mut exported_symbols = std::collections::BTreeMap::new();
         let mut sorted_exports: Vec<_> = self.provider.exported_symbols.iter().collect();
         sorted_exports.sort_by(|a, b| a.0.cmp(b.0));
-        
-        for (name, ext_sym) in sorted_exports {
-            let exported = self.convert_exported_symbol(ext_sym);
-            exported_symbols.insert(name.clone(), exported);
+        for (name, symbol) in sorted_exports {
+            exported_symbols.insert(name.clone(), self.convert_exported_symbol(symbol));
         }
-
         let mut traits = std::collections::BTreeMap::new();
-        // The trait implementations and definitions
-        // Wait, how do we get TraitDefinition?
-        // luna_semantic hasn't exposed trait fully, but we have trait_impl_entries
-        // We will build what we can
+        Self::collect_trait_definitions(&exported_symbols, &mut traits);
 
         let mut impl_headers = Vec::new();
-        let mut processed_keys = std::collections::HashSet::new();
-
-        // Deterministic sorting for impls
-        #[derive(PartialEq, Eq, PartialOrd, Ord)]
-        enum SelfTypeSort {
-            Primitive(u8),
-            Nominal(String, String),
-            Slice,
-        }
-        #[derive(PartialEq, Eq, PartialOrd, Ord)]
-        struct ImplSortKey {
-            min_method_id: u32,
-            trait_path: Option<(String, String)>,
-            self_type: SelfTypeSort,
-        }
-
-        let mut sorted_impls: Vec<_> = self.provider.impl_methods.iter().collect();
-        sorted_impls.sort_by_key(|(k, methods)| {
-            let min_method_id = methods.iter().filter_map(|m| m.decl_id.map(|d| d.0)).min().unwrap_or(u32::MAX);
-            let trait_path = k.trait_id.as_ref().map(|t| {
-                let stable = self.convert_symbol_id(t);
-                (stable.provider_name, stable.symbol_path)
-            });
-            let self_type = match &k.self_type_def {
-                crate::registry::ExternalImplSelfTypeKey::Primitive(b) => SelfTypeSort::Primitive(*b as u8),
-                crate::registry::ExternalImplSelfTypeKey::Slice => SelfTypeSort::Slice,
-                crate::registry::ExternalImplSelfTypeKey::Nominal(n) => {
-                    let stable = self.convert_symbol_id(n);
-                    SelfTypeSort::Nominal(stable.provider_name, stable.symbol_path)
+        for (identity, declaration, header, trait_entry) in owned_impls {
+            let self_type = self.convert_type_id(header.self_type);
+            let generic_params = header
+                .generic_params
+                .iter()
+                .map(|param| self.convert_symbol_id(&self.provider.symbol_canonicals[param]))
+                .collect();
+            let constraints = self.convert_constraints(&header.generic_params);
+            let mut methods = std::collections::BTreeMap::new();
+            let mut method_contracts = std::collections::BTreeMap::new();
+            let mut owned_methods: Vec<_> = self
+                .provider
+                .impl_method_symbols
+                .iter()
+                .filter(|method| {
+                    method
+                        .sym
+                        .decl_id
+                        .and_then(|d| self.provider.method_to_impl_decl.get(&d))
+                        == Some(&declaration)
+                        && (trait_entry.is_some()
+                            || method.sym.visibility != luna_ast::Visibility::Private)
+                })
+                .collect();
+            owned_methods.sort_by(|a, b| a.sym.name.cmp(&b.sym.name));
+            for method in owned_methods {
+                let contract = self.convert_exported_symbol(method);
+                if let Some(ty) = contract.ty_index {
+                    assert!(
+                        methods.insert(method.sym.name.clone(), ty).is_none(),
+                        "duplicate method in checked impl metadata"
+                    );
                 }
-            };
-            ImplSortKey { min_method_id, trait_path, self_type }
-        });
-
-        for (impl_key, method_canons) in sorted_impls {
-            processed_keys.insert(impl_key.clone());
-            let trait_id = impl_key.trait_id.as_ref().map(|t| self.convert_symbol_id(t));
-            let self_type = if let Some(&st) = self.provider.impl_self_types.get(impl_key) {
-                self.convert_type_id(st)
-            } else {
-                match &impl_key.self_type_def {
-                    crate::registry::ExternalImplSelfTypeKey::Nominal(canon_def) => {
-                        let stable = self.convert_symbol_id(canon_def);
-                        let ty = self.canonical_types.len() as u32;
-                        self.canonical_types.push(CanonicalType::Struct(stable, vec![], vec![]));
-                        ty
-                    }
-                    crate::registry::ExternalImplSelfTypeKey::Primitive(b) => {
-                        let ty = self.canonical_types.len() as u32;
-                        self.canonical_types.push(CanonicalType::Primitive(*b));
-                        ty
-                    }
-                    crate::registry::ExternalImplSelfTypeKey::Slice => {
-                        let ty = self.canonical_types.len() as u32;
-                        let inner_gp = self.canonical_types.len() as u32 + 1;
-                        self.canonical_types.push(CanonicalType::Slice(inner_gp));
-                        self.canonical_types.push(CanonicalType::GenericParam(luna_llib::metadata::StableSymbolId {
-                            provider_name: self.provider.name.clone(),
-                            symbol_path: "T".to_string(),
-                        }));
-                        ty
-                    }
-                }
-            };
-
-            let generic_params = self.provider.impl_generic_params.get(impl_key)
-                .map(|gps| gps.iter().map(|p| self.convert_symbol_id(p)).collect())
-                .unwrap_or_default();
-
-                let mut methods = std::collections::BTreeMap::new();
-                for m_canon in method_canons {
-                    let m_ty_opt = self.provider.impl_method_symbols.iter()
-                        .find(|s| s.sym.name == m_canon.name && (m_canon.decl_id.is_none() || s.sym.decl_id == m_canon.decl_id))
-                        .and_then(|s| self.provider.symbol_types.get(&s.sym.id).copied());
-                    if let Some(m_ty) = m_ty_opt {
-                        let ty_idx = self.convert_type_id(m_ty);
-                        methods.insert(m_canon.name.clone(), ty_idx);
-                    }
-                }
-
-                let actual_self_type_id_opt = self.provider.impl_self_types.get(impl_key).copied();
-
-                let mut found_trait_args = Vec::new();
-                for e in &self.provider.trait_impl_entries {
-                    if Some(e.trait_id.clone()) == impl_key.trait_id {
-                        if let Some(actual_st) = actual_self_type_id_opt {
-                            if e.self_type == actual_st {
-                                found_trait_args = e.trait_args.iter().map(|&a| self.convert_type_id(a)).collect();
-                                break;
-                            }
-                        } else {
-                            let self_type_def = match self.provider.types.get(e.self_type) {
-                                SemanticType::Primitive(b) => crate::registry::ExternalImplSelfTypeKey::Primitive(*b),
-                                SemanticType::Slice(_) => crate::registry::ExternalImplSelfTypeKey::Slice,
-                                _ => crate::registry::ExternalImplSelfTypeKey::Nominal(
-                                    self.get_canonical_from_type(e.self_type).unwrap_or_else(|| e.trait_id.clone())
-                                ),
-                            };
-                            if self_type_def == impl_key.self_type_def {
-                                found_trait_args = e.trait_args.iter().map(|&a| self.convert_type_id(a)).collect();
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                impl_headers.push(ImplHeader {
-                    trait_id,
-                    self_type,
-                    generic_params,
-                    trait_args: found_trait_args,
-                    methods,
-                });
+                method_contracts.insert(method.sym.name.clone(), contract);
             }
-
-            let mut sorted_trait_entries: Vec<_> = self.provider.trait_impl_entries.iter().collect();
-            sorted_trait_entries.sort_by_key(|e| {
-                let stable = self.convert_symbol_id(&e.trait_id);
-                (stable.provider_name, stable.symbol_path)
-            });
-
-            for entry in sorted_trait_entries {
-                let self_type_def = match self.provider.types.get(entry.self_type) {
-                    SemanticType::Primitive(b) => crate::registry::ExternalImplSelfTypeKey::Primitive(*b),
-                    SemanticType::Slice(_) => crate::registry::ExternalImplSelfTypeKey::Slice,
-                    _ => crate::registry::ExternalImplSelfTypeKey::Nominal(
-                        self.get_canonical_from_type(entry.self_type).unwrap_or_else(|| entry.trait_id.clone())
-                    ),
-                };
-                let key = ExternalImplKey {
-                    trait_id: Some(entry.trait_id.clone()),
-                    self_type_def,
-                };
-                if !processed_keys.contains(&key) {
-                    let trait_id = Some(self.convert_symbol_id(&entry.trait_id));
-                    let self_type = self.convert_type_id(entry.self_type);
-                    let generic_params = entry.generic_params.iter().map(|p| self.convert_symbol_id(p)).collect();
-                    let trait_args = entry.trait_args.iter().map(|&a| self.convert_type_id(a)).collect();
-                    impl_headers.push(ImplHeader {
-                        trait_id,
-                        self_type,
-                        generic_params,
-                        trait_args,
-                        methods: std::collections::BTreeMap::new(),
-                    });
-                }
+            let mut associated_types = std::collections::BTreeMap::new();
+            let mut associated: Vec<_> = self
+                .provider
+                .decl_associated_types
+                .iter()
+                .filter(|((owner, _), _)| *owner == declaration)
+                .collect();
+            associated.sort_by_key(|((_, assoc), _)| self.convert_symbol_id(assoc));
+            for ((_, associated), &ty) in associated {
+                let identity = self.convert_symbol_id(associated);
+                associated_types.insert(identity, self.convert_type_id(ty));
             }
-
-        let interface = CanonicalInterface {
-            exported_symbols: exported_symbols.into_iter().collect(),
-            types: self.canonical_types.clone(),
-            traits: traits.into_iter().collect(),
-            impl_headers,
-        };
-
+            impl_headers.push(ImplHeader {
+                identity,
+                trait_id: trait_entry.map(|entry| self.convert_symbol_id(&entry.trait_id)),
+                self_type,
+                generic_params,
+                trait_args: trait_entry
+                    .map(|entry| {
+                        entry
+                            .trait_args
+                            .iter()
+                            .map(|&arg| self.convert_type_id(arg))
+                            .collect()
+                    })
+                    .unwrap_or_default(),
+                methods,
+                constraints,
+                method_contracts,
+                associated_types,
+            });
+        }
         SemanticMetadata {
             metadata_version: luna_llib::format::SEMANTIC_METADATA_VERSION,
             language_version: luna_llib::format::MLIB_COMPILER_VERSION,
-            target_triple: "unknown".to_string(), // Set by writer later
-            interface_fingerprint: luna_llib::format::Fingerprint([0; 32]), // Set by writer later
-            interface,
+            target_triple: "unknown".to_string(), // Set by writer.
+            interface_fingerprint: luna_llib::format::Fingerprint([0; 32]),
+            interface: CanonicalInterface {
+                exported_symbols,
+                types: self.canonical_types,
+                traits,
+                impl_headers,
+            },
         }
     }
 
-    fn get_canonical_from_type(&self, ty_id: SemanticTypeId) -> Option<CanonicalSymbolId> {
-        let ty = self.provider.types.get(ty_id);
-        match ty {
-            SemanticType::Struct(sym_id, _, _) | SemanticType::Enum(sym_id, _, _) => {
-                self.provider.symbol_canonicals.get(sym_id).cloned()
+    fn parameters(&self, declaration: Option<luna_ast::DeclId>) -> Vec<luna_common::ids::SymbolId> {
+        let Some(declaration) = declaration else {
+            return Vec::new();
+        };
+        let mut parameters: Vec<_> = self
+            .provider
+            .raw_generic_param_symbols
+            .iter()
+            .filter(|((owner, _), _)| *owner == declaration)
+            .map(|((_, position), &symbol)| (*position, symbol))
+            .collect();
+        parameters.sort_by_key(|(position, _)| *position);
+        parameters.into_iter().map(|(_, symbol)| symbol).collect()
+    }
+
+    fn scope_parameters(
+        &mut self,
+        owner: &StableSymbolId,
+        parameters: &[luna_common::ids::SymbolId],
+    ) {
+        for (index, parameter) in parameters.iter().enumerate() {
+            self.scoped_symbols.insert(
+                self.provider.symbol_canonicals[parameter].clone(),
+                StableSymbolId {
+                    provider_name: owner.provider_name.clone(),
+                    symbol_path: format!("{}::$param{}", owner.symbol_path, index),
+                },
+            );
+        }
+    }
+
+    fn scope_export_binders(&mut self, symbol: &ExternalSymbol) {
+        if Self::owns_binders(symbol.sym.kind) {
+            if let Some(canonical) = self.provider.symbol_canonicals.get(&symbol.sym.id) {
+                let identity = self.convert_symbol_id(canonical);
+                self.scope_parameters(&identity, &self.parameters(symbol.sym.decl_id));
             }
-            _ => None,
+        }
+        for child in symbol.children.values() {
+            self.scope_export_binders(child);
+        }
+    }
+
+    fn owns_binders(kind: luna_semantic::symbol::SymbolKind) -> bool {
+        use luna_semantic::symbol::SymbolKind;
+        matches!(
+            kind,
+            SymbolKind::Function
+                | SymbolKind::ExternFunction
+                | SymbolKind::TraitMethod
+                | SymbolKind::Struct
+                | SymbolKind::Enum
+                | SymbolKind::Trait
+                | SymbolKind::Alias
+        )
+    }
+
+    fn collect_trait_definitions(
+        symbols: &std::collections::BTreeMap<String, ExportedSymbol>,
+        traits: &mut std::collections::BTreeMap<StableSymbolId, TraitDefinition>,
+    ) {
+        for symbol in symbols.values() {
+            if symbol.kind == "Trait" {
+                traits.insert(
+                    symbol.symbol_id.clone(),
+                    TraitDefinition {
+                        name: symbol.symbol_id.symbol_path.clone(),
+                        methods: symbol
+                            .children
+                            .iter()
+                            .filter(|(_, child)| child.kind == "TraitMethod")
+                            .filter_map(|(name, child)| child.ty_index.map(|ty| (name.clone(), ty)))
+                            .collect(),
+                        associated_types: symbol
+                            .children
+                            .values()
+                            .filter(|child| child.kind == "AssociatedType")
+                            .map(|child| child.symbol_id.clone())
+                            .collect(),
+                        generic_params: symbol.generic_params.clone(),
+                        constraints: symbol.constraints.clone(),
+                    },
+                );
+            }
+            Self::collect_trait_definitions(&symbol.children, traits);
+        }
+    }
+
+    // Structural sort keys carry only stable nominal paths and local binder
+    // positions. They never include DeclId, SymbolId, source order or GP names.
+    fn type_shape(&self, ty: SemanticTypeId, parameters: &[luna_common::ids::SymbolId]) -> String {
+        let ty = self.provider.types.get(self.provider.types.resolve(ty));
+        match ty {
+            SemanticType::GenericParam(symbol) => parameters
+                .iter()
+                .position(|p| p == symbol)
+                .map(|position| format!("param({position})"))
+                .unwrap_or_else(|| {
+                    format!(
+                        "generic({:?})",
+                        self.convert_symbol_id(&self.provider.symbol_canonicals[symbol])
+                    )
+                }),
+            SemanticType::Struct(symbol, args, _) | SemanticType::Enum(symbol, args, _) => format!(
+                "nominal({:?},{:?})",
+                self.convert_symbol_id(&self.provider.symbol_canonicals[symbol]),
+                args.iter()
+                    .map(|&ty| self.type_shape(ty, parameters))
+                    .collect::<Vec<_>>()
+            ),
+            SemanticType::Tuple(args) => format!(
+                "tuple({:?})",
+                args.iter()
+                    .map(|&ty| self.type_shape(ty, parameters))
+                    .collect::<Vec<_>>()
+            ),
+            SemanticType::Array(ty, len) => {
+                format!("array({},{len})", self.type_shape(*ty, parameters))
+            }
+            SemanticType::Slice(ty) => format!("slice({})", self.type_shape(*ty, parameters)),
+            SemanticType::Pointer(m, ty) => {
+                format!("ptr({m:?},{})", self.type_shape(*ty, parameters))
+            }
+            SemanticType::Reference(_, m, ty) => {
+                format!("ref({m:?},{})", self.type_shape(*ty, parameters))
+            }
+            SemanticType::Function {
+                params,
+                return_type,
+            } => format!(
+                "fn({:?},{})",
+                params
+                    .iter()
+                    .map(|&ty| self.type_shape(ty, parameters))
+                    .collect::<Vec<_>>(),
+                self.type_shape(*return_type, parameters)
+            ),
+            SemanticType::Projection {
+                self_type,
+                trait_id,
+                assoc_type,
+            } => format!(
+                "projection({},{:?},{:?})",
+                self.type_shape(*self_type, parameters),
+                self.convert_symbol_id(&self.provider.symbol_canonicals[trait_id]),
+                self.convert_symbol_id(&self.provider.symbol_canonicals[assoc_type])
+            ),
+            SemanticType::DynTrait(symbol) => format!(
+                "dyn({:?})",
+                self.convert_symbol_id(&self.provider.symbol_canonicals[symbol])
+            ),
+            SemanticType::Future(ty) => format!("future({})", self.type_shape(*ty, parameters)),
+            SemanticType::Range(ty) => format!("range({})", self.type_shape(*ty, parameters)),
+            SemanticType::Primitive(ty) => format!("primitive({ty:?})"),
+            SemanticType::Void => "void".into(),
+            SemanticType::Never => "never".into(),
+            SemanticType::Error | SemanticType::InferenceVar(_) | SemanticType::Closure(..) => {
+                panic!("unresolved/nonportable type in checked impl interface")
+            }
+        }
+    }
+
+    fn constraint_shapes(&self, parameters: &[luna_common::ids::SymbolId]) -> Vec<String> {
+        let mut shapes = Vec::new();
+        for (position, parameter) in parameters.iter().enumerate() {
+            let canonical = &self.provider.symbol_canonicals[parameter];
+            for bound in self
+                .provider
+                .trait_bounds
+                .get(canonical)
+                .into_iter()
+                .flatten()
+            {
+                shapes.push(format!(
+                    "trait({position},{:?},{:?})",
+                    self.convert_symbol_id(&bound.trait_id),
+                    bound
+                        .trait_args
+                        .iter()
+                        .map(|&ty| self.type_shape(ty, parameters))
+                        .collect::<Vec<_>>()
+                ));
+            }
+            for bound in self
+                .provider
+                .assoc_type_bounds
+                .get(canonical)
+                .into_iter()
+                .flatten()
+            {
+                shapes.push(format!(
+                    "equality({position},{:?},{:?},{})",
+                    self.convert_symbol_id(&bound.trait_id),
+                    self.convert_symbol_id(&bound.assoc_sym),
+                    self.type_shape(bound.target_ty, parameters)
+                ));
+            }
+        }
+        shapes.sort();
+        shapes.dedup();
+        shapes
+    }
+
+    fn impl_shape(
+        &self,
+        declaration: luna_ast::DeclId,
+        header: &luna_semantic::semantic_tables::CheckedImplHeader,
+        entry: Option<&crate::registry::ExternalTraitImplEntry>,
+    ) -> String {
+        let parameters = &header.generic_params;
+        let mut associated: Vec<_> = self
+            .provider
+            .decl_associated_types
+            .iter()
+            .filter(|((owner, _), _)| *owner == declaration)
+            .map(|((_, symbol), &ty)| {
+                (
+                    self.convert_symbol_id(symbol),
+                    self.type_shape(ty, parameters),
+                )
+            })
+            .collect();
+        associated.sort();
+        let mut methods = Vec::new();
+        for method in &self.provider.impl_method_symbols {
+            if method
+                .sym
+                .decl_id
+                .and_then(|d| self.provider.method_to_impl_decl.get(&d))
+                != Some(&declaration)
+                || (entry.is_none() && method.sym.visibility == luna_ast::Visibility::Private)
+            {
+                continue;
+            }
+            let mut binders = parameters.clone();
+            binders.extend(self.parameters(method.sym.decl_id));
+            let signature = self.type_shape(self.provider.symbol_types[&method.sym.id], &binders);
+            methods.push((
+                method.sym.name.clone(),
+                binders.len() - parameters.len(),
+                signature,
+                self.constraint_shapes(&binders),
+            ));
+        }
+        methods.sort();
+        format!(
+            "impl({},{},{:?},{:?},{:?},{:?},{:?})",
+            parameters.len(),
+            self.type_shape(header.self_type, parameters),
+            entry.map(|entry| self.convert_symbol_id(&entry.trait_id)),
+            entry.map(|entry| entry
+                .trait_args
+                .iter()
+                .map(|&ty| self.type_shape(ty, parameters))
+                .collect::<Vec<_>>()),
+            self.constraint_shapes(parameters),
+            associated,
+            methods
+        )
+    }
+
+    fn convert_constraints(
+        &mut self,
+        parameters: &[luna_common::ids::SymbolId],
+    ) -> GenericConstraints {
+        let mut traits = Vec::new();
+        let mut associated_equalities = Vec::new();
+        for &parameter in parameters {
+            let canonical = &self.provider.symbol_canonicals[&parameter];
+            let param = self.convert_symbol_id(canonical);
+            let mut bounds: Vec<_> = self
+                .provider
+                .trait_bounds
+                .get(canonical)
+                .into_iter()
+                .flatten()
+                .collect();
+            bounds.sort_by_key(|bound| {
+                (
+                    self.convert_symbol_id(&bound.trait_id),
+                    bound
+                        .trait_args
+                        .iter()
+                        .map(|&ty| self.type_shape(ty, parameters))
+                        .collect::<Vec<_>>(),
+                )
+            });
+            for bound in bounds {
+                let bound = CanonicalTraitBound {
+                    param: param.clone(),
+                    trait_id: self.convert_symbol_id(&bound.trait_id),
+                    trait_args: bound
+                        .trait_args
+                        .iter()
+                        .map(|&ty| self.convert_type_id(ty))
+                        .collect(),
+                };
+                if !traits.contains(&bound) {
+                    traits.push(bound);
+                }
+            }
+            let mut equalities: Vec<_> = self
+                .provider
+                .assoc_type_bounds
+                .get(canonical)
+                .into_iter()
+                .flatten()
+                .collect();
+            equalities.sort_by_key(|bound| {
+                (
+                    self.convert_symbol_id(&bound.trait_id),
+                    self.convert_symbol_id(&bound.assoc_sym),
+                    self.type_shape(bound.target_ty, parameters),
+                )
+            });
+            for bound in equalities {
+                let equality = CanonicalAssociatedEquality {
+                    param: param.clone(),
+                    trait_id: self.convert_symbol_id(&bound.trait_id),
+                    associated_type: self.convert_symbol_id(&bound.assoc_sym),
+                    target_type: self.convert_type_id(bound.target_ty),
+                };
+                if !associated_equalities.contains(&equality) {
+                    associated_equalities.push(equality);
+                }
+            }
+        }
+        GenericConstraints {
+            traits,
+            associated_equalities,
         }
     }
 
     fn convert_symbol_id(&self, sym_id: &CanonicalSymbolId) -> StableSymbolId {
+        if let Some(scoped) = self.scoped_symbols.get(sym_id) {
+            return scoped.clone();
+        }
         let provider_name = if sym_id.provider_id.0 == 0 || sym_id.provider_id == self.provider.id {
             self.provider.name.clone()
         } else {
@@ -243,20 +538,23 @@ impl<'a> MetadataBuilder<'a> {
         // Find its type if it exists: check sym.sym.id first, then merged_ids
         let mut ty_index = None;
         let sid = sym.sym.id;
-        let symbol_ty = self.provider.symbol_types.get(&sid)
-            .copied()
-            .or_else(|| sym.merged_ids.first().and_then(|(_, msid)| self.provider.symbol_types.get(msid).copied()));
+        let symbol_ty = self.provider.symbol_types.get(&sid).copied().or_else(|| {
+            sym.merged_ids
+                .first()
+                .and_then(|(_, msid)| self.provider.symbol_types.get(msid).copied())
+        });
         if let Some(ty_id) = symbol_ty {
             ty_index = Some(self.convert_type_id(ty_id));
-            if sym.sym.name == "Ok" || sym.sym.name == "Result" {
-            }
+            if sym.sym.name == "Ok" || sym.sym.name == "Result" {}
         }
-        if ty_index.is_none() && (sym.sym.name == "Ok" || sym.sym.name == "Result") {
-        }
-        
+        if ty_index.is_none() && (sym.sym.name == "Ok" || sym.sym.name == "Result") {}
+
         let mut generic_params = Vec::new();
-        let canon_opt = self.provider.symbol_canonicals.get(&sid)
-            .or_else(|| sym.merged_ids.first().and_then(|(_, msid)| self.provider.symbol_canonicals.get(msid)));
+        let canon_opt = self.provider.symbol_canonicals.get(&sid).or_else(|| {
+            sym.merged_ids
+                .first()
+                .and_then(|(_, msid)| self.provider.symbol_canonicals.get(msid))
+        });
         if let Some(canon) = canon_opt {
             if let Some(gps) = self.provider.generic_param_symbols.get(canon) {
                 generic_params = gps.iter().map(|p| self.convert_symbol_id(p)).collect();
@@ -281,7 +579,8 @@ impl<'a> MetadataBuilder<'a> {
             luna_semantic::symbol::SymbolKind::LifetimeParam => "LifetimeParam",
             luna_semantic::symbol::SymbolKind::Macro => "Macro",
             luna_semantic::symbol::SymbolKind::Unknown => "Unknown",
-        }.to_string();
+        }
+        .to_string();
 
         let mut children = std::collections::BTreeMap::new();
         let mut sorted_children: Vec<_> = sym.children.iter().collect();
@@ -292,17 +591,36 @@ impl<'a> MetadataBuilder<'a> {
         // and the canonical field-name table, so serialized contracts can be
         // validated without making field ordinals portable identities.
         let field_types_by_name: HashMap<String, SemanticTypeId> = symbol_ty
-            .and_then(|ty_id| match self.provider.types.get(self.provider.types.resolve(ty_id)) {
-                SemanticType::Struct(owner, _, field_types) => {
-                    self.provider.symbol_struct_field_names.get(owner).map(|names| {
-                        names.iter().cloned().zip(field_types.iter().copied()).collect()
-                    })
-                }
-                _ => None,
-            })
+            .and_then(
+                |ty_id| match self.provider.types.get(self.provider.types.resolve(ty_id)) {
+                    SemanticType::Struct(owner, _, field_types) => self
+                        .provider
+                        .symbol_struct_field_names
+                        .get(owner)
+                        .map(|names| {
+                            names
+                                .iter()
+                                .cloned()
+                                .zip(field_types.iter().copied())
+                                .collect()
+                        }),
+                    _ => None,
+                },
+            )
             .unwrap_or_default();
-        
+
         for (c_name, c_sym) in sorted_children {
+            if matches!(
+                sym.sym.kind,
+                luna_semantic::symbol::SymbolKind::Function
+                    | luna_semantic::symbol::SymbolKind::ExternFunction
+                    | luna_semantic::symbol::SymbolKind::TraitMethod
+            ) {
+                continue;
+            }
+            if c_sym.sym.kind == luna_semantic::symbol::SymbolKind::TypeParam {
+                continue;
+            }
             let mut child = self.convert_exported_symbol(c_sym);
             if let Some(field_ty) = field_types_by_name.get(c_name) {
                 child.ty_index = Some(self.convert_type_id(*field_ty));
@@ -310,16 +628,37 @@ impl<'a> MetadataBuilder<'a> {
             children.insert(c_name.clone(), child);
         }
 
-        let lifetime_contract = self.provider.symbol_lifetime_contracts.get(&sid)
-            .or_else(|| sym.merged_ids.first().and_then(|(_, msid)| self.provider.symbol_lifetime_contracts.get(msid)))
+        let lifetime_contract = self
+            .provider
+            .symbol_lifetime_contracts
+            .get(&sid)
+            .or_else(|| {
+                sym.merged_ids
+                    .first()
+                    .and_then(|(_, msid)| self.provider.symbol_lifetime_contracts.get(msid))
+            })
             .cloned();
 
-        let type_lifetime_contract = self.provider.symbol_type_lifetime_contracts.get(&sid)
-            .or_else(|| sym.merged_ids.first().and_then(|(_, msid)| self.provider.symbol_type_lifetime_contracts.get(msid)))
+        let type_lifetime_contract = self
+            .provider
+            .symbol_type_lifetime_contracts
+            .get(&sid)
+            .or_else(|| {
+                sym.merged_ids
+                    .first()
+                    .and_then(|(_, msid)| self.provider.symbol_type_lifetime_contracts.get(msid))
+            })
             .cloned();
 
-        let raw_storage_anchor_contract = self.provider.symbol_raw_storage_anchor_contracts.get(&sid)
-            .or_else(|| sym.merged_ids.first().and_then(|(_, msid)| self.provider.symbol_raw_storage_anchor_contracts.get(msid)))
+        let raw_storage_anchor_contract = self
+            .provider
+            .symbol_raw_storage_anchor_contracts
+            .get(&sid)
+            .or_else(|| {
+                sym.merged_ids.first().and_then(|(_, msid)| {
+                    self.provider.symbol_raw_storage_anchor_contracts.get(msid)
+                })
+            })
             .cloned();
 
         // Generic bodies are retained in AstInterface and reanalyzed by the
@@ -333,17 +672,33 @@ impl<'a> MetadataBuilder<'a> {
             let candidate_ids = std::iter::once(sid)
                 .chain(sym.merged_ids.iter().map(|(_, merged)| *merged))
                 .collect::<std::collections::HashSet<_>>();
-            let matching: Vec<_> = self.raw_summaries.iter()
-                .filter(|(global, _)| global.symbol_id.is_some_and(|id| candidate_ids.contains(&id)))
+            let matching: Vec<_> = self
+                .raw_summaries
+                .iter()
+                .filter(|(global, _)| {
+                    global
+                        .symbol_id
+                        .is_some_and(|id| candidate_ids.contains(&id))
+                })
                 .map(|(_, summary)| summary)
                 .collect();
             if matching.len() == 1 {
                 let summary = matching[0];
-                let direct_fields = summary.raw_pointer_field_ret.iter()
-                    .map(|(name, field)| (name.clone(), canonical_raw_effect(&field.origin, &field.anchor)))
+                let direct_fields = summary
+                    .raw_pointer_field_ret
+                    .iter()
+                    .map(|(name, field)| {
+                        (
+                            name.clone(),
+                            canonical_raw_effect(&field.origin, &field.anchor),
+                        )
+                    })
                     .collect();
                 Some(CanonicalRawPointerEffects {
-                    returned: canonical_raw_effect(&summary.raw_pointer_ret, &summary.raw_pointer_anchor_ret),
+                    returned: canonical_raw_effect(
+                        &summary.raw_pointer_ret,
+                        &summary.raw_pointer_anchor_ret,
+                    ),
                     direct_fields,
                 })
             } else {
@@ -353,13 +708,20 @@ impl<'a> MetadataBuilder<'a> {
             None
         };
 
-
         let is_unsafe = self.provider.unsafe_functions.contains(&sid)
-            || sym.merged_ids.iter().any(|(_, msid)| self.provider.unsafe_functions.contains(msid));
+            || sym
+                .merged_ids
+                .iter()
+                .any(|(_, msid)| self.provider.unsafe_functions.contains(msid));
 
+        let constraints = if Self::owns_binders(sym.sym.kind) {
+            self.convert_constraints(&self.parameters(sym.sym.decl_id))
+        } else {
+            GenericConstraints::default()
+        };
         let mut symbol_path = sym.sym.name.clone();
         if let Some(canon) = canon_opt {
-            symbol_path = canon.name.clone();
+            symbol_path = self.convert_symbol_id(canon).symbol_path;
         }
 
         ExportedSymbol {
@@ -371,6 +733,7 @@ impl<'a> MetadataBuilder<'a> {
                 luna_ast::Visibility::Private => 0,
             },
             generic_params,
+            constraints,
             symbol_id: StableSymbolId {
                 provider_name: self.provider.name.clone(),
                 symbol_path,
@@ -389,16 +752,21 @@ impl<'a> MetadataBuilder<'a> {
             return idx;
         }
 
-        let idx = self.canonical_types.len() as u32;
-        self.type_map.insert(ty_id, idx);
-        
-        // Insert a dummy to allocate slot
-        self.canonical_types.push(CanonicalType::Error);
-        
-        let sem_ty = self.provider.types.get(ty_id).clone();
+        let sem_ty = self
+            .provider
+            .types
+            .get(self.provider.types.resolve(ty_id))
+            .clone();
         let canon = self.convert_semantic_type(&sem_ty);
-        
-        self.canonical_types[idx as usize] = canon;
+        let idx = if let Some(&index) = self.canonical_type_indices.get(&canon) {
+            index
+        } else {
+            let index = self.canonical_types.len() as u32;
+            self.canonical_type_indices.insert(canon.clone(), index);
+            self.canonical_types.push(canon);
+            index
+        };
+        self.type_map.insert(ty_id, idx);
         idx
     }
 
@@ -423,12 +791,21 @@ impl<'a> MetadataBuilder<'a> {
             }
             SemanticType::Array(t, len) => CanonicalType::Array(self.convert_type_id(*t), *len),
             SemanticType::Slice(t) => CanonicalType::Slice(self.convert_type_id(*t)),
-            SemanticType::Function { params, return_type } => CanonicalType::Function {
+            SemanticType::Function {
+                params,
+                return_type,
+            } => CanonicalType::Function {
                 params: params.iter().map(|t| self.convert_type_id(*t)).collect(),
                 return_type: self.convert_type_id(*return_type),
             },
-            SemanticType::Pointer(mutability, t) => CanonicalType::Pointer(mutability.clone(), self.convert_type_id(*t)),
-            SemanticType::Reference(_lt, mutability, t) => CanonicalType::Reference(CanonicalLifetime::Anonymous, mutability.clone(), self.convert_type_id(*t)),
+            SemanticType::Pointer(mutability, t) => {
+                CanonicalType::Pointer(mutability.clone(), self.convert_type_id(*t))
+            }
+            SemanticType::Reference(_lt, mutability, t) => CanonicalType::Reference(
+                CanonicalLifetime::Anonymous,
+                mutability.clone(),
+                self.convert_type_id(*t),
+            ),
             SemanticType::Void => CanonicalType::Void,
             SemanticType::Never => CanonicalType::Never,
             SemanticType::Error | SemanticType::InferenceVar(_) => CanonicalType::Error,
@@ -446,7 +823,11 @@ impl<'a> MetadataBuilder<'a> {
             }
             SemanticType::Future(t) => CanonicalType::Future(self.convert_type_id(*t)),
             SemanticType::Range(t) => CanonicalType::Range(self.convert_type_id(*t)),
-            SemanticType::Projection { self_type, trait_id, assoc_type } => {
+            SemanticType::Projection {
+                self_type,
+                trait_id,
+                assoc_type,
+            } => {
                 let canon_trait = self.provider.symbol_canonicals.get(trait_id).unwrap();
                 let canon_assoc = self.provider.symbol_canonicals.get(assoc_type).unwrap();
                 CanonicalType::Projection {
@@ -466,8 +847,12 @@ fn canonical_raw_effect(
     let origin = match origin {
         RawPointerReturnEffect::Independent => CanonicalRawPointerOrigin::Independent,
         RawPointerReturnEffect::From(params) => {
-            let converted = params.iter().map(|index| u32::try_from(*index)).collect::<Result<Vec<_>, _>>();
-            converted.map(CanonicalRawPointerOrigin::FromParameters)
+            let converted = params
+                .iter()
+                .map(|index| u32::try_from(*index))
+                .collect::<Result<Vec<_>, _>>();
+            converted
+                .map(CanonicalRawPointerOrigin::FromParameters)
                 .unwrap_or(CanonicalRawPointerOrigin::Unknown)
         }
         RawPointerReturnEffect::Unknown => CanonicalRawPointerOrigin::Unknown,
@@ -476,17 +861,23 @@ fn canonical_raw_effect(
         RawPointerAnchorReturnEffect::Independent => CanonicalRawPointerAnchor::Independent,
         RawPointerAnchorReturnEffect::Unknown => CanonicalRawPointerAnchor::Unknown,
         RawPointerAnchorReturnEffect::From(sources) => {
-            let converted = sources.iter().map(|source| match source {
-                RawPointerAnchorSource::RawParam(index) => u32::try_from(*index)
-                    .map(CanonicalRawPointerAnchorSource::RawParameter).map_err(|_| ()),
-                RawPointerAnchorSource::OwnerField { param, field } => u32::try_from(*param)
-                    .map(|parameter| CanonicalRawPointerAnchorSource::OwnerField {
-                        parameter,
-                        field_name: field.clone(),
-                    }).map_err(|_| ()),
-                RawPointerAnchorSource::Unknown => Ok(CanonicalRawPointerAnchorSource::Unknown),
-            }).collect::<Result<Vec<_>, _>>();
-            converted.map(CanonicalRawPointerAnchor::From)
+            let converted = sources
+                .iter()
+                .map(|source| match source {
+                    RawPointerAnchorSource::RawParam(index) => u32::try_from(*index)
+                        .map(CanonicalRawPointerAnchorSource::RawParameter)
+                        .map_err(|_| ()),
+                    RawPointerAnchorSource::OwnerField { param, field } => u32::try_from(*param)
+                        .map(|parameter| CanonicalRawPointerAnchorSource::OwnerField {
+                            parameter,
+                            field_name: field.clone(),
+                        })
+                        .map_err(|_| ()),
+                    RawPointerAnchorSource::Unknown => Ok(CanonicalRawPointerAnchorSource::Unknown),
+                })
+                .collect::<Result<Vec<_>, _>>();
+            converted
+                .map(CanonicalRawPointerAnchor::From)
                 .unwrap_or(CanonicalRawPointerAnchor::Unknown)
         }
     };

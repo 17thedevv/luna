@@ -26,7 +26,7 @@ pub enum CanonicalLifetime {
     Anonymous,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum CanonicalType {
     Primitive(BuiltinType),
     Struct(StableSymbolId, Vec<u32>, Vec<u32>), // trait bounds and generic arguments as type indices
@@ -74,6 +74,7 @@ pub struct ExportedSymbol {
     pub ty_index: Option<u32>, // Index into CanonicalInterface::types, None for modules
     pub visibility: u8,
     pub generic_params: Vec<StableSymbolId>,
+    pub constraints: GenericConstraints,
     pub symbol_id: StableSymbolId,
     #[serde(default)]
     pub children: BTreeMap<String, ExportedSymbol>, // BTreeMap for deterministic ordering
@@ -131,10 +132,36 @@ pub struct TraitDefinition {
     pub name: String,
     pub methods: BTreeMap<String, u32>, // BTreeMap for deterministic ordering
     pub associated_types: Vec<StableSymbolId>,
+    pub generic_params: Vec<StableSymbolId>,
+    pub constraints: GenericConstraints,
+}
+
+/// Declaration-owned bounds; parameter IDs name an owner and binder position,
+/// never a compiler session or the source spelling of a type parameter.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+pub struct GenericConstraints {
+    pub traits: Vec<CanonicalTraitBound>,
+    pub associated_equalities: Vec<CanonicalAssociatedEquality>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CanonicalTraitBound {
+    pub param: StableSymbolId,
+    pub trait_id: StableSymbolId,
+    pub trait_args: Vec<u32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CanonicalAssociatedEquality {
+    pub param: StableSymbolId,
+    pub trait_id: StableSymbolId,
+    pub associated_type: StableSymbolId,
+    pub target_type: u32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ImplHeader {
+    pub identity: StableSymbolId,
     pub trait_id: Option<StableSymbolId>, // None for inherent impls
     pub self_type: u32,
     #[serde(default)]
@@ -142,6 +169,9 @@ pub struct ImplHeader {
     #[serde(default)]
     pub trait_args: Vec<u32>,
     pub methods: BTreeMap<String, u32>, // Method name -> Type index
+    pub constraints: GenericConstraints,
+    pub method_contracts: BTreeMap<String, ExportedSymbol>,
+    pub associated_types: BTreeMap<StableSymbolId, u32>,
 }
 
 
@@ -159,6 +189,7 @@ mod raw_storage_anchor_interface_tests {
             ty_index: None,
             visibility: 1,
             generic_params: Vec::new(),
+            constraints: GenericConstraints::default(),
             symbol_id: owner_id,
             children: BTreeMap::new(),
             lifetime_contract: None,

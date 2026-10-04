@@ -1,0 +1,21 @@
+import "provider";
+fn main() -> i32 {
+    dec numbers = api::Holder<i32> { value: 17 };
+    dec flags = api::Holder<bool> { value: true };
+    if numbers.read() != 17 { return 1; }
+    if flags.read() == false { return 2; }
+    if api::Marker<i32>::choose(&numbers, 29) != 29 { return 3; }
+    if api::Marker<bool>::choose(&flags, true) == false { return 4; }
+    dec tags = api::Holder<api::Tag> { value: api::Tag {} };
+    if tags.get() != 17 { return 5; }
+    if tags.constrained() != 23 { return 6; }
+    dec echoed = tags.echo<api::Tag>(api::Tag {});
+    if api::First::marker(&echoed) != 1 { return 7; }
+    dec identity = api::identity<api::Tag>(api::Tag {});
+    if api::First::marker(&identity) != 1 { return 8; }
+    dec explicit = api::Bounded<api::Tag> { value: api::Tag {}, second: api::Tag {} };
+    dec inferred = api::Bounded { value: api::Tag {}, second: api::Tag {} };
+    if api::First::marker(&explicit.value) != 1 || api::First::marker(&inferred.value) != 1 { return 9; }
+    if numbers.echo_number() != 17 { return 10; }
+    return 0;
+}

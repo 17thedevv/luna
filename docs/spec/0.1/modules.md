@@ -72,15 +72,26 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 4 rejects compiler versions 1–3, including previously
-compiled native/portable bodies with incorrect ownership cleanup or module
-constant storage. MVIR version 4 adds portable immutable static data whose
-initializer and type shape contain no semantic-session IDs or VM addresses.
-Rebuild incompatible artifacts
-through the build tooling; import never rebuilds or falls back from a selected
-invalid artifact. This is an internal compiler compatibility revision, not a
-declaration of language release readiness. File format version remains 2 and
-semantic metadata version remains 3.
+protocol version 9 rejects compiler versions 1–8. This revision retains
+public generic constraints and individual impl contracts, alongside the earlier
+method-identity, ownership-cleanup and module-constant-storage repairs. MVIR
+version 4 carries portable immutable static data whose initializer and type
+shape contain no semantic-session IDs or VM addresses. Rebuild incompatible
+artifacts through build tooling; import never rebuilds or falls back from a
+selected invalid artifact. File format version remains 2; semantic metadata
+version is 4. These are internal compatibility revisions, not a declaration of
+language release readiness.
+
+Canonical generic contracts retain declaration-owned binders, trait arguments,
+trait bounds and associated-type equalities. Impl contracts retain individual
+self patterns, method signatures/constraints and associated-type definitions;
+a nominal-head grouping cannot replace an individual checked header. Stable
+binder identities use their owner and parameter position, not a source name or
+session ID. Changing a public constraint must change interface identity;
+renaming generic binders, reordering independent declarations or changing a
+body without changing its public effects must preserve that identity. Function
+body locals do not belong to its exported symbol children.
+
 Comptime dependency collection remains conservative: a compilation that
 evaluates comptime retains execution identities for its loaded dependencies.
 More precise dependency selection remains an optimization requirement.

@@ -1249,160 +1249,115 @@ impl<'a> TypeChecker<'a> {
         None
     }
 
-    fn populate_trait_bounds(&mut self, items: &[Item]) {
-        for item in items {
-            if let Item::Decl(decl_id) = item {
-                let decl = &self.arena.decls[decl_id.0 as usize];
-                let scope_id = *self.ctx.tables.decl_scopes.get(decl_id).unwrap_or(&crate::ScopeId(0));
-                let prev_scope = self.current_scope;
-                self.current_scope = scope_id;
-                match decl {
-                    Decl::Function { generic_params, .. } => {
-                        for (gp_idx, gp) in generic_params.iter().enumerate() {
-                            let gp_sym_found = self.ctx.tables.generic_param_symbols.get(&(*decl_id, gp_idx));
-                            if let Some(gp_sym) = gp_sym_found.copied() {
-                                // Register GenericParam type for this symbol
-                                let gp_ty = self.ctx.types.intern(SemanticType::GenericParam(gp_sym));
-                                self.ctx.tables.symbol_types.insert(gp_sym, gp_ty);
-                                for &bound_type_id in &gp.bounds {
-                                    if let luna_ast::Type::Named { segments, generic_args, associated_bindings, .. } = &self.arena.types[bound_type_id.0 as usize] {
-                                        if let Some(last_seg) = segments.last() {
-                                            let trait_name = self.get_span_text(*last_seg);
-                                            if let Some(trait_sym) = self.resolve_type_path_symbol(segments, &[scope_id, crate::ScopeId(0)]) {
-                                                let trait_args = generic_args.iter().map(|arg| self.lower_type(*arg)).collect();
-                                                self.ctx.tables.trait_bounds
-                                                    .entry(gp_sym)
-                                                    .or_insert_with(Vec::new)
-                                                    .push(crate::semantic_tables::TraitBound { param: gp_sym, trait_id: trait_sym, trait_args });
-
-                                                for binding in associated_bindings {
-                                                    let b_name = self.get_span_text(binding.name);
-                                                    if let Some(&assoc_sym) = self.ctx.tables.assoc_type_names.get(&(trait_sym, b_name.to_string())) {
-                                                        let target_ty = self.lower_type(binding.ty);
-                                                        let proj = self.ctx.types.intern(SemanticType::Projection {
-                                                            self_type: gp_ty,
-                                                            trait_id: trait_sym,
-                                                            assoc_type: assoc_sym,
-                                                        });
-                                                        self.associated_type_obligations.push(AssociatedTypeEqObligation {
-                                                            projection: proj,
-                                                            target_ty,
-                                                            span: binding.name,
-                                                        });
-                                                        self.ctx.tables.assoc_type_bounds
-                                                            .entry(gp_sym)
-                                                            .or_default()
-                                                            .push((trait_sym, assoc_sym, target_ty));
-                                                    }
-                                                }
-                                            }
-                                            }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Decl::Impl { generic_params, methods, .. } => {
-                        // Impl-level generic params
-                        for (gp_idx, gp) in generic_params.iter().enumerate() {
-                            if let Some(gp_sym) = self.ctx.tables.generic_param_symbols.get(&(*decl_id, gp_idx)).copied() {
-                                let gp_ty = self.ctx.types.intern(SemanticType::GenericParam(gp_sym));
-                                self.ctx.tables.symbol_types.insert(gp_sym, gp_ty);
-                                for &bound_type_id in &gp.bounds {
-                                    if let luna_ast::Type::Named { segments, generic_args, associated_bindings, .. } = &self.arena.types[bound_type_id.0 as usize] {
-                                        if let Some(last_seg) = segments.last() {
-                                            let trait_name = self.get_span_text(*last_seg);
-                                            if let Some(trait_sym) = self.resolve_type_path_symbol(segments, &[scope_id, crate::ScopeId(0)]) {
-                                                let trait_args = generic_args.iter().map(|arg| self.lower_type(*arg)).collect();
-                                                self.ctx.tables.trait_bounds
-                                                    .entry(gp_sym)
-                                                    .or_insert_with(Vec::new)
-                                                    .push(crate::semantic_tables::TraitBound { param: gp_sym, trait_id: trait_sym, trait_args });
-
-                                                for binding in associated_bindings {
-                                                    let b_name = self.get_span_text(binding.name);
-                                                    if let Some(&assoc_sym) = self.ctx.tables.assoc_type_names.get(&(trait_sym, b_name.to_string())) {
-                                                        let target_ty = self.lower_type(binding.ty);
-                                                        let proj = self.ctx.types.intern(SemanticType::Projection {
-                                                            self_type: gp_ty,
-                                                            trait_id: trait_sym,
-                                                            assoc_type: assoc_sym,
-                                                        });
-                                                        self.associated_type_obligations.push(AssociatedTypeEqObligation {
-                                                            projection: proj,
-                                                            target_ty,
-                                                            span: binding.name,
-                                                        });
-                                                        self.ctx.tables.assoc_type_bounds.entry(gp_sym).or_default()
-                                                            .push((trait_sym, assoc_sym, target_ty));
-                                                    }
-                                                }
-                                        }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        // Method-level generic params
-                        for method_decl_id in methods {
-                            let m_decl = &self.arena.decls[method_decl_id.0 as usize];
-                            let m_scope = *self.ctx.tables.decl_scopes.get(method_decl_id).unwrap_or(&scope_id);
-                            if let Decl::Function { generic_params: m_gp, .. } = m_decl {
-                                for (gp_idx, gp) in m_gp.iter().enumerate() {
-                                    if let Some(gp_sym) = self.ctx.tables.generic_param_symbols.get(&(*method_decl_id, gp_idx)).copied() {
-                                        let gp_ty = self.ctx.types.intern(SemanticType::GenericParam(gp_sym));
-                                        self.ctx.tables.symbol_types.insert(gp_sym, gp_ty);
-                                        for &bound_type_id in &gp.bounds {
-                                            if let luna_ast::Type::Named { segments, generic_args, associated_bindings, .. } = &self.arena.types[bound_type_id.0 as usize] {
-                                                if let Some(last_seg) = segments.last() {
-                                                    let trait_name = self.get_span_text(*last_seg);
-                                                    if let Some(trait_sym) = self.resolve_type_path_symbol(segments, &[m_scope, scope_id, crate::ScopeId(0)]) {
-                                                        let trait_args = generic_args.iter().map(|arg| self.lower_type(*arg)).collect();
-                                                        self.ctx.tables.trait_bounds
-                                                            .entry(gp_sym)
-                                                            .or_insert_with(Vec::new)
-                                                            .push(crate::semantic_tables::TraitBound { param: gp_sym, trait_id: trait_sym, trait_args });
-
-                                                        for binding in associated_bindings {
-                                                            let b_name = self.get_span_text(binding.name);
-                                                            if let Some(&assoc_sym) = self.ctx.tables.assoc_type_names.get(&(trait_sym, b_name.to_string())) {
-                                                                let target_ty = self.lower_type(binding.ty);
-                                                                let proj = self.ctx.types.intern(SemanticType::Projection {
-                                                                    self_type: gp_ty,
-                                                                    trait_id: trait_sym,
-                                                                    assoc_type: assoc_sym,
-                                                                });
-                                                                self.associated_type_obligations.push(AssociatedTypeEqObligation {
-                                                                    projection: proj,
-                                                                    target_ty,
-                                                                    span: binding.name,
-                                                                });
-                                                                self.ctx.tables.assoc_type_bounds.entry(gp_sym).or_default()
-                                                                    .push((trait_sym, assoc_sym, target_ty));
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    Decl::Module { items: inner_decls, .. } => {
-                        let inner_items: Vec<Item> = inner_decls.iter().map(|&d| Item::Decl(d)).collect();
-                        self.populate_trait_bounds(&inner_items);
-                    }
-                    Decl::Extern { func, .. } => {
-                        let inner_items = [Item::Decl(*func)];
-                        self.populate_trait_bounds(&inner_items);
-                    }
-                    _ => {}
+    fn populate_decl_bounds(&mut self, declaration: luna_ast::DeclId,
+        parameters: &[luna_ast::GenericParam], scope: crate::ScopeId) {
+        let previous = self.current_scope;
+        self.current_scope = scope;
+        for (index, parameter) in parameters.iter().enumerate() {
+            let Some(&symbol) = self.ctx.tables.generic_param_symbols.get(&(declaration, index)) else { continue; };
+            let generic_type = self.ctx.types.intern(SemanticType::GenericParam(symbol));
+            self.ctx.tables.symbol_types.insert(symbol, generic_type);
+            for &bound_type in &parameter.bounds {
+                let luna_ast::Type::Named { segments, generic_args, associated_bindings } =
+                    self.arena.types[bound_type.0 as usize].clone() else {
+                    self.ctx.diagnostics.push(Diagnostic::error("A generic trait bound must name a trait")
+                        .with_code(DiagnosticCode::TypeMismatch).with_span(parameter.name));
+                    continue;
+                };
+                let span = segments.last().copied().unwrap_or(parameter.name);
+                let Some(trait_id) = self.resolve_type_path_symbol(&segments, &[scope, crate::ScopeId(0)]) else {
+                    self.ctx.diagnostics.push(Diagnostic::error("Unresolved trait in generic bound")
+                        .with_code(DiagnosticCode::UnresolvedSymbol).with_span(span));
+                    continue;
+                };
+                if self.ctx.symbol_table.get_symbol(trait_id).kind != crate::SymbolKind::Trait {
+                    self.ctx.diagnostics.push(Diagnostic::error("A generic trait bound must name a trait")
+                        .with_code(DiagnosticCode::TypeMismatch).with_span(span));
+                    continue;
                 }
-                self.current_scope = prev_scope;
+                if !self.ctx.symbol_table.is_accessible(trait_id, scope, self.ctx.current_provider) {
+                    self.ctx.diagnostics.push(Diagnostic::error("A generic bound cannot access this private trait")
+                        .with_code(DiagnosticCode::PrivateSymbolAccess).with_span(span));
+                    continue;
+                }
+                if generic_args.len() != self.ctx.tables.trait_generic_params.get(&trait_id).map_or(0, Vec::len) {
+                    self.ctx.diagnostics.push(Diagnostic::error("Incorrect number of type arguments in generic trait bound")
+                        .with_code(DiagnosticCode::TypeMismatch).with_span(span));
+                    continue;
+                }
+                let trait_args = generic_args.iter().map(|&arg| self.lower_type(arg)).collect();
+                let bound = crate::semantic_tables::TraitBound { param: symbol, trait_id, trait_args };
+                let bounds = self.ctx.tables.trait_bounds.entry(symbol).or_default();
+                if !bounds.contains(&bound) { bounds.push(bound); }
+                for binding in associated_bindings {
+                    let name = self.get_span_text(binding.name).to_string();
+                    let Some(&associated) = self.ctx.tables.assoc_type_names.get(&(trait_id, name)) else {
+                        self.ctx.diagnostics.push(Diagnostic::error("Unknown associated type in generic bound")
+                            .with_code(DiagnosticCode::NoAssociatedType).with_span(binding.name));
+                        continue;
+                    };
+                    let target_type = self.lower_type(binding.ty);
+                    let equality = (trait_id, associated, target_type);
+                    let equalities = self.ctx.tables.assoc_type_bounds.entry(symbol).or_default();
+                    if !equalities.contains(&equality) {
+                        equalities.push(equality);
+                        let projection = self.ctx.types.intern(SemanticType::Projection {
+                            self_type: generic_type, trait_id, assoc_type: associated,
+                        });
+                        self.associated_type_obligations.push(AssociatedTypeEqObligation {
+                            projection, target_ty: target_type, span: binding.name,
+                        });
+                    }
+                }
             }
         }
+        self.current_scope = previous;
+    }
+
+    fn populate_trait_bounds(&mut self, items: &[Item]) {
+        for item in items {
+            let Item::Decl(declaration) = item else { continue; };
+            let declaration = *declaration;
+            let scope = self.ctx.tables.decl_scopes.get(&declaration).copied().unwrap_or(crate::ScopeId(0));
+            let decl = self.arena.decls[declaration.0 as usize].clone();
+            let (parameters, children) = match decl {
+                Decl::Function { generic_params, .. } | Decl::Struct { generic_params, .. }
+                | Decl::Enum { generic_params, .. } | Decl::TypeAlias { generic_params, .. } =>
+                    (generic_params, Vec::new()),
+                Decl::Impl { generic_params, methods, .. } | Decl::Trait { generic_params, methods, .. } =>
+                    (generic_params, methods),
+                Decl::Module { items, .. } => (Vec::new(), items),
+                Decl::Extern { func, .. } => (Vec::new(), vec![func]),
+                _ => continue,
+            };
+            self.populate_decl_bounds(declaration, &parameters, scope);
+            let children: Vec<_> = children.into_iter().map(Item::Decl).collect();
+            self.populate_trait_bounds(&children);
+        }
+    }
+
+    /// Reconcile the resolver's provisional index with the checked self head.
+    /// Forward declarations and aliases may be unavailable during declaration
+    /// collection. Every accepted impl must have the same final method index.
+    fn register_checked_impl_methods(&mut self, key: crate::semantic_tables::ImplKey,
+        declaration: luna_ast::DeclId, methods: &[luna_ast::DeclId]) {
+        let symbols: Vec<_> = methods.iter().filter_map(|method|
+            self.ctx.tables.decl_symbols.get(method).copied()).collect();
+        for (old_key, declarations) in &mut self.ctx.tables.trait_impls {
+            if *old_key != key { declarations.retain(|owner| *owner != declaration); }
+        }
+        for (old_key, old_methods) in &mut self.ctx.tables.impl_methods {
+            if *old_key != key { old_methods.retain(|method| !symbols.contains(method)); }
+        }
+        let declarations = self.ctx.tables.trait_impls.entry(key.clone()).or_default();
+        if !declarations.contains(&declaration) { declarations.push(declaration); }
+        let indexed = self.ctx.tables.impl_methods.entry(key.clone()).or_default();
+        for &method in &symbols {
+            if !indexed.contains(&method) { indexed.push(method); }
+            self.ctx.tables.method_impls.insert(method, key.clone());
+            self.ctx.tables.method_sym_to_impl_decl.insert(method, declaration);
+        }
+        for &method in methods { self.ctx.tables.method_to_impl_decl.insert(method, declaration); }
     }
 
     fn populate_signatures_pass1(&mut self, items: &[Item]) {
@@ -1655,7 +1610,7 @@ impl<'a> TypeChecker<'a> {
             if let Item::Decl(decl_id) = item {
                 let decl = &self.arena.decls[decl_id.0 as usize];
                 match decl {
-                    Decl::Impl { trait_type, self_type, associated_types, generic_params, .. } => {
+                    Decl::Impl { trait_type, self_type, associated_types, generic_params, methods, .. } => {
                     let impl_scope = *self.ctx.tables.decl_scopes.get(decl_id).unwrap_or(&self.current_scope);
                     let self_sym_opt = self.ctx.tables.type_symbols.get(self_type).copied().or_else(|| {
                         let self_ast_ty = &self.arena.types[self_type.0 as usize];
@@ -1834,6 +1789,7 @@ impl<'a> TypeChecker<'a> {
                                         trait_id: Some(trait_sym),
                                         self_type_def: self_key,
                                     };
+                                    self.register_checked_impl_methods(key.clone(), *decl_id, methods);
                                     let entry = self.ctx.tables.trait_impls
                                         .entry(key.clone())
                                         .or_insert_with(Vec::new);
@@ -1888,6 +1844,7 @@ impl<'a> TypeChecker<'a> {
                                     trait_id: None,
                                     self_type_def: self_key,
                                 };
+                                self.register_checked_impl_methods(key.clone(), *decl_id, methods);
                                 self.ctx.tables.impl_self_types.insert(key.clone(), self_sem_ty);
                                 if !gp_syms.is_empty() {
                                     self.ctx.tables.impl_generic_params.insert(key.clone(), gp_syms);
@@ -4998,12 +4955,6 @@ impl<'a> TypeChecker<'a> {
                     }
                 }
                 
-                if !generic_params.is_empty() {
-                    let mut span = luna_common::ids::Span::new(luna_common::ids::FileId(0), 0, 0);
-                    if let Some(first) = path.first() { span = *first; }
-                    self.check_bounds_for_call(sym_id, &subst, span);
-                }
-
                 let mut field_tys = Vec::new();
                 for orig_ty in original_field_tys {
                     field_tys.push(self.ctx.types.subst(orig_ty, &subst));
@@ -5042,6 +4993,11 @@ impl<'a> TypeChecker<'a> {
                     if !provided {
                         self.ctx.diagnostics.push(Diagnostic::error(format!("Missing field `{}` in initializer of `{}`", declared_name, full_name)).with_code(DiagnosticCode::MissingField).with_span(span));
                     }
+                }
+                // Field/expected-type inference completes omitted arguments
+                // before checking the nominal declaration's bounds.
+                if !generic_params.is_empty() {
+                    self.check_bounds_for_call(sym_id, &subst, path.first().copied().unwrap_or(span));
                 }
                 self.ctx.tables.expr_struct_init_indices.insert(*expr_id, init_indices);
                 struct_ty

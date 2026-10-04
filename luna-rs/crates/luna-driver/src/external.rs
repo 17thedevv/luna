@@ -311,7 +311,7 @@ impl ExternalComponentLoader {
         // Canonical current `.llib` artifacts MUST carry the AstInterface section:
         // it is the required semantic authority for source/.llib parity
         // (ARTIFACT-PARITY-01). The SemanticMetadata-only reconstruction below is
-        // semantic-lossy (no trait bounds / associated types / lang items), so it is
+        // incomplete (no portable bodies / language hooks), so it is
         // restricted to legacy `.mlib` compatibility artifacts. A canonical `.llib`
         // missing AstInterface is an invalid artifact, not a fallback case.
         let is_legacy_mlib = descriptor

@@ -977,6 +977,10 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         for method_id in methods {
                             let item = Item::Decl(*method_id);
                             self.declare_item(&item, method_context);
+                            self.ctx.tables.method_to_impl_decl.insert(*method_id, *decl_id);
+                            if let Some(&method) = self.ctx.tables.decl_symbols.get(method_id) {
+                                self.ctx.tables.method_sym_to_impl_decl.insert(method, *decl_id);
+                            }
                         }
                         self.exit_scope();
 

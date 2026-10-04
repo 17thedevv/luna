@@ -1,0 +1,899 @@
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2024 which implies `resolver = "3"`
+  |
+  = note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+  = note: to use the edition 2024 resolver, specify `workspace.resolver = "3"` in the workspace root's manifest
+  = note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+warning: unused imports: `DeclId`, `ExprId`, `PatId`, `StmtId`, and `TypeId`
+ --> crates\luna-parser\src\lib.rs:1:26
+  |
+1 | use luna_ast::{AstArena, DeclId, ExprId, PatId, StmtId, TypeId};
+  |                          ^^^^^^  ^^^^^^  ^^^^^  ^^^^^^  ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `BuiltinKind`
+ --> crates\luna-parser\src\ty.rs:3:18
+  |
+3 | use luna_lexer::{BuiltinKind, TokenKind};
+  |                  ^^^^^^^^^^^
+
+warning: unused variable: `span_start`
+   --> crates\luna-parser\src\decl.rs:126:13
+    |
+126 |         let span_start = self.previous().span.start;
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_span_start`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `span_end`
+   --> crates\luna-parser\src\decl.rs:156:13
+    |
+156 |         let span_end = self.previous().span.end;
+    |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_span_end`
+
+warning: value assigned to `kind` is never read
+   --> crates\luna-parser\src\decl.rs:127:24
+    |
+127 |         let mut kind = luna_ast::ImportKind::External;
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+147 |             kind = luna_ast::ImportKind::Local;
+    |             ---------------------------------- `kind` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `start_span`
+   --> crates\luna-parser\src\decl.rs:836:21
+    |
+836 |                 let start_span = self.advance().span;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_span`
+
+warning: unused variable: `rparen_tok`
+   --> crates\luna-parser\src\decl.rs:841:21
+    |
+841 |                 let rparen_tok = self.consume(TokenKind::RParen, "Expected closing ')' after macro repetition")?;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_rparen_tok`
+
+warning: unused variable: `start_span`
+   --> crates\luna-parser\src\decl.rs:954:21
+    |
+954 |                 let start_span = self.advance().span;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_span`
+
+warning: unused variable: `rparen_tok`
+   --> crates\luna-parser\src\decl.rs:959:21
+    |
+959 |                 let rparen_tok = self.consume(TokenKind::RParen, "Expected closing ')' after macro repetition")?;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_rparen_tok`
+
+warning: unused variable: `allow_struct_literal`
+   --> crates\luna-parser\src\expr.rs:752:33
+    |
+752 |     fn parse_primary(&mut self, allow_struct_literal: bool) -> Result<ExprId, ()> {
+    |                                 ^^^^^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_allow_struct_literal`
+
+warning: `luna-parser` (lib) generated 10 warnings (run `cargo fix --lib -p luna-parser` to apply 9 suggestions)
+   Compiling luna-semantic v0.1.0 (D:\fdlang\luna-rs\crates\luna-semantic)
+warning: unused imports: `MacroFragment`, `MacroMatcher`, and `RepetitionKind`
+ --> crates\luna-semantic\src\macro_engine.rs:3:79
+  |
+3 |     AstArena, Decl, DeclId, Expr, ExprId, FragmentKind, Item, MacroDelimiter, MacroFragment,
+  |                                                                               ^^^^^^^^^^^^^
+4 |     MacroMatcher, MacroRule, MatcherElement, RepetitionKind, Stmt, StmtId, TranscriberElement,
+  |     ^^^^^^^^^^^^                             ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `DeriveInput`
+  --> crates\luna-semantic\src\annotation.rs:19:21
+   |
+19 | use crate::derive::{DeriveInput, DeriveRegistry, DeriveContext, extract_struct_input, extract_enum_input};
+   |                     ^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> crates\luna-semantic\src\comptime\type_repr.rs:16:5
+   |
+16 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::fmt`
+  --> crates\luna-semantic\src\comptime\type_repr.rs:17:5
+   |
+17 | use std::fmt;
+   |     ^^^^^^^^
+
+warning: unused import: `luna_common::ids::SymbolId`
+ --> crates\luna-semantic\src\effect.rs:2:5
+  |
+2 | use luna_common::ids::SymbolId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::ty::LifetimeId`
+  --> crates\luna-semantic\src\lifetime.rs:34:5
+   |
+34 | use crate::ty::LifetimeId;
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::symbol::SymbolTable`
+  --> crates\luna-semantic\src\lifetime.rs:36:5
+   |
+36 | use crate::symbol::SymbolTable;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `luna_ast::AstArena`
+  --> crates\luna-semantic\src\lib.rs:54:5
+   |
+54 | use luna_ast::AstArena;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::sync::Arc`
+  --> crates\luna-semantic\src\annotation.rs:14:5
+   |
+14 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+warning: unused import: `Hasher`
+  --> crates\luna-semantic\src\comptime\type_repr.rs:18:23
+   |
+18 | use std::hash::{Hash, Hasher};
+   |                       ^^^^^^
+
+warning: unused variable: `return_type`
+    --> crates\luna-semantic\src\resolver.rs:1939:17
+     |
+1939 |                 return_type,
+     |                 ^^^^^^^^^^^ help: try ignoring the field: `return_type: _`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `ty`
+    --> crates\luna-semantic\src\resolver.rs:1963:25
+     |
+1963 |                         ty,
+     |                         ^^ help: try ignoring the field: `ty: _`
+
+warning: unused variable: `generic_args`
+   --> crates\luna-semantic\src\typechecker.rs:566:27
+    |
+566 |         let (nominal_sym, generic_args) = match &sem_ty {
+    |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_generic_args`
+
+warning: value assigned to `span` is never read
+    --> crates\luna-semantic\src\typechecker.rs:1091:40
+     |
+1091 |                         let mut span = luna_common::Span::new(luna_common::ids::FileId(0), 0, 0);
+     |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+1092 |                         let sym = self.ctx.symbol_table.get_symbol(sym_id);
+1093 |                         span = sym.span;
+     |                         --------------- `span` is overwritten here before the previous value is read
+     |
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `generic_params`
+    --> crates\luna-semantic\src\typechecker.rs:1952:34
+     |
+1952 |                     Decl::Impl { generic_params, self_type, methods, .. } => {
+     |                                  ^^^^^^^^^^^^^^ help: try ignoring the field: `generic_params: _`
+
+warning: unused variable: `associated_types`
+    --> crates\luna-semantic\src\typechecker.rs:2119:69
+     |
+2119 |                 if let Decl::Impl { trait_type, self_type, methods, associated_types, .. } = decl {
+     |                                                                     ^^^^^^^^^^^^^^^^ help: try ignoring the field: `associated_types: _`
+
+warning: unused variable: `in2`
+    --> crates\luna-semantic\src\typechecker.rs:3886:50
+     |
+3886 |             (SemanticType::Reference(_, _, in1), in2) => {
+     |                                                  ^^^ help: if this is intentional, prefix it with an underscore: `_in2`
+
+warning: unused variable: `in1`
+    --> crates\luna-semantic\src\typechecker.rs:3889:14
+     |
+3889 |             (in1, SemanticType::Reference(_, _, in2)) => {
+     |              ^^^ help: if this is intentional, prefix it with an underscore: `_in1`
+
+warning: variable does not need to be mutable
+    --> crates\luna-semantic\src\typechecker.rs:5376:21
+     |
+5376 |                 let mut result_ty = self.ctx.types.new_inference_var();
+     |                     ----^^^^^^^^^
+     |                     |
+     |                     help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `i`
+    --> crates\luna-semantic\src\typechecker.rs:5382:22
+     |
+5382 |                 for (i, arm) in arms.iter().enumerate() {
+     |                      ^ help: if this is intentional, prefix it with an underscore: `_i`
+
+warning: value assigned to `has_enum_generics` is never read
+    --> crates\luna-semantic\src\typechecker.rs:4411:57
+     |
+4411 | ...                   let mut has_enum_generics = false;
+     |                                                   ^^^^^ this value is reassigned later and never used
+...
+4414 | ...                   has_enum_generics = !enum_args.is_empty();
+     |                       ----------------------------------------- `has_enum_generics` is overwritten here before the previous value is read
+
+warning: unused variable: `sym_id`
+   --> crates\luna-semantic\src\mono.rs:612:18
+    |
+612 |             for (sym_id, ty) in current_symbol_types.iter_mut() {
+    |                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_sym_id`
+
+warning: unused variable: `pat_id`
+   --> crates\luna-semantic\src\mono.rs:627:18
+    |
+627 |             for (pat_id, ty) in current_pat_types.iter_mut() {
+    |                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_pat_id`
+
+warning: unused variable: `generic_args`
+   --> crates\luna-semantic\src\mono.rs:661:27
+    |
+661 |         let (nominal_sym, generic_args) = match &sem_ty {
+    |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_generic_args`
+
+warning: unused variable: `sym_name`
+    --> crates\luna-semantic\src\mono.rs:1457:25
+     |
+1457 |                     let sym_name = symbol.name.clone();
+     |                         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sym_name`
+
+warning: unused variable: `inner`
+    --> crates\luna-semantic\src\macro_engine.rs:1209:60
+     |
+1209 |                 TranscriberElement::Repetition { elements: inner, .. } => {
+     |                                                            ^^^^^ help: if this is intentional, prefix it with an underscore: `_inner`
+
+warning: unused variable: `sym_id`
+  --> crates\luna-semantic\src\comptime\reflect.rs:33:34
+   |
+33 |             SemanticType::Struct(sym_id, _, _) => {
+   |                                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_sym_id`
+
+warning: unused variable: `name`
+   --> crates\luna-semantic\src\lifetime.rs:227:41
+    |
+227 |     pub fn register_lifetime(&mut self, name: &str, ident: LifetimeIdent) {
+    |                                         ^^^^ help: if this is intentional, prefix it with an underscore: `_name`
+
+warning: unused variable: `assignment`
+   --> crates\luna-semantic\src\lifetime.rs:670:26
+    |
+670 |         SolveResult::Sat(assignment) => {
+    |                          ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_assignment`
+
+warning: unused variable: `ty`
+   --> crates\luna-semantic\src\lib.rs:123:13
+    |
+123 |         let ty = self.types.get(id);
+    |             ^^ help: if this is intentional, prefix it with an underscore: `_ty`
+
+warning: method `resolve_type` is never used
+    --> crates\luna-semantic\src\typechecker.rs:3862:8
+     |
+  39 | impl<'a> TypeChecker<'a> {
+     | ------------------------ method in this implementation
+...
+3862 |     fn resolve_type(&mut self, ty_id: luna_ast::TypeId) -> SemanticTypeId {
+     |        ^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `types` is never read
+   --> crates\luna-semantic\src\lifetime.rs:515:5
+    |
+511 | pub struct LifetimeValidator<'a> {
+    |            ----------------- field in this struct
+...
+515 |     types: &'a crate::ty::TypeContext,
+    |     ^^^^^
+
+warning: field `ctx` is never read
+   --> crates\luna-semantic\src\lifetime.rs:753:5
+    |
+752 | pub struct LifetimeVerifier<'a> {
+    |            ---------------- field in this struct
+753 |     ctx: &'a SemanticContext,
+    |     ^^^
+
+   Compiling luna-mvir v0.1.0 (D:\fdlang\luna-rs\crates\luna-mvir)
+warning: `luna-semantic` (lib test) generated 32 warnings (4 duplicates) (run `cargo fix --lib -p luna-semantic --tests` to apply 24 suggestions)
+warning: unused import: `Span`
+ --> crates\luna-mvir\src\interp.rs:2:34
+  |
+2 | use luna_common::ids::{SymbolId, Span};
+  |                                  ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `effect::Effect`
+ --> crates\luna-mvir\src\interp.rs:6:5
+  |
+6 |     effect::Effect,
+  |     ^^^^^^^^^^^^^^
+
+warning: unreachable pattern
+    --> crates\luna-mvir\src\generator.rs:2058:13
+     |
+2058 |             _ => unreachable!("ICE: Unhandled variant, should be impossible after semantic invariants")
+     |             ^ no value can reach this
+     |
+note: multiple earlier patterns match some of the same values
+    --> crates\luna-mvir\src\generator.rs:2058:13
+     |
+1646 |             Stmt::Expr { expr, .. } => {
+     |             ----------------------- matches some of the same values
+...
+1649 |             Stmt::Block { body, tail_expr } => {
+     |             ------------------------------- matches some of the same values
+...
+1659 |             Stmt::Return { value } => {
+     |             ---------------------- matches some of the same values
+...
+1704 |             Stmt::While { condition, body, .. } => {
+     |             ----------------------------------- matches some of the same values
+...
+2058 |             _ => unreachable!("ICE: Unhandled variant, should be impossible after semantic invariants")
+     |             ^ ...and 6 other patterns collectively make this unreachable
+     = note: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `val_id`
+    --> crates\luna-mvir\src\generator.rs:2468:34
+     |
+2468 |                     if let Some(&val_id) = self.locals.get(&sym_id) {
+     |                                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_val_id`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unreachable pattern
+    --> crates\luna-mvir\src\generator.rs:3592:13
+     |
+3592 |             _ => Operand::Boolean(false),
+     |             ^ no value can reach this
+     |
+note: multiple earlier patterns match some of the same values
+    --> crates\luna-mvir\src\generator.rs:3592:13
+     |
+3447 |             Pattern::Wildcard => Operand::Boolean(true),
+     |             ----------------- matches some of the same values
+3448 |             Pattern::Identifier { .. } => {
+     |             -------------------------- matches some of the same values
+...
+3468 |             Pattern::Enum { fields, .. } => {
+     |             ---------------------------- matches some of the same values
+...
+3510 |             Pattern::Literal(token) => {
+     |             ----------------------- matches some of the same values
+...
+3592 |             _ => Operand::Boolean(false),
+     |             ^ ...and 2 other patterns collectively make this unreachable
+
+   Compiling luna-llib v0.1.0 (D:\fdlang\luna-rs\crates\luna-llib)
+warning: `luna-semantic` (lib) generated 33 warnings (28 duplicates) (run `cargo fix --lib -p luna-semantic` to apply 3 suggestions)
+warning: `luna-mvir` (lib) generated 5 warnings (run `cargo fix --lib -p luna-mvir` to apply 3 suggestions)
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\macro_fragment_tests.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\lifetime_constraint_tests.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\lifetime_basic_tests.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\macro_expansion_tests.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\lifetime_error_tests.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\macro_hygiene_tests.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\test_annotation_system.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+  --> crates\luna-semantic\tests\test_annotation_system.rs:21:9
+   |
+21 |     let mut src_mut = src.to_string();
+   |         ----^^^^^^^
+   |         |
+   |         help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `src_mut`
+  --> crates\luna-semantic\tests\test_annotation_system.rs:21:9
+   |
+21 |     let mut src_mut = src.to_string();
+   |         ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_src_mut`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `Cursor`
+ --> crates\luna-llib\src\writer.rs:1:22
+  |
+1 | use std::io::{Write, Cursor};
+  |                      ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `BasicBlock`, `CaptureInfo`, and `ValueData`
+ --> crates\luna-llib\src\writer.rs:4:35
+  |
+4 | use luna_mvir::{Module, Function, ValueData, BasicBlock, CaptureInfo, Instruction, Terminator, Operand};
+  |                                   ^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^^
+
+warning: unused import: `MlibHeader`
+ --> crates\luna-llib\src\reader.rs:2:33
+  |
+2 | use crate::format::{LlibHeader, MlibHeader, SectionEntry, SectionType, LLIB_MAGIC, MLIB_MAGIC, LLIB_FORMAT_VERSION, MLIB_FORMAT_VERSI...
+  |                                 ^^^^^^^^^^
+
+warning: `luna-semantic` (test "lifetime_basic_tests") generated 1 warning (run `cargo fix --test "lifetime_basic_tests" -p luna-semantic` to apply 1 suggestion)
+warning: `luna-semantic` (test "lifetime_constraint_tests") generated 1 warning (run `cargo fix --test "lifetime_constraint_tests" -p luna-semantic` to apply 1 suggestion)
+warning: `luna-semantic` (test "test_annotation_system") generated 3 warnings (run `cargo fix --test "test_annotation_system" -p luna-semantic` to apply 3 suggestions)
+warning: `luna-semantic` (test "macro_fragment_tests") generated 1 warning (run `cargo fix --test "macro_fragment_tests" -p luna-semantic` to apply 1 suggestion)
+warning: `luna-semantic` (test "macro_expansion_tests") generated 1 warning (run `cargo fix --test "macro_expansion_tests" -p luna-semantic` to apply 1 suggestion)
+warning: `luna-semantic` (test "macro_hygiene_tests") generated 1 warning (run `cargo fix --test "macro_hygiene_tests" -p luna-semantic` to apply 1 suggestion)
+warning: variable does not need to be mutable
+   --> crates\luna-semantic\tests\test_lang_item_registry.rs:114:9
+    |
+114 |     let mut ctx = SemanticContext::new();
+    |         ----^^^
+    |         |
+    |         help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\struct_generics_test.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `luna-semantic` (test "lifetime_error_tests") generated 1 warning (run `cargo fix --test "lifetime_error_tests" -p luna-semantic` to apply 1 suggestion)
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\macro_type_tests.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\test_fuzz_semantic.rs:5:5
+  |
+5 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `luna-semantic` (test "test_lang_item_registry") generated 1 warning (run `cargo fix --test "test_lang_item_registry" -p luna-semantic` to apply 1 suggestion)
+warning: `luna-semantic` (test "struct_generics_test") generated 1 warning (run `cargo fix --test "struct_generics_test" -p luna-semantic` to apply 1 suggestion)
+warning: unused import: `luna_common::ids::FileId`
+ --> crates\luna-semantic\tests\p1a_tests.rs:2:5
+  |
+2 | use luna_common::ids::FileId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `luna-semantic` (test "test_fuzz_semantic") generated 1 warning (run `cargo fix --test "test_fuzz_semantic" -p luna-semantic` to apply 1 suggestion)
+warning: `luna-semantic` (test "macro_type_tests") generated 1 warning (run `cargo fix --test "macro_type_tests" -p luna-semantic` to apply 1 suggestion)
+warning: `luna-semantic` (test "p1a_tests") generated 1 warning (run `cargo fix --test "p1a_tests" -p luna-semantic` to apply 1 suggestion)
+warning: `luna-llib` (lib) generated 3 warnings (run `cargo fix --lib -p luna-llib` to apply 3 suggestions)
+warning: unused imports: `MLIB_FORMAT_VERSION` and `MLIB_MAGIC`
+ --> crates\luna-llib\tests\llib_tests.rs:2:53
+  |
+2 | use luna_llib::{MlibHeader, MlibReader, MlibWriter, MLIB_MAGIC, MLIB_FORMAT_VERSION};
+  |                                                     ^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: `luna-llib` (lib test) generated 3 warnings (3 duplicates)
+warning: `luna-llib` (test "llib_tests") generated 1 warning (run `cargo fix --test "llib_tests" -p luna-llib` to apply 1 suggestion)
+    Finished `test` profile [unoptimized] target(s) in 6.64s
+     Running unittests src\lib.rs (target\debug\deps\luna_llib-cff6e0db29ab3d4c.exe)
+
+running 9 tests
+test reader::raw_anchor_validation_tests::rejects_raw_pointer_effect_parameter_outside_function_signature ... ok
+test reader::raw_anchor_validation_tests::rejects_contract_on_non_struct_or_non_pointer_field ... ok
+test reader::raw_anchor_validation_tests::rejects_unknown_anchor_contract_version ... ok
+test reader::semantic_metadata_version_tests::older_mvir_is_rejected_before_static_data_decode ... ok
+test reader::semantic_metadata_version_tests::older_compiler_artifacts_are_rejected_before_payload_decode ... ok
+test metadata::raw_storage_anchor_interface_tests::anchor_contract_is_owned_by_type_identity_and_changes_interface_fingerprint ... ok
+test reader::semantic_metadata_version_tests::truncated_semantic_metadata_version_is_corrupt ... ok
+test reader::semantic_metadata_version_tests::old_semantic_metadata_is_rejected_before_payload_decode ... ok
+test reader::semantic_metadata_version_tests::static_initializer_rejects_truncation_and_trailing_bytes ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\llib_tests.rs (target\debug\deps\llib_tests-5318793a331b3d47.exe)
+
+running 6 tests
+test test_version_mismatch ... ok
+test test_unknown_section ... ok
+test test_mvir_version_mismatch ... ok
+test test_invalid_magic ... ok
+test test_corrupted_data ... ok
+test test_golden_roundtrip ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\luna_semantic-e224768d4785f30d.exe)
+
+running 22 tests
+test comptime::type_repr::tests::test_int_repr ... ok
+test annotation::tests::test_compiler_attrs_are_separate ... ok
+test comptime::type_repr::tests::test_pointer_type_name ... ok
+test annotation::tests::test_can_register_custom_derive ... ok
+test comptime::type_repr::tests::test_struct_type_name ... ok
+test comptime::type_repr::tests::test_primitive_type_names ... ok
+test comptime::type_repr::tests::test_struct_field_access ... ok
+test comptime::type_repr::tests::test_tuple_type_name ... ok
+test comptime::type_repr::tests::test_array_type_name ... ok
+test comptime::type_repr::tests::test_primitive_size ... ok
+test comptime::type_repr::tests::test_type_equality ... ok
+test annotation::tests::test_derive_registry_has_std_derives ... ok
+test comptime::type_repr::tests::test_type_kind ... ok
+test lifetime::tests::test_canonical_lifetime_contract_normalization ... ok
+test lifetime::tests::test_canonical_provenance_canonicalization ... ok
+test lifetime::tests::test_canonical_type_lifetime_contract_normalization ... ok
+test lifetime::tests::test_canonical_transitive_outlives ... ok
+test lifetime::tests::test_provenance_canonicalization ... ok
+test lifetime::tests::test_solver_cycle ... ok
+test lifetime::tests::test_solver_simple ... ok
+test operators::tests::char_restrictions_do_not_change_comparison_assignment_or_integer_operators ... ok
+test ty::safe_reference_shape_tests::representation_and_safe_loan_shape_are_distinct ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\lifetime_basic_tests.rs (target\debug\deps\lifetime_basic_tests-51b80fc605ef800c.exe)
+
+running 2 tests
+test test_single_origin ... ok
+test test_multi_origin ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\lifetime_constraint_tests.rs (target\debug\deps\lifetime_constraint_tests-90f66d4c7c35dcbd.exe)
+
+running 3 tests
+test test_simple_outlives ... ok
+test test_multi_outlives ... ok
+test test_provenance_and_constraints ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\lifetime_error_tests.rs (target\debug\deps\lifetime_error_tests-fa3458430da5b5d5.exe)
+
+running 3 tests
+test test_legacy_where_outlives_diagnostic ... ok
+test test_unresolved_lifetime_in_constraint ... ok
+test test_unresolved_lifetime_in_provenance ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\literal_target_width_tests.rs (target\debug\deps\literal_target_width_tests-a4edfbe35ad2e4e2.exe)
+
+running 1 test
+test target_sized_literals_use_the_selected_width_not_host_magnitude ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\macro_expansion_tests.rs (target\debug\deps\macro_expansion_tests-92565ccbaee0e7a0.exe)
+
+running 4 tests
+test test_macro_tree_matching_and_backtracking ... ok
+test test_macro_nested_delimiter_groups ... ok
+test test_macro_fragment_expr_not_swallowing_comma ... ok
+test test_macro_recursion_limit_guard ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\macro_fragment_tests.rs (target\debug\deps\macro_fragment_tests-5ceb9dc73565b70c.exe)
+
+running 5 tests
+test test_macro_fragment_meta ... ok
+test test_macro_fragment_lifetime ... ok
+test test_macro_fragment_path ... ok
+test test_macro_fragment_tt ... ok
+test test_macro_fragment_pat ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\macro_hygiene_tests.rs (target\debug\deps\macro_hygiene_tests-14e56b212fb39eb1.exe)
+
+running 6 tests
+test test_hygiene_local_variable_no_collision ... ok
+test test_hygiene_same_macro_invoked_twice ... ok
+test test_hygiene_nested_macro_expansion ... ok
+test test_hygiene_transparent_global_item_lookup ... ok
+test test_hygiene_definition_site_resolution ... ok
+test test_hygiene_argument_captures_call_site_context ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\macro_symbol_tests.rs (target\debug\deps\macro_symbol_tests-ce775276a27719dc.exe)
+
+running 5 tests
+test test_macro_symbol_declaration_and_lookup ... ok
+test test_macro_shadowing_in_inner_scope ... ok
+test test_macro_qualified_module_lookup ... ok
+test test_macro_duplicate_symbol_error ... ok
+test test_macro_not_returned_for_non_macro ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\macro_type_tests.rs (target\debug\deps\macro_type_tests-74000bf252bbff1a.exe)
+
+running 5 tests
+test test_macro_tuple_type ... ok
+test test_macro_in_type_position_pointer ... ok
+test test_macro_generating_generic_struct ... ok
+test test_macro_type_alias_generic_substitution ... ok
+test test_macro_in_function_signatures ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\nominal_declaration_order_tests.rs (target\debug\deps\nominal_declaration_order_tests-a4593423f3538389.exe)
+
+running 4 tests
+test forward_nominal_population_uses_the_declarations_lexical_scope ... ok
+test forward_generic_nominal_preserves_concrete_field_substitution ... ok
+test forward_field_population_does_not_weaken_types_or_repeat_diagnostics ... ok
+test forward_struct_fields_have_the_same_types_as_ordered_declarations ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\p0c_tests.rs (target\debug\deps\p0c_tests-1d6c85721a4c6a4c.exe)
+
+running 10 tests
+test test_monomorphization_barrier_projection ... ok
+test test_poison_containment ... ok
+test test_projection_cycle_detection ... ok
+test test_missing_impl_rejection ... ok
+test test_missing_definition_rejection ... ok
+test test_ambiguity_rejection ... ok
+test test_generic_symbolic_projection ... ok
+test test_concrete_normalization ... ok
+test test_generic_substitution_deep ... ok
+test test_associated_equality_constraint ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\p1a_tests.rs (target\debug\deps\p1a_tests-b166dea634eb1b18.exe)
+
+running 21 tests
+test test_case_10_coherence_local_vs_imported_duplicate_fail ... ok
+test test_case_11_coherence_cross_imported_providers_collision_fail ... ok
+test test_case_04_local_inherent_impl_pass ... ok
+test test_case_06_orphan_foreign_trait_primitive_fail ... ok
+test test_case_07_orphan_inherent_foreign_type_fail ... ok
+test test_case_01_local_trait_foreign_type_pass ... ok
+test test_case_08_orphan_generic_args_no_locality_fail ... ok
+test test_case_09_coherence_duplicate_exact_fail ... ok
+test test_case_05_orphan_foreign_trait_foreign_type_fail ... ok
+test test_case_02_foreign_trait_local_type_pass ... ok
+test test_case_12_coherence_primitive_duplicate_fail ... ok
+test test_case_03_foreign_trait_local_generic_struct_pass ... ok
+test test_case_13_coherence_generic_vs_concrete_overlap_fail ... ok
+test test_case_16_orphan_reference_head_fail ... ok
+test test_case_14_coherence_two_generics_overlap_fail ... ok
+test test_case_17_orphan_pointer_head_fail ... ok
+test test_case_15_coherence_non_overlapping_generics_pass ... ok
+test test_case_18_local_trait_reference_head_pass ... ok
+test test_case_19_orphan_slice_inherent_in_user_module_fail ... ok
+test test_case_20_slice_inherent_in_slice_provider_pass ... ok
+test test_case_21_slice_inherent_name_impersonation_fails ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\region_facts_tests.rs (target\debug\deps\region_facts_tests-16d038723cf0f473.exe)
+
+running 7 tests
+test facts_05_program_point_and_cfg_edge_identity ... ok
+test facts_01_dual_fact_separation ... ok
+test facts_07_multiple_use_requirements_per_region ... ok
+test facts_04_contract_region_non_realizability ... ok
+test facts_03_point_domain_bound_distinction ... ok
+test facts_06_boundary_exit_deduplication ... ok
+test facts_02_one_edge_terminates_multiple_nested_regions ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\region_gen_tests.rs (target\debug\deps\region_gen_tests-2049b634e1d38b29.exe)
+
+running 19 tests
+test region_gen_01_single_life_from ... ok
+test region_gen_04_single_input_lle_elision ... ok
+test region_gen_05_struct_holder_invariant ... ok
+test region_gen_03_explicit_requires ... ok
+test region_gen_06_reference_creation_shared_and_mut ... ok
+test region_gen_07_closure_capture_invariant ... ok
+test region_gen_08_negative_raw_pointer_rule ... ok
+test region_gen_09_three_axis_origin_preservation ... ok
+test region_gen_02_intersection_life_from ... ok
+test region_gen_10_explicit_return_contract_suppresses_lle_while_unrelated_does_not ... ok
+test region_gen_12_raw_pointer_explicit_ffi_contract ... ok
+test region_gen_11_no_lle_for_extern_fn ... ok
+test region_gen_13_semantic_identity_resolution ... ok
+test region_gen_14_local_reference_uses_inference_region ... ok
+test region_gen_16_artifact_ffi_metadata_coexist ... ok
+test region_gen_17_structural_error_handling ... ok
+test region_gen_18_structural_nesting_constraints ... ok
+test region_gen_parity_01_source_vs_llib_parity ... ok
+test region_gen_15_projected_subject_identity_preserved ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\region_ir_tests.rs (target\debug\deps\region_ir_tests-25a93d8631bb63ee.exe)
+
+running 11 tests
+test region_ir_05_equality_normalization ... ok
+test region_ir_09_deterministic_duplicate_edge_indexing ... ok
+test region_ir_03_iteration_is_static_family_identity ... ok
+test region_ir_02_lexical_regions_stable_distinct_ids ... ok
+test region_ir_07_cycles_structurally_legal ... ok
+test region_ir_01_unique_program_region ... ok
+test region_ir_08_unknown_invalid_region_id_rejected ... ok
+test region_ir_04_direct_outlives_insertion ... ok
+test region_ir_06_self_outlives_legal ... ok
+test region_ir_10_origin_and_span_preserved ... ok
+test region_ir_11_no_transitive_solver_semantics ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\region_realization_tests.rs (target\debug\deps\region_realization_tests-d9f39acce259c6f0.exe)
+
+running 15 tests
+test contract_01_uninstantiated_contract_region_rejected ... ok
+test boundary_01_borrowing_outer_data_allowed_to_cross_break ... ok
+test real_01_direct_use_requirement ... ok
+test contract_02_uninstantiated_external_region_rejected ... ok
+test point_01_branch_has_two_maximal_uses_no_unique_last_point ... ok
+test boundary_02_borrowing_iteration_local_data_cannot_cross ... ok
+test point_03_loop_cyclic_frontier ... ok
+test point_04_loop_with_downstream_exit ... ok
+test boundary_03_one_cfg_edge_terminates_multiple_nested_regions ... ok
+test real_03_equivalence_class_propagation ... ok
+test real_02_upward_propagation_outlives ... ok
+test point_02_linear_code_unique_maximal_point ... ok
+test real_04_point_domain_bound_success ... ok
+test real_05_point_domain_bound_violation ... ok
+test real_06_region_valid_at ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\region_solver_tests.rs (target\debug\deps\region_solver_tests-caeadfd3955d7ad1.exe)
+
+running 18 tests
+test solve_01_direct_outlives ... ok
+test solve_09_direct_vs_derived_non_mutating ... ok
+test solve_06_three_node_cycle_single_scc ... ok
+test solve_12_static_bound_contradiction ... ok
+test solve_05_bidirectional_equality ... ok
+test solve_07_scc_condensation_acyclic ... ok
+test solve_08_program_outlives_every_registered_region ... ok
+test solve_02_transitive_outlives ... ok
+test solve_10_proof_explanation_witness_path ... ok
+test solve_11_metadata_retention_in_proof ... ok
+test solve_03_disconnected_reachability ... ok
+test solve_04_self_relation_reflexive ... ok
+test solve_13_unrelated_graph_components ... ok
+test solve_14_deterministic_scc_canonicalization ... ok
+test solve_15_program_axiom_participates_in_equivalence ... ok
+test solve_16_positive_promotion_not_inherently_invalid ... ok
+test solve_18_axiomatic_proof_explanation ... ok
+test solve_17_fixed_lexical_promotion_rejected ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\struct_generics_test.rs (target\debug\deps\struct_generics_test-0b773a4a9ba1b80f.exe)
+
+running 1 test
+test test_normal_struct_generics ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\test_annotation_system.rs (target\debug\deps\test_annotation_system-d34e7a4ff4945fd3.exe)
+
+running 20 tests
+test test_lang_non_string_argument ... ok
+test test_lang_unauthorized ... ok
+test test_lang_duplicate_definition ... ok
+test test_lang_duplicate_symbol ... ok
+test test_lang_missing_argument ... ok
+test test_lang_wrong_target_impl ... ok
+test test_lang_wrong_target_var ... ok
+test test_lang_wrong_target_module ... ok
+test test_lang_unknown_item ... ok
+test test_lang_multiple_arguments ... ok
+test test_lang_wrong_target_struct ... ok
+test test_lang_wrong_target_type_alias ... ok
+test test_sync_noescape_invalid_on_struct ... ok
+test test_unknown_attribute_on_function ... ok
+test test_unknown_attribute_on_enum_variant ... ok
+test test_unknown_attribute_on_param ... ok
+test test_unknown_attribute_on_variable ... ok
+test test_sync_noescape_valid_on_param ... ok
+test test_unknown_attribute_on_struct ... ok
+test test_valid_frozen_lang_items ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\test_fuzz_semantic.rs (target\debug\deps\test_fuzz_semantic-4a4b6b280609dbc5.exe)
+
+running 1 test
+test test_fuzz_exhaustiveness_property ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\test_lang_item_registry.rs (target\debug\deps\test_lang_item_registry-726833f8e748c99a.exe)
+
+running 8 tests
+test test_lang_item_3_reverse_lookup ... ok
+test test_lang_item_1_registration_and_2_forward_lookup ... ok
+test test_lang_item_7_unknown_item ... ok
+test test_lang_item_5_duplicate_symbol ... ok
+test test_lang_item_4_duplicate_item ... ok
+test test_lang_item_8_missing_required ... ok
+test test_lang_item_6_wrong_target ... ok
+test test_lang_item_9_unauthorized_registration ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_llib
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_semantic
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

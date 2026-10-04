@@ -815,3 +815,78 @@ named/default calls and the remaining R3–R5 scope stay open.
 
 SKILL IMPACT: none for this follow-up. Existing semantic and capability guidance
 already requires identity-based substitution and distinct backend instances.
+
+
+## Public generic contracts and independent binders — 2026-10-05
+
+The maintainer adopted independent impl/method binders; element constraints
+belong on constrained impls rather than joining two binders by spelling. Vec's
+Eq/Clone impl constraints remain in place. Canonical public metadata now retains
+individual checked impl headers, method contracts, declaration-owned generic
+bounds, trait arguments and associated equalities/definitions. Binder identities
+use owner plus parameter position. Type interning and header ordering exclude
+session allocation IDs. Function-body locals are excluded from public exports.
+Changing a public bound invalidates dependent artifacts; renaming binders,
+reordering declarations or changing a body while preserving its public effects
+does not change the interface fingerprint.
+
+Validation also exposed missing registration of nominal/trait/method bounds,
+missing inferred-constructor bound checks and forward impl indexing. These now
+use declaration-owned generic machinery. Unknown/non-trait/inaccessible bounds,
+invalid trait argument arity and unknown associated bounds reject. Strict bound
+lookup exposed slice's undeclared std::Copy dependency; its source now explicitly
+imports the ordinary copy provider. No stdlib type-name workaround was added.
+
+Compatibility: **artifact compiler9, semantic metadata4**, format2 and MVIR4.
+Compiler1–8 artifacts reject before payload decoding. The canonical sysroot was
+explicitly rebuilt. Reader checks reject invalid binder owners/type references
+and inconsistent method contracts; this is not a complete type-graph audit.
+
+Final focused verification on Windows GNU:
+
+- [Semantic/artifact internals](evidence/r2-public-contract-internals-final.txt):
+  **206 PASS**, cargo exit0.
+- [CLI build](evidence/r2-public-contract-build-final.txt) and
+  [canonical sysroot build](evidence/r2-public-contract-sysroot-final.txt): exit0,
+  **49 provider artifacts**.
+- [CLI regression matrix](evidence/r2-public-contract-cli-final.txt): **5 harness
+  cases PASS**, cargo exit0. The new public-contract case checks 11 fingerprint
+  comparisons (8 changed contracts, 3 invariance controls), 7 native executions,
+  108 semantic check/build rejections, 16 stale-dependent artifact rejections,
+  2 corrupted-metadata controls and direct decoder retention invariants. Source
+  and relocated artifact graphs cover baseline, renamed and reversed providers;
+  artifact-only graphs have no provider source. Method/generic/trust/execution
+  dependency CLI regressions also pass.
+- [Driver regression run](evidence/r2-public-contract-driver-final.txt):
+  **45 PASS, 1 FAIL**, exit101. The failing DAG oracle expected 209 edges;
+  slice's explicit copy dependency produces 210. The test now checks duplicate
+  dependencies and acyclicity instead of freezing an incidental edge total.
+  The [DAG rerun](evidence/r2-public-contract-dag-final.txt) is **6/6 PASS**, exit0.
+  The initial driver invocation selected a nonexistent test target and ran no
+  tests; its [command error](evidence/r2-public-contract-driver.txt) is retained.
+- [Workspace compile](evidence/r2-public-contract-workspace-check.txt): exit0.
+
+Intermediate evidence is retained without replacing failed verdicts: initial
+CLI controls exposed body-local fingerprint leakage and reversed declaration
+lookup failure. The expanded matrix exposed missing nominal-bound collection.
+Later runs exposed the missing copy import and a field/declaration binder-owner
+bug introduced during the metadata rewrite. Third/fourth logs contain transient
+Rust editing errors before fixtures could execute. Corrected final results
+close these reducers, not every public ABI/layout or generic well-formedness
+domain. The last full workspace run remains **FAIL at de9977d** and predates
+compiler8/9. Target identity, closure capture destruction, named/default calls,
+broader generic/projection/layout domains and R3–R5 release gates remain open.
+
+    Compiler Change
+        Capability: Declaration-owned generic contracts, separate checked impl metadata, stable dependency fingerprints and forward impl indexing.
+        Why stdlib exposed it: Independent method binders and generic provider validation require preserved element constraints across source/artifact compilation.
+        Why it is generic: Declaration ownership and canonical type/trait shapes determine contracts; library type/provider names do not.
+        User-defined type benefiting: Holder, Bounded, Tag, First/Second, Marker and independent method binders.
+        Tests: interface_constraints_cli, method_resolution_cli, generic_typing_cli, artifact_execution_dependencies_cli, compiler_trust_diagnostics_cli_parity, semantic/reader and driver regressions.
+        New intrinsic/lang_item?: NO
+        Stdlib-specific branch?: NO
+
+SKILL IMPACT: capability validation now explicitly requires public-constraint
+fingerprints and stale-dependent rejection, with binder/order/body invariance
+controls. Portable AST rechecking cannot substitute for public dependency
+identity. No skill grants release/freeze authority.

@@ -1,0 +1,2 @@
+import "dependent";
+fn main() -> i32 { return dep::value() - 17; }

@@ -1,0 +1,4 @@
+import "provider";
+export module dep {
+    export fn value() -> i32 { dec holder = api::Holder<i32> { value: 17 }; return holder.read(); }
+}
