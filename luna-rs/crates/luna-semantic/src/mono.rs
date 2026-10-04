@@ -42,13 +42,8 @@ impl CanonicalInstanceIdentity {
                 if nominal_name == "main" || nominal_name.starts_with("__luna_") {
                     return nominal_name.to_string();
                 }
-                let mut found_sym = None;
-                for s in &symbol_table.symbols {
-                    if s.decl_id == Some(decl_id) {
-                        found_sym = Some(s);
-                        break;
-                    }
-                }
+                let found_sym = tables.decl_symbols.get(&decl_id)
+                    .map(|&symbol| symbol_table.get_symbol(symbol));
                 let mut method_substs = Vec::new();
                 let mut gp_idx = 0;
                 while let Some(&gp_sym) = tables.generic_param_symbols.get(&(decl_id, gp_idx)) {
@@ -561,64 +556,9 @@ impl<'a> MonoCollector<'a> {
                 self.current_subst.insert(sym, ty);
             }
 
-            // Remap substitution to the function's own generic param symbols.
-            // The instance.subst uses call-site generic param symbols, but the
-            // function body may use its own generic param symbols (different SymbolIds).
-            // We look up the function's generic_param_symbols and map them too.
-            if !instance.subst.is_empty() {
-                let decl_id = instance.decl_id;
-                let impl_decl_id = self.ctx.tables.decl_symbols.get(&decl_id).and_then(|&sym_id| {
-                    self.ctx.tables.method_impls.get(&sym_id).and_then(|key| {
-                        self.ctx.tables.trait_impls.get(key).and_then(|decls| decls.first().copied())
-                    })
-                });
-
-                // Collect ALL generic param SymbolIds from impl + function declarations
-                let mut scope_gp_syms = Vec::new();
-                if let Some(impl_id) = impl_decl_id {
-                    let mut impl_gp_idx = 0;
-                    while let Some(&impl_gp_sym) = self.ctx.tables.generic_param_symbols.get(&(impl_id, impl_gp_idx)) {
-                        scope_gp_syms.push(impl_gp_sym);
-                        impl_gp_idx += 1;
-                    }
-                }
-                {
-                    let mut fn_gp_idx = 0;
-                    while let Some(&fn_gp_sym) = self.ctx.tables.generic_param_symbols.get(&(decl_id, fn_gp_idx)) {
-                        scope_gp_syms.push(fn_gp_sym);
-                        fn_gp_idx += 1;
-                    }
-                }
-
-                // Positional remapping: map each scoped generic param from the ordered subst
-                for (idx, &gp_sym) in scope_gp_syms.iter().enumerate() {
-                    if idx < instance.subst.len() {
-                        let (_, concrete_ty) = instance.subst[idx];
-                        self.current_subst.insert(gp_sym, concrete_ty);
-                    }
-                }
-
-                // Name-based remapping: for each subst entry, find any scoped generic param
-                // with a matching name that hasn't been mapped yet, and map it too.
-                // This handles cases where the function body references generic params via
-                // different SymbolIds (e.g., from trait declarations) that share the same name.
-                for &(sym, ty) in &instance.subst {
-                    let sym_name = if (sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                        self.ctx.symbol_table.symbols[sym.0 as usize].name.clone()
-                    } else { continue };
-                    if sym_name.is_empty() { continue; }
-                    for &gp_sym in &scope_gp_syms {
-                        if !self.current_subst.map.contains_key(&gp_sym) {
-                            let gp_name = if (gp_sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                                &self.ctx.symbol_table.symbols[gp_sym.0 as usize].name
-                            } else { continue };
-                            if *gp_name == sym_name {
-                                self.current_subst.insert(gp_sym, ty);
-                            }
-                        }
-                    }
-                }
-            }
+            // Call resolution records the selected declaration's binder IDs.
+            // Rebinding by spelling or incidental position can alias a method
+            // binder with an impl binder (and can choose a different impl).
 
             if let Some(&sym_id) = self.ctx.tables.decl_symbols.get(&instance.decl_id) {
                 if let Some(&ty) = self.ctx.tables.symbol_types.get(&sym_id) {
@@ -1168,7 +1108,6 @@ impl<'a> MonoCollector<'a> {
         subst: Vec<(SymbolId, SemanticTypeId)>,
     ) -> Vec<(SymbolId, SemanticTypeId)> {
         let mut ordered = Vec::new();
-        let mut used = vec![false; subst.len()];
 
         let mut expected_symbols = Vec::new();
         if let Some(impl_id) = impl_decl_id {
@@ -1185,40 +1124,10 @@ impl<'a> MonoCollector<'a> {
         }
 
         for &exp_sym in &expected_symbols {
-            let exp_name = if (exp_sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                &self.ctx.symbol_table.symbols[exp_sym.0 as usize].name
-            } else {
-                continue;
-            };
-            let mut found = subst.iter().enumerate()
-                .find(|(i, (sym, _))| !used[*i] && *sym == exp_sym)
-                .map(|(i, pair)| (i, *pair));
-            if found.is_none() {
-                for (i, (s, ty)) in subst.iter().enumerate() {
-                    if !used[i] {
-                    let s_name = if (s.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                        &self.ctx.symbol_table.symbols[s.0 as usize].name
-                    } else {
-                        ""
-                    };
-                    if s_name == exp_name {
-                        found = Some((i, (*s, *ty)));
-                        break;
-                    }
-                }
-                }
-            }
-            if let Some((i, (_s, ty))) = found {
-                used[i] = true;
+            if let Some(&(_, ty)) = subst.iter().find(|(symbol, _)| *symbol == exp_sym) {
                 ordered.push((exp_sym, ty));
-            } else if let Some(&sub_ty) = self.current_subst.get(exp_sym) {
-                ordered.push((exp_sym, sub_ty));
-            } else {
-                let gen_ty = self.ctx.types.intern(SemanticType::GenericParam(exp_sym));
-                let sub_ty = self.ctx.types.subst(gen_ty, &self.current_subst);
-                if sub_ty != gen_ty {
-                    ordered.push((exp_sym, sub_ty));
-                }
+            } else if let Some(&ty) = self.current_subst.get(exp_sym) {
+                ordered.push((exp_sym, ty));
             }
         }
 
@@ -1245,23 +1154,8 @@ impl<'a> MonoCollector<'a> {
         }
 
         if expected_symbols.is_empty() {
-            for (i, pair) in subst.into_iter().enumerate() {
-                if !used[i] {
-                    let name = if (pair.0.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                        &self.ctx.symbol_table.symbols[pair.0.0 as usize].name
-                    } else {
-                        ""
-                    };
-                    if !name.is_empty() && !ordered.iter().any(|(s, _)| {
-                        if (s.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                            self.ctx.symbol_table.symbols[s.0 as usize].name == *name
-                        } else {
-                            false
-                        }
-                    }) {
-                        ordered.push(pair);
-                    }
-                }
+            for pair in subst {
+                if !ordered.iter().any(|(symbol, _)| *symbol == pair.0) { ordered.push(pair); }
             }
         }
 
@@ -1276,36 +1170,7 @@ impl<'a> MonoCollector<'a> {
             crate::ty::SemanticType::GenericParam(gp_sym) => {
                 if let Some(&new_id) = self.current_subst.get(gp_sym) {
                     if new_id == resolved { resolved } else { self.substitute(new_id) }
-                } else {
-                    // Name fallback
-                    let gp_name = if (gp_sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                        self.ctx.symbol_table.symbols[gp_sym.0 as usize].name.clone()
-                    } else {
-                        String::new()
-                    };
-                    if gp_name.is_empty() {
-                        resolved
-                    } else {
-                        let mut found = None;
-                        for (&sym, &concrete_ty) in &self.current_subst.map {
-                            let sym_name = if (sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                                &self.ctx.symbol_table.symbols[sym.0 as usize].name
-                            } else {
-                                continue;
-                            };
-                            if *sym_name == gp_name {
-                                found = Some(concrete_ty);
-                                break;
-                            }
-                        }
-                        if let Some(concrete_ty) = found {
-                            self.current_subst.insert(gp_sym, concrete_ty);
-                            self.substitute(concrete_ty)
-                        } else {
-                            resolved
-                        }
-                    }
-                }
+                } else { resolved }
             }
             crate::ty::SemanticType::Struct(sym, args, fields) => {
                 let new_args: Vec<_> = args.iter().map(|&a| self.substitute(a)).collect();
@@ -1743,20 +1608,9 @@ impl<'a> MonoCollector<'a> {
                             if let Some(subst) = self.ctx.tables.expr_substs.get(expr_id).cloned() {
                                 for (sym, ty) in subst.map {
                                     let sub_ty = self.substitute(ty);
-                                    let sym_name = if (sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                                        &self.ctx.symbol_table.symbols[sym.0 as usize].name
-                                    } else {
-                                        ""
-                                    };
-                                    if !subst_pairs.iter().any(|(s, _)| {
-                                        if (s.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                                            &self.ctx.symbol_table.symbols[s.0 as usize].name == sym_name
-                                        } else {
-                                            *s == sym
-                                        }
-                                    }) {
-                                        subst_pairs.push((sym, sub_ty));
-                                    }
+                                if let Some((_, existing)) = subst_pairs.iter_mut().find(|(symbol, _)| *symbol == sym) {
+                                    *existing = sub_ty;
+                                } else { subst_pairs.push((sym, sub_ty)); }
                                 }
                             }
                             let instance_subst = self.order_subst_for_decl(decl_id, concrete_impl, subst_pairs);
@@ -1857,7 +1711,16 @@ impl<'a> MonoCollector<'a> {
                         }
                     }
 
-                    let (target_decl_id, target_impl_id, instance_subst) = if let Some(trait_sym) = trait_owner_opt {
+                    let selected_impl = self.ctx.tables.method_sym_to_impl_decl.get(&sym_id).copied()
+                        .or_else(|| self.ctx.tables.symbol_decls.get(&sym_id)
+                            .and_then(|declaration| self.ctx.tables.method_to_impl_decl.get(declaration)).copied());
+                    let is_trait_declaration = self.ctx.tables.trait_methods.values().any(|methods| methods.contains(&sym_id));
+                    let (target_decl_id, target_impl_id, instance_subst) = if selected_impl.is_some() && !is_trait_declaration {
+                        // Semantic selection is final. A concrete impl method
+                        // must not be replaced by a later same-head/return match.
+                        (self.ctx.tables.symbol_decls.get(&sym_id).copied(), selected_impl,
+                         call_substs.into_iter().collect())
+                    } else if let Some(trait_sym) = trait_owner_opt {
                         let (concrete_decl, concrete_impl, impl_subst) = self.resolve_trait_impl_method(
                             trait_sym,
                             sym_id,
@@ -1914,30 +1777,19 @@ impl<'a> MonoCollector<'a> {
                         (target_decl, concrete_impl, subst_pairs)
                     } else {
                         let mut impl_subst = crate::ty::Substitution::new();
-                        let inherent_impl = self.ctx.tables.method_impls.get(&sym_id).and_then(|key| {
-                            if let Some(&pattern_ty) = self.ctx.tables.impl_self_types.get(key) {
-                                self.match_types(pattern_ty, peeled_sub_ty, &mut impl_subst);
-                            }
-                            self.ctx.tables.trait_impls.get(key).and_then(|decls| decls.first().copied())
-                        });
+                        let inherent_impl = self.ctx.tables.method_sym_to_impl_decl.get(&sym_id).copied()
+                            .or_else(|| self.ctx.tables.symbol_decls.get(&sym_id)
+                                .and_then(|declaration| self.ctx.tables.method_to_impl_decl.get(declaration)).copied());
+                        if let Some(header) = inherent_impl.and_then(|implementation| self.ctx.tables.checked_impl_headers.get(&implementation)) {
+                            self.ctx.matches_impl_pattern(header.self_type, peeled_sub_ty, &header.generic_params, &mut impl_subst);
+                        }
                         let mut subst_pairs: Vec<(SymbolId, SemanticTypeId)> = impl_subst.map.into_iter().map(|(k, v)| (k, self.substitute(v))).collect();
                         if let Some(subst) = self.ctx.tables.expr_substs.get(expr_id).cloned() {
                             for (sym, ty) in subst.map {
                                 let sub_ty = self.substitute(ty);
-                                let sym_name = if (sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                                    &self.ctx.symbol_table.symbols[sym.0 as usize].name
-                                } else {
-                                    ""
-                                };
-                                if !subst_pairs.iter().any(|(s, _)| {
-                                    if (s.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                                        &self.ctx.symbol_table.symbols[s.0 as usize].name == sym_name
-                                    } else {
-                                        *s == sym
-                                    }
-                                }) {
-                                    subst_pairs.push((sym, sub_ty));
-                                }
+                                if let Some((_, existing)) = subst_pairs.iter_mut().find(|(symbol, _)| *symbol == sym) {
+                                    *existing = sub_ty;
+                                } else { subst_pairs.push((sym, sub_ty)); }
                             }
                         }
                         (self.ctx.tables.symbol_decls.get(&sym_id).copied(), inherent_impl, subst_pairs)

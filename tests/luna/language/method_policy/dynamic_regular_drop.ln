@@ -1,0 +1,10 @@
+trait Ordinary { fn drop(self: &Self) -> i32; }
+struct Token {};
+impl Ordinary for Token { fn drop(self: &Self) -> i32 { return 7; } }
+fn main() -> i32 {
+    dec token = Token {};
+    dec view: &dyn Ordinary = &token;
+    if view.drop() != 7 { return 1; }
+    if token.drop() != 7 { return 2; }
+    return 0;
+}

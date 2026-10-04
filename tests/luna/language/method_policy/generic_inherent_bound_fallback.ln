@@ -1,0 +1,17 @@
+trait Marker {} 
+trait Fallback { fn value(self: &Self) -> i32; }
+struct Wrapper<T> { item: T };
+impl<T: Marker> Wrapper<T> { fn value(self: &Self) -> i32 { return 30; } }
+impl<T> Fallback for Wrapper<T> { fn value(self: &Self) -> i32 { return 7; } }
+fn call<T>(value: &Wrapper<T>) -> i32 { return value.value(); }
+struct Marked {};
+impl Marker for Marked {}
+fn marked<T: Marker>(value: &Wrapper<T>) -> i32 { return value.value(); }
+fn main() -> i32 {
+    dec plain = Wrapper<i32> { item: 1 };
+    if call(&plain) != 7 { return 1; }
+    dec item = Marked {};
+    dec valid = Wrapper<Marked> { item: item };
+    if marked(&valid) != 30 { return 2; }
+    return 0;
+}

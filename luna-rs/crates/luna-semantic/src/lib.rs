@@ -64,6 +64,7 @@ pub enum NeedsDropState {
     No,
 }
 
+#[derive(Clone)]
 pub struct SemanticContext {
     /// Pointer width of the compilation target. The native-only driver defaults
     /// to its native width; explicit semantic target contexts may override it.

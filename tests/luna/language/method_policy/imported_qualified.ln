@@ -1,0 +1,7 @@
+import "trait_provider";
+fn main() -> i32 {
+    dec token = imported::Token {};
+    if imported::Left::value(&token) != 7 { return 1; }
+    if imported::Right::value(&token) != 17 { return 2; }
+    return 0;
+}

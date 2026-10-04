@@ -1,0 +1,10 @@
+trait Number { fn value(self: &Self) -> i32; }
+trait Truth { fn value(self: &Self) -> bool; }
+struct Token {};
+impl Number for Token { fn value(self: &Self) -> i32 { return 7; } }
+impl Truth for Token { fn value(self: &Self) -> bool { return true; } }
+fn main() -> i32 {
+    dec token = Token {};
+    dec result: i32 = token.value();
+    return result;
+}

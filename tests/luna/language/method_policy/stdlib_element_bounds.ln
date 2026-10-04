@@ -1,0 +1,21 @@
+import <vec>;
+import <clone>;
+import <cmp>;
+struct Item { value: i32 };
+impl std::Clone for Item { fn clone(self: &Self) -> Self { return Item { value: self.value }; } }
+impl std::Eq for Item { fn eq(self: &Self, other: &Self) -> bool { return self.value == other.value; } }
+fn main() -> i32 {
+    dec rw values = std::vec_new<Item>();
+    values.push(Item { value: 7 });
+    values.resize(3u64, Item { value: 7 });
+    if values.len() != 3u64 { return 1; }
+    values.dedup();
+    if values.len() != 1u64 { return 2; }
+    dec rw source = std::vec_new<Item>();
+    source.push(Item { value: 9 });
+    values.extend_from_slice(source.as_slice());
+    if values.len() != 2u64 { return 3; }
+    values.dedup_i32();
+    if values.len() != 2u64 { return 4; }
+    return 0;
+}

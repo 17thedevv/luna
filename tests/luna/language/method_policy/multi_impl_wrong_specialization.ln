@@ -1,0 +1,5 @@
+import "multi_impl_provider";
+fn main() -> i32 {
+    dec pair = split::Pair<i16, u64> { first: 3i16, second: 5u64 };
+    return pair.fixed();
+}

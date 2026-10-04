@@ -1,0 +1,7 @@
+module imported {
+    export trait Left { fn value(self: &Self) -> i32; }
+    export trait Right { fn value(self: &Self) -> i32; }
+    export struct Token {};
+    impl Right for Token { fn value(self: &Self) -> i32 { return 17; } }
+    impl Left for Token { fn value(self: &Self) -> i32 { return 7; } }
+}

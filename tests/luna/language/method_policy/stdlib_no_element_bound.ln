@@ -1,0 +1,8 @@
+import <vec>;
+struct Item { value: i32 };
+fn main() -> i32 {
+    dec rw values = std::vec_new<Item>();
+    values.push(Item { value: 7 });
+    values.dedup();
+    return 0;
+}

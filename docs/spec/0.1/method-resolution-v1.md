@@ -34,6 +34,27 @@ resolves its implementation under ordinary trait/generic rules. It is not
 shadowed by a same-named inherent method. This contract adds no keyword or
 alternate receiver syntax.
 
+## Generic binder identity
+
+Adopted by the maintainer on 2026-10-05: impl and method generic parameters
+are independent binders. Repeating a spelling in the method declaration does
+not constrain or alias the impl parameter. Substitution follows declaration
+identity and parameter position within that declaration, never name matching
+between unrelated binders.
+
+Element requirements belong on the corresponding impl, for example
+`impl<T: std::Eq> Vec<T> { fn dedup(self: &rw Self) ... }`. A method may declare
+its own generic arguments independently, including a parameter that shadows an
+impl parameter. An omitted method type argument must be inferred under ordinary
+typing rules or rejected; a same-named impl parameter is not an inference source.
+Generic caller parameters must establish required bounds from their contracts;
+being symbolic does not automatically satisfy a bound.
+
+The selected impl header, binder identities and method declaration must survive
+provider reconstruction and monomorphization. Grouping candidates by nominal
+head must not replace individual checked headers. Later stages must preserve
+semantic selection rather than choosing another candidate by result type.
+
 ## Acceptance boundary
 
 Require inherent/trait, two-trait ambiguity, explicit qualification, receiver

@@ -1,0 +1,2 @@
+import "trait_provider";
+fn main() -> i32 { dec token = imported::Token {}; return token.value(); }

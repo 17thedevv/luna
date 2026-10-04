@@ -82,6 +82,11 @@ candidate reject as ambiguous. Explicit trait qualification selects that trait.
 Local and imported candidates follow the same rule; iteration order and expected
 return type cannot silently choose between ambiguous traits.
 
+Impl and method generic parameters have independent declaration identities,
+including when they use the same spelling. An element constraint belongs on its
+impl binder; spelling-based substitution between binders is forbidden. The
+2026-10-05 amendment in METHOD-RESOLUTION-v1 records this maintainer decision.
+
 `dyn Trait` follows the adopted object-safety restrictions: generic trait methods,
 associated-type traits and supertrait composition are not silently admitted as
 supported dynamic interfaces. Defined unsizing admits only the specified

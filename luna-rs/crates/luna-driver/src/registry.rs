@@ -108,6 +108,8 @@ pub struct ProviderInterface {
     pub impl_associated_types:
         HashMap<(ExternalImplKey, CanonicalSymbolId), luna_semantic::ty::SemanticTypeId>,
     pub impl_self_types: HashMap<ExternalImplKey, luna_semantic::ty::SemanticTypeId>,
+    /// Compilation-local checked headers reconstructed from source/portable AST.
+    pub checked_impl_headers: HashMap<luna_ast::DeclId, luna_semantic::semantic_tables::CheckedImplHeader>,
     pub impl_generic_params: HashMap<ExternalImplKey, Vec<CanonicalSymbolId>>,
     pub impl_generic_param_symbols: Vec<ExternalSymbol>,
     pub trait_associated_type_symbols: Vec<ExternalSymbol>,
@@ -824,6 +826,13 @@ impl ModuleRegistry {
                 let new_gp = lookup_sym(old_gp);
                 ctx.tables.generic_param_symbols.insert((decl_id, idx), new_gp);
             }
+            for (&declaration, header) in &interface.checked_impl_headers {
+                ctx.tables.checked_impl_headers.insert(declaration,
+                    luna_semantic::semantic_tables::CheckedImplHeader {
+                        self_type: ctx.types.clone_type_from(header.self_type, &interface.types, &lookup_sym),
+                        generic_params: header.generic_params.iter().map(|&symbol| lookup_sym(symbol)).collect(),
+                    });
+            }
             for (&m_decl, &i_decl) in &interface.method_to_impl_decl {
                 ctx.tables.method_to_impl_decl.insert(m_decl, i_decl);
                 if let Some(&m_sym) = ctx.tables.decl_symbols.get(&m_decl) {
@@ -1481,6 +1490,9 @@ impl ModuleRegistry {
             trait_associated_types,
             impl_associated_types,
             impl_self_types,
+            checked_impl_headers: ctx.tables.checked_impl_headers.iter()
+                .filter(|(declaration, _)| ranges.decls.contains(&declaration.0))
+                .map(|(&declaration, header)| (declaration, header.clone())).collect(),
             impl_generic_params,
             impl_generic_param_symbols,
             trait_associated_type_symbols,
