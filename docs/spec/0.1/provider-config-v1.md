@@ -4,6 +4,9 @@ Contract ID: **PROVIDER-CONFIG-v1**. Maintainer-requested alpha scope, 2026-10-0
 Status: **IMPLEMENTED / CLI SOURCE-ARTIFACT MATRIX PASS** on Windows x86_64 GNU.
 Workspace snapshots and final targeted regressions are tracked in the [verification record](../../audits/alpha-modules-2026-10-03/README.md).
 This status does not certify other targets or the overall alpha release.
+Maintainer amendment, **2026-10-04**: file values are relative-only. This
+supersedes the absolute-path permission in the initial `4a5adf4` implementation;
+see the [relative-only verification record](../../audits/provider-config-relative-2026-10-04/README.md).
 `luna.toml` supplies optional provider discovery bindings. Existing local
 imports, external provider lookup, source/artifact loading and namespace
 semantics remain available. This is not a package version/dependency solver.
@@ -21,9 +24,21 @@ math = "../../libraries/numeric/math"
 Each key is a single Luna provider-name identifier; each value is a nonempty
 path string to a provider **stem**, omitting `.ln`/`.llib` as existing imports do.
 The first mapping locates `../shared/geometry.ln` or
-`../shared/geometry.llib`. Absolute paths are allowed for local setups; relative
-paths are recommended for portability. `..` is allowed. No environment-variable
-expansion, home expansion, globbing or implicit directory scan is performed.
+`../shared/geometry.llib`.
+
+**All provider paths in `luna.toml` MUST be relative paths resolved against the
+directory containing the selected `luna.toml`. Absolute paths, drive-qualified
+paths and filesystem-root paths MUST be rejected with E6008.** This applies to
+unused entries too, and foreign path syntax must reject independently of the
+host OS. `..` is allowed: `libs/math`, `../shared/geometry` and
+`../../common/foo` are valid stems. Use `/` as the canonical separator, including
+on Windows, to avoid TOML backslash escaping and host-dependent interpretation.
+
+Reject POSIX roots (`/home/user/foo`), Windows roots (`\foo`), drive-qualified
+forms (`C:/dev/foo`, `C:foo`, `C:`), UNC roots and device/extended prefixes.
+Home prefixes (`~`, `~user`), environment marker characters (`$`, `%`) and
+control characters are configuration errors; no expansion is performed.
+Globbing and implicit directory scanning are not performed.
 Alpha introduces file-provider mappings only; it does not add a new directory
 package format. Omitted `schema` means 1. Unknown schema, unknown fields,
 duplicate keys, invalid names, empty paths and paths with provider extensions
@@ -59,8 +74,13 @@ it, execute it or expose any of its declarations.
 3. Support explicit CLI `--config <file>` and `--no-config` for these three
    commands. They are mutually exclusive; an explicit missing/invalid file is
    an error. `--no-config` uses existing discovery only.
-4. Resolve relative mapping paths against the selected TOML file's parent,
-   regardless of the caller's cwd, entry-file location or transitive importer.
+4. Validate each mapping as a relative file value, then resolve it against the
+   selected TOML file's absolute parent, regardless of the caller's cwd,
+   entry-file location or transitive importer. The resulting internal `PathBuf`
+   may be absolute. This restriction applies to values inside TOML, not the
+   `--config FILE` argument, `-I`/`--search-path`, or typed driver inputs.
+   Those may still contain absolute machine-local paths. No `luna.local.toml`
+   override format is introduced in 0.1.
 5. No config is required. With none, behavior is the existing import/search-path
    behavior. Official `build-sysroot` continues to use `sysroot.toml` and does not
    discover project `luna.toml` automatically.
@@ -116,6 +136,9 @@ Both additions preserve [provider versus namespace separation](modules.md).
 | Nested config, explicit config, disabled config | Nearest-only/explicit/disabled policy; no implicit merge |
 | Config beside a transitive provider | Does not replace active invocation configuration |
 | Malformed TOML/schema/name/path; duplicate key; sysroot collision | Typed configuration error with key/file location |
+| Absolute/rooted/drive-relative/UNC/device value, even unused | E6008 before provider discovery, on every host |
+| Home/environment marker or control character in path | E6008; never expand |
+| `../` and `../../` values with an absolute `--config FILE`; different cwd | Resolve from config directory; check/build/run preserved |
 | Unused missing mapping; imported missing mapping | First does not load; second rejects without fallback |
 | Artifact and source both exist; artifact is stale or malformed | Existing artifact precedence; invalid selection rejects |
 | Two names select the same provider; dependency cycle | Stable single provider identity; cycles reject |

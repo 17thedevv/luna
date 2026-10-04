@@ -388,10 +388,79 @@ fn alpha_modules_source_and_fresh_artifact_contracts() {
                 shared.join("geometry").to_string_lossy().replace('\\', "/")
             ),
         );
-        accepted(
-            &cli(root, &work, "run", &input, &[]),
-            "absolute provider stem",
+        for command in ["check", "build", "run"] {
+            rejected(
+                &cli(root, &work, command, &input, &[]),
+                "E6008",
+                "existing absolute provider stem rejects before discovery",
+            );
+        }
+        // Do not let the host's Path implementation decide foreign path syntax.
+        // An unused mapping must still reject; no filesystem read is needed.
+        for forbidden in [
+            "C:/dev/foo",
+            r"D:\libs\foo",
+            "C:relative/foo",
+            "C:",
+            "/home/user/foo",
+            r"\rooted\foo",
+            r"\\server\share\foo",
+            "//server/share/foo",
+            r"\\?\C:\dev\foo",
+            r"\\.\device",
+            "~",
+            "~/libs/foo",
+            "~user/libs/foo",
+            "$HOME/libs/foo",
+            "${HOME}/libs/foo",
+            "%USERPROFILE%/libs/foo",
+            "libs/$ROOT/foo",
+            "libs/%ROOT%/foo",
+        ] {
+            write(
+                &config,
+                &format!("[providers]\ngeo = 'shared/geometry'\nunused = '{forbidden}'\n"),
+            );
+            for command in ["check", "build", "run"] {
+                let output = cli(root, &std::env::temp_dir(), command, &input, &[]);
+                rejected(&output, "E6008", forbidden);
+                let rendered = String::from_utf8_lossy(&output.stderr);
+                assert!(
+                    rendered.contains("luna.toml") && rendered.contains("unused ="),
+                    "configuration value location missing: {}",
+                    render(&output)
+                );
+            }
+        }
+        write(
+            &config,
+            "[providers]\ngeo = 'shared/geometry'\nunused = \"libs/\\nfoo\"\n",
         );
+        rejected(
+            &cli(root, &work, "check", &input, &[]),
+            "E6008",
+            "escaped path control character",
+        );
+        // Explicit config files may themselves be absolute. Relative values
+        // including ../ and ../../ resolve from that file, independent of cwd.
+        for (directory, stem) in [
+            ("config_one", "../shared/geometry"),
+            ("config_one/deeper", "../../shared/geometry"),
+        ] {
+            let alternate = work.join(directory).join("luna.toml");
+            write(&alternate, &format!("[providers]\ngeo = '{stem}'\n"));
+            for command in ["check", "build", "run"] {
+                let output = work.join(format!("relative_{}.exe", directory.replace('/', "_")));
+                let mut args = vec!["--config", alternate.to_str().unwrap()];
+                if command == "build" {
+                    args.extend(["-o", output.to_str().unwrap()]);
+                }
+                accepted(
+                    &cli(root, &std::env::temp_dir(), command, &input, &args),
+                    "relative parent path and absolute config argument",
+                );
+            }
+        }
         write(&config, config_text);
         // Artifact precedence is strict even when valid source is beside corrupt binary.
         let broken = shared.join("geometry.llib");

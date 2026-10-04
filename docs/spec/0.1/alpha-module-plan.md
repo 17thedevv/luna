@@ -48,3 +48,13 @@ new namespace keyword, auto-import, transitive config merging or backend shortcu
 Update the [contract chapters](README.md), [gap register](gaps.md), status and
 public documentation after evidence exists. Do not replace historical logs or
 call these features implemented because their grammar/specification was updated.
+
+## Relative-only amendment — 2026-10-04
+
+The maintainer tightened PROVIDER-CONFIG-v1 before freeze: provider values inside
+`luna.toml` must be relative, including unused entries. Reject absolute, rooted,
+drive-qualified, UNC/device, home/environment and control-character forms at the
+CLI loader with E6008. Keep absolute `--config`/search-path arguments and resolved
+driver inputs. Cover `../` and `../../`, cwd independence and source/fresh-artifact
+modes through the existing public CLI matrix. No semantic/backend or package
+manager changes are needed. See the [amendment verification](../../audits/provider-config-relative-2026-10-04/README.md).

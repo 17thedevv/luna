@@ -78,6 +78,8 @@ silently adopt package-manager policy or rebuild a stale library on import.
 bindings for `import <name>`. The CLI selects the nearest configuration from the
 entry file, or uses `--config FILE` / `--no-config`. A single selected table
 applies to the entire invocation, including transitive imports. Relative paths
-are based on the configuration directory. Existing `import "path"` remains
+must be relative file values based on the configuration directory. Absolute,
+drive-qualified/rooted values reject with E6008; internal absolute driver inputs
+and CLI search paths remain supported. Existing `import "path"` remains
 relative to its importing file. Configuration keys select providers, not
 namespace names, and cannot override sysroot names or aliases.
