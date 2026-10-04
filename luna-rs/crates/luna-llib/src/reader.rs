@@ -1008,14 +1008,16 @@ mod semantic_metadata_version_tests {
     use crate::MlibError;
 
     #[test]
-    fn old_execution_identity_protocol_is_rejected_before_payload_decode() {
-        let mut header = crate::format::LlibHeader::new();
-        header.compiler_version = crate::format::LLIB_COMPILER_VERSION - 1;
-        let mut bytes = Vec::new();
-        header.write_to(&mut bytes).unwrap();
-        let mut reader = std::io::Cursor::new(bytes);
-        assert!(matches!(super::LlibReader::read_manifest(&mut reader),
-            Err(MlibError::VersionMismatch(version)) if version == header.compiler_version));
+    fn older_compiler_artifacts_are_rejected_before_payload_decode() {
+        for old_version in 1..crate::format::LLIB_COMPILER_VERSION {
+            let mut header = crate::format::LlibHeader::new();
+            header.compiler_version = old_version;
+            let mut bytes = Vec::new();
+            header.write_to(&mut bytes).unwrap();
+            let mut reader = std::io::Cursor::new(bytes);
+            assert!(matches!(super::LlibReader::read_manifest(&mut reader),
+                Err(MlibError::VersionMismatch(version)) if version == header.compiler_version));
+        }
     }
 
     #[test]
