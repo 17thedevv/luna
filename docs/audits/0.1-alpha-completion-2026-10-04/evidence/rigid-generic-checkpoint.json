@@ -1,0 +1,84 @@
+{
+  "revision": "1bf0365879707ab11f665aa6a22cf776f69ff6ff",
+  "previous_checkpoint": "9daad1abbc23714f8dd09910bf21c3e9be601688",
+  "recorded_utc": "2026-10-04T19:13:14.012755+00:00",
+  "target": "x86_64-pc-windows-gnu",
+  "artifact_versions": {
+    "compiler": 7,
+    "format": 2,
+    "metadata": 3,
+    "mvir": 4
+  },
+  "cli_sha256": "a2775315decb2bb14fc851753072176ad73d64a4625d58c5fbc3660aec744db6",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "source_blobs": {
+    ".agents/skills/luna-semantic-compliance/SKILL.md": "1d47633917eb8d6741037392c54e97476ad0ac78",
+    "docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md": "82387f936e0bc32d53d94350e3c6d1a755416773",
+    "docs/spec/0.1/gaps.md": "0b7305e20dbec0fe399f97536a5d08b1f353fc92",
+    "docs/spec/0.1/semantics.md": "6f25397aa1ceb329bde22383265011c79093e71f",
+    "luna-rs/crates/luna-cli/tests/generic_typing_cli.rs": "59679196ded0aa549919d12465bb31875574aabd",
+    "luna-rs/crates/luna-cli/tests/support/stdlib.rs": "06fdef9f4d4f518e055960e14a33e2768a027bd7",
+    "luna-rs/crates/luna-llib/src/format.rs": "f208b661656341be6725646da12c5f0b4b379089",
+    "luna-rs/crates/luna-parser/src/expr.rs": "2643e00998eb4370e64f9fe5b65715d1dceb8032",
+    "luna-rs/crates/luna-parser/tests/struct_syntax_acceptance_tests.rs": "64a9275c6970362c431ff19037418d1fafa4d360",
+    "luna-rs/crates/luna-semantic/src/method_resolution.rs": "3ba94ca7129a7a8486a8e1c0dec8e6ff101f069f",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "c64ad2b6f05c935b7e3cc0e38655b028b3ec9559",
+    "tests/luna/language/generic_typing/boolean_not_observation.ln": "afe7245d4a6d021826bf5addcc23daf8b1807c4e",
+    "tests/luna/language/generic_typing/consumer.ln": "f7fc889f61d25341764b8644d76a529ed8b1918e",
+    "tests/luna/language/generic_typing/explicit_argument_reject.ln": "76f56e0f3fab00c6262403114c457b5db616289c",
+    "tests/luna/language/generic_typing/literal_return_reject.ln": "df5c597b0c19b8a011c6e4ff582158459d5af307",
+    "tests/luna/language/generic_typing/local_initializer_reject.ln": "ecc0cd6b4ad2a7a828c903a74f1fedd33b4a825a",
+    "tests/luna/language/generic_typing/nested_struct_literal_required_accept.ln": "2e4c38cecadbbfbaa0987b2264f368a190989b8f",
+    "tests/luna/language/generic_typing/provider.ln": "68670d8c7f9499b11e2526a49ac53d04233741e9",
+    "tests/luna/language/generic_typing/struct_initializer_reject.ln": "1eb421997517f2af21ba5c6281b40343d3b33391",
+    "tests/luna/language/generic_typing/unrelated_binder_reject.ln": "25fbc846c7b4a91a49fa60ed1fd7e3f521fc39b2"
+  },
+  "logs": {
+    "r2-rigid-check.txt": "2bdaebc32208565e41cc9e0a6b2c4c63e28edc255775456a8df492a7de46afa0",
+    "r2-rigid-cli-initial.txt": "b7937638bea786d6ec837f645c2c271bf2dee08c54c2d376656d6fc217c9b3c1",
+    "r2-rigid-format-trait.txt": "4dec6ffd56adfecac06e6163765aa88ccb45ed4555e905288eb0f902954de75f",
+    "r2-rigid-internals.txt": "e9dc7f8b7bd6426c658331c2c1f0674b54ff48fc73ef35973336b6a75e7aff92",
+    "r2-rigid-parser.txt": "7188479ca201fa3357a31fe7b611ef634c54be23aa0d91b4e2b1636d85cdc8d5",
+    "r2-rigid-sysroot.txt": "f55784f3ed2c1a596fac555bcce865eef4b17672ffef118a22c819b6da6a9563"
+  },
+  "verification": {
+    "parser": {
+      "passed": 37,
+      "exit": 0
+    },
+    "semantic_and_artifact": {
+      "passed": 206,
+      "exit": 0
+    },
+    "canonical_sysroot": {
+      "providers_built": 49,
+      "exit": 0
+    },
+    "workspace_check": {
+      "exit": 0
+    },
+    "initial_cli": {
+      "exit": 101,
+      "failed": "parallel formatting temp-root collision",
+      "trait_target": "not reached"
+    },
+    "format_trait_rerun": {
+      "passed": 3,
+      "exit": 0
+    },
+    "generic_matrix": {
+      "native_executions": 4,
+      "typed_rejections": 24
+    },
+    "method_matrix": {
+      "native_executions": 88,
+      "typed_rejections": 176
+    }
+  },
+  "limitations": [
+    "Focused checks do not close the previous full-workspace FAIL or approve release.",
+    "Initial CLI evidence predates the atomic temporary-root repair; compiler sources are unchanged between those CLI runs.",
+    "The new CLI harness was subsequently formatted without semantic changes.",
+    "Public metadata grouping/fingerprint, projection/fallback, closure cleanup, named/default calls and R3-R5 remain open."
+  ]
+}

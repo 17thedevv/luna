@@ -674,6 +674,10 @@ by the importing compiler.
 
 Verification and provenance:
 
+The [rigid generic checkpoint](evidence/rigid-generic-checkpoint.json) pins
+`1bf0365879707ab11f665aa6a22cf776f69ff6ff`, source blob identities, CLI/runtime
+hashes, log hashes and the initial FAIL/corrected-rerun boundary.
+
 - [Parser regressions](evidence/r2-rigid-parser.txt): **37/37 PASS**, including
   nested/tail/operator AST controls and condition-block preservation.
 - [Semantic and artifact internals](evidence/r2-rigid-internals.txt): **206/206
