@@ -1,0 +1,124 @@
+{
+  "implementation_revision": "bdbd8b118d83a723d931a1bd8b8cdd23bd6ef5bf",
+  "target": "x86_64-pc-windows-gnu",
+  "workspace_command": "cargo test --workspace --no-fail-fast -- --nocapture",
+  "workspace_shell_exit": 1,
+  "workspace_cargo_exit": null,
+  "workspace_totals": {
+    "passed": 1284,
+    "failed": 3,
+    "ignored": 1
+  },
+  "failed_test_cases": [
+    "generic_owned_values_drop_once_across_control_flow_and_provider_modes",
+    "test_adv_comptime_15_array_size_from_comptime_associated_type",
+    "test_ht7_source_vs_llib_parity"
+  ],
+  "failed_targets": [
+    "error: test failed, to rerun pass `-p luna-cli --test generic_drop_cli`",
+    "error: test failed, to rerun pass `-p luna-driver --test adv_comptime_dyn_tests`",
+    "error: test failed, to rerun pass `-p luna-driver --test stdlib_hashmap_storage_acceptance_tests`"
+  ],
+  "workspace_cli_sha256": null,
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "artifact_versions": {
+    "format": 2,
+    "metadata": 3,
+    "compiler": 4,
+    "mvir": 4
+  },
+  "evidence": {
+    "r1-module-const-cli.txt": {
+      "sha256": "8d862b2f2079239190bf040a2dc5d1a092655fb8b266f8762829839cf9dbec52"
+    },
+    "r1-module-const-ir-vm.txt": {
+      "sha256": "98b6b8ebcd56639661519047889a1580d219432ab24a883812421529741c4400"
+    },
+    "r1-module-const-option-result.txt": {
+      "sha256": "231b12832a980374471854dadc46cda8ba8c0292699467116650b339bbf4d3fb"
+    },
+    "r1-module-const-sysroot.txt": {
+      "sha256": "7b8533be012619e3cd36d6829df4b34be289b7919ff47056a54d96f4c2c9c5cf"
+    },
+    "workspace-module-const.txt.gz": {
+      "sha256": "5d74b9ba8e20342d80ed79b9adc5f921ea03a740c02df65439cbe88887a0cb03"
+    },
+    "workspace-module-const.summary.txt": {
+      "sha256": "20627eedeae7e87b53483199e1cd36239896cf49df667d19ad550aec110681ff"
+    }
+  },
+  "raw_workspace_sha256": "3d05b46e693ba64570b55ef02645397415e983048f04ad2a4e47d41f3b1bfa46",
+  "source_git_blobs": {
+    ".agents/skills/mellis-grammar/SKILL.md": "f7806d8bc50ed4df32e10157a41d298bb0fa2c95",
+    ".agents/skills/mellis-grammar/grammar.ebnf": "2ce9170d9fc0a1c29f6e3982ee89909b4adc79c1",
+    "docs/site/spec/gaps.html": "0fcdde7344b591301a248377696fe976ad4409f4",
+    "docs/site/spec/module-const-storage-v1.html": "5768a15fb98fec6390e9c77eaec85d45c653ccf8",
+    "docs/site/spec/modules.html": "2f36d21ea8809dbdb94aa5ba8aa35b07ced59f57",
+    "docs/spec/0.1/gaps.md": "e089131133b3f4b0449a1e9889a10fe3483d7551",
+    "docs/spec/0.1/module-const-storage-v1.md": "5561fa97f16decd19fe1d9d0b7bd88fe0e1b2d2f",
+    "docs/spec/0.1/modules.md": "0fbc5723668043706276555c4e50f63418aec29e",
+    "luna-rs/Cargo.lock": "428e54c7bacb183b08d8e35434ab805d0b3070d9",
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs": "0b4ee6115599fb0206d1ecfb297bc37e50d0af43",
+    "luna-rs/crates/luna-backend/src/static_codegen.rs": "2caecc76fcc4f173540d111741a1c0627a7bd9c9",
+    "luna-rs/crates/luna-borrowck/src/move_analysis.rs": "18cb099a77611fd8a3890145119fd77a13a2d94e",
+    "luna-rs/crates/luna-cli/tests/module_const_storage_cli.rs": "80b07d10b036a3320f5369eeafaab5633037f9d7",
+    "luna-rs/crates/luna-driver/src/async_lowering.rs": "ec184c119934e1128c68ae6a730e91c779eed810",
+    "luna-rs/crates/luna-driver/src/metadata_decoder.rs": "eb1839390db0dbc1cf2c914228b6669fcea15378",
+    "luna-rs/crates/luna-driver/src/registry.rs": "ba2da4e1107c07370500e3ca2c2ba1e663b79fb3",
+    "luna-rs/crates/luna-lexer/src/literal.rs": "2e4d5438cd3340b00aea58c1e55a8113e371aba2",
+    "luna-rs/crates/luna-llib/src/format.rs": "50b9a7d32397576d80e3863597496198ab4d666e",
+    "luna-rs/crates/luna-llib/src/ir.rs": "f92a4cac24aa509c3ca8245e1ca703c2313a8acf",
+    "luna-rs/crates/luna-llib/src/reader.rs": "a61427c4a911b1fc7c522ee54ebbb3317939c8dd",
+    "luna-rs/crates/luna-llib/src/writer.rs": "f95185e28ee2565f988c2145f3dec6d27644daeb",
+    "luna-rs/crates/luna-llib/tests/llib_tests.rs": "7312e99851d31270a1c0f7d3674a15c7f61984b7",
+    "luna-rs/crates/luna-mvir/Cargo.toml": "ed33840aec1908692a4423c68ad58f18429b9c10",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "749dcaf5819ad8146e504251cb91f7c6ec24eadf",
+    "luna-rs/crates/luna-mvir/src/interp.rs": "51438b750db58c6e028032f809cfb9432d29c8cc",
+    "luna-rs/crates/luna-mvir/src/lib.rs": "b9ee727a2cb3b06c1aa3d83828f23b21741439d4",
+    "luna-rs/crates/luna-mvir/src/mvir.rs": "e1ad1ee4e81dcb02915df18347573a18808203b3",
+    "luna-rs/crates/luna-mvir/src/printer.rs": "5f062ac60e69fec018d73ffbfd419040d71b6a86",
+    "luna-rs/crates/luna-mvir/src/static_data.rs": "35b67412a554ddaca5fb14860558a5be18529f71",
+    "luna-rs/crates/luna-mvir/tests/static_storage.rs": "dec488e8a17e1b83d5fc188a1efda9b2a2b7423b",
+    "luna-rs/crates/luna-optimizer/src/verifier.rs": "63f837e2fa3f3dcf9e937ea578d9d38dbc2fb69b",
+    "tests/luna/language/module_const_storage/comptime_pointer_escape.ln": "a2e70201480164d427ac199df188b8a16adf3adb",
+    "tests/luna/language/module_const_storage/comptime_read.ln": "8bc536167d0eb72664312296761184dd839bb87b",
+    "tests/luna/language/module_const_storage/consumer.ln": "f2a4450370c3f00c61ef6d5bca35b28343602449",
+    "tests/luna/language/module_const_storage/local_aggregate_escape.ln": "89fa5ff4545b33f5b530a65317d152e38e161114",
+    "tests/luna/language/module_const_storage/private_access.ln": "064edb41caf49666d45a2cfc589c400f21c57d9d",
+    "tests/luna/language/module_const_storage/provider.ln": "767c8f20ec5e09354fa49c4d5321e054df46e276",
+    "tests/luna/language/module_const_storage/provider_other.ln": "b590a1436cd53a47e1e43030e20e623fee515b29"
+  },
+  "fixture_hashes": {
+    "tests/luna/language/module_const_storage/comptime_pointer_escape.ln": "896890a1f0c8e26b599dc27af49fa8c760735c2cdf260e9790d1b8e29551b722",
+    "tests/luna/language/module_const_storage/comptime_read.ln": "5a55f848d356cbcf07fa6f5393c1d0b04c19f49be36afa38f078e56fa54b2278",
+    "tests/luna/language/module_const_storage/consumer.ln": "219390050ff8c0077fdaad47fb6de70f32e90e90971a0f6f2ba7a6efb163afb3",
+    "tests/luna/language/module_const_storage/local_aggregate_escape.ln": "74107396588abc5dd43e6dfa0f2d1d48ca484ae0c5419eceedcb13e1fc8d8bf6",
+    "tests/luna/language/module_const_storage/local_escape.ln": "ab9a93603dc68f96f7ab6c7d3cbf22d6ee37ff1c9d6cc1c410a032a39b4e9ae7",
+    "tests/luna/language/module_const_storage/module_reference.ln": "70600ff1d845e1fa655f8712db0729ae775945bdf26468b0f2e82c291e32460d",
+    "tests/luna/language/module_const_storage/mutable_module.ln": "bb11015a3169913cbbaaa224d3b49ee6a85ee8615d27c9f2919031f69aa2ebf2",
+    "tests/luna/language/module_const_storage/private_access.ln": "2048ff62a53d07bffb47d72892af0cb2806011cffb619e0b34877fce9c5fefd3",
+    "tests/luna/language/module_const_storage/provider.ln": "4936c246f1fae7a45953a3b6f0fd57de35344b97d5394aaea9d771de8220315c",
+    "tests/luna/language/module_const_storage/provider_other.ln": "49d002c2939fa7b7a1bc400dcd6bde0bdd8afbcf44c12ab382e3f0863eadcb9e"
+  },
+  "focused_cli": {
+    "native_runs": 6,
+    "negative_check_build_observations": 20,
+    "harness_passed": 1
+  },
+  "focused_ir_vm": {
+    "passed": 24,
+    "failed": 0
+  },
+  "focused_option_result": {
+    "passed": 9,
+    "failed": 0
+  },
+  "limits": [
+    "Windows GNU development tree; not a clean-checkout release certificate.",
+    "The workspace shell returned 1; cargo reported three failing targets. The individual cargo exit and pre-run CLI hash were not retained.",
+    "Full workspace compiled before formatting-only changes in four new Rust files; Luna fixtures and semantic code unchanged during execution.",
+    "Comptime field and array-element controls are in the workspace CLI fixture, added after the focused CLI run.",
+    "Remaining method policy, closure ownership, named/default calls and R3/R4/R5 gates are not certified by this checkpoint."
+  ],
+  "text_evidence_hash_policy": "UTF-8 LF bytes as stored in Git; normalize CRLF checkouts before verifying text hashes. Compressed log and raw-log digest retain original bytes."
+}

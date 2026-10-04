@@ -440,3 +440,99 @@ SKILL IMPACT: none. Existing skills defer semantic authority to the versioned
 spec/adopted amendments and require generic storage, provenance, candidate
 validation, negative controls and source/artifact parity. The new amendment
 belongs in that specification rather than being duplicated as skill authority.
+
+## Module-constant storage implementation checkpoint
+
+Implementation: `bdbd8b1` (`fix(compiler): give module constants immutable program storage`).
+The adopted module/local distinction now has an actual storage representation:
+module constants lower to `StaticAddress` with a typed structural initializer,
+while local constants retain scoped storage. LLVM emits immutable target data;
+the interpreter uses a separate immutable arena that survives calls and rejects
+write, mutable borrow, drop and deallocation. No stack Alloca is relabelled Global.
+
+Provider reconstruction now preserves evaluated local declaration constants,
+comptime values and module-storage classification, including private constants
+used by exported native and generic bodies. Private constants remain inaccessible
+to consumers. Initializer payloads retain structural values rather than source
+semantic IDs or VM addresses. Enum strings carry target relocations. Reference
+array indexing also loads the reference binding before offsetting array storage.
+
+The portable MVIR representation changes: **compiler version 4 and MVIR version
+4**, with format 2 and semantic metadata 3 unchanged. Earlier compiler/MVIR bodies
+reject before payload decoding; rebuilding is explicit. New reader controls
+reject truncated and trailing initializer payloads.
+
+- [Focused CLI matrix](evidence/r1-module-const-cli.txt): 1/1 harness PASS,
+  six native runs and twenty check/build negative observations. Independent
+  source-only and fresh-artifact-only sysroots contain all 49 providers. Project
+  providers are relocated and adjacent source is absent in artifact mode.
+  Coverage includes repeated references, private constants, distinct providers,
+  native/generic shared storage, wide integers, Unicode char/string escapes,
+  float, tuple/struct/array and nested enum data with string relocation.
+  Local scalar/aggregate escape rejects E3005, mutable borrow E2023, private
+  access E1001, and a comptime VM-pointer escape E4005.
+- [IR/VM/reader regressions](evidence/r1-module-const-ir-vm.txt): 24/24 PASS
+  (9 library reader tests, 6 artifact integrations, 7 comptime regressions and
+  2 immutable-storage VM controls).
+- [Original borrowed Option/Result suite](evidence/r1-module-const-option-result.txt):
+  9/9 PASS, including `test_opt_res_source_and_llib_parity`.
+- [Canonical sysroot](evidence/r1-module-const-sysroot.txt): all 49 providers
+  rebuilt successfully with version-4 artifacts.
+
+The completed [workspace summary](evidence/workspace-module-const.summary.txt)
+and [lossless log](evidence/workspace-module-const.txt.gz) record **1,284 PASS,
+3 FAIL and 1 ignored**, across three failing targets. The process wrapper
+returned 1; the individual cargo exit was not retained. The
+[checkpoint](evidence/module-const-checkpoint.json) pins `bdbd8b1`, source blobs,
+fixtures and evidence. This was a development-tree run started before commit,
+with formatting-only edits to four new Rust files after compilation, not an
+exact clean-checkout release certificate. The CLI matrix in this run additionally
+checks comptime field and array-element reads added after the first focused run.
+
+The three failures are:
+
+1. `generic_drop_cli`: moved closure capture cleanup still exits3 in source and
+   artifact modes; unresolved.
+2. `adv_comptime_dyn_tests::test_adv_comptime_15_array_size_from_comptime_associated_type`:
+   newly exposed storage lowering regression. Early array-size evaluation has
+   no expression-type entry; using that entry's default Void instead of the
+   checked constant declaration type rejects a valid initializer.
+3. `stdlib_hashmap_storage_acceptance_tests::test_ht7_source_vs_llib_parity`:
+   its fresh provider build fails with missing-file `os error 2`. The retained
+   build root has artifacts but no `lang/*.ln`; the actor/root cause is not
+   established. Passing isolated results cannot close this failure.
+
+The earlier ADV-14 async, closure escape, Option/Result borrowed parity and
+Whole-File I/O suites PASS in this workspace run. That is current run evidence;
+it does not identify the cause of historical missing-source failures or certify
+all ownership/async paths.
+
+Follow-up implementation `d333824` uses the checked declaration type for static
+storage and loads, including before expression typing. The permanent CLI
+comptime fixture includes an associated-type constant as an array length.
+[Affected comptime suite](evidence/r1-module-const-array-repair.txt): **16/16 PASS**.
+[Final CLI matrix](evidence/r1-module-const-final-cli.txt): **1/1 PASS**, six native
+runs and twenty correct negative check/build observations across source and
+fresh artifacts, now including that array-length case.
+[Final workspace check](evidence/r1-module-const-final-check.txt): **exit0**.
+The [follow-up checkpoint](evidence/module-const-array-repair-checkpoint.json)
+pins this revision and its focused verification. A full workspace has not been
+rerun on this follow-up; the prior full FAIL stays FAIL. Focused PASS does not
+close target coverage or R5. Existing closure destruction, method
+applicability/ambiguity, named/default calls and remaining
+ownership/provider/diagnostic matrices stay open.
+
+    Compiler Change
+        Capability: Immutable program-lifetime module-constant storage.
+        Why stdlib exposed it: Borrowed Option/Result parity returns a reference to a module constant.
+        Why it is generic: Typed static data, declaration identity and provider reconstruction apply to arbitrary user declarations.
+        User-defined type benefiting: The permanent user provider's Pair, Nested, Choice and TextChoice values.
+        Tests: module_const_storage_cli, static_storage, artifact reader roundtrip, original Option/Result regressions.
+        New intrinsic/lang_item?: NO
+        Stdlib-specific branch?: NO
+
+SKILL IMPACT: **CORRECTION** in `mellis-grammar`: array types now use `[T; N]`
+as already required by the versioned syntax; the illustrative private field
+uses explicit `private`. Parser semantics are unchanged. The skill and related
+semantic guidance were checked against the canonical syntax/visibility rules;
+no task status or new language authority is added to skills.
