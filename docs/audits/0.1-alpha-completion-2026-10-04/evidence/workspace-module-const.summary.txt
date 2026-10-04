@@ -1,0 +1,266 @@
+Implementation revision: bdbd8b118d83a723d931a1bd8b8cdd23bd6ef5bf
+Command: cargo test --workspace --no-fail-fast -- --nocapture
+Observed shell exit: 1; cargo FAIL (individual cargo exit was not retained)
+Aggregate totals: {"failed": 3, "ignored": 1, "passed": 1284}
+Raw SHA256: 3d05b46e693ba64570b55ef02645397415e983048f04ad2a4e47d41f3b1bfa46
+Lossless raw log: workspace-module-const.txt.gz
+Started on the implementation working tree before commit; four new Rust files received formatting-only changes after compilation.
+Not a clean-checkout exact-candidate release certificate.
+
+Failed test cases:
+generic_owned_values_drop_once_across_control_flow_and_provider_modes
+test_adv_comptime_15_array_size_from_comptime_associated_type
+test_ht7_source_vs_llib_parity
+
+Failed targets:
+error: test failed, to rerun pass `-p luna-cli --test generic_drop_cli`
+error: test failed, to rerun pass `-p luna-driver --test adv_comptime_dyn_tests`
+error: test failed, to rerun pass `-p luna-driver --test stdlib_hashmap_storage_acceptance_tests`
+
+Suite totals:
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_ast-024298f02ef1919f.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\relocation_diagnostic_spans.rs (target\\debug\\deps\\relocation_diagnostic_spans-bfce78db910929f1.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_backend-a11f2e651ae26300.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 12, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_borrowck-eddadfc2d992974e.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\fuzz_borrowck.rs (target\\debug\\deps\\fuzz_borrowck-e8bba403e0bbed1d.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\fuzz_effect.rs (target\\debug\\deps\\fuzz_effect-5d2d2a7dee2169a0.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\fuzz_soundness.rs (target\\debug\\deps\\fuzz_soundness-2cda96b15b377623.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\partial_move_tests.rs (target\\debug\\deps\\partial_move_tests-c9264b34996a618f.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 12, "target": "Running tests\\region_callsite_cutover_tests.rs (target\\debug\\deps\\region_callsite_cutover_tests-9f522c48eb16f002.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\region_cutover_tests.rs (target\\debug\\deps\\region_cutover_tests-2aea34a0abf3097b.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 12, "target": "Running tests\\region_shadow_tests.rs (target\\debug\\deps\\region_shadow_tests-360b57a505e91dce.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\test_ffi_reentrancy.rs (target\\debug\\deps\\test_ffi_reentrancy-39f1ccb413d61503.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\test_incremental.rs (target\\debug\\deps\\test_incremental-d88ac58e389bd4c2.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\test_perf_stress.rs (target\\debug\\deps\\test_perf_stress-6f1fc7f0b1a15ab8.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Running unittests src\\main.rs (target\\debug\\deps\\luna-82dbee415f26efab.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\alpha_modules_cli.rs (target\\debug\\deps\\alpha_modules_cli-793b4438f9c01eb9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\artifact_execution_dependencies_cli.rs (target\\debug\\deps\\artifact_execution_dependencies_cli-8667c7b75f33ae8d.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\char_operator_cli_parity.rs (target\\debug\\deps\\char_operator_cli_parity-63e223f67bf23a77.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\char_scalar_cli_parity.rs (target\\debug\\deps\\char_scalar_cli_parity-9a409ba1d4a433ba.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\compiler_trust_diagnostics_cli_parity.rs (target\\debug\\deps\\compiler_trust_diagnostics_cli_parity-5c85df65762384df.exe)", "verdict": "ok"}
+{"failed": 1, "ignored": 0, "passed": 0, "target": "Running tests\\generic_drop_cli.rs (target\\debug\\deps\\generic_drop_cli-415573439597d80b.exe)", "verdict": "FAILED"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\literal_typing_cli_parity.rs (target\\debug\\deps\\literal_typing_cli_parity-632b56f2de43e9f2.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\module_const_storage_cli.rs (target\\debug\\deps\\module_const_storage_cli-7bbc177409503995.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 22, "target": "Running tests\\semantic_maturity_phase0.rs (target\\debug\\deps\\semantic_maturity_phase0-bee31984110597d8.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 11, "target": "Running tests\\semantic_maturity_phase2a.rs (target\\debug\\deps\\semantic_maturity_phase2a-3f104c8b98fce66f.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\stdlib_format_cli_acceptance.rs (target\\debug\\deps\\stdlib_format_cli_acceptance-c03fc74f5ba67b72.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\struct_contract_cli_parity.rs (target\\debug\\deps\\struct_contract_cli_parity-63bbb44e7fdd0053.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\trait_argument_bounds_cli.rs (target\\debug\\deps\\trait_argument_bounds_cli-3f841551c147d85f.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\v01_arch_02_macro_decoupling_tests.rs (target\\debug\\deps\\v01_arch_02_macro_decoupling_tests-3f0e06b198e838a5.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\v01_grammar_acceptance_tests.rs (target\\debug\\deps\\v01_grammar_acceptance_tests-d3fe4a15e67e25a2.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 8, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_common-5773d4017f871143.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 17, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_driver-4211953cbd076f6f.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Running unittests src\\main.rs (target\\debug\\deps\\luna_driver-fcff61bf7e713201.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 16, "target": "Running tests\\adv_async_dyn_tests.rs (target\\debug\\deps\\adv_async_dyn_tests-5565cf9c0dfe170b.exe)", "verdict": "ok"}
+{"failed": 1, "ignored": 0, "passed": 15, "target": "Running tests\\adv_comptime_dyn_tests.rs (target\\debug\\deps\\adv_comptime_dyn_tests-74735d4f259555ea.exe)", "verdict": "FAILED"}
+{"failed": 0, "ignored": 0, "passed": 14, "target": "Running tests\\adv_raw_dyn_tests.rs (target\\debug\\deps\\adv_raw_dyn_tests-58144ccbf20d8eab.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 9, "target": "Running tests\\alloc_box_tests.rs (target\\debug\\deps\\alloc_box_tests-5ca254f75d63af6f.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\backend_fail_closed_tests.rs (target\\debug\\deps\\backend_fail_closed_tests-7c581d57508df548.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 12, "target": "Running tests\\canonical_syntax_acceptance_tests.rs (target\\debug\\deps\\canonical_syntax_acceptance_tests-2255544d949b45f7.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\compiler_gap_c_gap_01_drop_mono_tests.rs (target\\debug\\deps\\compiler_gap_c_gap_01_drop_mono_tests-c5dd7abc8bc8d786.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\compiler_gap_c_gap_02_mangling_tests.rs (target\\debug\\deps\\compiler_gap_c_gap_02_mangling_tests-62b5a2ff618219b3.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\compiler_gap_c_gap_03_provider_linking_tests.rs (target\\debug\\deps\\compiler_gap_c_gap_03_provider_linking_tests-24ff4cb9d2aa933b.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\compiler_gap_c_gap_04_provider_chain_bounds_tests.rs (target\\debug\\deps\\compiler_gap_c_gap_04_provider_chain_bounds_tests-d38c1ca9fc80dbb9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\compiler_gap_c_gap_04_trait_bound_generic_args_tests.rs (target\\debug\\deps\\compiler_gap_c_gap_04_trait_bound_generic_args_tests-b94e73ab4df70031.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\compiler_gap_c_gap_05_indirect_call_tests.rs (target\\debug\\deps\\compiler_gap_c_gap_05_indirect_call_tests-04c4a4a8d1323629.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\compiler_gap_c_gap_06_function_pointer_mangling_tests.rs (target\\debug\\deps\\compiler_gap_c_gap_06_function_pointer_mangling_tests-5ff3f2b01eee7eaa.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\compiler_gap_c_gap_12_safe_loan_effect_tests.rs (target\\debug\\deps\\compiler_gap_c_gap_12_safe_loan_effect_tests-3719cd97ffb6d899.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\compound_assignment_tests.rs (target\\debug\\deps\\compound_assignment_tests-e8fcbbcd02dd058b.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\copy_drop_tests.rs (target\\debug\\deps\\copy_drop_tests-16777f6c5eb7fe4c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\core_provider_baseline_acceptance_tests.rs (target\\debug\\deps\\core_provider_baseline_acceptance_tests-318694b959a656c7.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\cross_module_macro_tests.rs (target\\debug\\deps\\cross_module_macro_tests-86f3e9328f07c532.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\enum_tag_codegen_tests.rs (target\\debug\\deps\\enum_tag_codegen_tests-41d82157189aebde.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\generic_trait_bound_non_nominal_tests.rs (target\\debug\\deps\\generic_trait_bound_non_nominal_tests-8d3822a51316e67d.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\generic_trait_dispatch_acceptance_tests.rs (target\\debug\\deps\\generic_trait_dispatch_acceptance_tests-12604591a57ed167.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\generic_trait_method_monomorphization_tests.rs (target\\debug\\deps\\generic_trait_method_monomorphization_tests-8fcf5c53220cfe95.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\import_invariants_tests.rs (target\\debug\\deps\\import_invariants_tests-0b262efc9ca8e925.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\integer_cast_signedness_tests.rs (target\\debug\\deps\\integer_cast_signedness_tests-699be734aba63a44.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 12, "target": "Running tests\\lang_namespace_contract_tests.rs (target\\debug\\deps\\lang_namespace_contract_tests-4e4da86e3dc1bb72.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 13, "target": "Running tests\\lifetime_def_site_acceptance_tests.rs (target\\debug\\deps\\lifetime_def_site_acceptance_tests-d8c5f022cc8645f7.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\lifetime_outlives_acceptance_tests.rs (target\\debug\\deps\\lifetime_outlives_acceptance_tests-59d926e110aef0d3.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\lifetime_relation_abi_acceptance_tests.rs (target\\debug\\deps\\lifetime_relation_abi_acceptance_tests-7bbbb6bbb6aa2cb7.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\lifetime_virtual_dispatch_acceptance_tests.rs (target\\debug\\deps\\lifetime_virtual_dispatch_acceptance_tests-15e5518d156d73bf.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\macro_hygiene_tests.rs (target\\debug\\deps\\macro_hygiene_tests-9f520bcd9e74069e.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\macro_pipeline_tests.rs (target\\debug\\deps\\macro_pipeline_tests-b439c0c85e955dd8.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\macro_repetition_tests.rs (target\\debug\\deps\\macro_repetition_tests-6d65f7477822f4d0.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\main_entrypoint_tests.rs (target\\debug\\deps\\main_entrypoint_tests-bcf9571ad00e9548.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\main_shim_integration_tests.rs (target\\debug\\deps\\main_shim_integration_tests-ffaf7954f87ebadb.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 18, "target": "Running tests\\module_import_boundary_tests.rs (target\\debug\\deps\\module_import_boundary_tests-b7d9d018dfa3c70c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\p0b_drop_subplace_tests.rs (target\\debug\\deps\\p0b_drop_subplace_tests-5f586fb690210460.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 14, "target": "Running tests\\p1b_tests.rs (target\\debug\\deps\\p1b_tests-72e494ee6a025908.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 15, "target": "Running tests\\p1c_tests.rs (target\\debug\\deps\\p1c_tests-dc96969773a5b868.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 20, "target": "Running tests\\p2a_tests.rs (target\\debug\\deps\\p2a_tests-baf40da29bdb3af4.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 20, "target": "Running tests\\p2b_tests.rs (target\\debug\\deps\\p2b_tests-f7b47131791a2fa9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 22, "target": "Running tests\\p3_tests.rs (target\\debug\\deps\\p3_tests-a5cd8956e1e739a1.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\phase4c_capability_probes.rs (target\\debug\\deps\\phase4c_capability_probes-3bffb746cda262c0.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\provider_authority_tests.rs (target\\debug\\deps\\provider_authority_tests-6c8c1453b0da8f57.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 8, "target": "Running tests\\provider_module_contract_acceptance_tests.rs (target\\debug\\deps\\provider_module_contract_acceptance_tests-31733cfb469b96c0.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\raw_pointer_ffi_call_semantics_tests.rs (target\\debug\\deps\\raw_pointer_ffi_call_semantics_tests-8fd4db6a8988f22b.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 9, "target": "Running tests\\sem_gap_19_alias_safety_audit.rs (target\\debug\\deps\\sem_gap_19_alias_safety_audit-f3acd2a8d8d14c8b.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 1, "passed": 72, "target": "Running tests\\sem_maturity_phase2b.rs (target\\debug\\deps\\sem_maturity_phase2b-64594c6b97ce2bb2.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\sem_maturity_phase2d_a.rs (target\\debug\\deps\\sem_maturity_phase2d_a-b42d2721d21957f1.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 17, "target": "Running tests\\sem_maturity_phase2d_b_tests.rs (target\\debug\\deps\\sem_maturity_phase2d_b_tests-6cf28b12f07f24da.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 16, "target": "Running tests\\sem_maturity_phase2e_tests.rs (target\\debug\\deps\\sem_maturity_phase2e_tests-074be940fffbda87.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 22, "target": "Running tests\\semantic_gate_tests.rs (target\\debug\\deps\\semantic_gate_tests-297f013aaa343969.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 18, "target": "Running tests\\stdlib_box_ownership_acceptance_tests.rs (target\\debug\\deps\\stdlib_box_ownership_acceptance_tests-213586363e11a5f6.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 8, "target": "Running tests\\stdlib_collection_iterators_acceptance_tests.rs (target\\debug\\deps\\stdlib_collection_iterators_acceptance_tests-c0848ce46910f44b.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 9, "target": "Running tests\\stdlib_core_ptr_mem_acceptance_tests.rs (target\\debug\\deps\\stdlib_core_ptr_mem_acceptance_tests-9768bddaea25a617.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 14, "target": "Running tests\\stdlib_hashmap_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashmap_acceptance_tests-20b251cd110cdba5.exe)", "verdict": "ok"}
+{"failed": 1, "ignored": 0, "passed": 7, "target": "Running tests\\stdlib_hashmap_storage_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashmap_storage_acceptance_tests-c28bc47f7f1700c7.exe)", "verdict": "FAILED"}
+{"failed": 0, "ignored": 0, "passed": 11, "target": "Running tests\\stdlib_hashset_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashset_acceptance_tests-e1f73619fdf02eb9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\stdlib_io_acceptance_tests.rs (target\\debug\\deps\\stdlib_io_acceptance_tests-9b7cb1e177e5d337.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 11, "target": "Running tests\\stdlib_iterator_adapters_acceptance_tests.rs (target\\debug\\deps\\stdlib_iterator_adapters_acceptance_tests-be67371f9747b548.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 15, "target": "Running tests\\stdlib_iterator_collect_acceptance_tests.rs (target\\debug\\deps\\stdlib_iterator_collect_acceptance_tests-7e1e76194422cfed.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 15, "target": "Running tests\\stdlib_iterator_terminal_consumers_acceptance_tests.rs (target\\debug\\deps\\stdlib_iterator_terminal_consumers_acceptance_tests-bdaf2c0903c355f3.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 9, "target": "Running tests\\stdlib_option_result_borrow_acceptance_tests.rs (target\\debug\\deps\\stdlib_option_result_borrow_acceptance_tests-0f5525e8c37de49c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\stdlib_option_result_conversions_acceptance_tests.rs (target\\debug\\deps\\stdlib_option_result_conversions_acceptance_tests-6297b0ffe987cb1c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\stdlib_path_acceptance_tests.rs (target\\debug\\deps\\stdlib_path_acceptance_tests-363d6bba967d34e9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\stdlib_phase4b_cmp_tests.rs (target\\debug\\deps\\stdlib_phase4b_cmp_tests-1d6e9a6e6b542ad4.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\stdlib_phase4b_collections_tests.rs (target\\debug\\deps\\stdlib_phase4b_collections_tests-79cb29276ee392f8.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 9, "target": "Running tests\\stdlib_phase4b_combinators_tests.rs (target\\debug\\deps\\stdlib_phase4b_combinators_tests-de47ba90623a9283.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\stdlib_phase4b_iter_range_tests.rs (target\\debug\\deps\\stdlib_phase4b_iter_range_tests-f70fc121433c8538.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\stdlib_phase4b_iter_tests.rs (target\\debug\\deps\\stdlib_phase4b_iter_tests-799f95869a48e743.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\stdlib_phase4b_llib_parity_tests.rs (target\\debug\\deps\\stdlib_phase4b_llib_parity_tests-6341810c62745610.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\stdlib_phase4b_memory_tests.rs (target\\debug\\deps\\stdlib_phase4b_memory_tests-a474726bf07db20f.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\stdlib_phase4b_num_tests.rs (target\\debug\\deps\\stdlib_phase4b_num_tests-156cb0ea2cb9d872.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\stdlib_phase4b_ownership_stress_tests.rs (target\\debug\\deps\\stdlib_phase4b_ownership_stress_tests-3ea51c108f28b4b3.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\stdlib_phase4b_slice_tests.rs (target\\debug\\deps\\stdlib_phase4b_slice_tests-e5c401b1464b167b.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\stdlib_phase4b_sorting_tests.rs (target\\debug\\deps\\stdlib_phase4b_sorting_tests-2d49d3d7eff43d5d.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\stdlib_phase4b_vec_depth_tests.rs (target\\debug\\deps\\stdlib_phase4b_vec_depth_tests-c34cc49348d0f7a0.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\stdlib_phase4c_llib_parity_tests.rs (target\\debug\\deps\\stdlib_phase4c_llib_parity_tests-bec6ac297ae57735.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\stdlib_phase4c_numerics.rs (target\\debug\\deps\\stdlib_phase4c_numerics-b31484e4238062d2.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\stdlib_slice_borrow_acceptance_tests.rs (target\\debug\\deps\\stdlib_slice_borrow_acceptance_tests-3c88beb38c084329.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\stdlib_slice_index_acceptance_tests.rs (target\\debug\\deps\\stdlib_slice_index_acceptance_tests-e190f01bfc09c34d.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\stdlib_slice_iterator_acceptance_tests.rs (target\\debug\\deps\\stdlib_slice_iterator_acceptance_tests-855d246f826eca82.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 16, "target": "Running tests\\stdlib_string_acceptance_tests.rs (target\\debug\\deps\\stdlib_string_acceptance_tests-41c9cc3107c9f077.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\stdlib_vec_element_drop_acceptance_tests.rs (target\\debug\\deps\\stdlib_vec_element_drop_acceptance_tests-f289678f3fe1e2c9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 15, "target": "Running tests\\stdlib_visibility_migration_tests.rs (target\\debug\\deps\\stdlib_visibility_migration_tests-e4c1a012e95e3f5c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 9, "target": "Running tests\\struct_field_visibility_acceptance_tests.rs (target\\debug\\deps\\struct_field_visibility_acceptance_tests-260ba8909804c665.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 24, "target": "Running tests\\struct_lifetime_contract_acceptance_tests.rs (target\\debug\\deps\\struct_lifetime_contract_acceptance_tests-f9c2122a6a456f79.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\sysroot_tests.rs (target\\debug\\deps\\sysroot_tests-af16bc9420b5e34f.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 9, "target": "Running tests\\test_artifact_metadata_parity.rs (target\\debug\\deps\\test_artifact_metadata_parity-daebcfa2b8184434.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\test_canonical_serialization.rs (target\\debug\\deps\\test_canonical_serialization-311475b091233e09.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\test_core_bootstrap_isolation.rs (target\\debug\\deps\\test_core_bootstrap_isolation-e994490eebb56957.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\test_freshness.rs (target\\debug\\deps\\test_freshness-2acbcba53815fc64.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\test_legacy_compatibility.rs (target\\debug\\deps\\test_legacy_compatibility-544cd710f1be45f9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\test_llib_parity.rs (target\\debug\\deps\\test_llib_parity-584999ac6038c812.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\test_reassign_soundness.rs (target\\debug\\deps\\test_reassign_soundness-47c5b67584aa5c9c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\test_resolver_precedence.rs (target\\debug\\deps\\test_resolver_precedence-fad0874e1d751ee9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\test_strict_artifact_rejection.rs (target\\debug\\deps\\test_strict_artifact_rejection-61cb5594aaabcc01.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\test_sysroot_build_invariants.rs (target\\debug\\deps\\test_sysroot_build_invariants-75febef09bb0ec18.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\test_sysroot_manifest_resolution.rs (target\\debug\\deps\\test_sysroot_manifest_resolution-52adefb9d4b7bc81.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\ui_tests.rs (target\\debug\\deps\\ui_tests-e9d486ed8d750790.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 8, "target": "Running tests\\vec_iterator_lifetime_acceptance_tests.rs (target\\debug\\deps\\vec_iterator_lifetime_acceptance_tests-37ba8b74a9e3b13e.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 19, "target": "Running tests\\visibility_02_public_field_default_tests.rs (target\\debug\\deps\\visibility_02_public_field_default_tests-c0089eba66d06ce3.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\whole_file_io_v1_acceptance_tests.rs (target\\debug\\deps\\whole_file_io_v1_acceptance_tests-710cd329b21a559d.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_lexer-5e8ff5b565c16c0a.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 9, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_llib-5e5ac352dbba4caa.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\llib_tests.rs (target\\debug\\deps\\llib_tests-46982de9b5ea2cef.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_mvir-c322fcfe0b28fe25.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\comptime_execution_availability.rs (target\\debug\\deps\\comptime_execution_availability-a8af53c50b7abc25.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\static_storage.rs (target\\debug\\deps\\static_storage-217f50d74c2407e4.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_optimizer-636c1f775a83e11c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\optimizer_tests.rs (target\\debug\\deps\\optimizer_tests-46a4d5bbc3a2d933.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_parser-48d1ae143bb8716c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\annotation_tests.rs (target\\debug\\deps\\annotation_tests-ec282d0bf9026447.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\comptime_parser_tests.rs (target\\debug\\deps\\comptime_parser_tests-72bbe34eb5f1543d.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\literal_parser_tests.rs (target\\debug\\deps\\literal_parser_tests-81092b7a9316ab3e.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\macro_parser_tests.rs (target\\debug\\deps\\macro_parser_tests-b4b4869dfa970aad.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\namespace_using_parser_tests.rs (target\\debug\\deps\\namespace_using_parser_tests-b96287799dacd6bc.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\struct_field_visibility_parser_tests.rs (target\\debug\\deps\\struct_field_visibility_parser_tests-ed1451d9e153d9ec.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 11, "target": "Running tests\\struct_syntax_acceptance_tests.rs (target\\debug\\deps\\struct_syntax_acceptance_tests-717e87d1e9235aa3.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 22, "target": "Running unittests src\\lib.rs (target\\debug\\deps\\luna_semantic-247afc63bb9f08a6.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 2, "target": "Running tests\\lifetime_basic_tests.rs (target\\debug\\deps\\lifetime_basic_tests-1df331537b7cee9c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\lifetime_constraint_tests.rs (target\\debug\\deps\\lifetime_constraint_tests-53dc83ec1af66847.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 3, "target": "Running tests\\lifetime_error_tests.rs (target\\debug\\deps\\lifetime_error_tests-cdf56a56c68aa5f1.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\literal_target_width_tests.rs (target\\debug\\deps\\literal_target_width_tests-eaedb0193dad8fbc.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\macro_expansion_tests.rs (target\\debug\\deps\\macro_expansion_tests-72952ae79108801c.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\macro_fragment_tests.rs (target\\debug\\deps\\macro_fragment_tests-a0092226dad68df3.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 6, "target": "Running tests\\macro_hygiene_tests.rs (target\\debug\\deps\\macro_hygiene_tests-85310e2c32bf8714.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\macro_symbol_tests.rs (target\\debug\\deps\\macro_symbol_tests-de3fb75ebefcad32.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 5, "target": "Running tests\\macro_type_tests.rs (target\\debug\\deps\\macro_type_tests-0c502a9377ea6e52.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 4, "target": "Running tests\\nominal_declaration_order_tests.rs (target\\debug\\deps\\nominal_declaration_order_tests-5f43144cb1f0d295.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 10, "target": "Running tests\\p0c_tests.rs (target\\debug\\deps\\p0c_tests-04763605ab3787e3.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 21, "target": "Running tests\\p1a_tests.rs (target\\debug\\deps\\p1a_tests-73c3d3f1beff51ab.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 7, "target": "Running tests\\region_facts_tests.rs (target\\debug\\deps\\region_facts_tests-4453b717675043a0.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 19, "target": "Running tests\\region_gen_tests.rs (target\\debug\\deps\\region_gen_tests-c63313e2b2a5ecf9.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 11, "target": "Running tests\\region_ir_tests.rs (target\\debug\\deps\\region_ir_tests-8cab394cfdd734e4.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 15, "target": "Running tests\\region_realization_tests.rs (target\\debug\\deps\\region_realization_tests-71970bf285782cf2.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 18, "target": "Running tests\\region_solver_tests.rs (target\\debug\\deps\\region_solver_tests-cd10ff7ae5e540e0.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\struct_generics_test.rs (target\\debug\\deps\\struct_generics_test-2206347b6ae75888.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 20, "target": "Running tests\\test_annotation_system.rs (target\\debug\\deps\\test_annotation_system-1bbad26aa7643371.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 1, "target": "Running tests\\test_fuzz_semantic.rs (target\\debug\\deps\\test_fuzz_semantic-baa8eff6d0d784db.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 8, "target": "Running tests\\test_lang_item_registry.rs (target\\debug\\deps\\test_lang_item_registry-5addb61df147112e.exe)", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_ast", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_backend", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_borrowck", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_common", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_driver", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_lexer", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_llib", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_mvir", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_optimizer", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_parser", "verdict": "ok"}
+{"failed": 0, "ignored": 0, "passed": 0, "target": "Doc-tests luna_semantic", "verdict": "ok"}
+
+Final output:
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_borrowck
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_common
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_driver
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_lexer
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_llib
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_mvir
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_optimizer
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_parser
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_semantic
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: 3 targets failed:
+    `-p luna-cli --test generic_drop_cli`
+    `-p luna-driver --test adv_comptime_dyn_tests`
+    `-p luna-driver --test stdlib_hashmap_storage_acceptance_tests`

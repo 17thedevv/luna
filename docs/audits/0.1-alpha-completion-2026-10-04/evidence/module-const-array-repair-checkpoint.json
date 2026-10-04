@@ -1,0 +1,54 @@
+{
+  "text_evidence_hash_policy": "UTF-8 LF bytes as stored in Git; normalize CRLF checkouts before verifying text hashes. Compressed log and raw-log digest retain original bytes.",
+  "implementation_revision": "d3338243508d224417363e5b3424d000a6d9dd50",
+  "parent_storage_revision": "bdbd8b118d83a723d931a1bd8b8cdd23bd6ef5bf",
+  "target": "x86_64-pc-windows-gnu",
+  "artifact_versions": {
+    "format": 2,
+    "metadata": 3,
+    "compiler": 4,
+    "mvir": 4
+  },
+  "focused_commands": [
+    {
+      "command": "cargo test -p luna-driver --test adv_comptime_dyn_tests -- --nocapture",
+      "exit": 0,
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "command": "cargo test -p luna-cli --test module_const_storage_cli -- --nocapture",
+      "exit": 0,
+      "passed": 1,
+      "failed": 0,
+      "native_runs": 6,
+      "negative_check_build_observations": 20
+    },
+    {
+      "command": "cargo check --workspace",
+      "exit": 0
+    }
+  ],
+  "cli_sha256": "a99f5c7202cec26c747668444dbab704a6b19035337148f34b6c38c9c6d94777",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "evidence": {
+    "r1-module-const-array-repair.txt": {
+      "sha256": "7649a553f77fc3f4a2e39d69739b99530d39b6b0366141490bd37fe7ca00a351"
+    },
+    "r1-module-const-final-cli.txt": {
+      "sha256": "6efb7bad129db36c9aad8aa570b78290d65a2d4e2793ffdac8de0eb328305452"
+    },
+    "r1-module-const-final-check.txt": {
+      "sha256": "fba6f73eddc1d8adfcfa9f32f279dad780e481438dbe2ececd13bdfb12f8e689"
+    }
+  },
+  "source_git_blobs": {
+    "luna-rs/crates/luna-mvir/src/generator.rs": "d85d0a70424a10ed1d84ab6573f240f42a197803",
+    "tests/luna/language/module_const_storage/comptime_read.ln": "5a6602302fc3e9fbe97721a581eb9d4f668c105f"
+  },
+  "limits": [
+    "Focused reruns on a development tree; not full-workspace or clean-checkout release PASS.",
+    "The parent full workspace verdict remains FAIL with 1284 passed, 3 failed and 1 ignored.",
+    "No merge/tag or completion claim for the remaining 0.1 plan."
+  ]
+}
