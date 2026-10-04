@@ -1,0 +1,393 @@
+{
+  "implementation_revision": "cd9987a641cc6849d4751df8a311911b746c1834",
+  "capability_status": "PARTIAL",
+  "release_ready": false,
+  "workspace_test_completed": false,
+  "source_files": {
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs": "e457e4ad87740bd2676edf220c70480679323322685870824bdcba0b7b8d1413",
+    "luna-rs/crates/luna-borrowck/src/drop_flags.rs": "ed1ad97c3844f2ed3505b1a2f8d4e456f862c0483b1ed5cfc3dff9e761600781",
+    "luna-rs/crates/luna-borrowck/src/lib.rs": "255520e26a3d56d37abf9921d7fad3fc5e76ee849864f2c6785bcc4fd08a02cd",
+    "luna-rs/crates/luna-borrowck/src/move_analysis.rs": "e1489c4977ed0a3a326dd0d5bbba28ec04b55dbee9fdcf93bfd021c58b1dfc2b",
+    "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs": "ab6ecabe197e1bbfd17c0f59fc5201339c11204f3f62084f9bfb2e1bcf709f13",
+    "luna-rs/crates/luna-driver/src/lib.rs": "35b42fab01c4a03d6aa7346487a1baf80e76c9e4e3764e7777b24dabb20653dd",
+    "luna-rs/crates/luna-driver/tests/backend_fail_closed_tests.rs": "08075a24ad2f79c60888d294cbdf79aecc7f8fbc8ade996b436c9c2b1e770eb5",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "e02b311cc84b51405c05e3c511c37c29b64308725abf8dfffd80b533e2830317",
+    "luna-rs/crates/luna-semantic/src/mono.rs": "1cac0f0c25984ced797a5547c4ca00c62dcc4b70f21a2554198d4f439d870a0a",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "23e2c26af7bd16a90b89c619eb243e692cdc4cbeb0c1e2900499c783f87e42e8",
+    "tests/luna/language/generic_drop/branches_and_early_return.ln": "316ad262b3e92fa420608dbe04509d514891bc09f31b1b2c5b590d6e38e7a5ef",
+    "tests/luna/language/generic_drop/closure_capture.ln": "5fdc11b26f8d7cb961419d6e514daeab7cb555e29c1278faf2fc159000e5ff8f",
+    "tests/luna/language/generic_drop/conditional_initialization.ln": "1abc4596bceffe642d86b2f777503cb8d291b539a25b08a80c893b6975f51fe2",
+    "tests/luna/language/generic_drop/conditional_reinitialization.ln": "6323c87f486bf6e1d2e0875da7baaee0c21c290661bd303f6cb1993e20951d74",
+    "tests/luna/language/generic_drop/conditional_use.ln": "73dd463cfbd6942086c8414574bd16983de638c0f7d23775a14345c53ab7d24c",
+    "tests/luna/language/generic_drop/copy_drop_conflict.ln": "33e5994d761771acd34ecc982187b1cf354da015413b646a882e0db8783290bc",
+    "tests/luna/language/generic_drop/double_ownership.ln": "f502036070e64ddb369a3f68e1acaf16f728d3b9b01eda238f3d921d5d741a09",
+    "tests/luna/language/generic_drop/impl_method_substitution.ln": "92d14f7d016c3d18e4fc39d0cee306c015f8f3da64122ae517f4af29aa11d038",
+    "tests/luna/language/generic_drop/loop_exits.ln": "5b5efe17ac782ccac29f327425dad00e4e5f13899795b3b9f86f4205a6872a56",
+    "tests/luna/language/generic_drop/move_return.ln": "6ce866b41cb0655e2b9ebccad1a891b00e48d6d51a2e379542b810a3343a7300",
+    "tests/luna/language/generic_drop/nested_aggregates.ln": "2c5343840620e0298ac45b81b469f43c3f512cf8b563670b908ddbe9ad36a12d",
+    "tests/luna/language/generic_drop/overwrite.ln": "929c9805cbb77f668fc7491ea4144ee91e6b3156a7b8a27ea57a4f103cd64dd4",
+    "tests/luna/language/generic_drop/partial_move_drop_owner.ln": "aec2a27e239dd69710dc1646549e3261e4f2c4e39828d8c896e019d1bd1c1185",
+    "tests/luna/language/generic_drop/raw_write_and_safe_overwrite.ln": "9d86627bd0d5e63fa43e4cdcfa1bb390e6f688aa939c6090c8cc6aa4c7cf7686",
+    "tests/luna/language/generic_drop/resource.ln": "21621ecdd1c56ce3171c857117f9234cc990c7d515918614de4af8c45de0595d",
+    "tests/luna/language/generic_drop/use_after_move.ln": "38bf24e787ddb805687d3d8b89b994d0ef84355c1b976b075ebbbbb6c2ad227d"
+  },
+  "logs": {
+    "r1-drop-cli-regressions.txt": {
+      "sha256": "319518937abdbba0f998b1ff85c243c0eae9d924b1337f8e7a9eeb41223c3f54",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-drop-compiler-build.txt": {
+      "sha256": "95d00852774d0935f2af66d16492468ec4c699ee24953eeb1c7d761fd6508f87",
+      "test_results": []
+    },
+    "r1-drop-driver-regressions.txt": {
+      "sha256": "fdd24eef227cf6b58d4fafb0db51417e4e92ed45493e2838c8054d0f03f778af",
+      "test_results": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 3,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-drop-final-cli.txt": {
+      "sha256": "0fb4d97c6ff34f9b0329f50c3d380979b5178ceadc017d7dee72c6335aa31e83",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-drop-final-driver.txt": {
+      "sha256": "c04c3ed1d58f18bb6cbb2b2d904e84cbc869478115a6c35227219cc985c25c4e",
+      "test_results": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-drop-final-sysroot.txt": {
+      "sha256": "2a9c31b0292e884109303c4ab117f3b8d4d9f4bdbb6d2a99a307883da0d7818c",
+      "test_results": []
+    },
+    "r1-drop-flags-cli.txt": {
+      "sha256": "209739cb89a7fd1f2d7d9038bb6833124314d18f9d62f0e5fb3e7526db6ff14b",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-drop-semantic-borrow-regressions.txt": {
+      "sha256": "380eaa2457d468f5fb60bff15a06ceba280666ce9c1746581bdd1366d8b274a2",
+      "test_results": [
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 22,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 21,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 19,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 18,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 20,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-drop-sysroot-build.txt": {
+      "sha256": "2a9c31b0292e884109303c4ab117f3b8d4d9f4bdbb6d2a99a307883da0d7818c",
+      "test_results": []
+    },
+    "r1-drop-workspace-check.txt": {
+      "sha256": "25ef77c2eafbea0b97afed90f453bb40a7e58a7ce4a2687ceb9a618f5d447050",
+      "test_results": []
+    },
+    "r1-generic-drop-after-overwrite.txt": {
+      "sha256": "b81d736677c47e15082ffa7722fd0a96a32524175112f82f74e2d151331831db",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-generic-drop-aggregate.txt": {
+      "sha256": "472fa316f8107de2868b84a6eeb2590a592229cbc491c93ff61060a408b4e9c5",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-generic-drop-closure.txt": {
+      "sha256": "9364f55feab25b8b5e8ed4394434b5462b6d90d3bfb59da7d46112a425c9c1aa",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-generic-drop-initial.txt": {
+      "sha256": "a957b26511710e9181ef4227af510b5848df1be2bde1a9540a97688ee5366c9d",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    }
+  },
+  "cli_matrix": {
+    "positive_fixtures_per_mode": 10,
+    "positive_pass_per_mode": 9,
+    "negative_fixtures_per_mode": 5,
+    "negative_commands_per_mode": 10,
+    "remaining_failure": "closure_capture native exit3 in source and fresh artifact modes"
+  },
+  "scope_remaining": [
+    "closure destruction and invocation ownership",
+    "projected/partial-move cleanup and remaining R1 soundness",
+    "R2/R3 contract matrices",
+    "METHOD-RESOLUTION-v1",
+    "CALL-ARGUMENTS-v1 named binding and per-call defaults",
+    "R4 documentation reconciliation",
+    "R5 exact-candidate full workspace, CI and native clean-checkout gates"
+  ]
+}
