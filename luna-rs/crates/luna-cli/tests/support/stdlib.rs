@@ -3,6 +3,9 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
+use std::sync::atomic::{AtomicU64, Ordering};
+
+static PROVIDER_ROOT_COUNTER: AtomicU64 = AtomicU64::new(0);
 
 pub fn workspace_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -59,12 +62,13 @@ pub fn render(output: &Output) -> String {
 impl ProviderModes {
     pub fn fresh() -> Self {
         let work = std::env::temp_dir().join(format!(
-            "luna_cli_parity_{}_{}",
+            "luna_cli_parity_{}_{}_{}",
             std::process::id(),
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
-                .as_nanos()
+                .as_nanos(),
+            PROVIDER_ROOT_COUNTER.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir(&work).unwrap();
         let modes = Self {

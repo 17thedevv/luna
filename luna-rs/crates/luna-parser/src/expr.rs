@@ -606,13 +606,10 @@ impl<'a> Parser<'a> {
                 return true;
             }
             if self.tokens[self.pos + 1].kind == TokenKind::RBrace {
-                if self.pos + 2 < self.tokens.len() && self.tokens[self.pos + 2].kind == TokenKind::LBrace {
-                    return true;
-                }
-                let next_k = if self.pos + 2 < self.tokens.len() { self.tokens[self.pos + 2].kind } else { TokenKind::Eof };
-                if matches!(next_k, TokenKind::Semi | TokenKind::Comma | TokenKind::RParen | TokenKind::RBracket | TokenKind::Dot) {
-                    return true;
-                }
+                // The caller already excludes ambiguous condition/subject
+                // positions. An empty literal is valid regardless of the
+                // following delimiter or operator, including an outer `}`.
+                return true;
             }
         }
         false

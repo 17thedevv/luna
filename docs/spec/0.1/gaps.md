@@ -148,15 +148,27 @@ Subsequent focused fixes do not turn that run into PASS. See the
 [execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md) for
 revision-specific evidence and follow-ups.
 
-Two additional standalone counterexamples are retained as required regressions,
-not passing certificates:
+At the `c268372` checkpoint, two additional standalone counterexamples were
+retained as required regressions, not passing certificates:
 
 - `tests/luna/language/generic_typing/rigid_return_required_reject.ln`: a generic
   function returning an unrelated `i32` is accepted for `T = bool`, builds and
-  exits0. General TypeChecker unification still treats rigid generic parameters
-  as wildcards. This is a correctness blocker despite the stricter bound prover.
+  exits0. General TypeChecker unification treated rigid generic parameters
+  as wildcards, independently of the stricter bound prover.
 - `tests/luna/language/generic_typing/nested_struct_literal_required_accept.ln`:
-  nested struct literals in field initializers are rejected by the parser.
+  nested struct literals in field initializers were rejected by the parser.
+
+The subsequent rigid-body/parser follow-up rejects the first with E2001 and
+executes the second successfully. The standalone `generic_typing_cli` matrix
+checks four native executions and 24 typed check/build rejections across
+source-only and freshly published, relocated artifact-only provider graphs.
+Generic declaration binders remain rigid in ordinary unification; trait `Self`
+and parameter substitution precedes receiver checking. Empty struct literals no
+longer depend on a whitelist of following tokens; condition/subject positions
+retain their existing disambiguation. Artifact compiler identity is now 7;
+format2, metadata3 and MVIR4 are unchanged. This closes these two reduced
+counterexamples, not all generic typing or parser coverage. See the execution
+ledger for preserved failed runs, corrected reruns and remaining obligations.
 
 Canonical public metadata still groups some impl information by nominal head;
 its per-header identity/fingerprint contract needs further audit. Later fallback

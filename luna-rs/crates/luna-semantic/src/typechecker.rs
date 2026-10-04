@@ -244,13 +244,8 @@ impl<'a> TypeChecker<'a> {
                 Ok(())
             }
             (_, SemanticType::Never) => Ok(()),
-            (SemanticType::GenericParam(_), _) => {
-                // GenericParam expected, concrete actual — just accept it.
-                // The generic param will be resolved to the actual type.
-                Ok(())
-            }
-            (_, SemanticType::GenericParam(_)) => {
-                Ok(())
+            (SemanticType::GenericParam(_), _) | (_, SemanticType::GenericParam(_)) => {
+                Err("Rigid generic parameter does not match the other type; instantiate the declaration's binder explicitly".to_string())
             }
             (SemanticType::Pointer(m1, i1), SemanticType::Pointer(m2, i2)) if m1 == m2 => {
                 self.unify(i1, i2)

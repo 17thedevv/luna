@@ -1,0 +1,21 @@
+import "provider";
+using generic_api;
+
+fn select<U, C: Choose<U>, V>(cell: &C, value: V) -> V {
+    return cell.choose(value);
+}
+fn main() -> i32 {
+    dec a = identity<i32>(17);
+    dec b = identity<bool>(true);
+    dec c = identity<i64>(93i64);
+    if a != 17 || b == false || c != 93i64 { return 1; }
+    dec cell = make_cell<i32>(17);
+    dec other = make_cell<bool>(true);
+    dec borrowed = borrow(&cell);
+    if borrowed.value != 17 || other.value == false { return 2; }
+    // The method's T is independent of Cell's T despite identical spelling.
+    if cell.map<bool>(true) == false || other.map<i32>(23) != 23 { return 3; }
+    if select<i32, Cell<i32>, bool>(&cell, true) == false { return 4; }
+    if select<bool, Cell<bool>, i64>(&other, 41i64) != 41i64 { return 5; }
+    return 0;
+}

@@ -554,6 +554,37 @@ impl<'a> TypeChecker<'a> {
             };
             subst.insert(parameter, ty);
         }
+        if let Some(bound) = &candidate.bound {
+            let parameters = self
+                .ctx
+                .tables
+                .trait_generic_params
+                .get(&bound.trait_id)
+                .cloned()
+                .unwrap_or_else(|| {
+                    self.ctx
+                        .tables
+                        .symbol_decls
+                        .get(&bound.trait_id)
+                        .map(|declaration| {
+                            (0..bound.trait_args.len())
+                                .filter_map(|index| {
+                                    self.ctx
+                                        .tables
+                                        .generic_param_symbols
+                                        .get(&(*declaration, index))
+                                        .copied()
+                                })
+                                .collect()
+                        })
+                        .unwrap_or_default()
+                });
+            for (parameter, &argument) in parameters.into_iter().zip(&bound.trait_args) {
+                subst.insert(parameter, argument);
+            }
+            let mut has_generics = false;
+            self.bind_matching_generics(params[0], object_type, &mut subst, &mut has_generics);
+        }
         let expected_receiver = self.ctx.types.subst(params[0], &subst);
         if matches!(
             self.ctx.types.get(expected_receiver),
@@ -595,37 +626,6 @@ impl<'a> TypeChecker<'a> {
                     );
                 }
             }
-        }
-        if let Some(bound) = &candidate.bound {
-            let parameters = self
-                .ctx
-                .tables
-                .trait_generic_params
-                .get(&bound.trait_id)
-                .cloned()
-                .unwrap_or_else(|| {
-                    self.ctx
-                        .tables
-                        .symbol_decls
-                        .get(&bound.trait_id)
-                        .map(|declaration| {
-                            (0..bound.trait_args.len())
-                                .filter_map(|index| {
-                                    self.ctx
-                                        .tables
-                                        .generic_param_symbols
-                                        .get(&(*declaration, index))
-                                        .copied()
-                                })
-                                .collect()
-                        })
-                        .unwrap_or_default()
-                });
-            for (parameter, &argument) in parameters.into_iter().zip(&bound.trait_args) {
-                subst.insert(parameter, argument);
-            }
-            let mut has_generics = false;
-            self.bind_matching_generics(params[0], object_type, &mut subst, &mut has_generics);
         }
         // A result context may complete inference only after candidate choice.
         // It must never eliminate a same-named trait during applicability probes.

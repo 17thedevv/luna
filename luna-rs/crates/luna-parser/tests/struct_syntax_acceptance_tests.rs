@@ -222,3 +222,29 @@ fn struct_requires_rejects_malformed_contract_lists() {
         assert!(result.is_err() || !diags.is_empty(), "accepted malformed contract list: {contracts}");
     }
 }
+
+#[test]
+fn empty_struct_literals_compose_with_outer_fields_operators_and_tail_expressions() {
+    for body in [
+        "dec value = Wrapper<Item> { item: Item {} };",
+        "dec value = Outer { inner: Inner { item: Item {} } };",
+        "dec value = (Item {}, [Item {}, Item {}]);",
+        "return Wrapper<Item> { item: Item {} };",
+        "Item {}",
+        "dec value = Item {} == Item {};",
+        "dec value = library::Wrapper<Item> { item: library::Item {} };",
+    ] {
+        let input = format!("fn example() {{ {body} }}");
+        let (result, arena, diags) = parse(&input);
+        assert!(result.is_ok() && diags.is_empty(), "{body}: {diags:?}");
+        assert!(arena.exprs.iter().any(|expr| matches!(expr, luna_ast::Expr::StructInit { .. })));
+    }
+}
+
+#[test]
+fn empty_condition_blocks_do_not_become_struct_literals() {
+    let input = "fn example() { if condition {} while condition {} match value {} }";
+    let (result, arena, diags) = parse(input);
+    assert!(result.is_ok() && diags.is_empty(), "{diags:?}");
+    assert!(!arena.exprs.iter().any(|expr| matches!(expr, luna_ast::Expr::StructInit { .. })));
+}

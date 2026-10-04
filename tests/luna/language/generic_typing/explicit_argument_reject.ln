@@ -1,0 +1,3 @@
+import "provider";
+fn wrong<T>() -> T { return generic_api::identity<T>(7i32); }
+fn main() { dec value = wrong<bool>(); }

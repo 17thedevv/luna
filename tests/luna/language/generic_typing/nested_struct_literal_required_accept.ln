@@ -1,3 +1,12 @@
+import "provider";
 struct Item {};
 struct Wrapper<T> { item: T };
-fn main() { dec value = Wrapper<Item> { item: Item {} }; }
+fn main() -> i32 {
+    dec value = Wrapper<Item> { item: Item {} };
+    dec nested = Wrapper<generic_api::Cell<i32>> {
+        item: generic_api::Cell<i32> { value: 31 },
+    };
+    dec wrapped = generic_api::make_cell<Wrapper<Item>>(Wrapper<Item> { item: Item {} });
+    if nested.item.value != 31 { return 1; }
+    return 0;
+}

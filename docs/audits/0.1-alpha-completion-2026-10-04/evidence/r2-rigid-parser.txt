@@ -1,0 +1,169 @@
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2024 which implies `resolver = "3"`
+  |
+  = note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+  = note: to use the edition 2024 resolver, specify `workspace.resolver = "3"` in the workspace root's manifest
+  = note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+   Compiling luna-parser v0.1.0 (D:\fdlang\luna-rs\crates\luna-parser)
+warning: unused imports: `DeclId`, `ExprId`, `PatId`, `StmtId`, and `TypeId`
+ --> crates\luna-parser\src\lib.rs:1:26
+  |
+1 | use luna_ast::{AstArena, DeclId, ExprId, PatId, StmtId, TypeId};
+  |                          ^^^^^^  ^^^^^^  ^^^^^  ^^^^^^  ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `BuiltinKind`
+ --> crates\luna-parser\src\ty.rs:3:18
+  |
+3 | use luna_lexer::{BuiltinKind, TokenKind};
+  |                  ^^^^^^^^^^^
+
+warning: unused variable: `span_start`
+   --> crates\luna-parser\src\decl.rs:126:13
+    |
+126 |         let span_start = self.previous().span.start;
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_span_start`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `span_end`
+   --> crates\luna-parser\src\decl.rs:156:13
+    |
+156 |         let span_end = self.previous().span.end;
+    |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_span_end`
+
+warning: value assigned to `kind` is never read
+   --> crates\luna-parser\src\decl.rs:127:24
+    |
+127 |         let mut kind = luna_ast::ImportKind::External;
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+147 |             kind = luna_ast::ImportKind::Local;
+    |             ---------------------------------- `kind` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `start_span`
+   --> crates\luna-parser\src\decl.rs:836:21
+    |
+836 |                 let start_span = self.advance().span;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_span`
+
+warning: unused variable: `rparen_tok`
+   --> crates\luna-parser\src\decl.rs:841:21
+    |
+841 |                 let rparen_tok = self.consume(TokenKind::RParen, "Expected closing ')' after macro repetition")?;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_rparen_tok`
+
+warning: unused variable: `start_span`
+   --> crates\luna-parser\src\decl.rs:954:21
+    |
+954 |                 let start_span = self.advance().span;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_span`
+
+warning: unused variable: `rparen_tok`
+   --> crates\luna-parser\src\decl.rs:959:21
+    |
+959 |                 let rparen_tok = self.consume(TokenKind::RParen, "Expected closing ')' after macro repetition")?;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_rparen_tok`
+
+warning: unused variable: `allow_struct_literal`
+   --> crates\luna-parser\src\expr.rs:752:33
+    |
+752 |     fn parse_primary(&mut self, allow_struct_literal: bool) -> Result<ExprId, ()> {
+    |                                 ^^^^^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_allow_struct_literal`
+
+warning: `luna-parser` (lib) generated 10 warnings (2 duplicates) (run `cargo fix --lib -p luna-parser` to apply 7 suggestions)
+warning: `luna-parser` (lib test) generated 10 warnings (8 duplicates) (run `cargo fix --lib -p luna-parser --tests` to apply 2 suggestions)
+    Finished `test` profile [unoptimized] target(s) in 0.98s
+     Running unittests src\lib.rs (target\debug\deps\luna_parser-7de50766f6eee89d.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\annotation_tests.rs (target\debug\deps\annotation_tests-088d8b983dc4d13c.exe)
+
+running 4 tests
+test test_malformed_annotation_standalone_hash ... ok
+test test_malformed_annotation_missing_bracket ... ok
+test test_legacy_at_lang_rejected ... ok
+test test_valid_annotation ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\comptime_parser_tests.rs (target\debug\deps\comptime_parser_tests-f0bdf85bba179dae.exe)
+
+running 3 tests
+test test_parse_const_comptime_combination ... ok
+test test_parse_comptime_block_expr ... ok
+test test_parse_const_declaration ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\literal_parser_tests.rs (target\debug\deps\literal_parser_tests-fc9291a7f4814cf3.exe)
+
+running 1 test
+test numeric_suffix_and_byte_literals_preserve_source_tokens ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\macro_parser_tests.rs (target\debug\deps\macro_parser_tests-13274e36103fab68.exe)
+
+running 10 tests
+test test_macro_with_multiple_rules ... ok
+test test_simple_macro ... ok
+test test_macro_with_multiple_fragments ... ok
+test test_macro_invocations_paren_bracket_brace ... ok
+test test_malformed_macro_definition_missing_name ... ok
+test test_all_fragment_kinds ... ok
+test test_malformed_macro_invocation ... ok
+test test_malformed_macro_definition_missing_arrow ... ok
+test test_nested_delimiters_in_macro ... ok
+test test_malformed_fragment_specifier ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\namespace_using_parser_tests.rs (target\debug\deps\namespace_using_parser_tests-a63b6172aeabe4f5.exe)
+
+running 2 tests
+test exported_using_remains_a_source_syntax_error ... ok
+test namespace_opening_and_alias_have_distinct_ast_identity ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\struct_field_visibility_parser_tests.rs (target\debug\deps\struct_field_visibility_parser_tests-a56c2d28d419b899.exe)
+
+running 4 tests
+test test_struct_fields_default_public ... ok
+test test_struct_field_mixed_visibility ... ok
+test test_struct_field_visibility_parsing ... ok
+test test_struct_field_explicit_private ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\struct_syntax_acceptance_tests.rs (target\debug\deps\struct_syntax_acceptance_tests-8799aca432390329.exe)
+
+running 13 tests
+test test_struct_syntax_02_struct_with_postfix_lifetime_contract ... ok
+test test_struct_lifetime_and_raw_anchor_clauses_coexist ... ok
+test struct_requires_accepts_multiple_anchors_in_one_group ... ok
+test struct_requires_accepts_mixed_contract_entries_in_either_order ... ok
+test test_struct_raw_storage_anchor_rejects_nested_path_syntax ... ok
+test struct_requires_rejects_malformed_contract_lists ... ok
+test test_struct_raw_storage_anchor_syntax ... ok
+test empty_condition_blocks_do_not_become_struct_literals ... ok
+test test_struct_syntax_01_empty_struct_with_semicolon ... ok
+test test_struct_syntax_04_missing_semicolon_rejected ... ok
+test test_struct_syntax_03_semicolon_before_requires_rejected ... ok
+test empty_struct_literals_compose_with_outer_fields_operators_and_tail_expressions ... ok
+test test_struct_syntax_05_double_semicolon_rejected ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_parser
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

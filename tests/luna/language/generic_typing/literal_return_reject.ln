@@ -1,0 +1,2 @@
+fn wrong<T>() -> T { return 7; }
+fn main() { dec value = wrong<bool>(); }
