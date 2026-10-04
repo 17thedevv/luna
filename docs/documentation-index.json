@@ -205,7 +205,22 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/alpha-modules-2026-10-03/README.md",
+    "role": "evidence",
+    "owner": "modules"
+  },
+  {
     "path": "docs/audits/repair-0.1/README.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/repair-0.1/compiler-integrity-repair-2026-10-03.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/repair-0.1/provider_matrix.md",
     "role": "evidence",
     "owner": "conformance"
   },
@@ -500,6 +515,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/spec/0.1/alpha-module-plan.md",
+    "role": "canonical",
+    "owner": "modules"
+  },
+  {
     "path": "docs/spec/0.1/conformance.md",
     "role": "canonical",
     "owner": "conformance"
@@ -518,6 +538,16 @@
     "path": "docs/spec/0.1/modules.md",
     "role": "canonical",
     "owner": "modules"
+  },
+  {
+    "path": "docs/spec/0.1/namespace-using-v1.md",
+    "role": "canonical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/spec/0.1/provider-config-v1.md",
+    "role": "canonical",
+    "owner": "conformance"
   },
   {
     "path": "docs/spec/0.1/runtime.md",

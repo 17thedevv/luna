@@ -208,6 +208,7 @@ impl InterfaceDecoder {
             impl_generic_params,
             impl_generic_param_symbols: self.impl_generic_param_symbols,
             trait_associated_type_symbols: Vec::new(),
+            macro_environments: Default::default(),
             internal_symbols: Vec::new(),
             decl_symbols: HashMap::new(),
             expr_symbols: HashMap::new(),

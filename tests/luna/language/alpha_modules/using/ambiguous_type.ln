@@ -1,0 +1,3 @@
+module a { export struct Point { x: i32, }; } module b { export struct Point { x: i32, }; }
+using a; using b;
+fn main() -> i32 { dec p: Point; return 0; }

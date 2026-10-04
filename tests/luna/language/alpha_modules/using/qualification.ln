@@ -1,0 +1,3 @@
+module a { export fn value() -> i32 { return 1; } } module b { export fn value() -> i32 { return 2; } }
+using a; using b;
+fn main() -> i32 { return a::value() + b::value() - 3; }

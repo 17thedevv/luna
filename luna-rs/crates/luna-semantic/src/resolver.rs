@@ -123,6 +123,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     }
 
     pub fn new(ctx: &'a mut SemanticContext, arena: &'b AstArena, source_manager: &'c luna_common::source::SourceManager) -> Self {
+        ctx.symbol_table.lookup_provider = ctx.current_provider;
         // Assume global scope is 0
         let global_scope = ScopeId(0);
         Self {
@@ -151,9 +152,8 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     }
 
     pub fn register_macros(&mut self, items: &[Item]) {
-        for item in items {
-            self.declare_macro_item(item);
-        }
+        for item in items { self.declare_macro_item(item); }
+        self.resolve_using_items(items, false);
     }
 
     fn declare_macro_item(&mut self, item: &Item) {
@@ -224,57 +224,120 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                     }
                     self.current_scope = prev_scope;
                 }
-                Decl::Using { path, alias, .. } => {
-                    let alias_str = self.get_span_text(*alias).trim_matches('"').to_string();
-                    let path_str: Vec<&str> = path.iter().map(|seg| self.get_span_text(*seg).trim_matches('"')).collect();
-                    let target_scope_opt = if path_str.len() == 1 {
-                        self.ctx
-                            .symbol_table
-                            .lookup(path_str[0], self.current_scope)
-                            .and_then(|s| self.ctx.symbol_table.symbols[s.0 as usize].inner_scope)
-                    } else {
-                        let mut curr = self
-                            .ctx
-                            .symbol_table
-                            .lookup(path_str[0], self.current_scope)
-                            .and_then(|s| self.ctx.symbol_table.symbols[s.0 as usize].inner_scope);
-                        for &seg in &path_str[1..] {
-                            if let Some(scope) = curr {
-                                curr =
-                                    self.ctx
-                                        .symbol_table
-                                        .lookup_exact(seg, scope)
-                                        .and_then(|s| {
-                                            self.ctx.symbol_table.symbols[s.0 as usize].inner_scope
-                                        });
-                            } else {
-                                break;
-                            }
-                        }
-                        curr
+                // Register ordinary declaration identity before expansion too:
+                // a local function/type must shadow an opened macro, and hygienic
+                // macro names must see the same definition-site namespace.
+                Decl::Function { name, visibility, .. }
+                | Decl::Struct { name, visibility, .. }
+                | Decl::Enum { name, visibility, .. }
+                | Decl::Trait { name, visibility, .. }
+                | Decl::TypeAlias { name, visibility, .. }
+                | Decl::Var { name, visibility, .. } => {
+                    let kind = match decl {
+                        Decl::Function { .. } => SymbolKind::Function,
+                        Decl::Struct { .. } => SymbolKind::Struct,
+                        Decl::Enum { .. } => SymbolKind::Enum,
+                        Decl::Trait { .. } => SymbolKind::Trait,
+                        Decl::TypeAlias { .. } => SymbolKind::Alias,
+                        Decl::Var { is_mutable: true, .. } => SymbolKind::Variable,
+                        _ => SymbolKind::Constant,
                     };
-
-                    if let Some(target_scope) = target_scope_opt {
-                        let sym_id = self.ctx.symbol_table.declare_symbol(
-                            alias_str,
-                            SymbolKind::Module,
-                            self.current_scope,
-                            *alias,
-                            Some(*decl_id),
-                            Visibility::Private,
-                            &mut self.ctx.diagnostics,
-                        );
-                        self.ctx.symbol_table.set_inner_scope(sym_id, target_scope);
-                    } else {
-                        self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("unresolved module or path `{}`", alias_str)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(*alias));
-                    }
+                    let name_text = self.get_span_text(*name).to_string();
+                    let symbol = self.ctx.symbol_table.declare_symbol(
+                        name_text, kind, self.current_scope,
+                        *name, Some(*decl_id), *visibility, &mut self.ctx.diagnostics);
+                    self.ctx.tables.decl_symbols.insert(*decl_id, symbol);
+                    self.ctx.tables.symbol_decls.insert(symbol, *decl_id);
                 }
-                Decl::Import { name, kind, .. } => {
+                Decl::Extern { func, .. } => self.declare_macro_item(&Item::Decl(*func)),
+                Decl::Using { .. } | Decl::UsingNamespace { .. } => {},
+                    Decl::Import { name, kind, .. } => {
                     self.resolve_import_decl(name, kind);
                 }
                 _ => {}
             }
         }
+    }
+
+    fn resolve_using_items(&mut self, items: &[Item], report_errors: bool) {
+        // Targets are resolved only through explicit bindings; one opening cannot
+        // bootstrap another. Register all module declarations before this pass.
+        for item in items {
+            let Item::Decl(id) = item else { continue; };
+            match &self.arena.decls[id.0 as usize] {
+                Decl::Using { path, alias, span } => self.resolve_using(*id, path, Some(*alias), *span, report_errors),
+                Decl::UsingNamespace { path, span } => self.resolve_using(*id, path, None, *span, report_errors),
+                Decl::Module { items, .. } => {
+                    if let Some(scope) = self.ctx.tables.decl_symbols.get(id).and_then(|&symbol| self.ctx.symbol_table.get_symbol(symbol).inner_scope) {
+                        let previous = self.current_scope;
+                        self.current_scope = scope;
+                        let children: Vec<_> = items.iter().copied().map(Item::Decl).collect();
+                        self.resolve_using_items(&children, report_errors);
+                        self.current_scope = previous;
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    fn resolve_using(&mut self, decl: luna_ast::DeclId, path: &[Span], alias: Option<Span>, span: Span, report: bool) {
+        let mut target = None;
+        for (index, &segment) in path.iter().enumerate() {
+            let name = self.get_span_text(segment);
+            let symbol = if index == 0 {
+                self.ctx.symbol_table.lookup_without_openings(name, segment.ctxt, self.current_scope)
+            } else {
+                target.and_then(|scope| self.ctx.symbol_table.lookup_exact_with_ctxt(name, segment.ctxt, scope))
+            };
+            let Some(symbol) = symbol else {
+                if report { self.ctx.diagnostics.push(luna_common::Diagnostic::error("Unresolved namespace in using directive")
+                    .with_code(DiagnosticCode::UnresolvedSymbol).with_span(segment)); }
+                return;
+            };
+            if !self.ctx.symbol_table.is_accessible(symbol, self.current_scope, self.ctx.current_provider) {
+                if report { self.ctx.diagnostics.push(luna_common::Diagnostic::error("Namespace in using directive is private")
+                    .with_code(DiagnosticCode::PrivateSymbolAccess).with_span(segment)); }
+                return;
+            }
+            let symbol = self.ctx.symbol_table.get_symbol(symbol);
+            if symbol.kind != SymbolKind::Module {
+                if report { self.ctx.diagnostics.push(luna_common::Diagnostic::error("using target must be a namespace")
+                    .with_code(DiagnosticCode::UnresolvedSymbol).with_span(segment)); }
+                return;
+            }
+            target = symbol.inner_scope;
+        }
+        let Some(target) = target else { return; };
+        if let Some(alias) = alias {
+            let name = self.get_span_text(alias).to_string();
+            if let Some(existing) = self.ctx.symbol_table.lookup_exact_with_ctxt(&name, alias.ctxt, self.current_scope) {
+                let previous = self.ctx.symbol_table.get_symbol(existing);
+                if previous.span != alias || previous.decl_id != Some(decl) {
+                    if report { self.ctx.diagnostics.push(luna_common::Diagnostic::error(format!("Duplicate namespace alias '{}'", name))
+                        .with_code(DiagnosticCode::DuplicateDefinition).with_span(alias)
+                        .with_related(previous.span, "previous binding")); }
+                    return;
+                }
+            }
+            let symbol = self.ctx.symbol_table.declare_symbol(name, SymbolKind::Module, self.current_scope,
+                alias, Some(decl), Visibility::Private, &mut self.ctx.diagnostics);
+            self.ctx.symbol_table.set_inner_scope(symbol, target);
+            self.ctx.symbol_table.namespace_aliases.insert(symbol);
+        } else {
+            let opened = &mut self.ctx.symbol_table.scopes[self.current_scope.0 as usize].opened_namespaces;
+            if !opened.contains(&target) { opened.push(target); }
+        }
+        let _ = span;
+    }
+
+    fn reject_ambiguous_path(&mut self, path: &[Span]) -> bool {
+        let Some(&first) = path.first() else { return false; };
+        if let Some(diagnostic) = self.ctx.symbol_table.ambiguity_diagnostic(self.get_span_text(first), first.ctxt, self.current_scope, first) {
+            self.ctx.diagnostics.push(diagnostic);
+            return true;
+        }
+        false
     }
 
     fn resolve_import_decl(&mut self, name: &Span, kind: &luna_ast::ImportKind) {
@@ -466,9 +529,8 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         for item in items {
             self.declare_item(item, DeclarationContext::Free);
         }
-        for item in items {
-            self.resolve_item_body(item);
-        }
+        self.resolve_using_items(items, true);
+        for item in items { self.resolve_item_body(item); }
     }
 
     fn declare_item(&mut self, item: &Item, context: DeclarationContext) {
@@ -1185,55 +1247,12 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         }
                         self.current_scope = prev_scope;
                     }
-                    Decl::Using { path, alias, .. } => {
-                        let alias_str =
-                            self.get_span_text(*alias).trim_matches('"').to_string();
-                        let path_str: Vec<&str> = path
-                            .iter()
-                            .map(|seg| self.get_span_text(*seg).trim_matches('"'))
-                            .collect();
-                        let target_scope_opt = if path_str.len() == 1 {
-                            self.ctx
-                                .symbol_table
-                                .lookup(path_str[0], self.current_scope)
-                                .and_then(|s| {
-                                    self.ctx.symbol_table.symbols[s.0 as usize].inner_scope
-                                })
-                        } else {
-                            let mut curr = self
-                                .ctx
-                                .symbol_table
-                                .lookup(path_str[0], self.current_scope)
-                                .and_then(|s| {
-                                    self.ctx.symbol_table.symbols[s.0 as usize].inner_scope
-                                });
-                            for &seg in &path_str[1..] {
-                                if let Some(scope) = curr {
-                                    curr = self.ctx.symbol_table.lookup_exact(seg, scope).and_then(
-                                        |s| self.ctx.symbol_table.symbols[s.0 as usize].inner_scope,
-                                    );
-                                } else {
-                                    break;
-                                }
-                            }
-                            curr
-                        };
-
-                        if let Some(target_scope) = target_scope_opt {
-                            let sym_id = self.ctx.symbol_table.declare_symbol(
-                                alias_str,
-                                SymbolKind::Module,
-                                self.current_scope,
-                                *alias,
-                                Some(*decl_id),
-                                Visibility::Private,
-                                &mut self.ctx.diagnostics,
-                            );
-                            self.ctx.symbol_table.set_inner_scope(sym_id, target_scope);
-                        } else {
-                            self.ctx.diagnostics.push(luna_common::diagnostic::Diagnostic::error(format!("unresolved module or path `{}`", alias_str)).with_code(DiagnosticCode::UnresolvedSymbol).with_span(*alias));
+                    Decl::Using { span, .. } | Decl::UsingNamespace { span, .. } => {
+                        if !matches!(self.ctx.symbol_table.scopes[self.current_scope.0 as usize].kind, crate::symbol::ScopeKind::Global | crate::symbol::ScopeKind::Module) {
+                            self.ctx.diagnostics.push(luna_common::Diagnostic::error("using is restricted to file/module scope")
+                                .with_code(DiagnosticCode::InvalidSyntax).with_span(*span));
                         }
-                    }
+                    },
                     Decl::Import { name, kind, .. } => {
                         self.resolve_import_decl(name, kind);
                     }
@@ -1255,6 +1274,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
             luna_ast::Type::Builtin(_) | luna_ast::Type::Never | luna_ast::Type::Lifetime(_) => {}
 
             luna_ast::Type::Named { segments, generic_args, associated_bindings } => {
+                if self.reject_ambiguous_path(segments) { return; }
                 let last_span = segments.last().copied();
                 let ctxt = last_span.map(|s| s.ctxt).unwrap_or(luna_common::ids::SyntaxContext::ROOT);
                 let symbol = if segments.len() == 1 {
@@ -1538,6 +1558,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     ) {
         match &self.arena.pats[pat_id.0 as usize] {
             Pattern::Identifier { segments } => {
+                if segments.len() > 1 && self.reject_ambiguous_path(segments) { return; }
                 if segments.len() > 1 {
                     // It's a path, like Color::Red
                     let mut full_name = String::new();
@@ -1638,7 +1659,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         };
                         
                         if let Some(id) = sym_id {
-                            if i > 0 && !self.ctx.symbol_table.is_accessible(id, self.current_scope, self.ctx.current_provider) {
+                            if i > 0 && !self.ctx.symbol_table.is_accessible_with_ctxt(id, self.current_scope, self.ctx.current_provider, seg.ctxt) {
                                 self.ctx.diagnostics.push(
                                     luna_common::Diagnostic::error(format!(
                                         "Symbol '{}' is private and cannot be accessed from this scope",
@@ -1664,7 +1685,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                 }
 
                 if let Some(existing_sym_id) = resolved_sym {
-                    if !self.ctx.symbol_table.is_accessible(existing_sym_id, self.current_scope, self.ctx.current_provider) {
+                    if !self.ctx.symbol_table.is_accessible_with_ctxt(existing_sym_id, self.current_scope, self.ctx.current_provider, path[0].ctxt) {
                         let span = path.last().copied().unwrap_or(luna_common::Span::default());
                         self.ctx.diagnostics.push(
                             luna_common::Diagnostic::error(format!(
@@ -1700,6 +1721,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         let expr = &self.arena.exprs[expr_id.0 as usize];
         match expr {
             Expr::Identifier { segments, generic_args } => {
+                if self.reject_ambiguous_path(segments) { return; }
                 for arg in generic_args {
                     self.resolve_type(arg);
                 }
@@ -1737,7 +1759,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             };
 
                             if let Some(id) = sym_id {
-                                if i > 0 && !self.ctx.symbol_table.is_accessible(id, self.current_scope, self.ctx.current_provider) {
+                                if i > 0 && !self.ctx.symbol_table.is_accessible_with_ctxt(id, self.current_scope, self.ctx.current_provider, seg.ctxt) {
                                     self.ctx.diagnostics.push(
                                         luna_common::Diagnostic::error(format!(
                                             "Symbol '{}' is private and cannot be accessed from this scope",
@@ -1771,7 +1793,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
 
                     if let Some(sym_id) = resolved_sym {
                         let sym = self.ctx.symbol_table.get_symbol(sym_id);
-                        if !self.ctx.symbol_table.is_accessible(sym_id, self.current_scope, self.ctx.current_provider) {
+                        if !self.ctx.symbol_table.is_accessible_with_ctxt(sym_id, self.current_scope, self.ctx.current_provider, segments[0].ctxt) {
                             let name_str = segments
                                 .iter()
                                 .map(|seg| self.get_span_text(*seg))

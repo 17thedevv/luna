@@ -1,0 +1,1 @@
+export module cross_b { export struct Mark { value: i32, }; export fn answer() -> i32 { return 2; } }

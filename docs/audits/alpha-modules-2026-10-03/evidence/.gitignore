@@ -1,0 +1,2 @@
+# Commit the bounded verification logs referenced by this audit.
+!*.log

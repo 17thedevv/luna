@@ -12,6 +12,7 @@ pub mod metadata_decoder;
 pub mod lang_contracts;
 pub mod sysroot_manifest;
 pub mod resolution_context;
+pub mod provider_binding;
 
 pub use session::DriverSession;
 
@@ -108,6 +109,7 @@ pub struct CompilerOptions {
     pub comptime_steps: Option<usize>,
     pub comptime_depth: Option<usize>,
     pub is_sysroot_build: bool,
+    pub provider_bindings: provider_binding::ProviderBindings,
 }
 
 fn verify_items_lifetime(
@@ -162,6 +164,7 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
         .or_else(|| crate::sysroot::Sysroot::discover_for_test().ok())
         .unwrap_or_else(|| crate::sysroot::Sysroot::from_root(search_paths_buf.first().cloned().unwrap_or_else(|| std::path::PathBuf::from("."))).expect("Failed to initialize sysroot"));
     let mut driver_session = crate::session::DriverSession::new(sysroot, &mut session, options.search_paths.as_slice());
+    driver_session.set_provider_bindings(&options.provider_bindings)?;
 
     if let Err(e) = driver_session.bootstrap_lang_contracts(&mut arena) {
         return Err(e.into_diagnostics());
@@ -249,6 +252,7 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
         .or_else(|| crate::sysroot::Sysroot::discover_for_test().ok())
         .unwrap_or_else(|| crate::sysroot::Sysroot::from_root(search_paths_buf.first().cloned().unwrap_or_else(|| std::path::PathBuf::from("."))).expect("Failed to initialize sysroot"));
     let mut driver_session = crate::session::DriverSession::new(sysroot, session, options.search_paths.as_slice());
+    driver_session.set_provider_bindings(&options.provider_bindings)?;
     
     let is_slice_authorized = if options.is_sysroot_build {
         driver_session.sysroot.get_canonical_provider_capabilities(std::path::Path::new(file_name))
@@ -413,6 +417,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 .or_else(|| crate::sysroot::Sysroot::discover_for_test().ok())
                 .unwrap_or_else(|| crate::sysroot::Sysroot::from_root(search_paths_buf.first().cloned().unwrap_or_else(|| std::path::PathBuf::from("."))).expect("Failed to initialize sysroot"));
             let mut driver_session = crate::session::DriverSession::new(sysroot, session, options.search_paths.as_slice());
+            driver_session.set_provider_bindings(&options.provider_bindings)?;
             
             let base_name = std::path::Path::new(file_name)
                 .file_stem()
@@ -738,7 +743,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     identity: luna_llib::ArtifactIdentity {
                         package_id: "".to_string(),
                         version: "0.1.0".to_string(),
-                        module_id: "".to_string(),
+                        module_id: base_name.to_string(),
                         artifact_id: "".to_string(),
                     },
                     target: luna_llib::TargetContract {

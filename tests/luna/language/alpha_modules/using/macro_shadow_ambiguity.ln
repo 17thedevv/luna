@@ -1,0 +1,5 @@
+module left { export macro answer { () => { 1 } } }
+module right { export macro answer { () => { 2 } } }
+using left; using right;
+fn work(answer: i32) -> i32 { return answer!(); }
+fn main() -> i32 { return work(7); }

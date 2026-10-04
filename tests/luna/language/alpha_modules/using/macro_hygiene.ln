@@ -1,0 +1,7 @@
+module a {
+ export fn helper() -> i32 { return 42; }
+ export macro value { () => { helper() } }
+}
+module b { export fn helper() -> i32 { return 9; } }
+using a as m; using b;
+fn main() -> i32 { return m::value!() - 42; }

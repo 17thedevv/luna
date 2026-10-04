@@ -54,6 +54,8 @@ about past test runs or implementation completion remain dated evidence.
 
 | Contract | Detailed source |
 |---|---|
+| Namespace openings and aliases | [NAMESPACE-USING-v1](namespace-using-v1.md) |
+| Optional provider discovery configuration | [PROVIDER-CONFIG-v1](provider-config-v1.md) |
 | Core semantic rules A–K | [Normative rules](../../normative-rules-p0-p1.md) |
 | Lifetime relation algebra | [REGION-SPEC-01](../../../luna-rs/docs/spec/lifetime-formalism.md) |
 | Borrow joins, carried references, closure escape | [SPEC-HARDENING-01](../../../luna-rs/docs/spec-hardening-borrow-closure.md) |

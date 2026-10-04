@@ -1,0 +1,2 @@
+import "../shared/geometry";
+fn main() -> i32 { return geometry::answer() - 42; }

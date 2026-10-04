@@ -54,6 +54,35 @@ A full workspace test remains a required implementation check. The integration
 record distinguishes current checks from historical acceptance. The documentation validator performs local
 consistency checks; CLI example checks are recorded separately.
 
+## Optional module conveniences
+
+Namespace openings are additive: `using geometry;` makes accessible direct
+members available for unqualified lookup, while `using geometry as geo;`
+keeps the alias form. Both apply at file/module scope. Distinct candidates
+produce E1008; qualification resolves the collision.
+
+An optional `luna.toml` shortens external provider discovery:
+
+```toml
+schema = 1
+[providers]
+geo = "../shared/geometry"
+```
+
+```luna
+import <geo>;
+using geometry;
+fn main() -> i32 { return answer() - 42; }
+```
+
+Here the selected provider must declare `geometry::answer`. The `geo` key
+does not rename its namespace. Paths are extensionless stems, relative to
+this configuration. `check`, `build` and `run` select the nearest config
+from the entry file; `--config FILE` overrides it and `--no-config` disables
+it. Existing relative imports remain available. See the
+[using contract](docs/spec/0.1/namespace-using-v1.md) and
+[provider configuration contract](docs/spec/0.1/provider-config-v1.md).
+
 ## Repository
 
 - `luna-rs/crates/`: 12 canonical compiler workspace crates.

@@ -1,0 +1,2 @@
+# Preserve hashed log bytes and keep generated transcripts out of code diffs.
+*.log -text -diff

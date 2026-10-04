@@ -58,9 +58,6 @@ pub fn resolve_collected_imports(
             }
         } else {
             // Local module import: import "module"; -> searches relative to the importing file directory
-            if session.registry.local_providers.contains(&name) {
-                continue;
-            }
             if session.registry.is_loading(&name) {
                 diagnostics.push(Diagnostic::error(format!("Cyclic module dependency detected involving '{}'", name)).with_code(luna_common::DiagnosticCode::CyclicModuleDependency).with_span(span));
                 continue;

@@ -169,6 +169,11 @@ pub enum Decl {
         name: Span,
         rules: Vec<MacroRule>,
     },
+    /// Namespace opening; appended to preserve existing serialized variant indices.
+    UsingNamespace {
+        path: Vec<Span>,
+        span: Span,
+    },
 }
 
 impl Decl {
@@ -186,7 +191,7 @@ impl Decl {
             Decl::TypeAlias { annotations, .. } => annotations,
             Decl::Macro { annotations, .. } => annotations,
             Decl::Extern { annotations, .. } => annotations,
-            Decl::Using { .. } => &[],
+            Decl::Using { .. } | Decl::UsingNamespace { .. } => &[],
         }
     }
 }

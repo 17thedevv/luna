@@ -736,16 +736,16 @@ impl<'a> Parser<'a> {
         Ok(self.arena.alloc_decl(decl))
     }
 
-    /// Parse `using <module_path> as <alias>;`
+    /// Parse `using <module_path>;` or `using <module_path> as <alias>;`
     ///
-    /// Grammar: `using_decl ::= "using" module_path "as" IDENTIFIER ";"`
+    /// Grammar: `using_decl ::= "using" module_path [ "as" IDENTIFIER ] ";"`
     /// where `module_path ::= IDENTIFIER ("::" IDENTIFIER)*`
     ///
     /// Rejects:
     /// - `using as x;` (empty path)
     /// - `using ::foo as x;` (leading `::`)
     /// - `using foo:: as x;` (trailing `::`)
-    /// - `using foo::bar;` (missing `as`)
+    /// - `export using foo;` (using directives are private)
     fn parse_using_decl(&mut self) -> Result<DeclId, ()> {
         let start_span = self.previous().span; // span of `using` keyword
 
@@ -773,15 +773,9 @@ impl<'a> Parser<'a> {
 
         // Path must have at least one segment (already guaranteed above)
 
-        // Must have `as`
-        if !self.match_token(TokenKind::KwAs) {
-            let span = self.peek().span;
-            self.error_at_current("`using` requires `as <alias>` — bare `using path;` is not allowed", span);
-            return Err(());
-        }
-
-        // Parse alias identifier
-        let alias_token = self.consume(TokenKind::Identifier, "Expected alias identifier after `as`")?;
+        let alias = if self.match_token(TokenKind::KwAs) {
+            Some(self.consume(TokenKind::Identifier, "Expected alias identifier after `as`")?.span)
+        } else { None };
 
         // Semicolon
         self.consume(TokenKind::Semi, "Expected `;` after using declaration")?;
@@ -793,10 +787,9 @@ impl<'a> Parser<'a> {
             end_span.end,
         ).with_ctxt(start_span.ctxt);
 
-        Ok(self.arena.alloc_decl(Decl::Using {
-            path,
-            alias: alias_token.span,
-            span: full_span,
+        Ok(self.arena.alloc_decl(match alias {
+            Some(alias) => Decl::Using { path, alias, span: full_span },
+            None => Decl::UsingNamespace { path, span: full_span },
         }))
     }
 

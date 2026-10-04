@@ -1,0 +1,3 @@
+module math { export macro twice { (@v: expr) => { @v * 2 } } }
+using math;
+fn main() -> i32 { return twice!(21) - 42; }

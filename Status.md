@@ -27,3 +27,13 @@ See the [audit](docs/audits/stdlib-2026-10-02/README.md) for exact logs, limits 
 severity, and the [0.1 gap register](docs/spec/0.1/gaps.md) for grammar/spec debt.
 No full compiler, all-target, sanitizer or fuzzing completion is claimed.
 Historical progress reports are indexed as historical evidence.
+
+## Module implementation update — 2026-10-04
+
+`using namespace_name;` and optional `luna.toml` provider bindings are implemented
+on branch `codex/antigravity-repair-0.1`. The 57-fixture public CLI matrix passes
+in source-only and freshly built artifact-only modes on Windows x86_64 GNU.
+Aliases, existing imports, provider identity and strict artifact rejection are
+preserved. See the [feature verification record](docs/audits/alpha-modules-2026-10-03/README.md)
+for current source fingerprints, commands and regression failures. This update
+does not replace the dated audit above or establish release conformance.

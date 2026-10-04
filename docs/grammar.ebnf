@@ -52,7 +52,7 @@ life_target = "life", "(", ( identifier | "self" | "return" ),
               { ".", identifier }, ")" ;
 module_decl = [ "export" ], "module", identifier, "{", { declaration }, "}" ;
 import_decl = "import", ( string_literal | "<", provider_name, ">" ), ";" ;
-using_decl = "using", namespace_path, "as", identifier, ";" ;
+using_decl = "using", namespace_path, [ "as", identifier ], ";" ;
 namespace_path = identifier, { "::", identifier } ;
 type_path = ( identifier | "Self" ), [ generic_arguments ],
             { "::", identifier, [ generic_arguments ] } ;

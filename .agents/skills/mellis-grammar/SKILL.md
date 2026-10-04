@@ -29,8 +29,7 @@ The following keywords and syntax constructs are strictly **FORBIDDEN** in Luna:
 - `use`: Luna uses `import` for providers and `using ... as ...` for namespace aliases. The keyword `use` does not exist in Luna.
 - `mod`: Luna uses `module` for namespaces, or `import` for module providers. (Avoid Rust's `mod` assumptions).
 - `module foo;`: File-level module declarations without a body are forbidden. Luna only allows inline `module foo { ... }`. Provider identity is determined by file name / artifact resolution.
-- `using namespace`: Luna does NOT have `using namespace` (C++ style). Luna requires `using <path> as <alias>`.
-- `using <path>;`: Bare `using` without `as <alias>` is rejected. Always use `using <path> as <alias>;`.
+- `using namespace`: Luna does NOT have `using namespace` (C++ style). Luna uses `using path;` or `using path as alias;` under NAMESPACE-USING-v1.
 - `export using` / `export import`: Luna v1.0 does not support module re-export. Both are hard syntax errors.
 - `import <a::b>`: Mellis `import <...>` only accepts a single logical provider name. No `::`.
 - `import "foo.ms"` or `import "foo.mlib"`: File paths in local imports must not contain extensions (use `import "foo";`).
@@ -189,16 +188,16 @@ import <mem>;     // External sysroot provider loaded
 dec pt = geometry::Point { x: 1.0, y: 2.0 };
 ```
 
-### Namespace Aliases (`using`)
-`using` creates a **local alias** to an existing namespace path. It does NOT import symbols, does NOT glob, does NOT export, and does NOT create provider dependencies.
+### Namespace Openings and Aliases (`using`)
+`using path;` opens the accessible direct members of an existing namespace for unqualified lookup. `using path as alias;` creates a local namespace alias. Neither form loads providers or exports directives. Both are restricted to file/module scope; distinct competing candidates produce E1008. See NAMESPACE-USING-v1 for lexical precedence, visibility and declaration identity.
 
-**Grammar:** `using_decl ::= "using" module_path "as" IDENTIFIER ";"`
+**Grammar:** `using_decl ::= "using" module_path [ "as" IDENTIFIER ] ";"`
 
 **Rules:**
 - Target must be a qualified module/namespace path, not a leaf symbol (type, function, etc.)
 - `using` aliases are compilation-local — they are NOT exported via .llib
 - `export using` is a compile-time syntax error
-- `using <path>;` without `as` is a syntax error
+- `using path;` opens direct namespace members without copying declarations
 - Standard duplicate-scope rules apply
 
 ```rust
@@ -218,8 +217,8 @@ dec s: proto::Response;
 // INVALID — target is a type, not a namespace:
 // using std::Vec as V;       // ERROR
 
-// INVALID — missing 'as':
-// using std;    // ERROR
+// Valid namespace opening:
+using std;
 
 // INVALID — cannot export:
 // export using std as s;     // ERROR
@@ -324,7 +323,7 @@ Luna 0.1 has exactly 4 module system primitives:
 |-----------|---------|---------|
 | `import`  | Make an artifact provider available | `import <vec>;` / `import "math";` |
 | `module`  | Define an inline namespace container | `module std { ... }` |
-| `using`   | Local namespace alias | `using std as library;` |
+| `using`   | Namespace opening or local alias | `using std;` / `using std as library;` |
 | `::`      | Qualified namespace lookup | `library::Vec<i32>` |
 
 ## Lifetime Contracts (REGION-DESIGN-01)
@@ -341,7 +340,7 @@ These contracts are appended at the end of function, struct, and extern declarat
 
 ## Known current conformance disagreements
 
-The retained parenthesized foreach and receiver-equivalence contracts are not fully implemented; struct field semicolons still parse. Formal EBNF coverage is explicitly partial. See the versioned gap register. Do not infer completeness from the invariant below.
+The versioned gap register preserves dated grammar characterization; the repair ledger and current verification records track later checks separately. Do not treat historical parser failures as current language restrictions. Formal EBNF and complete receiver-equivalence coverage remain separate acceptance obligations. Do not infer completeness from the invariant below.
 
 ## Grammar Layer Invariant
 
@@ -350,3 +349,7 @@ $$\text{AST accepted by parser} \iff \text{Exactly defined by grammar.ebnf} \iff
 ## Related Documents
 - [grammar.ebnf](../../../docs/grammar.ebnf): Machine-readable formal EBNF definition of the Mellis syntax.
 - [docs/grammar.md](../../../docs/grammar.md): Original comprehensive grammar specification.
+
+
+Luna 0.1 alpha amendment: `using_decl = "using", namespace_path, [ "as", identifier ], ";" ;`
+See [NAMESPACE-USING-v1](../../../docs/spec/0.1/namespace-using-v1.md) for lookup, visibility and ambiguity rules.

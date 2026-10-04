@@ -1,0 +1,30 @@
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: second
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: other
+DEBUG: resolve_imports returning false
+error[E1002]: Distinct provider 'C:\Users\84387\AppData\Local\Temp\luna_alias_identity_ee15d15851fe4c3e83b07b95cd810461\second.ln' conflicts with loaded identity 'second'
+  --> C:/Users/84387/AppData/Local/Temp/luna_alias_identity_ee15d15851fe4c3e83b07b95cd810461/main.ln:1:26
+   |
+1  | import <second>; import <other>; fn main() -> i32 { return a::answer() + b::answer() - 3; }
+   |                          ^^^^^
+note: Provider 'other' is bound here to 'C:\Users\84387\AppData\Local\Temp\luna_alias_identity_ee15d15851fe4c3e83b07b95cd810461\second'
+  --> C:\Users\84387\AppData\Local\Temp\luna_alias_identity_ee15d15851fe4c3e83b07b95cd810461\luna.toml:3:1
+   |
+3  | other = 'second'
+   | ^^^^^^
+

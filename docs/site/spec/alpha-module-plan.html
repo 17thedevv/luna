@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1-alpha.1 — implementation plan for using and provider configuration</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01-alpha1--implementation-plan-for-using-and-provider-configuration">Luna 0.1-alpha.1 — implementation plan for using and provider configuration</h1>
+<p>The maintainer first approved these two bounded designs, then authorized implementation on 2026-10-03. The earlier compiler-integrity repairs were committed and pushed as <code>b330ee3</code> before feature work started. Contracts: <a href="namespace-using-v1.html">NAMESPACE-USING-v1</a> and <a href="provider-config-v1.html">PROVIDER-CONFIG-v1</a>. Status: <strong>IMPLEMENTED / CLI SOURCE-ARTIFACT MATRIX PASS</strong> on Windows x86_64 GNU; workspace snapshots and final targeted regressions tracked in the <a href="../../audits/alpha-modules-2026-10-03/README.md">verification record</a>.</p>
+<h2 id="execution-order">Execution order</h2>
+<p class="list-item">1. Preserve existing repairs and establish the exact implementation baseline.</p>
+<p>   Resolve existing correctness blockers under the <a href="../../audits/repair-0.1/README.md">repair ledger</a>.    These two features do not close S-06, DIAG, backend or target evidence gaps.</p>
+<p class="list-item">2. Implement namespace opening in AST/parser/resolver. Keep aliases separate</p>
+<p>   from namespace openings; retain canonical IDs, visibility and macro hygiene.    Define deterministic candidate lookup and ambiguity diagnostics before broad    positive examples. Preserve invalid leaf-target and export rejection.</p>
+<p class="list-item">3. Implement typed configuration/binding inputs at the CLI/discovery boundary.</p>
+<p>   Add nearest-entry configuration discovery and explicit/disabled selection.    Reuse the existing provider loader and artifact validator; do not add a    second source/artifact pipeline or provider-name branches in semantic code.</p>
+<p class="list-item">4. Preserve provider identity when a config key differs from a filename, and</p>
+<p>   when imports reach the same provider through more than one route. Validate    transitive configured discovery and portable dependency references before    claiming artifact support.</p>
+<p class="list-item">5. Execute each contract&#x27;s valid/invalid matrix through the CLI. Build artifact</p>
+<p>   fixtures freshly, remove provider sources from search roots, and consume in    another process. Verify cwd independence, import reorder, collisions and    equivalent <code>check</code>/<code>build</code>/<code>run</code> behavior. Add focused internal invariant tests    where CLI observation is insufficient.</p>
+<p class="list-item">6. Run relevant existing module/import, macro, provider/artifact and sysroot</p>
+<p>   regressions, then the required workspace and native target gates. Record    SHA, config, compiler/runtime identity, commands, expected/actual exits,    diagnostics and freshness. Mark supported only within the verified scope.</p>
+<h2 id="completion-boundaries">Completion boundaries</h2>
+<table>
+<tr><th>ID</th><th>Owner</th><th>Acceptance</th><th>Current state</th></tr>
+<tr><td>A1-USING-01</td><td>Parser/AST/resolver</td><td>Full namespace-using matrix; aliases preserved; deterministic errors; source/artifact parity</td><td>IMPLEMENTED; source/fresh-artifact CLI matrix PASS on tested target</td></tr>
+<tr><td>A1-CONFIG-01</td><td>CLI/discovery/driver provider identity</td><td>Full provider-config matrix; old imports preserved; artifact validation unchanged</td><td>IMPLEMENTED; source/fresh-artifact CLI matrix PASS on tested target</td></tr>
+</table>
+<p>The <a href="conformance.html">release gates</a> still apply. The requested additions are explicit exceptions to the feature pause, not permission for a package manager, new namespace keyword, auto-import, transitive config merging or backend shortcuts. Update the <a href="index.html">contract chapters</a>, <a href="gaps.html">gap register</a>, status and public documentation after evidence exists. Do not replace historical logs or call these features implemented because their grammar/specification was updated.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

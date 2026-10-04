@@ -1,0 +1,2 @@
+import <geo>; using geometry;
+fn main() -> i32 { return private_value(); }

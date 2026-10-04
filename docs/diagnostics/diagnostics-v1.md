@@ -136,6 +136,7 @@ The following table lists every stable `DiagnosticCode` recognized by Luna v1.0.
 | `E1004` | 1004 | UnresolvedModuleProvider | Resolver | Module provider not found in search paths or registry |
 | `E1005` | 1005 | CyclicModuleDependency | Resolver | Circular import cycle detected between providers |
 | `E1006` | 1006 | InvalidVisibility | Resolver | Visibility modifier used on invalid declaration |
+| `E1008` | 1008 | AmbiguousSymbol | Resolver | Distinct accessible namespace-opening candidates; related declaration locations |
 | `E1007` | 1007 | WildcardImportProhibited | Resolver | Wildcard glob import prohibited by Luna contract |
 | `E2001` | 2001 | TypeMismatch | TypeChecker | Incompatible types in assignment, call, or binary op |
 | `E2002` | 2002 | CannotDereference | TypeChecker | Dereference operator applied to non-pointer/reference |
@@ -190,6 +191,8 @@ The following table lists every stable `DiagnosticCode` recognized by Luna v1.0.
 | `E6004` | 6004 | SysrootConfigurationFailure | Infrastructure | Selected sysroot is missing or its configuration cannot be loaded |
 | `E6005` | 6005 | ProviderReadFailure | Infrastructure | Discovered provider cannot be read |
 | `E6006` | 6006 | OutputWriteFailure | Infrastructure | Requested compiler output cannot be written |
+| `E6008` | 6008 | ProviderConfigurationError | Infrastructure | Invalid project provider table, selection or reserved sysroot binding |
+| `E6009` | 6009 | ProcessExecutionFailure | Infrastructure | Compiled application could not be started |
 | `E6007` | 6007 | InvalidArtifactOutput | Infrastructure | Requested artifact output format is read-only or invalid |
 
 Registry extension, 2026-10-03: E2031, E3006–E3007 and E6004–E6007 fill

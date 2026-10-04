@@ -1,0 +1,4 @@
+module math { export macro answer { () => { 42 } } }
+using math;
+fn consume(answer: i32) -> i32 { return answer; }
+fn main() -> i32 { { dec answer = 7; } return answer!() - consume(42); }

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1-alpha.1 — optional provider configuration</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01-alpha1--optional-provider-configuration">Luna 0.1-alpha.1 — optional provider configuration</h1>
+<p>Contract ID: <strong>PROVIDER-CONFIG-v1</strong>. Maintainer-requested alpha scope, 2026-10-03. Status: <strong>IMPLEMENTED / CLI SOURCE-ARTIFACT MATRIX PASS</strong> on Windows x86_64 GNU. Workspace snapshots and final targeted regressions are tracked in the <a href="../../audits/alpha-modules-2026-10-03/README.md">verification record</a>. This status does not certify other targets or the overall alpha release. <code>luna.toml</code> supplies optional provider discovery bindings. Existing local imports, external provider lookup, source/artifact loading and namespace semantics remain available. This is not a package version/dependency solver.</p>
+<h2 id="file-format-and-example">File format and example</h2>
+<pre><code>schema = 1
+
+[providers]
+geometry = &quot;../shared/geometry&quot;
+math = &quot;../../libraries/numeric/math&quot;</code></pre>
+<p>Each key is a single Luna provider-name identifier; each value is a nonempty path string to a provider <strong>stem</strong>, omitting <code>.ln</code>/<code>.llib</code> as existing imports do. The first mapping locates <code>../shared/geometry.ln</code> or <code>../shared/geometry.llib</code>. Absolute paths are allowed for local setups; relative paths are recommended for portability. <code>..</code> is allowed. No environment-variable expansion, home expansion, globbing or implicit directory scan is performed. Alpha introduces file-provider mappings only; it does not add a new directory package format. Omitted <code>schema</code> means 1. Unknown schema, unknown fields, duplicate keys, invalid names, empty paths and paths with provider extensions are configuration errors with file/key locations.</p>
+<p>For a provider that declares <code>export module geometry { ... }</code>:</p>
+<pre><code>import &lt;geometry&gt;;
+using geometry;
+
+fn main() -&gt; i32 {
+    dec p = Point { x: 10, y: 32 };
+    return p.x + p.y - 42;
+}</code></pre>
+<p>The original <code>import &quot;../shared/geometry&quot;;</code> remains valid. Configuration does not require changing existing files. Merely listing a provider does not import it, execute it or expose any of its declarations.</p>
+<h2 id="selecting-a-configuration">Selecting a configuration</h2>
+<p class="list-item">1. For <code>luna check</code>, <code>build</code> and <code>run</code>, start from the input source file&#x27;s</p>
+<p>   absolute parent directory and search ancestors for the nearest <code>luna.toml</code>.    Stop at the first match or filesystem root. Do not base discovery on cwd.</p>
+<p class="list-item">2. There is <strong>one active configuration per compilation invocation</strong>, including</p>
+<p>   its transitive dependency resolution. Do not merge ancestor configurations    or switch automatically to configs beside imported providers. Every directory    may have its own file; compiling an entry file there selects the corresponding    nearest configuration. This bound prevents source and artifact imports from    acquiring different hidden configuration contexts.</p>
+<p class="list-item">3. Support explicit CLI <code>--config &lt;file&gt;</code> and <code>--no-config</code> for these three</p>
+<p>   commands. They are mutually exclusive; an explicit missing/invalid file is    an error. <code>--no-config</code> uses existing discovery only.</p>
+<p class="list-item">4. Resolve relative mapping paths against the selected TOML file&#x27;s parent,</p>
+<p>   regardless of the caller&#x27;s cwd, entry-file location or transitive importer.</p>
+<p class="list-item">5. No config is required. With none, behavior is the existing import/search-path</p>
+<p>   behavior. Official <code>build-sysroot</code> continues to use <code>sysroot.toml</code> and does not    discover project <code>luna.toml</code> automatically.</p>
+<h2 id="discovery-and-validity">Discovery and validity</h2>
+<p class="list-item">- <code>import &quot;path&quot;;</code> retains its existing importing-file-relative resolution;</p>
+<p>  the provider table does not rewrite it.</p>
+<p class="list-item">- <code>import &lt;name&gt;;</code> first uses an explicit configured binding when present.</p>
+<p>  Otherwise it uses the existing external-provider/search-path mechanism.   Configured names must not collide with canonical sysroot provider names or   aliases, including bootstrap contracts. Check this against the manifest and   existing generic resolution inputs, never a hardcoded list of stdlib names.</p>
+<p class="list-item">- A configured binding is authoritative for that name. A missing or invalid</p>
+<p>  mapped provider rejects; do not silently select an unrelated fallback provider.   An unused mapping need not exist on disk, but its syntax must still be valid.</p>
+<p class="list-item">- Apply existing candidate order to the mapped stem: canonical <code>.llib</code>,</p>
+<p>  canonical <code>.ln</code>, then supported legacy reads. Invalid selected <code>.llib</code>   rejects instead of falling back to source. All compiler/target/features,   interface, execution and dependency validation obligations still apply.</p>
+<p class="list-item">- A binding is a discovery alias, not an artifact/provider identity rewrite.</p>
+<p>  The filename and key may differ. Namespace paths still come exclusively from   declarations. Manifest identity and dependency references must remain genuine;   do not patch fingerprints to make a mapped artifact load.</p>
+<p class="list-item">- Multiple discovery bindings selecting the same canonical provider must not</p>
+<p>  instantiate it twice. Conversely, equal display names cannot merge distinct   providers. Existing import-cycle, duplicate/coherence and privacy checks apply.</p>
+<p class="list-item">- Capture the selected configuration and effective bindings as compilation</p>
+<p>  inputs. Diagnostics identify the import, configured key and resolved candidate.   Portable artifacts must use the existing stable identity/dependency contracts,   not absolute configuration paths or session-local IDs as semantic identity.</p>
+<h2 id="architecture-and-compatibility">Architecture and compatibility</h2>
+<p>The CLI/application discovery layer owns reading TOML and normalizing paths. It passes typed provider bindings/resolution inputs to the driver. Parser, semantic analysis, borrow checking and backend do not read TOML or infer module names from its keys. Driver APIs retain operation without a project file and may receive explicit equivalent bindings from other callers. No auto-build, artifact refresh, network fetch, version solving or caching policy is added.</p>
+<p>Both additions preserve <a href="modules.html">provider versus namespace separation</a>. <code>using</code> affects lexical lookup; configuration affects provider discovery; <code>import</code> is still required to acquire a provider.</p>
+<h2 id="required-acceptance">Required acceptance</h2>
+<table>
+<tr><th>Case</th><th>Required outcome</th></tr>
+<tr><td>No config; old relative imports and external imports</td><td>Existing behavior preserved</td></tr>
+<tr><td>Mapped file outside the entry directory; key differs from filename</td><td>Correct provider loaded, declared namespace preserved</td></tr>
+<tr><td>Change cwd; entry file several directories below config</td><td>Same config, path interpretation and result</td></tr>
+<tr><td>Nested config, explicit config, disabled config</td><td>Nearest-only/explicit/disabled policy; no implicit merge</td></tr>
+<tr><td>Config beside a transitive provider</td><td>Does not replace active invocation configuration</td></tr>
+<tr><td>Malformed TOML/schema/name/path; duplicate key; sysroot collision</td><td>Typed configuration error with key/file location</td></tr>
+<tr><td>Unused missing mapping; imported missing mapping</td><td>First does not load; second rejects without fallback</td></tr>
+<tr><td>Artifact and source both exist; artifact is stale or malformed</td><td>Existing artifact precedence; invalid selection rejects</td></tr>
+<tr><td>Two names select the same provider; dependency cycle</td><td>Stable single provider identity; cycles reject</td></tr>
+<tr><td>Source-only versus freshly built artifact-only graph</td><td>Same behavior/diagnostics; provider sources physically absent</td></tr>
+<tr><td>Move graph to a different directory; portable artifact dependencies</td><td>Same declarations and valid logical identity; no host-path leakage</td></tr>
+<tr><td><code>check</code>/<code>build</code>/<code>run</code>; explicit driver inputs</td><td>Same discovery decisions and common-stage failures</td></tr>
+</table>
+<p>Use <a href="alpha-module-plan.html">the implementation plan</a>. Existing alpha correctness and release gates remain required; the linked verification record supplies evidence for the tested implementation scope.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

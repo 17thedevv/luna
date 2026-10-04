@@ -1,0 +1,2 @@
+module math { export fn answer() -> i32 { return 42; } } using math::answer;
+fn main() -> i32 { return 0; }

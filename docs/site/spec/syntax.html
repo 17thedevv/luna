@@ -53,6 +53,7 @@ for (dec rw i = 0; i &lt; limit; i = i + 1) { ... }</code></pre>
 <pre><code>import &lt;vec&gt;;
 import &quot;geometry&quot;;
 using std as library;
+using std;
 
 module application { export fn answer() -&gt; i32 { return 42; } }
 
@@ -64,4 +65,4 @@ struct Owner { private data: *rw u8, } requires anchor(data) = self;</code></pre
 <p>Import selects a provider, never a synthetic namespace. Macros use <code>@</code> captures, <code>=&gt;</code> rule separators, and <code>!</code> invocations. Attributes use <code>#[...]</code>; parsing an attribute is not a promise that any arbitrary attribute has executable meaning. Supported attribute contracts must be stated independently.</p>
 <p><code>life_from(a | b)</code> supplies alternative provenance. Relations use <code>requires life(a) &gt;= life(b)</code> or the equivalent <code>&lt;=</code> spelling. A projected <code>life(...)</code> target does not grant a raw pointer a safe origin. Anchor contracts apply to direct pointer fields, separately from lifetime relations.</p>
 <h2 id="rejected-spellings">Rejected spellings</h2>
-<p>New Luna 0.1 code MUST NOT use <code>let</code>, <code>mut</code>, <code>use</code>, <code>mod</code>, Rust lifetime generic parameters, <code>::&lt;&gt;</code>, <code>@&lt;...&gt;</code> generics, <code>$</code> macro captures, prefix <code>await</code>, bare <code>using path;</code>, <code>using namespace</code>, <code>export using</code>, <code>export import</code>, or file-level <code>module name;</code>. <code>where outlives(...)</code> is a removed surface spelling; its relation is written using <code>requires life(...)</code>. Imports omit source/artifact extensions. Historical examples using these spellings are not current examples.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>
+<p>New Luna 0.1 code MUST NOT use <code>let</code>, <code>mut</code>, <code>use</code>, <code>mod</code>, Rust lifetime generic parameters, <code>::&lt;&gt;</code>, <code>@&lt;...&gt;</code> generics, <code>$</code> macro captures, prefix <code>await</code>, <code>using namespace</code>, <code>export using</code>, <code>export import</code>, or file-level <code>module name;</code>. <code>where outlives(...)</code> is a removed surface spelling; its relation is written using <code>requires life(...)</code>. Imports omit source/artifact extensions. Historical examples using these spellings are not current examples.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

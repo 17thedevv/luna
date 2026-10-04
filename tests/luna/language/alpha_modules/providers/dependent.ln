@@ -1,0 +1,3 @@
+import <geo>;
+using geometry;
+export module dependent { export fn result() -> i32 { return answer(); } }

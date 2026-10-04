@@ -1,0 +1,2 @@
+import <left>; import <right>;
+fn main() -> i32 { return 0; }

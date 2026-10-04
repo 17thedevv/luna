@@ -1,0 +1,3 @@
+module math {}
+using math as m; using math as m;
+fn main() -> i32 { return 0; }
