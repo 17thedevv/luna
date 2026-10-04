@@ -1,0 +1,8 @@
+{
+  "revision": "de9977d71dfb52a14617faf469441530dddb597e",
+  "tracked_status": " M crates/luna-driver/test_model.mvir\r\n",
+  "completed_utc": "2026-10-04T19:40:39.6867058Z",
+  "cli_sha256": "A84A21683C63EC91DE6F1528E2ACA6004A7A73E51378517A91743446E40C62C2",
+  "runtime_sha256": "D8AEA737AA7929E79AB70F24DB5705D7370570295DDAB9F569B3085EE230F5DE",
+  "exit_code": 101
+}
