@@ -1,0 +1,9 @@
+import "resource";
+struct CopyOwner<T> { value: T, };
+impl<T> std::Copy for CopyOwner<T> {}
+fn main() {
+    dec rw count = 0;
+    dec value = CopyOwner { value: resources::tracked(&rw count as *rw i32, 1) };
+    resources::consume(value);
+    resources::consume(value);
+}

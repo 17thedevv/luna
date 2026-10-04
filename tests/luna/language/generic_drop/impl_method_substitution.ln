@@ -1,0 +1,15 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec owner = resources::Envelope { value: resources::tracked(counter, 42) };
+        resources::consume(owner.pair(resources::tracked(counter, true)));
+        if count != 2 { return 1; }
+        dec nested = resources::Owner { value: resources::tracked(counter, false), counter: counter };
+        resources::consume(nested);
+        if count != 4 { return 2; }
+    }
+    if count != 4 { return 3; }
+    return 0;
+}

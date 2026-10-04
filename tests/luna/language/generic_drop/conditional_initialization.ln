@@ -1,0 +1,10 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    resources::conditional(resources::tracked(counter, 42), true);
+    if count != 1 { return 1; }
+    resources::conditional(resources::tracked(counter, false), false);
+    if count != 2 { return 2; }
+    return 0;
+}

@@ -1,0 +1,16 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec value = resources::tracked(counter, 42);
+        dec returned = resources::identity(value);
+        if count != 0 { return 1; }
+        resources::consume(returned);
+        if count != 1 { return 2; }
+        resources::consume(resources::identity(resources::tracked(counter, true)));
+        if count != 2 { return 3; }
+    }
+    if count != 2 { return 4; }
+    return 0;
+}

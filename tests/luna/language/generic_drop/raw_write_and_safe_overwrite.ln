@@ -1,0 +1,21 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec rw value = resources::tracked(counter, 1);
+        dec pointer = &rw value as *rw resources::Tracked<i32>;
+        // Raw storage initialization deliberately does not destroy the old
+        // payload. Here that payload only owns the observable drop obligation.
+        unsafe { resources::raw_initialize(pointer, resources::tracked(counter, 2)); }
+        if count != 0 { return 1; }
+    }
+    if count != 1 { return 2; }
+    {
+        dec rw value = resources::tracked(counter, false);
+        resources::replace_borrowed(&rw value, resources::tracked(counter, true));
+        if count != 2 { return 3; }
+    }
+    if count != 3 { return 4; }
+    return 0;
+}

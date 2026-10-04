@@ -1,0 +1,12 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    resources::branch(resources::tracked(counter, 1), true);
+    resources::branch(resources::tracked(counter, false), false);
+    if count != 2 { return 1; }
+    resources::early(resources::tracked(counter, 2), true);
+    resources::early(resources::tracked(counter, true), false);
+    if count != 4 { return 2; }
+    return 0;
+}
