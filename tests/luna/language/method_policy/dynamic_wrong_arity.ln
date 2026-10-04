@@ -1,0 +1,8 @@
+trait Action { fn call(self: &Self, arg: i32) -> i32; }
+struct Token {};
+impl Action for Token { fn call(self: &Self, arg: i32) -> i32 { return arg; } }
+fn main() -> i32 {
+    dec token = Token {};
+    dec view: &dyn Action = &token;
+    return view.call();
+}

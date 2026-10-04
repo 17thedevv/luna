@@ -1,0 +1,7 @@
+trait First { fn value(self: &Self, arg: bool) -> i32; }
+trait Second { fn value(self: &Self, arg: i32) -> i32; }
+struct Token {};
+impl First for Token { fn value(self: &Self, arg: bool) -> i32 { return 30; } }
+impl Second for Token { fn value(self: &Self, arg: i32) -> i32 { return arg; } }
+fn call<T: First + Second>(value: &T) -> i32 { return value.value(7); }
+fn main() -> i32 { dec token = Token {}; if call(&token) != 7 { return 1; } return 0; }

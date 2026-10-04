@@ -424,6 +424,13 @@ A raw-pointer-based implementation must never silently weaken the safety contrac
 
 # 13. Trait / Impl Compliance
 
+Under the adopted [METHOD-RESOLUTION-v1](../../../docs/spec/0.1/method-resolution-v1.md)
+amendment, impl and method generic parameters are independent declaration
+binders even when they share a spelling. Put element bounds on the impl binder;
+do not constrain it by redeclaring a method parameter with the same name. Keep
+the selected checked impl header and its binder identities through imports and
+monomorphization; a nominal-head grouping key cannot identify an individual impl.
+
 When implementing a trait method:
 1. Resolve the trait method's canonical semantic contract.
 2. Preserve its lifetime relation.

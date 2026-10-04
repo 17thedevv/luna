@@ -96,7 +96,7 @@ import <__lang_iterator>;
     return z ^ (z >> 31u64);
 }
 
-impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
+impl<K, V> RawTable<K, V> {
         export fn len(self: &Self) -> u64 {
             return self.len;
         }
@@ -113,6 +113,9 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
             return self.len == (0 as u64);
         }
 
+    }
+
+impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         // Probing strategy: Linear probing with first-tombstone reuse.
         // Search rule:
         //   - Occupied: compare hash -> Eq

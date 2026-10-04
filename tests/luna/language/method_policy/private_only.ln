@@ -1,0 +1,2 @@
+import "private_provider";
+fn main() -> i32 { dec token = hidden::Token {}; return token.value(); }

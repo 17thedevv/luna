@@ -85,6 +85,7 @@ pub struct Scope {
     pub opened_namespaces: Vec<ScopeId>,
 }
 
+#[derive(Clone)]
 pub struct SymbolTable {
     pub scopes: Vec<Scope>,
     pub symbols: Vec<Symbol>,

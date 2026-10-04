@@ -1,0 +1,12 @@
+trait Read { fn value(self: &Self) -> i32; }
+struct Token { item: i32 };
+impl Token { fn value(self: &rw Self) -> i32 { self.item = 99; return self.item; } }
+impl Read for Token { fn value(self: &Self) -> i32 { return self.item; } }
+fn main() -> i32 {
+    dec token = Token { item: 7 };
+    dec borrowed = &token;
+    if borrowed.value() != 7 { return 1; }
+    dec rw other = Token { item: 3 };
+    if other.value() != 99 { return 2; }
+    return 0;
+}

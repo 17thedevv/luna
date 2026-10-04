@@ -206,6 +206,7 @@ impl InterfaceDecoder {
             trait_associated_types: HashMap::new(),
             impl_associated_types: HashMap::new(),
             impl_self_types,
+            checked_impl_headers: HashMap::new(),
             impl_generic_params,
             impl_generic_param_symbols: self.impl_generic_param_symbols,
             trait_associated_type_symbols: Vec::new(),

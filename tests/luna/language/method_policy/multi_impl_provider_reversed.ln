@@ -1,0 +1,14 @@
+module split {
+    export struct Pair<A, B> { first: A, second: B };
+    impl Pair<i32, i64> {
+        export fn fixed(self: &Self) -> i32 { return 7; }
+    }
+    impl<P, Q> Pair<P, Q> {
+        export fn second(self: &Self) -> Q { return self.second; }
+        export fn echo<R>(self: &Self, item: R) -> R { return item; }
+    }
+    impl<X, Y> Pair<Y, X> {
+        export fn first(self: &Self) -> Y { return self.first; }
+    }
+
+}

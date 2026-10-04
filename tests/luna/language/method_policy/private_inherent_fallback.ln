@@ -1,0 +1,8 @@
+import "private_provider";
+trait Read { fn value(self: &Self) -> i32; }
+impl Read for hidden::Token { fn value(self: &Self) -> i32 { return 7; } }
+fn main() -> i32 {
+    dec token = hidden::Token {};
+    if token.value() != 7 { return 1; }
+    return 0;
+}

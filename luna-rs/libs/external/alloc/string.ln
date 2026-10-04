@@ -759,15 +759,7 @@ module std {
             return std::Option::None;
         }
 
-        export fn push_string(self: &rw Self, other: &String) {
-            dec bytes = other.as_bytes();
-            dec len = bytes.len as u64;
-            dec rw i: u64 = 0 as u64;
-            while i < len {
-                self.vec.push(bytes[i]);
-                i = i + (1 as u64);
-            }
-        }
+
 
         export fn substr(self: &Self, start: u64, end_pos: u64) -> String {
             dec bytes = self.as_bytes();

@@ -1,0 +1,5 @@
+trait Marker {}
+struct Wrapper<T> { item: T };
+impl<T: Marker> Wrapper<T> { fn only(self: &Self) -> i32 { return 7; } }
+fn call<T>(value: &Wrapper<T>) -> i32 { return value.only(); }
+fn main() -> i32 { return 0; }

@@ -1,0 +1,11 @@
+struct Wrapper<T> { item: T };
+impl<T> Wrapper<T> {
+    fn echo<T>(self: &Self, value: T) -> T { return value; }
+    fn item(self: &Self) -> T { return self.item; }
+}
+fn main() -> i32 {
+    dec wrapper = Wrapper<i32> { item: 7 };
+    if wrapper.echo<u64>(11u64) != 11u64 { return 1; }
+    if wrapper.item() != 7 { return 2; }
+    return 0;
+}

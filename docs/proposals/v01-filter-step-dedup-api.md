@@ -95,8 +95,8 @@ In `alloc/vec.ln`:
 - S-06 fix guarded this with `std::mem::size_of<T>() == (4 as u64)`.
 
 ### Analysis & Resolution
-- **Option 2 (Adopted)**: `dedup<T: std::Eq>(self: &rw Self)` is implemented as the canonical generic deduplication method in `alloc/vec.ln`, comparing adjacent elements via `p_ref.eq(r_ref)`.
-- `dedup_i32<T: std::Eq>(self: &rw Self)` is retained for backwards compatibility as an alias that safely delegates to `self.dedup()`.
+- **Option 2 (Adopted; binder spelling corrected 2026-10-05)**: `dedup(self: &rw Self)` belongs to `impl<T: std::Eq> Vec<T>`, comparing adjacent elements via `p_ref.eq(r_ref)`. The maintainer adopted independent impl/method binders in [METHOD-RESOLUTION-v1](../spec/0.1/method-resolution-v1.md); the previous method-level `<T: Eq>` shadowed the element binder and is not its constraint.
+- `dedup_i32(self: &rw Self)` remains an alias under the same constrained impl and delegates to `self.dedup()`. `resize` and `extend_from_slice` similarly use `impl<T: std::Clone> Vec<T>`.
 - Arbitrary pointer reinterpretation (`as *i32`) and size-of checks (`size_of<T>() == 4`) have been completely eradicated.
 - **Verification**: Verified with `tests/luna/stdlib/audit_2026_10_02/vec_dedup_4byte_nominal.ln` (4-byte nominal struct `Pair` safely deduplicated via `Eq`, exit code 0) and `tests/luna/stdlib/audit_2026_10_02/vec_dedup_i32_generic.ln` (exit code 0).
-- **Status**: CLOSED as RESOLVED.
+- **Status**: the earlier verification above describes its historical implementation. The corrected binder behavior and its current source/artifact evidence are tracked in the [0.1 execution ledger](../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md); they do not certify unrelated generic/drop behavior.

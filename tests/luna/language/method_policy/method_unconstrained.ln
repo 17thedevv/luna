@@ -1,0 +1,3 @@
+struct Wrapper<T> { item: T };
+impl<T> Wrapper<T> { fn unrelated<U>(self: &Self) {} }
+fn main() -> i32 { dec wrapper = Wrapper<i32> { item: 7 }; wrapper.unrelated(); return 0; }

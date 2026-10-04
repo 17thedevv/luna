@@ -1,0 +1,4 @@
+trait First { fn value(self: &Self) -> i32; }
+trait Second { fn value(self: &Self) -> i32; }
+fn call<T: First + Second>(value: &T) -> i32 { return value.value(); }
+fn main() -> i32 { return 0; }

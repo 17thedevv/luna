@@ -1,0 +1,9 @@
+trait Factory { fn zero<U>(self: &Self) -> U; }
+struct Token {};
+impl Factory for Token { fn zero<V>(self: &Self) -> V { return 0 as V; } }
+fn main() -> i32 {
+    dec token = Token {};
+    dec result: i64 = Factory::zero<i64>(&token);
+    if result != 0i64 { return 1; }
+    return 0;
+}

@@ -1,0 +1,4 @@
+module hidden {
+    export struct Token {};
+    impl Token { private fn value(self: &Self) -> i32 { return 30; } }
+}

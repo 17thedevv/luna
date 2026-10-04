@@ -1,0 +1,13 @@
+import "multi_impl_provider";
+fn main() -> i32 {
+    dec pair = split::Pair<i32, i64> { first: 3i32, second: 5i64 };
+    if pair.first() != 3i32 { return 1; }
+    if pair.second() != 5i64 { return 2; }
+    if pair.echo<u64>(9u64) != 9u64 { return 3; }
+    if pair.echo<i16>(11i16) != 11i16 { return 4; }
+    if pair.fixed() != 7 { return 5; }
+    dec other = split::Pair<i16, u64> { first: 13i16, second: 17u64 };
+    if other.first() != 13i16 { return 6; }
+    if other.second() != 17u64 { return 7; }
+    return 0;
+}

@@ -63,6 +63,14 @@ pub struct TraitImplEntry {
     pub trait_args: Vec<SemanticTypeId>,
 }
 
+/// A checked impl binder and self pattern, owned by one declaration. ImplKey
+/// groups candidates by nominal head; it cannot identify a particular impl.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CheckedImplHeader {
+    pub self_type: SemanticTypeId,
+    pub generic_params: Vec<SymbolId>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TraitResolution {
     pub trait_id: SymbolId,
@@ -98,6 +106,7 @@ pub enum IntrinsicKind {
     TypeInfo,
 }
 
+#[derive(Clone)]
 pub struct SemanticTables {
     pub expr_types: HashMap<ExprId, SemanticTypeId>,
     pub expr_symbols: HashMap<ExprId, SymbolId>,
@@ -205,6 +214,7 @@ pub struct SemanticTables {
     pub assoc_type_bounds: HashMap<SymbolId, Vec<(SymbolId, SymbolId, SemanticTypeId)>>,
     // Maps ImplKey to lowered SemanticTypeId of self_type in that impl (e.g., Result<T, E>)
     pub impl_self_types: HashMap<ImplKey, SemanticTypeId>,
+    pub checked_impl_headers: HashMap<DeclId, CheckedImplHeader>,
     // Maps ImplKey to list of generic parameter symbols declared on the impl block
     pub impl_generic_params: HashMap<ImplKey, Vec<SymbolId>>,
     pub trait_impl_entries: Vec<TraitImplEntry>,
@@ -315,6 +325,7 @@ impl SemanticTables {
             assoc_type_names: HashMap::new(),
             assoc_type_bounds: HashMap::new(),
             impl_self_types: HashMap::new(),
+            checked_impl_headers: HashMap::new(),
             impl_generic_params: HashMap::new(),
             trait_impl_entries: Vec::new(),
             decl_associated_types: HashMap::new(),
