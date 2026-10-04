@@ -1,0 +1,7 @@
+import "resource";
+fn main() {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    dec owner = resources::Owner { value: resources::tracked(counter, 1), counter: counter };
+    resources::consume(owner.value);
+}

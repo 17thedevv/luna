@@ -700,9 +700,11 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::Drop { value, callee, .. } => {
                 let val = self.generate_operand(value)?;
                 if let Some(c_id) = callee {
-                    if let Some(func_val) = self.get_function(&c_id.name) {
-                        let _ = self.builder.build_call(func_val, &[val.into()], "");
-                    }
+                    let func_val = self.get_function(&c_id.name).ok_or_else(|| BackendError::InvariantViolation(
+                        format!("Drop callee not found: {}", c_id.name),
+                    ))?;
+                    self.builder.build_call(func_val, &[val.into()], "")
+                        .map_err(|err| BackendError::InvariantViolation(format!("Invalid Drop call: {err}")))?;
                 }
                 Ok(self.context.i32_type().const_int(0, false).into())
             }
@@ -1121,8 +1123,25 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 };
                 Ok(field_ptr.into())
             }
-            Instruction::MakeClosure { func, env_ptr, .. } => {
+            Instruction::MakeClosure { func, env_ptr, captures } => {
                 let env = self.generate_operand(env_ptr)?.into_pointer_value();
+                let environment_type = match env_ptr {
+                    Operand::Value(id) => self.map_type(_func.value(*id).ty)?,
+                    _ => return Err(BackendError::InvariantViolation("Closure environment lacks a typed allocation".into())),
+                };
+                for capture in captures {
+                    let source = self.generate_operand(&Operand::Value(capture.source))?;
+                    let captured = if capture.mode == luna_semantic::CaptureMode::Move {
+                        self.builder.build_load(self.map_type(capture.ty)?, source.into_pointer_value(), "capture_move")
+                            .map_err(|err| BackendError::InvariantViolation(format!("Invalid moved capture: {err}")))?
+                    } else {
+                        source
+                    };
+                    let field = self.builder.build_struct_gep(environment_type, env, capture.env_field, "capture_field")
+                        .map_err(|err| BackendError::InvariantViolation(format!("Invalid capture field: {err}")))?;
+                    self.builder.build_store(field, captured)
+                        .map_err(|err| BackendError::InvariantViolation(format!("Invalid capture store: {err}")))?;
+                }
                 let closure_ty = self.map_type(data.ty)?.into_struct_type();
                 let code = self.get_function(&func.name)
                     .ok_or_else(|| BackendError::InvariantViolation(format!("Closure function not found: {}", func.name)))?

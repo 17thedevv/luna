@@ -446,7 +446,8 @@ impl<'a> MvirGenerator<'a> {
                     symbol_id: Some(sym),
                 })
             }
-            luna_semantic::SemanticType::Tuple(_) => {
+            luna_semantic::SemanticType::Tuple(_) | luna_semantic::SemanticType::Array(_, _) => {
+                let base_name = if matches!(self.ctx.types.get(ty_id), luna_semantic::SemanticType::Array(_, _)) { "array" } else { "tuple" };
                 let sym = luna_common::ids::SymbolId(0);
                 let identity = luna_semantic::CanonicalInstanceIdentity {
                     kind: luna_semantic::CanonicalInstanceKind::DropGlue {
@@ -455,7 +456,7 @@ impl<'a> MvirGenerator<'a> {
                     },
                     subst: Vec::new(),
                 };
-                let glue_name = identity.symbol_name(&self.ctx.types, &self.ctx.symbol_table, "tuple");
+                let glue_name = identity.symbol_name(&self.ctx.types, &self.ctx.symbol_table, base_name);
                 Some(GlobalId {
                     name: glue_name,
                     symbol_id: None,
@@ -472,7 +473,7 @@ impl<'a> MvirGenerator<'a> {
         };
         
         let nominal_name = if struct_sym.0 == 0 {
-            "tuple".to_string()
+            if matches!(self.ctx.types.get(concrete_ty), luna_semantic::SemanticType::Array(_, _)) { "array" } else { "tuple" }.to_string()
         } else if (struct_sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
             self.ctx.symbol_table.symbols[struct_sym.0 as usize].name.clone()
         } else {
@@ -600,8 +601,73 @@ impl<'a> MvirGenerator<'a> {
                     }, elem_ty);
                 }
             }
+        } else if let luna_semantic::SemanticType::Array(elem_ty, len) = self.ctx.types.get(concrete_ty).clone() {
+            let usize_ty = self.ctx.types.usize_id();
+            let remaining = self.push_inst(Instruction::Alloca, usize_ty);
+            let length = self.push_inst(Instruction::Assign(Operand::Number(len.to_string())), usize_ty);
+            let zero = self.push_inst(Instruction::Assign(Operand::Number("0".into())), usize_ty);
+            let one = self.push_inst(Instruction::Assign(Operand::Number("1".into())), usize_ty);
+            self.push_inst(Instruction::Store {
+                ptr: Operand::Value(remaining), value: Operand::Value(length),
+            }, usize_ty);
+            let elem_ptr_ty = self.find_pointer_type(elem_ty);
+            let elements = self.push_inst(Instruction::Cast { value: Operand::Value(obj_ptr), target_ty: elem_ptr_ty }, elem_ptr_ty);
+            let condition = self.new_label("array_drop_condition");
+            let body = self.new_label("array_drop_element");
+            let done = self.new_label("array_drop_done");
+            self.terminate_block(Terminator::Br { target: condition.clone() });
+            self.start_block(condition.clone());
+            let count = self.push_inst(Instruction::Load { ptr: Operand::Value(remaining) }, usize_ty);
+            let empty = self.push_inst(Instruction::Eq {
+                left: Operand::Value(count), right: Operand::Value(zero),
+            }, self.ctx.types.bool_id());
+            self.terminate_block(Terminator::CondBr {
+                condition: Operand::Value(empty), true_target: done.clone(), false_target: body.clone(),
+            });
+            self.start_block(body);
+            let index = self.push_inst(Instruction::Sub {
+                left: Operand::Value(count), right: Operand::Value(one),
+            }, usize_ty);
+            self.push_inst(Instruction::Store {
+                ptr: Operand::Value(remaining), value: Operand::Value(index),
+            }, usize_ty);
+            let element = self.push_inst(Instruction::Add {
+                left: Operand::Value(elements), right: Operand::Value(index),
+            }, elem_ptr_ty);
+            let callee = self.get_drop_glue_global_id(elem_ty);
+            self.push_inst(Instruction::Drop { value: Operand::Value(element), callee, ty: elem_ty }, elem_ty);
+            self.terminate_block(Terminator::Br { target: condition });
+            self.start_block(done);
+        } else if let luna_semantic::SemanticType::Enum(_, _, variants) = self.ctx.types.get(concrete_ty).clone() {
+            let tag_ty = self.ctx.types.u32_id();
+            let tag_ptr = self.push_inst(Instruction::FieldPtr {
+                base: Operand::Value(obj_ptr), field_idx: 0, field_name: None,
+            }, tag_ty);
+            let tag = self.push_inst(Instruction::Load { ptr: Operand::Value(tag_ptr) }, tag_ty);
+            let done = self.new_label("enum_drop_done");
+            for (index, payload_ty) in variants.into_iter().enumerate() {
+                if !self.ctx.needs_drop(payload_ty) { continue; }
+                let selected = self.new_label("enum_drop_payload");
+                let next = self.new_label("enum_drop_next");
+                let is_variant = self.push_inst(Instruction::Eq {
+                    left: Operand::Value(tag), right: Operand::Number(index.to_string()),
+                }, self.ctx.types.bool_id());
+                self.terminate_block(Terminator::CondBr {
+                    condition: Operand::Value(is_variant), true_target: selected.clone(), false_target: next.clone(),
+                });
+                self.start_block(selected);
+                let payload = self.push_inst(Instruction::FieldPtr {
+                    base: Operand::Value(obj_ptr), field_idx: 1, field_name: None,
+                }, self.find_pointer_type(payload_ty));
+                let callee = self.get_drop_glue_global_id(payload_ty);
+                self.push_inst(Instruction::Drop { value: Operand::Value(payload), callee, ty: payload_ty }, payload_ty);
+                self.terminate_block(Terminator::Br { target: done.clone() });
+                self.start_block(next);
+            }
+            self.terminate_block(Terminator::Br { target: done.clone() });
+            self.start_block(done);
         }
-        
+
         self.terminate_block(Terminator::Ret { value: None });
         if let Some(block) = self.current_block.take() {
             self.current_function.as_mut().unwrap().blocks.push(block);
@@ -843,6 +909,25 @@ impl<'a> MvirGenerator<'a> {
                 }
             }
             _ => unreachable!("ICE: Unhandled variant, should be impossible after semantic invariants")
+        }
+    }
+
+    // Unmanaged raw storage writes initialize a cell without invoking its
+    // previous destructor (PTR-MEM-3). Safe/local places use overwrite cleanup.
+    fn is_raw_storage_lvalue(&self, expr_id: luna_ast::ExprId) -> bool {
+        match &self.arena.exprs[expr_id.0 as usize] {
+            Expr::Unary { op: luna_ast::expr::UnaryOp::Deref | luna_ast::expr::UnaryOp::DerefMut, operand } => {
+                matches!(self.ctx.types.get(self.ctx.types.resolve(self.get_expr_type(operand))), luna_semantic::SemanticType::Pointer(..))
+            }
+            Expr::Member { object, .. } | Expr::TupleIndex { object, .. } => {
+                self.is_raw_storage_lvalue(*object)
+                    || matches!(self.ctx.types.get(self.ctx.types.resolve(self.get_expr_type(object))), luna_semantic::SemanticType::Pointer(..))
+            }
+            Expr::Index { base, .. } => {
+                self.is_raw_storage_lvalue(*base)
+                    || matches!(self.ctx.types.get(self.ctx.types.resolve(self.get_expr_type(base))), luna_semantic::SemanticType::Pointer(..))
+            }
+            _ => false,
         }
     }
 
@@ -1166,6 +1251,7 @@ impl<'a> MvirGenerator<'a> {
             }
 
             // Bind captured variables to environment fields after parameter allocas exist.
+            let environment = self.push_inst(Instruction::Load { ptr: Operand::Value(env_param) }, env_ty_id);
             let closure_bindings = if instance.closure_capture_bindings.is_empty() {
                 self.ctx.tables.expect_closure_capture_bindings(expr_id)
             } else {
@@ -1174,7 +1260,7 @@ impl<'a> MvirGenerator<'a> {
             if !closure_bindings.is_empty() {
                 for binding in &closure_bindings {
                     let field_ptr = self.push_inst(Instruction::FieldPtr {
-                        base: Operand::Value(env_param),
+                        base: Operand::Value(environment),
                         field_idx: binding.env_field,
                         field_name: None,
                     }, binding.env_ty);
@@ -2445,7 +2531,7 @@ impl<'a> MvirGenerator<'a> {
                     val_ty_id
                 };
 
-                let final_val = match op {
+                let mut final_val = match op {
                     AssignOp::Assign => val_op,
                     _ => {
                         let current_val = self.push_inst(Instruction::Load {
@@ -2469,6 +2555,21 @@ impl<'a> MvirGenerator<'a> {
                     }
                 };
 
+                if *op == AssignOp::Assign && self.ctx.needs_drop(store_ty_id)
+                    && !self.is_raw_storage_lvalue(*lvalue)
+                {
+                    // Transfer the RHS before destroying the destination. This
+                    // also lets move analysis suppress the old drop when the
+                    // RHS moved from this same place (e.g. x = identity(x)).
+                    let replacement = self.push_inst_span(
+                        Instruction::Assign(final_val), store_ty_id, self.extract_expr_span(expr_id),
+                    );
+                    final_val = Operand::Value(replacement);
+                    let callee = self.get_drop_glue_global_id(store_ty_id);
+                    self.push_inst_span(Instruction::Drop {
+                        value: ptr_op.clone(), callee, ty: store_ty_id,
+                    }, store_ty_id, self.extract_expr_span(expr_id));
+                }
                 self.push_inst_span(Instruction::Store {
                     ptr: ptr_op,
                     value: final_val,

@@ -1,0 +1,9 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    dec rw slot: resources::Tracked<i32>;
+    if count == 1 { slot = resources::tracked(counter, 10); }
+    resources::consume(slot);
+    return 0;
+}

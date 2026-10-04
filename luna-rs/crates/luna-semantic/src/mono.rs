@@ -395,6 +395,16 @@ impl<'a> MonoCollector<'a> {
                 }
             }
             SemanticType::Array(elem_ty, _) => {
+                let glue_id = CanonicalInstanceIdentity {
+                    kind: CanonicalInstanceKind::DropGlue {
+                        struct_sym: luna_common::ids::SymbolId(0),
+                        concrete_ty,
+                    },
+                    subst: Vec::new(),
+                };
+                self.drop_glues.push(glue_id);
+                self.ctx.types.intern(SemanticType::Pointer(crate::ty::Mutability::Mutable, concrete_ty));
+                self.ctx.types.intern(SemanticType::Pointer(crate::ty::Mutability::Mutable, elem_ty));
                 self.discover_drop_obligations(elem_ty);
             }
             _ => {}

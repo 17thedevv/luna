@@ -1,6 +1,7 @@
 pub mod borrow_analysis;
 pub mod cfg;
 pub mod cleanup;
+mod drop_flags;
 pub mod dataflow;
 pub mod effect;
 pub mod effect_inference;
@@ -41,10 +42,32 @@ pub fn borrow_check_function_with_shadow(
     std::collections::HashSet<luna_mvir::ValueId>,
     Vec<ShadowComparison>,
 ) {
+    analyze_with_guarded_drops(func, _ctx, summaries, Default::default())
+}
+
+/// Elaborate path-dependent local cleanup, then validate all ordinary uses.
+/// The proof set is produced only by the CFG transformation, never by callers.
+pub fn borrow_check_function_with_drop_flags(
+    func: &mut Function,
+    ctx: &SemanticContext,
+    summaries: &HashMap<GlobalId, crate::effect::CallEffectSummary>,
+) -> (Vec<Diagnostic>, std::collections::HashSet<luna_mvir::ValueId>) {
+    let guarded = drop_flags::elaborate(func, ctx, summaries);
+    let (diagnostics, dead, _) = analyze_with_guarded_drops(func, ctx, summaries, guarded);
+    (diagnostics, dead)
+}
+
+fn analyze_with_guarded_drops(
+    func: &Function,
+    _ctx: &SemanticContext,
+    summaries: &HashMap<GlobalId, crate::effect::CallEffectSummary>,
+    guarded_drops: std::collections::HashSet<luna_mvir::ValueId>,
+) -> (Vec<Diagnostic>, std::collections::HashSet<luna_mvir::ValueId>, Vec<ShadowComparison>) {
     let mut diagnostics = Vec::new();
 
     // 1. Run Move Analysis
     let mut move_analyzer = MoveAnalyzer::new(func, Some(_ctx), Some(summaries));
+    move_analyzer.guarded_drops = guarded_drops;
     let move_states = DataflowEngine::run_forward(func, &mut move_analyzer);
     move_analyzer.emit_diagnostics = true;
     for block in &func.blocks {

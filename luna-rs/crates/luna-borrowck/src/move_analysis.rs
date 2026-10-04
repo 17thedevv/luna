@@ -36,6 +36,7 @@ pub struct MoveAnalyzer<'a> {
     pub diagnostics: Vec<Diagnostic>,
     pub emit_diagnostics: bool,
     pub dead_drops: std::collections::HashSet<luna_mvir::ValueId>,
+    pub(crate) guarded_drops: HashSet<luna_mvir::ValueId>,
     pub func: &'a Function,
     pub semantic_ctx: Option<&'a luna_semantic::SemanticContext>,
     pub summaries: Option<&'a HashMap<luna_mvir::GlobalId, crate::effect::CallEffectSummary>>,
@@ -49,6 +50,7 @@ impl<'a> MoveAnalyzer<'a> {
             diagnostics: Vec::new(),
             emit_diagnostics: false,
             dead_drops: std::collections::HashSet::new(),
+            guarded_drops: HashSet::new(),
             func,
             semantic_ctx,
             summaries,
@@ -57,7 +59,7 @@ impl<'a> MoveAnalyzer<'a> {
         }
     }
 
-    fn get_place_state(&self, place: &Place, state: &MoveStateData) -> MoveState {
+    pub(crate) fn get_place_state(&self, place: &Place, state: &MoveStateData) -> MoveState {
         let mut current_ancestor = None;
         let mut max_len = -1;
         for (k, v) in &state.places {
@@ -554,7 +556,7 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                         if let Operand::Value(val) = value {
                             if let Some(place) = self.values_to_places.get(val).cloned() {
                                 let loc_state = self.get_place_state(&place, state);
-                                if loc_state == MoveState::ConditionallyMoved {
+                                if loc_state == MoveState::ConditionallyMoved && !self.guarded_drops.contains(&val_id) {
                                     let msg = format!("Cannot drop conditionally moved value");
                                     if !self.diagnostics.iter().any(|d| d.message == msg) {
                                         let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterMove);

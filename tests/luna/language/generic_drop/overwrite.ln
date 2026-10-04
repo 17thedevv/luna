@@ -1,0 +1,35 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec rw value = resources::tracked(counter, 1);
+        value = resources::tracked(counter, 2);
+        if count != 1 { return 1; }
+        resources::consume(value);
+        if count != 2 { return 2; }
+    }
+    if count != 2 { return 3; }
+    {
+        dec rw empty: resources::Tracked<bool>;
+        empty = resources::tracked(counter, true);
+        if count != 2 { return 4; }
+        empty = resources::identity(empty);
+        if count != 2 { return 5; }
+        empty = empty;
+        if count != 2 { return 6; }
+        resources::consume(empty);
+        if count != 3 { return 7; }
+    }
+    {
+        dec rw owner = resources::Owner {
+            value: resources::tracked(counter, 10), counter: counter
+        };
+        owner.value = resources::tracked(counter, 20);
+        if count != 4 { return 8; }
+        resources::consume(owner);
+        if count != 6 { return 9; }
+    }
+    if count != 6 { return 10; }
+    return 0;
+}

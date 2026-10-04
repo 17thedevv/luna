@@ -3998,6 +3998,13 @@ impl<'a> TypeChecker<'a> {
         result
     }
 
+    fn typecheck_expr_without_expected(&mut self, expr: &luna_ast::ExprId) -> SemanticTypeId {
+        let parent_context = std::mem::take(&mut self.expected_expr_type);
+        let result = self.typecheck_expr(expr);
+        self.expected_expr_type = parent_context;
+        result
+    }
+
     fn typecheck_integer_literal(&mut self, expr: luna_ast::ExprId, text: &str, negative: bool) -> SemanticTypeId {
         let span = self.get_expr_span_for_diag(&expr).unwrap_or_default();
         let ty = self.typecheck_integer_literal_at(span, text, negative);
@@ -4414,7 +4421,13 @@ impl<'a> TypeChecker<'a> {
                         .with_span(span));
                 }
 
-                if let SemanticType::Function { params, return_type } = callee_ty {
+                let is_closure_call = matches!(callee_ty, SemanticType::Closure(..));
+                if let SemanticType::Function { params, return_type } | SemanticType::Closure(_, params, return_type) = callee_ty {
+                    if is_closure_call && params.len() != args.len() {
+                        self.ctx.diagnostics.push(Diagnostic::error(format!(
+                            "Closure expects {} arguments, but {} were provided", params.len(), args.len(),
+                        )).with_code(DiagnosticCode::TypeMismatch).with_span(self.get_expr_span_for_diag(expr_id).unwrap_or_default()));
+                    }
                     ret_ty_id = if has_generics { self.ctx.types.subst(return_type, &subst) } else { return_type };
                     if has_generics {
                         if let Some(expected) = self.expected_expr_type.last().copied() {
@@ -5044,14 +5057,14 @@ impl<'a> TypeChecker<'a> {
                 struct_ty
             }
             Expr::ArrayLiteral { elements } => {
-                let mut elem_ty = self.ctx.types.new_inference_var();
                 let expected_elem = self.expected_expr_type.last().and_then(|&ty| match self.ctx.types.get(self.ctx.types.resolve_inference(ty)) {
                     SemanticType::Array(elem, _) => Some(*elem), _ => None,
                 });
+                let mut elem_ty = expected_elem.unwrap_or_else(|| self.ctx.types.new_inference_var());
                 for (i, el) in elements.iter().enumerate() {
                     let ty = if let Some(expected) = expected_elem {
                         self.typecheck_expr_expected(el, expected)
-                    } else { self.typecheck_expr(el) };
+                    } else { self.typecheck_expr_without_expected(el) };
                     if i == 0 {
                         elem_ty = ty;
                     } else if self.unify(elem_ty, ty).is_err() {
@@ -5068,7 +5081,7 @@ impl<'a> TypeChecker<'a> {
                 for (index, el) in elements.iter().enumerate() {
                     elem_tys.push(if let Some(expected) = expected_fields.as_ref().and_then(|fields| fields.get(index)) {
                         self.typecheck_expr_expected(el, *expected)
-                    } else { self.typecheck_expr(el) });
+                    } else { self.typecheck_expr_without_expected(el) });
                 }
                 self.ctx.types.intern(SemanticType::Tuple(elem_tys))
             }
@@ -6045,6 +6058,13 @@ impl<'a> TypeChecker<'a> {
                         }
                         self.ctx.diagnostics.push(diag);
                     }
+                } else if return_type.is_none()
+                    && matches!(self.ctx.types.get(self.ctx.types.resolve_inference(ret_ty_id)), SemanticType::InferenceVar(_))
+                {
+                    // A statement-only closure with no value return produces
+                    // void. Do not leave its output unconstrained at mono.
+                    let void_ty = self.ctx.types.intern(SemanticType::Void);
+                    let _ = self.unify(ret_ty_id, void_ty);
                 }
                 let ret_ty_id = self.ctx.types.resolve_inference(ret_ty_id);
                 

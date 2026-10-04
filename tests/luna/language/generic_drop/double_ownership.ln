@@ -1,0 +1,7 @@
+import "resource";
+fn main() {
+    dec rw count = 0;
+    dec value = resources::tracked(&rw count as *rw i32, true);
+    dec first = value;
+    dec second = value;
+}

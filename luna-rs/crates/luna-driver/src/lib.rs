@@ -24,6 +24,13 @@ use luna_semantic::{SemanticContext, Resolver, TypeChecker};
 use luna_mvir::{MvirGenerator, print_module};
 use luna_backend::{LLVMBackend, TargetConfig, link_objs_to_exe};
 
+pub fn validate_mvir_module(module: &luna_mvir::Module, stage: &str) -> Result<(), Vec<Diagnostic>> {
+    luna_optimizer::verify_module(module).map_err(|errors| {
+        errors.into_iter().map(|error| Diagnostic::error(format!("MVIR verification ({stage}): {error}"))
+            .with_code(luna_common::DiagnosticCode::BackendInvariantViolation)).collect()
+    })
+}
+
 fn seed_imported_raw_pointer_effects(
     interproc: &mut luna_borrowck::interprocedural::InterproceduralContext<'_>,
     module: &luna_mvir::Module,
@@ -335,8 +342,8 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
     seed_imported_raw_pointer_effects(&mut interproc, &module, &registry, &semantic_ctx);
     interproc.compute_summaries(&module);
     
-    for function in module.functions {
-        let (diags, _) = luna_borrowck::borrow_check_function(&function, &semantic_ctx, &interproc.summaries);
+    for mut function in module.functions {
+        let (diags, _) = luna_borrowck::borrow_check_function_with_drop_flags(&mut function, &semantic_ctx, &interproc.summaries);
         diagnostics.extend(diags);
     }
     if diagnostics.is_empty() { if !options.quiet { println!("check passed"); } Ok(()) } else { Err(diagnostics) }
@@ -565,7 +572,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             
             let mut borrowck_errors = 0;
             for func in &mut module.functions {
-                let (diagnostics, redundant_drops) = luna_borrowck::borrow_check_function(func, &semantic_ctx, &summaries);
+                let (diagnostics, redundant_drops) = luna_borrowck::borrow_check_function_with_drop_flags(func, &semantic_ctx, &summaries);
                 borrowck_errors += diagnostics.len();
                 if !options.quiet {
                     for diag in &diagnostics {
@@ -588,16 +595,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             }
             
             // MVIR Verification (Pre-opt)
-            if let Err(errs) = luna_optimizer::verify_module(&module) {
-                if !options.quiet {
-                    println!("--- Pre-Opt MVIR Verifier Error ---");
-                    for e in errs {
-                        println!("{}", e);
-                    }
-                    println!("-----------------------------------");
-                }
-                return Ok(());
-            }
+            validate_mvir_module(&module, "pre-opt")?;
 
             // Optimization phase
             if !options.quiet {
@@ -634,16 +632,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             }
 
             // MVIR Verification (Post-opt)
-            if let Err(errs) = luna_optimizer::verify_module(&module) {
-                if !options.quiet {
-                    println!("--- Post-Opt MVIR Verifier Error ---");
-                    for e in errs {
-                        println!("{}", e);
-                    }
-                    println!("------------------------------------");
-                }
-                return Ok(());
-            }
+            validate_mvir_module(&module, "post-opt")?;
 
             // LLVM IR / Backend phase
             if !options.quiet {
