@@ -1,5 +1,5 @@
 use super::{BackendError, LLVMBackend};
-use inkwell::targets::{ByteOrdering, CodeModel, RelocMode, Target, TargetData, TargetTriple};
+use inkwell::targets::{ByteOrdering, TargetData};
 use inkwell::types::{BasicType, BasicTypeEnum};
 use inkwell::values::{BasicValueEnum, PointerValue};
 use luna_mvir::static_data::{StaticData, StaticType, StaticValue};
@@ -11,23 +11,7 @@ fn invalid(message: impl Into<String>) -> BackendError {
 
 impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
     fn static_layout(&self) -> Result<TargetData, BackendError> {
-        let config = &self.target_config;
-        let triple = TargetTriple::create(&config.triple);
-        let target = Target::from_triple(&triple)
-            .map_err(|e| BackendError::TargetInitFailed(e.to_string()))?;
-        let machine = target
-            .create_target_machine(
-                &triple,
-                &config.cpu,
-                &config.features,
-                config.optimization,
-                RelocMode::Default,
-                CodeModel::Default,
-            )
-            .ok_or_else(|| {
-                BackendError::TargetInitFailed("static storage target layout unavailable".into())
-            })?;
-        Ok(machine.get_target_data())
+        Ok(self.target_config.create_machine()?.get_target_data())
     }
 
     fn static_type(

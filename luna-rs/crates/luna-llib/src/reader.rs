@@ -8,6 +8,7 @@ pub enum MlibError {
     InvalidMagic,
     VersionMismatch(u16),
     UnsupportedContractVersion(u32),
+    TargetMismatch,
     UnknownSection(u32),
     CorruptedData,
 }
@@ -268,6 +269,15 @@ pub fn validate_raw_pointer_effects(
     Ok(())
 }
 
+fn validate_target_header(header: &LlibHeader, manifest: &crate::format::Manifest) -> Result<(), MlibError> {
+    let end = header.target_triple.iter().position(|byte| *byte == 0).unwrap_or(64);
+    if header.target_triple[end..].iter().any(|byte| *byte != 0)
+        || header.target_triple[..end] != *manifest.target.target_triple.as_bytes() {
+        return Err(MlibError::TargetMismatch);
+    }
+    Ok(())
+}
+
 fn validate_header_versions(header: &LlibHeader) -> Result<(), MlibError> {
     if header.compiler_version != crate::format::LLIB_COMPILER_VERSION {
         return Err(MlibError::VersionMismatch(header.compiler_version));
@@ -296,6 +306,7 @@ impl LlibReader {
                 reader.read_exact(&mut data)?;
                 let manifest: crate::format::Manifest = bincode::deserialize(&data)
                     .map_err(|_| MlibError::CorruptedData)?;
+                validate_target_header(&header, &manifest)?;
                 return Ok(manifest);
             }
         }
@@ -382,6 +393,7 @@ impl LlibReader {
                         Ok(m) => m,
                         Err(_) => return Err(MlibError::CorruptedData),
                     };
+                    validate_target_header(&header, &manifest)?;
                     manifest_opt = Some(manifest);
                 }
                 SectionType::ObjectCode => {

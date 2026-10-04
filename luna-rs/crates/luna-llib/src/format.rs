@@ -3,7 +3,7 @@ use std::io::{Read, Write};
 pub const LLIB_MAGIC: [u8; 4] = *b"LLIB";
 pub const MLIB_MAGIC: [u8; 4] = *b"MLIB";
 pub const LLIB_FORMAT_VERSION: u16 = 2;
-pub const LLIB_COMPILER_VERSION: u16 = 9; // Canonical interfaces retain declaration-owned generic constraints and impls.
+pub const LLIB_COMPILER_VERSION: u16 = 10; // Target contracts bind emitted format and LLVM layout; all fields validate.
 pub const LLIB_MVIR_VERSION: u16 = 4; // Portable StaticAddress data, without semantic-session IDs.
 
 pub const MLIB_FORMAT_VERSION: u16 = LLIB_FORMAT_VERSION;
@@ -104,6 +104,8 @@ pub struct ArtifactIdentity {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TargetContract {
     pub target_triple: String,
+    pub cpu: String,
+    pub features: String,
     pub object_format: String,
     pub abi: String,
     pub pointer_width: u8,
@@ -230,11 +232,7 @@ pub type MlibHeader = LlibHeader;
 
 impl LlibHeader {
     pub fn new() -> Self {
-        let mut target_triple = [0u8; 64];
-        let target_str = "x86_64-pc-windows-msvc";
-        let bytes = target_str.as_bytes();
-        let len = std::cmp::min(bytes.len(), 64);
-        target_triple[..len].copy_from_slice(&bytes[..len]);
+        let target_triple = [0u8; 64]; // The writer fills this from the manifest.
 
         Self {
             magic: LLIB_MAGIC,

@@ -777,13 +777,10 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                         module_id: provider_name.clone(),
                         artifact_id: "".to_string(),
                     },
-                    target: luna_llib::TargetContract {
-                        target_triple: config.triple.clone(),
-                        object_format: "ELF".to_string(),
-                        abi: "".to_string(),
-                        pointer_width: 64,
-                        endianness: "".to_string(),
-                    },
+                    target: config.target_contract().map_err(|error| vec![
+                        Diagnostic::error(format!("target contract unavailable: {error}"))
+                            .with_code(luna_common::DiagnosticCode::ObjectEmissionFailure),
+                    ])?,
                     dependencies: luna_llib::format::DependencyTable {
                         deps,
                         native_deps: vec![],

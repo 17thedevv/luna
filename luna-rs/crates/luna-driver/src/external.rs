@@ -23,9 +23,15 @@ impl ExternalComponentLoader {
         })?;
 
         let manifest = luna_llib::reader::LlibReader::read_manifest(&mut file).map_err(|e| {
-            ExternalComponentError::ReadFailed {
-                path: descriptor.entry_file.clone(),
-                error: format!("Failed to read manifest: {:?}", e),
+            if matches!(&e, luna_llib::reader::MlibError::Io(_)) {
+                ExternalComponentError::ReadFailed {
+                    path: descriptor.entry_file.clone(), error: format!("Failed to read manifest: {e:?}"),
+                }
+            } else {
+                ExternalComponentError::InvalidArtifact {
+                    name: descriptor.name.clone(), path: descriptor.entry_file.clone(),
+                    reason: format!("invalid manifest: {e:?}"),
+                }
             }
         })?;
 
@@ -49,9 +55,14 @@ impl ExternalComponentLoader {
             }
         }
 
+        let expected_target = luna_backend::target_contract::default_target_contract()
+            .map_err(|error| ExternalComponentError::InvalidArtifact {
+                name: descriptor.name.clone(), path: descriptor.entry_file.clone(),
+                reason: format!("target contract unavailable: {error}"),
+            })?;
         let validation_ctx = luna_llib::ValidationContext {
             expected_compiler_version: "0.1.0".to_string(),
-            expected_target: luna_backend::TargetConfig::default().triple,
+            expected_target: expected_target.clone(),
             expected_source_fingerprint,
             expected_dependencies,
             expected_execution_dependencies,
@@ -95,12 +106,31 @@ impl ExternalComponentLoader {
             path: descriptor.entry_file.clone(),
             error: format!("Failed to rewind for semantic metadata: {}", e),
         })?;
-        let (_, _, _, semantic_metadata) = luna_llib::reader::LlibReader::read_module(&mut file)
+        let (_, _, object_bytes, semantic_metadata) = luna_llib::reader::LlibReader::read_module(&mut file)
             .map_err(|e| ExternalComponentError::InvalidArtifact {
                 name: descriptor.name.clone(),
                 path: descriptor.entry_file.clone(),
                 reason: format!("Invalid semantic metadata: {:?}", e),
             })?;
+        if let Some(bytes) = object_bytes.as_deref().filter(|bytes| !bytes.is_empty()) {
+            let identity = luna_backend::target_contract::object_identity(bytes)
+                .map_err(|error| ExternalComponentError::InvalidArtifact {
+                    name: descriptor.name.clone(), path: descriptor.entry_file.clone(),
+                    reason: format!("invalid embedded object: {error}"),
+                })?;
+            let expected = luna_backend::target_contract::default_object_identity()
+                .map_err(|error| ExternalComponentError::InvalidArtifact {
+                    name: descriptor.name.clone(), path: descriptor.entry_file.clone(),
+                    reason: format!("target object identity unavailable: {error}"),
+                })?;
+            if identity != expected {
+                return Err(ExternalComponentError::InvalidArtifact {
+                    name: descriptor.name.clone(), path: descriptor.entry_file.clone(),
+                    reason: format!("embedded object target mismatch: expected {expected:?}, got {identity:?}"),
+                });
+            }
+        }
+
         let mut raw_pointer_effects_by_path = std::collections::HashMap::new();
         fn collect_raw_effects(
             symbols: &std::collections::BTreeMap<String, luna_llib::metadata::ExportedSymbol>,
@@ -174,7 +204,7 @@ impl ExternalComponentLoader {
                 }
                 let dep_validation_ctx = luna_llib::ValidationContext {
                     expected_compiler_version: "0.1.0".to_string(),
-                    expected_target: luna_backend::TargetConfig::default().triple,
+                    expected_target: expected_target.clone(),
                     expected_source_fingerprint: None,
                     expected_dependencies: loaded_dependencies,
                     expected_execution_dependencies: loaded_execution_dependencies,
@@ -288,22 +318,7 @@ impl ExternalComponentLoader {
             driver_session.registry.register_external(descriptor.name.clone(), interface);
             driver_session.registry.finish_loading();
 
-            // Collect or extract provider object code
-            let sidecar_obj = descriptor.entry_file.with_extension("obj");
-            if sidecar_obj.exists() {
-                driver_session.add_collected_object(sidecar_obj);
-            } else {
-                use std::io::Seek;
-                let _ = file.seek(std::io::SeekFrom::Start(0));
-                if let Ok(Some(obj_bytes)) = luna_llib::reader::LlibReader::read_object_code(&mut file) {
-                    if !obj_bytes.is_empty() {
-                        let extracted_obj = descriptor.entry_file.with_extension("obj");
-                        if let Ok(_) = std::fs::write(&extracted_obj, &obj_bytes) {
-                            driver_session.add_collected_object(extracted_obj);
-                        }
-                    }
-                }
-            }
+            Self::collect_object(descriptor, object_bytes.as_deref(), driver_session)?;
 
             return Ok(provider_id);
         }
@@ -367,25 +382,58 @@ impl ExternalComponentLoader {
         driver_session.registry.interfaces.insert(provider_id, provider_interface);
         driver_session.registry.providers.insert(descriptor.name.clone(), provider_id);
 
-        // Collect or extract provider object code
-        let sidecar_obj = descriptor.entry_file.with_extension("obj");
-        if sidecar_obj.exists() {
-            driver_session.add_collected_object(sidecar_obj);
-        } else {
-            use std::io::Seek;
-            let _ = file.seek(std::io::SeekFrom::Start(0));
-            if let Ok(Some(obj_bytes)) = luna_llib::reader::MlibReader::read_object_code(&mut file) {
-                if !obj_bytes.is_empty() {
-                    let extracted_obj = descriptor.entry_file.with_extension("obj");
-                    if let Ok(_) = std::fs::write(&extracted_obj, &obj_bytes) {
-                        driver_session.add_collected_object(extracted_obj);
-                    }
-                }
-            }
-        }
+        Self::collect_object(descriptor, object_bytes.as_deref(), driver_session)?;
 
         Ok(provider_id)
     }
+    fn collect_object(
+        descriptor: &ExternalComponentDescriptor,
+        embedded: Option<&[u8]>,
+        session: &mut DriverSession,
+    ) -> Result<(), ExternalComponentError> {
+        let sidecar = descriptor.entry_file.with_extension("obj");
+        let embedded = embedded.filter(|bytes| !bytes.is_empty());
+        let bytes = if sidecar.exists() {
+            let bytes = std::fs::read(&sidecar).map_err(|error| ExternalComponentError::ReadFailed {
+                path: sidecar.clone(), error: error.to_string(),
+            })?;
+            // A sidecar is a cache of this artifact's object, not an alternative
+            // implementation selected merely because a file exists.
+            if embedded.is_some_and(|expected| expected != bytes.as_slice()) {
+                return Err(ExternalComponentError::InvalidArtifact {
+                    name: descriptor.name.clone(), path: sidecar,
+                    reason: "object sidecar content mismatch with embedded artifact object".into(),
+                });
+            }
+            bytes
+        } else if let Some(bytes) = embedded {
+            bytes.to_vec()
+        } else { return Ok(()); };
+        let identity = luna_backend::target_contract::object_identity(&bytes)
+            .map_err(|error| ExternalComponentError::InvalidArtifact {
+                name: descriptor.name.clone(), path: sidecar.clone(),
+                reason: format!("invalid object sidecar: {error}"),
+            })?;
+        let expected = luna_backend::target_contract::default_object_identity()
+            .map_err(|error| ExternalComponentError::InvalidArtifact {
+                name: descriptor.name.clone(), path: sidecar.clone(),
+                reason: format!("target object identity unavailable: {error}"),
+            })?;
+        if identity != expected {
+            return Err(ExternalComponentError::InvalidArtifact {
+                name: descriptor.name.clone(), path: sidecar,
+                reason: format!("object sidecar target mismatch: expected {expected:?}, got {identity:?}"),
+            });
+        }
+        if !sidecar.exists() {
+            std::fs::write(&sidecar, bytes).map_err(|error| ExternalComponentError::ReadFailed {
+                path: sidecar.clone(), error: format!("failed to extract provider object: {error}"),
+            })?;
+        }
+        session.add_collected_object(sidecar);
+        Ok(())
+    }
+
     pub fn load_component(
         descriptor: &ExternalComponentDescriptor,
         arena: &mut AstArena,

@@ -292,6 +292,11 @@ fn public_constraints_change_identity_without_binder_spelling_or_declaration_ord
             project.join("provider.llib"),
         )
         .unwrap();
+        // Replace the provider artifact as a complete bundle. A sidecar
+        // extracted from the preceding variant must not mask the dependency
+        // fingerprint rejection this control is intended to observe.
+        let sidecar = project.join("provider.obj");
+        if sidecar.exists() { fs::remove_file(sidecar).unwrap(); }
         let check = modes.check(&modes.artifact, &consumer);
         let (exe, build) = modes.build(
             &modes.artifact,
