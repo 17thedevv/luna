@@ -1,0 +1,31 @@
+{
+  "implementation_revision": "f5936c3344788168320dfd4b661532c2cfad8a8d",
+  "results": [
+    {
+      "mode": "source",
+      "build_exit": 0,
+      "fixture": "qualified_traits",
+      "run_exit": 0
+    },
+    {
+      "mode": "source",
+      "build_exit": 0,
+      "fixture": "imported_inherent_local_trait",
+      "run_exit": 0
+    },
+    {
+      "mode": "artifact",
+      "build_exit": 0,
+      "fixture": "qualified_traits",
+      "run_exit": 0
+    },
+    {
+      "mode": "artifact",
+      "build_exit": 0,
+      "fixture": "imported_inherent_local_trait",
+      "run_exit": 0
+    }
+  ],
+  "temp_root": "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_method_policy_67054f13dd504e328711757698ce2d24",
+  "sysroot_mode": "existing canonical artifacts rebuilt for compiler version 3; not fresh isolated source/artifact certification"
+}

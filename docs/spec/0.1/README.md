@@ -59,6 +59,7 @@ about past test runs or implementation completion remain dated evidence.
 | Core semantic rules A–K | [Normative rules](../../normative-rules-p0-p1.md) |
 | Method candidate precedence and ambiguity | [METHOD-RESOLUTION-v1](method-resolution-v1.md) |
 | Named arguments and per-call default values | [CALL-ARGUMENTS-v1](call-arguments-v1.md) |
+| Borrowed storage of module constants | [MODULE-CONST-STORAGE-v1](module-const-storage-v1.md) |
 | Lifetime relation algebra | [REGION-SPEC-01](../../../luna-rs/docs/spec/lifetime-formalism.md) |
 | Borrow joins, carried references, closure escape | [SPEC-HARDENING-01](../../../luna-rs/docs/spec-hardening-borrow-closure.md) |
 | FFI reference and aggregate restrictions | [SPEC-HARDENING-02](../../../luna-rs/docs/spec-hardening-ffi-contracts.md) |

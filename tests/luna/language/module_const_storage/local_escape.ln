@@ -1,0 +1,5 @@
+fn invalid() -> &i32 {
+    const LOCAL: i32 = 20;
+    return &LOCAL;
+}
+fn main() -> i32 { return *invalid(); }

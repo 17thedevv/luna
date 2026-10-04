@@ -1,0 +1,6 @@
+module policy {
+    export struct Counter { current: i32 };
+    impl Counter {
+        export fn value(self: &Self) -> i32 { return self.current; }
+    }
+}

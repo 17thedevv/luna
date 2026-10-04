@@ -1,0 +1,11 @@
+module values {
+    const DEFAULT: i32 = 20;
+    export fn default_ref() -> &i32 { return &DEFAULT; }
+}
+fn main() -> i32 {
+    dec reference = values::default_ref();
+    if *reference != 20 { return 1; }
+    dec other = values::default_ref();
+    if *other != 20 { return 2; }
+    return 0;
+}

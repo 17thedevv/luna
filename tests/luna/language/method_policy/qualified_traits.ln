@@ -1,0 +1,15 @@
+trait First { fn value(self: &Self) -> i32; }
+trait Second { fn value(self: &Self) -> i32; }
+struct Counter { current: i32 };
+impl First for Counter {
+    fn value(self: &Self) -> i32 { return self.current; }
+}
+impl Second for Counter {
+    fn value(self: &Self) -> i32 { return self.current + 10; }
+}
+fn main() -> i32 {
+    dec counter = Counter { current: 7 };
+    if First::value(&counter) != 7 { return 1; }
+    if Second::value(&counter) != 17 { return 2; }
+    return 0;
+}

@@ -120,6 +120,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/spec/0.1/gaps.md](spec/0.1/gaps.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/macros.md](spec/0.1/macros.md) | canonical | [macros](spec/0.1/macros.md) |
 | [docs/spec/0.1/method-resolution-v1.md](spec/0.1/method-resolution-v1.md) | canonical | [conformance](spec/0.1/conformance.md) |
+| [docs/spec/0.1/module-const-storage-v1.md](spec/0.1/module-const-storage-v1.md) | canonical | [modules](spec/0.1/modules.md) |
 | [docs/spec/0.1/modules.md](spec/0.1/modules.md) | canonical | [modules](spec/0.1/modules.md) |
 | [docs/spec/0.1/namespace-using-v1.md](spec/0.1/namespace-using-v1.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/provider-config-v1.md](spec/0.1/provider-config-v1.md) | canonical | [conformance](spec/0.1/conformance.md) |

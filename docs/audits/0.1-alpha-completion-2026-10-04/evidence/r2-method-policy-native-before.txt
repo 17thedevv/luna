@@ -1,0 +1,96 @@
+CASE source/qualified_traits BUILD EXIT 0
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+RUN EXIT 0
+CASE source/imported_inherent_local_trait BUILD EXIT 0
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+RUN EXIT 0
+PROVIDER BUILD artifact EXIT 0
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+CASE artifact/qualified_traits BUILD EXIT 0
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+RUN EXIT 0
+CASE artifact/imported_inherent_local_trait BUILD EXIT 0
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+RUN EXIT 0

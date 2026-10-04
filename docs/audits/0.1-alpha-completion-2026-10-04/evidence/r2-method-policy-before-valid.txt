@@ -1,0 +1,61 @@
+CASE ambiguous_traits CHECK EXIT 0
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+check passed
+Check successfully (no errors found).
+CASE qualified_traits CHECK EXIT 0
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+check passed
+Check successfully (no errors found).
+CASE imported_inherent_local_trait CHECK EXIT 0
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+check passed
+Check successfully (no errors found).
