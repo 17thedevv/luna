@@ -87,6 +87,12 @@ including when they use the same spelling. An element constraint belongs on its
 impl binder; spelling-based substitution between binders is forbidden. The
 2026-10-05 amendment in METHOD-RESOLUTION-v1 records this maintainer decision.
 
+Generic bodies must typecheck for every argument admitted by their declarations.
+A generic parameter is rigid within that body: an unrelated concrete type or
+another binder cannot unify with it. Inference variables may be solved, and
+declaration binders are instantiated at calls under the ordinary substitution
+rules; these are distinct operations.
+
 `dyn Trait` follows the adopted object-safety restrictions: generic trait methods,
 associated-type traits and supertrait composition are not silently admitted as
 supported dynamic interfaces. Defined unsizing admits only the specified

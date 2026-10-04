@@ -1,0 +1,2 @@
+fn wrong<T, U>(value: U) -> T { return value; }
+fn main() { dec value = wrong<bool, i32>(7); }

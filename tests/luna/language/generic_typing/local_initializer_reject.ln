@@ -1,0 +1,2 @@
+fn wrong<T>() { dec value: T = 7i32; }
+fn main() { wrong<bool>(); }

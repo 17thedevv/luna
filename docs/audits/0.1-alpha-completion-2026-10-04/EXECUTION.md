@@ -646,3 +646,77 @@ individual checked headers, complete impl premises and reference write
 capability are reusable guidance under existing contracts. Related grammar,
 boundary and validation guidance were checked for conflicts; skills acquire
 no task status, test counts or freeze authority.
+
+## R2 rigid generic bodies and nested literals — 2026-10-05 follow-up
+
+The maintainer's independent-binder decision also exposes a distinct correctness
+bug in ordinary unification. At the preceding checkpoint, `fn wrong<T>() -> T
+{ return 7i32; }` could be instantiated as bool, checked, compiled and executed.
+The general unifier now distinguishes rigid declaration binders from solvable
+inference variables. An unrelated concrete type or different declaration binder
+rejects with E2001. Trait-bound method candidates instantiate trait parameters
+and `Self` before checking their receivers, rather than relying on the old
+wildcard behavior. No spelling-based binder alias or library-name branch is
+introduced.
+
+The nested `Wrapper<Item> { item: Item {} }` parser counterexample is also
+repaired. Empty struct literals compose with an outer `}`, operators and tail
+expressions; conditional/match subjects retain their separate ambiguity rule.
+Parser controls inspect AST shape and preserve condition blocks. The CLI matrix
+includes nested nonempty data and a generic provider call containing the nested
+literal, rather than stopping at parse acceptance.
+
+Compatibility: **artifact compiler7**, format2, metadata3 and MVIR4. Reader
+controls reject compiler1–6 before payload decoding, including artifacts that
+could contain native bodies accepted under wildcard generic typing. Canonical
+sysroot regeneration is explicit; stale artifacts are never silently rebuilt
+by the importing compiler.
+
+Verification and provenance:
+
+- [Parser regressions](evidence/r2-rigid-parser.txt): **37/37 PASS**, including
+  nested/tail/operator AST controls and condition-block preservation.
+- [Semantic and artifact internals](evidence/r2-rigid-internals.txt): **206/206
+  PASS** (semantic191 and artifact15).
+- [Canonical sysroot](evidence/r2-rigid-sysroot.txt): all49 providers built with
+  compiler7. [Workspace check](evidence/r2-rigid-check.txt): cargo exit0.
+- [Initial focused CLI run](evidence/r2-rigid-cli-initial.txt): cargo **exit101**,
+  preserved as FAIL. Generic, method, const and char matrices passed, and the
+  positive formatting test passed, but parallel formatting tests selected the
+  same timestamp-based temporary root on Windows. The negative formatting test
+  failed with `AlreadyExists`; cargo stopped before the trait-argument target.
+- The shared CLI provider harness now adds a process-local atomic counter to its
+  temporary-root identity. The [corrected formatting/trait rerun](evidence/r2-rigid-format-trait.txt)
+  records **3/3 PASS**, cargo exit0; it does not rewrite the preceding FAIL.
+
+`generic_typing_cli` verifies **4 native executions and 24 E2001 observations**
+through check/build, with no rejected executable emitted and no E5001 cascade.
+Its user-defined provider is published, source removed in artifact mode and
+relocated before use. Controls cover identity/constructor/borrowed returns,
+same-name impl/method binders, alpha-renamed trait-method binders, multiple
+concrete instances, generic bound dispatch, and invalid return/initializer/call
+argument/field types. The method matrix retains **88 native and 176 typed
+negative observations**, in both provider modes and declaration/import orders.
+Module-constant regressions also pass on the new compiler.
+
+This is a focused checkpoint, **not R2 completion or release approval**. The
+full workspace result at fbf4e72 remains FAIL. Canonical metadata grouping and
+fingerprints, associated projection/fallback domains, the 64-frame proof-limit
+diagnostic, moved closure destruction, adopted named/default calls and R3–R5
+remain open. A separate standalone `boolean_not_observation.ln` preserves the
+observed E2012 rejection of logical-not for the operator coverage audit; it is
+outside this passing generic matrix and requires contract reconciliation.
+
+    Compiler Change
+        Capability: Rigid generic body typing and composition of nested struct literals.
+        Why stdlib exposed it: Independent Vec impl/method bounds exposed reliance on wildcard generic unification.
+        Why it is generic: Declaration/inference identities and syntactic expression contexts govern the change; no provider, container or method-name knowledge is added.
+        User-defined type benefiting: Cell<T>, Wrapper<T>, Choose<V> and independent generic functions in the relocated provider matrix.
+        Tests: generic_typing_cli; method_resolution_cli; module_const_storage_cli; parser, semantic and artifact reader suites; char/format/trait CLI regressions.
+        New intrinsic/lang_item?: NO
+        Stdlib-specific branch?: NO
+
+SKILL IMPACT: **REFINEMENT** in luna-semantic-compliance: declaration binders
+remain rigid in generic bodies as well as trait proof. Related grammar,
+capability-validation and boundary guidance were checked; no conflicting rule,
+task count or freeze claim was added to skills.

@@ -1,0 +1,15 @@
+export module generic_api {
+    export struct Cell<T> { value: T };
+    export fn identity<A>(value: A) -> A { return value; }
+    export fn make_cell<T>(value: T) -> Cell<T> { return Cell<T> { value: value }; }
+    export fn borrow<T>(value: &T) -> &T life_from(value) { return value; }
+    impl<T> Cell<T> {
+        export fn map<T>(&self, value: T) -> T { return value; }
+    }
+    export trait Choose<V> {
+        fn choose<W>(&self, value: W) -> W;
+    }
+    impl<T> Choose<T> for Cell<T> {
+        fn choose<X>(&self, value: X) -> X { return value; }
+    }
+}

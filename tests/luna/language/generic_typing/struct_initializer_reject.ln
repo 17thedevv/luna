@@ -1,0 +1,5 @@
+import "provider";
+fn wrong<T>() -> generic_api::Cell<T> {
+    return generic_api::Cell<T> { value: 7i32 };
+}
+fn main() { dec value = wrong<bool>(); }

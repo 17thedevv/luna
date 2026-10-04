@@ -431,7 +431,8 @@ do not constrain it by redeclaring a method parameter with the same name. Keep
 the selected checked impl header and its binder identities through imports and
 monomorphization; a nominal-head grouping key cannot identify an individual impl.
 A matching blanket impl is evidence only after its own trait and associated-type
-premises are established. Caller generic binders remain rigid during that proof.
+premises are established. Declaration generic binders remain rigid in bodies
+and trait proof; only inference variables are solved by ordinary unification.
 Calling through `&rw T` uses the reference's write capability; it does not require
 reassigning the binding that holds the reference. Shared references stay read-only.
 

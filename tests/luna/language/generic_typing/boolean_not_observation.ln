@@ -1,0 +1,6 @@
+// Retained observation for the operator coverage audit, outside this generic matrix.
+fn main() -> i32 {
+    dec value = true;
+    if !value { return 1; }
+    return 0;
+}
