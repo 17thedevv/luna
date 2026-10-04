@@ -1,0 +1,13 @@
+trait Fallback { fn value(self: &Self) -> i32; }
+struct Counter { current: i32 };
+impl Counter {
+    fn value(self: &Self, extra: i32) -> i32 { return self.current + extra; }
+}
+impl Fallback for Counter {
+    fn value(self: &Self) -> i32 { return self.current; }
+}
+fn main() -> i32 {
+    dec counter = Counter { current: 7 };
+    if counter.value() != 7 { return 1; }
+    return 0;
+}

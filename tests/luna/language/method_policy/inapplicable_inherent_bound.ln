@@ -1,0 +1,14 @@
+trait Marker { }
+trait Fallback { fn value(self: &Self) -> i32; }
+struct Wrapper<T> { item: T };
+impl<T: Marker> Wrapper<T> {
+    fn value(self: &Self) -> i32 { return 30; }
+}
+impl<T> Fallback for Wrapper<T> {
+    fn value(self: &Self) -> i32 { return 7; }
+}
+fn main() -> i32 {
+    dec wrapper = Wrapper<i32> { item: 1 };
+    if wrapper.value() != 7 { return 1; }
+    return 0;
+}

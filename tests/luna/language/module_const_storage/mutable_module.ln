@@ -1,0 +1,5 @@
+module values {
+    const DEFAULT: i32 = 20;
+    export fn invalid() -> &rw i32 { return &rw DEFAULT; }
+}
+fn main() { }

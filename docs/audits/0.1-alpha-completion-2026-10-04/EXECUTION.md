@@ -27,6 +27,10 @@ remain R5 work.
 - These additions remain implementation/acceptance tasks. The completion goal
   includes them as well as the original R0–R5 plan. Runtime overflow and final
   advertised target matrix are still explicit decisions, not silently deferred.
+- Module-level constants have immutable program-lifetime storage when borrowed;
+  local constants retain lexical lifetime:
+  [MODULE-CONST-STORAGE-v1](../../spec/0.1/module-const-storage-v1.md).
+  The maintainer adopted this decision after the compatibility checkpoint.
 
 ## Evidence and current findings
 
@@ -366,9 +370,73 @@ rebuilding remains an explicit build-tool operation.
 These are compatibility and focused verification results, not full-workspace
 or release PASS. Closure cleanup, remaining ownership matrices, adopted method
 selection and named/per-call default arguments, R3/R4 and final R5 gates remain
-open. A separate maintainer question now distinguishes module-const static
-storage from temporary value materialization; neither interpretation has been
-silently adopted to make the borrowed Option/Result parity test pass.
+open. At this checkpoint the module-constant storage decision was still pending.
+The subsequent adopted decision and implementation gap are recorded below.
 
 SKILL IMPACT: none. Existing artifact guidance already requires compiler
 identity validation and fail-closed rejection without rebuild/fallback.
+
+## New contract and method-policy counterexamples
+
+The maintainer adopted [MODULE-CONST-STORAGE-v1](../../spec/0.1/module-const-storage-v1.md):
+module-level constants provide immutable storage lasting for the program's
+lifetime when borrowed; local constants remain scoped. Implementation is
+pending. The [public pre-fix controls](evidence/r1-module-const-before.txt)
+on `f5936c3` reject the required-valid module reference with E3005; local escape
+rejects E3005 and mutable module borrow rejects E2023 as required. Current
+`generate_lvalue` materializes a constant into a function Alloca, which is the
+first incorrect representation for the new rule. The fix must create actual
+typed immutable target storage with declaration identity and portable initializer
+dependencies; setting `ValueOrigin::Global` on that Alloca would be unsound.
+
+The [pre-fix checkpoint](evidence/const-method-pre-fix-checkpoint.json) pins the
+CLI and fixture/evidence hashes. The adopted method policy has independent
+reduced counterexamples:
+
+- [Parsed pre-fix check controls](evidence/r2-method-policy-before-valid.txt):
+  `ambiguous_traits.ln` is incorrectly accepted instead of E1008. Both qualified
+  calls and the imported-inherent/local-trait control are accepted.
+- [Native controls](evidence/r2-method-policy-native-before.txt), with a
+  [mode/revision record](evidence/r2-method-policy-native-before.json): qualified
+  calls select the correct trait implementations, and the imported inherent
+  method wins against a local trait in this reduced case. All four runs exit0.
+  The provider is freshly built for artifact mode and its adjacent source is
+  absent there. Sysroot artifacts are existing canonical version-3 artifacts;
+  these probes are not a complete fresh-isolated parity certificate. Do not
+  report this passing local/imported control as a newly reproduced defect merely
+  because source contains separate lookup loops.
+- [Applicability controls](evidence/r2-method-applicability-before.txt):
+  `inapplicable_inherent_bound.ln` selects an inherent method requiring
+  `T: Marker` for `i32` with no matching impl. Check/build accept, native exits1
+  because the required applicable trait fallback was not selected.
+  `inapplicable_inherent_arity.ln` passes check but build rejects E6001 at LLVM
+  verification for an incorrect argument count. The applicable trait candidate
+  has the correct arity. Backend fail-closed exposes this defect; the candidate
+  selection/typecheck boundary must reject that inherent candidate earlier.
+
+Permanent fixtures are under `tests/luna/language/method_policy/` and
+`tests/luna/language/module_const_storage/`. These are pre-fix counterexamples,
+not a new passing acceptance harness.
+
+Next implementation order:
+
+1. Implement module-constant storage as a generic typed IR/backend/interpreter
+   capability with correct global provenance and source/artifact preservation;
+   retain local/mutability negatives and the original borrowed Option/Result
+   regression. Audit compiler/MVIR/metadata compatibility for any new portable
+   representation. No symbol-name or fixture-specific branch.
+2. Collect canonical local/imported method candidates together; probe receiver,
+   arity, generic bounds and access without leaking speculative inference or
+   equality obligations. Rank applicable inherent candidates before traits;
+   deduplicate declaration identity and diagnose distinct trait ambiguity with
+   E1008/related spans. Expected return type must not resolve that ambiguity.
+   Keep passing qualification/imported-inherent controls and test reversed order,
+   visibility, explicit method generics and artifact metadata paths.
+3. Continue closure destruction/conditional future cleanup and the remaining
+   R1/R2/R3 matrices; implement named/default calls under their adopted per-call
+   definition-scope contract, reconcile R4 and take exact-candidate R5 gates.
+
+SKILL IMPACT: none. Existing skills defer semantic authority to the versioned
+spec/adopted amendments and require generic storage, provenance, candidate
+validation, negative controls and source/artifact parity. The new amendment
+belongs in that specification rather than being duplicated as skill authority.

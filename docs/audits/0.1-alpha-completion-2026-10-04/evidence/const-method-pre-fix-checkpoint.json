@@ -1,0 +1,80 @@
+{
+  "implementation_revision": "f5936c3344788168320dfd4b661532c2cfad8a8d",
+  "cli_sha256": "bf16c0b3a32f527fbab6f959abf99cf9982c922653b8eb6b9f765f691f59e691",
+  "capability_status": "PARTIAL; pre-fix characterization only",
+  "evidence": {
+    "r1-module-const-before.txt": {
+      "sha256": "30a7907bd587776b051825fd2ded5bf9528521bb9894c0ab83c7c6689782f20b"
+    },
+    "r2-method-policy-before-valid.txt": {
+      "sha256": "8e23fc1cd896fd829cc2fead0ee7fb144b1614608cc5b91e72c9b789dd694996"
+    },
+    "r2-method-policy-native-before.txt": {
+      "sha256": "fc2a11352068c5e841a37d8d653de0d3f0592a721feec97d80d78c03211d397a"
+    },
+    "r2-method-applicability-before.txt": {
+      "sha256": "d345896d47a1c4c8dab12f13681df6703a948917552dde6ac481c3363d7bbfcb"
+    }
+  },
+  "fixture_hashes": {
+    "tests/luna/language/method_policy/ambiguous_traits.ln": "40b7e6e886cd654358250df4d2fa53a28c8df3413c6917c55b804ffa391f1a9b",
+    "tests/luna/language/method_policy/imported_inherent_local_trait.ln": "9d16a4138784e7eea70dd6441866ab810a8363dae4ff59792ca4c732dfd5313b",
+    "tests/luna/language/method_policy/inapplicable_inherent_arity.ln": "37ec63ec2d31263fb13ce429a49b3476d8eb107f0f7ca37d0d1bfc29c0544753",
+    "tests/luna/language/method_policy/inapplicable_inherent_bound.ln": "fb117c5fe521b7cc3d89f30e5c701418dcc04907070f2377c91a40c5e5e264a3",
+    "tests/luna/language/method_policy/provider.ln": "34ab236fce3747f6d0a572e668c838996388a8596b68b9771ed45dea21912a1e",
+    "tests/luna/language/method_policy/qualified_traits.ln": "f7b186116ba011aea4298e5b13c1d672cd644d08c45cec35218f23ea47fd6d8c",
+    "tests/luna/language/module_const_storage/local_escape.ln": "ab9a93603dc68f96f7ab6c7d3cbf22d6ee37ff1c9d6cc1c410a032a39b4e9ae7",
+    "tests/luna/language/module_const_storage/module_reference.ln": "70600ff1d845e1fa655f8712db0729ae775945bdf26468b0f2e82c291e32460d",
+    "tests/luna/language/module_const_storage/mutable_module.ln": "bb11015a3169913cbbaaa224d3b49ee6a85ee8615d27c9f2919031f69aa2ebf2"
+  },
+  "const_controls": {
+    "module_reference": {
+      "check_exit": 1,
+      "code": "E3005",
+      "contract_met": false
+    },
+    "local_escape": {
+      "check_exit": 1,
+      "code": "E3005",
+      "contract_met": true
+    },
+    "mutable_module": {
+      "check_exit": 1,
+      "code": "E2023",
+      "contract_met": true
+    }
+  },
+  "method_controls": {
+    "ambiguous_traits": {
+      "check_exit": 0,
+      "expected": "E1008",
+      "contract_met": false
+    },
+    "qualified_traits": {
+      "source_run_exit": 0,
+      "artifact_run_exit": 0,
+      "contract_met_for_reduced_case": true
+    },
+    "imported_inherent_local_trait": {
+      "source_run_exit": 0,
+      "artifact_run_exit": 0,
+      "contract_met_for_reduced_case": true
+    },
+    "inapplicable_inherent_bound": {
+      "check_exit": 0,
+      "build_exit": 0,
+      "run_exit": 1,
+      "contract_met": false
+    },
+    "inapplicable_inherent_arity": {
+      "check_exit": 0,
+      "build_exit": 1,
+      "code": "E6001",
+      "contract_met": false
+    }
+  },
+  "limits": [
+    "Existing canonical compiler-version-3 sysroot artifacts; not full fresh-isolated parity certification",
+    "No compiler implementation change for the new module storage or adopted method policy in this checkpoint"
+  ]
+}

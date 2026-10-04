@@ -560,6 +560,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/spec/0.1/module-const-storage-v1.md",
+    "role": "canonical",
+    "owner": "modules"
+  },
+  {
     "path": "docs/spec/0.1/modules.md",
     "role": "canonical",
     "owner": "modules"

@@ -113,3 +113,11 @@ artifact-only modes. The [verification record](../../audits/alpha-modules-2026-1
 tracks the tested baseline and final workspace regression separately. This
 update adds bounded module capabilities; it does not change the dated defects
 or automatically close W8, the full diagnostic contract, release or target gaps.
+
+## Module constant storage — adopted 2026-10-04, implementation pending
+
+[MODULE-CONST-STORAGE-v1](module-const-storage-v1.md) adopts program-lifetime
+immutable storage for references to module-level constants; local constants
+retain lexical storage lifetime. Current lowering of `&DUMMY` to a local
+temporary fails the borrowed Option/Result artifact regression. Generic target
+storage, provenance and source/artifact acceptance remain implementation work.

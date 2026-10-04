@@ -1,0 +1,71 @@
+CASE module_reference CHECK EXIT 1
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+error[E3005]: LocalBorrowEscape: Reference to local variable escapes function scope
+  --> ../tests/luna/language/module_const_storage/module_reference.ln:3:47
+   |
+3  |     export fn default_ref() -> &i32 { return &DEFAULT; }
+   |                                               ^^^^^^^
+
+CASE local_escape CHECK EXIT 1
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+error[E3005]: LocalBorrowEscape: Reference to local variable escapes function scope
+  --> ../tests/luna/language/module_const_storage/local_escape.ln:3:13
+   |
+3  |     return &LOCAL;
+   |             ^^^^^
+
+CASE mutable_module CHECK EXIT 1
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+error[E2023]: Cannot mutate immutable variable
+  --> ../tests/luna/language/module_const_storage/mutable_module.ln:3:49
+   |
+3  |     export fn invalid() -> &rw i32 { return &rw DEFAULT; }
+   |                                                 ^^^^^^^

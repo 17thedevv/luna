@@ -117,6 +117,10 @@ capture transfers ownership; it does not change an unsafe address into a valid
 safe loan. Callable representation is not the source ownership contract.
 
 `const` and `comptime` retain distinct admission rules but share MVIR evaluation.
+Under [MODULE-CONST-STORAGE-v1](module-const-storage-v1.md), a shared reference
+to a module-level constant designates immutable storage lasting for the
+program's lifetime. A local constant retains its ordinary lexical lifetime;
+compile-time evaluation does not promote its storage.
 Const admission is restricted, deterministic and pure. Comptime permits local
 imperative computation under effect containment. Observable I/O, extern calls,
 OS interactions and async suspension do not become compile-time fallbacks.
