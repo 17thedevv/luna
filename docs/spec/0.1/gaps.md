@@ -54,12 +54,16 @@ examples under a historical-role notice.
 
 | ID | Question / boundary |
 |---|---|
-| V01-DESIGN-01 | Exact inherent/trait method collision precedence or ambiguity policy; hash iteration cannot decide it |
 | V01-DESIGN-03 | Runtime integer overflow policy outside defined checked/compile-time operations; avoid declaring current LLVM wrapping normative |
 | V01-DESIGN-04 | Complete formal grammar beyond the consolidated productions; parser acceptance of legacy/uncontracted syntax is not adoption |
 
 No new format-macro hook, interpolation syntax, runtime opcode or container
 language item is adopted. These require their own complete generic contract.
+
+V01-DESIGN-01 was resolved by maintainer adoption of Option A on 2026-10-04:
+[METHOD-RESOLUTION-v1](method-resolution-v1.md). The resolver's complete
+conformance remains an implementation/acceptance task; deterministic selection
+of a first candidate is not proof of ambiguity rejection.
 
 V01-DESIGN-02 is resolved by the previously approved 2026-10-01 formatting
 contract, now recovered from the other branch: char is a Unicode scalar;

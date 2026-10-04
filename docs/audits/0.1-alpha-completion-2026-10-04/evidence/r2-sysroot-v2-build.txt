@@ -1,0 +1,1764 @@
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2024 which implies `resolver = "3"`
+  |
+  = note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+  = note: to use the edition 2024 resolver, specify `workspace.resolver = "3"` in the workspace root's manifest
+  = note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+warning: unused imports: `DeclId`, `ExprId`, `PatId`, `StmtId`, and `TypeId`
+ --> crates\luna-parser\src\lib.rs:1:26
+  |
+1 | use luna_ast::{AstArena, DeclId, ExprId, PatId, StmtId, TypeId};
+  |                          ^^^^^^  ^^^^^^  ^^^^^  ^^^^^^  ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `BuiltinKind`
+ --> crates\luna-parser\src\ty.rs:3:18
+  |
+3 | use luna_lexer::{BuiltinKind, TokenKind};
+  |                  ^^^^^^^^^^^
+
+warning: unused variable: `span_start`
+   --> crates\luna-parser\src\decl.rs:126:13
+    |
+126 |         let span_start = self.previous().span.start;
+    |             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_span_start`
+    |
+    = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `span_end`
+   --> crates\luna-parser\src\decl.rs:156:13
+    |
+156 |         let span_end = self.previous().span.end;
+    |             ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_span_end`
+
+warning: value assigned to `kind` is never read
+   --> crates\luna-parser\src\decl.rs:127:24
+    |
+127 |         let mut kind = luna_ast::ImportKind::External;
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+...
+147 |             kind = luna_ast::ImportKind::Local;
+    |             ---------------------------------- `kind` is overwritten here before the previous value is read
+    |
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `start_span`
+   --> crates\luna-parser\src\decl.rs:836:21
+    |
+836 |                 let start_span = self.advance().span;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_span`
+
+warning: unused variable: `rparen_tok`
+   --> crates\luna-parser\src\decl.rs:841:21
+    |
+841 |                 let rparen_tok = self.consume(TokenKind::RParen, "Expected closing ')' after macro repetition")?;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_rparen_tok`
+
+warning: unused variable: `start_span`
+   --> crates\luna-parser\src\decl.rs:954:21
+    |
+954 |                 let start_span = self.advance().span;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_start_span`
+
+warning: unused variable: `rparen_tok`
+   --> crates\luna-parser\src\decl.rs:959:21
+    |
+959 |                 let rparen_tok = self.consume(TokenKind::RParen, "Expected closing ')' after macro repetition")?;
+    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_rparen_tok`
+
+warning: unused variable: `allow_struct_literal`
+   --> crates\luna-parser\src\expr.rs:755:33
+    |
+755 |     fn parse_primary(&mut self, allow_struct_literal: bool) -> Result<ExprId, ()> {
+    |                                 ^^^^^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_allow_struct_literal`
+
+warning: `luna-parser` (lib) generated 10 warnings (run `cargo fix --lib -p luna-parser` to apply 9 suggestions)
+warning: unused imports: `MacroFragment`, `MacroMatcher`, and `RepetitionKind`
+ --> crates\luna-semantic\src\macro_engine.rs:3:79
+  |
+3 |     AstArena, Decl, DeclId, Expr, ExprId, FragmentKind, Item, MacroDelimiter, MacroFragment,
+  |                                                                               ^^^^^^^^^^^^^
+4 |     MacroMatcher, MacroRule, MatcherElement, RepetitionKind, Stmt, StmtId, TranscriberElement,
+  |     ^^^^^^^^^^^^                             ^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `std::sync::Arc`
+  --> crates\luna-semantic\src\annotation.rs:14:5
+   |
+14 | use std::sync::Arc;
+   |     ^^^^^^^^^^^^^^
+
+warning: unused import: `DeriveInput`
+  --> crates\luna-semantic\src\annotation.rs:19:21
+   |
+19 | use crate::derive::{DeriveInput, DeriveRegistry, DeriveContext, extract_struct_input, extract_enum_input};
+   |                     ^^^^^^^^^^^
+
+warning: unused import: `std::collections::HashMap`
+  --> crates\luna-semantic\src\comptime\type_repr.rs:16:5
+   |
+16 | use std::collections::HashMap;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `std::fmt`
+  --> crates\luna-semantic\src\comptime\type_repr.rs:17:5
+   |
+17 | use std::fmt;
+   |     ^^^^^^^^
+
+warning: unused import: `luna_common::ids::SymbolId`
+ --> crates\luna-semantic\src\effect.rs:2:5
+  |
+2 | use luna_common::ids::SymbolId;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::ty::LifetimeId`
+  --> crates\luna-semantic\src\lifetime.rs:34:5
+   |
+34 | use crate::ty::LifetimeId;
+   |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `crate::symbol::SymbolTable`
+  --> crates\luna-semantic\src\lifetime.rs:36:5
+   |
+36 | use crate::symbol::SymbolTable;
+   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `luna_ast::AstArena`
+  --> crates\luna-semantic\src\lib.rs:54:5
+   |
+54 | use luna_ast::AstArena;
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `Hasher`
+  --> crates\luna-semantic\src\comptime\type_repr.rs:18:23
+   |
+18 | use std::hash::{Hash, Hasher};
+   |                       ^^^^^^
+
+warning: unused variable: `return_type`
+    --> crates\luna-semantic\src\resolver.rs:1935:17
+     |
+1935 |                 return_type,
+     |                 ^^^^^^^^^^^ help: try ignoring the field: `return_type: _`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `ty`
+    --> crates\luna-semantic\src\resolver.rs:1959:25
+     |
+1959 |                         ty,
+     |                         ^^ help: try ignoring the field: `ty: _`
+
+warning: unused variable: `generic_args`
+   --> crates\luna-semantic\src\typechecker.rs:569:27
+    |
+569 |         let (nominal_sym, generic_args) = match &sem_ty {
+    |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_generic_args`
+
+warning: value assigned to `span` is never read
+    --> crates\luna-semantic\src\typechecker.rs:1094:40
+     |
+1094 |                         let mut span = luna_common::Span::new(luna_common::ids::FileId(0), 0, 0);
+     |                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this value is reassigned later and never used
+1095 |                         let sym = self.ctx.symbol_table.get_symbol(sym_id);
+1096 |                         span = sym.span;
+     |                         --------------- `span` is overwritten here before the previous value is read
+     |
+     = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `trait_name`
+    --> crates\luna-semantic\src\typechecker.rs:1273:49
+     |
+1273 | ...                   let trait_name = self.get_span_text(*last_seg);
+     |                           ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_trait_name`
+
+warning: unused variable: `trait_name`
+    --> crates\luna-semantic\src\typechecker.rs:1317:49
+     |
+1317 | ...                   let trait_name = self.get_span_text(*last_seg);
+     |                           ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_trait_name`
+
+warning: unused variable: `trait_name`
+    --> crates\luna-semantic\src\typechecker.rs:1359:57
+     |
+1359 | ...                   let trait_name = self.get_span_text(*last_seg);
+     |                           ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_trait_name`
+
+warning: unused variable: `generic_params`
+    --> crates\luna-semantic\src\typechecker.rs:2000:34
+     |
+2000 |                     Decl::Impl { generic_params, self_type, methods, .. } => {
+     |                                  ^^^^^^^^^^^^^^ help: try ignoring the field: `generic_params: _`
+
+warning: unused variable: `associated_types`
+    --> crates\luna-semantic\src\typechecker.rs:2167:69
+     |
+2167 |                 if let Decl::Impl { trait_type, self_type, methods, associated_types, .. } = decl {
+     |                                                                     ^^^^^^^^^^^^^^^^ help: try ignoring the field: `associated_types: _`
+
+warning: unused variable: `in2`
+    --> crates\luna-semantic\src\typechecker.rs:3981:50
+     |
+3981 |             (SemanticType::Reference(_, _, in1), in2) => {
+     |                                                  ^^^ help: if this is intentional, prefix it with an underscore: `_in2`
+
+warning: unused variable: `in1`
+    --> crates\luna-semantic\src\typechecker.rs:3984:14
+     |
+3984 |             (in1, SemanticType::Reference(_, _, in2)) => {
+     |              ^^^ help: if this is intentional, prefix it with an underscore: `_in1`
+
+warning: variable does not need to be mutable
+    --> crates\luna-semantic\src\typechecker.rs:5921:21
+     |
+5921 |                 let mut result_ty = self.ctx.types.new_inference_var();
+     |                     ----^^^^^^^^^
+     |                     |
+     |                     help: remove this `mut`
+     |
+     = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `i`
+    --> crates\luna-semantic\src\typechecker.rs:5927:22
+     |
+5927 |                 for (i, arm) in arms.iter().enumerate() {
+     |                      ^ help: if this is intentional, prefix it with an underscore: `_i`
+
+warning: value assigned to `has_enum_generics` is never read
+    --> crates\luna-semantic\src\typechecker.rs:4473:57
+     |
+4473 | ...                   let mut has_enum_generics = false;
+     |                                                   ^^^^^ this value is reassigned later and never used
+...
+4476 | ...                   has_enum_generics = !enum_args.is_empty();
+     |                       ----------------------------------------- `has_enum_generics` is overwritten here before the previous value is read
+
+warning: unused variable: `sym_id`
+   --> crates\luna-semantic\src\mono.rs:703:18
+    |
+703 |             for (sym_id, ty) in current_symbol_types.iter_mut() {
+    |                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_sym_id`
+
+warning: unused variable: `pat_id`
+   --> crates\luna-semantic\src\mono.rs:718:18
+    |
+718 |             for (pat_id, ty) in current_pat_types.iter_mut() {
+    |                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_pat_id`
+
+warning: unused variable: `generic_args`
+   --> crates\luna-semantic\src\mono.rs:752:27
+    |
+752 |         let (nominal_sym, generic_args) = match &sem_ty {
+    |                           ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_generic_args`
+
+warning: unused variable: `sym_name`
+    --> crates\luna-semantic\src\mono.rs:1623:25
+     |
+1623 |                     let sym_name = symbol.name.clone();
+     |                         ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_sym_name`
+
+warning: unused variable: `inner`
+    --> crates\luna-semantic\src\macro_engine.rs:1209:60
+     |
+1209 |                 TranscriberElement::Repetition { elements: inner, .. } => {
+     |                                                            ^^^^^ help: if this is intentional, prefix it with an underscore: `_inner`
+
+warning: unused variable: `sym_id`
+  --> crates\luna-semantic\src\comptime\reflect.rs:33:34
+   |
+33 |             SemanticType::Struct(sym_id, _, _) => {
+   |                                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_sym_id`
+
+warning: unused variable: `name`
+   --> crates\luna-semantic\src\lifetime.rs:227:41
+    |
+227 |     pub fn register_lifetime(&mut self, name: &str, ident: LifetimeIdent) {
+    |                                         ^^^^ help: if this is intentional, prefix it with an underscore: `_name`
+
+warning: unused variable: `assignment`
+   --> crates\luna-semantic\src\lifetime.rs:670:26
+    |
+670 |         SolveResult::Sat(assignment) => {
+    |                          ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_assignment`
+
+warning: unused variable: `ty`
+   --> crates\luna-semantic\src\lib.rs:122:13
+    |
+122 |         let ty = self.types.get(id);
+    |             ^^ help: if this is intentional, prefix it with an underscore: `_ty`
+
+warning: method `resolve_type` is never used
+    --> crates\luna-semantic\src\typechecker.rs:3957:8
+     |
+  35 | impl<'a> TypeChecker<'a> {
+     | ------------------------ method in this implementation
+...
+3957 |     fn resolve_type(&mut self, ty_id: luna_ast::TypeId) -> SemanticTypeId {
+     |        ^^^^^^^^^^^^
+     |
+     = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `types` is never read
+   --> crates\luna-semantic\src\lifetime.rs:515:5
+    |
+511 | pub struct LifetimeValidator<'a> {
+    |            ----------------- field in this struct
+...
+515 |     types: &'a crate::ty::TypeContext,
+    |     ^^^^^
+
+warning: field `ctx` is never read
+   --> crates\luna-semantic\src\lifetime.rs:753:5
+    |
+752 | pub struct LifetimeVerifier<'a> {
+    |            ---------------- field in this struct
+753 |     ctx: &'a SemanticContext,
+    |     ^^^
+
+warning: `luna-semantic` (lib) generated 36 warnings (run `cargo fix --lib -p luna-semantic` to apply 30 suggestions)
+warning: unused import: `Span`
+ --> crates\luna-mvir\src\interp.rs:2:34
+  |
+2 | use luna_common::ids::{SymbolId, Span};
+  |                                  ^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `effect::Effect`
+ --> crates\luna-mvir\src\interp.rs:6:5
+  |
+6 |     effect::Effect,
+  |     ^^^^^^^^^^^^^^
+
+warning: unreachable pattern
+    --> crates\luna-mvir\src\generator.rs:1947:13
+     |
+1947 |             _ => unreachable!("ICE: Unhandled variant, should be impossible after semantic invariants")
+     |             ^ no value can reach this
+     |
+note: multiple earlier patterns match some of the same values
+    --> crates\luna-mvir\src\generator.rs:1947:13
+     |
+1522 |             Stmt::Expr { expr, .. } => {
+     |             ----------------------- matches some of the same values
+...
+1525 |             Stmt::Block { body, tail_expr } => {
+     |             ------------------------------- matches some of the same values
+...
+1535 |             Stmt::Return { value } => {
+     |             ---------------------- matches some of the same values
+...
+1593 |             Stmt::While { condition, body, .. } => {
+     |             ----------------------------------- matches some of the same values
+...
+1947 |             _ => unreachable!("ICE: Unhandled variant, should be impossible after semantic invariants")
+     |             ^ ...and 6 other patterns collectively make this unreachable
+     = note: `#[warn(unreachable_patterns)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `val_id`
+    --> crates\luna-mvir\src\generator.rs:2357:34
+     |
+2357 |                     if let Some(&val_id) = self.locals.get(&sym_id) {
+     |                                  ^^^^^^ help: if this is intentional, prefix it with an underscore: `_val_id`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unreachable pattern
+    --> crates\luna-mvir\src\generator.rs:3460:13
+     |
+3460 |             _ => Operand::Boolean(false),
+     |             ^ no value can reach this
+     |
+note: multiple earlier patterns match some of the same values
+    --> crates\luna-mvir\src\generator.rs:3460:13
+     |
+3315 |             Pattern::Wildcard => Operand::Boolean(true),
+     |             ----------------- matches some of the same values
+3316 |             Pattern::Identifier { .. } => {
+     |             -------------------------- matches some of the same values
+...
+3336 |             Pattern::Enum { fields, .. } => {
+     |             ---------------------------- matches some of the same values
+...
+3378 |             Pattern::Literal(token) => {
+     |             ----------------------- matches some of the same values
+...
+3460 |             _ => Operand::Boolean(false),
+     |             ^ ...and 2 other patterns collectively make this unreachable
+
+warning: `luna-mvir` (lib) generated 5 warnings (run `cargo fix --lib -p luna-mvir` to apply 3 suggestions)
+warning: unused import: `Cursor`
+ --> crates\luna-llib\src\writer.rs:1:22
+  |
+1 | use std::io::{Write, Cursor};
+  |                      ^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused imports: `BasicBlock`, `CaptureInfo`, and `ValueData`
+ --> crates\luna-llib\src\writer.rs:4:35
+  |
+4 | use luna_mvir::{Module, Function, ValueData, BasicBlock, CaptureInfo, Instruction, Terminator, Operand};
+  |                                   ^^^^^^^^^  ^^^^^^^^^^  ^^^^^^^^^^^
+
+warning: unused import: `MlibHeader`
+ --> crates\luna-llib\src\reader.rs:2:33
+  |
+2 | use crate::format::{LlibHeader, MlibHeader, SectionEntry, SectionType, LLIB_MAGIC, MLIB_MAGIC, LLIB_FORMAT_VERSION, MLIB_FORMAT_VERSI...
+  |                                 ^^^^^^^^^^
+
+warning: unused import: `std::collections::HashSet`
+ --> crates\luna-borrowck\src\effect.rs:1:5
+  |
+1 | use std::collections::HashSet;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `ValueOrigin`
+ --> crates\luna-borrowck\src\effect_inference.rs:8:17
+  |
+8 | use luna_mvir::{ValueOrigin, Function, GlobalId, Instruction, Operand, Terminator, ValueId};
+  |                 ^^^^^^^^^^^
+
+warning: unused import: `ReturnEffect`
+ --> crates\luna-borrowck\src\interprocedural.rs:1:40
+  |
+1 | use crate::effect::{CallEffectSummary, ReturnEffect};
+  |                                        ^^^^^^^^^^^^
+
+warning: unused import: `Operand`
+ --> crates\luna-borrowck\src\interprocedural.rs:3:45
+  |
+3 | use luna_mvir::{Function, GlobalId, Module, Operand, Instruction};
+  |                                             ^^^^^^^
+
+warning: unused variable: `state`
+    --> crates\luna-borrowck\src\borrow_analysis.rs:1376:45
+     |
+1376 |     fn is_external_loan(&self, loan: &Loan, state: &BorrowStateData) -> bool {
+     |                                             ^^^^^ help: if this is intentional, prefix it with an underscore: `_state`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable `effects` is assigned to, but never used
+   --> crates\luna-borrowck\src\move_analysis.rs:369:21
+    |
+369 |                 let mut effects = None;
+    |                     ^^^^^^^^^^^
+    |
+    = note: consider using `_effects` instead
+
+warning: value assigned to `effects` is never read
+   --> crates\luna-borrowck\src\move_analysis.rs:371:21
+    |
+371 |                     effects = sums.get(callee);
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = help: maybe it is overwritten before being read?
+    = note: `#[warn(unused_assignments)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `arg_count` is never read
+  --> crates\luna-borrowck\src\effect_inference.rs:62:5
+   |
+61 | pub struct EffectInference<'a> {
+   |            --------------- field in this struct
+62 |     arg_count: usize,
+   |     ^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `i`
+  --> crates\luna-optimizer\src\verifier.rs:41:10
+   |
+41 |     for (i, block) in func.blocks.iter().enumerate() {
+   |          ^ help: if this is intentional, prefix it with an underscore: `_i`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `luna-llib` (lib) generated 3 warnings (run `cargo fix --lib -p luna-llib` to apply 3 suggestions)
+warning: `luna-borrowck` (lib) generated 8 warnings (run `cargo fix --lib -p luna-borrowck` to apply 5 suggestions)
+warning: `luna-optimizer` (lib) generated 1 warning (run `cargo fix --lib -p luna-optimizer` to apply 1 suggestion)
+warning: field `function_map` is never read
+  --> crates\luna-backend\src\llvm_codegen.rs:81:5
+   |
+72 | pub struct LLVMBackend<'a, 'ctx> {
+   |            ----------- field in this struct
+...
+81 |     function_map: HashMap<String, inkwell::values::FunctionValue<'ctx>>,
+   |     ^^^^^^^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `luna-backend` (lib) generated 1 warning
+warning: unused import: `crate::registry::ModuleRegistry`
+ --> crates\luna-driver\src\importer.rs:4:5
+  |
+4 | use crate::registry::ModuleRegistry;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `luna_lexer::Lexer`
+ --> crates\luna-driver\src\importer.rs:6:5
+  |
+6 | use luna_lexer::Lexer;
+  |     ^^^^^^^^^^^^^^^^^
+
+warning: unused import: `luna_parser::Parser`
+ --> crates\luna-driver\src\importer.rs:7:5
+  |
+7 | use luna_parser::Parser;
+  |     ^^^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `Resolver`, `SemanticContext`, and `TypeChecker`
+ --> crates\luna-driver\src\importer.rs:8:21
+  |
+8 | use luna_semantic::{SemanticContext, Resolver, TypeChecker};
+  |                     ^^^^^^^^^^^^^^^  ^^^^^^^^  ^^^^^^^^^^^
+
+warning: unused import: `ExternalTraitImplEntry`
+ --> crates\luna-driver\src\metadata_builder.rs:1:75
+  |
+1 | use crate::registry::{CanonicalSymbolId, ExternalImplKey, ExternalSymbol, ExternalTraitImplEntry, ModuleRegistry, ProviderInterface};
+  |                                                                           ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: unused import: `TraitDefinition`
+ --> crates\luna-driver\src\metadata_builder.rs:6:39
+  |
+6 |     SemanticMetadata, StableSymbolId, TraitDefinition,
+  |                                       ^^^^^^^^^^^^^^^
+
+warning: unused import: `TypeContext`
+ --> crates\luna-driver\src\metadata_builder.rs:8:55
+  |
+8 | use luna_semantic::ty::{SemanticType, SemanticTypeId, TypeContext};
+  |                                                       ^^^^^^^^^^^
+
+warning: unused import: `CanonicalLifetime`
+ --> crates\luna-driver\src\metadata_decoder.rs:2:62
+  |
+2 | use luna_llib::metadata::{CanonicalInterface, CanonicalType, CanonicalLifetime, SemanticMetadata, StableSymbolId};
+  |                                                              ^^^^^^^^^^^^^^^^^
+
+warning: unused imports: `BuiltinType` and `Mutability`
+ --> crates\luna-driver\src\metadata_decoder.rs:3:25
+  |
+3 | use luna_semantic::ty::{BuiltinType, Mutability, SemanticType, SemanticTypeId, TypeContext};
+  |                         ^^^^^^^^^^^  ^^^^^^^^^^
+
+warning: unused import: `link_objs_to_exe`
+  --> crates\luna-driver\src\lib.rs:25:47
+   |
+25 | use luna_backend::{LLVMBackend, TargetConfig, link_objs_to_exe};
+   |                                               ^^^^^^^^^^^^^^^^
+
+warning: variable does not need to be mutable
+   --> crates\luna-driver\src\external.rs:480:13
+    |
+480 |         let mut provider_items = match parse_res {
+    |             ----^^^^^^^^^^^^^^
+    |             |
+    |             help: remove this `mut`
+    |
+    = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `provider_id`
+  --> crates\luna-driver\src\session.rs:80:17
+   |
+80 |             let provider_id = match self.load_package(entry.provider_id, arena, ProviderResolutionContext::Bootstrap) {
+   |                 ^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_provider_id`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+  --> crates\luna-driver\src\metadata_builder.rs:49:13
+   |
+49 |         let mut traits = std::collections::BTreeMap::new();
+   |             ----^^^^^^
+   |             |
+   |             help: remove this `mut`
+
+warning: `luna-driver` (lib) generated 13 warnings (run `cargo fix --lib -p luna-driver` to apply 13 suggestions)
+    Finished `dev` profile [unoptimized] target(s) in 0.12s
+     Running `target\debug\luna.exe build-sysroot --quiet`
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __raw_table
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hash
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: hashmap
+DEBUG loading package: __raw_table
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hash
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: hash
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: atomic
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cell
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: copy
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: time
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: copy
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: time
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: copy
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: time
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: copy
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: default
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: default
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: btreemap
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: default
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: vec
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: default
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: fmt
+DEBUG loading package: result
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hashmap
+DEBUG loading package: __raw_table
+DEBUG loading package: __alloc_global
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hash
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hashset
+DEBUG loading package: hashmap
+DEBUG loading package: default
+DEBUG loading package: hash
+DEBUG loading package: cmp
+DEBUG loading package: clone
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: hash
+DEBUG loading package: cmp
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: core/panic
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: fmt
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: string
+DEBUG loading package: vec
+DEBUG loading package: default
+DEBUG loading package: core/panic
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: fmt
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: string
+DEBUG loading package: vec
+DEBUG loading package: default
+DEBUG loading package: core/panic
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: fmt
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: encoding
+DEBUG loading package: vec
+DEBUG loading package: string
+DEBUG loading package: result
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: result
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: string
+DEBUG loading package: vec
+DEBUG loading package: default
+DEBUG loading package: core/panic
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: fmt
+DEBUG loading package: result
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __alloc_global
+DEBUG loading package: fmt
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: string
+DEBUG loading package: vec
+DEBUG loading package: default
+DEBUG loading package: core/panic
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: fmt
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: vec
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: slice
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: string
+DEBUG loading package: vec
+DEBUG loading package: default
+DEBUG loading package: core/panic
+DEBUG loading package: ptr
+DEBUG loading package: mem
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_drop
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_into_iterator
+DEBUG loading package: fmt
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: result
+DEBUG loading package: clone
+DEBUG loading package: cmp
+DEBUG loading package: hash
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: __alloc_global
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: mem
+DEBUG loading package: ptr
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: clone
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: cmp
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: default
+DEBUG loading package: __lang_option
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_drop
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG loading package: __lang_iterator
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_into_iterator
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true

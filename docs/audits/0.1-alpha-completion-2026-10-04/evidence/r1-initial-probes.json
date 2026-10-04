@@ -1,0 +1,25 @@
+{
+  "scope": "Initial current CLI probes using existing canonical artifacts; not fresh-artifact certification",
+  "directory": "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_r1_probe_bivz66c2",
+  "results": [
+    {
+      "case": "consume",
+      "build_exit": 0,
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: copy\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+      "run_exit": 0,
+      "run_stderr": ""
+    },
+    {
+      "case": "generic_copy_conflict",
+      "build_exit": 1,
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: copy\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E2004]: E_COPY_DROP_CONFLICT: A composite type cannot satisfy or derive Copy if any transitive field satisfies Drop (in generic instantiation)\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_r1_probe_bivz66c2\\generic_copy_conflict.ln:4:8\n   |\n4  | struct Wrapper<T> { value: T, }; impl<T> std::Copy for Wrapper<T> {} fn consume<T>(x: T) {} fn main() { dec rw count = 0; dec w = Wrapper<Tracked> { value: Tracked { counter: &rw count as *rw i32 } }; consume<Wrapper<Tracked>>(w); consume<Wrapper<Tracked>>(w); }\n   |        ^^^^^^^\n\n"
+    },
+    {
+      "case": "named_colon",
+      "build_exit": 0,
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+      "run_exit": 101,
+      "run_stderr": ""
+    }
+  ]
+}

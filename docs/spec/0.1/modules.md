@@ -61,6 +61,23 @@ by the artifact contract. Mere file existence is not validity. Private changes
 and public interface changes must not be confused. The writer emits `LLIB`;
 legacy `MLIB` reads do not authorize legacy artifact emission.
 
+An ordinary native call depends on the callee's canonical interface. When a
+dependency body or value is materialized into the consumer (generic instances,
+comptime results, embedded constants or bundled source definitions), its
+execution identity is also required. Changing only an ordinary native callee's
+body permits relinking; changing a materialized dependency requires rejection
+of a stale dependent artifact. Provider identity comes from validated discovery,
+including the canonical sysroot manifest, rather than an incidental file stem.
+
+The current execution identity protocol hashes provider source bytes with a
+versioned domain tag. It conservatively includes private bodies and formatting,
+but excludes session arena offsets and dependency load order. Compiler header
+protocol version 2 rejects version 1 artifacts; this is an internal artifact
+compatibility revision, not a declaration of language release readiness.
+Comptime dependency collection remains conservative: a compilation that
+evaluates comptime retains execution identities for its loaded dependencies.
+More precise dependency selection remains an optimization requirement.
+
 Portable metadata must not serialize session-local IDs as stable semantic
 identity. It must preserve generic bodies, canonical instances, trait impls,
 lifetimes, anchors, raw-pointer effects and other required public contracts.

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>METHOD-RESOLUTION-v1 — inherent priority and trait ambiguity</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="method-resolution-v1--inherent-priority-and-trait-ambiguity">METHOD-RESOLUTION-v1 — inherent priority and trait ambiguity</h1>
+<p>Adopted by the maintainer on 2026-10-04 during the 0.1 completion work: Option A, applicable inherent methods first; ambiguous applicable trait methods reject; explicit trait qualification disambiguates. Implementation/evidence are separate; adoption does not declare the current resolver conformant.</p>
+<h2 id="candidate-selection">Candidate selection</h2>
+<p>An unqualified method call SHALL consider canonical candidates with a compatible self type/receiver, satisfied generic bounds and access from the calling scope. Ordinary type, visibility, ownership and lifetime checks remain requirements. An inaccessible or inapplicable candidate does not win merely by sharing a name.</p>
+<p class="list-item">1. Applicable inherent candidates take precedence over trait candidates.</p>
+<p class="list-item">2. In the absence of an applicable inherent candidate, exactly one applicable</p>
+<p>   trait candidate is selected.</p>
+<p class="list-item">3. Multiple distinct applicable trait candidates SHALL produce a typed</p>
+<p>   ambiguity diagnostic (<code>E1008</code>), including the canonical candidate names and    available related declaration spans. Repeated routes to the same declaration    do not create ambiguity.</p>
+<p class="list-item">4. No candidate produces the ordinary appropriate rejection, such as a missing</p>
+<p>   method, unsatisfied bound or access error; it must not become a successful    call through an unrelated candidate.</p>
+<p>Local source impls and imported metadata impls obey the same precedence. Candidates SHALL NOT be selected by import order, declaration order, hash-table iteration or numeric session-local symbol identity. An expected return type SHALL NOT silently select between otherwise ambiguous trait methods. The chosen method&#x27;s return type is checked against the expected type normally.</p>
+<p>Explicit <code>TraitName::method(receiver, ...)</code> selects that trait contract and resolves its implementation under ordinary trait/generic rules. It is not shadowed by a same-named inherent method. This contract adds no keyword or alternate receiver syntax.</p>
+<h2 id="acceptance-boundary">Acceptance boundary</h2>
+<p>Require inherent/trait, two-trait ambiguity, explicit qualification, receiver mutability, generic bounds, private/inapplicable controls and local/imported combinations through the CLI. Reverse declarations/imports; verify source-only and fresh-artifact-only modes. Definition/impl identities must survive portable metadata. Update the gap register and current status only after these checks.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

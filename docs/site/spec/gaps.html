@@ -40,11 +40,11 @@
 <h2 id="decisions-still-required">Decisions still required</h2>
 <table>
 <tr><th>ID</th><th>Question / boundary</th></tr>
-<tr><td>V01-DESIGN-01</td><td>Exact inherent/trait method collision precedence or ambiguity policy; hash iteration cannot decide it</td></tr>
 <tr><td>V01-DESIGN-03</td><td>Runtime integer overflow policy outside defined checked/compile-time operations; avoid declaring current LLVM wrapping normative</td></tr>
 <tr><td>V01-DESIGN-04</td><td>Complete formal grammar beyond the consolidated productions; parser acceptance of legacy/uncontracted syntax is not adoption</td></tr>
 </table>
 <p>No new format-macro hook, interpolation syntax, runtime opcode or container language item is adopted. These require their own complete generic contract.</p>
+<p>V01-DESIGN-01 was resolved by maintainer adoption of Option A on 2026-10-04: <a href="method-resolution-v1.html">METHOD-RESOLUTION-v1</a>. The resolver&#x27;s complete conformance remains an implementation/acceptance task; deterministic selection of a first candidate is not proof of ambiguity rejection.</p>
 <p>V01-DESIGN-02 is resolved by the previously approved 2026-10-01 formatting contract, now recovered from the other branch: char is a Unicode scalar; invalid static casts diagnose, invalid dynamic casts trap, and arithmetic/ bitwise/shift/negation operators on char reject. The approval and acceptance apply to their recorded baseline, not every newly merged addition.</p>
 <h2 id="evidence-not-completed">Evidence not completed</h2>
 <p class="list-item">- All compiler integration tests, exhaustive input/generic domains, sanitizers</p>
