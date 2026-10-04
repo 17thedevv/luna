@@ -22,9 +22,12 @@ fn method_applicability_and_binder_identity_survive_provider_modes_and_order() {
                 "private_provider",
                 "trait_provider",
                 "bound_provider",
+                "concrete_inherent_provider",
             ] {
                 let input_name = if reversed && provider == "multi_impl_provider" {
                     "multi_impl_provider_reversed"
+                } else if reversed && provider == "concrete_inherent_provider" {
+                    "concrete_inherent_provider_reversed"
                 } else {
                     provider
                 };
@@ -73,6 +76,8 @@ fn method_applicability_and_binder_identity_survive_provider_modes_and_order() {
                 "associated_impl_bound_valid",
                 "rigid_trait_argument_valid",
                 "reference_head_coherence",
+                "concrete_inherent_dispatch",
+                "concrete_inherent_consumer",
             ] {
                 let source = relocated.join(format!("{name}.ln"));
                 fs::copy(fixtures.join(format!("{name}.ln")), &source).unwrap();

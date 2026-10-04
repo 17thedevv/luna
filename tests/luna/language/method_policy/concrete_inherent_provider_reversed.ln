@@ -1,0 +1,11 @@
+export module concrete_api {
+    export struct Holder<T> { value: T };
+    impl Holder<bool> {
+        export fn read(&self) -> bool { return self.value; }
+        export fn map<U>(&self, value: U) -> U { return value; }
+    }
+    impl Holder<i32> {
+        export fn read(&self) -> i32 { return self.value; }
+        export fn map<T>(&self, value: T) -> T { return value; }
+    }
+}

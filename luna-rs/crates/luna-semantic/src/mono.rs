@@ -55,64 +55,22 @@ impl CanonicalInstanceIdentity {
                 let subst_types: Vec<_> = self.subst.iter().map(|&(_, ty)| ty).collect();
                 if let Some(s) = found_sym {
                     if let Some(impl_key) = tables.method_impls.get(&s.id) {
-                        let self_path = match impl_key.self_type_def {
-                            crate::semantic_tables::ImplSelfTypeKey::Nominal(sym) => symbol_table.get_full_logical_path(sym),
-                            crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => vec![format!("{:?}", b).to_lowercase()],
-                            crate::semantic_tables::ImplSelfTypeKey::Slice => vec!["slice".to_string()],
-                        };
+                        let parent_impl = tables.method_sym_to_impl_decl.get(&s.id).copied()
+                            .or_else(|| tables.method_to_impl_decl.get(&decl_id).copied())
+                            .expect("ICE: method instance has no owning impl declaration");
+                        let header = tables.checked_impl_headers.get(&parent_impl)
+                            .expect("ICE: method instance has no checked impl header");
                         if let Some(trait_sym) = impl_key.trait_id {
                             let trait_path = symbol_table.get_full_logical_path(trait_sym);
-                            let self_ty = tables.impl_self_types.get(impl_key).copied().unwrap_or(SemanticTypeId(0));
-                            let parent_impl_decl = tables.method_sym_to_impl_decl.get(&s.id).copied()
-                                .or_else(|| tables.method_to_impl_decl.get(&decl_id).copied());
-                            let trait_entry = parent_impl_decl.and_then(|p_id| {
-                                tables.trait_impl_entries.iter().find(|e| e.decl_id == Some(p_id))
-                            }).or_else(|| {
-                                // 1. Try concrete matches first (where self_type matches impl_key.self_type_def)
-                                let concrete_match = tables.trait_impl_entries.iter().find(|e| {
-                                    if e.trait_id != trait_sym { return false; }
-                                    let self_matches = match (types.get(e.self_type), &impl_key.self_type_def) {
-                                        (crate::ty::SemanticType::Primitive(b1), crate::semantic_tables::ImplSelfTypeKey::Primitive(b2)) => b1 == b2,
-                                        (crate::ty::SemanticType::Struct(s1, ..), crate::semantic_tables::ImplSelfTypeKey::Nominal(s2)) => s1 == s2,
-                                        (crate::ty::SemanticType::Enum(s1, ..), crate::semantic_tables::ImplSelfTypeKey::Nominal(s2)) => s1 == s2,
-                                        (crate::ty::SemanticType::Slice(_), crate::semantic_tables::ImplSelfTypeKey::Slice) => true,
-                                        _ => false,
-                                    };
-                                    if !self_matches { return false; }
-                                    if let Some(&m_ty) = tables.symbol_types.get(&s.id) {
-                                        if let crate::ty::SemanticType::Function { return_type, .. } = types.get(m_ty) {
-                                            if !e.trait_args.is_empty() && e.trait_args.iter().any(|&a| a == *return_type) {
-                                                return true;
-                                            }
-                                        }
-                                    }
-                                    true
-                                });
-                                if concrete_match.is_some() {
-                                    return concrete_match;
-                                }
-                                // 2. Generic matches (blanket impls) only if no concrete match
-                                tables.trait_impl_entries.iter().find(|e| {
-                                    if e.trait_id != trait_sym { return false; }
-                                    matches!(types.get(e.self_type), crate::ty::SemanticType::GenericParam(_))
-                                })
-                            });
-                            let trait_substs: Vec<SemanticTypeId> = if let Some(entry) = trait_entry {
-                                entry.trait_args.clone()
-                            } else {
-                                Vec::new()
-                            };
-                            let concrete_self_ty = if let Some(entry) = trait_entry {
-                                entry.self_type
-                            } else {
-                                self_ty
-                            };
+                            let entry = tables.trait_impl_entries.iter()
+                                .find(|entry| entry.decl_id == Some(parent_impl) && entry.trait_id == trait_sym)
+                                .expect("ICE: trait method instance has no matching checked trait entry");
                             return crate::Mangler::mangle_trait_method_with_substs(
                                 types,
                                 symbol_table,
                                 &trait_path,
-                                &trait_substs,
-                                concrete_self_ty,
+                                &entry.trait_args,
+                                header.self_type,
                                 &s.name,
                                 &method_substs,
                                 &self.subst,
@@ -121,9 +79,10 @@ impl CanonicalInstanceIdentity {
                             return crate::Mangler::mangle_method(
                                 types,
                                 symbol_table,
-                                &self_path,
+                                header.self_type,
                                 &s.name,
-                                &subst_types,
+                                &method_substs,
+                                &self.subst,
                             );
                         }
                     }

@@ -767,3 +767,51 @@ spelling-based mangler substitution, verify native/source/relocated artifact
 controls, then repair canonical constraint/header metadata. Continue closure
 cleanup under its ownership contract, named/default calls and the remaining
 R3–R5 acceptance obligations. The goal remains active; no merge/tag.
+
+## Concrete inherent instance identity follow-up — 2026-10-05
+
+Method ABI naming now uses the owning declaration's checked self type. The
+full shape of `Holder<i32>` and `Holder<bool>` survives into the backend symbol;
+method generic arguments remain independent. Trait method naming uses the exact
+owning trait entry rather than searching another impl by nominal head or return
+type. Missing ownership/header evidence fails closed. The mangler's remaining
+generic substitution by parameter spelling was removed: binder identity is the
+only substitution key.
+
+Compatibility: **artifact compiler8**, format2, metadata3 and MVIR4. Native
+method ABI names changed, so compiler1–7 artifacts reject before payload decode.
+The canonical sysroot was explicitly rebuilt. No stdlib/provider name branch,
+new language keyword or intrinsic was added.
+
+- [Semantic/artifact internals](evidence/r2-concrete-internals.txt): **206 PASS**.
+- [Canonical sysroot](evidence/r2-concrete-sysroot.txt): **49/49 built**.
+- [CLI matrix](evidence/r2-concrete-cli.txt): **6/6 harness cases PASS**, cargo
+  exit0. Expanded method coverage includes **96 native executions and 176 typed
+  check/build rejections**. A sixth user provider exercises same-name methods
+  on two concrete self types, distinct return types and independent method
+  binders; publishing, source removal, relocation and reversed declarations
+  are checked. Generic typing, module constants, formatting and trait arguments
+  also pass on this compiler.
+- [Linking/identity/drop regressions](evidence/r2-concrete-driver.txt): **34/34
+  PASS**, including nominal/generic method mangling, provider linking, function
+  pointers, generic drop and metadata round trips.
+- [Workspace check](evidence/r2-concrete-check.txt): cargo exit0.
+
+The direct native reducer changes from exit1 to required exit0; the distinct
+return-type library reducer now builds instead of emitting E6001. The earlier
+full workspace run remains FAIL and predates this ABI change. This closes the
+two concrete method reducers, not all identity/fingerprint domains or release
+gates. Canonical public constraints/headers, target metadata, closure cleanup,
+named/default calls and the remaining R3–R5 scope stay open.
+
+    Compiler Change
+        Capability: Distinct canonical backend identities for concrete inherent methods, exact trait ownership and identity-only generic substitution.
+        Why stdlib exposed it: Method/binder validation needed the same generic mechanism for arbitrary library implementations.
+        Why it is generic: Checked impl self types and declaration binders determine identity; library container/provider names are absent.
+        User-defined type benefiting: Holder<i32>, Holder<bool>, independent map<T>/map<U> and reversed relocated providers.
+        Tests: method_resolution_cli, generic_typing_cli, module_const_storage_cli, formatting/trait CLI, semantic/reader, mangling/linking/function-pointer/drop/metadata suites.
+        New intrinsic/lang_item?: NO
+        Stdlib-specific branch?: NO
+
+SKILL IMPACT: none for this follow-up. Existing semantic and capability guidance
+already requires identity-based substitution and distinct backend instances.
