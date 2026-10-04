@@ -114,10 +114,17 @@ tracks the tested baseline and final workspace regression separately. This
 update adds bounded module capabilities; it does not change the dated defects
 or automatically close W8, the full diagnostic contract, release or target gaps.
 
-## Module constant storage — adopted 2026-10-04, implementation pending
+## Module constant storage — implemented baseline, release verification pending
 
 [MODULE-CONST-STORAGE-v1](module-const-storage-v1.md) adopts program-lifetime
 immutable storage for references to module-level constants; local constants
-retain lexical storage lifetime. Current lowering of `&DUMMY` to a local
-temporary fails the borrowed Option/Result artifact regression. Generic target
-storage, provenance and source/artifact acceptance remain implementation work.
+retain lexical storage lifetime. `StaticAddress` now represents actual immutable
+target data with canonical provider/declaration naming and a portable initializer.
+Private evaluated data and module storage scope survive provider reconstruction;
+local escape, mutable access and VM pointer materialization remain rejected.
+The borrowed Option/Result artifact regression now passes. Focused CLI tests
+exercise scalar/aggregate data, field references, native and portable generic
+bodies, repeated references and relocated source/fresh-artifact provider graphs.
+See the [execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md).
+Clean-checkout and advertised-target release gates remain open, as do the
+independent ownership, method-selection and named/default-call gaps.

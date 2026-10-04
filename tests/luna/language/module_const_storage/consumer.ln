@@ -1,0 +1,44 @@
+import "provider";
+import "provider_other";
+#[link(name = "strlen")]
+extern fn strlen(value: str) -> usize;
+fn main() -> i32 {
+    dec reference = stored::default_ref();
+    if *reference != 20 { return 1; }
+    if *stored::default_generic(1) != 20 { return 2; }
+    if *stored::default_generic(true) != 20 { return 3; }
+    if reference as *i32 != stored::default_generic(2) as *i32 { return 17; }
+    if *stored::other_ref() != 31 { return 18; }
+    if *stored::wide_ref() != 18446744073709551619i128 { return 4; }
+    if strlen(*stored::text_ref()) != 4usize { return 5; }
+    if strlen(*stored::escaped_ref()) != 7usize { return 20; }
+    if *stored::char_ref() != 'λ' { return 21; }
+    if *stored::ratio_ref() != 1.25 { return 22; }
+    match *stored::text_choice_ref() {
+        stored::TextChoice::Text(text, length) -> { if strlen(text) != 5usize || length != 5 { return 23; } },
+        _ -> { return 24; },
+    }
+    dec pair = stored::pair_ref();
+    if pair.left != 42 { return 6; }
+    if pair.flag == false { return 7; }
+    if *stored::field_ref() != 42 { return 8; }
+    if stored::pair_generic(2).left != 42 || stored::pair_generic(false).flag == false { return 19; }
+    dec array = stored::array_ref();
+    if array[0] != 7 || array[1] != 11 || array[2] != 13 { return 9; }
+    dec tuple = stored::tuple_ref();
+    if (*tuple).0 != 17 || (*tuple).1 == false { return 10; }
+    match *stored::choice_ref() {
+        stored::Choice::Pair(value, flag) -> { if value != 19 || flag == false { return 11; } },
+        _ -> { return 12; },
+    }
+    dec nested = stored::nested_ref();
+    match nested.values[0] {
+        stored::Choice::Single(value) -> { if value != 23 { return 13; } },
+        _ -> { return 14; },
+    }
+    match nested.values[1] {
+        stored::Choice::Pair(value, flag) -> { if value != 29 || flag { return 15; } },
+        _ -> { return 16; },
+    }
+    return 0;
+}

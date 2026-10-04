@@ -33,6 +33,7 @@ pub enum RuntimeValue {
     Bool(bool),
     Int { val: i128, width: IntWidth },
     Float { val: f64, width: FloatWidth },
+    Str(String),
     Pointer(Address),
     NullPointer,
     Compound(Vec<RuntimeValue>),
@@ -71,6 +72,7 @@ impl RuntimeValue {
             RuntimeValue::Bool(b) => Ok(ComptimeValue::Bool(*b)),
             RuntimeValue::Int { val, width } => Ok(ComptimeValue::Int { val: *val, width: *width }),
             RuntimeValue::Float { val, width } => Ok(ComptimeValue::Float { val: *val, width: *width }),
+            RuntimeValue::Str(value) => Ok(ComptimeValue::Str(value.clone())),
             RuntimeValue::Pointer(Address::Stack { .. }) => {
                 Err(ComptimeError::PointerEscape("cannot return pointer to temporary compile-time stack memory".to_string()))
             }
@@ -129,6 +131,7 @@ impl RuntimeValue {
             ComptimeValue::Int { val, width } => RuntimeValue::Int { val: *val, width: *width },
             ComptimeValue::Float { val, width } => RuntimeValue::Float { val: *val, width: *width },
             ComptimeValue::Char(c) => RuntimeValue::Int { val: *c as i128, width: IntWidth::U32 },
+            ComptimeValue::Str(value) => RuntimeValue::Str(value.clone()),
             ComptimeValue::Tuple(elems) => {
                 RuntimeValue::Compound(elems.iter().map(Self::from_comptime_value).collect())
             }
@@ -157,6 +160,29 @@ fn integer_mask(width: IntWidth) -> u128 {
     } else {
         (1u128 << bits) - 1
     }
+}
+
+fn static_runtime_value(ty: &crate::static_data::StaticType, value: &crate::static_data::StaticValue) -> Result<RuntimeValue, ComptimeError> {
+    use crate::static_data::{StaticType as T, StaticValue as V};
+    Ok(match (ty, value) {
+        (T::Unit, V::Unit) => RuntimeValue::Unit,
+        (T::Primitive(BuiltinType::Bool), V::Bool(v)) => RuntimeValue::Bool(*v),
+        (T::Primitive(b), V::Int(v)) if b.is_integer() => RuntimeValue::Int { val: *v, width: IntWidth::from_builtin(*b) },
+        (T::Primitive(BuiltinType::Char), V::Char(v)) if char::from_u32(*v).is_some() => RuntimeValue::Int { val: *v as i128, width: IntWidth::U32 },
+        (T::Primitive(BuiltinType::F32 | BuiltinType::F64), V::Float(v)) => RuntimeValue::Float { val: f64::from_bits(*v), width: if *ty == T::Primitive(BuiltinType::F32) { FloatWidth::F32 } else { FloatWidth::F64 } },
+        (T::Primitive(BuiltinType::String), V::Str(v)) => RuntimeValue::Str(v.clone()),
+        (T::Aggregate(types), V::Aggregate(values)) if types.len() == values.len() => RuntimeValue::Compound(types.iter().zip(values).map(|(t, v)| static_runtime_value(t, v)).collect::<Result<_, _>>()?),
+        (T::Array { element, len }, V::Aggregate(values)) if *len == values.len() as u64 => RuntimeValue::Compound(values.iter().map(|v| static_runtime_value(element, v)).collect::<Result<_, _>>()?),
+        (T::Enum(variants), V::Enum { tag, field_count, payload }) => {
+            let ty = variants.get(*tag as usize).ok_or_else(|| ComptimeError::Custom("invalid static enum tag".into()))?;
+            let value = static_runtime_value(ty, payload)?;
+            let payload = if *field_count == 0 { Vec::new() } else if *field_count == 1 { vec![value] }
+                else if let RuntimeValue::Compound(values) = value { values }
+                else { return Err(ComptimeError::Custom("invalid static enum fields".into())); };
+            RuntimeValue::Variant { enum_ty: SemanticTypeId(0), tag: *tag, payload }
+        }
+        _ => return Err(ComptimeError::Custom("static initializer/type mismatch".into())),
+    })
 }
 
 fn cast_integer_value(value: i128, source: IntWidth, target: IntWidth) -> i128 {
@@ -201,6 +227,10 @@ pub struct MvirInterpreter<'a> {
     pub max_steps: usize,
     pub max_depth: usize,
     pub heap: HeapArena,
+    // A distinct immutable arena: static storage is neither a stack slot nor
+    // a live user heap allocation, and cannot be written, moved out of or freed.
+    static_slots: HashMap<usize, MemorySlot>,
+    static_names: HashMap<String, (usize, crate::static_data::StaticData)>,
     pub call_stack: Vec<StackFrame>,
 }
 
@@ -213,6 +243,8 @@ impl<'a> MvirInterpreter<'a> {
             max_steps: 1_000_000,
             max_depth: 512,
             heap: HeapArena::default(),
+            static_slots: HashMap::new(),
+            static_names: HashMap::new(),
             call_stack: Vec::new(),
         }
     }
@@ -264,6 +296,10 @@ impl<'a> MvirInterpreter<'a> {
                 Ok(slot)
             }
             Address::Heap { alloc_id, field_idx: _, offset } => {
+                if let Some(slot) = self.static_slots.get_mut(&alloc_id) {
+                    if offset != 0 { return Err(ComptimeError::Custom("static pointer offset out of bounds".into())); }
+                    return Ok(slot);
+                }
                 if self.heap.freed.contains_key(&alloc_id) {
                     return Err(ComptimeError::UseAfterFree);
                 }
@@ -286,7 +322,8 @@ impl<'a> MvirInterpreter<'a> {
             (slot.value.clone(), slot.state, slot.ty)
         };
         let actual_ty = if ty != SemanticTypeId(0) { ty } else { slot_ty };
-        let is_copy = match &val {
+        let is_static = matches!(addr, Address::Heap { alloc_id, .. } if self.static_slots.contains_key(&alloc_id));
+        let is_copy = is_static || match &val {
             RuntimeValue::Int { .. } | RuntimeValue::Float { .. } | RuntimeValue::Bool(_) | RuntimeValue::Unit => true,
             _ => self.is_copy_type(actual_ty),
         };
@@ -334,6 +371,9 @@ impl<'a> MvirInterpreter<'a> {
     }
 
     fn write_memory(&mut self, addr: Address, value: RuntimeValue) -> Result<(), ComptimeError> {
+        if matches!(addr, Address::Heap { alloc_id, .. } if self.static_slots.contains_key(&alloc_id)) {
+            return Err(ComptimeError::Custom("cannot write immutable module constant storage".into()));
+        }
         let ty = self.get_slot_mut(addr)?.ty;
         if let SemanticType::Array(_, len) = self.ctx.types.get(ty) {
             let field = match addr { Address::Stack { field_idx, .. } | Address::Heap { field_idx, .. } => field_idx };
@@ -413,8 +453,11 @@ impl<'a> MvirInterpreter<'a> {
                 Err(ComptimeError::SymbolNotFound(gid.name.clone()))
             }
             Operand::Block(_) => Err(ComptimeError::UnsupportedOperation("block operand cannot be evaluated to value".to_string())),
-            Operand::StringRef(_) => Err(ComptimeError::UnsupportedOperation("string literal evaluation not fully supported in comptime".to_string())),
-            Operand::Char(_) => Err(ComptimeError::UnsupportedOperation("char literal evaluation not fully supported in comptime".to_string())),
+            Operand::StringRef(text) => Ok(RuntimeValue::Str(luna_lexer::literal::decode_string(text))),
+            Operand::Char(text) => Ok(RuntimeValue::Int {
+                val: luna_lexer::literal::decode_character(text).map_err(ComptimeError::Custom)? as i128,
+                width: IntWidth::U32,
+            }),
             Operand::Float { text, ty } => {
                 let width = match ty {
                     FloatType::F32 => FloatWidth::F32,
@@ -532,6 +575,20 @@ impl<'a> MvirInterpreter<'a> {
                 let inst_ty = val_data.ty;
 
                 let res_val = match &val_data.inst {
+                    Instruction::StaticAddress(data) => {
+                        let alloc_id = if let Some((id, previous)) = self.static_names.get(&data.name) {
+                            if previous != data { return Err(ComptimeError::Custom("conflicting constant storage identity".into())); }
+                            *id
+                        } else {
+                            let value = static_runtime_value(&data.ty, &data.value)?;
+                            let alloc_id = self.heap.next_alloc_id;
+                            self.heap.next_alloc_id += 1;
+                            self.static_slots.insert(alloc_id, MemorySlot { value, state: PlaceState::Initialized, ty: inst_ty });
+                            self.static_names.insert(data.name.clone(), (alloc_id, data.clone()));
+                            alloc_id
+                        };
+                        RuntimeValue::Pointer(Address::Heap { alloc_id, field_idx: None, offset: 0 })
+                    }
                     Instruction::Alloca => {
                         let frame = self.call_stack.get_mut(frame_idx).unwrap();
                         let slot_idx = frame.slots.len();
@@ -560,6 +617,7 @@ impl<'a> MvirInterpreter<'a> {
                     Instruction::HeapFree { value } => {
                         let ptr = self.eval_operand(value)?;
                         if let RuntimeValue::Pointer(Address::Heap { alloc_id, .. }) = ptr {
+                            if self.static_slots.contains_key(&alloc_id) { return Err(ComptimeError::Custom("cannot free module constant storage".into())); }
                             if self.heap.freed.contains_key(&alloc_id) {
                                 return Err(ComptimeError::UseAfterFree);
                             }
@@ -610,8 +668,11 @@ impl<'a> MvirInterpreter<'a> {
                             _ => RuntimeValue::Unit,
                         }
                     }
-                    Instruction::Borrow { base, .. } => {
+                    Instruction::Borrow { base, is_rw } => {
                         let base_val = self.eval_operand(base)?;
+                        if *is_rw && matches!(base_val, RuntimeValue::Pointer(Address::Heap { alloc_id, .. }) if self.static_slots.contains_key(&alloc_id)) {
+                            return Err(ComptimeError::Custom("cannot mutably borrow module constant storage".into()));
+                        }
                         base_val
                     }
                     Instruction::PtrOffset { ptr, offset } => {
@@ -976,6 +1037,9 @@ impl<'a> MvirInterpreter<'a> {
                     }
                     Instruction::Drop { value, callee, .. } => {
                         let val = self.eval_operand(value)?;
+                        if matches!(val, RuntimeValue::Pointer(Address::Heap { alloc_id, .. }) if self.static_slots.contains_key(&alloc_id)) {
+                            return Err(ComptimeError::Custom("cannot drop module constant storage".into()));
+                        }
                         let mut should_drop = true;
                         if let RuntimeValue::Pointer(addr) = val {
                             if let Ok(slot) = self.get_slot_mut(addr) {

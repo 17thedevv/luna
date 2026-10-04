@@ -677,7 +677,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                     *index = map_op(index, &val_map);
                     *len = map_op(len, &val_map);
                 }
-                Instruction::Alloca | Instruction::HeapAlloc | Instruction::Null { .. } |
+                Instruction::StaticAddress(_) | Instruction::Alloca | Instruction::HeapAlloc | Instruction::Null { .. } |
                 Instruction::SizeOf { .. } | Instruction::AlignOf { .. } => {}
                 Instruction::CallIntrinsic { args, .. } => {
                     for arg in args {

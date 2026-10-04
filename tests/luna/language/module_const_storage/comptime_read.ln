@@ -1,0 +1,10 @@
+import "provider";
+const VALUE: i32 = comptime { *stored::default_ref() };
+const FIELD: i32 = comptime { *stored::field_ref() };
+const ELEMENT: i32 = comptime { dec array = stored::array_ref(); array[1] };
+fn main() -> i32 {
+    if VALUE != 20 { return 1; }
+    if FIELD != 42 { return 2; }
+    if ELEMENT != 11 { return 3; }
+    return 0;
+}

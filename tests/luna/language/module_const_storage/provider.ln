@@ -1,0 +1,33 @@
+export module stored {
+    const DEFAULT: i32 = 20;
+    const WIDE: i128 = 18446744073709551619i128;
+    const TEXT: str = "luna";
+    const ESCAPED: str = "a\\b\n\"λ";
+    const CHARACTER: char = 'λ';
+    const RATIO: f64 = 1.25;
+    const TEXT_CHOICE: TextChoice = comptime { stored::TextChoice::Text("hello", 5) };
+    const PAIR: Pair = comptime { stored::Pair { flag: true, left: 42 } };
+    const ARRAY: [i32; 3] = [7, 11, 13];
+    const TUPLE: (i32, bool) = (17, true);
+    const CHOICE: Choice = comptime { stored::Choice::Pair(19, true) };
+    const NESTED: Nested = comptime { stored::Nested { values: [stored::Choice::Single(23), stored::Choice::Pair(29, false)] } };
+    export struct Pair { left: i32, flag: bool, };
+    export enum Choice { Empty, Single(i32), Pair(i32, bool), }
+    export struct Nested { values: [Choice; 2], };
+    export enum TextChoice { Empty, Text(str, i32), }
+    export fn default_ref() -> &i32 { return &DEFAULT; }
+    export fn default_generic<T>(value: T) -> &i32 { return &DEFAULT; }
+    export fn wide_ref() -> &i128 { return &WIDE; }
+    export fn text_ref() -> &str { return &TEXT; }
+    export fn escaped_ref() -> &str { return &ESCAPED; }
+    export fn char_ref() -> &char { return &CHARACTER; }
+    export fn ratio_ref() -> &f64 { return &RATIO; }
+    export fn text_choice_ref() -> &TextChoice { return &TEXT_CHOICE; }
+    export fn pair_ref() -> &Pair { return &PAIR; }
+    export fn pair_generic<T>(value: T) -> &Pair { return &PAIR; }
+    export fn field_ref() -> &i32 { return &PAIR.left; }
+    export fn array_ref() -> &[i32; 3] { return &ARRAY; }
+    export fn tuple_ref() -> &(i32, bool) { return &TUPLE; }
+    export fn choice_ref() -> &Choice { return &CHOICE; }
+    export fn nested_ref() -> &Nested { return &NESTED; }
+}

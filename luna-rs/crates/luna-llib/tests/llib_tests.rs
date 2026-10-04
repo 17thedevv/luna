@@ -20,11 +20,22 @@ fn dummy_module() -> Module {
     // Add some dummy instructions
     func.values.push(ValueData { inst: Instruction::Alloca, ty: SemanticTypeId(0), span: None, origin: ValueOrigin::Temporary });
     func.values.push(ValueData { inst: Instruction::FieldPtr { base: Operand::Value(ValueId(0)), field_idx: 0, field_name: Some("payload".into()) }, ty: SemanticTypeId(0), span: None, origin: ValueOrigin::Temporary });
+    func.values.push(ValueData::new(Instruction::StaticAddress(luna_mvir::static_data::StaticData {
+        name: "__luna_const_provider_namespace_declaration".into(),
+        ty: luna_mvir::static_data::StaticType::Aggregate(vec![
+            luna_mvir::static_data::StaticType::Primitive(luna_semantic::BuiltinType::I128),
+            luna_mvir::static_data::StaticType::Primitive(luna_semantic::BuiltinType::String),
+        ]),
+        value: luna_mvir::static_data::StaticValue::Aggregate(vec![
+            luna_mvir::static_data::StaticValue::Int(i128::MIN),
+            luna_mvir::static_data::StaticValue::Str("λ\0data".into()),
+        ]),
+    }), SemanticTypeId(0), None));
     
     // Add block
     func.blocks.push(BasicBlock {
         label: LabelId { name: "entry0".to_string() },
-        insts: vec![ValueId(0), ValueId(1)],
+        insts: vec![ValueId(0), ValueId(1), ValueId(2)],
         terminator: Some(Terminator::Ret { value: Some(Operand::Value(ValueId(1))) }),
     });
 
@@ -61,7 +72,9 @@ fn test_golden_roundtrip() {
     
     assert_eq!(mlib_module.functions.len(), 1);
     assert_eq!(mlib_module.functions[0].name, "test_func");
-    assert_eq!(mlib_module.functions[0].values.len(), 2);
+    assert_eq!(mlib_module.functions[0].values.len(), 3);
+    let Instruction::StaticAddress(expected) = &module.functions[0].values[2].inst else { unreachable!() };
+    assert!(matches!(&mlib_module.functions[0].values[2].inst, luna_llib::MlibInstruction::StaticAddress(actual) if actual == expected));
     assert!(matches!(
         &mlib_module.functions[0].values[1].inst,
         luna_llib::MlibInstruction::FieldPtr { field_idx: 0, field_name: Some(name), .. } if name == "payload"

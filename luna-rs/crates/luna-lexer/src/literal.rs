@@ -2,6 +2,49 @@
 //! analysis; this module never performs an implicit numeric conversion.
 use crate::BuiltinKind;
 
+/// Decode the ordinary string escapes used by both native and comptime
+/// execution. Unknown escapes retain their spelling, matching the existing
+/// ordinary-string contract; raw/byte literals use their own decoder.
+pub fn decode_string(text: &str) -> String {
+    let raw = text.strip_prefix('"').and_then(|s| s.strip_suffix('"')).unwrap_or(text);
+    let mut out = String::new();
+    let mut chars = raw.chars();
+    while let Some(c) = chars.next() {
+        if c != '\\' { out.push(c); continue; }
+        match chars.next() {
+            Some('n') => out.push('\n'), Some('r') => out.push('\r'),
+            Some('t') => out.push('\t'), Some('0') => out.push('\0'),
+            Some('\\') => out.push('\\'), Some('\'') => out.push('\''), Some('"') => out.push('"'),
+            Some(c) => { out.push('\\'); out.push(c); },
+            None => out.push('\\'),
+        }
+    }
+    out
+}
+
+pub fn quote_string(value: &str) -> String {
+    let mut text = String::from("\"");
+    for c in value.chars() {
+        match c {
+            '\n' => text.push_str("\\n"), '\r' => text.push_str("\\r"), '\t' => text.push_str("\\t"),
+            '\0' => text.push_str("\\0"), '\\' => text.push_str("\\\\"), '"' => text.push_str("\\\""),
+            c => text.push(c),
+        }
+    }
+    text.push('"');
+    text
+}
+
+pub fn decode_character(text: &str) -> Result<char, String> {
+    let body = text.strip_prefix('\'').and_then(|s| s.strip_suffix('\''))
+        .ok_or("invalid character literal delimiters")?;
+    let value = decode_string(&format!("\"{body}\""));
+    let mut chars = value.chars();
+    let scalar = chars.next().ok_or("empty character literal")?;
+    if chars.next().is_some() { return Err("character literal must contain exactly one Unicode scalar".into()); }
+    Ok(scalar)
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct IntegerLiteral {
     pub magnitude: u128,

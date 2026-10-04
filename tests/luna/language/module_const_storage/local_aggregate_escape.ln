@@ -1,0 +1,6 @@
+struct Pair { left: i32, flag: bool, };
+fn invalid() -> &i32 {
+    const PAIR: Pair = comptime { Pair { left: 42, flag: true } };
+    return &PAIR.left;
+}
+fn main() -> i32 { return *invalid(); }

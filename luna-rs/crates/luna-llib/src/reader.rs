@@ -825,6 +825,22 @@ impl LlibReader {
                 let future = Self::deserialize_operand(r)?;
                 Ok(MlibInstruction::Await { future })
             }
+            0x29 => {
+                use bincode::Options;
+                let mut size = [0; 4];
+                r.read_exact(&mut size)?;
+                let size = u32::from_le_bytes(size) as u64;
+                let mut payload = Vec::new();
+                let mut limited = r.take(size);
+                limited.read_to_end(&mut payload)?;
+                if payload.len() as u64 != size {
+                    return Err(std::io::Error::new(std::io::ErrorKind::UnexpectedEof, "truncated static initializer"));
+                }
+                let data = bincode::DefaultOptions::new().with_fixint_encoding().with_limit(size)
+                    .reject_trailing_bytes().deserialize(&payload)
+                    .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+                Ok(MlibInstruction::StaticAddress(data))
+            }
             _ => Err(std::io::Error::new(std::io::ErrorKind::InvalidData, format!("Unknown instruction opcode {}", tag_buf[0]))),
         }
     }
@@ -1006,6 +1022,30 @@ mod semantic_metadata_version_tests {
     use super::check_semantic_metadata_version;
     use crate::format::SEMANTIC_METADATA_VERSION;
     use crate::MlibError;
+
+    #[test]
+    fn static_initializer_rejects_truncation_and_trailing_bytes() {
+        let data = luna_mvir::static_data::StaticData {
+            name: "constant".into(), ty: luna_mvir::static_data::StaticType::Primitive(luna_semantic::BuiltinType::I32),
+            value: luna_mvir::static_data::StaticValue::Int(20),
+        };
+        let valid = bincode::serialize(&data).unwrap();
+        for payload in [&valid[..valid.len() - 1], &[valid.as_slice(), &[0u8]].concat()[..]] {
+            let mut bytes = vec![0x29];
+            bytes.extend((payload.len() as u32).to_le_bytes());
+            bytes.extend(payload);
+            assert!(super::LlibReader::deserialize_instruction(&mut std::io::Cursor::new(bytes)).is_err());
+        }
+    }
+
+    #[test]
+    fn older_mvir_is_rejected_before_static_data_decode() {
+        for version in 1..crate::format::LLIB_MVIR_VERSION {
+            let mut header = crate::format::LlibHeader::new();
+            header.mvir_version = version;
+            assert!(matches!(super::validate_header_versions(&header), Err(MlibError::VersionMismatch(v)) if v == version));
+        }
+    }
 
     #[test]
     fn older_compiler_artifacts_are_rejected_before_payload_decode() {

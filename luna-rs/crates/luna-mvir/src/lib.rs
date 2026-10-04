@@ -4,6 +4,7 @@ mod drop_glue;
 pub mod printer;
 pub mod interp;
 pub mod place;
+pub mod static_data;
 
 pub use mvir::*;
 pub use generator::MvirGenerator;

@@ -55,6 +55,7 @@ pub struct MlibBlock {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum MlibInstruction {
+    StaticAddress(luna_mvir::static_data::StaticData),
     Alloca,
     HeapAlloc,
     Assign(MlibOperand),

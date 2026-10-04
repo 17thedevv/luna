@@ -5,7 +5,7 @@
 <body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
 <main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
 <h1 id="module-const-storage-v1--module-constants-and-borrowed-storage">MODULE-CONST-STORAGE-v1 — module constants and borrowed storage</h1>
-<p>Adopted by the maintainer on 2026-10-04 during the 0.1 completion work. A module-level constant has immutable storage lasting for the program&#x27;s lifetime when a reference is taken to it. A function-local constant retains its ordinary lexical storage lifetime. Implementation remains pending; adoption does not certify current lowering.</p>
+<p>Adopted by the maintainer on 2026-10-04 during the 0.1 completion work. A module-level constant has immutable storage lasting for the program&#x27;s lifetime when a reference is taken to it. A function-local constant retains its ordinary lexical storage lifetime. Generic immutable MVIR storage is now implemented and has focused source/fresh-artifact evidence on Windows x86_64 GNU. Full release/target certification remains pending; adoption and focused acceptance do not certify the entire 0.1 compiler.</p>
 <h2 id="scope-and-lifetime">Scope and lifetime</h2>
 <p>The rule covers constants declared at file/module level. Visibility does not determine storage lifetime: a private module constant can be used by its defining functions. Existing visibility and const-admission rules still apply.</p>
 <pre><code>module values {
