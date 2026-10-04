@@ -1,0 +1,10 @@
+import "concrete_inherent_provider";
+fn main() -> i32 {
+    dec integer = concrete_api::Holder<i32> { value: 17 };
+    dec boolean = concrete_api::Holder<bool> { value: true };
+    if integer.read() != 17 { return 1; }
+    if boolean.read() == false { return 2; }
+    if integer.map<bool>(true) == false { return 3; }
+    if boolean.map<i32>(29) != 29 { return 4; }
+    return 0;
+}

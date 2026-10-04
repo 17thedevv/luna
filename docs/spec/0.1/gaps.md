@@ -175,3 +175,14 @@ its per-header identity/fingerprint contract needs further audit. Later fallback
 lookup paths and broader associated-projection domains remain unverified.
 Moved closure capture destruction, named/default argument implementation,
 remaining provider/diagnostic/target coverage and exact-candidate R5 stay open.
+
+The subsequent full workspace run at `de9977d` records **1,290 PASS, 1 FAIL,
+1 ignored**, cargo exit101; only the owned-closure cleanup target fails.
+Additional reducers outside that matrix exposed concrete inherent method
+symbol collisions and incomplete public-bound fingerprints. A later focused
+repair uses each selected checked self header for method ABI naming and removes
+name-based mangler substitution; the two concrete dispatch/provider reducers
+now execute/build correctly across source and relocated artifacts. Compiler
+artifact identity is 8, with other schema versions unchanged. This does not
+rewrite the full run as PASS. The changed-public-bound fingerprint reducer and
+Windows manifest/object-format mismatch remain open in the execution ledger.

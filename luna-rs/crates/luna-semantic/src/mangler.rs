@@ -46,23 +46,6 @@ impl Mangler {
                     return Self::mangle_type_with_substs(types, symbol_table, concrete, substs);
                 }
             }
-            let gp_name = if (gp.0 as usize) < symbol_table.symbols.len() {
-                &symbol_table.symbols[gp.0 as usize].name
-            } else {
-                ""
-            };
-            if !gp_name.is_empty() {
-                for &(param_sym, concrete) in substs {
-                    let p_name = if (param_sym.0 as usize) < symbol_table.symbols.len() {
-                        &symbol_table.symbols[param_sym.0 as usize].name
-                    } else {
-                        ""
-                    };
-                    if gp_name == p_name {
-                        return Self::mangle_type_with_substs(types, symbol_table, concrete, substs);
-                    }
-                }
-            }
         }
         match types.get(ty_id) {
             SemanticType::Void => "v".to_string(),
@@ -168,25 +151,26 @@ impl Mangler {
         }
     }
 
-    /// Mangle an inherent method symbol: `_MM<self_path><method_ident>[G<substs>E]`.
+    /// Encode the complete checked self type and independent method arguments.
     pub fn mangle_method(
         types: &TypeContext,
         symbol_table: &SymbolTable,
-        self_path: &[String],
+        self_ty: SemanticTypeId,
         method_name: &str,
-        substs: &[SemanticTypeId],
+        method_substs: &[SemanticTypeId],
+        substs: &[(SymbolId, SemanticTypeId)],
     ) -> String {
-        let self_path_enc = Self::encode_path(self_path);
-        let meth_ident = Self::encode_ident(method_name);
-        if substs.is_empty() {
-            format!("_MM{}{}", self_path_enc, meth_ident)
-        } else {
-            let mut substs_enc = String::new();
-            for &s in substs {
-                substs_enc.push_str(&Self::mangle_type(types, symbol_table, s));
+        let self_type = Self::mangle_type_with_substs(types, symbol_table, self_ty, substs);
+        let method = Self::encode_ident(method_name);
+        let mut arguments = String::new();
+        if !method_substs.is_empty() {
+            arguments.push('G');
+            for &ty in method_substs {
+                arguments.push_str(&Self::mangle_type_with_substs(types, symbol_table, ty, substs));
             }
-            format!("_MM{}{}G{}E", self_path_enc, meth_ident, substs_enc)
+            arguments.push('E');
         }
+        format!("_MM{}{}{}", self_type, method, arguments)
     }
 
     /// Mangle a trait method symbol: `_MI<trait_path>[G<trait_substs>E]<self_ty><method_ident>[G<method_substs>E]`.
