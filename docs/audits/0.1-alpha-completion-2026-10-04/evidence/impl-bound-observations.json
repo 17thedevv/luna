@@ -1,0 +1,40 @@
+{
+  "revision": "de9977d71dfb52a14617faf469441530dddb597e",
+  "recorded_utc": "2026-10-04T19:24:45.017085+00:00",
+  "cli_sha256": "a84a21683c63ec91de6f1528e2aca6004a7a73e51378517a91743446e40c62c2",
+  "bound_fingerprint": {
+    "First": {
+      "saved_source_sha256": "7ffe0c31169a27c1e0b7286c58b3a2ccbf3b77fce6173f34647c8d08f2bcbbaa",
+      "source_fingerprint": "7ffe0c31169a27c1e0b7286c58b3a2ccbf3b77fce6173f34647c8d08f2bcbbaa",
+      "interface_fingerprint": "e38bf0636d56fccd276b758cae4bff5cc25b596856d3020215ee8c54bfcd18df",
+      "execution_fingerprint": "b5e674f77d69b5831f5a113492c4507fca78c934245474dfaaddcc5f1f8f8009",
+      "saved_source_matches_artifact": true
+    },
+    "Second": {
+      "saved_source_sha256": "d9915bace2bf550a69fa115dd39fabeaad7f5267057d6d4828e2b5a6e6e8edfa",
+      "source_fingerprint": "d9915bace2bf550a69fa115dd39fabeaad7f5267057d6d4828e2b5a6e6e8edfa",
+      "interface_fingerprint": "e38bf0636d56fccd276b758cae4bff5cc25b596856d3020215ee8c54bfcd18df",
+      "execution_fingerprint": "dee89be22a7f311090b4767b553420a3606b926a9ad1c91cb8cd948c87a58275",
+      "saved_source_matches_artifact": true
+    }
+  },
+  "equal_interface_for_changed_public_bound": true,
+  "concrete_inherent_instances": {
+    "check_exit": 0,
+    "build_exit": 1,
+    "shared_backend_symbol": "_MMN5multi6HolderE4read",
+    "diagnostic": "E6001 LLVM return-type mismatch"
+  },
+  "scope": "Retained reducers for the next repair. These observations do not modify the compiler or the concurrent workspace run.",
+  "concrete_inherent_same_return_type": {
+    "build_exit": 0,
+    "expected_native_exit": 0,
+    "native_exit": 1
+  },
+  "target_contract": {
+    "manifest_object_format": "ELF",
+    "triple": "x86_64-pc-windows-gnu",
+    "object_prefix_hex": "6486030000000000",
+    "status": "Manifest disagrees with AMD64 COFF object header; retained for target contract audit."
+  }
+}

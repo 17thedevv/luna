@@ -1,0 +1,11 @@
+{
+  "cli_sha256": "A84A21683C63EC91DE6F1528E2ACA6004A7A73E51378517A91743446E40C62C2",
+  "runtime_sha256": "D8AEA737AA7929E79AB70F24DB5705D7370570295DDAB9F569B3085EE230F5DE",
+  "tracked_status": "",
+  "started_utc": "2026-10-04T19:14:55.1754366Z",
+  "target": "x86_64-pc-windows-gnu",
+  "command": "cargo test --workspace --no-fail-fast",
+  "prebuilt": "cargo test --workspace --no-run: exit0",
+  "revision": "de9977d71dfb52a14617faf469441530dddb597e",
+  "compiler_artifact_version": 7
+}

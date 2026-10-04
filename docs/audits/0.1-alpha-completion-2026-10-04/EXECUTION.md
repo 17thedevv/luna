@@ -724,3 +724,46 @@ SKILL IMPACT: **REFINEMENT** in luna-semantic-compliance: declaration binders
 remain rigid in generic bodies as well as trait proof. Related grammar,
 capability-validation and boundary guidance were checked; no conflicting rule,
 task count or freeze claim was added to skills.
+
+## Full workspace at de9977d and additional reducers — 2026-10-05
+
+The [full-run summary](evidence/workspace-rigid-summary.json),
+[start record](evidence/workspace-rigid-start.json),
+[completion record](evidence/workspace-rigid-exit.json) and
+[lossless log](evidence/workspace-rigid.txt.gz) pin
+`de9977d71dfb52a14617faf469441530dddb597e`. All targets were prebuilt before
+`cargo test --workspace --no-fail-fast`; CLI and runtime hashes are identical
+before and after execution. The result is **1,290 PASS, 1 FAIL, 1 ignored**,
+cargo **exit101**. The sole failing target is `generic_drop_cli`: unused owned
+closure captures are not destroyed. The generated `test_model.mvir` changed
+during tests; no production source changed during this run. Earlier full FAIL
+records remain retained; neither this result nor focused passes approve release.
+
+Independent probes during the full run kept the compiler fixed and exposed
+further requirements outside that workspace matrix:
+
+- [Concrete inherent dispatch](../../../tests/luna/language/method_policy/concrete_inherent_dispatch.ln)
+  builds successfully but exits1 instead of required exit0. Inherent methods on
+  `Holder<i32>` and `Holder<bool>` share the same backend symbol despite
+  different bodies. This is a **correctness blocker**. The
+  [different-return provider reducer](../../../tests/luna/language/method_policy/concrete_inherent_distinct_returns.ln)
+  passes check but fails LLVM verification with E6001. Both functions are named
+  `_MMN5multi6HolderE4read`; nominal path plus method name does not distinguish
+  concrete self types. The selected checked header must govern instance naming.
+- [Fingerprint observations](evidence/impl-bound-observations.json) show that
+  changing a public impl bound from `T: First` to `T: Second` changes source and
+  execution fingerprints while preserving the same interface fingerprint,
+  `e38bf0636d56fccd276b758cae4bff5cc25b596856d3020215ee8c54bfcd18df`.
+  Canonical public metadata must retain these constraints and individual
+  applicable self headers. Portable AST rechecking is not a substitute for a
+  complete public dependency identity.
+- The same probe reports a Windows-GNU triple with manifest `object_format:
+  ELF`, while object bytes start `64 86` (AMD64 COFF). The driver currently
+  hardcodes ELF, pointer width64 and empty ABI/endianness fields. Target
+  contract/data-layout work remains required under R3.
+
+Next implementation order: repair concrete instance identity and remove
+spelling-based mangler substitution, verify native/source/relocated artifact
+controls, then repair canonical constraint/header metadata. Continue closure
+cleanup under its ownership contract, named/default calls and the remaining
+R3–R5 acceptance obligations. The goal remains active; no merge/tag.

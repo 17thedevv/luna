@@ -1,0 +1,10 @@
+struct Holder<T> { value: T };
+impl Holder<i32> { fn read(&self) -> i32 { return 17; } }
+impl Holder<bool> { fn read(&self) -> i32 { return 29; } }
+fn main() -> i32 {
+    dec integer = Holder<i32> { value: 0 };
+    dec boolean = Holder<bool> { value: true };
+    if integer.read() != 17 { return 1; }
+    if boolean.read() != 29 { return 2; }
+    return 0;
+}
