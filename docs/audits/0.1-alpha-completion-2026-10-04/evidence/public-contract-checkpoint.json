@@ -1,0 +1,190 @@
+{
+  "revision": "d4eb5147d1b9bd83649ebe2bd133d9781eb8693c",
+  "previous_checkpoint": "17be175",
+  "recorded_utc": "2026-10-04T23:01:22.071746+00:00",
+  "target": "x86_64-pc-windows-gnu",
+  "artifact_versions": {
+    "compiler": 9,
+    "format": 2,
+    "metadata": 4,
+    "mvir": 4
+  },
+  "cli_sha256": "6c7fecc4e83b0be8978d4d7dc05331c401c3baddf020ac1543dd0b65f756fa05",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "source_blobs": {
+    ".agents/skills/luna-language-capability-validation/SKILL.md": "b81ad49acd8fac816d1fc0090f1838ce82bc5110",
+    "docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md": "b070f3c750258891c04908d0673d0cfa31337c07",
+    "docs/spec/0.1/gaps.md": "42f6ed1dd1c526b55792eedc7957286f229154d7",
+    "docs/spec/0.1/modules.md": "9ede48295df5a4e6b0a01a45f0f63bbd8ee71e00",
+    "luna-rs/crates/luna-cli/tests/interface_constraints_cli.rs": "b554d76038e3c290345f60f04b4a4c00e0a29b7e",
+    "luna-rs/crates/luna-driver/src/external.rs": "2f9d1a1de7d9ff041e681236d5c115e5d9dce8d3",
+    "luna-rs/crates/luna-driver/src/metadata_builder.rs": "57387e3f55e43122f77ce577830fdacffa6d3eaf",
+    "luna-rs/crates/luna-driver/src/metadata_decoder.rs": "63e94be0aef20da9986acc769ad57109c6a6a5bb",
+    "luna-rs/crates/luna-driver/src/registry.rs": "d4c3cb1ad31467dcbce42bcd8bb1544f50c9bae0",
+    "luna-rs/crates/luna-driver/tests/test_sysroot_build_invariants.rs": "d14d5ad39adade6b632dc026f85508b9e6a964b1",
+    "luna-rs/crates/luna-llib/src/format.rs": "b5e97f2bfccb3c92b1a5c84111ada4f51f4365a2",
+    "luna-rs/crates/luna-llib/src/metadata.rs": "b1a385d0c52baf025819157bd63aba9c18a72725",
+    "luna-rs/crates/luna-llib/src/reader.rs": "c6edf476b780c552d0a167b888d024adad6cf1d3",
+    "luna-rs/crates/luna-semantic/src/resolver.rs": "fe3dd582feb6bd163dd93b7631f9c17d3648335a",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "d2226b816675e20968981af9dc4e0e651c408206",
+    "luna-rs/libs/external/core/slice.ln": "edc1b3f7b8bda6cd08aece1e3d34546af707b894",
+    "tests/luna/language/interface_constraints/alpha_renamed.ln": "97687459928a610a881595e5075895e4acb46ed2",
+    "tests/luna/language/interface_constraints/associated_definition.ln": "36aa61abc1094f920ff86288807b8eebd47c9406",
+    "tests/luna/language/interface_constraints/associated_equality.ln": "19f6455c6c2ce759138505af370bc2ce80ada3a7",
+    "tests/luna/language/interface_constraints/baseline.ln": "393945d4c5a5f46edfef3297f42ccda60c82203f",
+    "tests/luna/language/interface_constraints/consumer.ln": "8c39a5cc1355f37c2c99519c6f057fbaea2a9706",
+    "tests/luna/language/interface_constraints/dependent.ln": "b418615440211d0ee963e96cbc12a4eb968259fa",
+    "tests/luna/language/interface_constraints/dependent_consumer.ln": "005004c611d7f5128b6d133e0c1931bc3dc2b140",
+    "tests/luna/language/interface_constraints/function_bound.ln": "728aadf4163a2747a6767a1e2f8ed73b6075f5b8",
+    "tests/luna/language/interface_constraints/impl_bound.ln": "1926ea54e0d0f6cd0ef2c8b0bfeb5f21ab3dd35f",
+    "tests/luna/language/interface_constraints/method_bound.ln": "5d5146a61a99a2471f91068a5a564b50959646de",
+    "tests/luna/language/interface_constraints/missing_associated_equality.ln": "2d50b2a7ad1ec0b3be7b67b7ba8a8b909418f8f1",
+    "tests/luna/language/interface_constraints/missing_function_bound.ln": "bad0765aae4ed1882fa78ec5a17c8ff76a0d8212",
+    "tests/luna/language/interface_constraints/missing_impl_bound.ln": "59a30fa619963f2c4335ef5b9960af2717244874",
+    "tests/luna/language/interface_constraints/missing_inferred_nominal_bound.ln": "3daec03ed66aed94ec3a0bd0446f9948957a7e44",
+    "tests/luna/language/interface_constraints/missing_method_bound.ln": "8cb4888431acf855478b8e299294200e7b0f5712",
+    "tests/luna/language/interface_constraints/missing_nominal_bound.ln": "7765146d76048363abcfab15f7eee786621358da",
+    "tests/luna/language/interface_constraints/nominal_bound.ln": "f5c9309f2ff53151750ed413e3bcf9f915c7bbf2",
+    "tests/luna/language/interface_constraints/non_trait_bound.ln": "6a805b92cd6443eff9fcb42a633a1aee8547029f",
+    "tests/luna/language/interface_constraints/private_body.ln": "b8a3f66ef992e225915fd1faaaad2befd05e7f04",
+    "tests/luna/language/interface_constraints/reversed.ln": "340ca0ccf0b37e0f24a057adfb9513a5b067b0a6",
+    "tests/luna/language/interface_constraints/trait_bound.ln": "6bb9f31c7e920df1f22a6b6ca78486ffebfc7658",
+    "tests/luna/language/interface_constraints/trait_method_bound.ln": "77f1f6ac88c327d47cbe0dcdea65ae824c89998b",
+    "tests/luna/language/interface_constraints/unknown_associated_bound.ln": "e23c01e7ed4b8cc91901fc57be0f27680ba2f48c",
+    "tests/luna/language/interface_constraints/unknown_bound.ln": "967515a9ec4a9a89b2358ae3a1c50a68e81abdf7"
+  },
+  "logs": {
+    "r2-public-contract-build-final.txt": {
+      "working_file_sha256": "dc11dc9318ff2289456336d6a5f7e5d3a6ba123a18bbab9b69ded850011cbb26",
+      "git_blob": "8e5eeb9679ef7490e6eade0b4c95c75b075d3c29"
+    },
+    "r2-public-contract-build.txt": {
+      "working_file_sha256": "dcd5b58ffda604dcce2cc49587d174663f6694e9425430b1116abc73001587fc",
+      "git_blob": "4ca03ded48c8cb399c3a76561b89ca53249d6959"
+    },
+    "r2-public-contract-check.txt": {
+      "working_file_sha256": "98b75d94f992bf91e0037e100fd0a2994a3d6a3385193c197ac956fd35e913dd",
+      "git_blob": "b6c0f8068a388e0182f0b6b596e3e1e7524a84cc"
+    },
+    "r2-public-contract-cli-eighth.txt": {
+      "working_file_sha256": "d66c68c8d816b7ad853ab36891cb5a05fc8480fe4ac19e34098be75288663db6",
+      "git_blob": "219912c780fa3d0aab196c539a006b78cc1481d0"
+    },
+    "r2-public-contract-cli-expanded.txt": {
+      "working_file_sha256": "438fead6d52278abcd664e2e07b34321fe40f53900ff2cdab4d828671d818ae6",
+      "git_blob": "f9ba045b98818de5dfbe12f1f26d3290209cf2d9"
+    },
+    "r2-public-contract-cli-fifth.txt": {
+      "working_file_sha256": "2e768d3905e73a6a1560d73cd9026865017537fb9e470d16c7656c5dde1519ac",
+      "git_blob": "17b047993584f2bdea85d7c4ef1606c338f18d49"
+    },
+    "r2-public-contract-cli-final.txt": {
+      "working_file_sha256": "5b5cfc0e86a4b1b232a1f369f42ec48968e02b540c680e8773141f003306056f",
+      "git_blob": "46962ab01aff2de2f7dd0a77927597142bb3f875"
+    },
+    "r2-public-contract-cli-fourth.txt": {
+      "working_file_sha256": "652b8c8fb41793ced57a44d703614bec412ead01ee551ba431608ddd84113517",
+      "git_blob": "ec92dc8a253eb9f76ebb150855d9e1425c13b0c3"
+    },
+    "r2-public-contract-cli-initial.txt": {
+      "working_file_sha256": "29071eb961dd890d77c23f29907df4cb93e202854873f95fafa17edb96089c14",
+      "git_blob": "204b9fbb16cc2cd99e7a1cf2306d1cfc15575812"
+    },
+    "r2-public-contract-cli-second.txt": {
+      "working_file_sha256": "9aca0fc83493955beceab65039aacf698a7b56864e3859102670c9d91f5ffd42",
+      "git_blob": "c87f454275b79ea92376edf35f182f1a9a5d18e7"
+    },
+    "r2-public-contract-cli-seventh.txt": {
+      "working_file_sha256": "5c8a483f12471d9a8c99d4de758eb011d114c62d8d68763fdda736e5146fa32a",
+      "git_blob": "18446623258259f88acad042e222c1ce72768bad"
+    },
+    "r2-public-contract-cli-sixth.txt": {
+      "working_file_sha256": "043eb184c0f52a4924165a082103ee1278e403bddbd3c1ec781fec79f0f4a1bc",
+      "git_blob": "4d206669f9b6bf7c9e58b6791b0bfac9dc5a1fed"
+    },
+    "r2-public-contract-cli-third.txt": {
+      "working_file_sha256": "dc61126ff0938a1f1aa4a53aff1b0ec30ed311e21d651c66f3ea9d640b69d4de",
+      "git_blob": "d4daa3bbb701a19ab5610c286fcd8127d6b3bd33"
+    },
+    "r2-public-contract-dag-final.txt": {
+      "working_file_sha256": "00af4d325a53400983795d096ba8dfa4070f45fc346af82a0ca9a81efd357531",
+      "git_blob": "e3932b2d98ed2707dc29bf53ee4cd72db80be363"
+    },
+    "r2-public-contract-driver-final.txt": {
+      "working_file_sha256": "9bf1b4f6fd6ec925a2419081dfe8f6e7e7e429edce35dc516810123b1663d3fd",
+      "git_blob": "4dc0f0c3638e1224ecd552c19cc8daf70a14ff5f"
+    },
+    "r2-public-contract-driver.txt": {
+      "working_file_sha256": "3a30cb484f809702b555751fa53f9070f137d3a7b6e1ef91bc2d40d9e77a7631",
+      "git_blob": "ac25a504c2ec67477516048bc9c7d806154506a5"
+    },
+    "r2-public-contract-internals-final.txt": {
+      "working_file_sha256": "fa00f5cabf20256e49939f845fafc73e8a43c12df9373dd749cd0263cde84017",
+      "git_blob": "fa0be8351c4c7a8b49ce092bb800464efd1e1bc9"
+    },
+    "r2-public-contract-internals-initial.txt": {
+      "working_file_sha256": "c9c465cc7acaf7dcf444ceb4199eefc7ffb612551be9a2e2925b82dd6378dd9a",
+      "git_blob": "07e3d27f75270553a522145a07eff0f6db6770ca"
+    },
+    "r2-public-contract-sysroot-final.txt": {
+      "working_file_sha256": "39d5c5fa19267584fc6037f6d2471fbc65afc594289b39f60415aa51ea040d6c",
+      "git_blob": "888aec3a9347791d1ac36884b7f2b05a06248190"
+    },
+    "r2-public-contract-sysroot.txt": {
+      "working_file_sha256": "2a9c31b0292e884109303c4ab117f3b8d4d9f4bdbb6d2a99a307883da0d7818c",
+      "git_blob": "34d4379f1afd00fadf4b42f5b6c8e6eccc35be85"
+    },
+    "r2-public-contract-workspace-check.txt": {
+      "working_file_sha256": "e4966b578661c6ac9817b31d77506ffcb23146590cc15674f471894a78e0b434",
+      "git_blob": "32b9a6547cb67f9a325cc243a9f912f8cdbeeb03"
+    }
+  },
+  "verification": {
+    "semantic_and_artifact": {
+      "passed": 206,
+      "exit": 0
+    },
+    "canonical_sysroot": {
+      "providers_built": 49,
+      "exit": 0
+    },
+    "cli": {
+      "harness_cases_passed": 5,
+      "exit": 0,
+      "interface_matrix": {
+        "fingerprint_comparisons": 11,
+        "native_executions": 7,
+        "semantic_check_build_rejections": 108,
+        "stale_dependent_rejections": 16,
+        "corrupt_metadata_controls": 2
+      }
+    },
+    "driver_initial_command": {
+      "exit": 101,
+      "tests_run": 0,
+      "reason": "nonexistent function-pointer target"
+    },
+    "driver_regression": {
+      "passed": 45,
+      "failed": 1,
+      "exit": 101,
+      "reason": "DAG oracle freezes 209 edges; explicit slice/copy import gives 210"
+    },
+    "dag_rerun": {
+      "passed": 6,
+      "exit": 0
+    },
+    "workspace_check": {
+      "exit": 0
+    }
+  },
+  "limitations": [
+    "No full-workspace compiler9 PASS; the de9977d full run remains FAIL.",
+    "The DAG oracle was corrected after the initial driver run; other driver targets were not rerun without relevant source changes.",
+    "Initial/intermediate failures are retained; transient editing errors precede fixture execution.",
+    "Unknown/non-trait/associated-bound negative cases compare semantic messages, not uniform typed-code assertions.",
+    "Header/public-constraint controls do not certify all recursive type/layout, nominal well-formedness, projection/fallback or closure metadata domains.",
+    "Target metadata, owned closure cleanup, named/default calls and R3-R5 remain open.",
+    "Working-file log SHA256 and normalized Git blob identities are recorded separately."
+  ]
+}
