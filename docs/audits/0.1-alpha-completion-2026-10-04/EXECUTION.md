@@ -536,3 +536,109 @@ as already required by the versioned syntax; the illustrative private field
 uses explicit `private`. Parser semantics are unchanged. The skill and related
 semantic guidance were checked against the canonical syntax/visibility rules;
 no task status or new language authority is added to skills.
+
+
+## R2 method/binder checkpoint — 2026-10-05, not release approval
+
+The maintainer adopted independent impl/method binders. Implementation
+`fbf4e72` removes name/position aliasing between unrelated binders, carries each
+selected checked impl header through provider reconstruction, and checks all
+applicable inherent candidates before trait candidates. Multiple applicable
+trait methods report E1008; explicit qualification selects the trait contract.
+Expected result types do not choose between ambiguous unqualified candidates.
+Vec element Eq/Clone requirements now reside on constrained impls; method type
+parameters remain independent. RawTable accessors no longer inherit hashing
+bounds. The duplicate String.push_string declaration was removed.
+
+The first [focused matrix](evidence/r2-method-final-cli.txt) passed 64 native
+runs and 88 negative check/build observations, plus trait-argument parity.
+[Workspace check](evidence/r2-method-final-check.txt) and
+[canonical sysroot build](evidence/r2-method-final-sysroot.txt) passed.
+The subsequent full run on `fbf4e72` is **FAIL**: **1,270 PASS, 18 FAIL and
+1 ignored**, cargo exit101, 14 failing targets. Its
+[start record](evidence/workspace-method-start.json),
+[exit record](evidence/workspace-method-exit.json),
+[summary/inventory](evidence/workspace-method-summary.json) and
+[lossless log](evidence/workspace-method.txt.gz) preserve that result.
+Cargo rebuilt the CLI during the workspace run; before/after binary hashes
+are recorded separately. Generated test_model.mvir was the only tracked file
+changed by that run. This is development-checkout regression evidence, not
+clean-checkout or advertised-target R5 certification.
+
+Follow-up repairs address three independent compiler counterexamples:
+
+- Blanket impl matching must prove the matched impl's own recursive bounds,
+  associated-type equalities and exact trait arguments. A recursive assumption
+  does not prove itself. Caller binders are rigid within this proof; candidate
+  failures roll back inference/obligations/diagnostics. Qualified trait calls
+  also require an applicable impl with satisfied premises. Impl and method
+  associated equalities are retained, including for generic callers.
+- Array types participate structurally in impl matching, overlap detection and
+  occurs checking. Reference overlap compares mutability, not lifetime IDs.
+- Calling through a mutable reference uses its capability and does not require
+  a mutable binding for the reference variable. Owned immutable receivers and
+  shared references still reject mutable calls.
+
+The driver now stops after semantic errors before monomorphization, preventing
+secondary E5001 diagnostics from hiding the primary failure or differing across
+source/artifact modes. Historical fixtures were aligned with the adopted
+policy: Display/Debug and conversion collisions use qualification; resize no
+longer redeclares the impl binder; mutated owned locals use rw; diagnostic
+oracles check typed codes. Ordinary user trait methods named drop are callable;
+actual std::Drop destructors remain rejected. No safety rejection was removed
+to accommodate a positive fixture.
+
+**Artifact compiler version 6**, MVIR4, metadata3 and format2. Earlier compiler
+bodies reject explicitly; no automatic rebuilding is added. The
+[final canonical build](evidence/r2-method-proof-sysroot.txt) rebuilt all 49
+providers. Public metadata grouping/fingerprint identity still needs a separate
+per-impl-header audit; portable AST reconstruction passing does not close it.
+
+Verification at the follow-up source state:
+
+- [Final CLI suites](evidence/r2-method-proof-final-cli.txt): five targets PASS;
+  method matrix **88 native runs and 176 correct negative observations** across
+  source/fresh-artifact and declaration order, including relocated custom
+  providers. Associated premises, cycles, array lengths/overlap, binder identity,
+  mutable-reference binding and real/ordinary drop controls are covered.
+  Char/Unicode, formatting, receiver diagnostics and trait-argument parity PASS.
+- [Semantic suite](evidence/r2-method-proof-semantic.txt): **191/191 PASS**.
+- [Artifact reader](evidence/r2-method-proof-artifact.txt): **9/9 PASS**, including
+  rejection of earlier compiler versions before decoding bodies.
+- [Workspace check](evidence/r2-method-proof-check.txt): exit0.
+- [Earlier affected driver suites](evidence/r2-method-bound-driver.txt):
+  **95/95 PASS** across ten targets, before the associated/rigid bound-proof
+  follow-up. This covers Whole-File I/O, iterator consumers, resize/clone
+  ownership, conversions, namespace closure, async/dyn, alias evaluation order
+  and semantic gates. It is not final-state full regression evidence.
+
+**R2 remains PARTIAL.** A new permanent required-negative fixture,
+`tests/luna/language/generic_typing/rigid_return_required_reject.ln`, proves
+that the general unifier still accepts an unrelated i32 as a generic T:
+`wrong<bool>()` checks, builds and exits0. Strict trait proof does not repair
+ordinary expression/return typing. A required-positive nested struct-literal
+fixture also rejects at parsing. These are retained counterexamples, not
+passing certificates or permission to weaken the contract. The bound prover
+currently has a 64-frame expansion limit reported as unsatisfied evidence;
+limit diagnostics/deeper valid graphs need audit. Broader associated projection
+and fallback lookup domains remain open.
+
+Next: repair ordinary rigid generic typing, then nested-expression parsing and
+per-header canonical metadata; continue moved closure destruction and the
+adopted named/default argument contract. R3/R4 target/provider/diagnostic
+coverage and exact-candidate R5 remain required. No merge or release tag.
+
+    Compiler Change
+        Capability: Applicable method selection, independent binder/header identity and recursive trait/associated premise validation.
+        Why stdlib exposed it: Vec constraints, formatting collisions, mutable iteration and Whole-File I/O require ordinary generic/receiver contracts.
+        Why it is generic: Declaration identities, structural matching and trait evidence apply to arbitrary user types; invalid typing stops before mono.
+        User-defined type benefiting: Pair, Wrapper, AssocWrapper, ArrayHolder, Counter and custom provider traits in the CLI matrix.
+        Tests: method_resolution_cli, trait_argument_bounds_cli, char/format CLI, semantic/reader suites and affected driver regressions.
+        New intrinsic/lang_item?: NO
+        Stdlib-specific branch?: NO
+
+SKILL IMPACT: **REFINEMENT** in luna-semantic-compliance: independent binders,
+individual checked headers, complete impl premises and reference write
+capability are reusable guidance under existing contracts. Related grammar,
+boundary and validation guidance were checked for conflicts; skills acquire
+no task status, test counts or freeze authority.

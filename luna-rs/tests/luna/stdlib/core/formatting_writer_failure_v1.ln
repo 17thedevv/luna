@@ -21,7 +21,7 @@ impl std::fmt::Writer for FailAt {
 }
 
 fn render(value: &bool, writer: &rw FailAt) -> std::Result<void, std::fmt::FmtError> {
-    return value.fmt(writer);
+    return std::fmt::Display::fmt(value, writer);
 }
 
 fn main() -> i32 {

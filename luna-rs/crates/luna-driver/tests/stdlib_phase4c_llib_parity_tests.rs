@@ -148,32 +148,32 @@ fn phase4c_fresh_session_source_vs_llib_parity() {
         fn main() -> i32 {
             // Concrete widening and reflexive blanket selection.
             dec small: u8 = 42 as u8;
-            dec widened: u16 = small.convert();
+            dec widened: u16 = std::Convert::convert(small);
             if widened != (42 as u16) { return 1; }
             dec same: u8 = reflexive<u8>(small);
             if same != small { return 2; }
 
             // std::TryConvert success and all three typed error classes.
             dec boundary: u16 = 255 as u16;
-            dec narrow: std::Result<u8, std::TryConvertError> = boundary.try_convert();
+            dec narrow: std::Result<u8, std::TryConvertError> = std::TryConvert::try_convert(boundary);
             match narrow {
                 std::Result::Ok(value) -> { if value != (255 as u8) { return 3; } },
                 std::Result::Err(_) -> { return 4; },
             }
             dec too_large: u16 = 256 as u16;
-            dec overflow: std::Result<u8, std::TryConvertError> = too_large.try_convert();
+            dec overflow: std::Result<u8, std::TryConvertError> = std::TryConvert::try_convert(too_large);
             match overflow {
                 std::Result::Err(std::TryConvertError::Overflow) -> {},
                 _ -> { return 5; },
             }
             dec negative: i32 = -1;
-            dec underflow: std::Result<u32, std::TryConvertError> = negative.try_convert();
+            dec underflow: std::Result<u32, std::TryConvertError> = std::TryConvert::try_convert(negative);
             match underflow {
                 std::Result::Err(std::TryConvertError::Underflow) -> {},
                 _ -> { return 6; },
             }
             dec nan = std::f32_nan();
-            dec invalid: std::Result<i32, std::TryConvertError> = nan.try_convert();
+            dec invalid: std::Result<i32, std::TryConvertError> = std::TryConvert::try_convert(nan);
             match invalid {
                 std::Result::Err(std::TryConvertError::Invalid) -> {},
                 _ -> { return 7; },

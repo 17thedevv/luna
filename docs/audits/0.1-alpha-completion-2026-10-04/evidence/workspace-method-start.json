@@ -1,0 +1,8 @@
+{
+  "revision": "fbf4e72a20b7e802bbe7dd10e2f8bd882d08a12c",
+  "cli_sha256": "AA2162AE08034ECDEB256126C90514D61AA12B452CAC142B91883B7B6F9B3FEC",
+  "runtime_sha256": "D8AEA737AA7929E79AB70F24DB5705D7370570295DDAB9F569B3085EE230F5DE",
+  "command": "cargo test --workspace --no-fail-fast",
+  "target": "x86_64-pc-windows-gnu",
+  "start_utc": "2026-10-04T17:48:21.4178960Z"
+}

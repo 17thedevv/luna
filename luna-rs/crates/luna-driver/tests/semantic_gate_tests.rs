@@ -56,7 +56,7 @@ fn assert_semantic_gate_fires(test_name: &str, src: &str, expected_code: &str) {
         test_name
     );
     let sem_diags = sem_result.unwrap_err();
-    let sem_has_code = sem_diags.iter().any(|d| d.message.contains(expected_code));
+    let sem_has_code = sem_diags.iter().any(|d| d.message.contains(expected_code) || d.code.is_some_and(|code| code.to_string() == expected_code));
     assert!(
         sem_has_code,
         "[{}] Semantic diagnostics do not contain expected code '{}'. Got: {:?}",
@@ -72,7 +72,7 @@ fn assert_semantic_gate_fires(test_name: &str, src: &str, expected_code: &str) {
         test_name
     );
     let full_diags = full_result.unwrap_err();
-    let full_has_code = full_diags.iter().any(|d| d.message.contains(expected_code));
+    let full_has_code = full_diags.iter().any(|d| d.message.contains(expected_code) || d.code.is_some_and(|code| code.to_string() == expected_code));
     assert!(
         full_has_code,
         "[{}] Full pipeline diagnostics do not contain expected code '{}'. Got: {:?}",
@@ -164,7 +164,7 @@ fn test_gate_explicit_drop_call() {
             f.drop();
         }
     "#;
-    assert_semantic_gate_fires("gate_explicit_drop", src, "drop");
+    assert_semantic_gate_fires("gate_explicit_drop", src, "E2031");
 }
 
 // =============================================================================
@@ -442,7 +442,7 @@ fn test_adversarial_negative_corpus() {
         ("mut_immutable_ptr", "fn main() { dec x = 1; dec p: *i32 = &x as *i32; unsafe { *p = 2; } }", "E_CANNOT_MUTATE_IMMUTABLE_POINTER"),
         ("mut_immutable_var", "fn main() { dec x = 1; x = 2; }", "Cannot mutate immutable variable"),
         ("range_operator", "fn main() { dec r = 0..10; }", "E_UNSUPPORTED_FEATURE"),
-        ("explicit_drop", "struct S { x: i32 }; impl std::Drop for S { fn drop(self: &rw Self) {} } fn main() { dec s = S { x: 1 }; s.drop(); }", "Explicit calls to drop() are forbidden"),
+        ("explicit_drop", "struct S { x: i32 }; impl std::Drop for S { fn drop(self: &rw Self) {} } fn main() { dec s = S { x: 1 }; s.drop(); }", "E2031"),
         ("async_main", "async fn main() {}", "E_INVALID_MAIN_SIGNATURE"),
         ("main_args_void", "fn main(args: [str]) -> void {}", "E_INVALID_MAIN_SIGNATURE"),
         ("comptime_div_zero", "const X: i32 = comptime { 10 / 0 }; fn main() {}", "attempt to divide by zero"),

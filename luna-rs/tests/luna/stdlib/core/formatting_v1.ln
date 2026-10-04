@@ -10,9 +10,9 @@ struct Point {
 
 impl std::fmt::Display for Point {
     fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, std::fmt::FmtError> {
-        if self.x.fmt(writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if std::fmt::Display::fmt(&self.x, writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
         if writer.write_char(',').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
-        if self.y.fmt(writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if std::fmt::Display::fmt(&self.y, writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
         return std::Result::Ok;
     }
 }
@@ -67,7 +67,7 @@ fn main() -> i32 {
     append_display(Point { x: -12, y: 34 }, &rw output).unwrap();
     std::io::println(output.as_bytes());
     dec rw failing = FailingWriter {};
-    dec failed = true.fmt(&rw failing);
+    dec failed = std::fmt::Display::fmt(&true, &rw failing);
     if failed.is_err() == false {
         return 1;
     }

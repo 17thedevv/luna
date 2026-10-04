@@ -232,7 +232,7 @@ fn test_standard_conversions() {
 
             // std::TryConvert success
             dec big_u16: u16 = 200 as u16;
-            dec try_ok: std::Result<u8, std::TryConvertError> = big_u16.try_convert();
+            dec try_ok: std::Result<u8, std::TryConvertError> = std::TryConvert::try_convert(big_u16);
             match try_ok {
                 std::Result::Ok(val) -> {
                     if val != (200 as u8) { return 10; }
@@ -242,7 +242,7 @@ fn test_standard_conversions() {
 
             // std::TryConvert overflow
             dec overflow_u16: u16 = 256 as u16;
-            dec try_err: std::Result<u8, std::TryConvertError> = overflow_u16.try_convert();
+            dec try_err: std::Result<u8, std::TryConvertError> = std::TryConvert::try_convert(overflow_u16);
             match try_err {
                 std::Result::Ok(_) -> { return 12; },
                 std::Result::Err(std::TryConvertError::Overflow) -> {},
@@ -250,98 +250,98 @@ fn test_standard_conversions() {
             }
 
             dec exact_u16: u16 = 255 as u16;
-            dec exact_u16_result: std::Result<u8, std::TryConvertError> = exact_u16.try_convert();
+            dec exact_u16_result: std::Result<u8, std::TryConvertError> = std::TryConvert::try_convert(exact_u16);
             match exact_u16_result {
                 std::Result::Ok(v) -> { if v != (255 as u8) { return 14; } },
                 std::Result::Err(_) -> { return 15; },
             }
             dec signed_ok: i16 = 127 as i16;
-            dec signed_ok_result: std::Result<i8, std::TryConvertError> = signed_ok.try_convert();
+            dec signed_ok_result: std::Result<i8, std::TryConvertError> = std::TryConvert::try_convert(signed_ok);
             match signed_ok_result {
                 std::Result::Ok(v) -> { if v != (127 as i8) { return 16; } },
                 std::Result::Err(_) -> { return 17; },
             }
             dec signed_high: i16 = 128 as i16;
-            dec signed_high_result: std::Result<i8, std::TryConvertError> = signed_high.try_convert();
+            dec signed_high_result: std::Result<i8, std::TryConvertError> = std::TryConvert::try_convert(signed_high);
             match signed_high_result {
                 std::Result::Err(std::TryConvertError::Overflow) -> {},
                 _ -> { return 18; },
             }
             dec signed_low: i16 = -129 as i16;
-            dec signed_low_result: std::Result<i8, std::TryConvertError> = signed_low.try_convert();
+            dec signed_low_result: std::Result<i8, std::TryConvertError> = std::TryConvert::try_convert(signed_low);
             match signed_low_result {
                 std::Result::Err(std::TryConvertError::Underflow) -> {},
                 _ -> { return 19; },
             }
             dec unsigned_low: i32 = -1;
-            dec unsigned_low_result: std::Result<u32, std::TryConvertError> = unsigned_low.try_convert();
+            dec unsigned_low_result: std::Result<u32, std::TryConvertError> = std::TryConvert::try_convert(unsigned_low);
             match unsigned_low_result {
                 std::Result::Err(std::TryConvertError::Underflow) -> {},
                 _ -> { return 20; },
             }
             dec unsigned_zero: i32 = 0;
-            dec unsigned_zero_result: std::Result<u32, std::TryConvertError> = unsigned_zero.try_convert();
+            dec unsigned_zero_result: std::Result<u32, std::TryConvertError> = std::TryConvert::try_convert(unsigned_zero);
             match unsigned_zero_result {
                 std::Result::Ok(v) -> { if v != (0 as u32) { return 33; } },
                 std::Result::Err(_) -> { return 34; },
             }
             dec wide_unsigned: u32 = 42 as u32;
-            dec wide_unsigned_result: std::Result<i64, std::TryConvertError> = wide_unsigned.try_convert();
+            dec wide_unsigned_result: std::Result<i64, std::TryConvertError> = std::TryConvert::try_convert(wide_unsigned);
             match wide_unsigned_result {
                 std::Result::Ok(v) -> { if v != (42 as i64) { return 20; } },
                 std::Result::Err(_) -> { return 21; },
             }
             dec too_wide: u64 = 3000000000u64;
-            dec too_wide_result: std::Result<i32, std::TryConvertError> = too_wide.try_convert();
+            dec too_wide_result: std::Result<i32, std::TryConvertError> = std::TryConvert::try_convert(too_wide);
             match too_wide_result {
                 std::Result::Err(std::TryConvertError::Overflow) -> {},
                 _ -> { return 22; },
             }
 
             dec signed_float: f32 = 127.9 as f32;
-            dec signed_float_result: std::Result<i8, std::TryConvertError> = signed_float.try_convert();
+            dec signed_float_result: std::Result<i8, std::TryConvertError> = std::TryConvert::try_convert(signed_float);
             match signed_float_result {
                 std::Result::Ok(v) -> { if v != (127 as i8) { return 23; } },
                 std::Result::Err(_) -> { return 24; },
             }
             dec signed_float_low: f32 = -128.5 as f32;
-            dec signed_float_low_result: std::Result<i8, std::TryConvertError> = signed_float_low.try_convert();
+            dec signed_float_low_result: std::Result<i8, std::TryConvertError> = std::TryConvert::try_convert(signed_float_low);
             match signed_float_low_result {
                 std::Result::Ok(v) -> { if v != (-128 as i8) { return 25; } },
                 std::Result::Err(_) -> { return 26; },
             }
             dec i32_min_float: f32 = -2147483648.0 as f32;
-            dec i32_min_result: std::Result<i32, std::TryConvertError> = i32_min_float.try_convert();
+            dec i32_min_result: std::Result<i32, std::TryConvertError> = std::TryConvert::try_convert(i32_min_float);
             match i32_min_result {
                 std::Result::Ok(v) -> { if v != (-2147483648 as i32) { return 35; } },
                 std::Result::Err(_) -> { return 36; },
             }
             dec float_low: f32 = -0.5 as f32;
-            dec float_low_result: std::Result<u32, std::TryConvertError> = float_low.try_convert();
+            dec float_low_result: std::Result<u32, std::TryConvertError> = std::TryConvert::try_convert(float_low);
             match float_low_result {
                 std::Result::Err(std::TryConvertError::Underflow) -> {},
                 _ -> { return 27; },
             }
             dec float_nan: f32 = std::f32_nan();
-            dec float_nan_result: std::Result<i32, std::TryConvertError> = float_nan.try_convert();
+            dec float_nan_result: std::Result<i32, std::TryConvertError> = std::TryConvert::try_convert(float_nan);
             match float_nan_result {
                 std::Result::Err(std::TryConvertError::Invalid) -> {},
                 _ -> { return 28; },
             }
             dec float_inf: f32 = std::f32_infinity();
-            dec float_inf_result: std::Result<i32, std::TryConvertError> = float_inf.try_convert();
+            dec float_inf_result: std::Result<i32, std::TryConvertError> = std::TryConvert::try_convert(float_inf);
             match float_inf_result {
                 std::Result::Err(std::TryConvertError::Overflow) -> {},
                 _ -> { return 29; },
             }
             dec float_neg_inf: f64 = std::f64_neg_infinity();
-            dec float_neg_inf_result: std::Result<i32, std::TryConvertError> = float_neg_inf.try_convert();
+            dec float_neg_inf_result: std::Result<i32, std::TryConvertError> = std::TryConvert::try_convert(float_neg_inf);
             match float_neg_inf_result {
                 std::Result::Err(std::TryConvertError::Underflow) -> {},
                 _ -> { return 30; },
             }
             dec float64_ok: f64 = 42.75;
-            dec float64_ok_result: std::Result<i32, std::TryConvertError> = float64_ok.try_convert();
+            dec float64_ok_result: std::Result<i32, std::TryConvertError> = std::TryConvert::try_convert(float64_ok);
             match float64_ok_result {
                 std::Result::Ok(v) -> { if v != 42 { return 31; } },
                 std::Result::Err(_) -> { return 32; },

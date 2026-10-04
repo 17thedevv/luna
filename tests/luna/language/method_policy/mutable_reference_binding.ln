@@ -1,0 +1,8 @@
+struct Counter { value: i32 };
+impl Counter { fn increment(self: &rw Self) { self.value += 1; } }
+fn main() -> i32 {
+    dec rw counter = Counter { value: 0 };
+    { dec reference = &rw counter; reference.increment(); }
+    if counter.value != 1 { return 1; }
+    return 0;
+}

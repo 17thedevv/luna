@@ -183,7 +183,7 @@ fn test_iter_for_each_basic() {
             dec c_ptr = &rw ctx as *rw Context;
 
             dec arr: [i32; 4] = [10, 20, 30, 40];
-            dec it = std::slice::slice_iter<i32>(&arr);
+            dec rw it = std::slice::slice_iter<i32>(&arr);
 
             dec rw running = true;
             while running {
@@ -411,7 +411,7 @@ fn test_iter_terminal_pipeline_chaining() {
 
         fn main() -> i32 {
             dec arr: [i32; 10] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-            dec it = std::slice::slice_iter<i32>(&arr);
+            dec rw it = std::slice::slice_iter<i32>(&arr);
             dec filtered = std::iter::iter_filter(it, is_even);          // 2, 4, 6, 8, 10
             dec mapped = std::iter::iter_map(filtered, square);          // 4, 16, 36, 64, 100
             dec pipeline = std::iter::iter_take(mapped, 3 as u64);       // 4, 16, 36
@@ -1231,7 +1231,7 @@ fn test_iter_fold_droptracker_accumulator() {
                 dec init_acc = TrackedAcc { val: 0, counter: c_ptr };
 
                 dec arr: [i32; 3] = [10, 20, 30];
-                dec it = std::slice::slice_iter<i32>(&arr);
+                dec rw it = std::slice::slice_iter<i32>(&arr);
 
                 // fold replaces acc 3 times:
                 // step 1: acc0 (val 0) + 10 -> acc1 (val 10), acc0 dropped

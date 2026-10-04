@@ -206,7 +206,7 @@ fn test_parity_vec_and_slices() {
             // 4. clone and resize
             dec rw v2 = v.clone();
             if v2.len() != (4 as u64) { return 11; }
-            v2.resize<i32>(2 as u64, 0);
+            v2.resize(2 as u64, 0);
             if v2.len() != (2 as u64) { return 12; }
 
             return 0;

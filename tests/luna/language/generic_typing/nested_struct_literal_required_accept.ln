@@ -1,0 +1,3 @@
+struct Item {};
+struct Wrapper<T> { item: T };
+fn main() { dec value = Wrapper<Item> { item: Item {} }; }

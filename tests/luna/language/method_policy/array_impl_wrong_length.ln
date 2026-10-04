@@ -1,0 +1,7 @@
+type QuadArray = [i32; 4];
+struct ArrayHolder<T> { item: T };
+impl<T> ArrayHolder<[T; 2]> { fn value(self: &Self) -> i32 { return 7; } }
+fn main() -> i32 {
+    dec value = ArrayHolder<QuadArray> { item: [1i32, 2i32, 3i32, 4i32] };
+    return value.value();
+}

@@ -1,0 +1,4 @@
+trait Contract<A> {}
+fn require<T: Contract<i32>>(value: T) {}
+fn invalid<T, V: Contract<T>>(value: V) { require(value); }
+fn main() {}

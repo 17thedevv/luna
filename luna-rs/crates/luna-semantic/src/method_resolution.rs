@@ -563,7 +563,13 @@ impl<'a> TypeChecker<'a> {
             if !self.method_receiver_is_mutable(object) {
                 self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call a method requiring a mutable receiver through an immutable reference or pointer")
                     .with_code(DiagnosticCode::CannotMutateImmutable).with_span(span));
-            } else {
+            } else if !matches!(
+                self.ctx.types.get(self.ctx.types.resolve(object_type)),
+                SemanticType::Reference(_, Mutability::Mutable, _)
+                    | SemanticType::Pointer(Mutability::Mutable, _)
+            ) {
+                // Mutating through a capability does not reassign the binding
+                // holding that reference or pointer.
                 self.enforce_mutability(&object);
             }
         }

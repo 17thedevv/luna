@@ -1,4 +1,4 @@
-trait Marker {} 
+trait Marker {}
 trait Fallback { fn value(self: &Self) -> i32; }
 struct Wrapper<T> { item: T };
 impl<T: Marker> Wrapper<T> { fn value(self: &Self) -> i32 { return 30; } }

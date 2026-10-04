@@ -1,0 +1,4 @@
+trait Loop {}
+impl<T: Loop> Loop for T {}
+fn require<T: Loop>(value: T) {}
+fn main() { require(7i32); }

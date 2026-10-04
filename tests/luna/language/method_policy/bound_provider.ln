@@ -1,0 +1,15 @@
+export trait Marker {}
+export trait Exposed { fn value(self: &Self) -> i32; }
+export struct Wrapper<T> { item: T };
+impl<T: Marker> Marker for Wrapper<T> {}
+impl<T: Marker> Exposed for Wrapper<T> {
+    fn value(self: &Self) -> i32 { return 7; }
+}
+export fn require<T: Exposed>(value: T) -> i32 { return 0; }
+export trait HasItem { type Item; }
+export trait Specialized { fn get(self: &Self) -> i32; }
+export struct AssocWrapper<T> { item: T };
+impl<T: HasItem<Item = i32>> Specialized for AssocWrapper<T> {
+    fn get(self: &Self) -> i32 { return 11; }
+}
+export fn require_assoc<T: Specialized>(value: T) -> i32 { return 0; }

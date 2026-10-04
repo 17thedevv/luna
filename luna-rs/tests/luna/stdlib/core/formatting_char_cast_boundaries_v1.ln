@@ -48,12 +48,12 @@ fn main() -> i32 {
     if (from_usize(1114111 as usize) as u32) != (1114111 as u32) { return 14; }
     if identity(unicode_max) != unicode_max { return 15; }
 
-    nul.fmt(&rw output).unwrap();
-    ascii_max.fmt(&rw output).unwrap();
-    two_byte_min.fmt(&rw output).unwrap();
-    before_surrogates.fmt(&rw output).unwrap();
-    after_surrogates.fmt(&rw output).unwrap();
-    unicode_max.fmt(&rw output).unwrap();
+    std::fmt::Display::fmt(&nul, &rw output).unwrap();
+    std::fmt::Display::fmt(&ascii_max, &rw output).unwrap();
+    std::fmt::Display::fmt(&two_byte_min, &rw output).unwrap();
+    std::fmt::Display::fmt(&before_surrogates, &rw output).unwrap();
+    std::fmt::Display::fmt(&after_surrogates, &rw output).unwrap();
+    std::fmt::Display::fmt(&unicode_max, &rw output).unwrap();
     std::io::println(output.as_bytes());
     return 0;
 }

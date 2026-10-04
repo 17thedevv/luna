@@ -22,10 +22,10 @@ impl std::fmt::Debug for Point {
     fn fmt<W: std::fmt::Writer>(self: &Self, writer: &rw W) -> std::Result<void, std::fmt::FmtError> {
         if writer.write_char('P').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
         if writer.write_char('(').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
-        if self.x.fmt(writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if std::fmt::Display::fmt(&self.x, writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
         if writer.write_char(',').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
         if writer.write_char(' ').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
-        if self.y.fmt(writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
+        if std::fmt::Display::fmt(&self.y, writer).is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
         if writer.write_char(')').is_err() { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
         return std::Result::Ok;
     }

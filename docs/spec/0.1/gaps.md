@@ -128,3 +128,38 @@ bodies, repeated references and relocated source/fresh-artifact provider graphs.
 See the [execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md).
 Clean-checkout and advertised-target release gates remain open, as do the
 independent ownership, method-selection and named/default-call gaps.
+
+
+## Method/binder checkpoint — 2026-10-05, still PARTIAL
+
+The maintainer's independent impl/method binder decision is implemented in
+selected method headers and monomorphization. Vec element bounds now reside on
+constrained impls. Applicable inherent/trait candidates are checked separately;
+ambiguity reports E1008, with explicit qualification selecting a trait contract.
+Provider-local checked impl headers retain individual declaration identity.
+Blanket-impl proof now checks recursive trait/associated-type premises; caller
+binders are rigid within that proof. Array header matching and mutable-reference
+receiver checks have dedicated positive/negative controls. Compiler artifact
+version 6 rejects earlier bodies; metadata schema 3 and MVIR 4 are unchanged.
+
+This does **not** close R2 or release conformance. The full run at `fbf4e72`
+records 1,270 PASS, 18 FAIL and 1 ignored (cargo exit101, 14 failing targets).
+Subsequent focused fixes do not turn that run into PASS. See the
+[execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md) for
+revision-specific evidence and follow-ups.
+
+Two additional standalone counterexamples are retained as required regressions,
+not passing certificates:
+
+- `tests/luna/language/generic_typing/rigid_return_required_reject.ln`: a generic
+  function returning an unrelated `i32` is accepted for `T = bool`, builds and
+  exits0. General TypeChecker unification still treats rigid generic parameters
+  as wildcards. This is a correctness blocker despite the stricter bound prover.
+- `tests/luna/language/generic_typing/nested_struct_literal_required_accept.ln`:
+  nested struct literals in field initializers are rejected by the parser.
+
+Canonical public metadata still groups some impl information by nominal head;
+its per-header identity/fingerprint contract needs further audit. Later fallback
+lookup paths and broader associated-projection domains remain unverified.
+Moved closure capture destruction, named/default argument implementation,
+remaining provider/diagnostic/target coverage and exact-candidate R5 stay open.

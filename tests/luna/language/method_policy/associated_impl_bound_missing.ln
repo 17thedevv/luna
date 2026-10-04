@@ -1,0 +1,4 @@
+import "bound_provider";
+struct Flag {};
+impl HasItem for Flag { type Item = bool; }
+fn main() -> i32 { dec item = Flag {}; dec value = AssocWrapper<Flag> { item: item }; return require_assoc(value); }

@@ -1,0 +1,3 @@
+import "bound_provider";
+fn invalid<T: HasItem>(value: AssocWrapper<T>) -> i32 { return value.get(); }
+fn main() {}

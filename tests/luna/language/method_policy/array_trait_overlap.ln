@@ -1,0 +1,6 @@
+type PairArray = [i32; 2];
+trait Pick {}
+struct ArrayHolder<T> { item: T };
+impl<T> Pick for ArrayHolder<[T; 2]> {}
+impl Pick for ArrayHolder<PairArray> {}
+fn main() {}

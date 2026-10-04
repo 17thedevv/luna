@@ -1,0 +1,10 @@
+trait Marked {}
+impl Marked for &i32 {}
+impl Marked for &rw i32 {}
+fn require<T: Marked>(value: T) {}
+fn main() -> i32 {
+    dec rw value: i32 = 7;
+    require(&value);
+    require(&rw value);
+    return 0;
+}

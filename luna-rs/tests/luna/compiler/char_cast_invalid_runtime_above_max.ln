@@ -8,6 +8,6 @@ fn cast_dynamic(value: u32) -> char {
 fn main() -> i32 {
     dec invalid = cast_dynamic(1114112 as u32);
     dec rw output = std::string_new();
-    invalid.fmt(&rw output).unwrap();
+    std::fmt::Display::fmt(&invalid, &rw output).unwrap();
     return 0;
 }
