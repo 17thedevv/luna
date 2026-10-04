@@ -1,0 +1,25 @@
+export module api {
+    export trait First { fn marker(&self) -> i32; }
+    export trait Second { fn marker(&self) -> i32; }
+    export trait Marker<V> { fn choose(&self, value: V) -> V; }
+    export trait BoundedTrait<Q: Second> { fn accept(&self, value: Q) -> Q; }
+    export trait HasBoundMethod { fn accept<R: First>(&self, value: R) -> R; }
+    export struct Bounded<A: First> { value: A, second: A };
+    export trait HasItem { type Item; }
+    export struct Holder<T> { value: T };
+    export struct Tag {};
+    impl First for Tag { fn marker(&self) -> i32 { return 1; } }
+    impl Second for Tag { fn marker(&self) -> i32 { return 2; } }
+    impl HasItem for Tag { type Item = i32; }
+    impl Marker<i32> for Holder<i32> { fn choose(&self, value: i32) -> i32 { return value; } }
+    impl Marker<bool> for Holder<bool> { fn choose(&self, value: bool) -> bool { return value; } }
+    impl<T: First> Holder<T> {
+        export fn get(&self) -> i32 { return 17; }
+        export fn echo<T: Second>(&self, value: T) -> T { return value; }
+    }
+    impl<T: HasItem<Item = i32>> Holder<T> { export fn constrained(&self) -> i32 { return 23; } }
+    impl Holder<i32> { export fn read(&self) -> i32 { return self.value; } }
+    impl Holder<bool> { export fn read(&self) -> bool { return self.value; } }
+    impl Holder<i32> { export fn echo_number(&self) -> i32 { return self.value; } }
+    export fn identity<V: First>(value: V) -> V { return value; }
+}

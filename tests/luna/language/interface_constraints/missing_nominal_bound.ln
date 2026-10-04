@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { dec value = api::Bounded<i32> { value: 17, second: 19 }; return value.value; }

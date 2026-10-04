@@ -1,0 +1,4 @@
+import "provider";
+struct Other {};
+impl api::HasItem for Other { type Item = bool; }
+fn main() -> i32 { dec value = api::Holder<Other> { value: Other {} }; return value.constrained(); }

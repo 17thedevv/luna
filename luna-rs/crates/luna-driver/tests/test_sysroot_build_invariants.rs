@@ -1,8 +1,8 @@
 //! Phase 4D: Sysroot Build Infrastructure Tests
 //!
 //! These tests verify:
-//! - Canonical dependency DAG integrity (read-only against canonical sysroot; 32 providers, 91 direct edges)
-//! - Persistent canonical .obj and .llib sidecar invariant (32 providers, 32 .ln, 32 .llib, 32 .obj)
+//! - Canonical dependency DAG integrity (read-only against the manifest's providers)
+//! - Persistent canonical .obj and .llib sidecar invariant (one pair per provider)
 //! - Absence of orphan/monolithic legacy artifacts
 //! - External builder execution and lock mutual exclusion strictly within ISOLATED test sysroots
 //!
@@ -19,8 +19,8 @@ use std::path::PathBuf;
 /// SECTION 4D.1: CANONICAL DEPENDENCY GRAPH VALIDATION (READ-ONLY)
 /// ======================================================================
 
-/// Test that all 32 canonical providers have no unknown dependencies,
-/// no self-edges, no duplicate nodes, and all edges resolve.
+/// Test that canonical providers have no unknown or duplicate dependencies,
+/// no self-edges or cycles, and all edges resolve.
 #[test]
 fn test_canonical_dag_integrity() {
     let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
@@ -42,7 +42,6 @@ fn test_canonical_dag_integrity() {
 
     // Build dependency graph from parsed imports
     let mut graph: BTreeMap<String, Vec<String>> = BTreeMap::new();
-    let mut all_edges: Vec<(String, String)> = Vec::new();
     let mut self_edges: Vec<String> = Vec::new();
 
     for provider in &canonical_providers {
@@ -91,13 +90,25 @@ fn test_canonical_dag_integrity() {
     assert_eq!(graph.len(), 49, "Expected 49 graph nodes");
 
     for (provider, deps) in &graph {
-        for dep in deps {
-            all_edges.push((provider.clone(), dep.clone()));
+        let unique: BTreeSet<_> = deps.iter().collect();
+        assert_eq!(deps.len(), unique.len(), "Duplicate dependencies for {provider}");
+    }
+    // Edge counts change when a provider declares a missing dependency. Verify
+    // the actual DAG property instead of freezing an incidental edge total.
+    let mut pending = graph.clone();
+    while !pending.is_empty() {
+        let ready: Vec<_> = pending
+            .iter()
+            .filter(|(_, deps)| deps.iter().all(|dep| !pending.contains_key(dep)))
+            .map(|(provider, _)| provider.clone())
+            .collect();
+        assert!(!ready.is_empty(), "Dependency cycle among: {:?}", pending.keys());
+        for provider in ready {
+            pending.remove(&provider);
         }
     }
-
-    // 209 edges (49 providers; includes io -> fmt for format string streaming)
-    assert_eq!(all_edges.len(), 209, "Expected exactly 209 dependency edges in canonical DAG");
+    assert!(graph["slice"].iter().any(|dep| dep == "copy"),
+        "slice's std::Copy bound must have an explicit provider dependency");
 }
 
 /// Helper: extract provider imports from source content
@@ -143,7 +154,7 @@ fn extract_provider_imports(
 /// Frozen Policy: Each canonical sysroot provider owns one persistent canonical .obj sidecar
 /// and one canonical .llib artifact.
 ///
-/// Invariant: 32 canonical providers -> exactly 32 .ln, 32 .llib, 32 .obj.
+/// Invariant: each manifest provider has a .ln, .llib and .obj.
 #[test]
 fn test_canonical_persistent_obj_and_llib_sidecars() {
     let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");

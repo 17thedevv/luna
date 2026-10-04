@@ -1,0 +1,25 @@
+export module api {
+    export trait First { fn marker(&self) -> i32; }
+    export trait Second { fn marker(&self) -> i32; }
+    export trait Marker<TraitOrFnItem> { fn choose(&self, value: TraitOrFnItem) -> TraitOrFnItem; }
+    export trait BoundedTrait<TraitItem: First> { fn accept(&self, value: TraitItem) -> TraitItem; }
+    export trait HasBoundMethod { fn accept<TraitMethodItem: First>(&self, value: TraitMethodItem) -> TraitMethodItem; }
+    export struct Bounded<NominalItem: First> { value: NominalItem, second: NominalItem };
+    export trait HasItem { type Item; }
+    export struct Holder<Element> { value: Element };
+    export struct Tag {};
+    impl First for Tag { fn marker(&self) -> i32 { return 1; } }
+    impl Second for Tag { fn marker(&self) -> i32 { return 2; } }
+    impl HasItem for Tag { type Item = i32; }
+    impl Marker<i32> for Holder<i32> { fn choose(&self, value: i32) -> i32 { return value; } }
+    impl Marker<bool> for Holder<bool> { fn choose(&self, value: bool) -> bool { return value; } }
+    impl<Element: First> Holder<Element> {
+        export fn get(&self) -> i32 { return 17; }
+        export fn echo<Element: Second>(&self, value: Element) -> Element { return value; }
+    }
+    impl<Element: HasItem<Item = i32>> Holder<Element> { export fn constrained(&self) -> i32 { return 23; } }
+    impl Holder<i32> { export fn read(&self) -> i32 { return self.value; } }
+    impl Holder<bool> { export fn read(&self) -> bool { return self.value; } }
+    impl Holder<i32> { export fn echo_number(&self) -> i32 { return self.value; } }
+    export fn identity<TraitOrFnItem: First>(value: TraitOrFnItem) -> TraitOrFnItem { return value; }
+}

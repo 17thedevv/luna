@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { dec value = api::Holder<api::Tag> { value: api::Tag {} }; return value.echo<i32>(17); }

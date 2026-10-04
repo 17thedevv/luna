@@ -4,6 +4,7 @@ import <ptr>;
 import <mem>;
 import <cmp>;
 import <clone>;
+import <copy>;
 
 // Provider-private helper used by the nested public std::slice sorting API.
 // Keeping this implementation at provider scope preserves its internal linkage.

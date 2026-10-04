@@ -112,6 +112,12 @@ method-level substitutions as applicable, imported definitions, and multiple
 instances. Distinct semantic instances must retain distinct backend identity;
 portable artifacts must not depend on session-local IDs.
 
+When public generic contracts change, verify canonical interface fingerprints
+and stale-dependent rejection as well as execution. Portable AST rechecking
+cannot compensate for constraints omitted from the public dependency identity.
+Include unchanged-contract controls for generic binder renaming, declaration
+order and body edits which preserve public effects.
+
 For ownership, references, raw pointers, FFI, or mutation, preserve Luna's
 separate semantic domains and frozen safety rules. Unsafe does not disable
 ownership, moves, borrow checking, region validity, or provenance. Do not

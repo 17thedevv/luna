@@ -36,6 +36,7 @@ mod raw_anchor_validation_tests {
             ty_index,
             visibility: 1,
             generic_params: Vec::new(),
+            constraints: crate::metadata::GenericConstraints::default(),
             symbol_id: StableSymbolId { provider_name: "test".into(), symbol_path: path.into() },
             children: BTreeMap::new(),
             lifetime_contract: None,
@@ -104,6 +105,48 @@ mod raw_anchor_validation_tests {
     }
 }
 
+/// Validate declaration ownership and index references before trusting generic
+/// contracts. Bounds must constrain a binder declared by that owner.
+pub fn validate_generic_contracts(interface: &crate::metadata::CanonicalInterface) -> Result<(), MlibError> {
+    use crate::metadata::{ExportedSymbol, GenericConstraints, StableSymbolId};
+    fn constraints(value: &GenericConstraints, parameters: &[StableSymbolId], len: usize) -> Result<(), MlibError> {
+        if value.traits.iter().any(|bound| !parameters.contains(&bound.param)
+            || bound.trait_args.iter().any(|&ty| ty as usize >= len))
+            || value.associated_equalities.iter().any(|bound| !parameters.contains(&bound.param)
+                || bound.target_type as usize >= len) {
+            return Err(MlibError::CorruptedData);
+        }
+        Ok(())
+    }
+    fn symbol(value: &ExportedSymbol, len: usize) -> Result<(), MlibError> {
+        if value.ty_index.is_some_and(|ty| ty as usize >= len) { return Err(MlibError::CorruptedData); }
+        constraints(&value.constraints, &value.generic_params, len)?;
+        for child in value.children.values() { symbol(child, len)?; }
+        Ok(())
+    }
+    let len = interface.types.len();
+    for value in interface.exported_symbols.values() { symbol(value, len)?; }
+    let mut owners = std::collections::HashSet::new();
+    for header in &interface.impl_headers {
+        if !owners.insert(&header.identity) || header.self_type as usize >= len
+            || header.trait_args.iter().any(|&ty| ty as usize >= len)
+            || header.associated_types.values().any(|&ty| ty as usize >= len)
+            || header.methods.len() != header.method_contracts.len() {
+            return Err(MlibError::CorruptedData);
+        }
+        constraints(&header.constraints, &header.generic_params, len)?;
+        for (name, method) in &header.method_contracts {
+            symbol(method, len)?;
+            if method.ty_index != header.methods.get(name).copied() { return Err(MlibError::CorruptedData); }
+        }
+    }
+    for definition in interface.traits.values() {
+        constraints(&definition.constraints, &definition.generic_params, len)?;
+        if definition.methods.values().any(|&ty| ty as usize >= len) { return Err(MlibError::CorruptedData); }
+    }
+    Ok(())
+}
+
 fn check_semantic_metadata_version(data: &[u8]) -> Result<(), MlibError> {
     if data.len() < std::mem::size_of::<u16>() {
         return Err(MlibError::CorruptedData);
@@ -154,6 +197,9 @@ pub fn validate_raw_storage_anchor_contracts(
 
     for symbol in interface.exported_symbols.values() {
         visit(symbol, interface)?;
+    }
+    for header in &interface.impl_headers {
+        for symbol in header.method_contracts.values() { visit(symbol, interface)?; }
     }
     Ok(())
 }
@@ -216,6 +262,9 @@ pub fn validate_raw_pointer_effects(
     }
 
     for symbol in interface.exported_symbols.values() { visit(symbol, interface)?; }
+    for header in &interface.impl_headers {
+        for symbol in header.method_contracts.values() { visit(symbol, interface)?; }
+    }
     Ok(())
 }
 
@@ -355,6 +404,7 @@ impl LlibReader {
                         bincode::deserialize(&data).map_err(|_| MlibError::CorruptedData)?;
                     validate_raw_storage_anchor_contracts(&metadata.interface)?;
                     validate_raw_pointer_effects(&metadata.interface)?;
+                    validate_generic_contracts(&metadata.interface)?;
                     semantic_opt = Some(metadata);
                 }
                 SectionType::TypeMetadata => {

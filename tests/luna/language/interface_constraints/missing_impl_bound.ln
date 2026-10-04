@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { dec value = api::Holder<i32> { value: 17 }; return value.get(); }

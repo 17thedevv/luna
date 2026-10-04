@@ -110,6 +110,7 @@ pub struct ProviderInterface {
     pub impl_self_types: HashMap<ExternalImplKey, luna_semantic::ty::SemanticTypeId>,
     /// Compilation-local checked headers reconstructed from source/portable AST.
     pub checked_impl_headers: HashMap<luna_ast::DeclId, luna_semantic::semantic_tables::CheckedImplHeader>,
+    pub decl_associated_types: HashMap<(luna_ast::DeclId, CanonicalSymbolId), luna_semantic::ty::SemanticTypeId>,
     pub impl_generic_params: HashMap<ExternalImplKey, Vec<CanonicalSymbolId>>,
     pub impl_generic_param_symbols: Vec<ExternalSymbol>,
     pub trait_associated_type_symbols: Vec<ExternalSymbol>,
@@ -833,6 +834,12 @@ impl ModuleRegistry {
                         generic_params: header.generic_params.iter().map(|&symbol| lookup_sym(symbol)).collect(),
                     });
             }
+            for ((declaration, associated), &ty) in &interface.decl_associated_types {
+                if let Some(associated) = resolve_canonical(associated) {
+                    let ty = ctx.types.clone_type_from(ty, &interface.types, &lookup_sym);
+                    ctx.tables.decl_associated_types.insert((*declaration, associated), ty);
+                }
+            }
             for (&m_decl, &i_decl) in &interface.method_to_impl_decl {
                 ctx.tables.method_to_impl_decl.insert(m_decl, i_decl);
                 if let Some(&m_sym) = ctx.tables.decl_symbols.get(&m_decl) {
@@ -1493,6 +1500,10 @@ impl ModuleRegistry {
             checked_impl_headers: ctx.tables.checked_impl_headers.iter()
                 .filter(|(declaration, _)| ranges.decls.contains(&declaration.0))
                 .map(|(&declaration, header)| (declaration, header.clone())).collect(),
+            decl_associated_types: ctx.tables.decl_associated_types.iter()
+                .filter(|((declaration, _), _)| ranges.decls.contains(&declaration.0))
+                .map(|(&(declaration, associated), &ty)|
+                    ((declaration, Self::get_canonical(associated, ctx, provider_id)), ty)).collect(),
             impl_generic_params,
             impl_generic_param_symbols,
             trait_associated_type_symbols,
