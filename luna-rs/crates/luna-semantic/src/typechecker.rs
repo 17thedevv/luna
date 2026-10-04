@@ -4621,6 +4621,7 @@ impl<'a> TypeChecker<'a> {
             }
             Expr::Member { object, member } => {
                 let obj_ty_id = self.typecheck_expr(object);
+                let obj_ty_id = self.ctx.types.resolve_inference(obj_ty_id);
                 let obj_ty = self.ctx.types.get(obj_ty_id).clone();
                 let member_name = self.get_span_text(*member);
                 
@@ -4628,7 +4629,7 @@ impl<'a> TypeChecker<'a> {
                 let dyn_trait_sym = match &obj_ty {
                     SemanticType::DynTrait(sym) => Some(*sym),
                     SemanticType::Pointer(_, inner) | SemanticType::Reference(_, _, inner) => {
-                        if let SemanticType::DynTrait(sym) = self.ctx.types.get(*inner) {
+                        if let SemanticType::DynTrait(sym) = self.ctx.types.get(self.ctx.types.resolve_inference(*inner)) {
                             Some(*sym)
                         } else {
                             None
@@ -4657,7 +4658,7 @@ impl<'a> TypeChecker<'a> {
                 
                 let peeled_ty = match &obj_ty {
                     SemanticType::Pointer(_, inner) | SemanticType::Reference(_, _, inner) => {
-                        self.ctx.types.get(*inner).clone()
+                        self.ctx.types.get(self.ctx.types.resolve_inference(*inner)).clone()
                     }
                     _ => obj_ty.clone(),
                 };
@@ -6546,6 +6547,7 @@ impl<'a> TypeChecker<'a> {
             }
             luna_ast::Expr::Member { object, .. } | luna_ast::Expr::TupleIndex { object, .. } => {
                 let obj_ty = self.ctx.tables.expr_types.get(object).copied().unwrap_or(crate::ty::SemanticTypeId(0));
+                let obj_ty = self.ctx.types.resolve_inference(obj_ty);
                 match self.ctx.types.get(obj_ty) {
                     SemanticType::Reference(_, crate::ty::Mutability::Immutable, _) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
@@ -6563,6 +6565,7 @@ impl<'a> TypeChecker<'a> {
             }
             luna_ast::Expr::Index { base, .. } => {
                 let base_ty = self.ctx.tables.expr_types.get(base).copied().unwrap_or(crate::ty::SemanticTypeId(0));
+                let base_ty = self.ctx.types.resolve_inference(base_ty);
                 match self.ctx.types.get(base_ty) {
                     SemanticType::Reference(_, crate::ty::Mutability::Immutable, _) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
@@ -6577,6 +6580,7 @@ impl<'a> TypeChecker<'a> {
             }
             luna_ast::Expr::Unary { op: luna_ast::expr::UnaryOp::Deref | luna_ast::expr::UnaryOp::DerefMut, operand } => {
                 let ptr_ty = self.ctx.tables.expr_types.get(operand).copied().unwrap_or(crate::ty::SemanticTypeId(0));
+                let ptr_ty = self.ctx.types.resolve_inference(ptr_ty);
                 if let SemanticType::Pointer(crate::ty::Mutability::Immutable, _) = self.ctx.types.get(ptr_ty) {
                     let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                     self.ctx.diagnostics.push(Diagnostic::error("E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot borrow through an immutable raw pointer as mutable").with_code(DiagnosticCode::CannotMutateImmutable)

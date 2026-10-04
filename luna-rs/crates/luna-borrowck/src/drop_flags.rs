@@ -1,4 +1,4 @@
-//! Lower whole-local conditional cleanup without weakening definite use checks.
+//! Lower conditional local/subplace cleanup without weakening definite use checks.
 use crate::{
     dataflow::{DataflowAnalysis, DataflowEngine},
     effect::CallEffectSummary,
@@ -49,12 +49,11 @@ pub(crate) fn elaborate(
             } = &func.value(id).inst
             {
                 if let Some(place) = analyzer.values_to_places.get(value) {
-                    if place.projections.is_empty()
-                        && matches!(func.value(place.local).inst, Instruction::Alloca)
+                    if matches!(func.value(place.local).inst, Instruction::Alloca)
                         && analyzer.get_place_state(place, &state) == MoveState::ConditionallyMoved
                     {
-                        conditional.insert(id, place.local);
-                        locals.insert(place.local, ());
+                        conditional.insert(id, place.clone());
+                        locals.insert(place.clone(), ());
                     }
                 }
             }
@@ -67,24 +66,24 @@ pub(crate) fn elaborate(
 
     // Record the same ownership transitions that move analysis uses, at each
     // runtime operation, rather than deriving initialization from a CFG join.
-    let mut updates: HashMap<ValueId, Vec<(ValueId, bool)>> = HashMap::new();
+    let mut updates: HashMap<ValueId, Vec<(Place, bool)>> = HashMap::new();
     for block in &func.blocks {
         let mut state = incoming.get(&block.label.name).cloned().unwrap_or_default();
         for &id in &block.insts {
             let before: Vec<_> = locals
                 .keys()
-                .map(|&local| (local, analyzer.get_place_state(&Place::new(local), &state)))
+                .map(|place| (place.clone(), analyzer.get_place_state(place, &state)))
                 .collect();
             analyzer.transfer_instruction(id, &func.value(id).inst, &mut state);
-            for (local, previous) in before {
-                let current = analyzer.get_place_state(&Place::new(local), &state);
-                if current != previous || id == local {
+            for (place, previous) in before {
+                let current = analyzer.get_place_state(&place, &state);
+                if current != previous || id == place.local {
                     let initialized = match current {
                         MoveState::Live => true,
                         MoveState::Moved | MoveState::Dropped | MoveState::Uninitialized => false,
                         _ => continue,
                     };
-                    updates.entry(id).or_default().push((local, initialized));
+                    updates.entry(id).or_default().push((place, initialized));
                 }
             }
         }
@@ -104,7 +103,7 @@ pub(crate) fn elaborate(
             },
             bool_ty,
         ));
-        flags.insert(*local, flag);
+        flags.insert(local.clone(), flag);
     }
     let mut labels: HashSet<_> = func
         .blocks
@@ -157,12 +156,12 @@ pub(crate) fn elaborate(
                 current.insts.push(id);
             }
             if let Some(events) = updates.get(&id) {
-                for &(local, initialized) in events {
+                for (place, initialized) in events {
                     current.insts.push(append(
                         func,
                         Instruction::Store {
-                            ptr: Operand::Value(flags[&local]),
-                            value: Operand::Boolean(initialized),
+                            ptr: Operand::Value(flags[place]),
+                            value: Operand::Boolean(*initialized),
                         },
                         bool_ty,
                     ));

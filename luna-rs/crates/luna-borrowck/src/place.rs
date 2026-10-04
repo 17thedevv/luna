@@ -1,13 +1,13 @@
 ﻿use luna_mvir::ValueId;
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Projection {
     Field(usize),
     Deref,
     Index,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Place {
     pub local: ValueId,
     pub projections: Vec<Projection>,

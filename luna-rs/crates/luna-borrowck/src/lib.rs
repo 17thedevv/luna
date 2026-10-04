@@ -45,7 +45,7 @@ pub fn borrow_check_function_with_shadow(
     analyze_with_guarded_drops(func, _ctx, summaries, Default::default())
 }
 
-/// Elaborate path-dependent local cleanup, then validate all ordinary uses.
+/// Elaborate path-dependent local/subplace cleanup, then validate all ordinary uses.
 /// The proof set is produced only by the CFG transformation, never by callers.
 pub fn borrow_check_function_with_drop_flags(
     func: &mut Function,

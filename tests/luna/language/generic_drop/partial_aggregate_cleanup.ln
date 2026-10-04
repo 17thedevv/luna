@@ -1,0 +1,108 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec pair = resources::Split {
+            first: resources::tracked(counter, 1),
+            second: resources::tracked(counter, true),
+        };
+        resources::consume(pair.first);
+        if count != 1 { return 1; }
+    }
+    if count != 2 { return 2; }
+    {
+        dec nested = (resources::tracked(counter, 2),
+            (resources::tracked(counter, false), resources::tracked(counter, 3)));
+        resources::consume((nested.1).0);
+        if count != 3 { return 3; }
+    }
+    if count != 5 { return 4; }
+    for (dec rw round: i32 = 0; round < 2; round += 1) {
+        dec flag: bool = round == 0;
+        {
+            dec pair = resources::Split {
+                first: resources::tracked(counter, flag),
+                second: resources::tracked(counter, 4),
+            };
+            if flag { resources::consume(pair.first); }
+        }
+    }
+    if count != 9 { return 5; }
+    {
+        dec rw pair = resources::Split {
+            first: resources::tracked(counter, 5),
+            second: resources::tracked(counter, true),
+        };
+        resources::consume(pair.first);
+        pair.first = resources::tracked(counter, 6);
+    }
+    if count != 12 { return 6; }
+    {
+        dec pair = resources::Split {
+            first: resources::tracked(counter, 7),
+            second: resources::tracked(counter, false),
+        };
+        resources::consume(pair);
+    }
+    if count != 14 { return 7; }
+    for (dec rw round: i32 = 0; round < 2; round += 1) {
+        dec pair = resources::Split {
+            first: resources::tracked(counter, 8),
+            second: resources::tracked(counter, true),
+        };
+        if round == 0 { resources::consume(pair); }
+    }
+    if count != 18 { return 8; }
+    {
+        dec rw pair = resources::Split {
+            first: resources::tracked(counter, 9),
+            second: resources::tracked(counter, true),
+        };
+        resources::consume(pair.first);
+        pair = resources::Split {
+            first: resources::tracked(counter, 10),
+            second: resources::tracked(counter, false),
+        };
+    }
+    if count != 22 { return 9; }
+    {
+        dec first = resources::split_first(resources::Split {
+            first: resources::tracked(counter, false),
+            second: resources::tracked(counter, 11),
+        });
+        if count != 23 { return 10; }
+    }
+    if count != 24 { return 11; }
+    {
+        dec second = resources::split_second(resources::Split {
+            first: resources::tracked(counter, true),
+            second: resources::tracked(counter, 12),
+        });
+        if count != 25 { return 12; }
+    }
+    if count != 26 { return 13; }
+    dec rw trace = 0;
+    dec log = &rw trace as *rw i32;
+    {
+        dec nested = resources::Split {
+            first: resources::Trace { value: 1, tag: 1, log: log },
+            second: (resources::Trace { value: true, tag: 2, log: log },
+                resources::Trace { value: 3, tag: 3, log: log }),
+        };
+        resources::consume(nested.first);
+        if trace != 1 { return 14; }
+    }
+    if trace != 132 { return 15; }
+    {
+        dec pair = resources::Split {
+            first: resources::tracked(counter, 13),
+            second: resources::tracked(counter, true),
+        };
+        dec remaining = &pair.second;
+        resources::consume(pair.first);
+        if remaining.value != true { return 16; }
+    }
+    if count != 28 { return 17; }
+    return 0;
+}

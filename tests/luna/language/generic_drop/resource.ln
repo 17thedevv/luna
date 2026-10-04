@@ -9,6 +9,19 @@ export module resources {
         return Tracked<T> { value: value, counter: counter };
     }
     export struct Envelope<T> { value: T, };
+    export struct Split<A, B> { first: A, second: B, };
+    export fn split_first<A, B>(pair: Split<A, B>) -> A {
+        return pair.first;
+    }
+    export fn split_second<A, B>(pair: Split<A, B>) -> B {
+        pair.second
+    }
+    export struct Trace<T> { value: T, tag: i32, log: *rw i32, };
+    impl<T> std::Drop for Trace<T> {
+        fn drop(&rw self) {
+            unsafe { *self.log = *self.log * 10 + self.tag; }
+        }
+    }
     impl<T> Envelope<T> {
         export fn pair<U>(self, other: U) -> (Self, U) {
             return (self, other);

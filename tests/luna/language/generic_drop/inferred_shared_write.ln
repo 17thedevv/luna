@@ -1,0 +1,8 @@
+import "resource";
+fn main() {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    dec rw value = resources::tracked(counter, 1);
+    dec rw shared = &value;
+    shared.value = 2;
+}

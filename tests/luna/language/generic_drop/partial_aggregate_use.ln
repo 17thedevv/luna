@@ -1,0 +1,11 @@
+import "resource";
+fn main() {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    dec pair = resources::Split {
+        first: resources::tracked(counter, 1),
+        second: resources::tracked(counter, true),
+    };
+    resources::consume(pair.first);
+    resources::consume(pair);
+}
