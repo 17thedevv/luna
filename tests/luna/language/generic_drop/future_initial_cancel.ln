@@ -1,0 +1,28 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec future = resources::future_consume(resources::tracked(counter, 1));
+        if count != 0 { return 1; }
+    }
+    if count != 1 { return 2; }
+    {
+        dec future = resources::future_consume(resources::Split {
+            first: resources::tracked(counter, 2),
+            second: resources::tracked(counter, true),
+        });
+        if count != 1 { return 3; }
+    }
+    if count != 3 { return 4; }
+    dec rw trace = 0;
+    dec log = &rw trace as *rw i32;
+    {
+        dec future = resources::future_pair(
+            resources::Trace { value: 3, tag: 1, log: log },
+            resources::Trace { value: false, tag: 2, log: log });
+        if trace != 0 { return 5; }
+    }
+    if trace != 21 { return 6; }
+    return 0;
+}

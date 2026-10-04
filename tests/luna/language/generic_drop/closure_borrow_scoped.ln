@@ -1,0 +1,10 @@
+fn main() -> i32 {
+    dec x = 10;
+    dec closure = |y: i32| -> i32 { x + y };
+    if closure(2) != 12 { return 1; }
+    if closure(3) != 13 { return 2; }
+    dec reference = &x;
+    dec moved = move |y: i32| -> i32 { *reference + y };
+    if moved(4) != 14 { return 3; }
+    return 0;
+}

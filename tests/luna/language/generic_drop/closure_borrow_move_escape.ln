@@ -1,0 +1,8 @@
+type ClosureType = typeof(|y: i32| -> i32 { y });
+fn make_closure() -> ClosureType {
+    dec x = 10;
+    dec reference = &x;
+    dec closure = move |y: i32| -> i32 { *reference + y };
+    return closure;
+}
+fn main() { dec closure = make_closure(); }
