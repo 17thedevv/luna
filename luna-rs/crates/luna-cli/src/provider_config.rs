@@ -102,11 +102,27 @@ pub fn load(
                 ),
             ));
         }
-        let stem = if stem.is_absolute() {
-            stem
-        } else {
-            file.parent().unwrap().join(stem)
-        };
+        // Project path policy is independent of the host OS: a Windows drive
+        // or UNC/root path must also reject when the loader runs on Unix.
+        let bytes = path.as_bytes();
+        let drive_qualified =
+            bytes.len() >= 2 && bytes[0].is_ascii_alphabetic() && bytes[1] == b':';
+        if drive_qualified || path.starts_with(['/', '\\']) || stem.has_root() {
+            return Err(error(
+                &file, &source, range,
+                format!("Provider '{}' requires a relative path; rooted and drive-qualified paths are forbidden", name),
+            ));
+        }
+        if path.starts_with('~') || path.contains(['$', '%']) || path.chars().any(char::is_control)
+        {
+            return Err(error(
+                &file, &source, range,
+                format!("Provider '{}' path cannot contain home/environment expansion markers or control characters", name),
+            ));
+        }
+        // Only file contents are relative-only. The driver still receives an
+        // absolute discovery stem anchored to the selected configuration.
+        let stem = file.parent().unwrap().join(stem);
         bindings.insert(
             name,
             ProviderBinding {

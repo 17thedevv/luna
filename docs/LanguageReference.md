@@ -62,8 +62,11 @@ geo = "../shared/geometry"
 
 File `luna.toml` gần entry file nhất được chọn cho toàn bộ lần biên dịch, kể cả
 dependency bắc cầu. `import <geo>;` tìm provider tại stem đã cấu hình; provider
-vẫn tự khai báo namespace, ví dụ `geometry`. Đường dẫn tương đối tính từ file
-TOML, không từ thư mục chạy lệnh. `--config FILE` chọn rõ file, `--no-config`
+vẫn tự khai báo namespace, ví dụ `geometry`. Giá trị trong TOML bắt buộc là
+đường dẫn tương đối tính từ thư mục chứa TOML, không từ thư mục chạy lệnh;
+`../` và `../../` hợp lệ, nên dùng `/` kể cả Windows. Absolute path, drive path
+(kể cả `C:foo`), root/UNC/device path, home/environment marker báo E6008.
+CLI `-I` và đường dẫn absolute đã resolve trong driver vẫn được phép. `--config FILE` chọn rõ file, `--no-config`
 tắt cấu hình. Import đường dẫn cũ vẫn hoạt động. Không tự import, build lại
 artifact, tải package hoặc trộn config của dependency. Xem
 [PROVIDER-CONFIG-v1](spec/0.1/provider-config-v1.md) và

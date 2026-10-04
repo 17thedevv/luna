@@ -1,0 +1,20 @@
+python docs/tools/build_v01_docs.py
+{
+  "documents": 168,
+  "roles": {
+    "adopted-contract": 14,
+    "canonical": 13,
+    "evidence": 8,
+    "guidance": 28,
+    "historical": 105
+  },
+  "original_site_pages": 14
+}
+
+python docs/tools/validate_v01_docs.py
+{
+  "documents": 168,
+  "site_pages": 27,
+  "checked_local_links": 1047,
+  "errors": []
+}

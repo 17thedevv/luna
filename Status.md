@@ -37,3 +37,9 @@ Aliases, existing imports, provider identity and strict artifact rejection are
 preserved. See the [feature verification record](docs/audits/alpha-modules-2026-10-03/README.md)
 for current source fingerprints, commands and regression failures. This update
 does not replace the dated audit above or establish release conformance.
+
+Provider configuration was tightened on 2026-10-04 to relative-only file values.
+Absolute/drive/root/UNC/device paths and expansion markers reject with E6008;
+internal resolved paths and CLI search paths may remain absolute. See the
+[amendment verification](docs/audits/provider-config-relative-2026-10-04/README.md).
+Release conformance remains blocked; this does not close the older workspace gaps.

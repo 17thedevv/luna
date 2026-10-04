@@ -1,0 +1,2 @@
+# Preserve hashed transcript bytes without code-diff noise.
+*.log -text -diff

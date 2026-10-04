@@ -76,8 +76,10 @@ fn main() -> i32 { return answer() - 42; }
 ```
 
 Here the selected provider must declare `geometry::answer`. The `geo` key
-does not rename its namespace. Paths are extensionless stems, relative to
-this configuration. `check`, `build` and `run` select the nearest config
+does not rename its namespace. File values must be relative, extensionless
+stems resolved from this configuration; use `/` on every host. Absolute,
+drive-qualified/rooted values and home/environment markers reject with E6008.
+Absolute CLI search paths and internal driver paths remain available. `check`, `build` and `run` select the nearest config
 from the entry file; `--config FILE` overrides it and `--no-config` disables
 it. Existing relative imports remain available. See the
 [using contract](docs/spec/0.1/namespace-using-v1.md) and

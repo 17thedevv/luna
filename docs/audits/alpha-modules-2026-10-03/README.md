@@ -225,3 +225,12 @@ opening, plus removal of an undated claim treating historical parser failures
 as current restrictions. Historical grammar results remain in the gap register;
 current checks are reported separately. Implementation status remains separate
 from contract authority.
+
+## Later contract amendment — 2026-10-04
+
+This record describes `4a5adf4`, which initially allowed absolute TOML values.
+The maintainer subsequently required relative-only values; the
+[current contract](../../spec/0.1/provider-config-v1.md) and
+[new verification record](../provider-config-relative-2026-10-04/README.md)
+supersede that path policy. Logs, original source hashes and test counts above
+remain historical evidence of the earlier contract.

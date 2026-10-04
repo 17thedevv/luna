@@ -210,6 +210,11 @@
     "owner": "modules"
   },
   {
+    "path": "docs/audits/provider-config-relative-2026-10-04/README.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/repair-0.1/README.md",
     "role": "evidence",
     "owner": "conformance"
