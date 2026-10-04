@@ -928,7 +928,11 @@ impl<'a> MvirGenerator<'a> {
                     }
                     let sym_id = self.canonical_constant_symbol(sym_id);
                     if let Some(value) = self.ctx.const_values.get(&sym_id).cloned() {
-                        let ty = self.get_expr_type(expr_id);
+                        // Array-size comptime evaluation can lower a constant
+                        // identifier before that expression has a type-table
+                        // entry. Storage has the checked declaration's type.
+                        let ty = self.get_symbol_type(&sym_id)
+                            .unwrap_or_else(|| self.get_expr_type(expr_id));
                         let symbol = self.ctx.symbol_table.get_symbol(sym_id);
                         let scope = &self.ctx.symbol_table.scopes[symbol.scope.0 as usize];
                         if matches!(scope.kind, luna_semantic::symbol::ScopeKind::Global | luna_semantic::symbol::ScopeKind::Module) {
@@ -2499,7 +2503,8 @@ impl<'a> MvirGenerator<'a> {
                         if matches!(self.ctx.symbol_table.scopes[scope.0 as usize].kind,
                             luna_semantic::symbol::ScopeKind::Global | luna_semantic::symbol::ScopeKind::Module) {
                             let ptr = self.generate_lvalue(expr_id);
-                            return Operand::Value(self.push_inst(Instruction::Load { ptr }, ty_id));
+                            let constant_ty = self.get_symbol_type(&constant_sym).unwrap_or(ty_id);
+                            return Operand::Value(self.push_inst(Instruction::Load { ptr }, constant_ty));
                         }
                         return self.materialize_comptime_value(&ct_val, ty_id);
                     }
