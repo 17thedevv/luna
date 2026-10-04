@@ -1,0 +1,32 @@
+{
+  "implementation_revision": "f5936c3344788168320dfd4b661532c2cfad8a8d",
+  "compiler_header_version": 3,
+  "rejected_compiler_versions": [
+    1,
+    2
+  ],
+  "release_ready": false,
+  "evidence": {
+    "r2-cleanup-compat-build.txt": {
+      "sha256": "23dc8e35ede38ad260603abd896f28219596ca9478b273cffe07a18c46291dbe",
+      "exit_code": 0
+    },
+    "r2-cleanup-compat-sysroot.txt": {
+      "sha256": "b52752b30676d07f44775fca053343f1ad29d93dcc72615bf2cd419d83238d67",
+      "exit_code": 0
+    },
+    "r2-cleanup-compat-reader-driver.txt": {
+      "sha256": "ae5f8531c4eb2e0652ffa2ba7135adbf200eaee1a52760a42648b6f5b78840ca",
+      "exit_code": 0
+    },
+    "r2-cleanup-compat-execution-cli.txt": {
+      "sha256": "5d205bb8fb732c8ea56adf7aa94d1e69268a48210226557e6c8a92c740e5e37d",
+      "exit_code": 0
+    }
+  },
+  "focused_tests": {
+    "reader_driver_passed": 35,
+    "cli_execution_dependencies_passed": 1
+  },
+  "remaining_scope": "See EXECUTION.md; no full workspace or CI PASS on this revision."
+}

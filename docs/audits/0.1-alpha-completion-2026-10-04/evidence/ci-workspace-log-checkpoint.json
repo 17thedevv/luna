@@ -1,0 +1,11 @@
+{
+  "workflow_run_id": 37190486969,
+  "job_id": 111401430532,
+  "revision": "5ef8137073c7a5416ad8a271b91ce3455675b00c",
+  "retrieval": "Authenticated GitHub connector; public HTTP403 in the earlier metadata snapshot did not prevent this subsequent retrieval.",
+  "log": "ci-workspace-5ef8137-ubuntu.txt.gz",
+  "compressed_sha256": "ca46f59700f1c76818b89449df34adbe3f38f1756e5dc10cc669f25a6db4e624",
+  "uncompressed_sha256": "fafa84870471994e1901154bfc470b0ceb1dcf21fc926aaa992193fe080e865a",
+  "normalization": "Trailing blank lines at EOF removed; all timestamped output lines and whitespace are otherwise retained.",
+  "conclusion": "Full workspace job failed at generic_drop_cli closure_capture native exit3 in source and artifact; fail-fast command does not inventory later suites."
+}
