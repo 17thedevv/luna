@@ -52,6 +52,87 @@ escape. Then implement adopted method policy and named/default calls, complete
 diagnostics/provider/retained-contract matrices, reconcile current docs and take
 R5 exact-candidate regression gates. No tag or merge recommendation yet.
 
+## R1 ownership checkpoint — continued 2026-10-04
+
+Implementation revision: `cd9987a` (`fix(ownership): elaborate local drop flags and repair aggregate cleanup`).
+
+Status: **PARTIAL; release gate remains open.** New public CLI fixtures live in
+`tests/luna/language/generic_drop`, orchestrated by `generic_drop_cli` using
+fresh source-only and artifact-only sysroots. The imported user provider is
+published in a separate CLI invocation; its `.ln` is removed in artifact mode.
+The closure fixture remains a failing assertion, not an ignored or reclassified
+test. No full workspace PASS is implied by this checkpoint.
+
+- Fixed context leakage from an aggregate's expected type into unrelated
+  tuple/array elements. Empty arrays retain their declared element type.
+- Fixed managed-place overwrite: transfer the replacement first, destroy the
+  initialized old value, then store. Self-assignment, moved-from initialization,
+  Drop-owner field replacement and safe-reference replacement have runtime
+  counter controls. Raw storage writes remain initialization without implicit
+  old-value destruction under PTR-MEM-3, using type/place classification rather
+  than a library function name. The initial overly broad overwrite change caused
+  three Vec/Box heap-corruption regressions; preserve the failure log and use the
+  passing specific rerun below to supersede only those failures.
+- Added array drop discovery and a typed reverse-index loop, including empty
+  arrays. Enum drop glue selects only the active payload; tuple payloads use
+  their ordinary generic glue. Controls include multiple concrete payloads,
+  nested wrappers, arrays, empty variants and multiple-field variants.
+- Whole-local path-dependent cleanup now uses runtime initialization flags
+  derived from ownership transitions and guarded CFG drops. The generated proof
+  set suppresses only the guarded cleanup diagnostic; ordinary conditional use
+  still rejects E3001. Both `check` and `build` use the same elaboration entry.
+  Projected/partially moved aggregate cleanup remains separate audit work.
+- Statement-only closure outputs infer void; closure calls check their actual
+  parameter/return signature. Captures are stored into their environment, and
+  the closure body loads the environment pointer before accessing its fields.
+  The earlier native access violation is gone, but `closure_capture` still
+  exits **3** in both modes: an unused owned capture is not destroyed. Closure
+  environment destruction and repeated invocation after consuming a capture
+  are not certified. The latter callable policy has been presented to the
+  maintainer; do not infer a decision from silence.
+- Backend drop calls reject a missing callee instead of silently succeeding.
+  Pre/post-optimization MVIR verification now returns typed E6001 errors instead
+  of returning successful compilation. Internal tests cover invalid IR, missing
+  drop glue, valid external destructors and unhandled instructions.
+
+Evidence:
+
+- [Initial matrix](evidence/r1-generic-drop-initial.txt) and
+  [overwrite intermediate run](evidence/r1-generic-drop-after-overwrite.txt)
+  preserve the original failures and first reduced repairs.
+- [Final CLI matrix](evidence/r1-drop-final-cli.txt): nine positive ownership
+  fixtures execute exit0 in each mode; five negative fixtures reject in both
+  `check` and `build`, in each mode. The closure fixture fails exit3 in both.
+  Independent literal and trait-argument CLI suites pass. These counts describe
+  fixture outcomes; the generic drop harness as a whole is **FAILED**.
+- [Semantic/borrowck regressions](evidence/r1-drop-semantic-borrow-regressions.txt)
+  pass. This run includes drop flags but predates the subsequent raw-storage
+  classification adjustment in MVIR; it is not exact-final whole-workspace proof.
+- [Driver regression failure](evidence/r1-drop-driver-regressions.txt) records
+  three native heap-corruption failures introduced by the initial overwrite
+  change. [Specific rerun](evidence/r1-drop-final-driver.txt) checks the corrected
+  raw-storage boundary with fresh [canonical artifacts](evidence/r1-drop-final-sysroot.txt).
+  The final rerun is **31/31 PASS** (backend 4, generic drop 7, subplace 10, Vec 10).
+- [Workspace compile check](evidence/r1-drop-workspace-check.txt) passes with
+  existing warnings. It is not the full workspace test/release gate.
+
+The adopted per-call defaults decision remains unchanged. Method Option A and
+CALL-ARGUMENTS-v1 implementation, closure cleanup, remaining R1/R2/R3 matrices,
+documentation reconciliation and R5 release gates remain in the goal's scope.
+
+Compiler Change
+    Capability: Generic managed overwrite, aggregate destruction, conditional local cleanup and closure environment transfer.
+    Why stdlib exposed it: The generic ownership audit and existing nested Vec/Box drop regressions exercise the same machinery.
+    Why it is generic: Type/place identities and ownership transitions govern cleanup; raw initialization is distinguished from safe-place overwrite without container or function-name branches.
+    User-defined type benefiting: Tracked<T>, Envelope<T>, Owner<T>, Choice<T> and Mixed<A, B> in an independently imported provider.
+    Tests: generic_drop_cli; backend_fail_closed_tests; compiler_gap_c_gap_01_drop_mono_tests; p0b_drop_subplace_tests; stdlib_vec_element_drop_acceptance_tests.
+    New intrinsic/lang_item?: NO
+    Stdlib-specific branch?: NO
+
+SKILL IMPACT: none for these fixes. Existing PTR-MEM-3, ownership, compiler
+boundary and full-capability validation guidance already state the relevant
+rules; the discovered implementation gaps do not redefine those contracts.
+
 ## Compiler–stdlib boundary report
 
 Compiler Change
