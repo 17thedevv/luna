@@ -305,7 +305,7 @@ impl SemanticContext {
                         self.matches_impl_pattern(a1, a2, generic_params, subst)
                     })
             }
-            (&SemanticType::Reference(ref m1, _, inner1), &SemanticType::Reference(ref m2, _, inner2)) => {
+            (&SemanticType::Reference(_, ref m1, inner1), &SemanticType::Reference(_, ref m2, inner2)) => {
                 m1 == m2 && self.matches_impl_pattern(inner1, inner2, generic_params, subst)
             }
             (&SemanticType::Pointer(ref m1, inner1), &SemanticType::Pointer(ref m2, inner2)) => {

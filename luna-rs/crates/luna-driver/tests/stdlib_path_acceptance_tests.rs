@@ -5,6 +5,9 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+#[path = "support/canonical_artifacts.rs"]
+mod canonical_artifacts;
+
 fn create_temp_dir() -> PathBuf {
     let dir = std::env::temp_dir().join(format!(
         "luna_path_semantics_{}_{}",
@@ -136,10 +139,9 @@ fn path_provider_source_llib_loading_parity() {
 
     assert!(source_external.join("path").join("path.ln").exists());
     assert!(!source_external.join("path").join("path.llib").exists());
-    assert_eq!(count_files_with_extension(&source_external, "llib"), 35);
+    canonical_artifacts::assert_inventory(&source_external, &["path/path"]);
     assert_eq!(count_files_with_extension(&artifact_external, "ln"), 0);
-    assert_eq!(count_files_with_extension(&artifact_external, "llib"), 36);
-    assert_eq!(count_files_with_extension(&artifact_external, "obj"), 36);
+    canonical_artifacts::assert_inventory(&artifact_external, &[]);
 
     let source = include_str!("../../../tests/luna/stdlib/path/path_semantics_v1.ln");
     let source_output = run_fixture("source", &source_root, source, &dir.join("run_source"));

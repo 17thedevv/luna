@@ -3,7 +3,7 @@ use std::io::{Read, Write};
 pub const LLIB_MAGIC: [u8; 4] = *b"LLIB";
 pub const MLIB_MAGIC: [u8; 4] = *b"MLIB";
 pub const LLIB_FORMAT_VERSION: u16 = 2;
-pub const LLIB_COMPILER_VERSION: u16 = 1; // v1.0
+pub const LLIB_COMPILER_VERSION: u16 = 2; // Portable provider execution identity.
 pub const LLIB_MVIR_VERSION: u16 = 3;
 
 pub const MLIB_FORMAT_VERSION: u16 = LLIB_FORMAT_VERSION;
@@ -119,6 +119,12 @@ pub struct DependencyTable {
 
 /// Execution fingerprint: H(canonical provider execution payload)
 pub type ExecutionFingerprint = Fingerprint;
+
+/// Conservative provider body identity, independent of arena offsets, FileIds
+/// and the order in which dependencies happened to be loaded in a session.
+pub fn provider_execution_fingerprint(source: &str) -> ExecutionFingerprint {
+    Fingerprint::combine(&[b"Luna provider execution v1\0", source.as_bytes()])
+}
 
 /// A single dependency with its interface fingerprint.
 

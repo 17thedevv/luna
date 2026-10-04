@@ -87,6 +87,7 @@ impl<'a> TypeChecker<'a> {
     }
 
     pub fn eval_comptime_expr(&mut self, expr_id: luna_ast::ExprId) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
+        self.ctx.tables.evaluated_comptime = true;
         self.prepare_comptime_bodies();
         if let Some(engine) = self.comptime_engine {
             engine.eval_expr(self.arena, self.ctx, self.source_manager, expr_id)
@@ -96,6 +97,7 @@ impl<'a> TypeChecker<'a> {
     }
 
     pub fn eval_comptime_stmt(&mut self, stmt_id: luna_ast::StmtId) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
+        self.ctx.tables.evaluated_comptime = true;
         self.prepare_comptime_bodies();
         if let Some(engine) = self.comptime_engine {
             engine.eval_stmt(self.arena, self.ctx, self.source_manager, stmt_id)
@@ -2428,34 +2430,45 @@ impl<'a> TypeChecker<'a> {
                     };
                     if let Some(bounds) = self.ctx.tables.trait_bounds.get(&gp_sym).cloned() {
                         for bound in &bounds {
-                            let has_concrete_impl = concrete_self_key.is_some_and(|concrete_key| {
-                                let impl_key = crate::semantic_tables::ImplKey {
-                                    trait_id: Some(bound.trait_id),
-                                    self_type_def: concrete_key,
-                                };
-                                self.ctx.tables.trait_impls.contains_key(&impl_key)
-                            });
-                            let mut matched_entry = None;
-                            if !has_concrete_impl || !bound.trait_args.is_empty() {
-                                for entry in &self.ctx.tables.trait_impl_entries {
-                                    if entry.trait_id != bound.trait_id {
-                                        continue;
-                                    }
-                                    let mut test_subst = crate::ty::Substitution::new();
-                                    let matched = self.ctx.matches_impl_pattern(entry.self_type, resolved_ty, &entry.generic_params, &mut test_subst)
-                                        || match self.ctx.types.get(resolved_ty) {
-                                            SemanticType::Reference(_, _, inner) | SemanticType::Pointer(_, inner) => {
-                                                self.ctx.matches_impl_pattern(entry.self_type, *inner, &entry.generic_params, &mut test_subst)
-                                            }
-                                            _ => false,
-                                        };
-                                    if matched {
-                                        matched_entry = Some((entry.clone(), test_subst));
-                                        break;
+                            let entries: Vec<_> = self.ctx.tables.trait_impl_entries.iter()
+                                .filter(|entry| entry.trait_id == bound.trait_id)
+                                .cloned().collect();
+                            let mut satisfied = false;
+                            let mut mismatch = None;
+                            for entry in entries {
+                                let mut test_subst = crate::ty::Substitution::new();
+                                if !self.ctx.matches_impl_pattern(entry.self_type, resolved_ty, &entry.generic_params, &mut test_subst) {
+                                    continue;
+                                }
+                                // Matching the self type alone is insufficient: one
+                                // type may implement the same trait for distinct args.
+                                // An unsuccessful candidate must not bind inference
+                                // variables or leave deferred equality obligations.
+                                let saved_bindings = self.ctx.types.inference_bindings.clone();
+                                let saved_obligations = self.associated_type_obligations.len();
+                                let saved_diagnostics = self.ctx.diagnostics.len();
+                                let mut compatible = bound.trait_args.is_empty()
+                                    || bound.trait_args.len() == entry.trait_args.len();
+                                if compatible {
+                                    for (&b_arg, &impl_arg) in bound.trait_args.iter().zip(&entry.trait_args) {
+                                        let expected = self.ctx.types.subst(b_arg, subst);
+                                        let actual = self.ctx.types.subst(impl_arg, &test_subst);
+                                        if let Err(reason) = self.unify(expected, actual) {
+                                            mismatch = Some(reason);
+                                            compatible = false;
+                                            break;
+                                        }
                                     }
                                 }
+                                if compatible {
+                                    satisfied = true;
+                                    break;
+                                }
+                                self.ctx.types.inference_bindings = saved_bindings;
+                                self.associated_type_obligations.truncate(saved_obligations);
+                                self.ctx.diagnostics.truncate(saved_diagnostics);
                             }
-                            if !has_concrete_impl && matched_entry.is_none() {
+                            if !satisfied {
                                 let trait_name = self.ctx.symbol_table.get_symbol(bound.trait_id).name.clone();
                                 let type_name = concrete_self_key.map(|concrete_key| match concrete_key {
                                     crate::semantic_tables::ImplSelfTypeKey::Nominal(s) => self.ctx.symbol_table.get_symbol(s).name.clone(),
@@ -2465,24 +2478,16 @@ impl<'a> TypeChecker<'a> {
                                     crate::comptime::reflect::ComptimeReflection::type_name(resolved_ty, &self.ctx)
                                 });
                                 let gp_name = self.ctx.symbol_table.get_symbol(gp_sym).name.clone();
+                                let reason = mismatch.map(|reason| format!("; incompatible trait arguments: {reason}"))
+                                    .unwrap_or_default();
                                 self.ctx.diagnostics.push(
                                     Diagnostic::error(format!(
-                                        "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`)",
+                                        "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`){reason}",
                                         type_name, trait_name, gp_name
                                     ))
                                     .with_code(DiagnosticCode::TraitBoundNotSatisfied)
                                     .with_span(span)
                                 );
-                            } else if let Some((entry, test_subst)) = matched_entry {
-                                if !bound.trait_args.is_empty() {
-                                    for (arg_idx, &b_arg) in bound.trait_args.iter().enumerate() {
-                                        if let Some(&impl_arg) = entry.trait_args.get(arg_idx) {
-                                            let concrete_impl_arg = self.ctx.types.subst(impl_arg, &test_subst);
-                                            let expected_b_arg = self.ctx.types.subst(b_arg, subst);
-                                            let _ = self.unify(expected_b_arg, concrete_impl_arg);
-                                        }
-                                    }
-                                }
                             }
                         }
                     }

@@ -323,8 +323,8 @@ impl<'a> MetadataBuilder<'a> {
             .cloned();
 
         // Generic bodies are retained in AstInterface and reanalyzed by the
-        // consumer. Export a body-derived raw-pointer summary only for
-        // non-generic functions whose body is not present in the artifact.
+        // consumer. Export a body-derived raw-pointer summary for non-generic
+        // functions whose ordinary concrete calls use the provider object.
         // The serialized form below contains parameter indices and canonical
         // field names only, never session-local compiler identities.
         let raw_pointer_effects = if matches!(kind_str.as_str(), "Function" | "ExternFunction")

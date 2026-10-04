@@ -423,7 +423,11 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 .file_stem()
                 .and_then(|s| s.to_str())
                 .unwrap_or("");
-            semantic_ctx.current_provider_name = Some(base_name.to_string());
+            let provider_name = driver_session.sysroot
+                .get_canonical_provider(std::path::Path::new(file_name))
+                .map(|entry| entry.name.clone())
+                .unwrap_or_else(|| base_name.to_string());
+            semantic_ctx.current_provider_name = Some(provider_name.clone());
             let is_slice_authorized = if options.is_sysroot_build {
                 driver_session.sysroot.get_canonical_provider_capabilities(std::path::Path::new(file_name))
                     .map(|caps| caps.contains(&crate::sysroot_manifest::ProviderCapability::SliceInherentImpl))
@@ -728,12 +732,41 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 // This prevents readers from observing partial/half-written artifacts
                 let mut llib_buffer = Vec::new();
                 let mut deps = vec![];
+                let mut materialized_providers = std::collections::HashSet::new();
+                for function in &module.functions {
+                    if !function.is_extern {
+                        if let Some(provider) = function.name.symbol_id
+                            .and_then(|id| semantic_ctx.symbol_table.get_symbol(id).provider_id)
+                        {
+                            materialized_providers.insert(provider);
+                        }
+                    }
+                }
+                // Constant values can be embedded without a function instance.
+                for instance in &semantic_ctx.instantiated_functions {
+                    for expr in instance.expr_types.keys() {
+                        if let Some(symbol) = semantic_ctx.tables.expr_symbols.get(expr) {
+                            let symbol = semantic_ctx.symbol_table.get_symbol(*symbol);
+                            if symbol.kind == luna_semantic::symbol::SymbolKind::Constant {
+                                if let Some(provider) = symbol.provider_id {
+                                    materialized_providers.insert(provider);
+                                }
+                            }
+                        }
+                    }
+                }
                 for (id, interface) in &registry.interfaces {
-                    if interface.name != base_name {
+                    if interface.name != provider_name {
                         let dep_entry = luna_llib::format::DependencyEntry {
                             provider_name: interface.name.clone(),
                             interface_fingerprint: interface.interface_fingerprint,
-                            execution_fingerprint: interface.execution_fingerprint,
+                            execution_fingerprint: if semantic_ctx.tables.evaluated_comptime
+                                || materialized_providers.contains(id)
+                            {
+                                interface.execution_fingerprint
+                            } else {
+                                None
+                            },
                         };
                         deps.push(dep_entry);
                     }
@@ -743,7 +776,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     identity: luna_llib::ArtifactIdentity {
                         package_id: "".to_string(),
                         version: "0.1.0".to_string(),
-                        module_id: base_name.to_string(),
+                        module_id: provider_name.clone(),
                         artifact_id: "".to_string(),
                     },
                     target: luna_llib::TargetContract {
@@ -774,7 +807,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     decls: 0..main_decl_end,
                     pats: 0..main_pat_end,
                 };
-                let interface = crate::registry::ModuleRegistry::extract_interface_from_ctx(base_name.to_string(), main_provider_id, &semantic_ctx, &ranges);
+                let interface = crate::registry::ModuleRegistry::extract_interface_from_ctx(provider_name.clone(), main_provider_id, &semantic_ctx, &ranges);
                 let builder = crate::metadata_builder::MetadataBuilder::new(&registry, &interface, &summaries);
                 let semantic_metadata = Some(builder.build());
 

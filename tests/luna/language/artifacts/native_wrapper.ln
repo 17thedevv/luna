@@ -1,0 +1,4 @@
+import "a";
+module b {
+    export fn value() -> i32 { return a::value(); }
+}

@@ -769,7 +769,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             self.get_span_text(*name).to_string();
                         let sym_id = self.ctx.symbol_table.declare_symbol(
                             name_str.clone(),
-                            SymbolKind::Struct, // Enums use Struct kind for now
+                            SymbolKind::Enum,
                             self.current_scope,
                             *name,
                             Some(*decl_id),

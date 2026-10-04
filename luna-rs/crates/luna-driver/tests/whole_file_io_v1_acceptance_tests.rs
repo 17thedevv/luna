@@ -6,6 +6,9 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
 use std::time::{SystemTime, UNIX_EPOCH};
 
+#[path = "support/canonical_artifacts.rs"]
+mod canonical_artifacts;
+
 fn temp_dir(label: &str) -> PathBuf {
     let nonce = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -160,8 +163,7 @@ fn whole_file_io_source_and_fresh_artifact_parity() {
         0,
         "artifact-only mode must have no source fallback"
     );
-    assert_eq!(count_extension(&artifact_external, "llib"), 36);
-    assert_eq!(count_extension(&artifact_external, "obj"), 36);
+    canonical_artifacts::assert_inventory(&artifact_external, &[]);
 
     let payload = [0x00, 0xff, 0x80, 0x01, 0x7f, 0x00, 0xc3, 0xa9];
     let source_run = root.join("run_source");
@@ -228,8 +230,7 @@ fn copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_m
     copy_tree(&build_external, &artifact_external);
     assert!(remove_extension(&artifact_external, "ln") > 0);
     assert_eq!(count_extension(&artifact_external, "ln"), 0);
-    assert_eq!(count_extension(&artifact_external, "llib"), 36);
-    assert_eq!(count_extension(&artifact_external, "obj"), 36);
+    canonical_artifacts::assert_inventory(&artifact_external, &[]);
 
     let fixture = include_str!("../../../tests/luna/stdlib/file/copy_file_write_failure.ln");
     let mut outputs = Vec::new();

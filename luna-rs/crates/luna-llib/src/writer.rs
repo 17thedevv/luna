@@ -24,20 +24,15 @@ impl LlibWriter {
         source_hasher.update(source.as_bytes());
         manifest.provenance.source_fingerprint = crate::format::Fingerprint(source_hasher.finalize().into());
 
-        let mut ast_hasher = Sha256::new();
-        ast_hasher.update(&ast_payload);
-        manifest.provenance.execution_fingerprint = Some(crate::format::Fingerprint(ast_hasher.finalize().into()));
+        manifest.provenance.execution_fingerprint = Some(crate::format::provider_execution_fingerprint(source));
 
-        let mut interface_hasher = Sha256::new();
-        if let Some(semantic) = semantic_metadata {
-            let mut semantic_payload = Vec::new();
-            bincode::serialize_into(&mut semantic_payload, &semantic.interface)
-                .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
-            interface_hasher.update(&semantic_payload);
+        manifest.provenance.interface_fingerprint = if let Some(semantic) = semantic_metadata {
+            semantic.interface.fingerprint()?
         } else {
+            let mut interface_hasher = Sha256::new();
             interface_hasher.update(&ast_payload);
-        }
-        manifest.provenance.interface_fingerprint = crate::format::Fingerprint(interface_hasher.finalize().into());
+            crate::format::Fingerprint(interface_hasher.finalize().into())
+        };
 
         if let Some(obj) = obj_bytes {
             let mut obj_hasher = Sha256::new();

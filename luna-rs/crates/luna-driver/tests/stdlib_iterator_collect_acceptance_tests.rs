@@ -1021,8 +1021,8 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-        fn is_even(x: &i32) -> bool {
-            return (*x % 2) == 0;
+        fn is_even(x: & &i32) -> bool {
+            return (* *x % 2) == 0;
         }
 
         fn square(x: &i32) -> i32 {

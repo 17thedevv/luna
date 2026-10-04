@@ -190,6 +190,7 @@ impl InterfaceDecoder {
             name: self.provider_name,
             interface_fingerprint: self.interface_fingerprint,
             execution_fingerprint: None,
+            object_backed_functions: std::collections::HashSet::new(),
             exported_symbols,
             symbol_types,
             symbol_struct_field_names: HashMap::new(),

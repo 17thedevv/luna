@@ -1,0 +1,16 @@
+trait Produces<T> {
+    fn get(&self) -> T;
+}
+struct Source {};
+impl Produces<i32> for Source {
+    fn get(&self) -> i32 { return 42; }
+}
+fn invoke<I: Produces<T>, T>(source: I, pred: fn(&T) -> bool) -> bool {
+    dec value = source.get();
+    return pred(&value);
+}
+fn bool_pred(value: &bool) -> bool { return *value; }
+fn main() {
+    // T inferred from the predicate cannot contradict Produces<i32>.
+    dec result = invoke(Source {}, bool_pred);
+}

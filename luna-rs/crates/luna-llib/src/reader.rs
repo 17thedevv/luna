@@ -220,6 +220,9 @@ pub fn validate_raw_pointer_effects(
 }
 
 fn validate_header_versions(header: &LlibHeader) -> Result<(), MlibError> {
+    if header.compiler_version != crate::format::LLIB_COMPILER_VERSION {
+        return Err(MlibError::VersionMismatch(header.compiler_version));
+    }
     if header.mvir_version != crate::format::LLIB_MVIR_VERSION {
         return Err(MlibError::VersionMismatch(header.mvir_version));
     }
@@ -1003,6 +1006,17 @@ mod semantic_metadata_version_tests {
     use super::check_semantic_metadata_version;
     use crate::format::SEMANTIC_METADATA_VERSION;
     use crate::MlibError;
+
+    #[test]
+    fn old_execution_identity_protocol_is_rejected_before_payload_decode() {
+        let mut header = crate::format::LlibHeader::new();
+        header.compiler_version = crate::format::LLIB_COMPILER_VERSION - 1;
+        let mut bytes = Vec::new();
+        header.write_to(&mut bytes).unwrap();
+        let mut reader = std::io::Cursor::new(bytes);
+        assert!(matches!(super::LlibReader::read_manifest(&mut reader),
+            Err(MlibError::VersionMismatch(version)) if version == header.compiler_version));
+    }
 
     #[test]
     fn old_semantic_metadata_is_rejected_before_payload_decode() {

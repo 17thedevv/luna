@@ -1,0 +1,7 @@
+import "a";
+module b {
+    export fn value() -> i32 {
+        dec result = comptime { a::value() };
+        return result;
+    }
+}

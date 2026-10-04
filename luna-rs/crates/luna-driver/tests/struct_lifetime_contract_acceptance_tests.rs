@@ -115,7 +115,7 @@ fn main() {
     assert!(res.is_err(), "STRUCT-LIFE-04: Shorter provenance must be rejected");
     let errs = res.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation)),
         "STRUCT-LIFE-04: Expected E2016 LifetimeConstraintViolation, got: {:?}", errs
     );
 }
@@ -149,7 +149,7 @@ fn main() {
     assert!(res.is_err(), "STRUCT-LIFE-05: Move to longer carrier must fail dynamic instance check");
     let errs = res.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation)),
         "STRUCT-LIFE-05: Expected E2016 LifetimeConstraintViolation, got: {:?}", errs
     );
 }
@@ -204,7 +204,7 @@ fn test_raw_storage_anchor_rejects_non_pointer_field() {
     fs::write(&path, src).unwrap();
     let res = check(path.to_str().unwrap(), src.to_string(), &opts);
     let errors = res.expect_err("non-pointer anchor target must be rejected");
-    assert!(errors.iter().any(|d| d.message.contains("E_RAW_STORAGE_ANCHOR_FIELD")), "wrong diagnostic: {errors:?}");
+    assert!(errors.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::RawStorageAnchorViolation)), "wrong diagnostic: {errors:?}");
 }
 
 #[test]
@@ -217,7 +217,7 @@ fn test_raw_storage_anchor_rejects_copy_impl() {
     fs::write(&path, src).unwrap();
     let res = check(path.to_str().unwrap(), src.to_string(), &opts);
     let errors = res.expect_err("anchor-bearing type must not implement Copy");
-    assert!(errors.iter().any(|d| d.message.contains("E_RAW_STORAGE_ANCHOR_COPY")), "wrong diagnostic: {errors:?}");
+    assert!(errors.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::RawStorageAnchorViolation)), "wrong diagnostic: {errors:?}");
 }
 
 /// STRUCT-LIFE-07: Joined field provenance checked universally/conservatively across CFG paths.
@@ -250,7 +250,7 @@ fn main() {
     assert!(res.is_err(), "STRUCT-LIFE-07: Joined field provenance with short-lived branch must fail");
     let errs = res.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation)),
         "STRUCT-LIFE-07: Expected E2016 LifetimeConstraintViolation, got: {:?}", errs
     );
 }
@@ -365,7 +365,7 @@ fn main() {
     assert!(res_bad.is_err(), "STRUCT-LIFE-09: Binary .llib invalid construction must fail");
     let errs = res_bad.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation)),
         "STRUCT-LIFE-09: Expected E2016 LifetimeConstraintViolation in .llib mode, got: {:?}", errs
     );
 }
@@ -417,7 +417,7 @@ fn main() {
     assert!(res.is_err(), "STRUCT-LIFE-11: Assigning short reference to field must be rejected");
     let errs = res.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation)),
         "STRUCT-LIFE-11: Expected E2016 LifetimeConstraintViolation, got: {:?}", errs
     );
 }
@@ -467,7 +467,7 @@ fn main() {}
     assert!(res.is_err(), "STRUCT-LIFE-13: Non-reference field must be rejected");
     let errs = res.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("non-reference field")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation) && d.message.contains("non-reference type")),
         "STRUCT-LIFE-13: Expected non-reference field error with E2016, got: {:?}", errs
     );
 }
@@ -500,7 +500,7 @@ fn main() {
     assert!(res.is_err(), "STRUCT-LIFE-14: Aliased field pointer update must revalidate against container");
     let errs = res.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation)),
         "STRUCT-LIFE-14: Expected E2016 LifetimeConstraintViolation, got: {:?}", errs
     );
 }
@@ -559,7 +559,7 @@ fn caller_bad() {
     assert!(res_bad.is_err(), "STRUCT-LIFE-15: Returning into longer carrier must fail with E2016");
     let errs = res_bad.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation)),
         "STRUCT-LIFE-15: Expected E2016 LifetimeConstraintViolation, got: {:?}", errs
     );
 }
@@ -675,7 +675,7 @@ fn main() {
     assert!(res.is_err(), "STRUCT-LIFE-18: Post-construction field mutation with short ref must be rejected");
     let errs = res.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") || d.message.contains("LifetimeConstraintViolation")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation)),
         "STRUCT-LIFE-18: Expected E2016 LifetimeConstraintViolation, got: {:?}", errs
     );
 }
@@ -950,7 +950,7 @@ struct RawHolder {
     assert!(res.is_err(), "STRUCT-LIFE-21: Raw pointer in life(field) must be semantically rejected");
     let errs = res.err().unwrap();
     assert!(
-        errs.iter().any(|d| d.message.contains("E2016") && d.message.contains("non-reference type")),
+        errs.iter().any(|d| d.code == Some(luna_common::DiagnosticCode::LifetimeConstraintViolation) && d.message.contains("non-reference type")),
         "STRUCT-LIFE-21: Expected E2016 non-reference type error, got: {:?}", errs
     );
 }

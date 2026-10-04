@@ -454,7 +454,7 @@ fn test_float_to_int_truncation_bounds_valid() {
             if v2 != (127 as i8) { return 2; }
 
             dec v3: i32 = (-2147483648.75) as i32;
-            if v3 != (0 - 2147483648) { return 3; }
+            if v3 != (-2147483647 - 1) { return 3; }
 
             dec v4: i32 = (2147483647.9) as i32;
             if v4 != 2147483647 { return 4; }

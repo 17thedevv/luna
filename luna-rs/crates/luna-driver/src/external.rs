@@ -88,9 +88,9 @@ impl ExternalComponentLoader {
         };
 
         // Body-derived raw-pointer effects for non-generic functions are part
-        // of the versioned semantic interface. AstInterface intentionally
-        // strips those bodies, so preserve the stable parameter/field summary
-        // before reanalyzing the relocated declaration stubs below.
+        // of the versioned semantic interface. Portable AST retains definitions,
+        // but ordinary concrete calls use the provider object. Preserve these
+        // stable parameter/field summaries independently of body materialization.
         file.rewind().map_err(|e| ExternalComponentError::ReadFailed {
             path: descriptor.entry_file.clone(),
             error: format!("Failed to rewind for semantic metadata: {}", e),
@@ -282,6 +282,9 @@ impl ExternalComponentLoader {
             // rather than the default zero fingerprint.
             interface.interface_fingerprint = manifest.provenance.interface_fingerprint;
             interface.execution_fingerprint = manifest.provenance.execution_fingerprint;
+            interface.object_backed_functions = interface.decl_symbols.iter()
+                .filter_map(|(decl, symbol)| matches!(global_arena.decls.get(decl.0 as usize), Some(luna_ast::Decl::Function { .. })).then_some(*symbol))
+                .collect();
             driver_session.registry.register_external(descriptor.name.clone(), interface);
             driver_session.registry.finish_loading();
 
@@ -583,17 +586,69 @@ impl ExternalComponentLoader {
             return Err(ExternalComponentError::SemanticFailed(semantic_ctx.diagnostics));
         }
 
+        // The canonical interface includes portable effects for non-generic
+        // bodies. Source imports must compute those effects by the same
+        // semantic/MVIR analysis used when publishing an artifact; hashing an
+        // interface with absent effects would invalidate a mixed graph.
+        let mut mono = luna_semantic::MonoCollector::new_with_source(
+            &mut semantic_ctx,
+            global_arena,
+            Some(&driver_session.compiler_session.source_manager),
+        );
+        mono.run(&shifted_provider_items);
+        let drop_glues = mono.drop_glues;
+        let instances = mono.instantiated.into_values().collect();
+        semantic_ctx.drop_glue_instances = drop_glues;
+        semantic_ctx.instantiated_functions = instances;
+        if !semantic_ctx.diagnostics.is_empty() {
+            driver_session.registry.finish_loading();
+            return Err(ExternalComponentError::SemanticFailed(semantic_ctx.diagnostics));
+        }
+        let mut generator = luna_mvir::MvirGenerator::new(
+            global_arena,
+            &semantic_ctx,
+            &driver_session.compiler_session.source_manager,
+        );
+        generator.root_file_id = Some(file_id);
+        let (module, diagnostics) = generator.generate(&shifted_provider_items);
+        if !diagnostics.is_empty() {
+            driver_session.registry.finish_loading();
+            return Err(ExternalComponentError::SemanticFailed(diagnostics));
+        }
+        let mut interproc = luna_borrowck::interprocedural::InterproceduralContext::with_context(&semantic_ctx);
+        crate::seed_imported_raw_pointer_effects(
+            &mut interproc, &module, &driver_session.registry, &semantic_ctx,
+        );
+        interproc.compute_summaries(&module);
+        let summaries = interproc.summaries;
+
         let ranges = crate::registry::ArenaRanges {
             exprs: expr_start..(global_arena.exprs.len() as u32),
             decls: decl_start..(global_arena.decls.len() as u32),
             pats: pat_start..(global_arena.pats.len() as u32),
         };
-        let interface = ModuleRegistry::extract_interface_from_ctx(
+        let mut interface = ModuleRegistry::extract_interface_from_ctx(
             descriptor.name.clone(),
             provider_id,
             &semantic_ctx,
             &ranges,
         );
+        let metadata = crate::metadata_builder::MetadataBuilder::new(
+            &driver_session.registry,
+            &interface,
+            &summaries,
+        ).build();
+        interface.interface_fingerprint = match metadata.interface.fingerprint() {
+            Ok(fingerprint) => fingerprint,
+            Err(error) => {
+                driver_session.registry.finish_loading();
+                return Err(ExternalComponentError::ReadFailed {
+                    path: descriptor.entry_file.clone(),
+                    error: format!("Cannot fingerprint source provider interface: {error}"),
+                });
+            }
+        };
+        interface.execution_fingerprint = Some(luna_llib::format::provider_execution_fingerprint(&input));
         driver_session.registry.register_external(descriptor.name.clone(), interface);
         driver_session.registry.finish_loading();
 

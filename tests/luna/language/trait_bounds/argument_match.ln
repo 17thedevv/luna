@@ -1,0 +1,16 @@
+trait Produces<T> {
+    fn get(&self) -> T;
+}
+struct Source {};
+impl Produces<i32> for Source {
+    fn get(&self) -> i32 { return 42; }
+}
+fn invoke<I: Produces<T>, T>(source: I, pred: fn(&T) -> bool) -> bool {
+    dec value = source.get();
+    return pred(&value);
+}
+fn int_pred(value: &i32) -> bool { return *value == 42; }
+fn main() -> i32 {
+    if invoke(Source {}, int_pred) == false { return 1; }
+    return 0;
+}
