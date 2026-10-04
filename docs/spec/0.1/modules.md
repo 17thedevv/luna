@@ -72,8 +72,11 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 2 rejects version 1 artifacts; this is an internal artifact
-compatibility revision, not a declaration of language release readiness.
+protocol version 3 rejects compiler versions 1 and 2, including previously
+compiled native/portable bodies with incorrect ownership cleanup. Rebuild them
+through the build tooling; import never rebuilds or falls back from a selected
+invalid artifact. This is an internal compiler compatibility revision, not a
+declaration of language release readiness. Format and MVIR versions are unchanged.
 Comptime dependency collection remains conservative: a compilation that
 evaluates comptime retains execution identities for its loaded dependencies.
 More precise dependency selection remains an optimization requirement.

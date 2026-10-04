@@ -3,7 +3,7 @@ use std::io::{Read, Write};
 pub const LLIB_MAGIC: [u8; 4] = *b"LLIB";
 pub const MLIB_MAGIC: [u8; 4] = *b"MLIB";
 pub const LLIB_FORMAT_VERSION: u16 = 2;
-pub const LLIB_COMPILER_VERSION: u16 = 2; // Portable provider execution identity.
+pub const LLIB_COMPILER_VERSION: u16 = 3; // Reject bodies compiled before ownership cleanup repairs.
 pub const LLIB_MVIR_VERSION: u16 = 3;
 
 pub const MLIB_FORMAT_VERSION: u16 = LLIB_FORMAT_VERSION;
