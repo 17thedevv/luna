@@ -7,7 +7,7 @@ use inkwell::builder::Builder;
 use inkwell::values::BasicValueEnum;
 use inkwell::basic_block::BasicBlock as InkwellBasicBlock;
 use inkwell::types::{BasicTypeEnum, BasicType};
-use inkwell::targets::{Target, TargetMachine, InitializationConfig, RelocMode, CodeModel, FileType};
+use inkwell::targets::{Target, TargetMachine, InitializationConfig, FileType};
 use inkwell::OptimizationLevel;
 
 use luna_mvir::{Module as MvirModule, Function as MvirFunction, Instruction, Terminator, Operand, ValueId, ValueData, LabelId};
@@ -115,26 +115,11 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
     }
     
     pub fn emit_object(&self, path: &Path, config: &TargetConfig) -> Result<(), BackendError> {
-        Target::initialize_all(&InitializationConfig::default());
-            
-        let target = Target::from_triple(&inkwell::targets::TargetTriple::create(&config.triple))
-            .map_err(|e| BackendError::TargetInitFailed(e.to_string()))?;
-            
-        let target_machine = target
-            .create_target_machine(
-                &inkwell::targets::TargetTriple::create(&config.triple),
-                &config.cpu,
-                &config.features,
-                config.optimization,
-                if config.triple.contains("windows") {
-                    RelocMode::Default
-                } else {
-                    RelocMode::PIC
-                },
-                CodeModel::Default,
-            )
-            .ok_or_else(|| BackendError::TargetInitFailed("Failed to create target machine".to_string()))?;
-            
+        if config.triple != self.target_config.triple || config.cpu != self.target_config.cpu
+            || config.features != self.target_config.features {
+            return Err(BackendError::InvariantViolation("object emission target differs from lowering target".into()));
+        }
+        let target_machine = config.create_machine()?;
         target_machine
             .write_to_file(&self.llvm_module, FileType::Object, path)
             .map_err(|e| BackendError::ObjectEmissionFailed(e.to_string()))?;
@@ -309,6 +294,13 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
     }
 
     pub fn compile(&mut self) -> Result<(), BackendError> {
+        let machine = self.target_config.create_machine()?;
+        if machine.get_target_data().get_pointer_byte_size(None) != 8 {
+            return Err(BackendError::TargetInitFailed(
+                "Luna lowering still requires 64-bit pointers; refusing incomplete target layout".into()));
+        }
+        self.llvm_module.set_triple(&machine.get_triple());
+        self.llvm_module.set_data_layout(&machine.get_target_data().get_data_layout());
         self.declare_functions()?;
         let mut user_main_func = None;
         for func in &self.module.functions {
@@ -2050,4 +2042,3 @@ fn parse_char_literal(c: &str) -> char {
         '\0'
     }
 }
-

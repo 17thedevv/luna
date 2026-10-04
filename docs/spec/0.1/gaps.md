@@ -207,3 +207,21 @@ recursive canonical types and closure metadata need further audit. The
 Windows manifest/object-format mismatch remains open. The last full workspace
 run remains FAIL at de9977d; no full compiler9 candidate has been certified.
 Closure capture cleanup, named/default calls and R3–R5 remain open.
+
+
+## Target/object identity checkpoint — 2026-10-05, still PARTIAL
+
+Compiler10 replaces the fabricated ELF/64/empty target fields with the selected
+LLVM target contract, validates CPU/features, ABI/layout, pointer width and byte
+order, and checks header/manifest agreement. Embedded relocatable architecture
+and selected sidecar identity have standalone CLI rejection controls. This closes
+the Windows manifest/object reducer recorded above. Source and freshly built,
+relocated artifact providers run successfully; stale sidecars reject explicitly.
+
+Accurate cross-target descriptors do not establish native conformance. Current
+lowering rejects non-64-bit pointers while its remaining word/layout assumptions
+are repaired; this is a retained implementation gap, not a new language exclusion.
+Native target scope, runtime/toolchain coverage, broader ABI/layout domains and
+R5 clean-checkout/full-candidate gates remain open. The last full workspace run
+remains FAIL at de9977d; focused compiler10 passes do not replace it. See the
+[execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md).

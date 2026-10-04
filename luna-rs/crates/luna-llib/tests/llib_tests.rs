@@ -53,7 +53,7 @@ fn test_golden_roundtrip() {
     
     let manifest = luna_llib::Manifest {
         identity: luna_llib::ArtifactIdentity { package_id: "".into(), version: "".into(), module_id: "".into(), artifact_id: "".into() },
-        target: luna_llib::TargetContract { target_triple: "".into(), object_format: "".into(), abi: "".into(), pointer_width: 64, endianness: "".into() },
+        target: luna_llib::TargetContract { target_triple: "".into(), cpu: "".into(), features: "".into(), object_format: "".into(), abi: "".into(), pointer_width: 64, endianness: "".into() },
         dependencies: luna_llib::DependencyTable::default(),
         object_metadata: None,
         provenance: luna_llib::Provenance {
@@ -125,7 +125,7 @@ fn test_corrupted_data() {
     let mut buffer = Vec::new();
     let manifest = luna_llib::Manifest {
         identity: luna_llib::ArtifactIdentity { package_id: "".into(), version: "".into(), module_id: "".into(), artifact_id: "".into() },
-        target: luna_llib::TargetContract { target_triple: "".into(), object_format: "".into(), abi: "".into(), pointer_width: 64, endianness: "".into() },
+        target: luna_llib::TargetContract { target_triple: "".into(), cpu: "".into(), features: "".into(), object_format: "".into(), abi: "".into(), pointer_width: 64, endianness: "".into() },
         dependencies: luna_llib::DependencyTable::default(),
         object_metadata: None,
         provenance: luna_llib::Provenance {

@@ -72,8 +72,8 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 9 rejects compiler versions 1–8. This revision retains
-public generic constraints and individual impl contracts, alongside the earlier
+protocol version 10 rejects compiler versions 1–9. This revision retains
+validated target contracts, public generic constraints and individual impl contracts, alongside the earlier
 method-identity, ownership-cleanup and module-constant-storage repairs. MVIR
 version 4 carries portable immutable static data whose initializer and type
 shape contain no semantic-session IDs or VM addresses. Rebuild incompatible
@@ -81,6 +81,21 @@ artifacts through build tooling; import never rebuilds or falls back from a
 selected invalid artifact. File format version remains 2; semantic metadata
 version is 4. These are internal compatibility revisions, not a declaration of
 language release readiness.
+
+Target identity binds the selected triple, CPU/features, emitted object format,
+LLVM default ABI/data-layout identity, pointer width and endianness. All fields
+must match the consuming target configuration; this implementation uses strict
+CPU/features equality rather than assuming cross-machine compatibility. The
+artifact header and manifest must agree on the triple. Embedded objects must
+be valid relocatable objects with the expected format, architecture, width and
+endianness where represented by the object container. An existing object
+sidecar must match the embedded object bytes and target identity; its mere
+existence cannot authorize a different implementation. Invalid selected
+artifacts/sidecars reject without falling back or silently replacing them.
+Descriptor probes for another target do not certify Luna's lowering, runtime
+or native-language conformance on that target. Current native lowering rejects
+non-64-bit pointers until its remaining word-size assumptions are repaired;
+this is an implementation gap, not an adoption of a narrower language scope.
 
 Canonical generic contracts retain declaration-owned binders, trait arguments,
 trait bounds and associated-type equalities. Impl contracts retain individual

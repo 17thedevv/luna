@@ -61,6 +61,12 @@ impl LlibWriter {
         }
 
         let mut header = LlibHeader::new();
+        let triple = manifest.target.target_triple.as_bytes();
+        if triple.len() > header.target_triple.len() || triple.contains(&0) {
+            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, "invalid target triple for artifact header"));
+        }
+        header.target_triple.fill(0);
+        header.target_triple[..triple.len()].copy_from_slice(triple);
         header.section_count = section_count;
         
         let header_size = 122;

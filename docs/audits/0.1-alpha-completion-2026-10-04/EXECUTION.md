@@ -2,8 +2,11 @@
 
 Baseline implementation: `c8d0559500e78ef85c96ac842e824e639917cbad`.
 This supplements the dated [plan](README.md); no full release PASS is claimed.
+Current state remains **PARTIAL**. Revision-specific checkpoints are recorded
+chronologically below. The last completed full workspace run remains FAIL at
+`de9977d`; later focused results do not change that verdict.
 
-Latest implementation checkpoint: `f5936c3344788168320dfd4b661532c2cfad8a8d`
+Earlier artifact-compatibility checkpoint: `f5936c3344788168320dfd4b661532c2cfad8a8d`
 (artifact compatibility), following the async/closure repair `363eaf5`.
 Field-cleanup baseline: `3d6916673f1ef16a1356f5fe592a13db96efa29c`.
 The field-cleanup checkpoint below records its bounded evidence and the
@@ -890,3 +893,82 @@ SKILL IMPACT: capability validation now explicitly requires public-constraint
 fingerprints and stale-dependent rejection, with binder/order/body invariance
 controls. Portable AST rechecking cannot substitute for public dependency
 identity. No skill grants release/freeze authority.
+
+
+## Configured target and actual object identity — 2026-10-05
+
+The Windows-GNU manifest/object reducer is repaired. Provider manifests derive
+format, pointer width and endianness from the same LLVM target machine used for
+emission; ABI identity binds LLVM's default ABI/data layout. CPU/features are
+retained and validated with strict equality. LLVM modules receive that triple
+and layout before lowering. The artifact header now carries the manifest triple;
+readers reject disagreement and noncanonical padding. Object parsing validates
+relocatable format, architecture, width and byte order where represented.
+
+Existing sidecars must equal the artifact's embedded object and match the target.
+A stale/mutated sidecar rejects instead of supplying a different implementation.
+Extraction failures propagate diagnostics. The public-bound stale-dependent
+harness now removes a sidecar extracted from the preceding variant when replacing
+the dependency artifact, so it reaches the intended interface mismatch gate.
+The independent sidecar mismatch control remains a required rejection.
+
+Compatibility: **compiler10**, format2, semantic metadata4, MVIR4. Compiler1–9
+artifacts reject before payload decoding. Backend/driver share LLVM linkage
+configuration; standalone backend tests now link without relying on driver
+link flags. LLVM target-machine creation is shared by ordinary emission and
+static-data layout rather than using two relocation configurations.
+
+Final focused evidence:
+
+- [Backend/artifact internals](evidence/r3-target-internals-final.txt): **17 PASS**,
+  exit0; descriptor probes cover Windows COFF, Linux ELF, Darwin Mach-O and
+  32-bit ELF. These are LLVM descriptor probes, not native target certification.
+- [CLI matrix](evidence/r3-target-cli-final.txt): **4 harness cases PASS**, exit0:
+  target identity, public constraints, execution dependencies and module-constant
+  storage. Target controls execute 2 relocated source/artifact programs and
+  reject 22 check/build invocations with E6001 for triple, CPU/features, format,
+  ABI, byte order, pointer width, architecture, invalid object, header and sidecar.
+- [Driver regressions](evidence/r3-target-driver-final.txt): **55 PASS**, exit0;
+  metadata/parity, bound chain, canonical DAG, slice iterators, mangling, linking,
+  function pointers, strict rejection and backend fail-closed cases.
+- [CLI build](evidence/r3-target-build-final.txt),
+  [official sysroot](evidence/r3-target-sysroot-final.txt) (**49 providers**) and
+  [workspace compile](evidence/r3-target-check-final.txt): exit0.
+
+An additional fail-closed guard rejects native lowering with non-64-bit pointers:
+existing lowering still contains 64-bit word/layout assumptions. It is not safe
+to accept that target merely because its descriptor is accurate. After this
+narrow guard, [internals](evidence/r3-target-internals-guard-final.txt) pass
+**18/18**, including a valid 32-bit descriptor whose lowering rejects; the
+[target CLI rerun](evidence/r3-target-cli-guard-final.txt) passes on the latest
+binary with another fresh sysroot. The larger native suites above precede this
+32-bit-only guard; they were not relabeled as a new full run.
+
+Retained intermediate FAIL evidence: standalone backend linking initially lacked
+LLVM flags (no tests executed); format-only parsing initially accepted an object
+with an unknown machine; the next header control rejected with the wrong typed
+read code; and the public-bound harness first left an old object sidecar beside
+a replacement artifact. These were corrected separately. A transient guard test
+used a nonexistent Module::default constructor; its compiler error predates test
+execution and is retained, not claimed as an original language defect.
+
+This closes the Windows ELF/COFF metadata reducer and the tested object/sidecar
+identity controls. It does not certify arbitrary target lowering/layout, the
+advertised native runtime/compiler matrix, every object subtype/feature policy,
+all ABI/public-layout domains, or release. The last full workspace verdict is
+still FAIL at de9977d. Closure capture destruction, named/default calls, broader
+generic/projection/layout obligations and R3–R5 remain open. Toolchain host is
+Rust 1.98.0 **x86_64-pc-windows-msvc**; Luna emits **x86_64-pc-windows-gnu** through
+LLVM18.1.8. These two target identities must not be conflated.
+
+    Compiler Change
+        Capability: Validate configured target/header/object/sidecar identity and reject incomplete 32-bit lowering.
+        Why stdlib exposed it: Canonical provider artifacts exposed a Windows triple paired with a fabricated ELF label.
+        Why it is generic: LLVM target/layout and object container identities apply to every provider; no stdlib type/provider names determine behavior.
+        User-defined type benefiting: The ordinary api::answer provider plus relocated generic/constant/dependency providers.
+        Tests: artifact_target_contract_cli, interface_constraints_cli, module_const_storage_cli, artifact_execution_dependencies_cli, backend/reader and 55 driver regressions.
+        New intrinsic/lang_item?: NO
+        Stdlib-specific branch?: NO
+
+SKILL IMPACT: capability validation now distinguishes format labels from actual
+header/object/sidecar identity and descriptor probes from native conformance.

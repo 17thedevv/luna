@@ -118,6 +118,11 @@ cannot compensate for constraints omitted from the public dependency identity.
 Include unchanged-contract controls for generic binder renaming, declaration
 order and body edits which preserve public effects.
 
+For target/artifact identity, compare the complete configured contract with
+both artifact header/manifest and actual embedded/selected object code. A format
+label alone does not prove architecture or sidecar identity. Cross-target
+metadata/layout probes do not establish native language/runtime conformance.
+
 For ownership, references, raw pointers, FFI, or mutation, preserve Luna's
 separate semantic domains and frozen safety rules. Unsafe does not disable
 ownership, moves, borrow checking, region validity, or provenance. Do not
