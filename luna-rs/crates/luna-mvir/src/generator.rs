@@ -907,6 +907,16 @@ impl<'a> MvirGenerator<'a> {
         }
     }
 
+    fn canonical_constant_symbol(&self, sym: luna_common::ids::SymbolId) -> luna_common::ids::SymbolId {
+        // Comptime reconstruction can register a declaration in a new symbol
+        // context. References in an already checked body still identify the
+        // same declaration; do not resolve that identity by its short name.
+        self.ctx.symbol_table.get_symbol(sym).decl_id
+            .and_then(|decl| self.ctx.tables.decl_symbols.get(&decl).copied())
+            .filter(|canonical| self.ctx.const_values.contains_key(canonical))
+            .unwrap_or(sym)
+    }
+
     fn generate_lvalue(&mut self, expr_id: &luna_ast::ExprId) -> Operand {
         let expr = &self.arena.exprs[expr_id.0 as usize];
         
@@ -916,8 +926,41 @@ impl<'a> MvirGenerator<'a> {
                     if let Some(&val_id) = self.locals.get(&sym_id) {
                         return Operand::Value(val_id);
                     }
+                    let sym_id = self.canonical_constant_symbol(sym_id);
                     if let Some(value) = self.ctx.const_values.get(&sym_id).cloned() {
                         let ty = self.get_expr_type(expr_id);
+                        let symbol = self.ctx.symbol_table.get_symbol(sym_id);
+                        let scope = &self.ctx.symbol_table.scopes[symbol.scope.0 as usize];
+                        if matches!(scope.kind, luna_semantic::symbol::ScopeKind::Global | luna_semantic::symbol::ScopeKind::Module) {
+                            let data = (|| {
+                                use crate::static_data::{StaticData, StaticType, StaticValue};
+                                let provider = if let Some(pid) = symbol.provider_id {
+                                    self.ctx.provider_lookup.iter().filter(|(_, id)| **id == pid)
+                                        .map(|(name, _)| name.clone()).min()
+                                        .ok_or("module constant lacks canonical provider identity")?
+                                } else {
+                                    self.ctx.current_provider_name.clone().unwrap_or_else(|| "<entry>".into())
+                                };
+                                let mut name = "__luna_const_".to_string();
+                                for part in std::iter::once(provider).chain(self.ctx.symbol_table.get_full_logical_path(sym_id)) {
+                                    name.push_str(&format!("{}_{}", part.len(), part));
+                                }
+                                Ok::<_, String>(StaticData {
+                                    name,
+                                    ty: StaticType::from_semantic(self.ctx, ty)?,
+                                    value: StaticValue::from_comptime(self.ctx, ty, &value)?,
+                                })
+                            })();
+                            return match data {
+                                Ok(data) => Operand::Value(self.push_inst(Instruction::StaticAddress(data), ty)),
+                                Err(message) => {
+                                    self.diagnostics.push(luna_common::Diagnostic::error(message)
+                                        .with_code(luna_common::DiagnosticCode::BackendInvariantViolation)
+                                        .with_span(symbol.span));
+                                    Operand::Value(self.push_inst(Instruction::Null { ty }, ty))
+                                }
+                            };
+                        }
                         let value = self.materialize_comptime_value(&value, ty);
                         let storage = self.push_inst(Instruction::Alloca, ty);
                         self.push_inst(Instruction::Store { ptr: Operand::Value(storage), value }, ty);
@@ -1115,7 +1158,17 @@ impl<'a> MvirGenerator<'a> {
                             len: Operand::Number(len.to_string()),
                         }, self.ctx.types.bool_id());
 
-                        let base_lval = self.generate_lvalue(base);
+                        let mut base_lval = self.generate_lvalue(base);
+                        // A reference binding stores an address to the array,
+                        // not the array elements. Load each reference layer
+                        // before applying an element offset to that storage.
+                        let mut address_ty = base_ty_id;
+                        while let luna_semantic::SemanticType::Reference(_, _, inner)
+                            | luna_semantic::SemanticType::Pointer(_, inner) = self.ctx.types.get(address_ty) {
+                            let inner = *inner;
+                            base_lval = Operand::Value(self.push_inst(Instruction::Load { ptr: base_lval }, address_ty));
+                            address_ty = inner;
+                        }
                         let elem_ptr = self.push_inst(Instruction::PtrOffset {
                             ptr: base_lval,
                             offset: index_op,
@@ -2440,7 +2493,14 @@ impl<'a> MvirGenerator<'a> {
                         return Operand::Value(variant_val);
                     }
                     
-                    if let Some(ct_val) = self.ctx.const_values.get(&sym_id).cloned() {
+                    let constant_sym = self.canonical_constant_symbol(sym_id);
+                    if let Some(ct_val) = self.ctx.const_values.get(&constant_sym).cloned() {
+                        let scope = self.ctx.symbol_table.get_symbol(constant_sym).scope;
+                        if matches!(self.ctx.symbol_table.scopes[scope.0 as usize].kind,
+                            luna_semantic::symbol::ScopeKind::Global | luna_semantic::symbol::ScopeKind::Module) {
+                            let ptr = self.generate_lvalue(expr_id);
+                            return Operand::Value(self.push_inst(Instruction::Load { ptr }, ty_id));
+                        }
                         return self.materialize_comptime_value(&ct_val, ty_id);
                     }
 
@@ -3202,7 +3262,7 @@ impl<'a> MvirGenerator<'a> {
             },
             luna_semantic::ComptimeValue::Float { val, .. } => Operand::Number(val.to_string()),
             luna_semantic::ComptimeValue::Char(c) => Operand::Number((*c as u32).to_string()),
-            luna_semantic::ComptimeValue::Str(s) => Operand::StringRef(format!("\"{}\"", s)),
+            luna_semantic::ComptimeValue::Str(s) => Operand::StringRef(luna_lexer::literal::quote_string(s)),
             luna_semantic::ComptimeValue::Tuple(elements) => {
                 let alloca_val = self.push_inst(Instruction::Alloca, ty_id);
                 for (i, elem) in elements.iter().enumerate() {
@@ -3338,6 +3398,7 @@ impl<'a> MvirGenerator<'a> {
         let val_id = ValueId(func.values.len() as u32);
         let origin = match &inst {
             Instruction::Alloca => ValueOrigin::Local,
+            Instruction::StaticAddress(_) => ValueOrigin::Global,
             _ => ValueOrigin::Temporary,
         };
         func.values.push(ValueData { inst, ty, span, origin });

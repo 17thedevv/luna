@@ -112,6 +112,11 @@ pub struct ProviderInterface {
     pub impl_generic_param_symbols: Vec<ExternalSymbol>,
     pub trait_associated_type_symbols: Vec<ExternalSymbol>,
     pub internal_symbols: Vec<Symbol>,
+    /// Evaluated data reconstructed from provider source/portable AST. These
+    /// are transported within the compilation only, never session IDs on wire.
+    pub const_values: HashMap<luna_common::ids::SymbolId, luna_semantic::ComptimeValue>,
+    pub comptime_values: HashMap<luna_ast::ExprId, luna_semantic::ComptimeValue>,
+    pub module_constants: HashSet<luna_common::ids::SymbolId>,
     /// Definition-site lookup retained independently of public namespace exports.
     /// Reconstructed from source/portable AST, then remapped to each consumer.
     pub macro_environments: HashMap<luna_common::ids::SymbolId, HashMap<String, Vec<luna_common::ids::SymbolId>>>,
@@ -330,7 +335,7 @@ impl ModuleRegistry {
                     continue;
                 }
                 let dummy_scope = ctx.symbol_table.create_scope(
-                    luna_semantic::symbol::ScopeKind::Block,
+                    if interface.module_constants.contains(&sym.id) { ScopeKind::Module } else { ScopeKind::Block },
                     Some(global_scope),
                 );
                 let mut dummy_diags = Vec::new();
@@ -449,6 +454,13 @@ impl ModuleRegistry {
 
             for &old_sym_id in &interface.object_backed_functions {
                 ctx.tables.object_backed_functions.insert(lookup_sym(old_sym_id));
+            }
+
+            for (&symbol, value) in &interface.const_values {
+                ctx.const_values.insert(lookup_sym(symbol), detached_const_value(value));
+            }
+            for (&expr, value) in &interface.comptime_values {
+                ctx.comptime_values.insert(expr, detached_const_value(value));
             }
 
             // Inject lifetime contracts
@@ -1039,6 +1051,26 @@ pub struct ArenaRanges {
     pub pats: std::ops::Range<u32>,
 }
 
+/// Aggregate values emitted by the VM are structural. Drop optional source
+/// context IDs before passing them to another semantic session; the checked
+/// declaration type supplies nominal identity, element types and field order.
+fn detached_const_value(value: &luna_semantic::ComptimeValue) -> luna_semantic::ComptimeValue {
+    use luna_semantic::ComptimeValue as V;
+    match value {
+        V::Tuple(values) => V::Tuple(values.iter().map(detached_const_value).collect()),
+        V::Array { elements, .. } => V::Array { elements: elements.iter().map(detached_const_value).collect(), elem_ty: None },
+        V::Struct { type_name, fields, .. } => V::Struct {
+            symbol: None, type_name: type_name.clone(),
+            fields: fields.iter().map(|(n, v)| (n.clone(), detached_const_value(v))).collect(),
+        },
+        V::Enum { type_name, variant_name, variant_index, payload, .. } => V::Enum {
+            symbol: None, type_name: type_name.clone(), variant_name: variant_name.clone(),
+            variant_index: *variant_index, payload: payload.iter().map(detached_const_value).collect(),
+        },
+        other => other.clone(),
+    }
+}
+
 impl ModuleRegistry {
     pub fn extract_interface_from_ctx(
         provider_name: String,
@@ -1453,6 +1485,15 @@ impl ModuleRegistry {
             impl_generic_param_symbols,
             trait_associated_type_symbols,
             internal_symbols,
+            const_values: ctx.const_values.iter().filter(|(symbol, _)| {
+                ctx.symbol_table.get_symbol(**symbol).decl_id.is_some_and(|d| ranges.decls.contains(&d.0))
+            }).map(|(s, v)| (*s, detached_const_value(v))).collect(),
+            comptime_values: ctx.comptime_values.iter().filter(|(expr, _)| ranges.exprs.contains(&expr.0))
+                .map(|(expr, v)| (*expr, detached_const_value(v))).collect(),
+            module_constants: ctx.symbol_table.symbols.iter().filter(|s| {
+                s.kind == SymbolKind::Constant && s.decl_id.is_some_and(|d| ranges.decls.contains(&d.0))
+                    && matches!(ctx.symbol_table.scopes[s.scope.0 as usize].kind, ScopeKind::Global | ScopeKind::Module)
+            }).map(|s| s.id).collect(),
             macro_environments,
             decl_symbols,
             expr_symbols,

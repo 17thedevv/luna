@@ -191,6 +191,7 @@ impl LlibWriter {
     
     fn convert_instruction(inst: &Instruction) -> MlibInstruction {
         match inst {
+            Instruction::StaticAddress(data) => MlibInstruction::StaticAddress(data.clone()),
             Instruction::MarkInit { value } => MlibInstruction::MarkInit {
                 value: Self::convert_operand(value),
             },
@@ -742,6 +743,12 @@ impl LlibWriter {
             MlibInstruction::Await { future } => {
                 w.write_all(&[0x26u8])?;
                 Self::serialize_operand(w, future)?;
+            }
+            MlibInstruction::StaticAddress(data) => {
+                w.write_all(&[0x29u8])?;
+                let payload = bincode::serialize(data).map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+                w.write_all(&(payload.len() as u32).to_le_bytes())?;
+                w.write_all(&payload)?;
             }
         }
         Ok(())

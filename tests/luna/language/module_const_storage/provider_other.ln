@@ -1,0 +1,4 @@
+export module stored {
+    const DEFAULT: i32 = 31;
+    export fn other_ref() -> &i32 { return &DEFAULT; }
+}

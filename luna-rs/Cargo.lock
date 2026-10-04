@@ -478,6 +478,7 @@ dependencies = [
  "luna-common",
  "luna-lexer",
  "luna-semantic",
+ "serde",
 ]
 
 [[package]]

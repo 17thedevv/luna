@@ -91,7 +91,7 @@ pub fn verify_function(func: &Function) -> Result<(), Vec<String>> {
             Instruction::Await { future } => {
                 check_operand(future, &mut errors, &ctx);
             }
-            Instruction::Alloca | Instruction::HeapAlloc => {}
+            Instruction::StaticAddress(_) | Instruction::Alloca | Instruction::HeapAlloc => {}
             Instruction::Assign(val) => {
                 check_operand(val, &mut errors, &ctx);
             }

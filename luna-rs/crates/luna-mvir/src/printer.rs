@@ -23,6 +23,7 @@ pub fn print_module(module: &Module) -> String {
 
 fn print_instruction(inst: &Instruction) -> String {
     match inst {
+        Instruction::StaticAddress(data) => format!("static_address {} {:?} = {:?}", data.name, data.ty, data.value),
         Instruction::Alloca => "alloca".to_string(),
         Instruction::HeapAlloc => "heap_alloc".to_string(),
         Instruction::Assign(val) => format!("assign {}", print_operand(val)),

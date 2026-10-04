@@ -3,8 +3,10 @@
 Adopted by the maintainer on 2026-10-04 during the 0.1 completion work.
 A module-level constant has immutable storage lasting for the program's
 lifetime when a reference is taken to it. A function-local constant retains
-its ordinary lexical storage lifetime. Implementation remains pending;
-adoption does not certify current lowering.
+its ordinary lexical storage lifetime. Generic immutable MVIR storage is now
+implemented and has focused source/fresh-artifact evidence on Windows x86_64
+GNU. Full release/target certification remains pending; adoption and focused
+acceptance do not certify the entire 0.1 compiler.
 
 ## Scope and lifetime
 

@@ -72,11 +72,15 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 3 rejects compiler versions 1 and 2, including previously
-compiled native/portable bodies with incorrect ownership cleanup. Rebuild them
+protocol version 4 rejects compiler versions 1–3, including previously
+compiled native/portable bodies with incorrect ownership cleanup or module
+constant storage. MVIR version 4 adds portable immutable static data whose
+initializer and type shape contain no semantic-session IDs or VM addresses.
+Rebuild incompatible artifacts
 through the build tooling; import never rebuilds or falls back from a selected
 invalid artifact. This is an internal compiler compatibility revision, not a
-declaration of language release readiness. Format and MVIR versions are unchanged.
+declaration of language release readiness. File format version remains 2 and
+semantic metadata version remains 3.
 Comptime dependency collection remains conservative: a compilation that
 evaluates comptime retains execution identities for its loaded dependencies.
 More precise dependency selection remains an optimization requirement.

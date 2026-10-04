@@ -13,6 +13,10 @@ This skill is operational guidance for the versioned Luna 0.1 syntax and adopted
 
 ## Grammar Authority Rule
 
+Canonical fixed-array types use `[T; N]`; slices use `[T]`. See the
+[versioned syntax contract](../../../docs/spec/0.1/syntax.md). A stale auxiliary
+grammar spelling must not override that contract.
+
 Agents MUST adhere to the following rules at all times:
 1. **Read this skill** before modifying parser, AST, or semantic syntax.
 2. **Never introduce a new keyword** without first updating the grammar in `docs/grammar.md`, `grammar.ebnf`, and this skill.
@@ -122,7 +126,7 @@ export struct Point {
 
 export struct User {
     export name: str,
-    password_hash: str, // private field
+    private password_hash: str,
 };
 
 // A private containing type remains inaccessible externally, independently of its field visibility.

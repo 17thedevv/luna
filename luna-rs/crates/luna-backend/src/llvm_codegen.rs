@@ -14,6 +14,8 @@ use luna_mvir::{Module as MvirModule, Function as MvirFunction, Instruction, Ter
 use luna_semantic::{SemanticContext, SemanticTypeId, SemanticType};
 use luna_semantic::ty::BuiltinType;
 use thiserror::Error;
+#[path = "static_codegen.rs"]
+mod static_codegen;
 
 #[derive(Error, Debug)]
 pub enum BackendError {
@@ -40,6 +42,7 @@ pub enum BackendError {
 }
 
 
+#[derive(Clone)]
 pub struct TargetConfig {
     pub triple: String,
     pub cpu: String,
@@ -81,6 +84,7 @@ pub struct LLVMBackend<'a, 'ctx> {
     function_map: HashMap<String, inkwell::values::FunctionValue<'ctx>>,
     link_name_map: HashMap<String, String>,
     supports_comdat: bool,
+    target_config: TargetConfig,
 }
 
 impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
@@ -102,6 +106,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             function_map: HashMap::new(),
             link_name_map: HashMap::new(),
             supports_comdat: target_config.supports_comdat(),
+            target_config: target_config.clone(),
         }
     }
     
@@ -623,6 +628,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
 
     fn generate_inst(&self, id: ValueId, data: &ValueData, _func: &MvirFunction) -> Result<BasicValueEnum<'ctx>, BackendError> {
         match &data.inst {
+            Instruction::StaticAddress(static_data) => self.static_address(static_data, data.ty),
             Instruction::Alloca => {
                 let ty = self.map_type(data.ty)?;
                 let alloca = self.builder.build_alloca(ty, &format!("v{}", id.0)).unwrap();

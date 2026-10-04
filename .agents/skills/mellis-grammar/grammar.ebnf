@@ -270,7 +270,7 @@ trait_object_type ::= KW_DYN type_path
 
 reference_type ::= "&" KW_RW? type
 pointer_type   ::= "*" KW_RW? type
-array_type     ::= "[" type ("," const_expression)? "]"
+array_type     ::= "[" type (";" const_expression)? "]"
 tuple_type     ::= "(" (type ("," type)* ","?)? ")"
 func_type      ::= KW_UNSAFE? KW_FN "(" (type ("," type)* ","?)? ")" "->" type
 never_type     ::= BANG

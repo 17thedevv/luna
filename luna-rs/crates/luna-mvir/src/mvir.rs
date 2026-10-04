@@ -57,6 +57,8 @@ pub struct CaptureInfo {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Instruction {
+    /// Address of real immutable storage with program lifetime.
+    StaticAddress(crate::static_data::StaticData),
     Alloca, // ty is kept in ValueData
     HeapAlloc, // ty is kept in ValueData, dynamically allocates memory
     Assign(Operand), // For constant folding or aliases
@@ -269,6 +271,7 @@ impl ValueData {
     pub fn new(inst: Instruction, ty: SemanticTypeId, span: Option<luna_common::ids::Span>) -> Self {
         let origin = match &inst {
             Instruction::Alloca => ValueOrigin::Local,
+            Instruction::StaticAddress(_) => ValueOrigin::Global,
             _ => ValueOrigin::Temporary,
         };
         Self { inst, ty, span, origin }
