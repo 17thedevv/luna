@@ -1,0 +1,15 @@
+trait Produces<T> { fn get(&self) -> T; }
+struct Source {};
+impl Produces<bool> for Source {
+    fn get(&self) -> bool { return true; }
+}
+impl Produces<i32> for Source {
+    fn get(&self) -> i32 { return 42; }
+}
+fn require<I: Produces<T>, T>(source: I, pred: fn(&T) -> bool) {}
+fn int_pred(value: &i32) -> bool { return *value == 42; }
+fn bool_pred(value: &bool) -> bool { return *value; }
+fn main() {
+    require(Source {}, int_pred);
+    require(Source {}, bool_pred);
+}

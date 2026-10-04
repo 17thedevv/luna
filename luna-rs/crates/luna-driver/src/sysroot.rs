@@ -57,6 +57,13 @@ impl Sysroot {
         &self,
         file_path: &Path,
     ) -> Option<Vec<crate::sysroot_manifest::ProviderCapability>> {
+        self.get_canonical_provider(file_path).map(|entry| entry.capabilities.clone())
+    }
+
+    pub fn get_canonical_provider(
+        &self,
+        file_path: &Path,
+    ) -> Option<&crate::sysroot_manifest::ProviderEntry> {
         let manifest = self.manifest();
         let canon_file = std::fs::canonicalize(file_path).ok()?;
         let canon_root = std::fs::canonicalize(self.external_dir()).ok()?;
@@ -77,7 +84,7 @@ impl Sysroot {
             ] {
                 if let Ok(canon_entry) = std::fs::canonicalize(candidate) {
                     if canon_file == canon_entry {
-                        return Some(entry.capabilities.clone());
+                        return Some(entry);
                     }
                 }
             }

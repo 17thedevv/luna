@@ -58,6 +58,16 @@ pub struct CanonicalInterface {
     pub impl_headers: Vec<ImplHeader>,
 }
 
+impl CanonicalInterface {
+    /// Source and artifact discovery must fingerprint the same canonical ABI.
+    pub fn fingerprint(&self) -> std::io::Result<InterfaceFingerprint> {
+        use sha2::{Digest, Sha256};
+        let payload = bincode::serialize(self)
+            .map_err(|error| std::io::Error::new(std::io::ErrorKind::Other, error))?;
+        Ok(Fingerprint(Sha256::digest(&payload).into()))
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExportedSymbol {
     pub kind: String, // "Function", "Struct", etc.

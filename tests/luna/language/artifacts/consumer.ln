@@ -1,0 +1,2 @@
+import "b";
+fn main() -> i32 { return b::value(); }

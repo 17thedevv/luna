@@ -650,7 +650,13 @@ impl<'a> MonoCollector<'a> {
                                     }
                                 }
                             }
-                            self.visit_stmt(body_stmt);
+                            let object_backed = instance.subst.is_empty()
+                                && self.ctx.tables.decl_symbols.get(&instance.decl_id)
+                                    .is_some_and(|symbol| self.ctx.tables.object_backed_functions.contains(symbol))
+                                && !matches!(decl, Decl::Function { is_comptime: true, .. });
+                            if !object_backed {
+                                self.visit_stmt(body_stmt);
+                            }
                         },
                         Decl::Function { body: None, .. } => {},
                         _ => {}

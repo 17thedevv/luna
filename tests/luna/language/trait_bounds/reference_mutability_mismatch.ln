@@ -1,0 +1,8 @@
+trait Mark {}
+struct Source {};
+impl Mark for &rw Source {}
+fn require<T: Mark>(value: T) {}
+fn main() {
+    dec source = Source {};
+    require(&source);
+}

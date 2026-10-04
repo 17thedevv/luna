@@ -51,8 +51,9 @@ fn source_sysroot() -> PathBuf {
         .parent().expect("workspace root")
         .join("libs").join("external");
     let root = create_temp_dir("source_sysroot");
-    copy_dir_all(&external_dir, &root);
-    remove_artifacts(&root);
+    let external = root.join("libs").join("external");
+    copy_dir_all(&external_dir, &external);
+    remove_artifacts(&external);
     root
 }
 

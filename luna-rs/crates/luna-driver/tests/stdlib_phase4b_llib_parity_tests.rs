@@ -89,15 +89,17 @@ impl ParityHarness {
         let source_sysroot = base_dir.join("source_mode");
         let llib_sysroot = base_dir.join("llib_mode");
 
-        copy_dir_all(&external_dir, &source_sysroot).expect("copy to source_sysroot");
-        copy_dir_all(&external_dir, &llib_sysroot).expect("copy to llib_sysroot");
+        let source_external = source_sysroot.join("libs").join("external");
+        let artifact_external = llib_sysroot.join("libs").join("external");
+        copy_dir_all(&external_dir, &source_external).expect("copy to source_sysroot");
+        copy_dir_all(&external_dir, &artifact_external).expect("copy to llib_sysroot");
 
         // Source mode: keep ONLY .ln and sysroot.toml (strip all .llib and .obj)
-        remove_files_by_ext(&source_sysroot, "llib");
-        remove_files_by_ext(&source_sysroot, "obj");
+        remove_files_by_ext(&source_external, "llib");
+        remove_files_by_ext(&source_external, "obj");
 
         // Llib mode: keep ONLY .llib, .obj, and sysroot.toml (strip all .ln source files)
-        remove_files_by_ext(&llib_sysroot, "ln");
+        remove_files_by_ext(&artifact_external, "ln");
 
         Self {
             source_sysroot,

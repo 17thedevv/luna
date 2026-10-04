@@ -153,6 +153,13 @@ pub struct SemanticTables {
     /// `SymbolKind` because safe-reference FFI calls have their own safe,
     /// synchronous contract while raw-pointer FFI accesses are call-scoped.
     pub extern_functions: HashSet<SymbolId>,
+    /// Imported function definitions already supplied by a provider object.
+    /// Concrete calls use that object; generic/comptime bodies remain portable.
+    pub object_backed_functions: HashSet<SymbolId>,
+    /// Evaluation may materialize dependency bodies without a runtime call.
+    /// Until precise evaluation dependencies are returned by the VM, retain
+    /// execution identities conservatively for that compilation.
+    pub evaluated_comptime: bool,
     
     // Maps a (DeclId, param_index) to the SymbolId of the generic parameter
     pub generic_param_symbols: HashMap<(DeclId, usize), SymbolId>,
@@ -288,6 +295,8 @@ impl SemanticTables {
             decl_scopes: HashMap::new(),
             ffi_sync_noescape: HashMap::new(),
             extern_functions: HashSet::new(),
+            object_backed_functions: HashSet::new(),
+            evaluated_comptime: false,
             drop_impls: HashMap::new(),
             generic_param_symbols: HashMap::new(),
             trait_impls: HashMap::new(),

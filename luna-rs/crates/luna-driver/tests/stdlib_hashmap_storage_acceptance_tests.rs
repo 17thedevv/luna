@@ -23,6 +23,7 @@ use std::process::Command;
 
 use luna_driver::{compile, CompilerOptions};
 use luna_driver::sysroot::Sysroot;
+use luna_driver::sysroot_builder::SysrootBuilder;
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
     let mut dir = std::env::temp_dir();
@@ -41,32 +42,17 @@ fn create_temp_dir(prefix: &str) -> PathBuf {
 }
 
 
-fn locate_canonical_raw_table_ln() -> PathBuf {
-    let mut dir = std::env::current_dir().expect("Failed to get current directory");
-    for _ in 0..6 {
-        let p = dir.join("libs").join("external").join("alloc").join("raw_table.ln");
-        if p.exists() {
-            return p;
-        }
-        if !dir.pop() {
-            break;
-        }
-    }
-    panic!("Unable to locate canonical libs/external/alloc/raw_table.ln");
-}
-
-fn locate_canonical_raw_table_llib() -> PathBuf {
-    let mut dir = std::env::current_dir().expect("Failed to get current directory");
-    for _ in 0..6 {
-        let p = dir.join("libs").join("external").join("alloc").join("raw_table.llib");
-        if p.parent().unwrap().exists() {
-            return p;
-        }
-        if !dir.pop() {
-            break;
+fn copy_tree(source: &Path, destination: &Path) {
+    fs::create_dir_all(destination).expect("create isolated sysroot directory");
+    for entry in fs::read_dir(source).expect("enumerate canonical sysroot") {
+        let entry = entry.expect("read sysroot entry");
+        let target = destination.join(entry.file_name());
+        if entry.path().is_dir() {
+            copy_tree(&entry.path(), &target);
+        } else {
+            fs::copy(entry.path(), target).expect("copy provider file");
         }
     }
-    panic!("Unable to locate canonical libs/external/alloc/raw_table.llib");
 }
 
 fn run_binary_with_output(
@@ -724,25 +710,28 @@ import <__raw_table>;
 fn test_ht7_source_vs_llib_parity() {
     let sysroot = Sysroot::discover_for_test().expect("sysroot required");
     let dir = create_temp_dir("ht7_parity");
-    let raw_table_ln = locate_canonical_raw_table_ln();
-    let raw_table_src = fs::read_to_string(&raw_table_ln).expect("Failed to read raw_table.ln");
+    let build_root = dir.join("build");
+    let build_external = build_root.join("libs").join("external");
+    copy_tree(sysroot.external_dir(), &build_external);
+    SysrootBuilder::new(Sysroot::from_root(build_root).expect("isolated builder sysroot"))
+        .build_all(true)
+        .expect("build fresh, coherent provider artifacts");
 
-    let out_llib = dir.join("raw_table.llib");
-    let compile_opts = CompilerOptions {
-        output_path: Some(out_llib.to_string_lossy().to_string()),
-        emit_mlib: true,
-        no_link: true,
-        quiet: true,
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
-        is_sysroot_build: true,
-        ..Default::default()
-    };
+    let source_root = dir.join("source");
+    let source_external = source_root.join("libs").join("external");
+    copy_tree(&build_external, &source_external);
+    // Exercise the RawTable source boundary; dependencies remain fresh artifacts.
+    for extension in ["llib", "obj"] {
+        fs::remove_file(source_external.join("alloc/raw_table").with_extension(extension))
+            .expect("remove RawTable artifact from source mode");
+    }
+    assert!(source_external.join("alloc/raw_table.ln").is_file());
 
-    let res_compile = compile(raw_table_ln.to_str().unwrap(), raw_table_src, &compile_opts);
-    assert!(res_compile.is_ok(), "Compiling raw_table.ln to raw_table.llib must succeed: {:?}", res_compile.err());
-
-    let canonical_llib = locate_canonical_raw_table_llib();
-    let _ = fs::copy(&out_llib, &canonical_llib);
+    let artifact_root = dir.join("artifact");
+    let artifact_external = artifact_root.join("libs").join("external");
+    copy_tree(&build_external, &artifact_external);
+    fs::remove_file(artifact_external.join("alloc/raw_table.ln"))
+        .expect("disable RawTable source fallback in artifact mode");
 
     let src = r#"
         import <core/panic>;
@@ -793,11 +782,19 @@ import <__raw_table>;
         }
     "#;
 
-    let mut opts = CompilerOptions::default();
-    opts.search_paths = vec![sysroot.root().to_string_lossy().to_string()];
-
-    let (code, _stdout, stderr) = run_binary_with_output(&dir, src, &opts)
-        .expect("Execution must succeed");
-
-    assert_eq!(code, 0, "HT-7 parity execution failed (code: {}, stderr: {})", code, stderr);
+    let mut outputs = Vec::new();
+    for (mode, root) in [("source", source_root), ("artifact", artifact_root)] {
+        let run_dir = dir.join(mode).join("run");
+        fs::create_dir_all(&run_dir).expect("create mode-specific run directory");
+        let opts = CompilerOptions {
+            search_paths: vec![root.to_string_lossy().to_string()],
+            quiet: true,
+            ..Default::default()
+        };
+        let output = run_binary_with_output(&run_dir, src, &opts)
+            .expect("RawTable parity fixture must execute");
+        assert_eq!(output.0, 0, "HT-7 {mode} failed: {}", output.2);
+        outputs.push(output);
+    }
+    assert_eq!(outputs[0], outputs[1], "RawTable source/artifact result mismatch");
 }

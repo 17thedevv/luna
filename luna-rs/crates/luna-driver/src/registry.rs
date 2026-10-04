@@ -90,6 +90,7 @@ pub struct ProviderInterface {
     pub name: String,
     pub interface_fingerprint: luna_llib::format::Fingerprint,
     pub execution_fingerprint: Option<luna_llib::format::Fingerprint>,
+    pub object_backed_functions: HashSet<luna_common::ids::SymbolId>,
     pub exported_symbols: HashMap<String, ExternalSymbol>,
     pub symbol_types: HashMap<luna_common::ids::SymbolId, luna_semantic::ty::SemanticTypeId>,
     pub symbol_struct_field_names: HashMap<luna_common::ids::SymbolId, Vec<String>>,
@@ -444,6 +445,10 @@ impl ModuleRegistry {
                             .clone_type_from(old_ty_id, &interface.types, &lookup_sym);
                     ctx.tables.symbol_types.insert(new_sym_id, new_ty_id);
                 }
+            }
+
+            for &old_sym_id in &interface.object_backed_functions {
+                ctx.tables.object_backed_functions.insert(lookup_sym(old_sym_id));
             }
 
             // Inject lifetime contracts
@@ -1428,6 +1433,7 @@ impl ModuleRegistry {
             name: provider_name,
             interface_fingerprint: luna_llib::format::Fingerprint::default(),
             execution_fingerprint: None,
+            object_backed_functions: HashSet::new(),
             exported_symbols,
             symbol_types,
             symbol_struct_field_names: ctx.tables.struct_field_names.clone(),

@@ -1,0 +1,11 @@
+trait Pair<A, B> {}
+struct Source {};
+impl Pair<i32, i32> for Source {}
+impl Pair<bool, bool> for Source {}
+fn choose<I: Pair<T, bool>, T>(source: I) -> i32 {
+    return sizeof(T) as i32;
+}
+fn main() -> i32 {
+    if choose(Source {}) != 1 { return 1; }
+    return 0;
+}

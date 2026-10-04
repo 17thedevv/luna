@@ -1338,19 +1338,8 @@ impl<'a> MvirGenerator<'a> {
             let is_async = if let Decl::Function { is_async, .. } = decl { *is_async } else { false };
 
             let is_extern = body.is_none() || {
-                if instance.instance.subst.is_empty() && !self.is_comptime {
-                    if let Decl::Function { name, .. } = decl {
-                        if let Some(file_info) = self.source_manager.get_file(name.file_id) {
-                            file_info.name.ends_with(".llib") || file_info.name.ends_with(".mlib")
-                        } else {
-                            false
-                        }
-                    } else {
-                        false
-                    }
-                } else {
-                    false
-                }
+                instance.instance.subst.is_empty() && !self.is_comptime
+                    && sym_id_opt.is_some_and(|symbol| self.ctx.tables.object_backed_functions.contains(&symbol))
             };
             self.current_function = Some(Function {
                 name: global_id,

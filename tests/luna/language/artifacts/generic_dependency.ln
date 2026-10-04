@@ -1,0 +1,3 @@
+module a {
+    export fn value<T>(input: T) -> i32 { return 1; }
+}
