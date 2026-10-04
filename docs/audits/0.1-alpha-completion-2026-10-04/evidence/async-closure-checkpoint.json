@@ -1,0 +1,104 @@
+{
+  "implementation_revision": "363eaf51f5d4bd59f7060cabc624ad6a6473dbea",
+  "capability_status": "PARTIAL",
+  "release_ready": false,
+  "git_blobs": {
+    "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs": "0b531b228d0fb57bf3481a18f5fa7ccc8a40297d",
+    "luna-rs/crates/luna-driver/src/async_lowering.rs": "2caf4371a39eb48b1076ba0a426f19ba1fa6560c",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "5f17f17c8a496b8b4002e313710eba8390dbce02",
+    "luna-rs/crates/luna-mvir/src/drop_glue.rs": "2bd7f17f325f7e4bb3bd140869f778d4e5ce21f9",
+    "luna-rs/crates/luna-mvir/src/lib.rs": "b8674b011537d8fb15bee4f479023de4de412f9e",
+    "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs": "6028bad1c4953ba924f8e8fa28f983c9830be45f",
+    "tests/luna/language/generic_drop/resource.ln": "3ae1586e9aff5ff3747c689941b6603794c287d9",
+    "tests/luna/language/generic_drop/future_initial_cancel.ln": "dd27dc2609318a236a1b5d65f540bf194a79955c",
+    "tests/luna/language/generic_drop/closure_borrow_escape.ln": "1caa85c32548a2e7eb95383c941ab279de664e55",
+    "tests/luna/language/generic_drop/closure_borrow_local_escape.ln": "3efcc84046f1d66bbd8d28f9517dc6dc091b158d",
+    "tests/luna/language/generic_drop/closure_borrow_move_escape.ln": "f262d0e9784a00cf0ee1c97ea5fee4d76aa0ec96",
+    "tests/luna/language/generic_drop/closure_borrow_scoped.ln": "aefb31b331a0dcc676d27bc99dd47eebd8cb8597",
+    "tests/luna/language/generic_drop/closure_capture.ln": "152ee37d9941961a104419b1767675d8a83e2da3"
+  },
+  "evidence": {
+    "r1-async-closure-driver-final.txt": {
+      "sha256": "ab234b10ada4537f31290145aaef47539fb50559920d40cbac492ab210dac521",
+      "exit_code": 0,
+      "test_results": [
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 17,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 16,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 72,
+          "failed": 0,
+          "ignored": 1
+        }
+      ]
+    },
+    "r1-async-closure-workspace-check.txt": {
+      "sha256": "3734c292a22da3c6015b0a8cd148c04936d2bbdbea45ef11e06ca4ca8ce4b31e",
+      "exit_code": 0,
+      "test_results": []
+    },
+    "r1-closure-move-borrow-cli.txt": {
+      "sha256": "dcfbfdad3def4fcd8ff5c6e584f0d6536ea81ea668c579f7b591ce26dd29cdf1",
+      "exit_code": 101,
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-closure-move-borrow-before.txt": {
+      "sha256": "d728807c37cd091a34a6e109e027c1405d8668143a89f4e1fea41d0d3c53bb85",
+      "exit_code": 0,
+      "test_results": []
+    }
+  },
+  "cli_matrix": {
+    "modes": [
+      "source-only",
+      "fresh-artifact-only"
+    ],
+    "positive_pass_per_mode": 12,
+    "positive_failure_per_mode": 1,
+    "negative_fixtures_per_mode": 10,
+    "negative_commands_per_mode": 20,
+    "remaining_failure": "closure_capture native exit3: unused owned captures are not dropped"
+  },
+  "workspace_baseline": {
+    "revision": "3d6916673f1ef16a1356f5fe592a13db96efa29c",
+    "log": "workspace-3d69166.txt.gz",
+    "exit_code": 101,
+    "totals": {
+      "passed": 1276,
+      "failed": 6,
+      "ignored": 1
+    },
+    "later_focused_pass_does_not_replace_baseline": true
+  },
+  "remaining": [
+    "closure environment destruction and invocation ownership",
+    "conditional and projected suspended future cleanup and future ABI origin",
+    "aggregate/interprocedural closure provenance",
+    "primitive constant storage/borrowing contract",
+    "whole-file source inventory isolation",
+    "artifact compatibility revision (subsequent separate change)",
+    "R2 method policy and named/default calls",
+    "R2/R3 contract matrices",
+    "R4 reconciliation",
+    "R5 exact candidate clean checkout/workspace/native CI gates"
+  ],
+  "evidence_text_normalization": "Trailing blank lines at EOF removed; command output content retained."
+}

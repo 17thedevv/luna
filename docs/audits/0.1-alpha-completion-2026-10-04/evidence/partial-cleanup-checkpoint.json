@@ -1,0 +1,384 @@
+{
+  "implementation_revision": "3d6916673f1ef16a1356f5fe592a13db96efa29c",
+  "created_utc": "2026-10-04T18:35:53.625444+07:00",
+  "capability_status": "PARTIAL",
+  "release_ready": false,
+  "workspace_test_completed": true,
+  "source_files": {
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs": "e457e4ad87740bd2676edf220c70480679323322685870824bdcba0b7b8d1413",
+    "luna-rs/crates/luna-borrowck/src/drop_flags.rs": "c08ffaf4a4e31000152e8c9644bba8233570e7577fe184a9b0839f9eb5da387a",
+    "luna-rs/crates/luna-borrowck/src/lib.rs": "ec33241615b7da63e2a3886b2925dcc67bbbc2b063fc7a2b31a494cc94969909",
+    "luna-rs/crates/luna-borrowck/src/move_analysis.rs": "e1489c4977ed0a3a326dd0d5bbba28ec04b55dbee9fdcf93bfd021c58b1dfc2b",
+    "luna-rs/crates/luna-borrowck/src/place.rs": "1f4e5c21fe10eeab866b0733d71bd1c560188063cb73ff314c37fe75a418e942",
+    "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs": "90f4c7ca506f5fd8fbf75b893e47e0a7ff12885736668a8a1a7d068426ece4b8",
+    "luna-rs/crates/luna-driver/src/lib.rs": "35b42fab01c4a03d6aa7346487a1baf80e76c9e4e3764e7777b24dabb20653dd",
+    "luna-rs/crates/luna-driver/tests/backend_fail_closed_tests.rs": "08075a24ad2f79c60888d294cbdf79aecc7f8fbc8ade996b436c9c2b1e770eb5",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "f769abba2fed4169ad0bb64c49f71c16666e6477406ab51755427ef5789fe7b1",
+    "luna-rs/crates/luna-semantic/src/mono.rs": "1cac0f0c25984ced797a5547c4ca00c62dcc4b70f21a2554198d4f439d870a0a",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "2cc757875af215f2b4192fae5c0e07710bd7ea40672ede7de51545322ccaaa00",
+    "tests/luna/language/generic_drop/branches_and_early_return.ln": "316ad262b3e92fa420608dbe04509d514891bc09f31b1b2c5b590d6e38e7a5ef",
+    "tests/luna/language/generic_drop/closure_capture.ln": "5fdc11b26f8d7cb961419d6e514daeab7cb555e29c1278faf2fc159000e5ff8f",
+    "tests/luna/language/generic_drop/conditional_initialization.ln": "1abc4596bceffe642d86b2f777503cb8d291b539a25b08a80c893b6975f51fe2",
+    "tests/luna/language/generic_drop/conditional_reinitialization.ln": "6323c87f486bf6e1d2e0875da7baaee0c21c290661bd303f6cb1993e20951d74",
+    "tests/luna/language/generic_drop/conditional_use.ln": "73dd463cfbd6942086c8414574bd16983de638c0f7d23775a14345c53ab7d24c",
+    "tests/luna/language/generic_drop/copy_drop_conflict.ln": "33e5994d761771acd34ecc982187b1cf354da015413b646a882e0db8783290bc",
+    "tests/luna/language/generic_drop/double_ownership.ln": "f502036070e64ddb369a3f68e1acaf16f728d3b9b01eda238f3d921d5d741a09",
+    "tests/luna/language/generic_drop/impl_method_substitution.ln": "92d14f7d016c3d18e4fc39d0cee306c015f8f3da64122ae517f4af29aa11d038",
+    "tests/luna/language/generic_drop/inferred_shared_write.ln": "5ff4bae033c37e2f4c50e5ce6e776e99682e94be783a29002be223b6e9fb7675",
+    "tests/luna/language/generic_drop/loop_exits.ln": "5b5efe17ac782ccac29f327425dad00e4e5f13899795b3b9f86f4205a6872a56",
+    "tests/luna/language/generic_drop/move_return.ln": "6ce866b41cb0655e2b9ebccad1a891b00e48d6d51a2e379542b810a3343a7300",
+    "tests/luna/language/generic_drop/nested_aggregates.ln": "2c5343840620e0298ac45b81b469f43c3f512cf8b563670b908ddbe9ad36a12d",
+    "tests/luna/language/generic_drop/overwrite.ln": "929c9805cbb77f668fc7491ea4144ee91e6b3156a7b8a27ea57a4f103cd64dd4",
+    "tests/luna/language/generic_drop/partial_aggregate_cleanup.ln": "0674ed14cf3ffdaf41f6172d5bf7c040426d3c04320de204a6fe49866455d874",
+    "tests/luna/language/generic_drop/partial_aggregate_use.ln": "3b13fe1c6f483711a01ac7d468b9816f5139f23c48c7bda4a4e1945767445288",
+    "tests/luna/language/generic_drop/partial_move_drop_owner.ln": "aec2a27e239dd69710dc1646549e3261e4f2c4e39828d8c896e019d1bd1c1185",
+    "tests/luna/language/generic_drop/raw_write_and_safe_overwrite.ln": "9d86627bd0d5e63fa43e4cdcfa1bb390e6f688aa939c6090c8cc6aa4c7cf7686",
+    "tests/luna/language/generic_drop/resource.ln": "6e43bb813358e0f2c943df61114b7dc0448eb5c1d7b573eeff231e34a2e28e63",
+    "tests/luna/language/generic_drop/use_after_move.ln": "38bf24e787ddb805687d3d8b89b994d0ef84355c1b976b075ebbbbb6c2ad227d"
+  },
+  "evidence": {
+    "r1-partial-aggregate-before.txt": {
+      "sha256": "5600b5334ecca79b6a31532630798f1bb6dd7f49a38feb615f37ad89adae5936",
+      "test_results": []
+    },
+    "r1-partial-build.txt": {
+      "sha256": "a723575d669a4c51de0ee5feade937cf3c9c7dc36f2b87b40fb870a1b89e13c4",
+      "test_results": []
+    },
+    "r1-partial-cli.txt": {
+      "sha256": "2c46b2666de79b14ac4ed3f4105b70127b90303d7ee89c14e4901c23e83bde11",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-partial-return-cli.txt": {
+      "sha256": "264c5738a34f4ba345a5ff6d1da8ed912213417ccf4d2f3295807a05528163ba",
+      "test_results": [
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-partial-final-cli.txt": {
+      "sha256": "66a3bf48188a6c721ca138fc09a6dfe4e103ab1c184b0d7158ea0d5b6d078054",
+      "test_results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-partial-resolved-cli.txt": {
+      "sha256": "d28374441b54bfe79b64a1dd8bd20c0437be8c975b6a2bede781fe7e60e2447b",
+      "test_results": [
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 1,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-partial-driver.txt": {
+      "sha256": "e087bfae00db23d61a5ab3c4891b99fe0f1f7b118a329132da00332471e54230",
+      "test_results": [
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 13,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-partial-semantic-borrow.txt": {
+      "sha256": "cef294f478f521b0c38b86fbf81ed4c56342cd90247fc0c84e3e33a4a2123ee4",
+      "test_results": [
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 12,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 22,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 21,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 19,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 18,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 20,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    "r1-partial-final-build.txt": {
+      "sha256": "151c9d688b54503c03a64437e1a6d650944cc68de6377856bfdc74fef6c48513",
+      "test_results": []
+    },
+    "r1-partial-final-sysroot.txt": {
+      "sha256": "61975e353a69edf06e50e78aafc4327a54a076b14808ef3fe23041eec0365843",
+      "test_results": []
+    },
+    "r1-partial-workspace-check.txt": {
+      "sha256": "ee35ecb6da6df198f5a267588b938221834fe271ff3ad7d8418e0034d11989a3",
+      "test_results": []
+    },
+    "r1-partial-exact-build.txt": {
+      "sha256": "58aa7ee53ad92557a693f193a9a2f214ab7f099e66b0023b407d03bee3d2bb20",
+      "test_results": []
+    },
+    "r1-partial-exact-sysroot.txt": {
+      "sha256": "61975e353a69edf06e50e78aafc4327a54a076b14808ef3fe23041eec0365843",
+      "test_results": []
+    },
+    "ci-after-drop-checkpoint.json": {
+      "sha256": "be451930c9204e2df8d0dd078a5907fed9f0e58739f320dd8ac5d6cd5d7d5fa0",
+      "test_results": []
+    }
+  },
+  "cli_matrix": {
+    "positive_fixtures_per_mode": 11,
+    "positive_pass_per_mode": 10,
+    "negative_fixtures_per_mode": 7,
+    "negative_commands_per_mode": 14,
+    "remaining_failure": "closure_capture native exit3 in source and fresh artifact modes",
+    "revision_boundary": "Resolved CLI matrix precedes final assignment span restoration; driver/semantic/borrowck reruns precede inferred-member/mutability changes. Exact-revision full workspace completed exit101; later repairs require separate verification."
+  },
+  "workspace_run": {
+    "implementation_revision": "3d6916673f1ef16a1356f5fe592a13db96efa29c",
+    "command": "cargo test --workspace --no-fail-fast -- --nocapture",
+    "unified_exec_session_id": 11529,
+    "log": "workspace-3d69166.txt.gz",
+    "status": "completed; exit101",
+    "release_gate_scope": "local workspace regression; not a clean checkout, CI or complete native release certificate",
+    "exit_code": 101,
+    "test_totals": {
+      "passed": 1276,
+      "failed": 6,
+      "ignored": 1
+    },
+    "sha256": "14517c0d1e3cd585b01f088181e15fe1f70e462b1c25ac63e0194a62e5caf479",
+    "summary": "workspace-3d69166.summary.txt",
+    "raw_sha256": "218a90c1986d901a21a02266f4bd1dfd73242270ab64519558121924a51a57e7"
+  },
+  "scope_remaining": [
+    "closure destruction and invocation ownership",
+    "remaining projected/enum/indexed cleanup, async cancellation and R1 soundness",
+    "artifact compatibility revision for pre-repair bodies",
+    "R2/R3 contract matrices",
+    "METHOD-RESOLUTION-v1",
+    "CALL-ARGUMENTS-v1 named binding and per-call defaults",
+    "R4 documentation reconciliation",
+    "R5 exact-candidate full workspace, CI and native clean-checkout gates"
+  ],
+  "evidence_text_normalization": "Trailing blank lines at EOF removed; command output content retained."
+}

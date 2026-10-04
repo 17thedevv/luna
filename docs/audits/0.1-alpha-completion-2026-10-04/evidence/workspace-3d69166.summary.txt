@@ -1,0 +1,682 @@
+Exact revision: 3d6916673f1ef16a1356f5fe592a13db96efa29c
+Command: cargo test --workspace --no-fail-fast -- --nocapture
+Exit: 101
+Aggregate totals: {"failed": 6, "ignored": 1, "passed": 1276}
+Raw SHA256: 218a90c1986d901a21a02266f4bd1dfd73242270ab64519558121924a51a57e7
+Lossless raw log: workspace-3d69166.txt.gz
+This summary extracts test result lines and failure contexts. The compressed log preserves the full output.
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 67.30s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.22s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 42.54s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 57.80s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.10s
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 39.44s
+error: test failed, to rerun pass `-p luna-cli --test generic_drop_cli`
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.50s
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 73.25s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 31.41s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.56s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 48.88s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: FAILED. 15 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.68s
+error: test failed, to rerun pass `-p luna-driver --test adv_async_dyn_tests`
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.66s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.77s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.15s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.62s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.74s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.23s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.60s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.66s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 68.79s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.45s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.41s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.62s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.75s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.84s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.17s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 143.08s
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.72s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.81s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.95s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.80s
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.16s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.97s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.17s
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.63s
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.61s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 28.09s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.65s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+test result: FAILED. 71 passed; 1 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.04s
+error: test failed, to rerun pass `-p luna-driver --test sem_maturity_phase2b`
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.20s
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.56s
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.35s
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.70s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 9.96s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.90s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 18.72s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 43.02s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.32s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 29.82s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 7.39s
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 19.93s
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.61s
+test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.26s
+error: test failed, to rerun pass `-p luna-driver --test stdlib_option_result_borrow_acceptance_tests`
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.72s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 36.78s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.38s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.73s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.37s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.38s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.68s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.44s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.88s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.91s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.22s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.33s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.02s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.58s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 62.76s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 12.61s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 13.15s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.76s
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 21.20s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.10s
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 11.11s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.57s
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.67s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.01s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.02s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.77s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 6.30s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.56s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.86s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.24s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.68s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.54s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 32.78s
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.76s
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 49.00s
+error: test failed, to rerun pass `-p luna-driver --test whole_file_io_v1_acceptance_tests`
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+error: 5 targets failed:
+
+Failure context at raw line 1251:
+thread 'generic_owned_values_drop_once_across_control_flow_and_provider_modes' (2688) panicked at crates\luna-cli\tests\generic_drop_cli.rs:93:5:
+source/closure_capture run: status: exit code: 3
+stdout:
+
+stderr:
+
+
+artifact/closure_capture run: status: exit code: 3
+stdout:
+
+stderr:
+
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test generic_owned_values_drop_once_across_control_flow_and_provider_modes ... FAILED
+
+failures:
+
+failures:
+    generic_owned_values_drop_once_across_control_flow_and_provider_modes
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 39.44s
+
+error: test failed, to rerun pass `-p luna-cli --test generic_drop_cli`
+     Running tests\literal_typing_cli_parity.rs (target\debug\deps\literal_typing_cli_parity-ef5083d4135b980f.exe)
+
+running 1 test
+test literals_full_codegen_and_negative_matrix_match_fresh_artifacts ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 8.50s
+
+     Running tests\semantic_maturity_phase0.rs (target\debug\deps\semantic_maturity_phase0-0962194a69e1923f.exe)
+
+running 22 tests
+test sem_diag_01_unknown_method_is_rejected ... ok
+test sem_const_01_local_mutation_is_accepted ... ok
+test sem_borrow_02_conflicting_field_borrow_is_rejected ... ok
+test sem_assoc_01_same_provider_projection_is_accepted ... ok
+test sem_coherence_01_reference_head_orphan_is_rejected ... ok
+test sem_borrow_01_shared_then_mutable_is_accepted ... ok
+test sem_assoc_02_cross_provider_projection_is_accepted ... ok
+test sem_diag_02_use_after_move_uses_frozen_numeric_code ... ok
+test sem_const_02_division_by_zero_is_rejected ... ok
+test sem_diag_03_partial_move_uses_frozen_numeric_code ... ok
+test sem_diag_05_private_access_uses_frozen_numeric_code ... ok
+test sem_drop_01_partial_move_under_drop_is_rejected ... ok
+test sem_generic_01_nested_user_types_are_accepted ... ok
+test sem_lifetime_01_union_provenance_is_accepted ... ok
+test sem_lifetime_02_local_escape_is_rejected ... ok
+test sem_own_01_use_after_move_is_rejected ... ok
+test sem_trait_01_generic_trait_argument_is_accepted ... ok
+test sem_vis_01_explicit_private_field_is_rejected_externally ... ok
+test sem_diag_04_borrow_conflict_uses_frozen_numeric_code ... ok
+test sem_provider_01_duplicate_root_definition_is_rejected ... ok
+test sem_method_01_sequential_mut_receivers_are_accepted ... ok
+test sem_iter_01_user_defined_for_in_is_accepted ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s
+
+     Running tests\semantic_maturity_phase2a.rs (target\debug\deps\semantic_maturity_phase2a-8d6fc7094de4e532.exe)
+
+running 11 tests
+test sem2a_assoc_01_generic_inherent_function_is_accepted ... ok
+test sem2a_assoc_03_receiver_method_without_receiver_is_rejected ... ok
+test sem2a_assoc_02_trait_function_is_accepted ... ok
+test sem2a_trait_02_shared_receiver_for_mutable_method_is_rejected ... ok
+test sem2a_method_01_generic_inherent_method_is_accepted ... ok
+test sem2a_method_02_explicit_generic_mismatch_is_rejected ... ok
+test sem2a_generic_01_nested_trait_bound_is_accepted ... ok
+test sem2a_trait_01_generic_mutable_receiver_is_accepted ... ok
+test sem2a_generic_02_missing_nested_bound_is_rejected ... ok
+test sem2a_type_02_generic_alias_mismatch_is_rejected ... ok
+test sem2a_type_01_nested_generic_alias_is_accepted ... ok
+
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+
+Failure context at raw line 1820:
+thread 'test_adv_14_future_cancellation_at_suspended_state_with_dyn_trait' (12764) panicked at crates\luna-driver\tests\adv_async_dyn_tests.rs:568:5:
+Future cancellation at suspended state with dyn Trait should compile cleanly: [Diagnostic { level: Error, code: Some(BackendInvariantViolation), span: None, message: "Backend Error: Compiler internal invariant violated: In function _MFN6workerE_drop (val ValueId(16), inst Drop { value: Value(ValueId(15)), ty: SemanticTypeId(1029), callee: Some(GlobalId { name: \"drop\", symbol_id: Some(SymbolId(1634)) }) }): InvariantViolation(\"Drop callee not found: drop\")", related: [] }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test test_adv_14_future_cancellation_at_suspended_state_with_dyn_trait ... FAILED
+
+failures:
+
+failures:
+    test_adv_14_future_cancellation_at_suspended_state_with_dyn_trait
+
+test result: FAILED. 15 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.68s
+
+error: test failed, to rerun pass `-p luna-driver --test adv_async_dyn_tests`
+     Running tests\adv_comptime_dyn_tests.rs (target\debug\deps\adv_comptime_dyn_tests-f295a39030cb4afe.exe)
+
+running 16 tests
+test test_adv_comptime_09_unmonomorphized_generic_comptime_rejected ... ok
+test test_adv_comptime_02_make_trait_object_and_call ... ok
+test test_adv_comptime_12_comptime_dyn_heap_leak_rejected ... ok
+test test_adv_comptime_11_comptime_dyn_trait_drop_glue ... ok
+test test_adv_comptime_13_virtual_call_on_missing_method_trapped ... ok
+test test_adv_comptime_14_unresolved_projection_barrier ... ok
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+
+Failure context at raw line 57901:
+thread 'regression_controls::e3005_02_closure_local_borrow' (19660) panicked at crates\luna-driver\tests\sem_maturity_phase2b.rs:66:5:
+E3005-02: Closure capturing local borrow cannot escape: expected compile failure, but succeeded
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test regression_controls::e3005_02_closure_local_borrow ... FAILED
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+test shared_borrow_after_ended_mutable::sem_borrow_ended_01_mut_then_shared ... ok
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+test shared_borrow_after_ended_mutable::sem_borrow_ended_05_fn_call_mut_then_shared ... ok
+test shared_borrow_after_ended_mutable::sem_borrow_ended_03_multiple_mutations_then_shared ... ok
+test shared_borrow_after_ended_mutable::sem_borrow_ended_02_shared_while_mut_live ... ok
+DEBUG: resolve_collected_imports finished successfully
+test shared_borrow_after_ended_mutable::sem_borrow_ended_04_retained_mutable_blocks_shared ... ok
+test regression_controls::e3001_02_use_after_move_function_arg ... ok
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+test regression_controls::e3003_01_multiple_shared_borrows_allowed ... ok
+test regression_controls::e3003_02_mutable_shared_conflict ... ok
+test regression_controls::e3005_01_local_borrow_escape ... ok
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+
+Failure context at raw line 856640:
+thread 'test_opt_res_source_and_llib_parity' (26344) panicked at crates\luna-driver\tests\stdlib_option_result_borrow_acceptance_tests.rs:434:5:
+Compiling my_provider.ln to .llib MUST succeed: Some([Diagnostic { level: Error, code: Some(LocalBorrowEscape), span: Some(Span { file_id: FileId(0), start: 437, end: 442, ctxt: SyntaxContext(0) }), message: "LocalBorrowEscape: Reference to local variable escapes function scope", related: [] }])
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test test_opt_as_mut_valid_write ... ok
+test test_opt_res_source_and_llib_parity ... FAILED
+test test_opt_res_local_escape_rejected ... ok
+test test_opt_as_mut_exclusive_borrow_conflict_rejected ... ok
+test test_opt_as_ref_mutation_conflict_rejected ... ok
+test test_res_as_ref_and_as_mut_contract ... ok
+test test_opt_as_ref_mutation_after_drop_allowed ... ok
+test test_opt_res_nested_generic_projection ... ok
+test test_opt_as_ref_valid_read ... ok
+
+failures:
+
+failures:
+    test_opt_res_source_and_llib_parity
+
+test result: FAILED. 8 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.26s
+
+error: test failed, to rerun pass `-p luna-driver --test stdlib_option_result_borrow_acceptance_tests`
+     Running tests\stdlib_option_result_conversions_acceptance_tests.rs (target\debug\deps\stdlib_option_result_conversions_acceptance_tests-e185b168034d7aa5.exe)
+
+running 10 tests
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+
+Failure context at raw line 1099983:
+thread 'whole_file_io_source_and_fresh_artifact_parity' (3976) panicked at crates\luna-driver\tests\whole_file_io_v1_acceptance_tests.rs:106:9:
+Whole-File I/O fixture failed to compile:
+None: fatal error: required component `__lang_drop` could not be bootstrapped. Luna requires `__lang_drop` for language primitives and runtime items.
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test whole_file_io_source_and_fresh_artifact_parity ... FAILED
+Diagnostic { level: Error, code: Some(UnresolvedModuleProvider), span: None, message: "external component `__lang_drop` not found in `C:\\Users\\84387\\AppData\\Local\\Temp\\luna_whole_file_io_copy_failure_parity_8804_1791114703891370100\\source\\libs\\external`", related: [] }
+
+thread 'copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_modes' (18160) panicked at crates\luna-driver\tests\whole_file_io_v1_acceptance_tests.rs:255:27:
+source copy-failure fixture did not compile: [
+    Diagnostic {
+        level: Error,
+        code: Some(
+            UnresolvedModuleProvider,
+        ),
+        span: None,
+        message: "fatal error: required component `__lang_drop` could not be bootstrapped. Luna requires `__lang_drop` for language primitives and runtime items.",
+        related: [],
+    },
+]
+test copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_modes ... FAILED
+
+failures:
+
+failures:
+    copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_modes
+    whole_file_io_source_and_fresh_artifact_parity
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 49.00s
+
+error: test failed, to rerun pass `-p luna-driver --test whole_file_io_v1_acceptance_tests`
+     Running unittests src\lib.rs (target\debug\deps\luna_lexer-5e8ff5b565c16c0a.exe)
+
+running 3 tests
+test literal::tests::byte_arrays_are_not_text_or_c_strings ... ok
+test literal::tests::ranges_do_not_depend_on_host_width ... ok
+test literal::tests::exact_magnitude_and_suffix ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\luna_llib-0f3b01741c764dea.exe)
+
+running 7 tests
+test reader::semantic_metadata_version_tests::old_semantic_metadata_is_rejected_before_payload_decode ... ok
+test reader::semantic_metadata_version_tests::truncated_semantic_metadata_version_is_corrupt ... ok
+test reader::raw_anchor_validation_tests::rejects_unknown_anchor_contract_version ... ok
+test reader::raw_anchor_validation_tests::rejects_raw_pointer_effect_parameter_outside_function_signature ... ok
+test reader::raw_anchor_validation_tests::rejects_contract_on_non_struct_or_non_pointer_field ... ok
+test reader::semantic_metadata_version_tests::old_execution_identity_protocol_is_rejected_before_payload_decode ... ok
+test metadata::raw_storage_anchor_interface_tests::anchor_contract_is_owned_by_type_identity_and_changes_interface_fingerprint ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\llib_tests.rs (target\debug\deps\llib_tests-35961197c72ecead.exe)
+
+running 6 tests
+test test_invalid_magic ... ok
+test test_version_mismatch ... ok
+test test_mvir_version_mismatch ... ok
+test test_unknown_section ... ok
+test test_corrupted_data ... ok
+test test_golden_roundtrip ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\luna_mvir-91e1d54a9692eb68.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\comptime_execution_availability.rs (target\debug\deps\comptime_execution_availability-b99a425af9d44131.exe)
+
+running 7 tests
+test uninitialized_storage_does_not_require_a_destructor_call ... ok
+test already_dropped_storage_is_not_dropped_again ... ok
+
+Failure context at raw line 1099990:
+thread 'copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_modes' (18160) panicked at crates\luna-driver\tests\whole_file_io_v1_acceptance_tests.rs:255:27:
+source copy-failure fixture did not compile: [
+    Diagnostic {
+        level: Error,
+        code: Some(
+            UnresolvedModuleProvider,
+        ),
+        span: None,
+        message: "fatal error: required component `__lang_drop` could not be bootstrapped. Luna requires `__lang_drop` for language primitives and runtime items.",
+        related: [],
+    },
+]
+test copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_modes ... FAILED
+
+failures:
+
+failures:
+    copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_modes
+    whole_file_io_source_and_fresh_artifact_parity
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 0 filtered out; finished in 49.00s
+
+error: test failed, to rerun pass `-p luna-driver --test whole_file_io_v1_acceptance_tests`
+     Running unittests src\lib.rs (target\debug\deps\luna_lexer-5e8ff5b565c16c0a.exe)
+
+running 3 tests
+test literal::tests::byte_arrays_are_not_text_or_c_strings ... ok
+test literal::tests::ranges_do_not_depend_on_host_width ... ok
+test literal::tests::exact_magnitude_and_suffix ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\luna_llib-0f3b01741c764dea.exe)
+
+running 7 tests
+test reader::semantic_metadata_version_tests::old_semantic_metadata_is_rejected_before_payload_decode ... ok
+test reader::semantic_metadata_version_tests::truncated_semantic_metadata_version_is_corrupt ... ok
+test reader::raw_anchor_validation_tests::rejects_unknown_anchor_contract_version ... ok
+test reader::raw_anchor_validation_tests::rejects_raw_pointer_effect_parameter_outside_function_signature ... ok
+test reader::raw_anchor_validation_tests::rejects_contract_on_non_struct_or_non_pointer_field ... ok
+test reader::semantic_metadata_version_tests::old_execution_identity_protocol_is_rejected_before_payload_decode ... ok
+test metadata::raw_storage_anchor_interface_tests::anchor_contract_is_owned_by_type_identity_and_changes_interface_fingerprint ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\llib_tests.rs (target\debug\deps\llib_tests-35961197c72ecead.exe)
+
+running 6 tests
+test test_invalid_magic ... ok
+test test_version_mismatch ... ok
+test test_mvir_version_mismatch ... ok
+test test_unknown_section ... ok
+test test_corrupted_data ... ok
+test test_golden_roundtrip ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\luna_mvir-91e1d54a9692eb68.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\comptime_execution_availability.rs (target\debug\deps\comptime_execution_availability-b99a425af9d44131.exe)
+
+running 7 tests
+test uninitialized_storage_does_not_require_a_destructor_call ... ok
+test already_dropped_storage_is_not_dropped_again ... ok
+test missing_required_destructor_is_not_a_no_op ... ok
+test ordinary_missing_callee_and_bodyless_entry_fail_closed ... ok
+test extern_destructor_remains_forbidden_with_a_retained_body ... ok
+test effectful_destructor_remains_forbidden_with_a_retained_body ... ok
+test present_required_destructor_is_executed ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Final output:
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_parser
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests luna_semantic
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: 5 targets failed:
+    `-p luna-cli --test generic_drop_cli`
+    `-p luna-driver --test adv_async_dyn_tests`
+    `-p luna-driver --test sem_maturity_phase2b`
+    `-p luna-driver --test stdlib_option_result_borrow_acceptance_tests`
+    `-p luna-driver --test whole_file_io_v1_acceptance_tests`

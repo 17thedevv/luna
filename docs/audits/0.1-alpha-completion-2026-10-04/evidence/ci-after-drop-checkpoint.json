@@ -1,0 +1,956 @@
+{
+  "observed_utc": "2026-10-04T11:26:05.379766+00:00",
+  "request_url": "https://api.github.com/repos/17thedevv/luna/actions/runs?branch=codex%2Fantigravity-repair-0.1&per_page=12",
+  "runs": [
+    {
+      "id": 37190486969,
+      "name": "Phase 5 platform verification",
+      "head_sha": "5ef8137073c7a5416ad8a271b91ce3455675b00c",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486969",
+      "created_at": "2026-10-04T08:55:30Z",
+      "updated_at": "2026-10-04T09:02:20Z",
+      "jobs": [
+        {
+          "id": 111401430532,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "completed",
+          "conclusion": "failure",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486969/job/111401430532",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:34Z",
+              "completed_at": "2026-10-04T08:55:36Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:36Z",
+              "completed_at": "2026-10-04T08:55:38Z"
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:38Z",
+              "completed_at": "2026-10-04T08:55:51Z"
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-04T08:55:51Z",
+              "completed_at": "2026-10-04T08:55:58Z"
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:55:58Z",
+              "completed_at": "2026-10-04T08:56:00Z"
+            },
+            {
+              "name": "Build canonical sysroot artifacts",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-04T08:56:00Z",
+              "completed_at": "2026-10-04T08:56:37Z"
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 7,
+              "started_at": "2026-10-04T08:56:37Z",
+              "completed_at": "2026-10-04T09:00:40Z"
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-04T09:00:40Z",
+              "completed_at": "2026-10-04T09:00:40Z"
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-10-04T09:00:40Z",
+              "completed_at": "2026-10-04T09:00:40Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-04T09:00:40Z",
+              "completed_at": "2026-10-04T09:00:41Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-04T09:00:41Z",
+              "completed_at": "2026-10-04T09:00:41Z"
+            }
+          ]
+        },
+        {
+          "id": 111401430608,
+          "name": "RuntimeAbiTests (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486969/job/111401430608",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:35Z",
+              "completed_at": "2026-10-04T08:55:36Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:36Z",
+              "completed_at": "2026-10-04T08:55:42Z"
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:42Z",
+              "completed_at": "2026-10-04T08:55:51Z"
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-04T08:55:51Z",
+              "completed_at": "2026-10-04T08:55:56Z"
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:55:56Z",
+              "completed_at": "2026-10-04T08:55:57Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-10-04T08:55:57Z",
+              "completed_at": "2026-10-04T08:55:59Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-10-04T08:55:59Z",
+              "completed_at": "2026-10-04T08:56:01Z"
+            }
+          ]
+        },
+        {
+          "id": 111401430640,
+          "name": "RuntimeAbiTests (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486969/job/111401430640",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:35Z",
+              "completed_at": "2026-10-04T08:55:36Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:36Z",
+              "completed_at": "2026-10-04T08:55:38Z"
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:38Z",
+              "completed_at": "2026-10-04T08:55:40Z"
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-04T08:55:40Z",
+              "completed_at": "2026-10-04T08:55:41Z"
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:55:41Z",
+              "completed_at": "2026-10-04T08:55:43Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-10-04T08:55:43Z",
+              "completed_at": "2026-10-04T08:55:43Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-10-04T08:55:43Z",
+              "completed_at": "2026-10-04T08:55:43Z"
+            }
+          ]
+        },
+        {
+          "id": 111401430644,
+          "name": "Whole-File I/O parity (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486969/job/111401430644",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:19Z",
+              "completed_at": "2026-10-04T08:55:25Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:25Z",
+              "completed_at": "2026-10-04T08:55:47Z"
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:47Z",
+              "completed_at": "2026-10-04T08:55:47Z"
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-04T08:55:47Z",
+              "completed_at": "2026-10-04T08:55:58Z"
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:55:58Z",
+              "completed_at": "2026-10-04T08:56:21Z"
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-04T08:56:21Z",
+              "completed_at": "2026-10-04T08:56:30Z"
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-10-04T08:56:30Z",
+              "completed_at": "2026-10-04T09:01:58Z"
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-10-04T09:01:58Z",
+              "completed_at": "2026-10-04T09:01:58Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-10-04T09:01:58Z",
+              "completed_at": "2026-10-04T09:02:00Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-10-04T09:02:00Z",
+              "completed_at": "2026-10-04T09:02:00Z"
+            }
+          ]
+        },
+        {
+          "id": 111401430696,
+          "name": "Whole-File I/O parity (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486969/job/111401430696",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:36Z",
+              "completed_at": "2026-10-04T08:55:38Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:38Z",
+              "completed_at": "2026-10-04T08:55:40Z"
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:40Z",
+              "completed_at": "2026-10-04T08:55:55Z"
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4,
+              "started_at": "2026-10-04T08:55:55Z",
+              "completed_at": "2026-10-04T08:55:55Z"
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:55:55Z",
+              "completed_at": "2026-10-04T08:56:04Z"
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-04T08:56:04Z",
+              "completed_at": "2026-10-04T08:56:06Z"
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-10-04T08:56:06Z",
+              "completed_at": "2026-10-04T08:58:55Z"
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-10-04T08:58:55Z",
+              "completed_at": "2026-10-04T08:58:55Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14,
+              "started_at": "2026-10-04T08:58:55Z",
+              "completed_at": "2026-10-04T08:58:55Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-10-04T08:58:55Z",
+              "completed_at": "2026-10-04T08:58:55Z"
+            }
+          ]
+        },
+        {
+          "id": 111401430741,
+          "name": "Runtime partial-read cleanup (Ubuntu + ASan)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486969/job/111401430741",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:34Z",
+              "completed_at": "2026-10-04T08:55:35Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:35Z",
+              "completed_at": "2026-10-04T08:55:37Z"
+            },
+            {
+              "name": "Configure runtime with AddressSanitizer",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:37Z",
+              "completed_at": "2026-10-04T08:55:38Z"
+            },
+            {
+              "name": "Build sanitized runtime tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-04T08:55:38Z",
+              "completed_at": "2026-10-04T08:55:38Z"
+            },
+            {
+              "name": "Run RuntimeAbiTests with leak detection",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:55:38Z",
+              "completed_at": "2026-10-04T08:55:44Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-10-04T08:55:44Z",
+              "completed_at": "2026-10-04T08:55:44Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-10-04T08:55:44Z",
+              "completed_at": "2026-10-04T08:55:44Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 37190486956,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "5ef8137073c7a5416ad8a271b91ce3455675b00c",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486956",
+      "created_at": "2026-10-04T08:55:30Z",
+      "updated_at": "2026-10-04T09:05:22Z",
+      "jobs": [
+        {
+          "id": 111401430555,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "completed",
+          "conclusion": "failure",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486956/job/111401430555",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:34Z",
+              "completed_at": "2026-10-04T08:55:35Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:35Z",
+              "completed_at": "2026-10-04T08:55:37Z"
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:37Z",
+              "completed_at": "2026-10-04T08:55:50Z"
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-04T08:55:50Z",
+              "completed_at": "2026-10-04T08:56:00Z"
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:56:00Z",
+              "completed_at": "2026-10-04T08:56:10Z"
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-04T08:56:10Z",
+              "completed_at": "2026-10-04T08:57:17Z"
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "completed",
+              "conclusion": "failure",
+              "number": 7,
+              "started_at": "2026-10-04T08:57:17Z",
+              "completed_at": "2026-10-04T09:04:50Z"
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 8,
+              "started_at": "2026-10-04T09:04:50Z",
+              "completed_at": "2026-10-04T09:04:50Z"
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-10-04T09:04:50Z",
+              "completed_at": "2026-10-04T09:04:50Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-04T09:04:50Z",
+              "completed_at": "2026-10-04T09:04:50Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 17,
+              "started_at": "2026-10-04T09:04:50Z",
+              "completed_at": "2026-10-04T09:04:50Z"
+            }
+          ]
+        },
+        {
+          "id": 111401430680,
+          "name": "Formatting acceptance (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486956/job/111401430680",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:35Z",
+              "completed_at": "2026-10-04T08:55:37Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:37Z",
+              "completed_at": "2026-10-04T08:55:41Z"
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:41Z",
+              "completed_at": "2026-10-04T08:56:02Z"
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4,
+              "started_at": "2026-10-04T08:56:02Z",
+              "completed_at": "2026-10-04T08:56:02Z"
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:56:02Z",
+              "completed_at": "2026-10-04T08:56:11Z"
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-04T08:56:11Z",
+              "completed_at": "2026-10-04T08:56:14Z"
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-10-04T08:56:14Z",
+              "completed_at": "2026-10-04T08:57:08Z"
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-10-04T08:57:08Z",
+              "completed_at": "2026-10-04T08:57:18Z"
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-10-04T08:57:18Z",
+              "completed_at": "2026-10-04T08:57:18Z"
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-10-04T08:57:18Z",
+              "completed_at": "2026-10-04T09:00:07Z"
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-10-04T09:00:07Z",
+              "completed_at": "2026-10-04T09:01:20Z"
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-10-04T09:01:20Z",
+              "completed_at": "2026-10-04T09:02:48Z"
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-10-04T09:02:48Z",
+              "completed_at": "2026-10-04T09:02:48Z"
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25,
+              "started_at": "2026-10-04T09:02:48Z",
+              "completed_at": "2026-10-04T09:02:48Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26,
+              "started_at": "2026-10-04T09:02:48Z",
+              "completed_at": "2026-10-04T09:02:48Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27,
+              "started_at": "2026-10-04T09:02:48Z",
+              "completed_at": "2026-10-04T09:02:48Z"
+            }
+          ]
+        },
+        {
+          "id": 111401430694,
+          "name": "Formatting acceptance (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "html_url": "https://github.com/17thedevv/luna/actions/runs/37190486956/job/111401430694",
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1,
+              "started_at": "2026-10-04T08:55:37Z",
+              "completed_at": "2026-10-04T08:55:40Z"
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2,
+              "started_at": "2026-10-04T08:55:40Z",
+              "completed_at": "2026-10-04T08:55:43Z"
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3,
+              "started_at": "2026-10-04T08:55:43Z",
+              "completed_at": "2026-10-04T08:55:43Z"
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4,
+              "started_at": "2026-10-04T08:55:43Z",
+              "completed_at": "2026-10-04T08:55:47Z"
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5,
+              "started_at": "2026-10-04T08:55:47Z",
+              "completed_at": "2026-10-04T08:56:09Z"
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6,
+              "started_at": "2026-10-04T08:56:09Z",
+              "completed_at": "2026-10-04T08:56:17Z"
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7,
+              "started_at": "2026-10-04T08:56:17Z",
+              "completed_at": "2026-10-04T08:57:39Z"
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8,
+              "started_at": "2026-10-04T08:57:39Z",
+              "completed_at": "2026-10-04T08:58:01Z"
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9,
+              "started_at": "2026-10-04T08:58:01Z",
+              "completed_at": "2026-10-04T08:58:03Z"
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10,
+              "started_at": "2026-10-04T08:58:03Z",
+              "completed_at": "2026-10-04T09:01:42Z"
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11,
+              "started_at": "2026-10-04T09:01:42Z",
+              "completed_at": "2026-10-04T09:03:16Z"
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12,
+              "started_at": "2026-10-04T09:03:16Z",
+              "completed_at": "2026-10-04T09:05:17Z"
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13,
+              "started_at": "2026-10-04T09:05:17Z",
+              "completed_at": "2026-10-04T09:05:17Z"
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25,
+              "started_at": "2026-10-04T09:05:17Z",
+              "completed_at": "2026-10-04T09:05:17Z"
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26,
+              "started_at": "2026-10-04T09:05:17Z",
+              "completed_at": "2026-10-04T09:05:18Z"
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27,
+              "started_at": "2026-10-04T09:05:18Z",
+              "completed_at": "2026-10-04T09:05:19Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 37189172853,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "139e44373d381a7362906e191e8c2000fdb375f1",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37189172853",
+      "created_at": "2026-10-04T08:30:57Z",
+      "updated_at": "2026-10-04T09:00:00Z"
+    },
+    {
+      "id": 37189172861,
+      "name": "Phase 5 platform verification",
+      "head_sha": "139e44373d381a7362906e191e8c2000fdb375f1",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37189172861",
+      "created_at": "2026-10-04T08:30:57Z",
+      "updated_at": "2026-10-04T08:59:49Z"
+    },
+    {
+      "id": 37179483561,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "c8d0559500e78ef85c96ac842e824e639917cbad",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37179483561",
+      "created_at": "2026-10-04T05:18:00Z",
+      "updated_at": "2026-10-04T05:43:00Z"
+    },
+    {
+      "id": 37179483526,
+      "name": "Phase 5 platform verification",
+      "head_sha": "c8d0559500e78ef85c96ac842e824e639917cbad",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37179483526",
+      "created_at": "2026-10-04T05:18:00Z",
+      "updated_at": "2026-10-04T05:43:31Z"
+    },
+    {
+      "id": 37175356920,
+      "name": "Phase 5 platform verification",
+      "head_sha": "4a5adf42a4fdb48b640acaa14c097adb675a9b60",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37175356920",
+      "created_at": "2026-10-04T03:53:21Z",
+      "updated_at": "2026-10-04T04:21:28Z"
+    },
+    {
+      "id": 37175356940,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "4a5adf42a4fdb48b640acaa14c097adb675a9b60",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37175356940",
+      "created_at": "2026-10-04T03:53:21Z",
+      "updated_at": "2026-10-04T04:09:49Z"
+    },
+    {
+      "id": 37135386038,
+      "name": "Phase 5 platform verification",
+      "head_sha": "b330ee38113254e653531796f2ee44befc30f339",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37135386038",
+      "created_at": "2026-10-03T16:02:26Z",
+      "updated_at": "2026-10-03T16:12:11Z"
+    },
+    {
+      "id": 37135386492,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "b330ee38113254e653531796f2ee44befc30f339",
+      "status": "completed",
+      "conclusion": "failure",
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/37135386492",
+      "created_at": "2026-10-03T16:02:26Z",
+      "updated_at": "2026-10-03T16:16:05Z"
+    }
+  ],
+  "failed_workspace_log_fetch": {
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/jobs/111401430532/logs",
+    "result": "unavailable through unauthenticated public API",
+    "http_status": 403
+  }
+}
