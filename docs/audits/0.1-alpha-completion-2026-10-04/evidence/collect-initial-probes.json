@@ -1,0 +1,49 @@
+{
+  "directory": "C:\\Users\\84387\\AppData\\Local\\Temp\\luna_collect_crash_348nioqq",
+  "scope": "Source-only and existing canonical artifact discovery; artifacts not rebuilt for this initial diagnosis",
+  "results": [
+    {
+      "mode": "artifact",
+      "variant": "original",
+      "build_exit": 0,
+      "diagnostics": "",
+      "run_exit": 3221225477
+    },
+    {
+      "mode": "artifact",
+      "variant": "borrowed_predicate",
+      "build_exit": 1,
+      "diagnostics": "error[E0003]: Expected type\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_collect_crash_348nioqq\\artifact_borrowed_predicate.ln:17:23\n   |\n17 |         fn is_even(x: &&i32) -> bool {\n   |                       ^^\n\nerror[E0003]: Expected expression.\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_collect_crash_348nioqq\\artifact_borrowed_predicate.ln:19:9\n   |\n19 |         }\n   |         ^\n\n"
+    },
+    {
+      "mode": "source",
+      "variant": "original",
+      "build_exit": 0,
+      "diagnostics": "",
+      "run_exit": 3221225477
+    },
+    {
+      "mode": "source",
+      "variant": "borrowed_predicate",
+      "build_exit": 1,
+      "diagnostics": "error[E0003]: Expected type\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_collect_crash_348nioqq\\source_borrowed_predicate.ln:17:23\n   |\n17 |         fn is_even(x: &&i32) -> bool {\n   |                       ^^\n\nerror[E0003]: Expected expression.\n  --> C:\\Users\\84387\\AppData\\Local\\Temp\\luna_collect_crash_348nioqq\\source_borrowed_predicate.ln:19:9\n   |\n19 |         }\n   |         ^\n\n"
+    },
+    {
+      "mode": "artifact",
+      "build_exit": 0,
+      "diagnostics": "",
+      "run_exit": 0
+    },
+    {
+      "mode": "source",
+      "build_exit": 0,
+      "diagnostics": "",
+      "run_exit": 0
+    },
+    {
+      "case": "wrong_trait_argument",
+      "build_exit": 0,
+      "diagnostics": ""
+    }
+  ]
+}

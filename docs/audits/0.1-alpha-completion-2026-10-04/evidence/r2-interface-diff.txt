@@ -1,0 +1,11 @@
+--- artifact (provider identity normalized for comparison)
++++ source before Enum correction
+@@ -1,7 +1,7 @@
+ CanonicalInterface {
+     exported_symbols: {
+         "ProbeResult": ExportedSymbol {
+-            kind: "Enum",
++            kind: "Struct",
+             ty_index: Some(
+                 0,
+             ),

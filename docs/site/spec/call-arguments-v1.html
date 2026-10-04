@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CALL-ARGUMENTS-v1 — named arguments and per-call defaults</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="call-arguments-v1--named-arguments-and-per-call-defaults">CALL-ARGUMENTS-v1 — named arguments and per-call defaults</h1>
+<p>Maintainer-authorized 2026-10-04 addition to the 0.1 completion scope: Python-style named arguments and default values. The maintainer chose per-call default evaluation in the function&#x27;s defining scope. Implementation is pending; parser recognition of historical labels is not evidence of correct binding.</p>
+<h2 id="source-surface-and-binding">Source surface and binding</h2>
+<pre><code>fn make_rect(width: i32, height: i32 = 20) -&gt; i32 {
+    return width * height;
+}
+fn main() -&gt; i32 {
+    dec a = make_rect(10);
+    dec b = make_rect(height=30, width=10);
+    dec c = make_rect(10, height=30);
+    return 0;
+}</code></pre>
+<p>A named argument uses <code>identifier = expression</code> at the outer call-argument boundary. Existing parsed <code>identifier: expression</code> labels are retained as an equivalent spelling; they must no longer be silently ignored. This does not change struct field initialization, assignment expressions or parameter types. Ordinary positional calls remain valid.</p>
+<p>Positional arguments bind by parameter order and must precede named arguments. Named arguments bind by the declared signature name, independently of their source order. Each parameter receives at most one value. Duplicate/unknown labels, positional-plus-named duplicates, excess arguments and missing required parameters reject with typed source diagnostics. <code>self</code> is not a defaultable parameter; a method-call receiver remains implicit under existing rules. Required parameters precede defaulted parameters in a declaration. No <code>*args</code>, <code>**kwargs</code>, keyword-only separator or argument splatting is introduced.</p>
+<p>The contract applies to direct functions, inherent methods and statically resolved trait calls, including generic and imported declarations. Trait call labels/defaults come from the trait signature, not arbitrary implementation parameter spellings. Implementations cannot change those defaults. Calls through a structural function-pointer type retain its full positional arity: that type does not carry declaration names/defaults, and a named/omitted-argument call without declaration signature information must reject rather than guess. Function-pointer ABI and ordinary full-arity calling conventions do not change.</p>
+<h2 id="evaluation-ownership-and-hygiene">Evaluation, ownership and hygiene</h2>
+<p>Evaluate receiver/callee under the existing call rules, then explicit arguments exactly once in source order. Reordering their binding MUST NOT reorder side effects or repeat evaluations. Evaluate only omitted defaults, once per call, in parameter declaration order after explicit arguments have been evaluated.</p>
+<p>Default expressions resolve names in the defining scope. Previously declared parameters are available according to ordinary ownership/borrow rules; later parameters are not. A default may construct a fresh owned value. It is not a shared object cached at function-definition time. Supplied arguments do not evaluate the default at all. Moves, temporary cleanup, unsafe/async/comptime admission, escape/provenance and lifetime checks apply normally; defaults grant no privileged escape from those rules.</p>
+<p>After binding, type inference, generic bounds, coercion and lifetime relations refer to declaration parameter positions. Named source order is presentation, not an ABI ordinal. Extern unsafe boundaries remain required even if defaults or named arguments are used.</p>
+<h2 id="providerartifact-preservation">Provider/artifact preservation</h2>
+<p>Public parameter names and default contracts are part of the canonical callable interface. Changing them must participate in the appropriate interface/body fingerprints. Portable default bodies retain definition-site identity, types, generic substitutions and required helpers without exposing private names to ordinary consumer lookup or retaining session-local IDs.</p>
+<p>Source-only and freshly built artifact-only consumers must bind, evaluate and reject identically in independent processes. Default semantics must not depend on the original source remaining available. Selected invalid/stale artifacts still reject; this feature is not an artifact rebuild policy.</p>
+<h2 id="required-acceptance">Required acceptance</h2>
+<p>CLI tests cover reordered labels, mixed positional/named, nested/generic calls, methods/qualified traits, side-effect ordering, default omission/override, definition-site names and earlier parameter references, fresh non-Copy values, move/borrow/escape negatives, unknown/duplicate/missing arguments and function pointer controls. Include a relocated provider graph and source/fresh-artifact parity. Defaults may not be limited silently to literals to pass a small matrix.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

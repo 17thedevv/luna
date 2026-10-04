@@ -49,6 +49,8 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/agent-handoff/phase-15-completion-audit.md](agent-handoff/phase-15-completion-audit.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/architecture.md](architecture.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/ast.md](ast.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md](audits/0.1-alpha-completion-2026-10-04/EXECUTION.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/README.md](audits/0.1-alpha-completion-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/alpha-modules-2026-10-03/README.md](audits/alpha-modules-2026-10-03/README.md) | evidence | [modules](spec/0.1/modules.md) |
 | [docs/audits/provider-config-relative-2026-10-04/README.md](audits/provider-config-relative-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/repair-0.1/README.md](audits/repair-0.1/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
@@ -113,9 +115,11 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/site/README.md](site/README.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/README.md](spec/0.1/README.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/alpha-module-plan.md](spec/0.1/alpha-module-plan.md) | canonical | [modules](spec/0.1/modules.md) |
+| [docs/spec/0.1/call-arguments-v1.md](spec/0.1/call-arguments-v1.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/conformance.md](spec/0.1/conformance.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/gaps.md](spec/0.1/gaps.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/macros.md](spec/0.1/macros.md) | canonical | [macros](spec/0.1/macros.md) |
+| [docs/spec/0.1/method-resolution-v1.md](spec/0.1/method-resolution-v1.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/modules.md](spec/0.1/modules.md) | canonical | [modules](spec/0.1/modules.md) |
 | [docs/spec/0.1/namespace-using-v1.md](spec/0.1/namespace-using-v1.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/spec/0.1/provider-config-v1.md](spec/0.1/provider-config-v1.md) | canonical | [conformance](spec/0.1/conformance.md) |

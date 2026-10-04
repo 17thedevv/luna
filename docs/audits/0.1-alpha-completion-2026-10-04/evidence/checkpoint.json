@@ -1,0 +1,295 @@
+{
+  "implementation_checkpoint": "7f818610428da3b39565f2f8a88386b0dfc4707c",
+  "captured_utc": "2026-10-04T08:29:54.061280+00:00",
+  "target": "x86_64-pc-windows-gnu",
+  "runtime": "build/runtime-win/libluna-runtime.a",
+  "compiler_header_protocol": 2,
+  "source_sha256": {
+    "luna-rs/crates/luna-cli/tests/artifact_execution_dependencies_cli.rs": "37bb4ef0c467f67d075cf7b1b20f6662a634addcf4b42cea252b0d38938faa63",
+    "luna-rs/crates/luna-cli/tests/trait_argument_bounds_cli.rs": "1f8faf86609e22c9b540f0f2b1a2a4fc1a74d772a3354530cff9d3629d6d6869",
+    "luna-rs/crates/luna-driver/src/external.rs": "0ee0d25b2a7044d45f4f0df2547a7546b7f53dec434cd56590abe0fbfbe78ecc",
+    "luna-rs/crates/luna-driver/src/lib.rs": "c9f1ab75d5befb512712e8bfd3c8a4a43ab5d17080b330893347b266887e966c",
+    "luna-rs/crates/luna-driver/src/metadata_builder.rs": "45bd04461c34b9af6805c9dcaa416ff13f3b972d2e425704b955630d85c0ddd9",
+    "luna-rs/crates/luna-driver/src/metadata_decoder.rs": "2ab3317017cdbedcbc36f40d68b09f47df6cc7c0f0f67f54ae25d7475cd5ee90",
+    "luna-rs/crates/luna-driver/src/registry.rs": "d0500846094123235357b967039c9c1c8f14d728e4b354763a789a412959419e",
+    "luna-rs/crates/luna-driver/src/sysroot.rs": "9b2f32982d85051b95e0067d169ed3034fa343acf08c8ea95f367b0feba2e7a3",
+    "luna-rs/crates/luna-driver/tests/stdlib_hashmap_storage_acceptance_tests.rs": "f2c7ef02b7664f07aaddc6cb66c7948f4e6b9b858caac864b46c65dce8283768",
+    "luna-rs/crates/luna-driver/tests/stdlib_iterator_collect_acceptance_tests.rs": "b00b378b53dc614b53bf3d579fc3bb49aa3f94cff21d67f438deb0bad2ba4896",
+    "luna-rs/crates/luna-driver/tests/stdlib_path_acceptance_tests.rs": "11fe8cdf943c23e7928579935c61f51d27d93ecc8fb76418f49116abf4aa559c",
+    "luna-rs/crates/luna-driver/tests/stdlib_phase4b_combinators_tests.rs": "7c129ee99570cb132524509b0d66c645cb0a3b02c4e719f7c717f8128bbff16e",
+    "luna-rs/crates/luna-driver/tests/stdlib_phase4b_llib_parity_tests.rs": "c02386cc06bcf1c568fb6a2005a7d9d070856977fd263019f539851749e28219",
+    "luna-rs/crates/luna-driver/tests/stdlib_phase4c_numerics.rs": "5729cec1e9101b01c29fc922d042818d19ddb004d59a1f6301e172a22fd93187",
+    "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs": "bb8e69b57e8862d102b3d5dbe1d47fa03895132027e78b6e96e636ba18b3ac0c",
+    "luna-rs/crates/luna-driver/tests/support/canonical_artifacts.rs": "783699fad6c8e49ccfc26bb3a583bf9886f7f0a0c9ee18657c577a003a16e3af",
+    "luna-rs/crates/luna-driver/tests/whole_file_io_v1_acceptance_tests.rs": "0c94f221408749fe4d8cc19c06ab1c112023a9bd4c1380436703a1a607e76ae9",
+    "luna-rs/crates/luna-llib/src/format.rs": "718d53a6983b1c0cacb642d3decae1af9f0bf7cd66f17f5eebdc6bc26c8e79da",
+    "luna-rs/crates/luna-llib/src/metadata.rs": "bb7da6a142fc3f2a1ad4eaa332583fa4371b0c62a49bb8e721123cacffb03935",
+    "luna-rs/crates/luna-llib/src/reader.rs": "95fc83b2cbbe1ac145071e667fc08e6b5ff2901c7944b69a1cc1942910e08d2f",
+    "luna-rs/crates/luna-llib/src/writer.rs": "5b21c66045470120c39621e855d25d966d0a7f7a51f8c239540a75d4e9f50c4c",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "2e0f3b6a6bb6838dffd3f5e1f7a4bcfe1a6f6def86107ba2b3b75f4dc808adb5",
+    "luna-rs/crates/luna-semantic/src/coherence.rs": "3fdf6dbc9d72cbd81d6b9100a12e79a07c8d19f3732fe719a37deff92af55b4b",
+    "luna-rs/crates/luna-semantic/src/mono.rs": "9dc34686d426adcf130e77e2dbd225e4f1da4ba4114d6efe4467b056e6e9cb9e",
+    "luna-rs/crates/luna-semantic/src/resolver.rs": "e665b4e52c8987a84d6f1b5b2048fdbfdff15373c199e2b033a21be0f20d31d5",
+    "luna-rs/crates/luna-semantic/src/semantic_tables.rs": "c8a0f4d03f59c0188aaed5286ec7b4f881c9e3b5f6ec9392f7646617abfa3463",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "ebb6f3fbaa4ffd18d594e329e1b99daafbcbafa2f6ddcb1c8d68e09ace1fe7b0",
+    "tests/luna/language/artifacts/comptime_wrapper.ln": "f78e3f8eb3688b132dd566f0c2bae6758d2ab4733a75f55ca2af02469b76b185",
+    "tests/luna/language/artifacts/consumer.ln": "346378a3cba9ef8db0fa1acd9b447f2b475ef638eb0b089e24f0bf4e0ca63fe8",
+    "tests/luna/language/artifacts/generic_dependency.ln": "e14f9c86151917ac48eb80ff3c4952032f11c17d88d5fb3854e091b8674f8484",
+    "tests/luna/language/artifacts/generic_wrapper.ln": "09ff1df5a62488b52c291c1f3521c2db288d49d0057301706c939d6bdbdbe4cd",
+    "tests/luna/language/artifacts/native_dependency.ln": "4884f65a7f63da3e0b0d2b1ed800cf82cadfe371882f20563d53efdd12169338",
+    "tests/luna/language/artifacts/native_wrapper.ln": "6491edbc39f26181692f7f8831249730cbdf928ca5ec8ae3efcc671e218c6ff4",
+    "tests/luna/language/trait_bounds/argument_match.ln": "a30cc121b206245cd08c5e5e190fe494272b9eb3f6332fe92aada6de709c1054",
+    "tests/luna/language/trait_bounds/argument_mismatch.ln": "9eb9c6a309b1104b1373920d4775d618ca15336021582e56312156785962f06d",
+    "tests/luna/language/trait_bounds/candidate_inference_rollback.ln": "50c13a424c8b343410583dd54ecdafdf9912f41f36e31187ed9ea1c2af372fdd",
+    "tests/luna/language/trait_bounds/multiple_impl_arguments.ln": "5e46370753d031097e0a5fd1e4e24e628f0937fd0d9c3c55751b5ffe8cef3621",
+    "tests/luna/language/trait_bounds/reference_does_not_inherit.ln": "f4bd9916228463ac0a51614de6c21e6c91f0b8f1937bdf3ba24f68cbdc215f4a",
+    "tests/luna/language/trait_bounds/reference_mutability_match.ln": "53a188e5c5435a472dfd9e809f822010bc9a24aeb40800811a598597e33e18f5",
+    "tests/luna/language/trait_bounds/reference_mutability_mismatch.ln": "b977356c6b625ebd7996d1dfd90c1135c84b1389b70c9c9dd4206a5c7822a882"
+  },
+  "recorded_runs": {
+    "r0-r2-current-regressions.txt": [
+      {
+        "passed": 8,
+        "failed": 0
+      },
+      {
+        "passed": 15,
+        "failed": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "passed": 9,
+        "failed": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0
+      },
+      {
+        "passed": 5,
+        "failed": 1
+      },
+      {
+        "passed": 24,
+        "failed": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0
+      }
+    ],
+    "r1-candidate-regressions.txt": [
+      {
+        "passed": 15,
+        "failed": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0
+      },
+      {
+        "passed": 9,
+        "failed": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "r1-semantic-borrow-regressions.txt": [
+      {
+        "passed": 12,
+        "failed": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "passed": 12,
+        "failed": 0
+      },
+      {
+        "passed": 10,
+        "failed": 0
+      },
+      {
+        "passed": 12,
+        "failed": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "passed": 22,
+        "failed": 0
+      },
+      {
+        "passed": 2,
+        "failed": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0
+      },
+      {
+        "passed": 4,
+        "failed": 0
+      },
+      {
+        "passed": 10,
+        "failed": 0
+      },
+      {
+        "passed": 21,
+        "failed": 0
+      },
+      {
+        "passed": 7,
+        "failed": 0
+      },
+      {
+        "passed": 19,
+        "failed": 0
+      },
+      {
+        "passed": 11,
+        "failed": 0
+      },
+      {
+        "passed": 15,
+        "failed": 0
+      },
+      {
+        "passed": 18,
+        "failed": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "passed": 20,
+        "failed": 0
+      },
+      {
+        "passed": 1,
+        "failed": 0
+      },
+      {
+        "passed": 8,
+        "failed": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0
+      }
+    ],
+    "r1-bound-candidates-cli-verified.txt": [
+      {
+        "passed": 1,
+        "failed": 0
+      }
+    ],
+    "r2-artifact-regressions.txt": [
+      {
+        "passed": 7,
+        "failed": 0
+      },
+      {
+        "passed": 9,
+        "failed": 0
+      },
+      {
+        "passed": 3,
+        "failed": 0
+      },
+      {
+        "passed": 5,
+        "failed": 0
+      }
+    ],
+    "r2-llib-version-regressions.txt": [
+      {
+        "passed": 7,
+        "failed": 0
+      },
+      {
+        "passed": 6,
+        "failed": 0
+      },
+      {
+        "passed": 0,
+        "failed": 0
+      }
+    ],
+    "r2-execution-cli-checkpoint.txt": [
+      {
+        "passed": 1,
+        "failed": 0
+      }
+    ]
+  },
+  "release_status": "INCOMPLETE: named/default/method policy, remaining R1-R5 matrices and clean checkout release gates remain open",
+  "note": "Logs include intermediate failures; specific later reruns only supersede the corresponding cases. This is not a full workspace test result."
+}

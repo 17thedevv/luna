@@ -75,9 +75,12 @@ Generic associated projections may be symbolic during generic analysis.
 Concrete MVIR/backend input MUST contain no unresolved projection, generic
 parameter or inference variable. Impl-, trait-, and method-level substitutions
 must produce distinct canonical instances where semantics differ. Method
-resolution and diagnostics must be deterministic. The exact inherent/trait
-collision precedence is listed as a remaining design question in the gap
-register; an arbitrary first HashMap entry cannot supply that rule.
+resolution and diagnostics must be deterministic. Under adopted
+[METHOD-RESOLUTION-v1](method-resolution-v1.md), applicable inherent methods
+take precedence; multiple distinct applicable trait methods without an inherent
+candidate reject as ambiguous. Explicit trait qualification selects that trait.
+Local and imported candidates follow the same rule; iteration order and expected
+return type cannot silently choose between ambiguous traits.
 
 `dyn Trait` follows the adopted object-safety restrictions: generic trait methods,
 associated-type traits and supertrait composition are not silently admitted as
