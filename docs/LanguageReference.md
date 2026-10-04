@@ -38,7 +38,7 @@ fn main() -> i32 {
 }
 ```
 
-import nạp provider; module định nghĩa namespace; :: truy cập namespace; using std as library đặt alias cục bộ. Vec là std::Vec, không suy alloc::Vec hay std::collections::Vec từ tên file. Bootstrap chỉ lộ path được chỉ định dưới std.
+import nạp provider; module định nghĩa namespace; :: truy cập namespace; using std as library đặt alias cục bộ; using std mở các tên trực tiếp có quyền truy cập để dùng không cần tiền tố. Các directive này chỉ dùng ở cấp file/module; tên xung đột báo E1008. Vec là std::Vec, không suy alloc::Vec hay std::collections::Vec từ tên file. Bootstrap chỉ lộ path được chỉ định dưới std.
 
 | Chủ đề | Spec |
 |---|---|
@@ -50,4 +50,21 @@ import nạp provider; module định nghĩa namespace; :: truy cập namespace;
 | Runtime ABI và targets | [Runtime](spec/0.1/runtime.md) |
 | Diagnostic, evidence và release gates | [Conformance](spec/0.1/conformance.md) |
 
-Các ví dụ cũ dùng mut, use, mod, $, @<...>, prefix await hoặc where outlives không phải syntax hiện hành. Contract parenthesized foreach còn bất đồng với parser; xem V01-GRAMMAR-02.
+Các ví dụ cũ dùng mut, use, mod, $, @<...>, prefix await hoặc where outlives không phải syntax hiện hành. Các kết quả grammar cũ trong V01-GRAMMAR-02 là bằng chứng có ngày; đối chiếu với sổ cái sửa chữa và kiểm chứng hiện tại trước khi kết luận về implementation.
+
+## Cấu hình provider tùy chọn
+
+```toml
+schema = 1
+[providers]
+geo = "../shared/geometry"
+```
+
+File `luna.toml` gần entry file nhất được chọn cho toàn bộ lần biên dịch, kể cả
+dependency bắc cầu. `import <geo>;` tìm provider tại stem đã cấu hình; provider
+vẫn tự khai báo namespace, ví dụ `geometry`. Đường dẫn tương đối tính từ file
+TOML, không từ thư mục chạy lệnh. `--config FILE` chọn rõ file, `--no-config`
+tắt cấu hình. Import đường dẫn cũ vẫn hoạt động. Không tự import, build lại
+artifact, tải package hoặc trộn config của dependency. Xem
+[PROVIDER-CONFIG-v1](spec/0.1/provider-config-v1.md) và
+[NAMESPACE-USING-v1](spec/0.1/namespace-using-v1.md).

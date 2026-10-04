@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Luna 0.1-alpha.1 — namespace using amendment</title><link rel="stylesheet" href="../assets/styles.css">
+<style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
+<body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<h1 id="luna-01-alpha1--namespace-using-amendment">Luna 0.1-alpha.1 — namespace using amendment</h1>
+<p>Contract ID: <strong>NAMESPACE-USING-v1</strong>. Design scope requested by the maintainer on 2026-10-03; <code>using math;</code> was explicitly selected over C++ <code>using namespace math;</code>. Status: <strong>IMPLEMENTED / CLI SOURCE-ARTIFACT MATRIX PASS</strong> on Windows x86_64 GNU. Workspace snapshots and final targeted regressions are tracked in the <a href="../../audits/alpha-modules-2026-10-03/README.md">verification record</a>. This status does not certify other targets or the overall alpha release. This amendment supersedes only the former prohibition of bare namespace using. Existing namespace aliases retain their contract. Implementation evidence is separate from contract authority; this amendment makes no freeze claim.</p>
+<h2 id="syntax-and-purpose">Syntax and purpose</h2>
+<pre><code>import &quot;geometry&quot;;
+using geometry as geo;
+using geometry;
+
+fn main() -&gt; i32 {
+    dec point = Point { x: 10, y: 32 };
+    return point.x + point.y - 42;
+}</code></pre>
+<p>The imported provider must explicitly declare an accessible namespace <code>geometry</code> containing the accessible type <code>Point</code>. The filename alone cannot supply that namespace. <code>geo::Point</code>, <code>geometry::Point</code> and the successfully resolved unqualified <code>Point</code> denote the same declaration.</p>
+<pre><code>using_decl = &quot;using&quot;, namespace_path, [ &quot;as&quot;, identifier ], &quot;;&quot; ;</code></pre>
+<p class="list-item">- <code>using path as alias;</code> creates a namespace alias, as before.</p>
+<p class="list-item">- <code>using path;</code> adds the accessible direct members of that namespace as</p>
+<p>  candidates for unqualified lookup in the containing scope.</p>
+<p class="list-item">- Both forms require an existing namespace target. A type, function, variable</p>
+<p>  or provider name without a corresponding namespace is not a valid target.</p>
+<p class="list-item">- Alpha admits these declarations at file scope and within an inline module.</p>
+<p>  Function/block-local directives and selective <code>using path::leaf;</code> are outside   this amendment. <code>using namespace</code>, <code>export using</code> and <code>export import</code> remain   rejected.</p>
+<h2 id="lookup-visibility-and-identity">Lookup, visibility and identity</h2>
+<p class="list-item">1. Resolve each directive&#x27;s target through existing qualified namespace/alias</p>
+<p>   lookup after required providers have been acquired. A directive never loads    a provider. Bare directives do not resolve each other&#x27;s target paths, so    mutually dependent namespace openings cannot bootstrap a missing target.</p>
+<p class="list-item">2. At each lexical scope, search its ordinary declarations, parameters and</p>
+<p>   explicit aliases first. If no eligible direct binding exists, inspect that    scope&#x27;s opened namespaces. If neither yields a binding, continue outward.    An inner direct binding or opening therefore takes precedence over an outer    scope. An inaccessible declaration follows existing visibility diagnostics;    an opening cannot make it accessible.</p>
+<p class="list-item">3. One distinct accessible candidate resolves normally. Two or more distinct</p>
+<p>   candidates reject an unqualified use as ambiguous, with the competing    qualified paths and related locations. Never choose the first imported,    declared or iterated provider. Explicit qualification resolves the collision.    This amendment does not introduce overload resolution.</p>
+<p class="list-item">4. Deduplicate candidates by canonical declaration identity. Opening the same</p>
+<p>   namespace twice, or through two aliases, does not create ambiguity. Preserve    namespace composition when multiple providers contribute to one namespace.</p>
+<p class="list-item">5. Only direct namespace members participate. An exported child module can be</p>
+<p>   reached through its member name, but its contents are not recursively opened.    Directives or aliases inside the target are not re-exported into the caller.</p>
+<p class="list-item">6. Visibility, trait/coherence rules, generic substitutions, lifetimes and macro</p>
+<p>   hygiene remain governed by their existing contracts. Accessible macro members    may use ordinary macro lookup; an opening cannot capture definition-site names    or grant additional trait implementations.</p>
+<p class="list-item">7. The directive adds lookup candidates rather than copied/redeclared symbols.</p>
+<p>   Provider, symbol and semantic identities remain stable. Neither form is a    public <code>.llib</code> export; resolved public signatures and portable body references    must retain their canonical identities without depending on a consumer using    the same directive.</p>
+<h2 id="required-acceptance">Required acceptance</h2>
+<table>
+<tr><th>Case</th><th>Required outcome</th></tr>
+<tr><td>Existing alias syntax, with no bare using</td><td>Existing accept/reject behavior preserved</td></tr>
+<tr><td>Open imported namespace; use type, function and exported child module</td><td>Correct check/build/run and declaration identity</td></tr>
+<tr><td>Open namespace through an alias; repeat opening</td><td>Same binding, no artificial ambiguity</td></tr>
+<tr><td>Two namespaces contain distinct <code>Point</code> declarations</td><td>Unqualified use rejects; qualified use succeeds</td></tr>
+<tr><td>Direct local binding plus an opened name; nested module scope</td><td>Lexical precedence above, deterministic under import reorder</td></tr>
+<tr><td>Private member, missing namespace, leaf target, exported using</td><td>Reject for the correct reason, with typed diagnostic and spans</td></tr>
+<tr><td>Provider acquired under a different configured name</td><td>Namespace remains the one declared in provider source</td></tr>
+<tr><td>Public generic API/body built with a directive</td><td>Fresh source/artifact consumers agree; no provider source fallback</td></tr>
+<tr><td>Exported macros and definition-site references</td><td>Existing hygiene preserved; ambiguous lookup rejects</td></tr>
+</table>
+<p>Implementation owners: lexer/parser admission where applicable, AST, resolver/symbol lookup, visibility/macro lookup, metadata/portable body identity, CLI acceptance. No dedicated backend instruction or stdlib-name branch is needed. Use <a href="conformance.html">the acceptance boundaries</a> and <a href="alpha-module-plan.html">the implementation plan</a>.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

@@ -21,6 +21,7 @@ pub enum DiagnosticCode {
     CyclicModuleDependency = 1005,
     InvalidVisibility = 1006,
     WildcardImportProhibited = 1007,
+    AmbiguousSymbol = 1008,
     TypeMismatch = 2001,
     CannotDereference = 2002,
     CannotIndex = 2003,
@@ -75,6 +76,8 @@ pub enum DiagnosticCode {
     ProviderReadFailure = 6005,
     OutputWriteFailure = 6006,
     InvalidArtifactOutput = 6007,
+    ProviderConfigurationError = 6008,
+    ProcessExecutionFailure = 6009,
 }
 
 impl DiagnosticCode {
@@ -102,7 +105,11 @@ pub struct Diagnostic {
     pub code: Option<DiagnosticCode>,
     pub span: Option<Span>,
     pub message: String,
+    pub related: Vec<DiagnosticLabel>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DiagnosticLabel { pub span: Span, pub message: String }
 
 impl Diagnostic {
     pub fn error(message: impl Into<String>) -> Self {
@@ -111,6 +118,7 @@ impl Diagnostic {
             code: None,
             span: None,
             message: message.into(),
+            related: Vec::new(),
         }
     }
 
@@ -122,6 +130,10 @@ impl Diagnostic {
     pub fn with_span(mut self, span: Span) -> Self {
         self.span = Some(span);
         self
+    }
+
+    pub fn with_related(mut self, span: Span, message: impl Into<String>) -> Self {
+        self.related.push(DiagnosticLabel { span, message: message.into() }); self
     }
 
     pub fn render(&self, source_manager: &SourceManager) -> String {
@@ -169,6 +181,10 @@ impl Diagnostic {
             }
         }
 
+        for label in &self.related {
+            out.push_str(&Self { level: DiagnosticLevel::Note, code: None, span: Some(label.span),
+                message: label.message.clone(), related: Vec::new() }.render(source_manager));
+        }
         out
     }
 }
@@ -194,6 +210,25 @@ fn display_text(text: &str, initial_column: usize) -> (String, usize) {
 mod tests {
     use super::{Diagnostic, DiagnosticCode};
     use crate::source::SourceManager;
+
+    #[test]
+    fn candidate_labels_remain_structural_across_rendering() {
+        let mut manager = SourceManager::new();
+        let file = manager.add_file("names.ln".into(), "a b value".into());
+        let primary = crate::Span::new(file, 4, 9);
+        let origin = crate::Span::new(file, 0, 1);
+        let diagnostic = Diagnostic::error("ambiguous name")
+            .with_code(DiagnosticCode::AmbiguousSymbol).with_span(primary)
+            .with_related(origin, "first candidate");
+        assert_eq!(diagnostic.code, Some(DiagnosticCode::AmbiguousSymbol));
+        assert_eq!(diagnostic.span, Some(primary));
+        assert_eq!(diagnostic.related[0].span, origin);
+        assert_eq!(diagnostic.related[0].message, "first candidate");
+        let rendered = diagnostic.render(&manager);
+        assert!(rendered.contains("error[E1008]"));
+        assert!(rendered.contains("names.ln:1:1"));
+        assert!(rendered.contains("note: first candidate"));
+    }
 
     #[test]
     fn structured_code_renders_without_becoming_message_identity() {

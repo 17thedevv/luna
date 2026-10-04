@@ -15,7 +15,6 @@ fn create_temp_dir(prefix: &str) -> PathBuf {
             .unwrap()
             .as_nanos()
     ));
-    let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).expect("Failed to create temp dir");
     dir
 }
@@ -27,8 +26,8 @@ fn copy_dir_all(src: &Path, dst: &Path) {
         let target = dst.join(entry.file_name());
         if entry.file_type().expect("provider entry type").is_dir() {
             copy_dir_all(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), target).expect("copy provider file");
+        } else if matches!(entry.path().extension().and_then(|extension| extension.to_str()), Some("ln" | "toml")) {
+            fs::copy(entry.path(), target).expect("copy provider source/manifest");
         }
     }
 }
@@ -44,14 +43,47 @@ fn remove_artifacts(dir: &Path) {
     }
 }
 
-fn source_sysroot() -> PathBuf {
+static SYSROOT_ENVIRONMENT: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+struct SourceSysroot {
+    root: PathBuf,
+    previous: Option<std::ffi::OsString>,
+    _guard: std::sync::MutexGuard<'static, ()>,
+}
+impl std::ops::Deref for SourceSysroot {
+    type Target = Path;
+    fn deref(&self) -> &Path { &self.root }
+}
+impl Drop for SourceSysroot {
+    fn drop(&mut self) {
+        match &self.previous {
+            Some(value) => std::env::set_var("LUNA_SYSROOT", value),
+            None => std::env::remove_var("LUNA_SYSROOT"),
+        }
+        if self.root.parent() == Some(std::env::temp_dir().as_path())
+            && self.root.file_name().is_some_and(|name| name.to_string_lossy().starts_with("luna_test_dispatch_source_sysroot_")) {
+            let _ = fs::remove_dir_all(&self.root);
+        }
+    }
+}
+
+fn source_sysroot() -> SourceSysroot {
+    let guard = SYSROOT_ENVIRONMENT.lock().unwrap_or_else(|error| error.into_inner());
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let external_dir = manifest_dir.parent().expect("crates directory")
         .parent().expect("workspace root").join("libs").join("external");
     let root = create_temp_dir("source_sysroot");
-    copy_dir_all(&external_dir, &root);
-    remove_artifacts(&root);
-    root
+    let copied_external = root.join("libs").join("external");
+    copy_dir_all(&external_dir, &copied_external);
+    remove_artifacts(&copied_external);
+    let selected = luna_driver::sysroot::Sysroot::from_root(root.clone())
+        .expect("copied source-only sysroot must have the canonical directory layout");
+    assert_eq!(selected.external_dir(), copied_external.as_path());
+    // A search path alone does not grant canonical sysroot capabilities.
+    // Select this source-only manifest root explicitly, for the entire test.
+    let previous = std::env::var_os("LUNA_SYSROOT");
+    std::env::set_var("LUNA_SYSROOT", &root);
+    SourceSysroot { root, previous, _guard: guard }
 }
 
 fn run_binary_with_output(

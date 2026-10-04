@@ -1,0 +1,18 @@
+export module hidden_scope { fn secret() -> i32 { return 5; } }
+export module geometry {
+ using hidden_scope;
+ export macro forbidden { () => { secret() } }
+ export struct Point { x: i32, };
+ export fn answer() -> i32 { return 42; }
+ fn private_value() -> i32 { return 9; }
+ export module child { export fn answer() -> i32 { return 42; } }
+ export macro private_answer { () => { private_value() } }
+ export macro defined_answer { () => { answer() } }
+ export macro twice { (@v: expr) => { @v * 2 } }
+}
+using geometry;
+export module api {
+ export fn point<T>(value: T) -> Point { return Point { x: 42 }; }
+ export fn identity<T>(value: T) -> T { return value; }
+ export fn composed<T>(value: T) -> i32 { return answer(); }
+}

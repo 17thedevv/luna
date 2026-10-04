@@ -30,6 +30,18 @@ pub struct ExternalComponentDescriptor {
 pub struct ExternalComponentDiscovery;
 
 impl ExternalComponentDiscovery {
+    pub fn discover_file(stem: &Path, name: &str) -> Result<ExternalComponentDescriptor, ExternalComponentError> {
+        for (extension, format) in [("llib", ComponentFormat::Llib), ("ln", ComponentFormat::Source),
+                                   ("mlib", ComponentFormat::Llib), ("ms", ComponentFormat::Source)] {
+            let entry_file = PathBuf::from(format!("{}.{}", stem.display(), extension));
+            if entry_file.exists() {
+                return Ok(ExternalComponentDescriptor { name: name.to_string(),
+                    root_dir: stem.parent().unwrap_or(Path::new(".")).to_path_buf(),
+                    entry_file, format, provenance: ComponentProvenance::LocalProject });
+            }
+        }
+        Err(ExternalComponentError::NotFound { name: name.to_string(), searched_dir: stem.to_path_buf() })
+    }
     pub fn discover(
         external_dir: &Path,
         name: &str,

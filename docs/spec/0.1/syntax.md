@@ -113,6 +113,7 @@ mark unsafe operations; they do not disable other semantic checks.
 import <vec>;
 import "geometry";
 using std as library;
+using std;
 
 module application { export fn answer() -> i32 { return 42; } }
 
@@ -137,7 +138,7 @@ apply to direct pointer fields, separately from lifetime relations.
 
 New Luna 0.1 code MUST NOT use `let`, `mut`, `use`, `mod`, Rust lifetime generic
 parameters, `::<>`, `@<...>` generics, `$` macro captures, prefix `await`,
-bare `using path;`, `using namespace`, `export using`, `export import`, or
+`using namespace`, `export using`, `export import`, or
 file-level `module name;`. `where outlives(...)` is a removed surface spelling;
 its relation is written using `requires life(...)`. Imports omit source/artifact
 extensions. Historical examples using these spellings are not current examples.

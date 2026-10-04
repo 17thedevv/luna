@@ -52,7 +52,7 @@ fn comma_separated_struct_anchors_survive_source_and_fresh_artifact_loading() {
             ("wrong_first_owner", "LifetimeConstraintViolation"),
             ("wrong_second_owner", "LifetimeConstraintViolation"),
             ("duplicate", "duplicate raw storage anchor"),
-            ("non_pointer", "E_RAW_STORAGE_ANCHOR_FIELD"),
+            ("non_pointer", "error[E3011]"),
             (
                 "missing_field",
                 "raw storage anchor field 'missing' not found",

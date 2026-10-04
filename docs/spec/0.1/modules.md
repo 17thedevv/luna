@@ -4,6 +4,8 @@
 
 `import` acquires a provider. `module` creates an inline namespace. `::` resolves
 a namespace path. `using path as alias;` creates a local namespace alias.
+`using path;` opens accessible direct namespace members for unqualified lookup,
+under [NAMESPACE-USING-v1](namespace-using-v1.md).
 None of these operations implies another: a filename does not create a module,
 an import does not introduce arbitrary unqualified bindings, and an alias does
 not load a dependency. Multiple providers may contribute exported declarations
@@ -69,3 +71,13 @@ acceptance, rejection, behavior and relevant diagnostics.
 The compiler resolves and validates providers. The package/build tool orchestrates
 rebuild, caching, acquisition and invalidation policy. The compiler must not
 silently adopt package-manager policy or rebuild a stale library on import.
+
+## Optional project provider discovery
+
+[PROVIDER-CONFIG-v1](provider-config-v1.md) adds optional `luna.toml` file-stem
+bindings for `import <name>`. The CLI selects the nearest configuration from the
+entry file, or uses `--config FILE` / `--no-config`. A single selected table
+applies to the entire invocation, including transitive imports. Relative paths
+are based on the configuration directory. Existing `import "path"` remains
+relative to its importing file. Configuration keys select providers, not
+namespace names, and cannot override sysroot names or aliases.

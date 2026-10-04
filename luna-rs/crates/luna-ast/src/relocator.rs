@@ -344,6 +344,10 @@ pub trait AstMapping {
                 self.shift_span(alias);
                 self.shift_span(span);
             }
+            Decl::UsingNamespace { path, span } => {
+                for segment in path { self.shift_span(segment); }
+                self.shift_span(span);
+            }
             Decl::Macro { annotations, name, rules, .. } => {
                 self.relocate_annotations(annotations);
                 self.shift_span(name);

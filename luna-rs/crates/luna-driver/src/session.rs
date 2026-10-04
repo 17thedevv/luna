@@ -14,6 +14,9 @@ pub struct DriverSession<'a> {
     pub compiler_session: &'a mut CompilerSession,
     pub search_paths: Vec<PathBuf>,
     pub collected_objects: Vec<PathBuf>,
+    pub provider_bindings: crate::provider_binding::ProviderBindings,
+    pub provider_paths: std::collections::HashMap<PathBuf, ProviderId>,
+    pub loading_paths: std::collections::HashSet<PathBuf>,
 }
 
 impl<'a> DriverSession<'a> {
@@ -28,6 +31,9 @@ impl<'a> DriverSession<'a> {
             compiler_session,
             search_paths: search_paths.iter().map(PathBuf::from).collect(),
             collected_objects: Vec::new(),
+            provider_bindings: Default::default(),
+            provider_paths: Default::default(),
+            loading_paths: Default::default(),
         }
     }
 
@@ -35,6 +41,27 @@ impl<'a> DriverSession<'a> {
         if !self.collected_objects.contains(&path) {
             self.collected_objects.push(path);
         }
+    }
+
+    pub fn set_provider_bindings(&mut self, bindings: &crate::provider_binding::ProviderBindings) -> Result<(), Vec<luna_common::Diagnostic>> {
+        for (name, binding) in bindings {
+            let reason = if !crate::provider_binding::valid_provider_name(name) {
+                Some(format!("Invalid configured provider name '{}'", name))
+            } else if self.sysroot.manifest().find_provider(name).is_some() {
+                Some(format!("Configured provider '{}' collides with a canonical sysroot name or alias", name))
+            } else { None };
+            if let Some(reason) = reason {
+                let mut diagnostic = luna_common::Diagnostic::error(reason)
+                    .with_code(luna_common::DiagnosticCode::ProviderConfigurationError);
+                if let Some(origin) = &binding.origin {
+                    let file = self.compiler_session.source_manager.add_file(origin.file.display().to_string(), origin.source.clone());
+                    diagnostic = diagnostic.with_span(luna_common::Span::new(file, origin.key_range.start as u32, origin.key_range.end as u32));
+                }
+                return Err(vec![diagnostic]);
+            }
+        }
+        self.provider_bindings = bindings.clone();
+        Ok(())
     }
 
     /// Bootstraps required external language contracts.
@@ -76,6 +103,23 @@ impl<'a> DriverSession<'a> {
         arena: &mut AstArena,
         context: ProviderResolutionContext,
     ) -> Result<ProviderId, ExternalComponentError> {
+        if let Some(binding) = self.provider_bindings.get(name).cloned() {
+            let result = crate::discovery::ExternalComponentDiscovery::discover_file(&binding.stem, name)
+                .and_then(|descriptor| ExternalComponentLoader::load_component(&descriptor, arena, self));
+            return result.map_err(|error| {
+                let mut diagnostics = error.into_diagnostics();
+                if let Some(origin) = &binding.origin {
+                    let file = self.compiler_session.source_manager.add_file(origin.file.display().to_string(), origin.source.clone());
+                    let span = luna_common::Span::new(file, origin.key_range.start as u32, origin.key_range.end as u32);
+                    for diagnostic in &mut diagnostics {
+                        diagnostic.related.push(luna_common::diagnostic::DiagnosticLabel {
+                            span, message: format!("Provider '{}' is bound here to '{}'", name, binding.stem.display()),
+                        });
+                    }
+                }
+                ExternalComponentError::ImportFailed(diagnostics)
+            });
+        }
         if let Some(provider) = self.sysroot.manifest().find_provider(name) {
             if provider.visibility == crate::sysroot_manifest::ProviderVisibility::Internal
                 && !context.can_access_internal()

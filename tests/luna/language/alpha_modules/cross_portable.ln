@@ -1,0 +1,1 @@
+import <bridge>; fn main() -> i32 { return cross_api::first().value + cross_api::second().value - 3; }

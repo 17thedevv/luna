@@ -1,0 +1,2 @@
+import <geo>;
+fn main() -> i32 { return geometry::forbidden!(); }

@@ -1,0 +1,4 @@
+module math { export macro answer { () => { 42 } } }
+using math;
+fn answer() -> i32 { return 42; }
+fn main() -> i32 { return answer() + math::answer!() - 84; }

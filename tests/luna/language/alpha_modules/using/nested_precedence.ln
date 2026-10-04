@@ -1,0 +1,4 @@
+fn answer() -> i32 { return 7; }
+module math { export fn answer() -> i32 { return 42; } }
+module client { using math; export fn value() -> i32 { return answer(); } }
+fn main() -> i32 { return client::value() - 42; }

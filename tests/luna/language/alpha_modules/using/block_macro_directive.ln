@@ -1,0 +1,2 @@
+module math { export macro value { () => { 42 } } }
+fn main() -> i32 { using math; return value!(); }

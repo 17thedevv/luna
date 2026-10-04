@@ -111,6 +111,9 @@ pub struct ProviderInterface {
     pub impl_generic_param_symbols: Vec<ExternalSymbol>,
     pub trait_associated_type_symbols: Vec<ExternalSymbol>,
     pub internal_symbols: Vec<Symbol>,
+    /// Definition-site lookup retained independently of public namespace exports.
+    /// Reconstructed from source/portable AST, then remapped to each consumer.
+    pub macro_environments: HashMap<luna_common::ids::SymbolId, HashMap<String, Vec<luna_common::ids::SymbolId>>>,
     pub decl_symbols: HashMap<luna_ast::DeclId, luna_common::ids::SymbolId>,
     pub expr_symbols: HashMap<luna_ast::ExprId, luna_common::ids::SymbolId>,
     pub pat_symbols: HashMap<luna_ast::PatId, luna_common::ids::SymbolId>,
@@ -138,6 +141,8 @@ pub struct ProviderInterface {
 #[derive(Default)]
 pub struct ModuleRegistry {
     pub providers: HashMap<String, ProviderId>,
+    /// Invocation discovery keys, kept separate from genuine provider identity.
+    pub discovery_aliases: HashMap<String, ProviderId>,
     pub local_providers: HashSet<String>,
     pub external_providers: HashSet<String>,
     pub interfaces: HashMap<ProviderId, ProviderInterface>,
@@ -192,6 +197,7 @@ impl ModuleRegistry {
     pub fn new() -> Self {
         Self {
             providers: HashMap::new(),
+            discovery_aliases: HashMap::new(),
             local_providers: HashSet::new(),
             external_providers: HashSet::new(),
             interfaces: HashMap::new(),
@@ -236,9 +242,9 @@ impl ModuleRegistry {
     }
 
     pub fn get_provider_name(&self, id: ProviderId) -> String {
-        self.providers
-            .iter()
-            .find_map(|(k, &v)| if v == id { Some(k.clone()) } else { None })
+        self.interfaces
+            .get(&id)
+            .map(|interface| interface.name.clone())
             .unwrap_or_else(|| "unknown".to_string())
     }
 
@@ -250,8 +256,17 @@ impl ModuleRegistry {
         > = HashMap::new();
 
         // Inject all external providers into isolated provider scopes for `import <name>;`
-        for (prov_name, &pid) in &self.providers {
+        let mut provider_names = self.providers.clone();
+        provider_names.extend(self.discovery_aliases.clone());
+        let mut provider_names: Vec<_> = provider_names.into_iter().collect();
+        provider_names.sort_by(|left, right| left.0.cmp(&right.0));
+        for (prov_name, pid) in provider_names {
             if let Some(prov_interface) = self.interfaces.get(&pid) {
+                if let Some(&scope) = ctx.provider_scopes.get(&pid) {
+                    ctx.provider_lookup.insert(prov_name.clone(), pid);
+                    ctx.external_module_scopes.insert(prov_name, scope);
+                    continue;
+                }
                 let prov_scope = ctx.symbol_table.create_scope(
                     luna_semantic::symbol::ScopeKind::Module,
                     Some(global_scope),
@@ -328,6 +343,11 @@ impl ModuleRegistry {
                     &mut dummy_diags,
                 );
                 ctx.symbol_table.symbols[new_sym_id.0 as usize].provider_id = Some(interface.id);
+                // Private symbols remain outside exported namespace lookup, but
+                // their canonical path must still match the provider object ABI.
+                if let Some(canonical) = interface.symbol_canonicals.get(&sym.id) {
+                    ctx.symbol_table.imported_paths.insert(new_sym_id, canonical.name.split("::").map(str::to_string).collect());
+                }
                 provider_symbol_maps
                     .entry(interface.id)
                     .or_default()
@@ -723,6 +743,13 @@ impl ModuleRegistry {
                     let new_gps: Vec<_> = canon_gps.iter().filter_map(resolve_canonical).collect();
                     ctx.tables.impl_generic_params.insert(new_impl_key, new_gps);
                 }
+            }
+
+            for (&macro_symbol, environment) in &interface.macro_environments {
+                let environment = environment.iter().map(|(name, symbols)| {
+                    (name.clone(), symbols.iter().map(|&symbol| lookup_sym(symbol)).collect())
+                }).collect();
+                ctx.symbol_table.macro_environments.insert(lookup_sym(macro_symbol), environment);
             }
 
             // Inject AST tables for generic function monomorphization
@@ -1384,6 +1411,18 @@ impl ModuleRegistry {
             assoc_type_bounds.insert(canon_gp, ext_bounds);
         }
 
+        let names: HashSet<_> = ctx.symbol_table.scopes.iter().flat_map(|scope| scope.symbols.keys())
+            .filter(|key| key.ctxt.is_root()).map(|key| key.name.clone()).collect();
+        let macro_environments = internal_symbols.iter().filter(|symbol| symbol.kind == SymbolKind::Macro)
+            .map(|symbol| {
+                let environment = names.iter().filter_map(|name| {
+                    let bindings: Vec<_> = ctx.symbol_table.lookup_candidates(name, luna_common::ids::SyntaxContext::ROOT, symbol.scope, true)
+                        .into_iter().filter(|&binding| ctx.symbol_table.is_accessible(binding, symbol.scope, ctx.current_provider)).collect();
+                    (!bindings.is_empty()).then(|| (name.clone(), bindings))
+                }).collect();
+                (symbol.id, environment)
+            }).collect();
+
         ProviderInterface {
             id: provider_id,
             name: provider_name,
@@ -1408,6 +1447,7 @@ impl ModuleRegistry {
             impl_generic_param_symbols,
             trait_associated_type_symbols,
             internal_symbols,
+            macro_environments,
             decl_symbols,
             expr_symbols,
             pat_symbols,

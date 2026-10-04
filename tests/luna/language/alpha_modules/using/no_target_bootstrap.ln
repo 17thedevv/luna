@@ -1,0 +1,2 @@
+module math { export module child {} } using math; using child;
+fn main() -> i32 { return 0; }

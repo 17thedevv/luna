@@ -1,0 +1,4 @@
+module math { export macro answer { () => { 42 } } }
+using math;
+struct answer {};
+fn main() -> i32 { return answer!(); }

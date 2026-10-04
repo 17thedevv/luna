@@ -1,0 +1,2 @@
+module real {} module math { using real as hidden; } using math;
+fn main() -> i32 { return hidden::missing(); }

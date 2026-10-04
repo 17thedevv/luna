@@ -35,6 +35,10 @@ impl<'a> Parser<'a> {
         let mut body = Vec::new();
 
         while !self.check(TokenKind::RBrace) && !self.is_at_end() {
+            if self.check(TokenKind::KwUsing) {
+                self.error_at_current("using is restricted to file/module scope", self.peek().span);
+                return Err(());
+            }
             body.push(self.parse_item()?);
         }
 

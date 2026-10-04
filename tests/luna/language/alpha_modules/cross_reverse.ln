@@ -1,0 +1,1 @@
+import <other>; import <second>; fn main() -> i32 { return cross_a::answer() + cross_b::answer() - 3; }

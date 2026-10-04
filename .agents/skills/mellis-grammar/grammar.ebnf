@@ -184,7 +184,7 @@ import_decl   ::= KW_IMPORT ("<" IDENTIFIER ">" | STRING_LITERAL) ";"
 
 // --- USING: local namespace alias (KHÔNG export, KHÔNG glob, KHÔNG import symbol) ---
 // Target phải là module/namespace, không phải leaf symbol (struct, fn, etc.)
-using_decl    ::= KW_USING module_path KW_AS IDENTIFIER ";"
+using_decl    ::= KW_USING module_path [KW_AS IDENTIFIER] ";"
 
 module_path   ::= IDENTIFIER ("::" IDENTIFIER)*
 

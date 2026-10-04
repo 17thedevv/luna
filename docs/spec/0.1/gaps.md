@@ -99,3 +99,13 @@ rebuilding the merged CLI/runtime and all 49 providers, repeats the same 16
 attempts and outcomes. All three grammar gaps remain reproduced. The custom
 macro case uses an integer argument; it does not exercise or excuse the newly
 imported format-string interception recorded as V01-ARCH-02.
+
+
+## Alpha module additions — implementation update 2026-10-04
+
+NAMESPACE-USING-v1 and PROVIDER-CONFIG-v1 now have implementation plus a
+permanent CLI matrix passing on Windows x86_64 GNU, in source-only and fresh
+artifact-only modes. The [verification record](../../audits/alpha-modules-2026-10-03/README.md)
+tracks the tested baseline and final workspace regression separately. This
+update adds bounded module capabilities; it does not change the dated defects
+or automatically close W8, the full diagnostic contract, release or target gaps.

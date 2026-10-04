@@ -349,7 +349,7 @@ impl ExternalComponentLoader {
             provider_id,
             descriptor.name.clone(),
             semantic,
-            driver_session.registry.providers.clone(),
+            driver_session.registry.interfaces.iter().map(|(&id, interface)| (interface.name.clone(), id)).collect(),
             manifest.provenance.interface_fingerprint,
         );
         let mut provider_interface = decoder.decode().map_err(|e| {
@@ -385,15 +385,54 @@ impl ExternalComponentLoader {
     }
     pub fn load_component(
         descriptor: &ExternalComponentDescriptor,
+        arena: &mut AstArena,
+        session: &mut DriverSession,
+    ) -> Result<ProviderId, ExternalComponentError> {
+        let file = std::fs::canonicalize(&descriptor.entry_file).map_err(|error|
+            ExternalComponentError::ReadFailed { path: descriptor.entry_file.clone(), error: error.to_string() })?;
+        if let Some(&id) = session.provider_paths.get(&file) {
+            session.registry.discovery_aliases.insert(descriptor.name.clone(), id);
+            return Ok(id);
+        }
+        if session.loading_paths.contains(&file) {
+            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::error(
+                format!("Cyclic module dependency through '{}'", descriptor.entry_file.display()))
+                .with_code(luna_common::DiagnosticCode::CyclicModuleDependency)]));
+        }
+        let mut canonical = descriptor.clone();
+        if matches!(descriptor.provenance, crate::discovery::ComponentProvenance::LocalProject) {
+            canonical.name = descriptor.entry_file.file_stem().and_then(|s| s.to_str()).unwrap_or(&descriptor.name).to_string();
+            if descriptor.format == ComponentFormat::Llib {
+                if let Ok(mut input) = std::fs::File::open(&descriptor.entry_file) {
+                    if let Ok(manifest) = luna_llib::reader::LlibReader::read_manifest(&mut input) {
+                        if !manifest.identity.module_id.is_empty() { canonical.name = manifest.identity.module_id; }
+                    }
+                }
+            }
+        }
+        // Identical logical identities from distinct physical providers must not
+        // silently reuse an earlier provider. Configuration aliases do not rename identity.
+        if session.registry.interfaces.values().any(|interface| interface.name == canonical.name) {
+            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::error(
+                format!("Distinct provider '{}' conflicts with loaded identity '{}'", descriptor.entry_file.display(), canonical.name))
+                .with_code(luna_common::DiagnosticCode::DuplicateDefinition)]));
+        }
+        session.loading_paths.insert(file.clone());
+        let result = Self::load_uncached(&canonical, arena, session);
+        session.loading_paths.remove(&file);
+        if let Ok(id) = result {
+            session.provider_paths.insert(file, id);
+            session.registry.discovery_aliases.insert(descriptor.name.clone(), id);
+        }
+        result
+    }
+
+    fn load_uncached(
+        descriptor: &ExternalComponentDescriptor,
         global_arena: &mut AstArena,
         
         driver_session: &mut DriverSession,
     ) -> Result<ProviderId, ExternalComponentError> {
-        // Ensure load-once: return existing provider if already loaded
-        if let Some(&existing_id) = driver_session.registry.providers.get(&descriptor.name) {
-            return Ok(existing_id);
-        }
-
         if descriptor.format == ComponentFormat::Llib {
             return Self::load_binary_component(descriptor, global_arena, driver_session);
         }

@@ -1,0 +1,10 @@
+import <geo>;
+module impostor { export fn answer() -> i32 { return 9; } }
+module hygiene { using impostor; export fn result() -> i32 { return geometry::defined_answer!(); } }
+using geometry as g;
+using geometry;
+fn main() -> i32 {
+ dec q = api::point(7);
+ dec p = Point { x: twice!(21) };
+ return geometry::private_answer!() + hygiene::result() + answer() + g::answer() + child::answer() + api::composed(7) + q.x - p.x - 219;
+}

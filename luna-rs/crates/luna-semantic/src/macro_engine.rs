@@ -33,8 +33,8 @@ pub struct MacroEngine<'a> {
     pub tables: &'a SemanticTables,
     pub current_scope: ScopeId,
     pub diagnostics: Vec<Diagnostic>,
-    expansion_counter: u32,
     recursion_depth: u32,
+    lexical_bindings: Vec<std::collections::HashSet<crate::symbol::IdentKey>>,
 }
 
 impl<'a> MacroEngine<'a> {
@@ -59,9 +59,61 @@ impl<'a> MacroEngine<'a> {
             tables,
             current_scope: ScopeId(0),
             diagnostics: Vec::new(),
-            expansion_counter: 0,
             recursion_depth: 0,
+            lexical_bindings: Vec::new(),
         }
+    }
+
+    // Expansion needs local binding visibility before full name/type resolution.
+    // These frames only block macro lookup; they never copy or export symbols.
+    fn push_bindings(&mut self, spans: Vec<Span>) {
+        let bindings = spans.into_iter().map(|span|
+            crate::symbol::IdentKey::new(self.get_span_text(span), span.ctxt)).collect();
+        self.lexical_bindings.push(bindings);
+    }
+
+    fn pattern_bindings(&self, pattern: luna_ast::PatId, spans: &mut Vec<Span>) {
+        match &self.arena.pats[pattern.0 as usize] {
+            luna_ast::Pattern::Identifier { segments } if segments.len() == 1 => spans.push(segments[0]),
+            luna_ast::Pattern::Tuple { elements, .. } | luna_ast::Pattern::Enum { fields: elements, .. } => {
+                for &element in elements { self.pattern_bindings(element, spans); }
+            }
+            luna_ast::Pattern::Struct { fields, .. } => {
+                for field in fields {
+                    if let Some(pattern) = field.pattern { self.pattern_bindings(pattern, spans); }
+                    else { spans.push(field.name); }
+                }
+            }
+            _ => {}
+        }
+    }
+
+    fn declaration_bindings(&self, declaration: DeclId, spans: &mut Vec<Span>) {
+        match &self.arena.decls[declaration.0 as usize] {
+            Decl::Var { name, pattern, .. } => {
+                if let Some(pattern) = pattern { self.pattern_bindings(*pattern, spans); }
+                else { spans.push(*name); }
+            }
+            Decl::Param { name, .. } | Decl::Function { name, .. }
+            | Decl::Struct { name, .. } | Decl::Enum { name, .. }
+            | Decl::Trait { name, .. } | Decl::TypeAlias { name, .. } => spans.push(*name),
+            _ => {}
+        }
+    }
+
+    fn macro_is_shadowed(&self, name: &str, context: SyntaxContext) -> bool {
+        let key = crate::symbol::IdentKey::new(name, context);
+        self.lexical_bindings.iter().rev().any(|frame| frame.contains(&key))
+    }
+
+    fn lookup_macro(&self, path: &[&str], context: SyntaxContext) -> Option<SymbolId> {
+        if self.macro_is_shadowed(path.first().copied()?, context) { return None; }
+        self.symbol_table.lookup_macro_with_ctxt(path, context, self.current_scope)
+    }
+
+    fn macro_ambiguity(&self, name: &str, context: SyntaxContext, span: Span) -> Option<Diagnostic> {
+        if self.macro_is_shadowed(name, context) { return None; }
+        self.symbol_table.ambiguity_diagnostic(name, context, self.current_scope, span)
     }
 
     pub fn expand_items(&mut self, items: Vec<Item>) -> Result<Vec<Item>, Vec<Diagnostic>> {
@@ -80,7 +132,7 @@ impl<'a> MacroEngine<'a> {
     fn expand_decl(&mut self, decl_id: DeclId) {
         let decl = self.arena.decls[decl_id.0 as usize].clone();
         match decl {
-            Decl::Function { name, params, return_type, body, .. } => {
+            Decl::Function { name, params, generic_params, return_type, body, .. } => {
                 let name_str = self.get_span_text(name);
                 let func_sym = self.symbol_table.lookup_exact(name_str, self.current_scope);
                 let prev_scope = self.current_scope;
@@ -90,6 +142,9 @@ impl<'a> MacroEngine<'a> {
                     }
                 }
 
+                let mut bindings: Vec<_> = generic_params.iter().map(|parameter| parameter.name).collect();
+                for &parameter in &params { self.declaration_bindings(parameter, &mut bindings); }
+                self.push_bindings(bindings);
                 // Expand parameter types
                 for &param_id in &params {
                     let old_ty = if let Decl::Param { ty, .. } = &self.arena.decls[param_id.0 as usize] {
@@ -112,6 +167,7 @@ impl<'a> MacroEngine<'a> {
                 if let Some(body_stmt) = body {
                     let _ = self.expand_stmt(body_stmt);
                 }
+                self.lexical_bindings.pop();
                 self.current_scope = prev_scope;
             }
             Decl::Var { type_annot, initializer, .. } => {
@@ -213,6 +269,11 @@ impl<'a> MacroEngine<'a> {
                 vec![stmt_id]
             }
             Stmt::Block { body, tail_expr } => {
+                let mut bindings = Vec::new();
+                for item in &body {
+                    if let Item::Decl(declaration) = item { self.declaration_bindings(*declaration, &mut bindings); }
+                }
+                self.push_bindings(bindings);
                 let mut new_body = Vec::new();
                 for item in body {
                     new_body.extend(self.expand_block_item(item));
@@ -240,6 +301,7 @@ impl<'a> MacroEngine<'a> {
                     *b = new_body;
                     *t = new_tail;
                 }
+                self.lexical_bindings.pop();
                 vec![stmt_id]
             }
             Stmt::If { condition, then_branch, else_branch } => {
@@ -261,12 +323,24 @@ impl<'a> MacroEngine<'a> {
                 }
                 vec![stmt_id]
             }
-            Stmt::For { iterable, body, .. } => {
+            Stmt::For { iterable, body, pattern, init, cond, step, .. } => {
+                let mut bindings = Vec::new();
+                if let Some(pattern) = pattern { self.pattern_bindings(pattern, &mut bindings); }
+                if let Some(Item::Decl(declaration)) = &init { self.declaration_bindings(*declaration, &mut bindings); }
+                self.push_bindings(bindings);
+                if let Some(item) = init { self.expand_block_item(item); }
                 let new_iter = iterable.map(|it| self.expand_expr(it));
+                let new_cond = cond.map(|expr| self.expand_expr(expr));
+                let new_step = step.map(|expr| self.expand_expr(expr));
                 let _ = self.expand_stmt(body);
-                if let Stmt::For { iterable: it, .. } = &mut self.arena.stmts[stmt_id.0 as usize] {
-                    *it = new_iter;
+                if let Stmt::For { iterable: it, cond, step, .. } = &mut self.arena.stmts[stmt_id.0 as usize] {
+                    *it = new_iter; *cond = new_cond; *step = new_step;
                 }
+                self.lexical_bindings.pop();
+                vec![stmt_id]
+            }
+            Stmt::Unsafe { body } | Stmt::Comptime { body } => {
+                self.expand_stmt(body);
                 vec![stmt_id]
             }
             Stmt::Return { value } => {
@@ -362,15 +436,23 @@ impl<'a> MacroEngine<'a> {
                 self.arena.alloc_expr(Expr::StructInit { path, generic_args: new_generic_args, fields: new_fields })
             }
             Expr::Lambda { params, return_type, body, is_move } => {
+                let mut bindings = Vec::new();
+                for &parameter in &params { self.declaration_bindings(parameter, &mut bindings); }
+                self.push_bindings(bindings);
                 let new_ret = return_type.map(|rt| self.expand_type(rt));
                 let _ = self.expand_stmt(body);
+                self.lexical_bindings.pop();
                 self.arena.alloc_expr(Expr::Lambda { params, return_type: new_ret, body, is_move })
             }
             Expr::Match { match_span, subject, arms } => {
                 let new_subject = self.expand_expr(subject);
                 let mut new_arms = Vec::new();
                 for arm in arms {
+                    let mut bindings = Vec::new();
+                    self.pattern_bindings(arm.pattern, &mut bindings);
+                    self.push_bindings(bindings);
                     let _ = self.expand_stmt(arm.body);
+                    self.lexical_bindings.pop();
                     new_arms.push(arm);
                 }
                 self.arena.alloc_expr(Expr::Match { match_span, subject: new_subject, arms: new_arms })
@@ -390,16 +472,15 @@ impl<'a> MacroEngine<'a> {
                 };
                 let macro_name = path_strs.join("::");
 
-                let Some(macro_sym) = self.symbol_table.lookup_macro(&path_strs, self.current_scope) else {
+                let Some(macro_sym) = self.lookup_macro(&path_strs, if path.is_empty() { name.ctxt } else { path[0].ctxt }) else {
                     self.diagnostics.push(
-                        Diagnostic::error(format!("no macro named `{}` in scope", macro_name))
-                            .with_code(DiagnosticCode::UnresolvedSymbol)
+                        self.macro_ambiguity(path_strs[0], if path.is_empty() { name.ctxt } else { path[0].ctxt }, if path.is_empty() { name } else { path[0] }).unwrap_or_else(|| Diagnostic::error(format!("no macro named `{}` in scope", macro_name)).with_code(DiagnosticCode::UnresolvedSymbol))
                             .with_span(span),
                     );
                     return ty_id;
                 };
 
-                if !self.symbol_table.is_accessible(macro_sym, self.current_scope, None) {
+                if !self.symbol_table.is_accessible_with_ctxt(macro_sym, self.current_scope, self.symbol_table.lookup_provider, if path.is_empty() { name.ctxt } else { path[0].ctxt }) {
                     self.diagnostics.push(
                         Diagnostic::error(format!("Macro `{}` is private and cannot be accessed from this scope", macro_name))
                             .with_code(DiagnosticCode::PrivateSymbolAccess)
@@ -431,8 +512,7 @@ impl<'a> MacroEngine<'a> {
                 }
 
                 self.recursion_depth += 1;
-                self.expansion_counter += 1;
-                let expansion_id = self.expansion_counter;
+                let expansion_id = self.symbol_table.allocate_macro_context(macro_sym).0;
 
                 let mut best_failure: Option<MatchFailure> = None;
                 for rule in &rules {
@@ -534,10 +614,9 @@ impl<'a> MacroEngine<'a> {
         };
         let macro_name = path_strs.join("::");
 
-        let Some(macro_sym) = self.symbol_table.lookup_macro(&path_strs, self.current_scope) else {
+        let Some(macro_sym) = self.lookup_macro(&path_strs, if path.is_empty() { name.ctxt } else { path[0].ctxt }) else {
             self.diagnostics.push(
-                Diagnostic::error(format!("no macro named `{}` in scope", macro_name))
-                    .with_code(DiagnosticCode::UnresolvedSymbol)
+                self.macro_ambiguity(path_strs[0], if path.is_empty() { name.ctxt } else { path[0].ctxt }, if path.is_empty() { name } else { path[0] }).unwrap_or_else(|| Diagnostic::error(format!("no macro named `{}` in scope", macro_name)).with_code(DiagnosticCode::UnresolvedSymbol))
                     .with_span(if !path.is_empty() {
                         Span::new(
                             path[0].file_id,
@@ -551,7 +630,7 @@ impl<'a> MacroEngine<'a> {
             return self.arena.alloc_expr(Expr::Literal(Token::new(TokenKind::IntegerLiteral, call_span), "0".to_string()));
         };
 
-        if !self.symbol_table.is_accessible(macro_sym, self.current_scope, None) {
+        if !self.symbol_table.is_accessible_with_ctxt(macro_sym, self.current_scope, self.symbol_table.lookup_provider, if path.is_empty() { name.ctxt } else { path[0].ctxt }) {
             self.diagnostics.push(
                 Diagnostic::error(format!("Macro `{}` is private and cannot be accessed from this scope", macro_name))
                     .with_code(DiagnosticCode::PrivateSymbolAccess)
@@ -588,8 +667,7 @@ impl<'a> MacroEngine<'a> {
         }
 
         self.recursion_depth += 1;
-        self.expansion_counter += 1;
-        let expansion_id = self.expansion_counter;
+        let expansion_id = self.symbol_table.allocate_macro_context(macro_sym).0;
 
         // Try rules in order
         let mut best_failure: Option<MatchFailure> = None;
@@ -662,8 +740,8 @@ impl<'a> MacroEngine<'a> {
         };
         let macro_name = path_strs.join("::");
 
-        let macro_sym = self.symbol_table.lookup_macro(&path_strs, self.current_scope)?;
-        if !self.symbol_table.is_accessible(macro_sym, self.current_scope, None) {
+        let macro_sym = self.lookup_macro(&path_strs, if path.is_empty() { name.ctxt } else { path[0].ctxt })?;
+        if !self.symbol_table.is_accessible_with_ctxt(macro_sym, self.current_scope, self.symbol_table.lookup_provider, if path.is_empty() { name.ctxt } else { path[0].ctxt }) {
             self.diagnostics.push(
                 Diagnostic::error(format!("Macro `{}` is private and cannot be accessed from this scope", macro_name))
                     .with_code(DiagnosticCode::PrivateSymbolAccess)
@@ -692,8 +770,7 @@ impl<'a> MacroEngine<'a> {
         }
 
         self.recursion_depth += 1;
-        self.expansion_counter += 1;
-        let expansion_id = self.expansion_counter;
+        let expansion_id = self.symbol_table.allocate_macro_context(macro_sym).0;
 
         let mut best_failure: Option<MatchFailure> = None;
         let has_trace = self.tables.macro_decls.get(&macro_sym).and_then(|id| {

@@ -1,0 +1,3 @@
+import <geo>; import <other>; import "../shared/geometry";
+using geometry;
+fn main() -> i32 { return answer() - 42; }

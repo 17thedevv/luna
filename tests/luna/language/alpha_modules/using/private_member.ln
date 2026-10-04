@@ -1,0 +1,2 @@
+module math { fn secret() -> i32 { return 7; } } using math;
+fn main() -> i32 { return secret(); }
