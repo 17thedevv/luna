@@ -13,6 +13,7 @@ fn generic_owned_values_drop_once_across_control_flow_and_provider_modes() {
     let positives = [
         "move_return",
         "nested_aggregates",
+        "partial_aggregate_cleanup",
         "impl_method_substitution",
         "branches_and_early_return",
         "conditional_initialization",
@@ -27,6 +28,8 @@ fn generic_owned_values_drop_once_across_control_flow_and_provider_modes() {
         ("double_ownership", "E3001"),
         ("copy_drop_conflict", "E2004"),
         ("partial_move_drop_owner", "E3002"),
+        ("partial_aggregate_use", "E3001"),
+        ("inferred_shared_write", "E2023"),
         ("conditional_use", "E3001"),
     ];
     let mut failures = Vec::new();

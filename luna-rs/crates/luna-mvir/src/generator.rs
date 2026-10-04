@@ -753,15 +753,7 @@ impl<'a> MvirGenerator<'a> {
     ) {
         for &(value, ty) in temporaries.iter().rev() {
             if self.ctx.needs_drop(ty) {
-                let callee = self.get_drop_glue_global_id(ty);
-                self.push_inst(
-                    Instruction::Drop {
-                        value: Operand::Value(value),
-                        callee,
-                        ty,
-                    },
-                    ty,
-                );
+                self.emit_place_cleanup(Operand::Value(value), ty, None);
             }
         }
     }
@@ -777,10 +769,36 @@ impl<'a> MvirGenerator<'a> {
                     }
                 }
                 if self.ctx.needs_drop(ty_id) {
-                    let callee = self.get_drop_glue_global_id(ty_id);
-                    self.push_inst(Instruction::Drop { value: Operand::Value(val_id), callee, ty: ty_id }, ty_id);
+                    self.emit_place_cleanup(Operand::Value(val_id), ty_id, None);
                 }
             }
+        }
+    }
+
+    // Aggregates without a user destructor can be partially moved. Keep their
+    // remaining fields visible to move analysis instead of deleting the entire
+    // aggregate destructor when one field has transferred ownership.
+    fn emit_place_cleanup(&mut self, place: Operand, ty: luna_semantic::SemanticTypeId, span: Option<luna_common::Span>) {
+        let ty = self.ctx.types.resolve(ty);
+        if !self.ctx.needs_drop(ty) { return; }
+        let fields = match self.ctx.types.get(ty).clone() {
+            luna_semantic::SemanticType::Struct(symbol, _, fields)
+                if !self.ctx.tables.drop_impls.contains_key(&symbol) => Some(fields),
+            luna_semantic::SemanticType::Tuple(fields) => Some(fields),
+            _ => None,
+        };
+        if let Some(fields) = fields {
+            for (index, field_ty) in fields.into_iter().enumerate().rev() {
+                if !self.ctx.needs_drop(field_ty) { continue; }
+                let pointer_ty = self.find_pointer_type(field_ty);
+                let field = self.push_inst_span(Instruction::FieldPtr {
+                    base: place.clone(), field_idx: index as u32, field_name: None,
+                }, pointer_ty, span);
+                self.emit_place_cleanup(Operand::Value(field), field_ty, span);
+            }
+        } else {
+            let callee = self.get_drop_glue_global_id(ty);
+            self.push_inst_span(Instruction::Drop { value: place, callee, ty }, ty, span);
         }
     }
 
@@ -1503,6 +1521,20 @@ impl<'a> MvirGenerator<'a> {
         self.current_instance = None;
     }
 
+    // Transfer the return place before scope cleanup. In particular, returning
+    // a field must not exempt its entire containing aggregate from destruction.
+    fn transfer_return_value(&mut self, expr: &luna_ast::ExprId) -> Operand {
+        let value = self.generate_expr(expr);
+        let ty = self.get_expr_type(expr);
+        if matches!(self.ctx.types.get(ty), luna_semantic::SemanticType::Void) {
+            return value;
+        }
+        let transferred = self.push_inst_span(
+            Instruction::Assign(value), ty, self.extract_expr_span(expr),
+        );
+        Operand::Value(transferred)
+    }
+
     fn generate_fn_body(&mut self, body_stmt_id: &luna_ast::StmtId, ret_ty_id: luna_semantic::SemanticTypeId) {
         let stmt = &self.arena.stmts[body_stmt_id.0 as usize];
         match stmt {
@@ -1512,21 +1544,12 @@ impl<'a> MvirGenerator<'a> {
                     self.generate_item(item);
                 }
                 if let Some(tail_expr_id) = tail_expr {
-                    let mut returned_sym = None;
-                    let expr = &self.arena.exprs[tail_expr_id.0 as usize];
-                    if let Expr::Identifier { .. } = expr {
-                        if let Some(sym_id) = self.ctx.tables.expr_symbols.get(tail_expr_id).copied() {
-                            if self.locals.contains_key(&sym_id) {
-                                returned_sym = Some(sym_id);
-                            }
-                        }
-                    }
-                    let tail_op = self.generate_expr(tail_expr_id);
-                    self.pop_scope_and_drop(returned_sym);
+                    let tail_op = self.transfer_return_value(tail_expr_id);
+                    self.pop_scope_and_drop(None);
                     if let Some(mut block) = self.current_block.take() {
                         if block.terminator.is_none() {
                             self.current_block = Some(block);
-                            self.emit_drops_up_to(0, returned_sym);
+                            self.emit_drops_up_to(0, None);
                             block = self.current_block.take().unwrap();
                             let ret_val = if ret_ty_id == luna_semantic::SemanticTypeId(0) {
                                 None
@@ -1548,7 +1571,7 @@ impl<'a> MvirGenerator<'a> {
                 return;
             }
             Stmt::Expr { expr, .. } => {
-                let tail_op = self.generate_expr(expr);
+                let tail_op = self.transfer_return_value(expr);
                 if let Some(mut block) = self.current_block.take() {
                     if block.terminator.is_none() {
                         self.current_block = Some(block);
@@ -1654,26 +1677,13 @@ impl<'a> MvirGenerator<'a> {
                     return;
                 }
 
-                let mut returned_sym = None;
                 let val_operand = if let Some(expr_id) = value {
-                    let mut curr_expr_id = expr_id;
-                    while let Expr::Member { object, .. } | Expr::TupleIndex { object, .. } = &self.arena.exprs[curr_expr_id.0 as usize] {
-                        curr_expr_id = object;
-                    }
-                    let expr = &self.arena.exprs[curr_expr_id.0 as usize];
-                    if let Expr::Identifier { .. } = expr {
-                        if let Some(sym_id) = self.ctx.tables.expr_symbols.get(&curr_expr_id).copied() {
-                            if self.locals.contains_key(&sym_id) {
-                                returned_sym = Some(sym_id);
-                            }
-                        }
-                    }
-                    Some(self.generate_expr(expr_id))
+                    Some(self.transfer_return_value(expr_id))
                 } else {
                     None
                 };
                 
-                self.emit_drops_up_to(0, returned_sym);
+                self.emit_drops_up_to(0, None);
                 self.terminate_block(Terminator::Ret { value: val_operand });
             }
             Stmt::While { condition, body, .. } => {
@@ -2565,10 +2575,7 @@ impl<'a> MvirGenerator<'a> {
                         Instruction::Assign(final_val), store_ty_id, self.extract_expr_span(expr_id),
                     );
                     final_val = Operand::Value(replacement);
-                    let callee = self.get_drop_glue_global_id(store_ty_id);
-                    self.push_inst_span(Instruction::Drop {
-                        value: ptr_op.clone(), callee, ty: store_ty_id,
-                    }, store_ty_id, self.extract_expr_span(expr_id));
+                    self.emit_place_cleanup(ptr_op.clone(), store_ty_id, self.extract_expr_span(expr_id));
                 }
                 self.push_inst_span(Instruction::Store {
                     ptr: ptr_op,
