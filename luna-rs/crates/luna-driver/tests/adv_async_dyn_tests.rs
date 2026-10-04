@@ -335,13 +335,13 @@ fn test_adv_08_explicit_drop_method_call_rejected() {
     "#;
     let (success, diags) = run_compiler("test_adv_08", src);
     assert!(!success, "Explicit r.drop() must be rejected");
-    let err = diags.iter().find(|d| d.message.contains("Explicit calls to drop() are forbidden"));
+    let err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::ExplicitDropCall));
     assert!(err.is_some(), "Expected 'Explicit calls to drop() are forbidden', got: {:?}", diags);
 }
 
-// ADV-09: Explicit drop() through dyn trait method call must be rejected
+// ADV-09: An ordinary trait method named drop is not a destructor.
 #[test]
-fn test_adv_09_explicit_drop_through_dyn_trait_rejected() {
+fn test_adv_09_ordinary_drop_through_dyn_trait_allowed() {
     let src = r#"
         import <core/panic>;
         import <mem>;
@@ -373,9 +373,7 @@ fn test_adv_09_explicit_drop_through_dyn_trait_rejected() {
         }
     "#;
     let (success, diags) = run_compiler("test_adv_09", src);
-    assert!(!success, "Explicit d.drop() through dyn trait must be rejected");
-    let err = diags.iter().find(|d| d.message.contains("Explicit calls to drop() are forbidden"));
-    assert!(err.is_some(), "Expected 'Explicit calls to drop() are forbidden', got: {:?}", diags);
+    assert!(success, "An ordinary CustomDrop method must remain callable: {:?}", diags);
 }
 
 // ADV-10: dyn Drop must be rejected by object safety

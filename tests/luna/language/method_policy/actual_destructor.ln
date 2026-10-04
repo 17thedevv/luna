@@ -1,0 +1,3 @@
+struct Resource { value: i32 };
+impl std::Drop for Resource { fn drop(self: &rw Self) {} }
+fn main() { dec rw resource = Resource { value: 7 }; resource.drop(); }

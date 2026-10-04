@@ -1,0 +1,154 @@
+{
+  "revision": "fbf4e72a20b7e802bbe7dd10e2f8bd882d08a12c",
+  "cargo_exit": 101,
+  "finish_utc": "2026-10-04T18:11:30.3078688Z",
+  "cli_after_sha256": "f7b004c4c94c4f79929d200f588fae3f95097d0a7607e041487d749e9ba7b1a0",
+  "totals": {
+    "passed": 1270,
+    "failed": 18,
+    "ignored": 1
+  },
+  "log_sha256": "a775016095d58460abc86db0d2b79c9e0e7fba7b271575583ac0048ba1e410d0",
+  "failed_tests": [
+    {
+      "test": "char_scalar_contract_and_formatting_match_fresh_source_and_artifacts",
+      "snippets": [
+        "thread 'char_scalar_contract_and_formatting_match_fresh_source_and_artifacts' (22556) panicked at crates\\luna-cli\\tests\\char_scalar_cli_parity.rs:88:9:",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier"
+      ]
+    },
+    {
+      "test": "generic_owned_values_drop_once_across_control_flow_and_provider_modes",
+      "snippets": [
+        "thread 'generic_owned_values_drop_once_across_control_flow_and_provider_modes' (4716) panicked at crates\\luna-cli\\tests\\generic_drop_cli.rs:98:5:"
+      ]
+    },
+    {
+      "test": "sem2a_trait_02_shared_receiver_for_mutable_method_is_rejected",
+      "snippets": [
+        "thread 'sem2a_trait_02_shared_receiver_for_mutable_method_is_rejected' (32544) panicked at crates\\luna-cli\\tests\\semantic_maturity_phase2a.rs:58:5:",
+        "error[E2023]: E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call a method requiring a mutable receiver through an immutable reference or pointer"
+      ]
+    },
+    {
+      "test": "formatting_v1_matches_source_and_fresh_artifacts_through_cli",
+      "snippets": [
+        "thread 'formatting_v1_matches_source_and_fresh_artifacts_through_cli' (14836) panicked at crates\\luna-cli\\tests\\stdlib_format_cli_acceptance.rs:18:9:",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E1008]: Ambiguous method `fmt`: std::fmt::Debug::fmt, std::fmt::Display::fmt",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier",
+        "error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier"
+      ]
+    },
+    {
+      "test": "formatting_v1_negative_contracts_reject_through_cli_in_both_modes",
+      "snippets": [
+        "thread 'formatting_v1_negative_contracts_reject_through_cli_in_both_modes' (31164) panicked at crates\\luna-cli\\tests\\stdlib_format_cli_acceptance.rs:122:9:",
+        "assertion `left == right` failed: source/artifact diagnostics: reject_legacy_root_display.ln",
+        "  left: [\"error[E1001]: Method `fmt` not found for type `Reference(LifetimeId(0), Immutable, SemanticTypeId(<session>))`\", \"error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\", \"error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\", \"error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\", \"error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\", \"error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\", \"error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\", \"error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\"]",
+        " right: [\"error[E1001]: Method `fmt` not found for type `Reference(LifetimeId(0), Immutable, SemanticTypeId(<session>))`\", \"error[E5001]: E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\"]"
+      ]
+    },
+    {
+      "test": "test_adv_09_explicit_drop_through_dyn_trait_rejected",
+      "snippets": [
+        "thread 'test_adv_09_explicit_drop_through_dyn_trait_rejected' (29592) panicked at crates\\luna-driver\\tests\\adv_async_dyn_tests.rs:376:5:"
+      ]
+    },
+    {
+      "test": "test_adv_08_explicit_drop_method_call_rejected",
+      "snippets": [
+        "thread 'test_adv_08_explicit_drop_method_call_rejected' (33668) panicked at crates\\luna-driver\\tests\\adv_async_dyn_tests.rs:339:5:"
+      ]
+    },
+    {
+      "test": "global_std_namespace_closure_matches_fresh_source_and_artifact_only_sysroots",
+      "snippets": [
+        "thread 'global_std_namespace_closure_matches_fresh_source_and_artifact_only_sysroots' (32460) panicked at crates\\luna-driver\\tests\\lang_namespace_contract_tests.rs:909:9:",
+        "assertion `left == right` failed: canonical try_convert_float_and_panic fixture must compile, link, and execute: Err(\"[\\n    Diagnostic {\\n        level: Error,\\n        code: Some(\\n            AmbiguousSymbol,\\n        ),\\n        span: Some(\\n            Span {\\n                file_id: FileId(\\n                    0,\\n                ),\\n                start: 275,\\n                end: 286,\\n                ctxt: SyntaxContext(\\n                    0,\\n                ),\\n            },\\n        ),\\n        message: \\\"Ambiguous method `try_convert`: std::TryConvert::try_convert, std::TryConvert::try_convert\\\",\\n        related: [\\n            DiagnosticLabel {\\n                span: Span {\\n                    file_id: FileId(\\n                        9,\\n                    ),\\n                    start: 2265,\\n                    end: 2276,\\n                    ctxt: SyntaxContext(\\n                        0,\\n                    ),\\n                },\\n                message: \\\"candidate std::TryConvert::try_convert\\\",\\n            },\\n            DiagnosticLabel {\\n                span: Span {\\n                    file_id: FileId(\\n                        9,\\n                    ),\\n                    start: 6736,\\n                    end: 6747,\\n                    ctxt: SyntaxContext(\\n                        0,\\n                    ),\\n                },\\n                message: \\\"candidate std::TryConvert::try_convert\\\",\\n            },\\n        ],\\n    },\\n]\")",
+        "  left: Err(\"[\\n    Diagnostic {\\n        level: Error,\\n        code: Some(\\n            AmbiguousSymbol,\\n        ),\\n        span: Some(\\n            Span {\\n                file_id: FileId(\\n                    0,\\n                ),\\n                start: 275,\\n                end: 286,\\n                ctxt: SyntaxContext(\\n                    0,\\n                ),\\n            },\\n        ),\\n        message: \\\"Ambiguous method `try_convert`: std::TryConvert::try_convert, std::TryConvert::try_convert\\\",\\n        related: [\\n            DiagnosticLabel {\\n                span: Span {\\n                    file_id: FileId(\\n                        9,\\n                    ),\\n                    start: 2265,\\n                    end: 2276,\\n                    ctxt: SyntaxContext(\\n                        0,\\n                    ),\\n                },\\n                message: \\\"candidate std::TryConvert::try_convert\\\",\\n            },\\n            DiagnosticLabel {\\n                span: Span {\\n                    file_id: FileId(\\n                        9,\\n                    ),\\n                    start: 6736,\\n                    end: 6747,\\n                    ctxt: SyntaxContext(\\n                        0,\\n                    ),\\n                },\\n                message: \\\"candidate std::TryConvert::try_convert\\\",\\n            },\\n        ],\\n    },\\n]\")"
+      ]
+    },
+    {
+      "test": "test_evaluation_order_sequence",
+      "snippets": [
+        "thread 'test_evaluation_order_sequence' (24432) panicked at crates\\luna-driver\\tests\\sem_gap_19_alias_safety_audit.rs:325:5:",
+        "Compilation failed: Some([Diagnostic { level: Error, code: Some(CannotMutateImmutable), span: Some(Span { file_id: FileId(0), start: 1825, end: 1826, ctxt: SyntaxContext(0) }), message: \"Cannot mutate immutable variable\", related: [] }])"
+      ]
+    },
+    {
+      "test": "test_gate_explicit_drop_call",
+      "snippets": [
+        "thread 'test_gate_explicit_drop_call' (29948) panicked at crates\\luna-driver\\tests\\semantic_gate_tests.rs:60:5:"
+      ]
+    },
+    {
+      "test": "test_adversarial_negative_corpus",
+      "snippets": [
+        "thread 'test_adversarial_negative_corpus' (3716) panicked at crates\\luna-driver\\tests\\semantic_gate_tests.rs:60:5:"
+      ]
+    },
+    {
+      "test": "test_iter_for_each_basic",
+      "snippets": [
+        "thread 'test_iter_for_each_basic' (33024) panicked at crates\\luna-driver\\tests\\stdlib_iterator_terminal_consumers_acceptance_tests.rs:215:10:",
+        "Execution must succeed: \"Compilation failed: [Diagnostic { level: Error, code: Some(CannotMutateImmutable), span: Some(Span { file_id: FileId(0), start: 846, end: 850, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MUTATE_IMMUTABLE_POINTER: Cannot call a method requiring a mutable receiver through an immutable reference or pointer\\\", related: [] }, Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 902, end: 905, ctxt: SyntaxContext(0) }), message: \\\"Enum variant expects 0 fields, but 1 were provided\\\", related: [] }, Diagnostic { level: Error, code: Some(MonomorphizationBarrier), span: Some(Span { file_id: FileId(0), start: 0, end: 0, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\\\", related: [] }]\""
+      ]
+    },
+    {
+      "test": "test_parity_vec_and_slices",
+      "snippets": [
+        "thread 'test_parity_vec_and_slices' (15880) panicked at crates\\luna-driver\\tests\\stdlib_phase4b_llib_parity_tests.rs:149:14:",
+        "source-mode execution should succeed: \"Compilation failed in source mode: [Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 1253, end: 1259, ctxt: SyntaxContext(0) }), message: \\\"Wrong number of method generic arguments: expected 0, got 1\\\", related: [] }, Diagnostic { level: Error, code: Some(MonomorphizationBarrier), span: Some(Span { file_id: FileId(9), start: 22856, end: 22861, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\\\", related: [] }, Diagnostic { level: Error, code: Some(MonomorphizationBarrier), span: Some(Span { file_id: FileId(9), start: 22693, end: 22697, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\\\", related: [] }, Diagnostic { level: Error, code: Some(MonomorphizationBarrier), span: Some(Span { file_id: FileId(9), start: 22773, end: 22777, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\\\", related: [] }, Diagnostic { level: Error, code: Some(MonomorphizationBarrier), span: Some(Span { file_id: FileId(9), start: 22850, end: 22855, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\\\", related: [] }, Diagnostic { level: Error, code: Some(MonomorphizationBarrier), span: Some(Span { file_id: FileId(9), start: 22669, end: 22673, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\\\", related: [] }, Diagnostic { level: Error, code: Some(MonomorphizationBarrier), span: Some(Span { file_id: FileId(9), start: 22840, end: 22844, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\\\", related: [] }, Diagnostic { level: "
+      ]
+    },
+    {
+      "test": "test_ownership_stress_vec_resize_and_clone",
+      "snippets": [
+        "thread 'test_ownership_stress_vec_resize_and_clone' (1772) panicked at crates\\luna-driver\\tests\\stdlib_phase4b_ownership_stress_tests.rs:355:65:",
+        "execution should succeed: \"Compilation failed: [Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 1477, end: 1483, ctxt: SyntaxContext(0) }), message: \\\"Wrong number of method generic arguments: expected 0, got 1\\\", related: [] }, Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 2172, end: 2178, ctxt: SyntaxContext(0) }), message: \\\"Wrong number of method generic arguments: expected 0, got 1\\\", related: [] }, Diagnostic { level: Error, code: Some(MonomorphizationBarrier), span: Some(Span { file_id: FileId(0), start: 0, end: 0, ctxt: SyntaxContext(0) }), message: \\\"E_CANNOT_MONOMORPHIZE: Generic parameter could not be instantiated at monomorphization barrier\\\", related: [] }]\""
+      ]
+    },
+    {
+      "test": "phase4c_fresh_session_source_vs_llib_parity",
+      "snippets": [
+        "thread 'phase4c_fresh_session_source_vs_llib_parity' (6460) panicked at crates\\luna-driver\\tests\\stdlib_phase4c_llib_parity_tests.rs:100:37:"
+      ]
+    },
+    {
+      "test": "test_standard_conversions",
+      "snippets": [
+        "thread 'test_standard_conversions' (18568) panicked at crates\\luna-driver\\tests\\stdlib_phase4c_numerics.rs:360:13:",
+        "test_standard_conversions failed: Compilation failed: [Diagnostic { level: Error, code: Some(AmbiguousSymbol), span: Some(Span { file_id: FileId(0), start: 1593, end: 1604, ctxt: SyntaxContext(0) }), message: \"Ambiguous method `try_convert`: std::TryConvert::try_convert, std::TryConvert::try_convert\", related: [DiagnosticLabel { span: Span { file_id: FileId(9), start: 2265, end: 2276, ctxt: SyntaxContext(0) }, message: \"candidate std::TryConvert::try_convert\" }, DiagnosticLabel { span: Span { file_id: FileId(9), start: 6736, end: 6747, ctxt: SyntaxContext(0) }, message: \"candidate std::TryConvert::try_convert\" }] }, Diagnostic { level: Error, code: Some(AmbiguousSymbol), span: Some(Span { file_id: FileId(0), start: 1989, end: 2000, ctxt: SyntaxContext(0) }), message: \"Ambiguous method `try_convert`: std::TryConvert::try_convert, std::TryConvert::try_convert\", related: [DiagnosticLabel { span: Span { file_id: FileId(9), start: 2265, end: 2276, ctxt: SyntaxContext(0) }, message: \"candidate std::TryConvert::try_convert\" }, DiagnosticLabel { span: Span { file_id: FileId(9), start: 6736, end: 6747, ctxt: SyntaxContext(0) }, message: \"candidate std::TryConvert::try_convert\" }] }, Diagnostic { level: Error, code: Some(AmbiguousSymbol), span: Some(Span { file_id: FileId(0), start: 2357, end: 2368, ctxt: SyntaxContext(0) }), message: \"Ambiguous method `try_convert`: std::TryConvert::try_convert, std::TryConvert::try_convert\", related: [DiagnosticLabel { span: Span { file_id: FileId(9), start: 2265, end: 2276, ctxt: SyntaxContext(0) }, message: \"candidate std::TryConvert::try_convert\" }, DiagnosticLabel { span: Span { file_id: FileId(9), start: 6736, end: 6747, ctxt: SyntaxContext(0) }, message: \"candidate std::TryConvert::try_convert\" }] }, Diagnostic { level: Error, code: Some(AmbiguousSymbol), span: Some(Span { file_id: FileId(0), start: 2685, end: 2696, ctxt: SyntaxContext(0) }), message: \"Ambiguous method `try_convert`: std::TryConvert::try_convert, std::TryConvert::try_"
+      ]
+    },
+    {
+      "test": "copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_modes",
+      "snippets": [
+        "thread 'copy_file_propagates_destination_write_failure_in_source_and_fresh_artifact_modes' (32984) panicked at crates\\luna-driver\\tests\\whole_file_io_v1_acceptance_tests.rs:255:27:"
+      ]
+    },
+    {
+      "test": "whole_file_io_source_and_fresh_artifact_parity",
+      "snippets": [
+        "thread 'whole_file_io_source_and_fresh_artifact_parity' (15104) panicked at crates\\luna-driver\\tests\\whole_file_io_v1_acceptance_tests.rs:106:9:"
+      ]
+    }
+  ]
+}

@@ -21,6 +21,7 @@ fn method_applicability_and_binder_identity_survive_provider_modes_and_order() {
                 "multi_impl_provider",
                 "private_provider",
                 "trait_provider",
+                "bound_provider",
             ] {
                 let input_name = if reversed && provider == "multi_impl_provider" {
                     "multi_impl_provider_reversed"
@@ -66,6 +67,12 @@ fn method_applicability_and_binder_identity_survive_provider_modes_and_order() {
                 "dynamic_regular_drop",
                 "qualified_generic",
                 "bound_argument_applicability",
+                "recursive_impl_bound_valid",
+                "array_impl_pattern",
+                "mutable_reference_binding",
+                "associated_impl_bound_valid",
+                "rigid_trait_argument_valid",
+                "reference_head_coherence",
             ] {
                 let source = relocated.join(format!("{name}.ln"));
                 fs::copy(fixtures.join(format!("{name}.ln")), &source).unwrap();
@@ -101,6 +108,17 @@ fn method_applicability_and_binder_identity_survive_provider_modes_and_order() {
                 ("stdlib_no_element_bound", "E2021"),
                 ("dynamic_wrong_arity", "E2001"),
                 ("generic_missing_bound", "E2021"),
+                ("recursive_impl_bound_missing", "E2021"),
+                ("qualified_impl_bound_missing", "E2021"),
+                ("method_impl_bound_missing", "E2021"),
+                ("cyclic_impl_bound", "E2021"),
+                ("array_impl_wrong_length", "E2001"),
+                ("array_trait_overlap", "E2005"),
+                ("immutable_reference_binding", "E2023"),
+                ("actual_destructor", "E2031"),
+                ("associated_impl_bound_missing", "E2021"),
+                ("associated_caller_bound_missing", "E2001"),
+                ("rigid_trait_argument_missing", "E2021"),
             ] {
                 let source = relocated.join(format!("{name}.ln"));
                 fs::copy(fixtures.join(format!("{name}.ln")), &source).unwrap();

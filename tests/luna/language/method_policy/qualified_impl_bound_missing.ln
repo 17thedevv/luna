@@ -1,0 +1,2 @@
+import "bound_provider";
+fn main() -> i32 { dec value = Wrapper<i32> { item: 7 }; return Exposed::value(&value); }

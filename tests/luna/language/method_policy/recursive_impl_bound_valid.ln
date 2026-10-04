@@ -1,0 +1,19 @@
+import "bound_provider";
+struct Marked {};
+impl Marker for Marked {}
+fn generic<T: Marker>(value: Wrapper<T>) -> i32 {
+    if value.value() != 7 { return 1; }
+    if Exposed::value(&value) != 7 { return 2; }
+    return require(value);
+}
+fn main() -> i32 {
+    dec first_item = Marked {};
+    dec first = Wrapper<Marked> { item: first_item };
+    if generic(first) != 0 { return 3; }
+    dec inner_item = Marked {};
+    dec inner = Wrapper<Marked> { item: inner_item };
+    dec outer = Wrapper<Wrapper<Marked>> { item: inner };
+    if outer.value() != 7 { return 4; }
+    if Exposed::value(&outer) != 7 { return 5; }
+    return require(outer);
+}

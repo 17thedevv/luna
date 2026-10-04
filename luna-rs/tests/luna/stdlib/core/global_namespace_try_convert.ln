@@ -11,7 +11,7 @@ fn maybe_panic(should_panic: bool) {
 
 fn main() -> i32 {
     dec value: u16 = 255 as u16;
-    dec converted: std::Result<u8, std::TryConvertError> = value.try_convert();
+    dec converted: std::Result<u8, std::TryConvertError> = std::TryConvert::try_convert(value);
     match converted {
         std::Result::Ok(narrow) -> { if narrow != (255 as u8) { return 1; } },
         std::Result::Err(_) -> { return 2; },

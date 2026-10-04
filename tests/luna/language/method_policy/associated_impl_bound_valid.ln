@@ -1,0 +1,12 @@
+import "bound_provider";
+struct Number {};
+impl HasItem for Number { type Item = i32; }
+fn forward<T: HasItem<Item = i32>>(value: AssocWrapper<T>) -> i32 {
+    if value.get() != 11 { return 1; }
+    if Specialized::get(&value) != 11 { return 2; }
+    return require_assoc(value);
+}
+fn main() -> i32 {
+    dec item = Number {};
+    return forward(AssocWrapper<Number> { item: item });
+}

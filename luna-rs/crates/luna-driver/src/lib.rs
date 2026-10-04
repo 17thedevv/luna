@@ -212,6 +212,9 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
         max_depth: options.comptime_depth.unwrap_or(512),
     };
     TypeChecker::new_with_engine(&mut semantic_ctx, &arena, &session.source_manager, &comptime_engine).typecheck_items(&items);
+    if !semantic_ctx.diagnostics.is_empty() {
+        return Err(semantic_ctx.diagnostics);
+    }
 
     let mut mono = luna_semantic::MonoCollector::new_with_source(&mut semantic_ctx, &arena, Some(&session.source_manager));
     mono.run(&items);
@@ -315,6 +318,9 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
         max_depth: options.comptime_depth.unwrap_or(512),
     };
     TypeChecker::new_with_engine(&mut semantic_ctx, &arena, &session.source_manager, &comptime_engine).typecheck_items(&items);
+    if !semantic_ctx.diagnostics.is_empty() {
+        return Err(semantic_ctx.diagnostics);
+    }
 
     let mut mono = luna_semantic::MonoCollector::new_with_source(&mut semantic_ctx, &arena, Some(&session.source_manager));
     mono.run(&items);
@@ -496,6 +502,9 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             };
             let mut typechecker = TypeChecker::new_with_engine(&mut semantic_ctx, &arena, &session.source_manager, &comptime_engine);
             typechecker.typecheck_items(&items_mut);
+            if !semantic_ctx.diagnostics.is_empty() {
+                return Err(semantic_ctx.diagnostics);
+            }
             
             let mut mono = luna_semantic::MonoCollector::new_with_source(&mut semantic_ctx, &arena, Some(&session.source_manager));
             mono.run(&items_mut);

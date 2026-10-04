@@ -1,0 +1,12 @@
+type PairArray = [i32; 2];
+type TripleArray = [i32; 3];
+struct ArrayHolder<T> { item: T };
+impl<T> ArrayHolder<[T; 2]> { fn value(self: &Self) -> i32 { return 7; } }
+impl ArrayHolder<TripleArray> { fn value(self: &Self) -> i32 { return 9; } }
+fn main() -> i32 {
+    dec pair = ArrayHolder<PairArray> { item: [3i32, 5i32] };
+    dec triple = ArrayHolder<TripleArray> { item: [1i32, 2i32, 3i32] };
+    if pair.value() != 7 { return 1; }
+    if triple.value() != 9 { return 2; }
+    return 0;
+}

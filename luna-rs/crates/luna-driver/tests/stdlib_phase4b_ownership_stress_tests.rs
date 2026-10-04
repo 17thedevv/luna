@@ -288,7 +288,7 @@ fn test_ownership_stress_vec_resize_and_clone() {
             v.push(DropProbe {{ id: 50, counter: drops }});
 
             // Shrink from 5 to 2: 3 elements dropped + 1 template value dropped
-            v.resize<DropProbe>(2 as u64, DropProbe {{ id: 99, counter: drops }});
+            v.resize(2 as u64, DropProbe {{ id: 99, counter: drops }});
 
             unsafe {{
                 if *drops != 4 {{ return 1; }}
@@ -307,7 +307,7 @@ fn test_ownership_stress_vec_resize_and_clone() {
             v.push(DropProbe {{ id: 2, counter: drops }});
 
             // Grow from 2 to 4 with id: 100: 2 clones pushed + 1 template value dropped
-            v.resize<DropProbe>(4 as u64, DropProbe {{ id: 100, counter: drops }});
+            v.resize(4 as u64, DropProbe {{ id: 100, counter: drops }});
             unsafe {{
                 // Only the template argument dropped so far
                 if *drops != 1 {{ return 5; }}

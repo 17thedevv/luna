@@ -177,7 +177,7 @@ impl SemanticContext {
             SemanticType::Struct(_, args, _) | SemanticType::Enum(_, args, _) | SemanticType::Tuple(args) => {
                 args.iter().any(|&a| self.occurs_in_pattern(target, a, generics_1, generics_2, subst))
             }
-            SemanticType::Reference(_, _, inner) | SemanticType::Pointer(_, inner) | SemanticType::Slice(inner) => {
+            SemanticType::Reference(_, _, inner) | SemanticType::Pointer(_, inner) | SemanticType::Slice(inner) | SemanticType::Array(inner, _) => {
                 self.occurs_in_pattern(target, *inner, generics_1, generics_2, subst)
             }
             _ => false,
@@ -253,7 +253,7 @@ impl SemanticContext {
                         self.can_unify_patterns(a1, a2, generics_1, generics_2, subst)
                     })
             }
-            (SemanticType::Reference(m1, _, inner1), SemanticType::Reference(m2, _, inner2)) => {
+            (SemanticType::Reference(_, m1, inner1), SemanticType::Reference(_, m2, inner2)) => {
                 m1 == m2 && self.can_unify_patterns(*inner1, *inner2, generics_1, generics_2, subst)
             }
             (SemanticType::Pointer(m1, inner1), SemanticType::Pointer(m2, inner2)) => {
@@ -261,6 +261,9 @@ impl SemanticContext {
             }
             (SemanticType::Slice(inner1), SemanticType::Slice(inner2)) => {
                 self.can_unify_patterns(*inner1, *inner2, generics_1, generics_2, subst)
+            }
+            (SemanticType::Array(inner1, size1), SemanticType::Array(inner2, size2)) => {
+                size1 == size2 && self.can_unify_patterns(*inner1, *inner2, generics_1, generics_2, subst)
             }
             (SemanticType::GenericParam(gp1), SemanticType::GenericParam(gp2)) => gp1 == gp2,
             _ => false,
@@ -313,6 +316,9 @@ impl SemanticContext {
             }
             (&SemanticType::Slice(inner1), &SemanticType::Slice(inner2)) => {
                 self.matches_impl_pattern(inner1, inner2, generic_params, subst)
+            }
+            (&SemanticType::Array(inner1, size1), &SemanticType::Array(inner2, size2)) => {
+                size1 == size2 && self.matches_impl_pattern(inner1, inner2, generic_params, subst)
             }
             (&SemanticType::GenericParam(gp1), &SemanticType::GenericParam(gp2)) => gp1 == gp2,
             _ => false,

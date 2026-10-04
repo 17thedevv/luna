@@ -80,7 +80,7 @@ fn check_copy(src: &std::String, dst: &std::String) -> i32 {
 }
 
 fn check_copy_write_failure(src: &std::String, directory: &std::String) -> i32 {
-    dec bytes = std::vec_new<u8>();
+    dec rw bytes = std::vec_new<u8>();
     bytes.push(65 as u8);
     match std::write_file(directory, bytes.as_slice()) {
         std::Result::Err(_) -> {},
@@ -223,11 +223,11 @@ fn main(args: [str]) -> i32 {
     dec empty_read_path = std::path::join(&empty_read_directory, &empty_read_name);
     if check_empty_read(&empty_read_path) != 0 { return 21; }
 
-    dec payload = std::vec_new<u8>();
+    dec rw payload = std::vec_new<u8>();
     payload.push(0 as u8); payload.push(255 as u8); payload.push(128 as u8); payload.push(1 as u8);
     payload.push(127 as u8); payload.push(0 as u8); payload.push(195 as u8); payload.push(169 as u8);
     if check_write(&unicode_path, payload.as_slice()) != 0 { return 23; }
-    dec text_bytes = std::vec_new<u8>();
+    dec rw text_bytes = std::vec_new<u8>();
     text_bytes.push(108 as u8); text_bytes.push(117 as u8); text_bytes.push(110 as u8);
     text_bytes.push(97 as u8); text_bytes.push(32 as u8); text_bytes.push(116 as u8);
     text_bytes.push(101 as u8); text_bytes.push(120 as u8); text_bytes.push(116 as u8);

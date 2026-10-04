@@ -4,6 +4,8 @@ use luna_lexer::{BuiltinKind, TokenKind};
 use luna_common::diagnostic::{Diagnostic, DiagnosticCode};
 #[path = "method_resolution.rs"]
 mod method_resolution;
+#[path = "trait_bound_proof.rs"]
+mod trait_bound_proof;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssociatedTypeEqObligation {
@@ -1336,6 +1338,8 @@ impl<'a> TypeChecker<'a> {
                                                             target_ty,
                                                             span: binding.name,
                                                         });
+                                                        self.ctx.tables.assoc_type_bounds.entry(gp_sym).or_default()
+                                                            .push((trait_sym, assoc_sym, target_ty));
                                                     }
                                                 }
                                         }
@@ -1378,6 +1382,8 @@ impl<'a> TypeChecker<'a> {
                                                                     target_ty,
                                                                     span: binding.name,
                                                                 });
+                                                                self.ctx.tables.assoc_type_bounds.entry(gp_sym).or_default()
+                                                                    .push((trait_sym, assoc_sym, target_ty));
                                                             }
                                                         }
                                                     }
@@ -2446,67 +2452,9 @@ impl<'a> TypeChecker<'a> {
                     };
                     if let Some(bounds) = self.ctx.tables.trait_bounds.get(&gp_sym).cloned() {
                         for bound in &bounds {
-                            let entries: Vec<_> = self.ctx.tables.trait_impl_entries.iter()
-                                .filter(|entry| entry.trait_id == bound.trait_id)
-                                .cloned().collect();
-                            let mut satisfied = false;
-                            let mut mismatch = None;
-                            if let SemanticType::GenericParam(caller_parameter) = resolved_sem {
-                                let declared = self.ctx.tables.trait_bounds.get(&caller_parameter).cloned().unwrap_or_default();
-                                for available in declared.iter().filter(|available| available.trait_id == bound.trait_id) {
-                                    if available.trait_args.len() != bound.trait_args.len() { continue; }
-                                    let saved_bindings = self.ctx.types.inference_bindings.clone();
-                                    let saved_obligations = self.associated_type_obligations.len();
-                                    let saved_diagnostics = self.ctx.diagnostics.len();
-                                    let mut compatible = true;
-                                    for (&expected, &actual) in bound.trait_args.iter().zip(&available.trait_args) {
-                                        let expected = self.ctx.types.subst(expected, subst);
-                                        if let Err(reason) = self.unify(expected, actual) {
-                                            mismatch = Some(reason);
-                                            compatible = false;
-                                            break;
-                                        }
-                                    }
-                                    if compatible { satisfied = true; break; }
-                                    self.ctx.types.inference_bindings = saved_bindings;
-                                    self.associated_type_obligations.truncate(saved_obligations);
-                                    self.ctx.diagnostics.truncate(saved_diagnostics);
-                                }
-                            }
-                            for entry in entries {
-                                if satisfied { break; }
-                                let mut test_subst = crate::ty::Substitution::new();
-                                if !self.ctx.matches_impl_pattern(entry.self_type, resolved_ty, &entry.generic_params, &mut test_subst) {
-                                    continue;
-                                }
-                                // Matching the self type alone is insufficient: one
-                                // type may implement the same trait for distinct args.
-                                // An unsuccessful candidate must not bind inference
-                                // variables or leave deferred equality obligations.
-                                let saved_bindings = self.ctx.types.inference_bindings.clone();
-                                let saved_obligations = self.associated_type_obligations.len();
-                                let saved_diagnostics = self.ctx.diagnostics.len();
-                                let mut compatible = bound.trait_args.is_empty()
-                                    || bound.trait_args.len() == entry.trait_args.len();
-                                if compatible {
-                                    for (&b_arg, &impl_arg) in bound.trait_args.iter().zip(&entry.trait_args) {
-                                        let expected = self.ctx.types.subst(b_arg, subst);
-                                        let actual = self.ctx.types.subst(impl_arg, &test_subst);
-                                        if let Err(reason) = self.unify(expected, actual) {
-                                            mismatch = Some(reason);
-                                            compatible = false;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if compatible {
-                                    satisfied = true;
-                                    break;
-                                }
-                                self.ctx.types.inference_bindings = saved_bindings;
-                                self.associated_type_obligations.truncate(saved_obligations);
-                                self.ctx.diagnostics.truncate(saved_diagnostics);
-                            }
+                            let required_arguments: Vec<_> = bound.trait_args.iter()
+                                .map(|&ty| self.ctx.types.subst(ty, subst)).collect();
+                            let satisfied = self.prove_trait_bound(resolved_ty, bound.trait_id, &required_arguments);
                             if !satisfied {
                                 let trait_name = self.ctx.symbol_table.get_symbol(bound.trait_id).name.clone();
                                 let type_name = concrete_self_key.map(|concrete_key| match concrete_key {
@@ -2517,11 +2465,9 @@ impl<'a> TypeChecker<'a> {
                                     crate::comptime::reflect::ComptimeReflection::type_name(resolved_ty, &self.ctx)
                                 });
                                 let gp_name = self.ctx.symbol_table.get_symbol(gp_sym).name.clone();
-                                let reason = mismatch.map(|reason| format!("; incompatible trait arguments: {reason}"))
-                                    .unwrap_or_default();
                                 self.ctx.diagnostics.push(
                                     Diagnostic::error(format!(
-                                        "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`){reason}",
+                                        "The type `{}` does not implement trait `{}` (required by inferred generic parameter `{}`)",
                                         type_name, trait_name, gp_name
                                     ))
                                     .with_code(DiagnosticCode::TraitBoundNotSatisfied)
@@ -2530,27 +2476,16 @@ impl<'a> TypeChecker<'a> {
                             }
                         }
                     }
-                    if let Some(concrete_key) = concrete_self_key {
-                        if let Some(assoc_bounds) = self.ctx.tables.assoc_type_bounds.get(&gp_sym).cloned() {
-                            for (trait_sym, assoc_sym, expected_ty) in assoc_bounds {
-                                let norm_ty = self.normalize_projection(resolved_ty, trait_sym, assoc_sym, span);
-                                if let Err(e) = self.unify(expected_ty, norm_ty) {
-                                    let trait_name = self.ctx.symbol_table.get_symbol(trait_sym).name.clone();
-                                    let assoc_name = self.ctx.symbol_table.get_symbol(assoc_sym).name.clone();
-                                    let type_name = match concrete_key {
-                                        crate::semantic_tables::ImplSelfTypeKey::Nominal(s) => self.ctx.symbol_table.get_symbol(s).name.clone(),
-                                        crate::semantic_tables::ImplSelfTypeKey::Primitive(b) => format!("{:?}", b).to_lowercase(),
-                                        crate::semantic_tables::ImplSelfTypeKey::Slice => "slice".to_string(),
-                                    };
-                                    self.ctx.diagnostics.push(
-                                        Diagnostic::error(format!(
-                                            "E_ASSOCIATED_TYPE_MISMATCH: The type `{}` implements `{}` with associated type `{}` = `{:?}`, but `{:?}` was expected: {}",
-                                            type_name, trait_name, assoc_name, self.ctx.types.get(norm_ty), self.ctx.types.get(expected_ty), e
-                                        ))
-                                        .with_code(DiagnosticCode::TypeMismatch)
-                                        .with_span(span)
-                                    );
-                                }
+                    if let Some(assoc_bounds) = self.ctx.tables.assoc_type_bounds.get(&gp_sym).cloned() {
+                        for (owner, associated, expected) in assoc_bounds {
+                            let expected = self.ctx.types.subst(expected, subst);
+                            if !self.prove_associated_bound(resolved_ty, owner, associated, expected) {
+                                self.ctx.diagnostics.push(Diagnostic::error(format!(
+                                    "E_ASSOCIATED_TYPE_MISMATCH: The associated type equality `{}::{}` is not established for `{}`",
+                                    self.ctx.symbol_table.get_symbol(owner).name,
+                                    self.ctx.symbol_table.get_symbol(associated).name,
+                                    crate::comptime::reflect::ComptimeReflection::type_name(resolved_ty, &self.ctx)))
+                                    .with_code(DiagnosticCode::TypeMismatch).with_span(span));
                             }
                         }
                     }
@@ -4502,6 +4437,23 @@ impl<'a> TypeChecker<'a> {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                         if let Some(func_sym) = func_sym_opt {
                             self.check_bounds_for_call(func_sym, &subst, span);
+                            let owner = self.ctx.tables.trait_methods.iter()
+                                .find(|(_, methods)| methods.contains(&func_sym)).map(|(&owner, _)| owner);
+                            if let Some(owner) = owner {
+                                if let Some(&receiver) = subst.get(owner) {
+                                    let parameters = self.ctx.tables.trait_generic_params.get(&owner).cloned().unwrap_or_default();
+                                    let arguments: Vec<_> = parameters.into_iter().map(|parameter| {
+                                        let parameter = self.ctx.types.intern(SemanticType::GenericParam(parameter));
+                                        self.ctx.types.subst(parameter, &subst)
+                                    }).collect();
+                                    if !self.prove_trait_bound(receiver, owner, &arguments) {
+                                        self.ctx.diagnostics.push(Diagnostic::error(format!(
+                                            "Qualified call requires an applicable implementation of `{}` with satisfied bounds",
+                                            self.ctx.symbol_table.get_symbol(owner).name))
+                                            .with_code(DiagnosticCode::TraitBoundNotSatisfied).with_span(span));
+                                    }
+                                }
+                            }
                         }
                         
                         let empty = crate::ty::Substitution::new();

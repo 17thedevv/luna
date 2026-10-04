@@ -1,0 +1,6 @@
+trait Contract<A> {}
+struct Marker {};
+impl Contract<i32> for Marker {}
+fn require<T: Contract<U>, U>(value: T) -> i32 { return 0; }
+fn forward<T, V: Contract<T>>(value: V) -> i32 { return require<V, T>(value); }
+fn main() -> i32 { return forward<i32, Marker>(Marker {}); }

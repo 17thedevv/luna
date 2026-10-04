@@ -114,7 +114,7 @@ fn sem2a_trait_01_generic_mutable_receiver_is_accepted() {
 fn sem2a_trait_02_shared_receiver_for_mutable_method_is_rejected() {
     assert_rejects(
         "sem2a_trait_02_shared_to_rw_receiver.ln",
-        "Cannot call method requiring mutable receiver",
+        "error[E2023]",
     );
 }
 
