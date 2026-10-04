@@ -1,0 +1,7 @@
+type ClosureType = typeof(|y: i32| -> i32 { y });
+fn make_closure() -> ClosureType {
+    dec x = 10;
+    dec closure = |y: i32| -> i32 { x + y };
+    return closure;
+}
+fn main() { dec closure = make_closure(); }

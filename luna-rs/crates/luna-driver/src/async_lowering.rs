@@ -6,6 +6,29 @@ pub const FUTURE_STATE_POISONED: i64 = -2;
 use luna_semantic::{SemanticContext, SemanticType, SemanticTypeId};
 use std::collections::HashMap;
 
+// A parameter Alloca is a slot holding the incoming handle, not the environment
+// itself. Load it and give the opaque ABI pointer its concrete environment view.
+fn environment_parameter(
+    function: &mut Function,
+    opaque_pointer: SemanticTypeId,
+    environment_pointer: SemanticTypeId,
+) -> (ValueId, Vec<ValueId>) {
+    assert!(function.values.is_empty() && function.arg_count == 1);
+    function.values.push(ValueData {
+        inst: Instruction::Alloca, ty: opaque_pointer, span: None,
+        origin: ValueOrigin::Parameter(0),
+    });
+    function.values.push(ValueData {
+        inst: Instruction::Load { ptr: Operand::Value(ValueId(0)) },
+        ty: opaque_pointer, span: None, origin: ValueOrigin::Temporary,
+    });
+    function.values.push(ValueData {
+        inst: Instruction::Cast { value: Operand::Value(ValueId(1)), target_ty: environment_pointer },
+        ty: environment_pointer, span: None, origin: ValueOrigin::Temporary,
+    });
+    (ValueId(2), vec![ValueId(0), ValueId(1), ValueId(2)])
+}
+
 pub fn lower_async(module: &mut Module, ctx: &mut SemanticContext) {
     let mut async_funcs = Vec::new();
     for (i, func) in module.functions.iter().enumerate() {
@@ -191,6 +214,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
     }
 
     let env_ty_id = ctx.types.intern(SemanticType::Tuple(env_fields.clone()));
+    let env_ptr_ty = ctx.types.intern(SemanticType::Pointer(luna_semantic::ty::Mutability::Mutable, env_ty_id));
     
     // 2. Create the kickoff function
     let mut kickoff = Function {
@@ -356,14 +380,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         values: Vec::new(),
     };
     
-    // First value in resume is the env pointer alloca
-    let env_arg_id = ValueId(resume.values.len() as u32);
-    resume.values.push(ValueData {
-        inst: Instruction::Alloca,
-        ty: env_ty_id,
-        span: None,
-            origin: ValueOrigin::Temporary,
-    });
+    let (env_arg_id, env_parameter_insts) = environment_parameter(&mut resume, void_ptr_ty, env_ptr_ty);
     
     let mut val_map = HashMap::new();
     
@@ -825,7 +842,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         
         // Insert them right after the env_arg_id
         dispatch_block.insts.splice(0..0, alloca_field_ptrs);
-        dispatch_block.insts.insert(0, env_arg_id);
+        dispatch_block.insts.splice(0..0, env_parameter_insts.clone());
         
         resume.blocks.push(dispatch_block);
         resume.blocks.extend(translated_blocks);
@@ -852,7 +869,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         // Dispatch 0 block
         let mut entry_dispatch = BasicBlock {
             label: LabelId { name: "entry_dispatch".to_string() },
-            insts: vec![env_arg_id],
+            insts: env_parameter_insts.clone(),
             terminator: None,
         };
         
@@ -949,13 +966,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         values: Vec::new(),
     };
 
-    let drop_env_arg_id = ValueId(drop_fn.values.len() as u32);
-    drop_fn.values.push(ValueData {
-        inst: Instruction::Alloca,
-        ty: env_ty_id,
-        span: None,
-            origin: ValueOrigin::Temporary,
-    });
+    let (drop_env_arg_id, mut drop_parameter_insts) = environment_parameter(&mut drop_fn, void_ptr_ty, env_ptr_ty);
 
     let drop_state_ptr_id = ValueId(drop_fn.values.len() as u32);
     drop_fn.values.push(ValueData {
@@ -973,9 +984,10 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         origin: ValueOrigin::Temporary,
     });
 
+    drop_parameter_insts.extend([drop_state_ptr_id, drop_state_val_id]);
     let mut drop_entry = BasicBlock {
         label: LabelId { name: "entry".to_string() },
-        insts: vec![drop_env_arg_id, drop_state_ptr_id, drop_state_val_id],
+        insts: drop_parameter_insts,
         terminator: None,
     };
 
@@ -1048,7 +1060,9 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                 terminator: Some(Terminator::Br { target: free_env_label.clone() }),
             };
 
-            for place in &async_state_map.initial_state.live_places {
+            let mut places: Vec<_> = async_state_map.initial_state.live_places.iter().collect();
+            places.sort_unstable_by(|a, b| b.cmp(a));
+            for place in places {
                 if let Some(&env_field_idx) = alloca_map.get(&place.local) {
                     let env_field_ty = env_fields[env_field_idx as usize];
                     emit_drop_for_place(
@@ -1149,7 +1163,9 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
 
             let suspension_state = async_state_map.await_states.get(&await_vid).unwrap_or(&async_state_map.initial_state);
 
-            for place in &suspension_state.live_places {
+            let mut places: Vec<_> = suspension_state.live_places.iter().collect();
+            places.sort_unstable_by(|a, b| b.cmp(a));
+            for place in places {
                 if let Some(&env_field_idx) = alloca_map.get(&place.local) {
                     let env_field_ty = env_fields[env_field_idx as usize];
                     emit_drop_for_place(
@@ -1313,37 +1329,28 @@ fn emit_drop_for_place(
             }
         }
 
-        // 3. Load the value at curr_ptr and drop it
-        let load_id = ValueId(drop_fn.values.len() as u32);
-        drop_fn.values.push(ValueData {
-            inst: Instruction::Load {
-                ptr: Operand::Value(curr_ptr),
-            },
-            ty: target_ty,
-            span: None,
-            origin: ValueOrigin::Temporary,
-        });
-        block.insts.push(load_id);
-
+        // Ordinary glue consumes an address, including recursive field cleanup.
+        // A future destructor instead receives its allocated environment handle.
+        let mut drop_value = curr_ptr;
         let callee = match ctx.types.get(target_ty) {
-            SemanticType::Struct(sym_id, ..) => {
-                ctx.tables.drop_impls.get(sym_id).map(|&meth_sym| {
-                    let name = ctx.symbol_table.get_symbol(meth_sym).name.clone();
-                    GlobalId { name, symbol_id: Some(meth_sym) }
-                })
-            }
             SemanticType::Future(..) => {
+                drop_value = ValueId(drop_fn.values.len() as u32);
+                drop_fn.values.push(ValueData {
+                    inst: Instruction::Load { ptr: Operand::Value(curr_ptr) },
+                    ty: target_ty, span: None, origin: ValueOrigin::Temporary,
+                });
+                block.insts.push(drop_value);
                 find_originating_call_callee(func, &Operand::Value(place.local)).map(|name| {
                     GlobalId { name: format!("{}_drop", name), symbol_id: None }
                 })
             }
-            _ => None,
+            _ => luna_mvir::drop_glue_global_id(ctx, target_ty),
         };
 
         let drop_id = ValueId(drop_fn.values.len() as u32);
         drop_fn.values.push(ValueData {
             inst: Instruction::Drop {
-                value: Operand::Value(load_id),
+                value: Operand::Value(drop_value),
                 ty: target_ty,
                 callee,
             },
@@ -1531,6 +1538,15 @@ mod tests {
         // Verify drop_fn contains Drop for child future and Drop for the local struct
         let drop_inst_count = drop_fn.values.iter().filter(|v| matches!(v.inst, Instruction::Drop { .. })).count();
         assert!(drop_inst_count >= 2, "Expected at least child_future drop and local resource drop, got {}", drop_inst_count);
+        let expected_glue = luna_mvir::drop_glue_global_id(&ctx, struct_ty).unwrap();
+        assert!(drop_fn.values.iter().any(|value| matches!(&value.inst,
+            Instruction::Drop { ty, callee: Some(callee), .. }
+            if *ty == struct_ty && *callee == expected_glue)));
+        assert!(matches!(drop_fn.values[0].inst, Instruction::Alloca));
+        assert!(matches!(drop_fn.values[1].inst,
+            Instruction::Load { ptr: Operand::Value(ValueId(0)) }));
+        assert!(matches!(drop_fn.values[2].inst,
+            Instruction::Cast { value: Operand::Value(ValueId(1)), .. }));
 
         // Verify heap free exists in drop_fn
         let heap_free_count = drop_fn.values.iter().filter(|v| matches!(v.inst, Instruction::HeapFree { .. })).count();

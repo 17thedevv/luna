@@ -323,6 +323,9 @@ pub struct BorrowStateData {
     pub escaped_loans: HashSet<Loan>,
     pub aliases: HashMap<ValueId, Operand>,
     pub closure_captures: HashMap<ValueId, Vec<luna_semantic::CaptureMode>>,
+    /// Capture facts follow the value stored in a canonical place, rather
+    /// than the SSA identity of the address used by a particular load.
+    pub closure_capture_storage: HashMap<PlaceDesc, Vec<luna_semantic::CaptureMode>>,
 }
 
 pub struct BorrowAnalyzer<'a> {
@@ -774,12 +777,16 @@ let val_op = Operand::Value(*val);
                             }
                         }
 
-                        let closure_modes = current_state.closure_captures.get(val).cloned();
+                        let closure_modes = current_state.closure_captures.get(val)
+                            .or_else(|| match resolved_op {
+                                Operand::Value(source) => current_state.closure_captures.get(source),
+                                _ => None,
+                            }).cloned();
                         let is_ref_ret = if let Some(ctx) = analyzer.ctx {
                             type_has_borrow(func.ret_ty, ctx)
                         } else {
                             false
-                        };
+                        } || (closure_modes.is_some() && !ret_loans.is_empty());
                         let is_direct_ref_ret = if let Some(ctx) = analyzer.ctx {
                             matches!(ctx.types.get(func.ret_ty), SemanticType::Reference(..))
                         } else {
@@ -1847,6 +1854,13 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                     if matches!(capture.mode, luna_semantic::CaptureMode::SharedBorrow | luna_semantic::CaptureMode::MutableBorrow) {
                         let source = Operand::Value(capture.source);
                         self.issue_loan(&source, capture.mode == luna_semantic::CaptureMode::MutableBorrow, val_id, state);
+                    } else {
+                        // Moving a reference or a borrowed aggregate into an
+                        // environment transfers its existing referent loans.
+                        // It does not borrow the old capture storage itself.
+                        let mut loans = state.direct_provenance.get(&capture.source).cloned().unwrap_or_default();
+                        loans.extend(state.carried_provenance.get(&capture.source).into_iter().flatten().cloned());
+                        state.carried_provenance.entry(val_id).or_default().extend(loans);
                     }
                 }
             }
@@ -2016,6 +2030,18 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
                 self.check_access(value, false, val_id, state);
                 self.check_access(ptr, true, val_id, state);
+                let destination = self.compute_place_desc(ptr, state);
+                let modes = match value {
+                    Operand::Value(value) => state.closure_captures.get(value).cloned(),
+                    _ => None,
+                };
+                state.closure_capture_storage.retain(|place, _| {
+                    place.root != destination.root
+                        || !place.projections.starts_with(&destination.projections)
+                });
+                if let Some(modes) = modes {
+                    state.closure_capture_storage.insert(destination, modes);
+                }
                 if let Operand::Value(value_id) = value {
                     if !self.unsafe_raw_loans_for_carrier(*value_id, state).is_empty()
                         && !self.is_function_local_storage(ptr, state)
@@ -2291,6 +2317,12 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             }
             Instruction::Load { ptr } => {
                 self.check_access(ptr, false, val_id, state);
+                let source = self.compute_place_desc(ptr, state);
+                if let Some(modes) = state.closure_capture_storage.get(&source).cloned() {
+                    state.closure_captures.insert(val_id, modes);
+                } else {
+                    state.closure_captures.remove(&val_id);
+                }
                 if let Operand::Value(ptr_val) = ptr {
                     let place = self.compute_place_desc(&Operand::Value(*ptr_val), state);
                     if let Some(roots) = state.unsafe_raw_root_storage.get(&place).cloned() {
@@ -2309,6 +2341,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                 | SemanticType::Enum(..)
                                 | SemanticType::Tuple(..)
                                 | SemanticType::Slice(..)
+                                | SemanticType::Closure(..)
                         )
                     } else {
                         true
@@ -3492,6 +3525,9 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             }
             Instruction::Assign(op) => {
                 if let Operand::Value(v) = op {
+                    if let Some(modes) = state.closure_captures.get(v).cloned() {
+                        state.closure_captures.insert(val_id, modes);
+                    }
                     let address_roots = self.raw_value_roots(state, op);
                     if !address_roots.is_empty() {
                         state.unsafe_raw_roots.entry(val_id).or_default().extend(address_roots);
@@ -3918,8 +3954,21 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
             }
         }
         for (closure, modes) in &src.closure_captures {
-            if dest.closure_captures.insert(*closure, modes.clone()).is_none() {
-                changed = true;
+            let entry = dest.closure_captures.entry(*closure).or_default();
+            for mode in modes {
+                if !entry.contains(mode) {
+                    entry.push(*mode);
+                    changed = true;
+                }
+            }
+        }
+        for (place, modes) in &src.closure_capture_storage {
+            let entry = dest.closure_capture_storage.entry(place.clone()).or_default();
+            for mode in modes {
+                if !entry.contains(mode) {
+                    entry.push(*mode);
+                    changed = true;
+                }
             }
         }
         changed

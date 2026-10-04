@@ -421,49 +421,7 @@ impl<'a> MvirGenerator<'a> {
     }
 
     fn get_drop_glue_global_id(&self, ty_id: luna_semantic::SemanticTypeId) -> Option<GlobalId> {
-        let ty_id = self.ctx.types.resolve(ty_id);
-        if !self.ctx.needs_drop(ty_id) {
-            return None;
-        }
-        match self.ctx.types.get(ty_id) {
-            luna_semantic::SemanticType::Struct(sym_id, ..) | luna_semantic::SemanticType::Enum(sym_id, ..) => {
-                let sym = *sym_id;
-                let nominal_name = if (sym.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                    self.ctx.symbol_table.symbols[sym.0 as usize].name.clone()
-                } else {
-                    format!("type{}", sym.0)
-                };
-                let identity = luna_semantic::CanonicalInstanceIdentity {
-                    kind: luna_semantic::CanonicalInstanceKind::DropGlue {
-                        struct_sym: sym,
-                        concrete_ty: ty_id,
-                    },
-                    subst: Vec::new(),
-                };
-                let glue_name = identity.symbol_name(&self.ctx.types, &self.ctx.symbol_table, &nominal_name);
-                Some(GlobalId {
-                    name: glue_name,
-                    symbol_id: Some(sym),
-                })
-            }
-            luna_semantic::SemanticType::Tuple(_) | luna_semantic::SemanticType::Array(_, _) => {
-                let base_name = if matches!(self.ctx.types.get(ty_id), luna_semantic::SemanticType::Array(_, _)) { "array" } else { "tuple" };
-                let sym = luna_common::ids::SymbolId(0);
-                let identity = luna_semantic::CanonicalInstanceIdentity {
-                    kind: luna_semantic::CanonicalInstanceKind::DropGlue {
-                        struct_sym: sym,
-                        concrete_ty: ty_id,
-                    },
-                    subst: Vec::new(),
-                };
-                let glue_name = identity.symbol_name(&self.ctx.types, &self.ctx.symbol_table, base_name);
-                Some(GlobalId {
-                    name: glue_name,
-                    symbol_id: None,
-                })
-            }
-            _ => None,
-        }
+        crate::drop_glue_global_id(self.ctx, ty_id)
     }
 
     fn generate_drop_glue(&mut self, identity: &luna_semantic::CanonicalInstanceIdentity) {
