@@ -1,0 +1,145 @@
+{
+  "revision": "a8efc1446c035aa288b10750aef4365704979502",
+  "previous_checkpoint": "6b1f7c7",
+  "recorded_utc": "2026-10-04T23:33:42.392013+00:00",
+  "target": "x86_64-pc-windows-gnu",
+  "rust_host": "x86_64-pc-windows-msvc",
+  "rust_version": "1.98.0",
+  "luna_codegen_llvm_version": "18.1.8",
+  "artifact_versions": {
+    "compiler": 10,
+    "format": 2,
+    "metadata": 4,
+    "mvir": 4
+  },
+  "cli_sha256": "dfe25c0309d0edfa90d30d51dd1609ccdcccf09acb3f191faa3ada7f57034c6e",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "source_blobs": {
+    ".agents/skills/luna-language-capability-validation/SKILL.md": "6c3b39a6679a38f299d91800adecff3fdd684e46",
+    "docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md": "9fce7584e272319ef0974fae8e669a1a7707b5a8",
+    "docs/spec/0.1/gaps.md": "7938539ab759bc3100d0c9b6e41aabfe480d872f",
+    "docs/spec/0.1/modules.md": "6b1772a34d9507fa06a3b72c55e0911868e7f61a",
+    "luna-rs/build-support/llvm.rs": "080ebf1177489906a08da75af7e4db5a18089bb2",
+    "luna-rs/crates/luna-backend/build.rs": "ab90e955a477429b6c04655ea80e70167c7ebdd2",
+    "luna-rs/crates/luna-backend/src/lib.rs": "750444ebc9395dbe6377cc8267a0d7da739ef2c8",
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs": "e6fab57813f93410cc1f98826d3ace007127725b",
+    "luna-rs/crates/luna-backend/src/static_codegen.rs": "970c2d8c6bc9ad98085351dd8c8f7eecd4e09aa1",
+    "luna-rs/crates/luna-backend/src/target_contract.rs": "df3cb74b509bd51e53a7b19448c78b5becaaca74",
+    "luna-rs/crates/luna-cli/tests/artifact_target_contract_cli.rs": "7f419e952bd81d454c88fdb3f7146571937a2cf6",
+    "luna-rs/crates/luna-cli/tests/interface_constraints_cli.rs": "4b5501faa9eb1d3f5b9265062ed5843596a080b5",
+    "luna-rs/crates/luna-driver/build.rs": "ab90e955a477429b6c04655ea80e70167c7ebdd2",
+    "luna-rs/crates/luna-driver/src/external.rs": "074eb2de74a9a4c5e94e9017fce9ce54b77702d5",
+    "luna-rs/crates/luna-driver/src/lib.rs": "967ae7081efada3b7669a7d54e5094205f18f30d",
+    "luna-rs/crates/luna-llib/src/format.rs": "aef9211e7d1f253ee9cc692a6ddf1526442f446b",
+    "luna-rs/crates/luna-llib/src/lib.rs": "2fc5ffab0cd0dc85a0149a1ac9af37039515e02f",
+    "luna-rs/crates/luna-llib/src/reader.rs": "e2f40aa621a618e713b89e517fd632a67685145b",
+    "luna-rs/crates/luna-llib/src/writer.rs": "204b69c229c466cc38e47d7a104708ff8af3ef49",
+    "luna-rs/crates/luna-llib/tests/llib_tests.rs": "d531fc51f4799feec8b21f1e0b36be73ff69724e",
+    "tests/luna/language/artifact_target/consumer.ln": "ee54a3f022073d9a7bcecc43fa3bd2c7f6e8cec6",
+    "tests/luna/language/artifact_target/provider.ln": "50b3ab7f76def7c83b8a3c9224a6f7c6f3b2cf58"
+  },
+  "logs": {
+    "r3-target-build-final.txt": {
+      "working_file_sha256": "eddd1c861444ede47fce7daa696cc49471fafdf94b01e53fa214d9d276f014d1",
+      "git_blob": "3669fd0f7998d2030e60b92ecd79b2b11430e0aa"
+    },
+    "r3-target-check-final.txt": {
+      "working_file_sha256": "77bd8db7d41ec996d4bc7f1640469119c34f41423dfae53c662a82db3fe806ee",
+      "git_blob": "f3068774a7cc5e015536228c39475f22e8ef65a6"
+    },
+    "r3-target-check-guard-final.txt": {
+      "working_file_sha256": "58213ca9d7e8003b7478717c7d45dbb8bc542585d2cd2e84d69e9ef3d9da12ba",
+      "git_blob": "ded4be440207ee75c477ad270ecd2aacd890428d"
+    },
+    "r3-target-check-initial.txt": {
+      "working_file_sha256": "d0a7f5f267e570e511c23ca22e98717267336b5590fb76cfce4c9a0161006ba5",
+      "git_blob": "c8944fa9af41efdae175dd92c93fd573de6246cc"
+    },
+    "r3-target-cli-final.txt": {
+      "working_file_sha256": "5991bc10ed59fc00b893869f47dcb94e481ff695bce43ebe89db9676401721a5",
+      "git_blob": "7df094d1b502c720e786abca56f98d4873f6c6d3"
+    },
+    "r3-target-cli-guard-final.txt": {
+      "working_file_sha256": "f9e426884dfc7f8973da8d2ef67caf25cd8ce6ee5573544a7dc11af1fac957b4",
+      "git_blob": "9588340c25cafd564f0cc87008d4ce2c6b75381d"
+    },
+    "r3-target-cli-header-before.txt": {
+      "working_file_sha256": "522fc9897a3fae1be76138890a17c65ea87cbc1426ede82fbd072e98eb8f137b",
+      "git_blob": "7c5424b2f49059579f35e817d5673f4f267f02da"
+    },
+    "r3-target-cli-initial.txt": {
+      "working_file_sha256": "ff35f99ab64b0df6fe1b43498484a07704702de8bc3740a08d8c0fa712438b1e",
+      "git_blob": "b3454485af10bc3c1674ca382b14383ba7b5ce09"
+    },
+    "r3-target-cli-stale-sidecar-before.txt": {
+      "working_file_sha256": "f9ed8e6476a7929817ec66d9681e3d0a6fcd45557b8e1a62bfffbe84907b80f5",
+      "git_blob": "c5777433f43995500978c6398046c384452aeb3d"
+    },
+    "r3-target-driver-final.txt": {
+      "working_file_sha256": "546363d2e57cc1c5973a330025272d5c0c9525747b984ac3153a2cd70861373b",
+      "git_blob": "8e1c64fda5697e5138e9091c1895cbb0b63cc3e6"
+    },
+    "r3-target-internals-final.txt": {
+      "working_file_sha256": "6ff1e2cbe5466bb10ecbd6ed1801d79c062e23584d0b8ba3d3f9740c191d6109",
+      "git_blob": "ff221da8cffb05bdc2eff081f7c5d356336d3025"
+    },
+    "r3-target-internals-guard-edit-error.txt": {
+      "working_file_sha256": "20f40ef773473750769c8eec75b38051c566d3c5907d233657a8d780426f26c3",
+      "git_blob": "d4ff973ddf956c2a960797d10fe1c238c49de6f8"
+    },
+    "r3-target-internals-guard-final.txt": {
+      "working_file_sha256": "9063806ac96ca025d75f4e7c95526e421e6a5238e1906070fac34e6671da8a6c",
+      "git_blob": "de9e81b6f079fba502bd301f83aad789f57bd3c9"
+    },
+    "r3-target-internals-initial.txt": {
+      "working_file_sha256": "c7f71d9d46c13cc5a861701bc935ba7685763db4ae07a5ae8e45f4c20b79ffa1",
+      "git_blob": "7eaeac7ec843a33aceaf3c0330539957e811f5d6"
+    },
+    "r3-target-sysroot-final.txt": {
+      "working_file_sha256": "39d5c5fa19267584fc6037f6d2471fbc65afc594289b39f60415aa51ea040d6c",
+      "git_blob": "888aec3a9347791d1ac36884b7f2b05a06248190"
+    }
+  },
+  "verification": {
+    "backend_and_artifact_before_guard": {
+      "passed": 17,
+      "exit": 0
+    },
+    "backend_and_artifact_after_guard": {
+      "passed": 18,
+      "exit": 0
+    },
+    "canonical_sysroot_before_32bit_guard": {
+      "providers_built": 49,
+      "exit": 0
+    },
+    "cli_before_32bit_guard": {
+      "harness_cases_passed": 4,
+      "exit": 0
+    },
+    "driver_before_32bit_guard": {
+      "passed": 55,
+      "exit": 0
+    },
+    "target_cli_after_guard": {
+      "passed": 1,
+      "exit": 0,
+      "native_executions": 2,
+      "typed_check_build_rejections": 22,
+      "fresh_sysroot_built": true
+    },
+    "workspace_check_after_guard": {
+      "exit": 0
+    }
+  },
+  "limitations": [
+    "No full-workspace compiler10 PASS; de9977d full run remains FAIL.",
+    "The larger native matrix precedes the final non-64-bit-only guard; the target CLI and internals were rerun after it.",
+    "Cross-target descriptor probes are not native compiler/runtime conformance.",
+    "Non-64-bit native lowering rejects while incomplete; this is a gap, not an adopted language target exclusion.",
+    "CPU/features compatibility currently requires exact equality.",
+    "General layout/ABI, every object subtype, native target matrix, closure cleanup, named/default calls and R3-R5 remain open.",
+    "Intermediate failures, stale-sidecar harness correction and transient test editing error are retained.",
+    "Working-file hashes and normalized Git blob identities are recorded separately."
+  ]
+}
