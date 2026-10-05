@@ -1410,3 +1410,19 @@ R3–R5 still require completion.
 Final amended cast/identity/span/char candidate: three CLI suites and 286
 semantic/metadata/backend/MVIR/borrow tests pass. Its pin/logs are linked in
 CAST-GATE. No final full-workspace or release PASS is inferred.
+
+### Rigid generic fixtures and call-argument baseline — 2026-10-05
+
+[CALL-ARGUMENTS-GATE](CALL-ARGUMENTS-GATE.md) records two old positive method
+fixtures which incorrectly fabricated an unconstrained generic value with
+`0 as T`. Trait-bound construction restores their original inference/binder
+purpose, including two different return types. The method and expanded cast
+CLI harnesses pass against an immutable e3b4402 compiler in independent fresh
+source/artifact roots. The invalid cast remains a permanent rejection fixture.
+
+Eleven independent call probes establish ignored labels, wrong native results,
+semantic arity gaps and absent defaults. These requirements remain incomplete.
+The currently running full workspace is not an immutable candidate: eight
+start-pinned inputs changed when the shared checkout moved to the LSP branch.
+Preserve the eventual raw verdict and changed-input report without converting
+focused passes into a workspace or release PASS.
