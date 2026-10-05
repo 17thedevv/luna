@@ -1,0 +1,19 @@
+{
+  "base_commit": "9558701",
+  "stage": "isolated cast-admission candidate, before identity operand preservation",
+  "cli_sha256": "814f9af5a0cbf14025139d887e986ed2ec65003b28cdc6f4ad53c46ac2c4c9e7",
+  "observations": [
+    {
+      "name": "identity_drop",
+      "build": 0,
+      "source_sha256": "71c79a5f3e0f8fcaf99a1b4b28d0762edad7dbe30e451d7da7a363e73aee45c1",
+      "native": 1
+    },
+    {
+      "name": "identity_move_reject",
+      "build": 0,
+      "source_sha256": "05bb879d3774efdd2e5b65063d742077324fc06d7a0bae65e964af7510f56122",
+      "native": 73
+    }
+  ]
+}

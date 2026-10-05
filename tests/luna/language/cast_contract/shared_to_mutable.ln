@@ -1,0 +1,7 @@
+fn main() -> i32 {
+ dec value: i32 = 10;
+ dec borrowed = &value;
+ dec writable = borrowed as &rw i32;
+ *writable = 20;
+ return value - 20;
+}

@@ -1373,3 +1373,40 @@ plus 72 typed rejections in both modes. These are scoped results, not a recomput
 workspace PASS. The earlier full FAIL 1305/7/1 remains unchanged; the next full
 run must establish a new verdict. Closure cleanup, named/defaults and broader
 R3–R5 remain open.
+
+
+### New cast/diagnostic gate while workspace 9558701 runs
+
+[Independent pinned probes](CAST-GATE.md) expose five native safe-code bypasses
+of capability, nominal/privacy, callable safety, char validity and raw-to-safe
+admission. Ordinary private lookup still rejects E1003; nominal-to-integer
+casts pass check and hit the backend's E6001 guard. The focused span matrix
+also finds DIAG-2 violations, with scalar indexing as a location control.
+Standalone permanent fixtures and compressed before logs are preserved.
+Compiler inputs remain unchanged during the pinned full workspace run; these
+new fixtures are not yet counted in that run. Cast validation is now the next
+correctness repair before closure/defaults and release review.
+
+
+### Completed 9558701 workspace / isolated cast repair
+
+The pinned Windows workspace completed **1311/1/1**, exit101, with all 1227
+compiler/library/fixture inputs unchanged. Its remaining failure is owned
+closure capture cleanup, also confirmed in both Ubuntu workspace jobs. ABI,
+ASan, whole-file IO and formatting passed in their scoped jobs. The baseline
+logs and binary/source hashes are retained in CAST-GATE; no failures are
+subtracted to rewrite its verdict.
+
+The isolated protocol-15 cast admission/span candidate passes 215 internal
+and two source/fresh-artifact CLI suites. Expanded move/drop probes exposed
+an identity-cast MVIR place loss; preserving the original operand repairs
+one-drop and E3001 controls. Expanded final acceptance in the main checkout passes two CLI suites and
+215 internal tests. Sysroot protocol15 rebuilds; numerics 7/7 pass on the
+admission candidate before the identity lowering repair. Further char/memory
+and generic-drop CLI regressions are running. No merge/tag or full-release certification is implied. Closure
+policy remains pending maintainer input; named/default calls and broader
+R3–R5 still require completion.
+
+Final amended cast/identity/span/char candidate: three CLI suites and 286
+semantic/metadata/backend/MVIR/borrow tests pass. Its pin/logs are linked in
+CAST-GATE. No final full-workspace or release PASS is inferred.

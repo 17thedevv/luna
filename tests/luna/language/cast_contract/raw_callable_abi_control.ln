@@ -1,0 +1,8 @@
+fn answer(pointer: *rw i32) -> i32 { return 73; }
+fn main() -> i32 {
+    unsafe {
+        dec erased = answer as fn(*rw void) -> i32;
+        dec pointer = 0 as u64 as *rw void;
+        return erased(pointer) - 73;
+    }
+}

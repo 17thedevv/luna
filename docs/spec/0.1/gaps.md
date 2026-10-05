@@ -312,3 +312,19 @@ raw-view matrix of 14 native and 72 typed rejections. It removes spurious abstra
 trait callee instances without weakening the generic barrier. These focused
 results require a new full-workspace verdict; they do not subtract failures
 from the recorded full run or establish release readiness.
+
+
+### Cast identity/capability counterexamples — 2026-10-05
+
+Independent native probes on 9558701 expose safe shared-to-mutable reference
+casting, same-layout nominal/private-field bypass, unsafe-callable erasure,
+referent reinterpretation producing an invalid char, and raw-to-safe reference
+creation without unsafe admission. All five pass check/build and execute.
+They are correctness blockers under retained contracts, not optional features.
+See the [pinned cast audit](../../audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md).
+The same audit records wrong/missing expression spans and nominal-to-integer
+check/build disagreement. Existing scoped and workspace results do not certify
+these new paths. A protocol-15 repair candidate passes focused admission/span
+source/artifact acceptance; an additional identity-cast move/drop defect is
+repaired and expanded focused acceptance passes. Whole-workspace, imported
+user-provider and broader diagnostic containment gates remain open.

@@ -1,0 +1,6 @@
+fn main() -> i32 {
+ dec value: i32 = 55296;
+ dec reference = &value as &char;
+ if *reference as u32 != 55296 as u32 { return 1; }
+ return 0;
+}

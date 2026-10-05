@@ -1,0 +1,45 @@
+{
+  "base_commit": "9558701462a36e1699a70bd25defb3e53d20f68c",
+  "scope": "Windows GNU isolated checkout; fresh provider modes. Not final full-workspace/clean-target certification.",
+  "protocol": 15,
+  "semantic_metadata": 7,
+  "sources": {
+    "luna-rs/crates/luna-semantic/src/cast.rs": "9142b05e9fc8494529afb54b2c795975a15effa53504bfedc58e62b0ec358560",
+    "luna-rs/crates/luna-semantic/src/lib.rs": "e46c464cf20111f1048f147fe05c49695dda8fc056e24f33f0a4c40b912979f9",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "1f53c95689b98b07b49a6e17f8d3659c6f3d2672b79c8f1f262622ec69e4c59c",
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs": "0ff364ac8621f5b4280fc18d147ca56b0304722eb6a549f40d743fc3083df9ee",
+    "luna-rs/crates/luna-llib/src/format.rs": "9d60198d058445eaccb90222c1728bbac58d4943f5dc5dd70f9bf247b9489eb9",
+    "luna-rs/crates/luna-cli/tests/cast_contract_cli.rs": "ad1a4cab1e630e9431ed701721206bfca887795120098640ef895ecaf0342cab",
+    "luna-rs/crates/luna-cli/tests/expression_diagnostic_spans_cli.rs": "b5ee9edd1b81ef92df471f750ad61894e25061272b060e10c866e13ccaaaf120",
+    "tests/luna/language/cast_contract/controls.ln": "166a5ea3d19dd52e2cd057339b4650ede8f3c2a36945f73e48f8e02b2bb1532d",
+    "tests/luna/language/cast_contract/generic_nominal_to_integer.ln": "a7c7e10ad6b4839f1299df908f01a1e7ddc73aea44fdcaec7f80ade69dc5a8b5",
+    "tests/luna/language/cast_contract/nominal_privacy.ln": "36e2cdfdb2881a94b0f40158764ef911d588fe61de0814ce0f8bf11bd16f6bbb",
+    "tests/luna/language/cast_contract/private_direct_control.ln": "bd5432b4262572524a91eeeadf8b510da00a1f3ec10ee333d6c89bace8e0c741",
+    "tests/luna/language/cast_contract/raw_callable_abi_control.ln": "90262dd10d5cc10edc6a4fd901cc40347f6ccf325d4decb75b0dcd9a4919542f",
+    "tests/luna/language/cast_contract/raw_reference_without_unsafe.ln": "534c67690abeba483e59bb1bd55f86acd7489092cb91f4f09648beb51c711a2a",
+    "tests/luna/language/cast_contract/reference_reinterpret.ln": "cd56e61f3d34db72f0f4250bcabb44c0d8f653495c5323e80b7920e8a9825c4c",
+    "tests/luna/language/cast_contract/shared_to_mutable.ln": "a5f9f897375a3a967c8adbf2a137aa096b94c40ae31bdc097a2f484d2649ce0a",
+    "tests/luna/language/cast_contract/unsafe_callable_erasure.ln": "1385bcc55dd2c2281070980701eeaf9f660c27a106e048166d1513579df08653",
+    "tests/luna/language/diagnostic_spans/char_invalid.ln": "f093fe710998004cbeea5e0ce6c058a7a281e87a8de468738a5fea1bc88216e5",
+    "tests/luna/language/diagnostic_spans/deref_scalar.ln": "dbbf9b7942585864edd95abf96edb5feac7b52e1f0d5a26d464f90459be6b81a",
+    "tests/luna/language/diagnostic_spans/index_scalar.ln": "6a9e16487b58457524142ce9160fa26d3d99edd0bfafcf7b176a9d219a966101",
+    "tests/luna/language/diagnostic_spans/neg_bool.ln": "1a85a901c8eaf693fe81a56752e0bf44d412cab0a463b6239dbbd5f9da2a97ad",
+    "tests/luna/language/diagnostic_spans/tuple_scalar.ln": "0a5b4c58c6dca50c4d897c974b90e2bb2768e9cabf863c04fce87f1a06ddd5cb"
+  },
+  "cli_sha256": "814f9af5a0cbf14025139d887e986ed2ec65003b28cdc6f4ad53c46ac2c4c9e7",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "logs": {
+    "cast-isolated-cli.txt": "58c54f32d7425b5a5740102c4b10568ec5f7c5ab53e2890e75a6057cd58e98e1",
+    "cast-isolated-cli-corrected.txt": "64cb31d3d92064011e813f87e136c6085cc4e168cf9f16750aa537c5af4ea9f2",
+    "cast-isolated-internals.txt": "d5bfc889bd25ed83d478efbb1ac39c89a1db1e044219dbe7e9a96be5d76fba2b",
+    "cast-isolated-sysroot.txt": "16f694a32d2661b78518dff65dd49be6bbdd471c24624313c816594c25e01188",
+    "cast-isolated-sysroot-str.txt": "39d5c5fa19267584fc6037f6d2471fbc65afc594289b39f60415aa51ea040d6c",
+    "cast-isolated-direct-check.json": "81bc943503e3031b92c26c6019932303955e861fef44f3474829ee4ff34a2d80",
+    "workspace-mono-role-generated-output.patch": "bc4a8f2bb3e361455ddc86d51c0ac74dca0c92b6c4927f9542de012bd43ce05c"
+  },
+  "internal_counts": {
+    "passed": 215,
+    "failed": 0,
+    "ignored": 0
+  }
+}

@@ -205,6 +205,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md",
     "role": "evidence",
     "owner": "conformance"

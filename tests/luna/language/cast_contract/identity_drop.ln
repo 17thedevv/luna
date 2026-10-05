@@ -1,0 +1,13 @@
+struct Owned { counter: *rw i32, };
+impl std::Drop for Owned {
+    fn drop(&rw self) { unsafe { *self.counter = *self.counter + 1; } }
+}
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec first = Owned { counter: counter };
+        dec second = first as Owned;
+    }
+    return count - 1;
+}

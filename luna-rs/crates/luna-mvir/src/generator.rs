@@ -3309,6 +3309,15 @@ impl<'a> MvirGenerator<'a> {
                 if target_ty_id == luna_semantic::SemanticTypeId(0) {
                     target_ty_id = self.resolve_ast_type(target_type);
                 }
+
+                // A true semantic identity cast preserves the operand's place
+                // and ownership. Introducing a detached Cast value here would
+                // hide the source place from normal move/drop accounting.
+                if let Some(source_ty) = self.ctx.tables.expr_types.get(expr).copied() {
+                    if self.ctx.types.resolve(source_ty) == self.ctx.types.resolve(target_ty_id) {
+                        return val_op;
+                    }
+                }
                 
                 let val = self.push_inst(Instruction::Cast {
                     value: val_op,

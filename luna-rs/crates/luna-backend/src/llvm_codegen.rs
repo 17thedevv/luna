@@ -1520,6 +1520,19 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 self.generate_operand(future)
             }
             Instruction::Cast { value, target_ty } => {
+                // LLVM representation equality is never evidence that Luna
+                // nominal identities or reference/callable capabilities agree.
+                let source_type = match value {
+                    Operand::Value(source) => _func.values.get(source.0 as usize).map(|v| v.ty),
+                    Operand::Global(global) => global.symbol_id.and_then(|symbol|
+                        self.semantic_ctx.tables.symbol_types.get(&symbol).copied()),
+                    _ => None,
+                };
+                if let Some(source_type) = source_type {
+                    self.semantic_ctx.types.cast_admission(source_type, *target_ty)
+                        .map_err(|reason| BackendError::InvariantViolation(format!(
+                            "invalid typed MVIR cast: {reason}")))?;
+                }
                 let llvm_ty = self.map_type(*target_ty)?;
                 let resolved_target = self.semantic_ctx.types.resolve(*target_ty);
                 let target_sem = self.semantic_ctx.types.get(resolved_target);
@@ -1667,9 +1680,9 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     }
                 }
                 
-                // Identity cast: source and target LLVM types are structurally identical.
-                // This handles representation-preserving casts like &dyn Foo → *dyn Foo
-                // where both are { ptr, ptr } at the LLVM level.
+                // A representation-preserving lowering is valid only after
+                // language-level cast admission above (for example &dyn Foo
+                // to *dyn Foo). Semantic identity is not inferred here.
                 if llvm_val.get_type() == llvm_ty {
                     return Ok(llvm_val);
                 }
@@ -2040,5 +2053,46 @@ fn parse_char_literal(c: &str) -> char {
         }
     } else {
         '\0'
+    }
+}
+
+#[cfg(test)]
+mod cast_invariant_tests {
+    use super::*;
+    use luna_common::ids::SymbolId;
+    use luna_semantic::ty::{LifetimeId, Mutability};
+
+    #[test]
+    fn malformed_typed_casts_reject_before_representation_lowering() {
+        let mut semantic = SemanticContext::new();
+        let i32_ty = semantic.types.intern(SemanticType::Primitive(BuiltinType::I32));
+        let char_ty = semantic.types.intern(SemanticType::Primitive(BuiltinType::Char));
+        let shared = semantic.types.intern(SemanticType::Reference(LifetimeId(0), Mutability::Immutable, i32_ty));
+        let mutable = semantic.types.intern(SemanticType::Reference(LifetimeId(0), Mutability::Mutable, i32_ty));
+        let char_ref = semantic.types.intern(SemanticType::Reference(LifetimeId(0), Mutability::Immutable, char_ty));
+        let first = semantic.types.intern(SemanticType::Struct(SymbolId(100), vec![], vec![i32_ty]));
+        let second = semantic.types.intern(SemanticType::Struct(SymbolId(101), vec![], vec![i32_ty]));
+        let safe = semantic.types.intern(SemanticType::Function { params: vec![i32_ty], return_type: i32_ty, is_unsafe: false });
+        let guarded = semantic.types.intern(SemanticType::Function { params: vec![i32_ty], return_type: i32_ty, is_unsafe: true });
+        let context = Context::create();
+        let module = MvirModule::new();
+        let config = TargetConfig { triple: "x86_64-pc-windows-gnu".into(), cpu: "generic".into(), features: String::new(), optimization: OptimizationLevel::None };
+        let backend = LLVMBackend::new(&context, &module, &semantic, "cast_guard", &config);
+        for (source, target, reason) in [
+            (shared, mutable, "upgrade shared"),
+            (shared, char_ref, "referent type"),
+            (first, second, "not defined"),
+            (guarded, safe, "unsafe requirement"),
+        ] {
+            let function = MvirFunction {
+                name: luna_mvir::GlobalId { name: "malformed".into(), symbol_id: None },
+                is_extern: false, is_async: false, arg_count: 0, link_name: None,
+                param_types: vec![], ret_ty: semantic.types.void_id(), blocks: vec![],
+                values: vec![ValueData::new(Instruction::Assign(Operand::Number("0".into())), source, None)],
+            };
+            let cast = ValueData::new(Instruction::Cast { value: Operand::Value(ValueId(0)), target_ty: target }, target, None);
+            let result = backend.generate_inst(ValueId(1), &cast, &function);
+            assert!(matches!(result, Err(BackendError::InvariantViolation(ref message)) if message.contains(reason)), "{result:?}");
+        }
     }
 }

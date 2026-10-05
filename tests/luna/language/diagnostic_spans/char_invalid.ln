@@ -1,0 +1,5 @@
+fn main() -> i32 {
+	dec banner = "雪";
+	dec invalid = 55296 as char;
+	return 0;
+}
