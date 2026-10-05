@@ -1076,3 +1076,18 @@ Compiler Change
 SKILL IMPACT: REFINE capability validation with nominal ABI/reachability controls;
 REFINE testing strategy with isolated artifact mutation and genuine parity.
 Both changed skills were reread and related guidance checked for conflicts.
+
+### Remaining shared sysroot mutation audit
+
+Five additional legacy parity tests (Box, collection iterators, HashMap,
+HashSet and iterator collection) still copied newly built artifacts over shared
+canonical libraries. They now use isolated source/artifact provider pairs,
+matching sidecars and explicit route exclusions. Four executable comparisons
+run both routes and compare the complete result; the existing Box metadata test
+checks admission in both routes. JSON publication in the sysroot-invariants
+suite is isolated too, and checks the emitted manifest/object/metadata.
+
+[Five existing suites](evidence/r0-parity-isolation.txt) pass **66/66**;
+[sysroot invariants](evidence/r0-json-isolation.txt) pass **6/6**. No shared
+canonical publication remains in these parity tests. This is test-harness
+repair, not new language support or a full-workspace PASS.

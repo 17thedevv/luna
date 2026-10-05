@@ -1,3 +1,6 @@
+#[path = "support/provider_parity.rs"]
+mod provider_parity;
+
 // =============================================================================
 // Stdlib Phase 04.4 std::HashMap<K, V> Acceptance Tests
 //
@@ -905,29 +908,9 @@ import <iter_collect>;
 /// 13. Source vs .llib Parity
 #[test]
 fn test_hashmap_source_vs_llib_parity() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
     let dir = create_temp_dir("map_parity");
-    let hashmap_ln = locate_canonical_hashmap_ln();
-    let hashmap_src = fs::read_to_string(&hashmap_ln).expect("Failed to read hashmap.ln");
-
-    let out_llib = dir.join("hashmap.llib");
-    let compile_opts = CompilerOptions {
-        output_path: Some(out_llib.to_string_lossy().to_string()),
-        emit_mlib: true,
-        no_link: true,
-        quiet: true,
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
-        is_sysroot_build: true,
-        ..Default::default()
-    };
-
-    let res_compile = compile(hashmap_ln.to_str().unwrap(), hashmap_src, &compile_opts);
-    assert!(res_compile.is_ok(), "Compiling hashmap.ln to hashmap.llib must succeed: {:?}", res_compile.err());
-
-    let canonical_llib = locate_canonical_hashmap_llib();
-    let tmp = canonical_llib.with_file_name(format!("{}.publish{}", canonical_llib.file_name().unwrap().to_string_lossy(), std::process::id()));
-    let _ = fs::copy(&out_llib, &tmp);
-    let _ = fs::rename(&tmp, &canonical_llib);
+    let pair = provider_parity::ProviderPair::new(&dir, "alloc/hashmap.ln");
+    let sysroot = &pair.artifact;
 
     let src = r#"
         import <core/panic>;
@@ -985,6 +968,11 @@ import <iter_collect>;
         .expect("Execution must succeed");
 
     assert_eq!(code, 0, "Parity test failed with code {} (stderr: {})", code, stderr);
+
+    let mut source_options = opts.clone();
+    source_options.search_paths = vec![pair.source.root().to_string_lossy().into_owned()];
+    let source_result = run_binary_with_output(&dir, src, &source_options).expect("source provider execution");
+    assert_eq!((code, _stdout, stderr), source_result, "source/artifact observable parity");
 }
 
 /// 14. Overwrite & Hit Stress: Ensure no redundant rehash or capacity growth on hit

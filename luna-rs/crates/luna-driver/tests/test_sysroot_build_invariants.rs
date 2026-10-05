@@ -14,6 +14,8 @@ use luna_driver::sysroot_builder::SysrootBuilder;
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::PathBuf;
+#[path = "support/provider_parity.rs"]
+mod provider_parity;
 
 /// ======================================================================
 /// SECTION 4D.1: CANONICAL DEPENDENCY GRAPH VALIDATION (READ-ONLY)
@@ -356,27 +358,11 @@ fn test_sysroot_builder_lock_mutual_exclusion_isolated() {
 
 #[test]
 fn test_build_json_provider() {
-    let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
-    let external_dir = sysroot.external_dir();
-    let json_ln = external_dir.join("json/json.ln");
-    let json_llib = external_dir.join("json/json.llib");
-    let content = fs::read_to_string(&json_ln).expect("Failed to read json.ln");
-    let options = luna_driver::CompilerOptions {
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
-        quiet: false,
-        emit_llib: true,
-        no_link: true,
-        output_path: Some(json_llib.to_string_lossy().to_string()),
-        is_sysroot_build: true,
-        ..Default::default()
-    };
-    println!("Starting compile of json.ln...");
-    let res = luna_driver::compile(json_ln.to_str().unwrap(), content, &options);
-    println!("Finished compile of json.ln: {:?}", res.is_ok());
-    if let Err(diags) = &res {
-        for d in diags {
-            eprintln!("{:?}", d);
-        }
-    }
-    assert!(res.is_ok(), "Compiling json.ln to json.llib must succeed");
+    let work = std::env::temp_dir().join(format!("luna_json_publish_{}_{}", std::process::id(),
+        std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    let pair = provider_parity::ProviderPair::new(&work, "json/json.ln");
+    let artifact = pair.artifact.external_dir().join("json/json.llib");
+    let (_, manifest, object, metadata) = luna_llib::MlibReader::read_module(&mut fs::File::open(artifact).unwrap()).unwrap();
+    assert_eq!(manifest.unwrap().identity.module_id, "json");
+    assert!(object.is_some() && metadata.is_some());
 }
