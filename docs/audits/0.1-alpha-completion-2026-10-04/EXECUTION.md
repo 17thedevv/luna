@@ -4,7 +4,8 @@ Baseline implementation: `c8d0559500e78ef85c96ac842e824e639917cbad`.
 This supplements the dated [plan](README.md); no full release PASS is claimed.
 Current state remains **PARTIAL**. Revision-specific checkpoints are recorded
 chronologically below. The last completed full workspace run remains FAIL at
-`de9977d`; later focused results do not change that verdict.
+`39a2a9b`: **1,262 passed, 34 failed, 1 ignored**, exit 101. Later focused
+results do not change that immutable verdict.
 
 Earlier artifact-compatibility checkpoint: `f5936c3344788168320dfd4b661532c2cfad8a8d`
 (artifact compatibility), following the async/closure repair `363eaf5`.
@@ -972,3 +973,52 @@ LLVM18.1.8. These two target identities must not be conflated.
 
 SKILL IMPACT: capability validation now distinguishes format labels from actual
 header/object/sidecar identity and descriptor probes from native conformance.
+
+## Full target-checkpoint regression — 2026-10-05
+
+Source revision: `39a2a9bf7a9ed56539ccff7bbfa671aab3c952b5`.
+`cargo test --workspace --no-run` succeeded, then
+`cargo test --workspace --no-fail-fast` exited 101:
+**1,262 passed, 34 failed, 1 ignored**, nine failing targets.
+The [summary](evidence/workspace-target-summary.json),
+[start](evidence/workspace-target-start.json), [completion](evidence/workspace-target-exit.json)
+and [lossless raw log](evidence/workspace-target.txt.gz) pin command, times,
+source revision, CLI/runtime hashes and all 34 panic details. CLI/runtime hashes
+were unchanged across the run. Rust host was Windows MSVC; Luna target Windows GNU.
+
+Failure triage:
+
+- 31 failures involve mismatched object sidecars. The I/O suite rebuilds the
+  shared canonical sysroot concurrently with its own readers. The String parity
+  test replaces the shared `string.llib` with a newly built artifact while
+  retaining the previous `string.obj`, contaminating later suites. Artifact
+  rejection is correct; test isolation and actual parity coverage require repair.
+- The struct-lifetime compatibility test expects semantic metadata v3, while
+  declaration-owned generic contracts adopted v4. Its explicit version oracle
+  needs reconciliation, preserving incompatible-version rejection.
+- The contract-bootstrap test writes Iterator/IntoIterator bounds without the
+  declared trait arguments. Strict bound checking rejects them; the valid
+  visibility control needs complete trait applications and useful failure output.
+- The generic-drop CLI still fails source and artifact closure-capture cleanup,
+  exit 3. This compiler correctness gap remains open.
+
+Independent artifact-only reducers on the same source revision establish two
+additional correctness defects: reordering public struct fields, or reordering
+an enum's variants, leaves the interface fingerprint unchanged. Replacing a
+valid dependency bundle then permits an old wrapper to run with the changed
+layout/discriminants: baseline exit 0, changed dependency exit 6 (13 instead of
+7). These are separate silent wrong-code findings, not covered by the workspace
+failure count. Ordered nominal representation must enter dependency identity.
+No freeze, release, tag or merge readiness is claimed.
+
+### Isolated regression repair
+
+The test-only repair keeps object-sidecar validation intact. The I/O builder
+now owns a copied sysroot. String parity builds into its own sysroot with a
+matching object, removes String source from the artifact mode, and executes a
+separate source mode without String artifacts. Bootstrap bounds supply the
+actual Iterator/IntoIterator arguments; schema expectations track v4.
+After a fresh canonical build, the [eight-suite rerun](evidence/r0-isolation-focused.txt)
+passes **96/96**, exit 0; [sysroot rebuild](evidence/r0-isolation-sysroot.txt) exits 0.
+These focused results close those exact failures only. The full 39a2a9b run,
+closure drop failure and nominal representation reducers remain recorded FAIL.
