@@ -9,6 +9,8 @@ pub enum MlibError {
     VersionMismatch(u16),
     UnsupportedContractVersion(u32),
     TargetMismatch,
+    ObjectIntegrityMismatch(&'static str),
+    SectionChecksumMismatch(u32),
     UnknownSection(u32),
     CorruptedData,
 }
@@ -382,74 +384,121 @@ fn validate_header_versions(header: &LlibHeader) -> Result<(), MlibError> {
     }
     Ok(())
 }
-impl LlibReader {
-    pub fn read_manifest<R: Read + Seek>(reader: &mut R) -> Result<crate::format::Manifest, MlibError> {
-        let header = LlibHeader::read_from(reader)?;
-        if header.magic != LLIB_MAGIC && header.magic != MLIB_MAGIC {
-            return Err(MlibError::InvalidMagic);
+// The native envelope is checked before any payload is exposed. This is a
+// consistency check, not authentication of the artifact publisher.
+fn read_native_envelope<R: Read + Seek>(
+    reader: &mut R,
+    header: &LlibHeader,
+    sections: &[SectionEntry],
+) -> Result<(Option<crate::format::Manifest>, Option<Vec<u8>>), MlibError> {
+    let mut manifest: Option<crate::format::Manifest> = None;
+    let mut object = None;
+    for section in sections {
+        if !matches!(section.section_type, SectionType::Manifest | SectionType::ObjectCode) { continue; }
+        reader.seek(SeekFrom::Start(section.offset))?;
+        let size = usize::try_from(section.size).map_err(|_| MlibError::CorruptedData)?;
+        let mut bytes = vec![0u8; size];
+        reader.read_exact(&mut bytes)?;
+        match section.section_type {
+            SectionType::Manifest => {
+                if manifest.is_some() { return Err(MlibError::CorruptedData); }
+                let value = bincode::deserialize(&bytes).map_err(|_| MlibError::CorruptedData)?;
+                validate_target_header(header, &value)?;
+                manifest = Some(value);
+            }
+            SectionType::ObjectCode => {
+                if object.is_some() { return Err(MlibError::ObjectIntegrityMismatch("duplicate object sections")); }
+                object = Some(bytes);
+            }
+            _ => unreachable!(),
         }
-        if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
-            return Err(MlibError::VersionMismatch(header.format_version));
-        }
-        validate_header_versions(&header)?;
-        reader.seek(SeekFrom::Start(header.section_table_offset))?;
-        for _ in 0..header.section_count {
-            let section = SectionEntry::read_from(reader)?;
-            if section.section_type == SectionType::Manifest {
-                reader.seek(SeekFrom::Start(section.offset))?;
-                let mut data = vec![0u8; section.size as usize];
-                reader.read_exact(&mut data)?;
-                let manifest: crate::format::Manifest = bincode::deserialize(&data)
-                    .map_err(|_| MlibError::CorruptedData)?;
-                validate_target_header(&header, &manifest)?;
-                return Ok(manifest);
+    }
+    match (&manifest, object.as_deref()) {
+        (Some(manifest), Some(bytes)) => {
+            let metadata = manifest.object_metadata.as_ref()
+                .ok_or(MlibError::ObjectIntegrityMismatch("missing object metadata"))?;
+            if bytes.is_empty() { return Err(MlibError::ObjectIntegrityMismatch("empty object payload")); }
+            if metadata.size != bytes.len() as u64 { return Err(MlibError::ObjectIntegrityMismatch("object size mismatch")); }
+            if metadata.hash != crate::format::Fingerprint::from_slice(bytes).0 {
+                return Err(MlibError::ObjectIntegrityMismatch("object hash mismatch"));
+            }
+            if metadata.format != manifest.target.object_format {
+                return Err(MlibError::ObjectIntegrityMismatch("object metadata format mismatch"));
             }
         }
-        Err(MlibError::CorruptedData) // Or MissingManifest
+        (Some(manifest), None) if manifest.object_metadata.is_some() => {
+            return Err(MlibError::ObjectIntegrityMismatch("object metadata without payload"));
+        }
+        (None, Some(_)) => return Err(MlibError::ObjectIntegrityMismatch("object payload without manifest")),
+        _ => {},
+    }
+    Ok((manifest, object))
+}
+
+fn read_header_and_sections<R: Read + Seek>(reader: &mut R) -> Result<(LlibHeader, Vec<SectionEntry>), MlibError> {
+    let header = LlibHeader::read_from(reader)?;
+    if header.magic != LLIB_MAGIC && header.magic != MLIB_MAGIC { return Err(MlibError::InvalidMagic); }
+    if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
+        return Err(MlibError::VersionMismatch(header.format_version));
+    }
+    validate_header_versions(&header)?;
+    let header_end = reader.stream_position()?;
+    let file_end = reader.seek(SeekFrom::End(0))?;
+    if header.section_table_offset < header_end || header.section_table_offset > file_end {
+        return Err(MlibError::CorruptedData);
+    }
+    reader.seek(SeekFrom::Start(header.section_table_offset))?;
+    let mut sections = Vec::new();
+    for _ in 0..header.section_count { sections.push(SectionEntry::read_from(reader)?); }
+    let table_end = reader.stream_position()?;
+    let mut ranges = Vec::new();
+    for section in &sections {
+        let end = section.offset.checked_add(section.size).ok_or(MlibError::CorruptedData)?;
+        if section.offset < table_end || end > file_end { return Err(MlibError::CorruptedData); }
+        if section.size != 0 { ranges.push((section.offset, end)); }
+    }
+    ranges.sort_unstable();
+    if ranges.windows(2).any(|pair| pair[0].1 > pair[1].0) { return Err(MlibError::CorruptedData); }
+    // Stream checksums before deserializing portable AST, metadata or MVIR.
+    // The table's existing u64 field carries the first 64 bits of SHA-256.
+    // This detects incoherent/corrupt payloads; it is not publisher authentication.
+    use sha2::{Digest, Sha256};
+    for section in &sections {
+        reader.seek(SeekFrom::Start(section.offset))?;
+        let mut remaining = section.size;
+        let mut digest = Sha256::new();
+        let mut buffer = [0u8; 8192];
+        while remaining != 0 {
+            let size = remaining.min(buffer.len() as u64) as usize;
+            reader.read_exact(&mut buffer[..size])?;
+            digest.update(&buffer[..size]);
+            remaining -= size as u64;
+        }
+        let hash = digest.finalize();
+        if section.hash != u64::from_le_bytes(hash[..8].try_into().unwrap()) {
+            return Err(MlibError::SectionChecksumMismatch(section.section_type as u32));
+        }
+    }
+    Ok((header, sections))
+}
+
+impl LlibReader {
+    pub fn read_manifest<R: Read + Seek>(reader: &mut R) -> Result<crate::format::Manifest, MlibError> {
+        let (header, sections) = read_header_and_sections(reader)?;
+        let (manifest, _) = read_native_envelope(reader, &header, &sections)?;
+        manifest.ok_or(MlibError::CorruptedData)
     }
 
     pub fn read_object_code<R: Read + Seek>(reader: &mut R) -> Result<Option<Vec<u8>>, MlibError> {
-        let header = LlibHeader::read_from(reader)?;
-        if header.magic != LLIB_MAGIC && header.magic != MLIB_MAGIC {
-            return Err(MlibError::InvalidMagic);
-        }
-        if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
-            return Err(MlibError::VersionMismatch(header.format_version));
-        }
-        validate_header_versions(&header)?;
-        reader.seek(SeekFrom::Start(header.section_table_offset))?;
-        for _ in 0..header.section_count {
-            let section = SectionEntry::read_from(reader)?;
-            if section.section_type == SectionType::ObjectCode {
-                reader.seek(SeekFrom::Start(section.offset))?;
-                let mut data = vec![0u8; section.size as usize];
-                reader.read_exact(&mut data)?;
-                return Ok(Some(data));
-            }
-        }
-        Ok(None)
+        let (header, sections) = read_header_and_sections(reader)?;
+        let (_, object) = read_native_envelope(reader, &header, &sections)?;
+        Ok(object)
     }
 
     pub fn read_module<R: Read + Seek>(reader: &mut R) -> Result<(MlibModule, Option<crate::format::Manifest>, Option<Vec<u8>>, Option<crate::metadata::SemanticMetadata>), MlibError> {
-        let header = LlibHeader::read_from(reader)?;
-        
-        if header.magic != LLIB_MAGIC && header.magic != MLIB_MAGIC {
-            return Err(MlibError::InvalidMagic);
-        }
-        
-        if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
-            return Err(MlibError::VersionMismatch(header.format_version));
-        }
-        validate_header_versions(&header)?;
-        
-        reader.seek(SeekFrom::Start(header.section_table_offset))?;
+        let (header, sections) = read_header_and_sections(reader)?;
+        let (manifest_opt, obj_bytes_opt) = read_native_envelope(reader, &header, &sections)?;
 
-        let mut sections = Vec::new();
-        for _ in 0..header.section_count {
-            let section = SectionEntry::read_from(reader)?;
-            sections.push(section);
-        }
-        
         let mut raw_string_table = Vec::new();
 
         // Pass 1: String Table
@@ -463,8 +512,6 @@ impl LlibReader {
         }
         
         let mut mlib_module = MlibModule::default();
-        let mut manifest_opt = None;
-        let mut obj_bytes_opt = None;
         let mut semantic_opt = None;
         
         // Helper to extract string by offset
@@ -480,23 +527,7 @@ impl LlibReader {
         // Pass 2: Metadata and MVIR
         for section in &sections {
             match section.section_type {
-                SectionType::Manifest => {
-                    reader.seek(SeekFrom::Start(section.offset))?;
-                    let mut data = vec![0u8; section.size as usize];
-                    reader.read_exact(&mut data)?;
-                    let manifest: crate::format::Manifest = match bincode::deserialize(&data) {
-                        Ok(m) => m,
-                        Err(_) => return Err(MlibError::CorruptedData),
-                    };
-                    validate_target_header(&header, &manifest)?;
-                    manifest_opt = Some(manifest);
-                }
-                SectionType::ObjectCode => {
-                    reader.seek(SeekFrom::Start(section.offset))?;
-                    let mut data = vec![0u8; section.size as usize];
-                    reader.read_exact(&mut data)?;
-                    obj_bytes_opt = Some(data);
-                }
+                SectionType::Manifest | SectionType::ObjectCode => {}, // Checked above.
                 SectionType::SemanticMetadata => {
                     reader.seek(SeekFrom::Start(section.offset))?;
                     let mut data = vec![0u8; section.size as usize];
@@ -1144,24 +1175,9 @@ impl LlibReader {
     }
 
     pub fn read_ast_interface<R: Read + Seek>(reader: &mut R) -> Result<Option<(luna_ast::AstArena, Vec<luna_ast::Item>, String)>, MlibError> {
-        let header = LlibHeader::read_from(reader)?;
-        
-        if header.magic != LLIB_MAGIC && header.magic != MLIB_MAGIC {
-            return Err(MlibError::InvalidMagic);
-        }
-        if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
-            return Err(MlibError::VersionMismatch(header.format_version));
-        }
-        validate_header_versions(&header)?;
-        
-        reader.seek(SeekFrom::Start(header.section_table_offset))?;
+        let (header, sections) = read_header_and_sections(reader)?;
+        read_native_envelope(reader, &header, &sections)?;
 
-        let mut sections = Vec::new();
-        for _ in 0..header.section_count {
-            let section = SectionEntry::read_from(reader)?;
-            sections.push(section);
-        }
-        
         for section in &sections {
             if section.section_type == SectionType::AstInterface {
                 reader.seek(SeekFrom::Start(section.offset))?;

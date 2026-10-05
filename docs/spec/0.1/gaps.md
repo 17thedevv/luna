@@ -240,3 +240,21 @@ release gate. The completed full workspace run at39a2a9b remains FAIL:
 1,262 pass, 34 fail, 1 ignored. Test isolation/oracle repairs subsequently pass
 96 focused cases. Closure cleanup and named/default calls remain open. See the
 [execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md).
+
+### Artifact payload consistency/publication — bounded follow-up, 2026-10-05
+
+At20f682f, standalone artifact-only reducers accepted a valid replacement object
+and executed exit6 rather than exit0; a changed generic AST literal, with unchanged
+source text/object, executed exit2. A failed `.llib` destination rename also
+reported CLI success. Compiler12 now populates native metadata, validates native
+integrity and all section checksums before decoding, and propagates publication
+errors independently of `--quiet`. Dedicated CLI controls cover these reducers,
+section ranges, coherent target/container mismatches and valid native providers.
+
+The workspace invocation at20f682f exits101. Completed suites report1,143 passes,
+116 failures and1 ignored test; those counts exclude an aborted native test target.
+StorageFull and a hung out-of-bounds child invalidate this run as a complete
+environment gate. Closure capture destruction still fails independently. The raw
+log and intervention are preserved; focused repair passes do not turn this into
+a release PASS. Named/default calls, broader contract validation and R3–R5 remain
+open. See the [execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md).

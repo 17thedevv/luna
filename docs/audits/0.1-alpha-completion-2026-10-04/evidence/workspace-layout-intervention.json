@@ -1,0 +1,9 @@
+{
+  "revision": "20f682f0f41c952fdaa848e2e1333638e44d099b",
+  "reason": "Native out-of-bounds fixture hung for over 3 minutes after StorageFull; abort this test target, never classify its output as PASS",
+  "native_pid": 5064,
+  "timestamp_utc": "2026-10-05T01:09:24.4542779Z",
+  "native_command": "\"C:\\Users\\84387\\AppData\\Local\\Temp\\luna_slice_index_tests_index_oob\\main.exe\"",
+  "test_target": "stdlib_slice_index_acceptance_tests-7ab04bfacdbdd029.exe",
+  "test_pid": 26052
+}

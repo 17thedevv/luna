@@ -806,43 +806,22 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 let builder = crate::metadata_builder::MetadataBuilder::new(&registry, &interface, &summaries);
                 let semantic_metadata = Some(builder.build());
 
-                let obj_bytes = std::fs::read(path_obj).ok();
-
-                match luna_llib::LlibWriter::write_module(&module, &arena, &items, &input, manifest, semantic_metadata.as_ref(), obj_bytes.as_deref(), &mut llib_buffer) {
-                    Ok(_) => {
-                        // Atomically publish the complete artifact
-                        // Use sibling temp file + rename pattern with RAII cleanup
-                        let canonical_path = std::path::Path::new(&llib_file);
-                        let ext_suffix = "llib";
-                        match create_sibling_temp(canonical_path, ext_suffix) {
-                            Ok((mut tmp_file, tmp_path, mut guard)) => {
-                                use std::io::Write;
-                                if let Err(e) = tmp_file.write_all(&llib_buffer) {
-                                    if !options.quiet { println!("Failed to write temp artifact: {}", e); }
-                                } else if let Err(e) = tmp_file.flush() {
-                                    if !options.quiet { println!("Failed to flush temp artifact: {}", e); }
-                                } else {
-                                    drop(tmp_file); // Close handle before rename on Windows
-                                    match std::fs::rename(&tmp_path, canonical_path) {
-                                        Ok(_) => {
-                                            guard.disarm();
-                                            if !options.quiet { println!("Successfully wrote {}", llib_file); }
-                                        }
-                                        Err(e) => {
-                                            if !options.quiet { println!("Failed to publish artifact: {}", e); }
-                                        }
-                                    }
-                                }
-                            }
-                            Err(e) => {
-                                if !options.quiet { println!("Failed to create temp artifact: {}", e); }
-                            }
-                        }
-                    }
-                    Err(e) => {
-                        if !options.quiet { println!("Failed to serialize library: {}", e); }
-                    }
-                }
+                let obj_bytes = std::fs::read(path_obj).map_err(|error| vec![
+                    Diagnostic::error(format!("Failed to read emitted object '{}': {}", path_obj.display(), error))
+                        .with_code(luna_common::DiagnosticCode::ObjectEmissionFailure),
+                ])?;
+                luna_llib::LlibWriter::write_module(
+                    &module, &arena, &items, &input, manifest, semantic_metadata.as_ref(),
+                    Some(&obj_bytes), &mut llib_buffer,
+                ).map_err(|error| vec![
+                    Diagnostic::error(format!("Failed to serialize library artifact '{}': {}", llib_file, error))
+                        .with_code(luna_common::DiagnosticCode::InvalidArtifactOutput),
+                ])?;
+                publish_artifact(std::path::Path::new(&llib_file), &llib_buffer).map_err(|error| vec![
+                    Diagnostic::error(format!("Failed to publish library artifact '{}': {}", llib_file, error))
+                        .with_code(luna_common::DiagnosticCode::OutputWriteFailure),
+                ])?;
+                if !options.quiet { println!("Successfully wrote {}", llib_file); }
                 if !options.quiet {
                     println!("---------------------------\n");
                 }
@@ -937,6 +916,18 @@ pub(crate) fn create_sibling_temp(
             Err(e) => return Err(e),
         }
     }
+}
+
+/// Publish complete bytes, preserving errors independently of CLI verbosity.
+fn publish_artifact(path: &std::path::Path, bytes: &[u8]) -> std::io::Result<()> {
+    use std::io::Write;
+    let (mut file, temporary, mut guard) = create_sibling_temp(path, "llib")?;
+    file.write_all(bytes)?;
+    file.flush()?;
+    drop(file); // Release the handle before rename on Windows.
+    std::fs::rename(&temporary, path)?;
+    guard.disarm();
+    Ok(())
 }
 
 pub fn test_backend_compile(

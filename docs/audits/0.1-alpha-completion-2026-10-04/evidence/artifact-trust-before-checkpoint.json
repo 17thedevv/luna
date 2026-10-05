@@ -1,0 +1,56 @@
+{
+  "revision": "20f682f0f41c952fdaa848e2e1333638e44d099b",
+  "cli_sha256": "AAC7F73CB5F1C76A0B3FFEE292B8DC5054A252D4A339474C73689515160DBB96",
+  "runtime_sha256": "D8AEA737AA7929E79AB70F24DB5705D7370570295DDAB9F569B3085EE230F5DE",
+  "records": [
+    {
+      "file": "artifact-trust-before-object-integrity-probe-observations.json",
+      "sha256": "1490f4f57636c7d93813e45210caa7df300238838883596bb4231536c58fe824"
+    },
+    {
+      "file": "artifact-trust-before-object-integrity-probe-baseline-publish.txt",
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9"
+    },
+    {
+      "file": "artifact-trust-before-object-integrity-probe-changed-publish.txt",
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9"
+    },
+    {
+      "file": "artifact-trust-before-object-integrity-probe-tampered-check.txt",
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2"
+    },
+    {
+      "file": "artifact-trust-before-object-integrity-probe-tampered-build.txt",
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2"
+    },
+    {
+      "file": "artifact-trust-before-generic-body-integrity-probe-observations.json",
+      "sha256": "ecf0b0a13cb70f91dd43f4f980b7f99e20a099c1d5dde17fa6743221dfb48778"
+    },
+    {
+      "file": "artifact-trust-before-generic-body-integrity-probe-publish.txt",
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9"
+    },
+    {
+      "file": "artifact-trust-before-generic-body-integrity-probe-baseline-build.txt",
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2"
+    },
+    {
+      "file": "artifact-trust-before-generic-body-integrity-probe-tampered-check.txt",
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2"
+    },
+    {
+      "file": "artifact-trust-before-generic-body-integrity-probe-tampered-build.txt",
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2"
+    },
+    {
+      "file": "artifact-trust-before-publication-probe-observations.json",
+      "sha256": "fdde5e6e8fffb04aba9cc1d38a720206a15306379b8989974b4ef310cbe9393f"
+    },
+    {
+      "file": "artifact-trust-before-publication-probe-before.txt",
+      "sha256": "31e50524a159f15c552fce9e78f155e1404dc219f5ae857ffe15c3816974a486"
+    }
+  ],
+  "probe_setup_note": "An initial generic literal probe used an ambiguous one-digit needle; it stopped at its uniqueness assertion. The recorded completed reducer uses a unique six-digit literal and verifies unchanged source text/object."
+}

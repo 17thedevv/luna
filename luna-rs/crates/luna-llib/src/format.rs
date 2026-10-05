@@ -3,7 +3,7 @@ use std::io::{Read, Write};
 pub const LLIB_MAGIC: [u8; 4] = *b"LLIB";
 pub const MLIB_MAGIC: [u8; 4] = *b"MLIB";
 pub const LLIB_FORMAT_VERSION: u16 = 2;
-pub const LLIB_COMPILER_VERSION: u16 = 11; // ABI-reachable ordered nominal representations participate in identity.
+pub const LLIB_COMPILER_VERSION: u16 = 12; // Native envelopes and all portable payload checksums are required.
 pub const LLIB_MVIR_VERSION: u16 = 4; // Portable StaticAddress data, without semantic-session IDs.
 
 pub const MLIB_FORMAT_VERSION: u16 = LLIB_FORMAT_VERSION;
@@ -53,6 +53,12 @@ impl std::fmt::Display for Fingerprint {
         }
         Ok(())
     }
+}
+
+/// Section-table checksum: first eight SHA-256 bytes interpreted little-endian.
+/// Consistency/integrity only; it does not authenticate an artifact publisher.
+pub fn section_checksum(bytes: &[u8]) -> u64 {
+    u64::from_le_bytes(Fingerprint::from_slice(bytes).0[..8].try_into().unwrap())
 }
 
 /// Source fingerprint: H(source bytes)

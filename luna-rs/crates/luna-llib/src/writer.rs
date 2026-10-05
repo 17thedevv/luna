@@ -9,6 +9,9 @@ pub type MlibWriter = LlibWriter;
 
 impl LlibWriter {
     pub fn write_module<W: Write>(module: &Module, arena: &luna_ast::AstArena, items: &[luna_ast::Item], source: &str, mut manifest: crate::format::Manifest, semantic_metadata: Option<&crate::metadata::SemanticMetadata>, obj_bytes: Option<&[u8]>, writer: &mut W) -> std::io::Result<()> {
+        if obj_bytes.is_some_and(|bytes| bytes.is_empty()) {
+            return Err(std::io::Error::new(std::io::ErrorKind::InvalidInput, "empty object payload"));
+        }
         let mlib_module = Self::convert_module(module);
         
         let mut mvir_payload = Vec::new();
@@ -34,13 +37,13 @@ impl LlibWriter {
             crate::format::Fingerprint(interface_hasher.finalize().into())
         };
 
-        if let Some(obj) = obj_bytes {
-            let mut obj_hasher = Sha256::new();
-            obj_hasher.update(obj);
-            if let Some(ref mut metadata) = manifest.object_metadata {
-                metadata.hash = obj_hasher.finalize().into();
-            }
-        }
+        // Native integrity is writer-owned, including when callers supply no
+        // metadata or stale metadata. No native payload means no native envelope.
+        manifest.object_metadata = obj_bytes.map(|obj| crate::format::ObjectMetadata {
+            format: manifest.target.object_format.clone(),
+            hash: crate::format::Fingerprint::from_slice(obj).0,
+            size: obj.len() as u64,
+        });
 
         let mut manifest_payload = Vec::new();
         bincode::serialize_into(&mut manifest_payload, &manifest)
@@ -95,7 +98,7 @@ impl LlibWriter {
             version: 1,
             compression: 0,
             reserved: [0u8; 5],
-            hash: 0,
+            hash: crate::format::section_checksum(&manifest_payload),
         };
 
         let mvir_section = SectionEntry {
@@ -106,7 +109,7 @@ impl LlibWriter {
             version: 1,
             compression: 0,
             reserved: [0u8; 5],
-            hash: 0,
+            hash: crate::format::section_checksum(&mvir_payload),
         };
 
         let ast_section = SectionEntry {
@@ -117,7 +120,7 @@ impl LlibWriter {
             version: 1,
             compression: 0,
             reserved: [0u8; 5],
-            hash: 0,
+            hash: crate::format::section_checksum(&ast_payload),
         };
         
         manifest_section.write_to(writer)?;
@@ -134,7 +137,7 @@ impl LlibWriter {
                 version: 1,
                 compression: 0,
                 reserved: [0u8; 5],
-                hash: 0,
+                hash: crate::format::section_checksum(&semantic_payload),
             };
             semantic_section.write_to(writer)?;
             next_section_id += 1;
@@ -149,7 +152,7 @@ impl LlibWriter {
                 version: 1,
                 compression: 0,
                 reserved: [0u8; 5],
-                hash: 0, // In reality, we'd hash this
+                hash: crate::format::section_checksum(obj),
             };
             obj_section.write_to(writer)?;
         }

@@ -1,0 +1,11 @@
+{
+  "revision": "20f682f0f41c952fdaa848e2e1333638e44d099b",
+  "cli_sha256": "aac7f73cb5f1c76a0b3ffee292b8dc5054a252d4a339474c73689515160dbb96",
+  "source_absent": true,
+  "baseline_run": 0,
+  "check_exit": 0,
+  "build_exit": 0,
+  "tampered_run": 2,
+  "unchanged_source_text": true,
+  "unchanged_object": true
+}

@@ -1,5 +1,7 @@
 #[path = "support/stdlib.rs"]
 mod support;
+#[path = "support/artifact_payload.rs"]
+mod payload;
 
 use luna_llib::{LlibHeader, LlibReader, SectionEntry, SectionType};
 use std::{
@@ -181,6 +183,22 @@ fn actual_objects_match_target_contract_and_mismatches_reject_before_use() {
         }
         // Keep payload sizes/offsets and portable interfaces valid so each
         // rejection reaches the intended target/object validation boundary.
+        // These probes intentionally reach target/container validation, so
+        // retain a coherent checksum/native envelope around the changed fields.
+        // Independent integrity tests retain stale checksums and native hashes.
+        if case == "object" || case == "invalid_object" {
+            let bytes = &invalid[section(&invalid, SectionType::ObjectCode)];
+            let hash = luna_llib::Fingerprint::from_slice(bytes).0;
+            invalid = payload::change_manifest(&invalid, |manifest| {
+                manifest.object_metadata.as_mut().unwrap().hash = hash;
+            });
+        } else if case == "format" {
+            invalid = payload::change_manifest(&invalid, |manifest| {
+                manifest.object_metadata.as_mut().unwrap().format = manifest.target.object_format.clone();
+            });
+        } else {
+            invalid = payload::rewrite(&invalid, |_, _| {});
+        }
         fs::write(&destination, &invalid).unwrap();
         for command in ["check", "build"] {
             let exe = project.join(format!("rejected_{case}.exe"));

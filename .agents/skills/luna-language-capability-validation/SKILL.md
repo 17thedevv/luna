@@ -129,6 +129,14 @@ both artifact header/manifest and actual embedded/selected object code. A format
 label alone does not prove architecture or sidecar identity. Cross-target
 metadata/layout probes do not establish native language/runtime conformance.
 
+For artifact integrity, separately test altered native bytes and altered portable
+AST/MVIR/metadata, including a generic body whose source text/object stay unchanged.
+Keep integrity rejection controls separate from malformed target/container probes:
+the latter need coherent checksum envelopes to reach their intended validator.
+Exercise publication failure through the CLI in quiet and ordinary modes; success
+status must mean the requested artifact was published. Checksums establish payload
+consistency, not publisher authentication or semantic equivalence of native code.
+
 For ownership, references, raw pointers, FFI, or mutation, preserve Luna's
 separate semantic domains and frozen safety rules. Unsafe does not disable
 ownership, moves, borrow checking, region validity, or provenance. Do not
