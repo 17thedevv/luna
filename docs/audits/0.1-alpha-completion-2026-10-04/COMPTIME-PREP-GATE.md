@@ -87,3 +87,70 @@ checking, omission entries sharing a logical callee frame, portable bodies and
 full ownership/effects acceptance. A literal-only implementation or forwarding
 wrapper cannot replace that adopted contract. Closure capture policy and
 R3–R5 remain open; no merge, tag or release verdict follows from this gate.
+
+## Follow-up: ordinary admission before execution — 2026-10-05
+
+The confirmed alias counterexample above is now rejected before VM execution.
+MVIR preparation returns `PreparedComptime`, retaining the root and reachable
+concrete module. The driver's checked engine performs ordinary declaration
+lifetime verification, pre-borrow MVIR validation, interprocedural summaries,
+borrow/drop-flag checking and redundant-drop cleanup, then post-borrow
+validation. The VM executes that same verified program. All five production
+engine construction paths use this orchestration; the low-level interpreter
+engine remains available to direct VM invariant tests. MVIR does not depend on
+borrowck or implement separate loan rules.
+
+Owning-phase diagnostics cross the comptime API without changing their typed
+codes or primary source spans. Invalid move cases now produce E3001, local
+escape E3005 and loan conflicts E3003; VM effects continue to produce E4005.
+Poisoned constant initializers do not execute again during later typechecking.
+This changes the diagnostic oracle to the earlier owning phase while retaining
+the invalid programs and required rejections. VM effect, resource and address
+escape guards remain independently enforced.
+
+The new CLI matrix checks local/imported mutable aliases, shared/mutable
+conflicts and transported return loans: 20 check/build rejections, source
+snippet/caret evidence and no emitted executable across fresh source/artifact
+modes. Two native controls retain sequential mutation, repeated shared reads
+and precise selected-parameter return provenance. The imported provider is
+published through the CLI, its source removed and its project relocated.
+The named matrix retains 68 check/build negatives and 18 native positives,
+including generic/drop cases. Module-const storage and pointer-escape
+regressions also pass in both modes; module storage lifetime is unchanged.
+
+The [terminal record](evidence/comptime-admission/exit.json) pins 774 compiler,
+library and fixture inputs before the final commands. Every input and both
+compiler/runtime hashes agree at completion. `cargo check --workspace
+--all-targets` exits0; the internal regression passes 324 and the separate
+CLI/driver regression passes 43, both exit0. Lossless raw logs retain the first
+development failure (obsolete E4005/string-only oracles), corrected 25-test
+development pass, source probes and final commands/exits. An initial scratch
+pin setup failed before Cargo ran; the corrected pre-command pin is used.
+Earlier committed evidence and failed workspace/closure verdicts are preserved.
+
+```text
+Compiler Change
+    Capability: Ordinary move/loan/escape admission before early comptime.
+    Why stdlib exposed it: Generic and owned constant evaluation needs the same
+                         safe language rules as ordinary user execution.
+    Why it is generic: Existing lifetime, MVIR, interprocedural and borrow/drop
+                       analyses operate on arbitrary checked callable bodies.
+    User-defined type benefiting: Owner<T> and imported user functions in the
+                                 generic/drop and comptime loan CLI controls.
+    Tests: comptime_loans_cli, named_arguments_cli, module_const_storage_cli,
+           adv_comptime_dyn_tests, struct lifetime and VM invariants.
+    New intrinsic/lang_item?: NO; no native ABI or portable epoch change.
+    Stdlib-specific branch?: NO
+```
+
+SKILL IMPACT: **NEW DURABLE RULE** in luna-language-capability-validation:
+admit the original prepared program before VM execution and execute the same
+verified IR; materialized constants cannot retrospectively validate loans.
+The changed skill was reread in full and checked against related testing,
+semantic compliance, phase ownership and comptime guidance without conflict.
+
+This closes the recorded loan-admission counterexample within the tested scope.
+CALL-ARGUMENTS-v1 remains **PARTIAL** because default expressions are not yet
+implemented. Known owned closure_capture native exit3 in both modes was not
+rerun or closed here. Full R0–R5, pending closure/overflow/target decisions and
+remaining release conformance stay required; no merge, tag or release follows.

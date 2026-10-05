@@ -1,0 +1,6 @@
+import "provider";
+const VALUE: i32 = comptime {
+    dec rw value = 0;
+    loans::mixed(shared=&value, exclusive=&rw value)
+};
+fn main() -> i32 { return VALUE; }

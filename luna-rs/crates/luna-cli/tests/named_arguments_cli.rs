@@ -42,11 +42,11 @@ fn named_arguments_bind_declaration_ordinals_and_preserve_source_evaluation_in_b
             ("unsafe_call", "E2025", "unsafe"),
             ("use_after_move", "E3001", "moved"),
             ("later_use_after_move", "E3001", "moved"),
-            ("comptime_moved", "E4005", "moved"),
-            ("comptime_reference_escape", "E4005", "escape"),
+            ("comptime_moved", "E3001", "moved"),
+            ("comptime_reference_escape", "E3005", "escapes"),
             ("borrow_conflict", "E3003", ""),
-            ("comptime_moved_generic", "E4005", "moved"),
-            ("comptime_escape_generic", "E4005", "escape"),
+            ("comptime_moved_generic", "E3001", "moved"),
+            ("comptime_escape_generic", "E3005", "escapes"),
             ("comptime_effect_generic", "E4005", "forbidden"),
         ] {
             let source = relocated.join(format!("{name}.ln"));

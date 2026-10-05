@@ -262,7 +262,7 @@ fn test_adv_comptime_03_dyn_pointer_escape_rejected() {
     "#;
     let (success, diags) = run_compiler("test_03", src);
     assert!(!success, "Expected escaping &dyn Trait from comptime to be rejected");
-    let err = diags.iter().find(|d| d.message.contains("pointer escape") || d.message.contains("cannot evaluate constant in comptime"));
+    let err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::LocalBorrowEscape) || d.message.contains("pointer escape") || d.message.contains("cannot evaluate constant in comptime"));
     assert!(err.is_some(), "Expected pointer escape diagnostic, got: {:?}", diags);
 }
 
@@ -282,7 +282,7 @@ fn test_adv_comptime_04_slice_pointer_escape_rejected() {
     "#;
     let (success, diags) = run_compiler("test_04", src);
     assert!(!success, "Expected escaping &[T] from comptime to be rejected");
-    let err = diags.iter().find(|d| d.message.contains("pointer escape") || d.message.contains("cannot evaluate constant in comptime"));
+    let err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::LocalBorrowEscape) || d.message.contains("pointer escape") || d.message.contains("cannot evaluate constant in comptime"));
     assert!(err.is_some(), "Expected pointer escape diagnostic, got: {:?}", diags);
 }
 
@@ -321,7 +321,7 @@ fn test_adv_comptime_05_smuggled_fat_pointer_in_struct_rejected() {
     "#;
     let (success, diags) = run_compiler("test_05", src);
     assert!(!success, "Expected smuggled fat pointer in struct to be rejected");
-    let err = diags.iter().find(|d| d.message.contains("pointer escape") || d.message.contains("cannot evaluate constant in comptime"));
+    let err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::LocalBorrowEscape) || d.message.contains("pointer escape") || d.message.contains("cannot evaluate constant in comptime"));
     assert!(err.is_some(), "Expected pointer escape diagnostic, got: {:?}", diags);
 }
 
@@ -775,6 +775,6 @@ fn test_adv_comptime_16_runtime_reachable_fat_pointer_escape_invariant() {
     "#;
     let (success, diags) = run_compiler("test_16", src);
     assert!(!success, "Expected deeply nested fat pointer escape to be rejected");
-    let err = diags.iter().find(|d| d.message.contains("pointer escape") || d.message.contains("cannot evaluate constant in comptime"));
+    let err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::LocalBorrowEscape) || d.message.contains("pointer escape") || d.message.contains("cannot evaluate constant in comptime"));
     assert!(err.is_some(), "Expected pointer escape diagnostic, got: {:?}", diags);
 }

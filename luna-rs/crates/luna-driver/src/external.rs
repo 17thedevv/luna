@@ -278,7 +278,7 @@ impl ExternalComponentLoader {
                 return Err(ExternalComponentError::SemanticFailed(semantic_ctx.diagnostics));
             }
 
-            let comptime_engine = luna_mvir::MvirComptimeEngine {
+            let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
                 max_steps: 1_000_000,
                 max_depth: 512,
             };
@@ -621,7 +621,7 @@ impl ExternalComponentLoader {
             return Err(ExternalComponentError::SemanticFailed(semantic_ctx.diagnostics));
         }
 
-        let comptime_engine = luna_mvir::MvirComptimeEngine {
+        let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
             max_steps: 1_000_000,
             max_depth: 512,
         };

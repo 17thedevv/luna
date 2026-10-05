@@ -13,6 +13,7 @@ pub mod lang_contracts;
 pub mod sysroot_manifest;
 pub mod resolution_context;
 pub mod provider_binding;
+mod comptime_admission;
 
 pub use session::DriverSession;
 
@@ -290,7 +291,7 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
     let items = macro_engine.expand_items(items).map_err(|e| e)?;
 
     Resolver::new(&mut semantic_ctx, &arena, &session.source_manager).resolve_items(&items);
-    let comptime_engine = luna_mvir::MvirComptimeEngine {
+    let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
         max_steps: options.comptime_steps.unwrap_or(1_000_000),
         max_depth: options.comptime_depth.unwrap_or(512),
     };
@@ -396,7 +397,7 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
     let items = macro_engine.expand_items(items).map_err(|e| e)?;
 
     Resolver::new(&mut semantic_ctx, &arena, &session.source_manager).resolve_items(&items);
-    let comptime_engine = luna_mvir::MvirComptimeEngine {
+    let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
         max_steps: options.comptime_steps.unwrap_or(1_000_000),
         max_depth: options.comptime_depth.unwrap_or(512),
     };
@@ -579,7 +580,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             let mut resolver = Resolver::new(&mut semantic_ctx, &arena, &session.source_manager);
             resolver.resolve_items(&items_mut);
             
-            let comptime_engine = luna_mvir::MvirComptimeEngine {
+            let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
                 max_steps: options.comptime_steps.unwrap_or(1_000_000),
                 max_depth: options.comptime_depth.unwrap_or(512),
             };

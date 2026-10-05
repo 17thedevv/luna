@@ -716,7 +716,11 @@ impl<'a> MvirGenerator<'a> {
         let ret_val = if matches!(self.ctx.types.get(ret_ty), luna_semantic::SemanticType::Void | luna_semantic::SemanticType::Never) {
             ret_val
         } else {
-            let transferred = self.push_inst(Instruction::Assign(ret_val), ret_ty);
+            let span = match &ret_val {
+                Operand::Value(value) => self.current_function.as_ref().unwrap().values[value.0 as usize].span,
+                _ => None,
+            };
+            let transferred = self.push_inst_span(Instruction::Assign(ret_val), ret_ty, span);
             Operand::Value(transferred)
         };
         self.pop_scope_and_drop(None);

@@ -112,12 +112,17 @@ impl<'a> TypeChecker<'a> {
             return Err(crate::comptime::ComptimeError::UnsupportedOperation("comptime engine not configured".to_string()));
         };
         self.prepare_comptime_bodies();
+        let return_type = match target {
+            ComptimeTarget::Expression(expr) => self.ctx.tables.expr_types.get(&expr).copied(),
+            ComptimeTarget::Statement(stmt) => self.infer_stmt_value_type(&stmt),
+        }.unwrap_or_else(|| self.ctx.types.intern(SemanticType::Void));
         let diagnostics_before = self.ctx.diagnostics.len();
         let mut collector = crate::mono::MonoCollector::new_with_source(self.ctx, self.arena, Some(self.source_manager));
-        let root = match target {
+        let mut root = match target {
             ComptimeTarget::Expression(expr) => collector.run_on_expr(expr),
             ComptimeTarget::Statement(stmt) => collector.run_on_stmt(stmt),
         };
+        root.return_type = Some(return_type);
         let functions = collector.instantiated.into_values().collect();
         let glues = collector.drop_glues;
         if self.ctx.diagnostics.len() != diagnostics_before {
@@ -138,6 +143,14 @@ impl<'a> TypeChecker<'a> {
         self.ctx.instantiated_functions = previous_functions;
         self.ctx.drop_glue_instances = previous_glues;
         result
+    }
+
+    fn report_comptime_error(&mut self, error: crate::ComptimeError, span: luna_common::Span, context: &str) {
+        match error {
+            crate::ComptimeError::Diagnostics(diagnostics) => self.ctx.diagnostics.extend(diagnostics),
+            other => self.ctx.diagnostics.push(Diagnostic::error(format!("{context}: {other}"))
+                .with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span)),
+        }
     }
     
     /// Body elaboration belongs to semantic analysis, including bodies required
@@ -2190,6 +2203,11 @@ impl<'a> TypeChecker<'a> {
                         let expected = self.lower_type(annot);
                         self.typecheck_expr_expected(&init, expected)
                     } else { self.typecheck_expr(&init) };
+                    if matches!(self.ctx.types.get(init_ty), SemanticType::Error) {
+                        if let Some(symbol) = sym_id_opt { self.ctx.tables.symbol_types.insert(symbol, init_ty); }
+                        self.current_scope = previous_scope;
+                        continue;
+                    }
                     let final_ty = if let Some(annot) = type_annot {
                         let annot_ty = self.lower_type(annot);
                         if let Err(e) = self.unify(annot_ty, init_ty) {
@@ -2212,7 +2230,7 @@ impl<'a> TypeChecker<'a> {
                         }
                         Err(e) => {
                             let span = self.get_expr_span_for_diag(&init).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
+                            self.report_comptime_error(e, span, "cannot evaluate constant in comptime");
                         }
                     }
                     self.current_scope = previous_scope;
@@ -2989,7 +3007,7 @@ impl<'a> TypeChecker<'a> {
                     Ok(val) => val.as_usize().unwrap_or(0) as u64,
                     Err(e) => {
                         let span = self.get_expr_span_for_diag(size).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate array size in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
+                        self.report_comptime_error(e, span, "cannot evaluate array size in comptime");
                         0
                     }
                 };
@@ -3221,6 +3239,12 @@ impl<'a> TypeChecker<'a> {
                         } else {
                             self.ctx.types.new_inference_var()
                         };
+                        if matches!(self.ctx.types.get(init_ty), SemanticType::Error) {
+                            if let Some(symbol) = self.ctx.tables.decl_symbols.get(decl_id).copied() {
+                                self.ctx.tables.symbol_types.insert(symbol, init_ty);
+                            }
+                            return;
+                        }
                         
                         if let Some(annot) = type_annot {
                             let expected_ty = self.lower_type(*annot);
@@ -3275,7 +3299,7 @@ impl<'a> TypeChecker<'a> {
                                             }
                                         }
                                         Err(e) => {
-                                            self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(*name));
+                                            self.report_comptime_error(e, *name, "cannot evaluate constant in comptime");
                                         }
                                     }
                                 }
@@ -5989,16 +6013,19 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             Expr::Comptime { body } => {
+                if self.ctx.tables.expr_types.get(expr_id).is_some_and(|&ty| matches!(self.ctx.types.get(ty), SemanticType::Error)) {
+                    return self.ctx.types.error_id();
+                }
                 self.typecheck_stmt(body);
                 let ty = self.infer_stmt_value_type(body).unwrap_or_else(|| self.ctx.types.intern(SemanticType::Void));
                 match self.eval_comptime_stmt(*body) {
-                    Ok(v) => { self.ctx.comptime_values.insert(*expr_id, v); }
+                    Ok(v) => { self.ctx.comptime_values.insert(*expr_id, v); ty }
                     Err(e) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate comptime block: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
+                        self.report_comptime_error(e, span, "cannot evaluate comptime block");
+                        self.ctx.types.error_id()
                     }
                 }
-                ty
             }
             other => {
                 let mut diag = Diagnostic::error(format!("Unsupported or unrecognized expression construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax);

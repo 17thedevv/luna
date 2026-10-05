@@ -1469,3 +1469,15 @@ mutable loans which ordinary check rejects E3003. Preserve this required
 rejection and put ordinary borrow validation before VM execution. Defaults,
 closure policy/cleanup and the full R3–R5 scope remain open; no merge/tag/release
 or full-workspace PASS is implied.
+
+### Early comptime admission checkpoint — 2026-10-05
+
+The [admission record](COMPTIME-PREP-GATE.md#follow-up-ordinary-admission-before-execution--2026-10-05)
+now rejects the recorded unsafe loan counterexample before VM execution, using
+ordinary lifetime/borrow/drop analysis and preserving owning-phase diagnostics.
+Fresh source/artifact matrices retain alias/conflict negatives, legal mutation/
+read/return controls, named generic owned cleanup and module-const storage.
+The unchanged final 774-input pin passes workspace/all-target compilation,
+324 internal and 43 CLI/driver tests with observed exit0. Raw failed development
+oracles and setup attempts remain recorded separately. Defaults, owned closure
+policy/cleanup and all broader R0–R5 release obligations remain open.

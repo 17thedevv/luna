@@ -371,3 +371,13 @@ CLI/driver tests. A new simultaneous mutable-loan probe rejects E3003 in native
 check but passes inside comptime, including build/native exit0. Borrow admission
 must precede VM execution; it is a correctness gap, not a comptime exemption.
 Defaults and all remaining release gates retain their full scope.
+
+The [early admission follow-up](../../audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md#follow-up-ordinary-admission-before-execution--2026-10-05)
+supersedes that loan counterexample within its scoped tests: ordinary lifetime/
+borrow/drop validation precedes VM execution and the VM consumes the verified
+prepared program. Mutable alias, shared/mutable and return-loan conflicts reject
+with original typed diagnostics/spans in fresh source/artifact modes; valid
+controls pass. Final immutable verification passes workspace/all-target
+compilation, 324 internal and 43 CLI/driver tests, exit0. Defaults remain
+unimplemented; the known closure failure and broader release gates are not
+closed by this checkpoint.

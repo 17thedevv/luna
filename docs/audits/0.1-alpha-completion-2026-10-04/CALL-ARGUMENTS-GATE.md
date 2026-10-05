@@ -291,3 +291,17 @@ mutable arguments reject E3003 in ordinary execution but pass comptime check,
 build and native control. This required rejection remains open. Generic callee
 availability is repaired within its tested scope; defaults, compile-time loan
 validation, closure cleanup and all broader R3–R5 gates remain required.
+
+### Follow-up: early comptime loan admission repaired
+
+The [admission follow-up](COMPTIME-PREP-GATE.md#follow-up-ordinary-admission-before-execution--2026-10-05)
+places ordinary lifetime/borrow/drop analysis before VM execution across all
+five production engine construction paths. It preserves typed codes/spans and
+executes the same verified prepared program. Aliased mutable, shared/mutable
+and transported return-loan conflicts now reject in fresh source/artifact CLI
+check/build, while sequential mutation, repeated reads and precise return-loan
+controls run successfully. Final pinned verification passes workspace/all-target
+compilation, 324 internal and 43 CLI/driver tests, all exit0.
+
+Defaults remain mandatory and unimplemented. The known closure failure and
+broader R3–R5 gates are unchanged; scoped comptime success is not release PASS.

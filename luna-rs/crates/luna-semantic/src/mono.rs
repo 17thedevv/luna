@@ -142,6 +142,7 @@ pub struct InstantiatedFunction {
 /// type/call plans separate from the reachable function instances.
 #[derive(Debug, Clone, Default)]
 pub struct MonoRoot {
+    pub return_type: Option<SemanticTypeId>,
     pub expr_types: HashMap<ExprId, SemanticTypeId>,
     pub symbol_types: HashMap<SymbolId, SemanticTypeId>,
     pub pat_types: HashMap<luna_ast::PatId, SemanticTypeId>,
@@ -500,6 +501,7 @@ impl<'a> MonoCollector<'a> {
 
     fn take_root(&mut self) -> MonoRoot {
         MonoRoot {
+            return_type: None,
             expr_types: std::mem::take(&mut self.current_expr_types),
             symbol_types: std::mem::take(&mut self.current_symbol_types),
             pat_types: std::mem::take(&mut self.current_pat_types),

@@ -173,6 +173,14 @@ separate semantic domains and frozen safety rules. Unsafe does not disable
 ownership, moves, borrow checking, region validity, or provenance. Do not
 solve a failing case by globally weakening safety.
 
+Compile-time execution must obey the same safe move/loan/escape rules before
+the VM runs. Preserve the checked evaluation root and reachable concrete units;
+the driver orchestrates ordinary admission over that prepared program, and
+execution consumes the same verified IR. Checking only a materialized constant
+after evaluation cannot validate the original loans or moves. Keep VM effect,
+resource and pointer-escape guards as independent requirements, with direct
+invariant tests as well as source/artifact CLI acceptance.
+
 ### 5. Fix compiler defects generically
 
 When a user-visible compiler defect is found:

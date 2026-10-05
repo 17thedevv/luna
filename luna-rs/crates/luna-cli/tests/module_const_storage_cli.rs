@@ -61,7 +61,7 @@ fn module_constants_preserve_storage_across_native_portable_and_relocated_provid
             ("local_aggregate_escape", "E3005"),
             ("mutable_module", "E2023"),
             ("private_access", "E1001"),
-            ("comptime_pointer_escape", "E4005"),
+            ("comptime_pointer_escape", "E3005"),
         ] {
             let input = relocated.join(format!("{name}.ln"));
             fs::copy(fixtures.join(format!("{name}.ln")), &input).unwrap();

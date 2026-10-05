@@ -1414,11 +1414,18 @@ fn has_unresolved_projection(ctx: &SemanticContext, ty_id: SemanticTypeId) -> bo
     }
 }
 
-impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
-    fn eval_expr(&self, arena: &luna_ast::AstArena, ctx: &SemanticContext, source_manager: &luna_common::source::SourceManager, expr_id: luna_ast::ExprId) -> Result<ComptimeValue, ComptimeError> {
+/// Prepared MVIR is passed forward to driver-owned admission before execution.
+/// The driver must execute this same module after analysis/cleanup.
+pub struct PreparedComptime {
+    pub module: Module,
+    pub root: GlobalId,
+}
+
+impl MvirComptimeEngine {
+    pub fn prepare_expr(&self, arena: &luna_ast::AstArena, ctx: &SemanticContext, source_manager: &luna_common::source::SourceManager, expr_id: luna_ast::ExprId) -> Result<PreparedComptime, ComptimeError> {
         let expr = &arena.exprs[expr_id.0 as usize];
         if let luna_ast::Expr::Comptime { body } = expr {
-            return self.eval_stmt(arena, ctx, source_manager, *body);
+            return self.prepare_stmt(arena, ctx, source_manager, *body);
         }
         let ret_ty = ctx.tables.expr_types.get(&expr_id).copied().unwrap_or(luna_semantic::SemanticTypeId(0));
         if has_unresolved_projection(ctx, ret_ty) {
@@ -1427,6 +1434,18 @@ impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
         let mut generator = crate::generator::MvirGenerator::new(arena, ctx, source_manager);
         generator.is_comptime = true;
         let func = generator.generate_expr_as_function(&expr_id, ret_ty);
+        self.finish_preparation(generator, func, ctx)
+    }
+
+    pub fn prepare_stmt(&self, arena: &luna_ast::AstArena, ctx: &SemanticContext, source_manager: &luna_common::source::SourceManager, stmt_id: luna_ast::StmtId) -> Result<PreparedComptime, ComptimeError> {
+        let mut generator = crate::generator::MvirGenerator::new(arena, ctx, source_manager);
+        generator.is_comptime = true;
+        let return_type = ctx.comptime_root.as_ref().and_then(|root| root.return_type).unwrap_or(luna_semantic::SemanticTypeId(0));
+        let func = generator.generate_stmt_as_function(&stmt_id, return_type);
+        self.finish_preparation(generator, func, ctx)
+    }
+
+    fn finish_preparation(&self, mut generator: crate::generator::MvirGenerator<'_>, func: Function, ctx: &SemanticContext) -> Result<PreparedComptime, ComptimeError> {
         generator.generate_comptime_dependencies(&func);
         if !generator.diagnostics.is_empty() {
             return Err(ComptimeError::TypeMismatch(generator.diagnostics.iter().map(|d| d.message.clone()).collect::<Vec<_>>().join("; ")));
@@ -1434,10 +1453,19 @@ impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
         if func.values.iter().any(|v| has_unresolved_projection(ctx, v.ty)) {
             return Err(ComptimeError::TypeMismatch("E_UNRESOLVED_PROJECTION: comptime function contains unresolved associated type projection".to_string()));
         }
-        let mut interp = MvirInterpreter::new(generator.current_module(), ctx);
+        let mut module = generator.current_module().clone();
+        let root = func.name.clone();
+        module.functions.push(func);
+        Ok(PreparedComptime { module, root })
+    }
+
+    pub fn execute(&self, program: &PreparedComptime, ctx: &SemanticContext) -> Result<ComptimeValue, ComptimeError> {
+        let func = program.module.functions.iter().find(|function| function.name == program.root)
+            .ok_or_else(|| ComptimeError::SymbolNotFound(program.root.name.clone()))?;
+        let mut interp = MvirInterpreter::new(&program.module, ctx);
         interp.max_steps = self.max_steps;
         interp.max_depth = self.max_depth;
-        let val = interp.eval_function(&func, Vec::new())?;
+        let val = interp.eval_function(func, Vec::new())?;
         if !interp.heap.allocations.is_empty() {
             return Err(ComptimeError::ResourceLeak(format!(
                 "comptime evaluation leaked heap memory: {} unfreed allocation(s) at compile-time boundary",
@@ -1445,31 +1473,19 @@ impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
             )));
         }
         val.to_comptime_value(ctx)
+    }
+
+}
+
+// Low-level VM entry points are retained for interpreter invariants. Compiler
+// orchestration uses the driver's checked engine, including early borrow checks.
+impl luna_semantic::ComptimeEngine for MvirComptimeEngine {
+    fn eval_expr(&self, arena: &luna_ast::AstArena, ctx: &SemanticContext, source_manager: &luna_common::source::SourceManager, expr_id: luna_ast::ExprId) -> Result<ComptimeValue, ComptimeError> {
+        self.execute(&self.prepare_expr(arena, ctx, source_manager, expr_id)?, ctx)
     }
 
     fn eval_stmt(&self, arena: &luna_ast::AstArena, ctx: &SemanticContext, source_manager: &luna_common::source::SourceManager, stmt_id: luna_ast::StmtId) -> Result<ComptimeValue, ComptimeError> {
-        let mut generator = crate::generator::MvirGenerator::new(arena, ctx, source_manager);
-        generator.is_comptime = true;
-        let func = generator.generate_stmt_as_function(&stmt_id, luna_semantic::SemanticTypeId(0));
-        generator.generate_comptime_dependencies(&func);
-        if !generator.diagnostics.is_empty() {
-            return Err(ComptimeError::TypeMismatch(generator.diagnostics.iter().map(|d| d.message.clone()).collect::<Vec<_>>().join("; ")));
-        }
-        if func.values.iter().any(|v| has_unresolved_projection(ctx, v.ty)) {
-            return Err(ComptimeError::TypeMismatch("E_UNRESOLVED_PROJECTION: comptime function contains unresolved associated type projection".to_string()));
-        }
-        let mut interp = MvirInterpreter::new(generator.current_module(), ctx);
-        interp.max_steps = self.max_steps;
-        interp.max_depth = self.max_depth;
-        let val = interp.eval_function(&func, Vec::new())?;
-        if !interp.heap.allocations.is_empty() {
-            return Err(ComptimeError::ResourceLeak(format!(
-                "comptime evaluation leaked heap memory: {} unfreed allocation(s) at compile-time boundary",
-                interp.heap.allocations.len()
-            )));
-        }
-        val.to_comptime_value(ctx)
+        self.execute(&self.prepare_stmt(arena, ctx, source_manager, stmt_id)?, ctx)
     }
 }
-
 
