@@ -1,3 +1,6 @@
+#[path = "support/provider_parity.rs"]
+mod provider_parity;
+
 use luna_driver::{check, compile, CompilerOptions};
 use luna_driver::sysroot::Sysroot;
 use std::fs;
@@ -503,31 +506,9 @@ import <iter_collect>;
 /// B13: Binary .llib metadata parity between source and binary providers.
 #[test]
 fn test_b13_source_vs_llib_parity() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
     let dir = create_temp_dir("b13_parity");
-
-    let alloc_path = locate_canonical_alloc_ln();
-    let alloc_src = fs::read_to_string(&alloc_path).expect("Failed to read alloc.ln");
-
-    let out_llib = dir.join("box.llib");
-    let compile_opts = CompilerOptions {
-        output_path: Some(out_llib.to_string_lossy().to_string()),
-        emit_mlib: true,
-        no_link: true,
-        quiet: true,
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
-        is_sysroot_build: true,
-        ..Default::default()
-    };
-
-    let res_compile = compile(alloc_path.to_str().unwrap(), alloc_src, &compile_opts);
-    assert!(res_compile.is_ok(), "Compiling box.ln to box.llib must succeed: {:?}", res_compile.err());
-
-    // Sync canonical box.llib
-    let canonical_llib = locate_canonical_alloc_llib();
-    let tmp = canonical_llib.with_file_name(format!("{}.publish{}", canonical_llib.file_name().unwrap().to_string_lossy(), std::process::id()));
-    let _ = fs::copy(&out_llib, &tmp);
-    let _ = fs::rename(&tmp, &canonical_llib);
+    let pair = provider_parity::ProviderPair::new(&dir, "alloc/box.ln");
+    let sysroot = &pair.artifact;
 
     let consumer_src = r#"
         import <box>;
@@ -547,7 +528,7 @@ import <iter_collect>;
     fs::write(&consumer_path, consumer_src).unwrap();
 
     let consumer_opts = CompilerOptions {
-        search_paths: vec![dir.to_string_lossy().to_string()],
+        search_paths: vec![sysroot.root().to_string_lossy().into_owned()],
         quiet: true,
         no_link: true,
         ..Default::default()
@@ -558,6 +539,13 @@ import <iter_collect>;
         "Consumer compiling against binary alloc.llib must succeed: {:?}",
         res_consumer.err()
     );
+
+    let source_options = CompilerOptions {
+        search_paths: vec![pair.source.root().to_string_lossy().into_owned()],
+        ..consumer_opts
+    };
+    let source_result = check(consumer_path.to_str().unwrap(), consumer_src.to_string(), &source_options);
+    assert!(source_result.is_ok(), "source Box parity: {source_result:?}");
 }
 
 /// B14: No user-level Box semantic special cases remain in the compiler.

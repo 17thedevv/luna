@@ -1,3 +1,6 @@
+#[path = "support/provider_parity.rs"]
+mod provider_parity;
+
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -1072,29 +1075,9 @@ import <iter_collect>;
 /// C12: Source vs .llib Parity: run iter_collect_vec and iter_collect_hashmap against precompiled iter_collect.llib
 #[test]
 fn test_c12_collect_source_vs_llib_parity() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
     let dir = create_temp_dir("c12_parity");
-    let iter_collect_ln = locate_canonical_iter_collect_ln();
-    let iter_collect_src = fs::read_to_string(&iter_collect_ln).expect("Failed to read iter_collect.ln");
-
-    let out_llib = dir.join("iter_collect.llib");
-    let compile_opts = CompilerOptions {
-        output_path: Some(out_llib.to_string_lossy().to_string()),
-        emit_mlib: true,
-        no_link: true,
-        quiet: true,
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
-        is_sysroot_build: true,
-        ..Default::default()
-    };
-
-    let res_compile = compile(iter_collect_ln.to_str().unwrap(), iter_collect_src, &compile_opts);
-    assert!(res_compile.is_ok(), "Compiling iter_collect.ln to iter_collect.llib must succeed: {:?}", res_compile.err());
-
-    let canonical_llib = locate_canonical_iter_collect_llib();
-    let tmp = canonical_llib.with_file_name(format!("{}.publish{}", canonical_llib.file_name().unwrap().to_string_lossy(), std::process::id()));
-    let _ = fs::copy(&out_llib, &tmp);
-    let _ = fs::rename(&tmp, &canonical_llib);
+    let pair = provider_parity::ProviderPair::new(&dir, "alloc/iter_collect.ln");
+    let sysroot = &pair.artifact;
 
     let src = r#"
         import <core/panic>;
@@ -1175,6 +1158,11 @@ fn test_c12_collect_source_vs_llib_parity() {
         .expect("Execution must succeed");
 
     assert_eq!(code, 0, "C12 parity failed (code: {}, stderr: {})", code, stderr);
+
+    let mut source_options = opts.clone();
+    source_options.search_paths = vec![pair.source.root().to_string_lossy().into_owned()];
+    let source_result = run_binary_with_output(&dir, src, &source_options).expect("source provider execution");
+    assert_eq!((code, _stdout, stderr), source_result, "source/artifact observable parity");
 }
 
 /// C13: Borrowed-to-owned collection via map (&i32 -> Box<i32> -> Vec<Box<i32>>)

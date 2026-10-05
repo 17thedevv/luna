@@ -1,3 +1,6 @@
+#[path = "support/provider_parity.rs"]
+mod provider_parity;
+
 // =============================================================================
 // Stdlib Phase 04.5 std::HashSet<T> Acceptance Tests
 //
@@ -736,27 +739,9 @@ import <iter_collect>;
 /// 9. Source vs .llib Parity
 #[test]
 fn test_hashset_source_vs_llib_parity() {
-    let sysroot = Sysroot::discover_for_test().expect("sysroot required");
     let dir = create_temp_dir("set_parity");
-    let hashset_ln = locate_canonical_hashset_ln();
-    let hashset_src = fs::read_to_string(&hashset_ln).expect("Failed to read hashset.ln");
-
-    let out_llib = dir.join("hashset.llib");
-    let compile_opts = CompilerOptions {
-        output_path: Some(out_llib.to_string_lossy().to_string()),
-        emit_mlib: true,
-        no_link: true,
-        quiet: true,
-        search_paths: vec![sysroot.root().to_string_lossy().to_string()],
-        is_sysroot_build: true,
-        ..Default::default()
-    };
-
-    let res_compile = compile(hashset_ln.to_str().unwrap(), hashset_src, &compile_opts);
-    assert!(res_compile.is_ok(), "Compiling hashset.ln to hashset.llib must succeed: {:?}", res_compile.err());
-
-    let canonical_llib = locate_canonical_hashset_llib();
-    let _ = fs::copy(&out_llib, &canonical_llib);
+    let pair = provider_parity::ProviderPair::new(&dir, "alloc/hashset.ln");
+    let sysroot = &pair.artifact;
 
     let src = r#"
         import <core/panic>;
@@ -812,6 +797,11 @@ import <iter_collect>;
         .expect("Execution must succeed");
 
     assert_eq!(code, 0, "Parity test failed with code {} (stderr: {})", code, stderr);
+
+    let mut source_options = opts.clone();
+    source_options.search_paths = vec![pair.source.root().to_string_lossy().into_owned()];
+    let source_result = run_binary_with_output(&dir, src, &source_options).expect("source provider execution");
+    assert_eq!((code, _stdout, stderr), source_result, "source/artifact observable parity");
 }
 
 fn check_source_with_sysroot(
