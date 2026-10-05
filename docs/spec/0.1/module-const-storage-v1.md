@@ -13,6 +13,9 @@ acceptance do not certify the entire 0.1 compiler.
 The rule covers constants declared at file/module level. Visibility does not
 determine storage lifetime: a private module constant can be used by its
 defining functions. Existing visibility and const-admission rules still apply.
+Type annotations and initializers resolve in the constant declaration's lexical
+scope, including module-private types and shadowed names. Evaluation dependency
+order does not change that defining scope or the scope of later declarations.
 
 ```luna
 module values {

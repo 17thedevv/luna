@@ -1,0 +1,9 @@
+import "private_provider";
+fn main() -> i32 {
+    if *first::first_ref() != 7 { return 1; }
+    if first::total() != 20 { return 2; }
+    if *second::second_ref() != 23 { return 3; }
+    if second::flag() == false { return 4; }
+    if *roots::root_ref() != 100 { return 5; }
+    return 0;
+}
