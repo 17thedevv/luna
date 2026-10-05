@@ -14,6 +14,7 @@ fn casts_preserve_type_capability_and_unsafe_admission_in_both_provider_modes() 
         ("reference_reinterpret", "E2026"),
         ("unsafe_callable_erasure", "E2026"),
         ("generic_nominal_to_integer", "E2026"),
+        ("integer_to_rigid_generic", "E2026"),
         ("raw_reference_without_unsafe", "E2025"),
         ("private_direct_control", "E1003"),
         ("identity_move_reject", "E3001"),

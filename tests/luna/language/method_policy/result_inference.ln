@@ -1,8 +1,16 @@
+trait Construct { fn create() -> Self; }
+impl Construct for i64 { fn create() -> Self { return 0i64; } }
+struct Product { value: i32, padding: i64 };
+impl Construct for Product {
+    fn create() -> Self { return Product { value: 7, padding: 9i64 }; }
+}
 struct Token {};
-impl Token { fn zero<T>(self: &Self) -> T { return 0 as T; } }
+impl Token { fn zero<T: Construct>(self: &Self) -> T { return Construct::create(); } }
 fn main() -> i32 {
     dec token = Token {};
     dec result: i64 = token.zero();
+    dec product: Product = token.zero();
     if result != 0i64 { return 1; }
+    if product.value != 7 || product.padding != 9i64 { return 2; }
     return 0;
 }
