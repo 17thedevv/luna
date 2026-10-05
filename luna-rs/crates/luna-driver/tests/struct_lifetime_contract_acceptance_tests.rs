@@ -630,7 +630,7 @@ fn test_struct_life_17_llib_version_compatibility() {
 
     assert_eq!(CanonicalTypeLifetimeContract::CURRENT_VERSION, 1, "STRUCT-LIFE-17: Contract schema version must be 1");
     assert_eq!(LLIB_FORMAT_VERSION, 2, "RAW-STORAGE-ANCHOR reuses the outer format; the semantic metadata section has its own gate");
-    assert_eq!(SEMANTIC_METADATA_VERSION, 4, "public generic constraints require semantic metadata v4, retaining raw-pointer effects");
+    assert_eq!(SEMANTIC_METADATA_VERSION, 5, "ordered nominal representations require semantic metadata v5, retaining generic contracts and raw-pointer effects");
 
     // An artifact with an incompatible version (e.g. 999) must be rejected with VersionMismatch
     let mut header = LlibHeader::new();

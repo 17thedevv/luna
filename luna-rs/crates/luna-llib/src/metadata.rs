@@ -29,7 +29,7 @@ pub enum CanonicalLifetime {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 pub enum CanonicalType {
     Primitive(BuiltinType),
-    Struct(StableSymbolId, Vec<u32>, Vec<u32>), // trait bounds and generic arguments as type indices
+    Struct(StableSymbolId, Vec<u32>, Vec<u32>), // identity, arguments, legacy inline fields (normally empty)
     Enum(StableSymbolId, Vec<u32>, Vec<u32>),
     Tuple(Vec<u32>),
     Array(u32, u64),
@@ -56,6 +56,39 @@ pub struct CanonicalInterface {
     /// Trait definitions - using BTreeMap for deterministic iteration order.
     pub traits: BTreeMap<StableSymbolId, TraitDefinition>,
     pub impl_headers: Vec<ImplHeader>,
+    /// Ordered representations of owned nominals reachable from the interface,
+    /// including private types in public signatures. Identity stays nominal so
+    /// recursive pointer/reference graphs do not recursively serialize layouts.
+    pub nominal_layouts: BTreeMap<StableSymbolId, CanonicalNominalLayout>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CanonicalNominalLayout {
+    pub generic_params: Vec<StableSymbolId>,
+    pub constraints: GenericConstraints,
+    pub members: CanonicalNominalMembers,
+    pub lifetime_contract: Option<luna_semantic::CanonicalTypeLifetimeContract>,
+    pub raw_storage_anchor_contract: Option<luna_semantic::CanonicalRawStorageAnchorContract>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum CanonicalNominalMembers {
+    Struct(Vec<CanonicalNominalField>),
+    /// Position is the discriminant assigned by the language.
+    Enum(Vec<CanonicalNominalVariant>),
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CanonicalNominalField {
+    pub name: String,
+    pub ty: u32,
+    pub visibility: u8,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CanonicalNominalVariant {
+    pub name: String,
+    pub payload: u32,
 }
 
 impl CanonicalInterface {
@@ -203,6 +236,7 @@ mod raw_storage_anchor_interface_tests {
             types: Vec::new(),
             traits: BTreeMap::new(),
             impl_headers: Vec::new(),
+            nominal_layouts: BTreeMap::new(),
         }
     }
 

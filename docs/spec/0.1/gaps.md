@@ -225,3 +225,18 @@ Native target scope, runtime/toolchain coverage, broader ABI/layout domains and
 R5 clean-checkout/full-candidate gates remain open. The last full workspace run
 remains FAIL at de9977d; focused compiler10 passes do not replace it. See the
 [execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md).
+
+### Ordered nominal ABI identity — bounded follow-up, 2026-10-05
+
+Artifact-only reducers proved that reordered struct fields and enum variants
+shared fingerprints while stale code ran with the changed ABI (exit6 instead
+of exit0). Compiler11/metadata5 now include ordered, reachable nominal
+representations, including hidden types in public contracts, while keeping
+unreachable private changes outside public identity. Source/artifact/rebuilt
+native controls and typed stale-dependent rejection pass in the dedicated CLI
+suite; recursive identity, binder/body invariance and corruption checks are
+also recorded. This closes those reducers, not all ABI domains or the full
+release gate. The completed full workspace run at39a2a9b remains FAIL:
+1,262 pass, 34 fail, 1 ignored. Test isolation/oracle repairs subsequently pass
+96 focused cases. Closure cleanup and named/default calls remain open. See the
+[execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md).

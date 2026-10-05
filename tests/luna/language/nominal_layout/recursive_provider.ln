@@ -1,0 +1,6 @@
+struct Hidden<T> { next: *Hidden<T>, value: T, };
+struct Unreachable { field: i32, };
+module api {
+    export struct Visible<T> { nested: *Hidden<T>, marker: u8, };
+    export fn marker<T>(value: &Visible<T>) -> u8 { return value.marker; }
+}

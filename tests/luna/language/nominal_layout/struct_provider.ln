@@ -1,0 +1,4 @@
+module api {
+    export struct Record { a: i32, b: u64, };
+    export fn get_a(value: &Record) -> i32 { return value.a; }
+}

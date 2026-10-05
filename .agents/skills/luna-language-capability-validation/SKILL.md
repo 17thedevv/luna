@@ -118,6 +118,12 @@ cannot compensate for constraints omitted from the public dependency identity.
 Include unchanged-contract controls for generic binder renaming, declaration
 order and body edits which preserve public effects.
 
+Nominal ABI identity must include field order and enum discriminants/payloads,
+including private types reachable through public contracts. Test stale dependent
+execution after replacing a complete dependency bundle, recursive reachability,
+and unchanged-interface controls for unreachable private declarations. Stable
+names alone do not prove layout compatibility or grant private visibility.
+
 For target/artifact identity, compare the complete configured contract with
 both artifact header/manifest and actual embedded/selected object code. A format
 label alone does not prove architecture or sidecar identity. Cross-target

@@ -59,6 +59,7 @@ mod raw_anchor_validation_tests {
             types: vec![CanonicalType::Pointer(Mutability::Mutable, 1), CanonicalType::Primitive(BuiltinType::U8)],
             traits: BTreeMap::new(),
             impl_headers: Vec::new(),
+            nominal_layouts: BTreeMap::new(),
         }
     }
 
@@ -101,6 +102,7 @@ mod raw_anchor_validation_tests {
             types: vec![CanonicalType::Function { params: vec![1], return_type: 2 }],
             traits: BTreeMap::new(),
             impl_headers: Vec::new(),
+            nominal_layouts: BTreeMap::new(),
         };
         assert!(matches!(validate_raw_pointer_effects(&interface), Err(MlibError::CorruptedData)));
     }
@@ -144,6 +146,99 @@ pub fn validate_generic_contracts(interface: &crate::metadata::CanonicalInterfac
     for definition in interface.traits.values() {
         constraints(&definition.constraints, &definition.generic_params, len)?;
         if definition.methods.values().any(|&ty| ty as usize >= len) { return Err(MlibError::CorruptedData); }
+    }
+    for layout in interface.nominal_layouts.values() {
+        constraints(&layout.constraints, &layout.generic_params, len)?;
+    }
+    Ok(())
+}
+
+/// A nominal definition carries an ordered ABI contract independently of name
+/// lookup. Foreign definitions are validated in their owning dependencies.
+pub fn validate_nominal_layouts(interface: &crate::metadata::CanonicalInterface, provider: &str) -> Result<(), MlibError> {
+    use crate::metadata::{CanonicalType, CanonicalNominalMembers};
+    let len = interface.types.len();
+    fn visit(value: &crate::metadata::ExportedSymbol, interface: &crate::metadata::CanonicalInterface) -> Result<(), MlibError> {
+        match value.kind.as_str() {
+            "Struct" | "Enum" => {
+                let layout = interface.nominal_layouts.get(&value.symbol_id).ok_or(MlibError::CorruptedData)?;
+                match (&layout.members, value.kind.as_str()) {
+                    (CanonicalNominalMembers::Struct(fields), "Struct") => {
+                        for field in fields {
+                            let child = value.children.get(&field.name).ok_or(MlibError::CorruptedData)?;
+                            if child.ty_index != Some(field.ty) || child.visibility != field.visibility { return Err(MlibError::CorruptedData); }
+                        }
+                    }
+                    (CanonicalNominalMembers::Enum(variants), "Enum") => {
+                        for variant in variants {
+                            if !value.children.get(&variant.name).is_some_and(|child| child.kind == "EnumVariant") { return Err(MlibError::CorruptedData); }
+                        }
+                    }
+                    _ => return Err(MlibError::CorruptedData),
+                }
+            }
+            "EnumVariant" => {
+                let (owner, name) = value.symbol_id.symbol_path.rsplit_once("::").ok_or(MlibError::CorruptedData)?;
+                let identity = crate::metadata::StableSymbolId { provider_name: value.symbol_id.provider_name.clone(), symbol_path: owner.into() };
+                let layout = interface.nominal_layouts.get(&identity).ok_or(MlibError::CorruptedData)?;
+                if !matches!(&layout.members, CanonicalNominalMembers::Enum(variants) if variants.iter().any(|v| v.name == name)) {
+                    return Err(MlibError::CorruptedData);
+                }
+            }
+            _ => {}
+        }
+        for child in value.children.values() { visit(child, interface)?; }
+        Ok(())
+    }
+    for (identity, layout) in &interface.nominal_layouts {
+        if identity.provider_name != provider { return Err(MlibError::CorruptedData); }
+        let mut names = std::collections::HashSet::new();
+        match &layout.members {
+            CanonicalNominalMembers::Struct(fields) => {
+                for field in fields {
+                    if field.ty as usize >= len || field.visibility > 2 || !names.insert(&field.name) {
+                        return Err(MlibError::CorruptedData);
+                    }
+                }
+            }
+            CanonicalNominalMembers::Enum(variants) => {
+                if layout.raw_storage_anchor_contract.is_some() { return Err(MlibError::CorruptedData); }
+                for variant in variants {
+                    if variant.payload as usize >= len || !names.insert(&variant.name) {
+                        return Err(MlibError::CorruptedData);
+                    }
+                }
+            }
+        }
+        if let Some(contract) = &layout.raw_storage_anchor_contract {
+            if contract.version != luna_semantic::CanonicalRawStorageAnchorContract::CURRENT_VERSION {
+                return Err(MlibError::UnsupportedContractVersion(contract.version));
+            }
+            let CanonicalNominalMembers::Struct(fields) = &layout.members else { unreachable!() };
+            if contract.field_names.is_empty() || contract.field_names.windows(2).any(|pair| pair[0] >= pair[1])
+                || contract.field_names.iter().any(|name| !fields.iter().any(|field|
+                    &field.name == name && matches!(interface.types[field.ty as usize], CanonicalType::Pointer(..)))) {
+                return Err(MlibError::CorruptedData);
+            }
+        }
+    }
+    for ty in &interface.types {
+        match ty {
+            CanonicalType::Struct(identity, _, inline) | CanonicalType::Enum(identity, _, inline) => {
+                if !inline.is_empty() { return Err(MlibError::CorruptedData); }
+                if identity.provider_name == provider {
+                    let layout = interface.nominal_layouts.get(identity).ok_or(MlibError::CorruptedData)?;
+                    if matches!(ty, CanonicalType::Struct(..)) != matches!(layout.members, CanonicalNominalMembers::Struct(_)) {
+                        return Err(MlibError::CorruptedData);
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    for value in interface.exported_symbols.values() { visit(value, interface)?; }
+    for header in &interface.impl_headers {
+        for method in header.method_contracts.values() { visit(method, interface)?; }
     }
     Ok(())
 }
@@ -491,6 +586,10 @@ impl LlibReader {
             }
         }
         
+        if let Some(metadata) = &semantic_opt {
+            let manifest = manifest_opt.as_ref().ok_or(MlibError::CorruptedData)?;
+            validate_nominal_layouts(&metadata.interface, &manifest.identity.module_id)?;
+        }
         Ok((mlib_module, manifest_opt, obj_bytes_opt, semantic_opt))
     }
 

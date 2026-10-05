@@ -265,6 +265,9 @@ A feature can be marked **FROZEN** only after:
 - Create Rust stdlib tests simply because they are easier.
 - Test stdlib internals through private compiler APIs.
 - Modify expected outputs to hide semantic bugs.
+- Rebuild or replace artifacts in a shared canonical sysroot while other tests
+  consume it. Give mutation/parity tests isolated roots and keep `.llib`/object
+  bundles coherent; a source/artifact comparison must exercise both routes.
 - Add compiler magic for a single stdlib type.
 - Treat compilation success as proof of ownership correctness.
 - Treat runtime success as proof of lifetime correctness.

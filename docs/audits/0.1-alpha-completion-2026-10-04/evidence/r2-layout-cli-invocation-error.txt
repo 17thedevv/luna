@@ -1,0 +1,27 @@
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2024 which implies `resolver = "3"`
+  |
+  = note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+  = note: to use the edition 2024 resolver, specify `workspace.resolver = "3"` in the workspace root's manifest
+  = note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+error: no test target named `execution_dependency_cli` in `luna-cli` package
+help: available test targets:
+    alpha_modules_cli
+    artifact_execution_dependencies_cli
+    artifact_target_contract_cli
+    char_operator_cli_parity
+    char_scalar_cli_parity
+    compiler_trust_diagnostics_cli_parity
+    generic_drop_cli
+    generic_typing_cli
+    interface_constraints_cli
+    literal_typing_cli_parity
+    method_resolution_cli
+    module_const_storage_cli
+    nominal_layout_cli
+    semantic_maturity_phase0
+    semantic_maturity_phase2a
+    stdlib_format_cli_acceptance
+    struct_contract_cli_parity
+    trait_argument_bounds_cli
+    v01_arch_02_macro_decoupling_tests
+    v01_grammar_acceptance_tests

@@ -1,0 +1,5 @@
+import "provider";
+fn measure<T>(value: &T) -> u64 { return sizeof(T) as u64; }
+module client {
+    export fn read() -> i32 { return measure(api::record_ref()) as i32; }
+}

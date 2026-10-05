@@ -88,6 +88,7 @@ impl InterfaceDecoder {
         luna_llib::reader::validate_raw_storage_anchor_contracts(&self.interface)?;
         luna_llib::reader::validate_raw_pointer_effects(&self.interface)?;
         luna_llib::reader::validate_generic_contracts(&self.interface)?;
+        luna_llib::reader::validate_nominal_layouts(&self.interface, &self.provider_name)?;
         // Decode all types to populate type context first
         for i in 0..self.interface.types.len() {
             self.decode_type_index(i as u32);
@@ -233,6 +234,13 @@ impl InterfaceDecoder {
             impl_self_types.insert(key, self_type);
         }
 
+        let mut symbol_struct_field_names = HashMap::new();
+        for (identity, layout) in self.interface.nominal_layouts.clone() {
+            if let luna_llib::metadata::CanonicalNominalMembers::Struct(fields) = layout.members {
+                let symbol = self.allocate_sym(&identity);
+                symbol_struct_field_names.insert(symbol, fields.into_iter().map(|field| field.name).collect());
+            }
+        }
         Ok(ProviderInterface {
             id: self.provider_id,
             name: self.provider_name,
@@ -241,7 +249,7 @@ impl InterfaceDecoder {
             object_backed_functions: std::collections::HashSet::new(),
             exported_symbols,
             symbol_types,
-            symbol_struct_field_names: HashMap::new(),
+            symbol_struct_field_names,
             types: self.types,
             lang_items: HashMap::new(), // Not implemented in v1 SemanticMetadata
             generic_param_symbols,
@@ -351,7 +359,14 @@ impl InterfaceDecoder {
             "Constant" => luna_semantic::symbol::SymbolKind::Constant,
             "Struct" => luna_semantic::symbol::SymbolKind::Struct,
             "Enum" => luna_semantic::symbol::SymbolKind::Enum,
-            "EnumVariant" => luna_semantic::symbol::SymbolKind::EnumVariant(0),
+            "EnumVariant" => {
+                let (owner, variant) = exported.symbol_id.symbol_path.rsplit_once("::").expect("checked variant path");
+                let identity = StableSymbolId { provider_name: exported.symbol_id.provider_name.clone(), symbol_path: owner.to_string() };
+                let layout = &self.interface.nominal_layouts[&identity];
+                let luna_llib::metadata::CanonicalNominalMembers::Enum(variants) = &layout.members else { unreachable!("checked enum owner") };
+                let index = variants.iter().position(|v| v.name == variant).expect("checked enum variant");
+                luna_semantic::symbol::SymbolKind::EnumVariant(index as u32)
+            }
             "Trait" => luna_semantic::symbol::SymbolKind::Trait,
             "TraitMethod" => luna_semantic::symbol::SymbolKind::TraitMethod,
             "Alias" => luna_semantic::symbol::SymbolKind::Alias,

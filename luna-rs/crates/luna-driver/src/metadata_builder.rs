@@ -7,6 +7,7 @@ use luna_llib::metadata::{
     CanonicalRawPointerAnchorSource, CanonicalRawPointerEffect, CanonicalRawPointerEffects,
     CanonicalRawPointerOrigin, CanonicalTraitBound, CanonicalType, ExportedSymbol,
     GenericConstraints, ImplHeader, SemanticMetadata, StableSymbolId, TraitDefinition,
+    CanonicalNominalLayout, CanonicalNominalMembers, CanonicalNominalField, CanonicalNominalVariant,
 };
 use luna_mvir::GlobalId;
 use luna_semantic::ty::{SemanticType, SemanticTypeId};
@@ -19,6 +20,7 @@ pub struct MetadataBuilder<'a> {
     canonical_types: Vec<CanonicalType>,
     canonical_type_indices: HashMap<CanonicalType, u32>,
     scoped_symbols: HashMap<CanonicalSymbolId, StableSymbolId>,
+    nominal_queue: std::collections::BTreeMap<StableSymbolId, luna_common::ids::SymbolId>,
     raw_summaries: &'a HashMap<GlobalId, CallEffectSummary>,
 }
 
@@ -35,11 +37,20 @@ impl<'a> MetadataBuilder<'a> {
             canonical_types: Vec::new(),
             canonical_type_indices: HashMap::new(),
             scoped_symbols: HashMap::new(),
+            nominal_queue: Default::default(),
             raw_summaries,
         }
     }
 
     pub fn build(mut self) -> SemanticMetadata {
+        // Hidden types may be ABI-reachable. Their binders must be scoped before
+        // an exported signature or an ordered representation interns their types.
+        for symbol in &self.provider.internal_symbols {
+            if matches!(symbol.kind, luna_semantic::SymbolKind::Struct | luna_semantic::SymbolKind::Enum) {
+                let owner = self.convert_symbol_id(&self.provider.symbol_canonicals[&symbol.id]);
+                self.scope_parameters(&owner, &self.parameters(symbol.decl_id));
+            }
+        }
         // Assign binder identities before any type is interned in the public
         // registry. A binder belongs to a declaration and an ordinal, not T.
         for symbol in self.provider.exported_symbols.values() {
@@ -172,6 +183,7 @@ impl<'a> MetadataBuilder<'a> {
                 associated_types,
             });
         }
+        let nominal_layouts = self.build_nominal_layouts();
         SemanticMetadata {
             metadata_version: luna_llib::format::SEMANTIC_METADATA_VERSION,
             language_version: luna_llib::format::MLIB_COMPILER_VERSION,
@@ -182,7 +194,67 @@ impl<'a> MetadataBuilder<'a> {
                 types: self.canonical_types,
                 traits,
                 impl_headers,
+                nominal_layouts,
             },
+        }
+    }
+
+    fn build_nominal_layouts(&mut self) -> std::collections::BTreeMap<StableSymbolId, CanonicalNominalLayout> {
+        use luna_semantic::SymbolKind;
+        let mut layouts = std::collections::BTreeMap::new();
+        while let Some((identity, symbol)) = self.nominal_queue.pop_first() {
+            if layouts.contains_key(&identity) { continue; }
+            let definition = self.provider.internal_symbols.iter().find(|s| s.id == symbol)
+                .expect("owned nominal definition");
+            let parameters = self.parameters(definition.decl_id);
+            let ty = self.provider.types.get(self.provider.types.resolve(self.provider.symbol_types[&symbol])).clone();
+            let members = match ty {
+                SemanticType::Struct(_, _, fields) => {
+                    let names = &self.provider.symbol_struct_field_names[&symbol];
+                    assert_eq!(names.len(), fields.len(), "checked struct field order");
+                    CanonicalNominalMembers::Struct(names.iter().zip(fields).map(|(name, ty)| {
+                        let field = self.provider.internal_symbols.iter().find(|s|
+                            Some(s.scope) == definition.inner_scope && s.name == *name);
+                        CanonicalNominalField {
+                            name: name.clone(), ty: self.convert_type_id(ty),
+                            visibility: match field.map(|s| s.visibility) {
+                                Some(luna_ast::Visibility::Private) => 0,
+                                Some(luna_ast::Visibility::Internal) => 2,
+                                _ => 1,
+                            },
+                        }
+                    }).collect())
+                }
+                SemanticType::Enum(_, _, payloads) => {
+                    let mut variants: Vec<_> = self.provider.internal_symbols.iter().filter_map(|s| {
+                        if Some(s.scope) == definition.inner_scope {
+                            if let SymbolKind::EnumVariant(index) = s.kind { return Some((index, s.name.clone())); }
+                        }
+                        None
+                    }).collect();
+                    variants.sort_by_key(|(index, _)| *index);
+                    assert_eq!(variants.len(), payloads.len(), "checked enum variant order");
+                    CanonicalNominalMembers::Enum(variants.into_iter().zip(payloads).enumerate().map(|(ordinal, ((index, name), ty))| {
+                        assert_eq!(ordinal, index as usize, "checked enum discriminant");
+                        CanonicalNominalVariant { name, payload: self.convert_type_id(ty) }
+                    }).collect())
+                }
+                _ => unreachable!("nominal definition type"),
+            };
+            let layout = CanonicalNominalLayout {
+                generic_params: parameters.iter().map(|p| self.convert_symbol_id(&self.provider.symbol_canonicals[p])).collect(),
+                constraints: self.convert_constraints(&parameters), members,
+                lifetime_contract: self.provider.symbol_type_lifetime_contracts.get(&symbol).cloned(),
+                raw_storage_anchor_contract: self.provider.symbol_raw_storage_anchor_contracts.get(&symbol).cloned(),
+            };
+            layouts.insert(identity, layout);
+        }
+        layouts
+    }
+
+    fn queue_nominal(&mut self, symbol: luna_common::ids::SymbolId, identity: &StableSymbolId) {
+        if identity.provider_name == self.provider.name {
+            self.nominal_queue.insert(identity.clone(), symbol);
         }
     }
 
@@ -776,12 +848,14 @@ impl<'a> MetadataBuilder<'a> {
             SemanticType::Struct(sym_id, targs, _bounds) => {
                 let canon_sym = self.provider.symbol_canonicals.get(sym_id).unwrap();
                 let stable_id = self.convert_symbol_id(canon_sym);
+                self.queue_nominal(*sym_id, &stable_id);
                 let args = targs.iter().map(|t| self.convert_type_id(*t)).collect();
                 CanonicalType::Struct(stable_id, args, vec![])
             }
             SemanticType::Enum(sym_id, targs, _bounds) => {
                 let canon_sym = self.provider.symbol_canonicals.get(sym_id).unwrap();
                 let stable_id = self.convert_symbol_id(canon_sym);
+                self.queue_nominal(*sym_id, &stable_id);
                 let args = targs.iter().map(|t| self.convert_type_id(*t)).collect();
                 CanonicalType::Enum(stable_id, args, vec![])
             }

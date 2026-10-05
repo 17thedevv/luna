@@ -1,0 +1,9 @@
+module api {
+    export enum Color { Red, Blue, }
+    export fn score(value: Color) -> i32 {
+        match value {
+            Color::Red -> { return 7; }
+            Color::Blue -> { return 13; }
+        }
+    }
+}

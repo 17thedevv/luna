@@ -1,0 +1,129 @@
+{
+  "baseline": {
+    "identity": [
+      "",
+      "0.1.0",
+      "provider",
+      ""
+    ],
+    "target": [
+      "x86_64-pc-windows-gnu",
+      "alderlake",
+      "+prfchw,-cldemote,+avx,+aes,+sahf,+pclmul,-xop,+crc32,+xsaves,-avx512fp16,-usermsr,-sm4,+sse4.1,-avx512ifma,+xsave,-avx512pf,+sse4.2,-tsxldtrk,+ptwrite,-widekl,-sm3,+invpcid,+64bit,+xsavec,-avx10.1-512,-avx512vpopcntdq,+cmov,-avx512vp2intersect,-avx512cd,+movbe,-avxvnniint8,-avx512er,-amx-int8,-kl,-avx10.1-256,-sha512,+avxvnni,-rtm,+adx,+avx2,+hreset,+movdiri,+serialize,+vpclmulqdq,-avx512vl,-uintr,+clflushopt,-raoint,-cmpccxadd,+bmi,-amx-tile,+sse,+gfni,-avxvnniint16,-amx-fp16,+xsaveopt,+rdrnd,-avx512f,-amx-bf16,-avx512bf16,-avx512vnni,+cx8,-avx512bw,+sse3,-pku,+fsgsbase,-clzero,-mwaitx,-lwp,+lzcnt,+sha,+movdir64b,-wbnoinvd,-enqcmd,-prefetchwt1,-avxneconvert,-tbm,-pconfig,-amx-complex,+ssse3,+cx16,+bmi2,+fma,+popcnt,-avxifma,+f16c,-avx512bitalg,-rdpru,+clwb,+mmx,+sse2,+rdseed,-avx512vbmi2,-prefetchi,+rdpid,-fma4,-avx512vbmi,+shstk,+vaes,+waitpkg,-sgx,+fxsr,-avx512dq,-sse4a",
+      "COFF",
+      "llvm-default;layout=e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+    ],
+    "bits": 64,
+    "endian": "little",
+    "source": "37a518647dea4f4c56c414d09527b65ae69ce3c446ef77a301ff6b86f3c1d168",
+    "interface": "348d69bae2508722ff8e870e42519e3bda520d535207508f9cbeaf894b550f2b",
+    "execution": "0090dfcc20f7e070742263b3dbd5f32a167ca6ffab05cdbff366c46b849c7028",
+    "dependencies": [
+      [
+        "__lang_iterator",
+        "ecad1939f95d4032936515f5a4bbb67cbeaceaa5105690ea734cb0ec84d2c5e2",
+        null
+      ],
+      [
+        "__lang_drop",
+        "21d5a32a4e949779d7fd5462b2d63f66d39f27fd54f29128d878f4091a92aa2c",
+        null
+      ],
+      [
+        "core/panic",
+        "a503436c6cec16030e17697b4931bf6a5e877d0cd993230f60701f08a306fe21",
+        null
+      ],
+      [
+        "copy",
+        "58dbe9e65dffe6dbf4a9e99402d67e09ab13c8d7034f54a2d8ef19f6a4aa170c",
+        null
+      ],
+      [
+        "result",
+        "6de6ca70eed3beae4f1dca4bf0ec7f53fff23783034c386a4a949c3c9395ebd6",
+        null
+      ],
+      [
+        "__lang_into_iterator",
+        "5957e457fc3a9c70a9e2795778b065cc5b3e578c68871133ee53854deb866ad2",
+        null
+      ],
+      [
+        "__lang_option",
+        "b61e6e90f9fdd1a526203657c232cb66fe2bc926275e2247b10324b6f40e5174",
+        null
+      ],
+      [
+        "try",
+        "6b20ac3d85c0a4037ce126a403205a897440d10406eb5bc02054d30f5354cc81",
+        null
+      ]
+    ]
+  },
+  "reordered": {
+    "identity": [
+      "",
+      "0.1.0",
+      "provider",
+      ""
+    ],
+    "target": [
+      "x86_64-pc-windows-gnu",
+      "alderlake",
+      "+prfchw,-cldemote,+avx,+aes,+sahf,+pclmul,-xop,+crc32,+xsaves,-avx512fp16,-usermsr,-sm4,+sse4.1,-avx512ifma,+xsave,-avx512pf,+sse4.2,-tsxldtrk,+ptwrite,-widekl,-sm3,+invpcid,+64bit,+xsavec,-avx10.1-512,-avx512vpopcntdq,+cmov,-avx512vp2intersect,-avx512cd,+movbe,-avxvnniint8,-avx512er,-amx-int8,-kl,-avx10.1-256,-sha512,+avxvnni,-rtm,+adx,+avx2,+hreset,+movdiri,+serialize,+vpclmulqdq,-avx512vl,-uintr,+clflushopt,-raoint,-cmpccxadd,+bmi,-amx-tile,+sse,+gfni,-avxvnniint16,-amx-fp16,+xsaveopt,+rdrnd,-avx512f,-amx-bf16,-avx512bf16,-avx512vnni,+cx8,-avx512bw,+sse3,-pku,+fsgsbase,-clzero,-mwaitx,-lwp,+lzcnt,+sha,+movdir64b,-wbnoinvd,-enqcmd,-prefetchwt1,-avxneconvert,-tbm,-pconfig,-amx-complex,+ssse3,+cx16,+bmi2,+fma,+popcnt,-avxifma,+f16c,-avx512bitalg,-rdpru,+clwb,+mmx,+sse2,+rdseed,-avx512vbmi2,-prefetchi,+rdpid,-fma4,-avx512vbmi,+shstk,+vaes,+waitpkg,-sgx,+fxsr,-avx512dq,-sse4a",
+      "COFF",
+      "llvm-default;layout=e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+    ],
+    "bits": 64,
+    "endian": "little",
+    "source": "56377262a5b3aff65e969d9f3d3c47e9c0be02adfacac4a3f634c16d69be1708",
+    "interface": "348d69bae2508722ff8e870e42519e3bda520d535207508f9cbeaf894b550f2b",
+    "execution": "719541f0eff72fad4549aeee3208ac196da8dfbb45e549ceea3e3dc05b46f25b",
+    "dependencies": [
+      [
+        "__lang_into_iterator",
+        "5957e457fc3a9c70a9e2795778b065cc5b3e578c68871133ee53854deb866ad2",
+        null
+      ],
+      [
+        "result",
+        "6de6ca70eed3beae4f1dca4bf0ec7f53fff23783034c386a4a949c3c9395ebd6",
+        null
+      ],
+      [
+        "__lang_drop",
+        "21d5a32a4e949779d7fd5462b2d63f66d39f27fd54f29128d878f4091a92aa2c",
+        null
+      ],
+      [
+        "__lang_iterator",
+        "ecad1939f95d4032936515f5a4bbb67cbeaceaa5105690ea734cb0ec84d2c5e2",
+        null
+      ],
+      [
+        "__lang_option",
+        "b61e6e90f9fdd1a526203657c232cb66fe2bc926275e2247b10324b6f40e5174",
+        null
+      ],
+      [
+        "copy",
+        "58dbe9e65dffe6dbf4a9e99402d67e09ab13c8d7034f54a2d8ef19f6a4aa170c",
+        null
+      ],
+      [
+        "core/panic",
+        "a503436c6cec16030e17697b4931bf6a5e877d0cd993230f60701f08a306fe21",
+        null
+      ],
+      [
+        "try",
+        "6b20ac3d85c0a4037ce126a403205a897440d10406eb5bc02054d30f5354cc81",
+        null
+      ]
+    ]
+  },
+  "baseline_exit": 0,
+  "reordered_exit": 6,
+  "same_interface": true
+}

@@ -1,0 +1,5 @@
+struct Record { a: i32, b: u64, };
+const VALUE: Record = comptime { Record { a: 7, b: 13 as u64 } };
+module api {
+    export fn record_ref() -> &Record { return &VALUE; }
+}
