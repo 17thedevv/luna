@@ -61,12 +61,120 @@ must contribute to canonical interface identity. Defaults still require their
 full per-call definition-scope, ownership and portable-body contract; accepting
 syntax or a literal default is insufficient.
 
+### Implementation sequence after the arity prerequisite
+
+This is an implementation plan under the adopted contract, not a new language
+policy or a claim that the following stages are implemented.
+
+1. Introduce one semantic binding plan which maps each explicit source argument
+   to a declaration parameter ordinal. Keep the AST argument list in source
+   order. Candidate applicability, expected argument types and bounds consume
+   that mapping. Validate unknown/duplicate labels and positional-after-named
+   before selecting a method; use the trait declaration's signature for trait
+   calls. Structural callable values keep full positional arity.
+2. Carry the plan through provider extraction/injection, concrete mono calls
+   and MVIR lowering. Lower explicit expressions once in source order, then
+   pass values in parameter order. Test effect order and moves of user-owned
+   values: delayed operand loads must not let a later argument change an
+   earlier argument's value. Borrow and return effects use parameter ordinals.
+3. Include public parameter names and declaration capabilities in the canonical
+   callable interface. Keep structural function-type identity distinct from
+   declaration labels. Update schema/compatibility epochs when representation
+   changes, rebuild artifacts officially, and verify stale-dependent rejection
+   plus unchanged-body and binder-renaming controls.
+4. Add parameter default expressions to AST, relocation and lexical resolution.
+   Resolve in the defining scope with only earlier parameters available. Check
+   defaults under rigid generic binders and ordinary ownership/unsafe rules.
+   Cover invalid receiver defaults, required-after-default and later-parameter
+   references. Reconcile formal grammar and examples with the adopted syntax.
+5. Materialize only needed omission patterns while preserving a logical callee
+   parameter frame. Initialize provided parameters, evaluate omitted defaults
+   in declaration order, then execute the original body with its normal
+   move/drop/borrow machinery. The full-arity ABI remains unchanged; omission
+   entry identity includes its pattern and concrete generic substitution.
+   Avoid exponential eager specialization or zero/null stand-ins for absent
+   arguments. A forwarding wrapper alone is insufficient if moving a supplied
+   owner into another frame invalidates a default borrowing that owner.
+6. Preserve definition-site helpers, parameter/generic identities and default
+   bodies across relocated artifact-only providers. Map trait parameter roles
+   to implementation roles by ordinal, and derive actual omission-entry effects
+   rather than blindly copying full-arity lifetime parameter indices. Verify
+   private-helper hygiene, earlier-parameter borrowing, fresh owned defaults,
+   omitted/overridden side effects, move/escape negatives and public freshness.
+7. Run the full call-contract CLI matrix, focused regressions and a new immutable
+   workspace candidate. Record named and default dimensions separately until
+   both satisfy the complete contract; neither a parser pass nor this positional
+   arity repair closes CALL-ARGUMENTS-v1.
+
+## Positional arity repair and unsized diagnostic compatibility
+
+Ordinary function calls previously skipped semantic arity checks unless they
+were closures or memory intrinsics. The candidate validates every callable's
+required positional arity before lowering. Implicit receiver identity comes
+from the method declaration instead of being guessed from the supplied argument
+count. A structural function-pointer field remains an ordinary callable.
+Explicitly variadic declarations retain their fixed-prefix minimum at semantic
+checking; this does not claim native variadic ABI support.
+
+The initial arity candidate passes 195 semantic tests, the method and cast
+matrices, and the new arity CLI matrix: 52 typed check/build rejections plus two
+native controls in fresh source/artifact modes. A check-only variadic control
+passes in both modes. The memory/callable suite passes 3/3 through Cargo.
+[Its exact pin and commands](evidence/call-arity/verification-exit.json.gz) are
+retained along with [the Cargo memory retry](evidence/call-arity/memory-cargo-exit.json.gz).
+The initial verification script incorrectly tried to compile that dependency-
+using memory harness with bare rustc; its failed compile/log remain preserved.
+No compiler failure is inferred from that missing-harness-dependency error.
+
+The completed workspace also exposed a compatibility regression in cast
+diagnostics: rejecting a cast to an unsized value lost the existing
+`E_UNSIZED_TYPE_IN_VALUE_POSITION` category and TypeMismatch code. The amended
+candidate restores that classification using the semantic target type while
+keeping centralized cast rejection and poison propagation. The original driver
+oracle is unchanged; all 14 adversarial raw/dyn driver tests now pass. A new
+public `unsized_value.ln` rejection is included in the cast CLI suite. The
+[amended pin](evidence/call-final/start.json.gz) separates this diagnostic change
+from the earlier arity evidence; final cast/span/char results are recorded with
+that candidate, not retroactively assigned to the initial one.
+
+The amended candidate builds its canonical sysroot and passes all three CLI
+cast, UTF-8/tab span and char suites, with inputs/runtime unchanged. The
+[terminal report](evidence/call-final/exit.json.gz) records its new binary hash,
+the 14 driver and three CLI passes, and exact command/log hashes.
+
+Compiler/library boundary: this is generic callable validation and unsized
+diagnostic handling, benefiting arbitrary user functions/types. No library
+name/layout, intrinsic, lang item, artifact schema or native ABI is added.
+SKILL IMPACT: a minimal testing-strategy refinement requires check/build arity
+agreement and preserving the original purpose when repairing generic fixtures.
+
 ## Workspace evidence limitation
 
 The workspace run started with 1246 tracked inputs pinned to e3b4402. During
 the run, the shared checkout moved to an LSP branch and eight pinned files
 changed, including Cargo configuration, the CLI entrypoint, SourceManager and
-driver files. Its eventual raw result must be preserved with those differences;
-it cannot certify an immutable e3b4402 candidate. This work stays in an isolated
-checkout based on e3b4402. Closure cleanup, defaults and broader R3–R5 gates
-remain open.
+driver files. Its raw result is preserved with those differences. The run ends
+exit101 with 1311 passed, three reported failed, one ignored and **four failed
+targets**. The generic-drop target exits abnormally without a test-result
+summary, so the reported test counts do not count every failed target. Span
+acceptance fails during its fresh sysroot child process (0xffffffff);
+generic-drop's harness also ends 0xffffffff. Their underlying causes are not
+established by that log. Method resolution exposes the two invalid generic
+fixtures repaired above; the driver raw/dyn suite exposes the unsized diagnostic
+classification loss. Neither focused fixes nor unexplained process exits
+rewrite the raw verdict.
+
+[Start pin](evidence/workspace-cast-start.json.gz),
+[terminal report](evidence/workspace-cast-exit.json.gz) and
+[complete log](evidence/workspace-cast.txt.gz) retain that run. It cannot certify
+an immutable e3b4402 candidate. This work stays in an isolated checkout based on
+e3b4402. No shared LSP branch changes are merged or overwritten.
+
+The immutable Ubuntu e3b4402 platform workflow also fails: its workspace command
+is fail-fast and stops on `closure_capture`, native exit3 in both modes.
+[Complete job log](evidence/call-arity/ci-e3b-job-111721303256.json.gz) and
+[job statuses](evidence/call-arity/ci-e3b-jobs.json.gz) are retained. Runtime ABI
+on Ubuntu/macOS, Ubuntu ASan and whole-file I/O on both platforms pass within
+their job scopes. The 1a9ea27 workflows were still running at the recorded
+snapshot; no later verdict is inferred. Closure cleanup, defaults and broader
+R3–R5 gates remain open.

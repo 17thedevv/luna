@@ -1,0 +1,12 @@
+module calls {
+    export fn subtract(left: i32, right: i32) -> i32 { return left - right; }
+    export fn first<T>(left: T, right: T) -> T { return left; }
+    export struct Counter {};
+    export trait Operation {
+        fn subtract(self: &Self, left: i32, right: i32) -> i32;
+    }
+    impl Operation for Counter {
+        fn subtract(self: &Self, left: i32, right: i32) -> i32 { return left - right; }
+    }
+    export extern fn parameter_probe(first: i32, ...) -> i32;
+}

@@ -87,6 +87,17 @@ tests/luna/
 
 Tests must use the same public surface available to an end-user Luna program.
 
+Callable acceptance should verify `check` and `build` agree on rejection of
+missing required or excess arguments before backend emission. Keep valid
+full-arity direct, generic and opaque-call controls. Named/default binding has
+its own adopted contract; positional arity evidence does not establish it.
+
+When correcting an obsolete generic fixture, preserve the phenomenon it was
+intended to test (for example, inference from the expected return type).
+Construct generic values through arguments or declared bounds, rather than
+fabricating an arbitrary `T` with `0 as T`. Retain the invalid original as a
+negative case and exercise more than one concrete instantiation.
+
 **Typical Verification Flow:**
 ```
 .ln source

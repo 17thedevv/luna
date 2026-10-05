@@ -1,0 +1,6 @@
+import "arity_provider";
+struct Handler { operation: fn(i32, i32) -> i32 };
+fn main() -> i32 {
+    dec handler = Handler { operation: calls::subtract };
+    return (handler.operation)(9, 2, 1);
+}

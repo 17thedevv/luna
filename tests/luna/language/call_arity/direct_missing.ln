@@ -1,0 +1,2 @@
+import "arity_provider";
+fn main() -> i32 { return calls::subtract(9); }

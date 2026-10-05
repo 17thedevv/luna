@@ -1422,7 +1422,16 @@ source/artifact roots. The invalid cast remains a permanent rejection fixture.
 
 Eleven independent call probes establish ignored labels, wrong native results,
 semantic arity gaps and absent defaults. These requirements remain incomplete.
-The currently running full workspace is not an immutable candidate: eight
+The completed full workspace is not an immutable candidate: eight
 start-pinned inputs changed when the shared checkout moved to the LSP branch.
-Preserve the eventual raw verdict and changed-input report without converting
-focused passes into a workspace or release PASS.
+The terminal report preserves 1311/3/1 and exit101 across four failed targets,
+including a harness which exits without a test-result summary. Raw logs are
+linked in CALL-ARGUMENTS-GATE; focused passes do not establish workspace PASS.
+
+The isolated positional-arity candidate passes 195 semantic tests, method/cast
+and arity CLI matrices plus the 3/3 memory/callable suite. Missing/excess ordinary
+calls now reject at the semantic boundary. A further diagnostic-only amendment
+restores the retained unsized-value cast category without weakening rejection;
+the unchanged adversarial driver suite passes 14/14. Final cast/span/char checks
+have their own pin. Named/defaults remain incomplete, and the immutable Ubuntu
+e3b4402 workspace independently fails owned closure capture in both modes.
