@@ -1,0 +1,1 @@
+#[lang("drop_in_place")] unsafe intrinsic fn destroy<T>(p: *rw T); fn main() {}

@@ -1,0 +1,1 @@
+import "provider"; fn main() { dec callback = ordinary::return_dangerous(); callback(1); }

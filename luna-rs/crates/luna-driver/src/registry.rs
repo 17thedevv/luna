@@ -418,6 +418,22 @@ impl ModuleRegistry {
                 by_name_map.get(&(canonical.provider_id, canonical.name.clone())).copied()
             };
 
+        // Explicit imports carry checked language-hook identity as well. This
+        // does not autoload providers or add any namespace/prelude visibility.
+        for interface in self.interfaces.values() {
+            for (&item, canonical) in &interface.lang_items {
+                if !item.is_memory_intrinsic() || canonical.provider_id != interface.id {
+                    continue;
+                }
+                if let Some(symbol) = resolve_canonical(canonical) {
+                    if ctx.lang_items.get(item) != Some(symbol) {
+                        let span = ctx.symbol_table.get_symbol(symbol).span;
+                        ctx.lang_items.register(item, symbol, item.target(), span, &mut ctx.diagnostics);
+                    }
+                }
+            }
+        }
+
         // Now inject types
         for interface in self.interfaces.values() {
             let lookup_sym = |sym: luna_common::ids::SymbolId| -> luna_common::ids::SymbolId {

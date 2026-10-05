@@ -16,6 +16,7 @@ pub struct MvirGenerator<'a> {
     
     // Track local variables to their Alloca ValueId
     locals: HashMap<luna_common::ids::SymbolId, ValueId>,
+    known_function_values: HashMap<luna_common::ids::SymbolId, GlobalId>,
     lexical_scopes: Vec<Vec<luna_common::ids::SymbolId>>,
     temporary_drop_scopes: Vec<Vec<(ValueId, luna_semantic::SemanticTypeId)>>,
     loop_scopes: Vec<usize>,
@@ -48,6 +49,7 @@ impl<'a> MvirGenerator<'a> {
             current_block: None,
             next_label_id: 0,
             locals: HashMap::new(),
+            known_function_values: HashMap::new(),
             lexical_scopes: Vec::new(),
             temporary_drop_scopes: Vec::new(),
             loop_scopes: Vec::new(),
@@ -465,6 +467,7 @@ impl<'a> MvirGenerator<'a> {
         self.current_function = Some(func);
         self.current_block = None;
         self.locals.clear();
+        self.known_function_values.clear();
         self.lexical_scopes.clear();
         self.temporary_drop_scopes.clear();
         self.loop_scopes.clear();
@@ -774,8 +777,20 @@ impl<'a> MvirGenerator<'a> {
             Item::Decl(decl_id) => {
                 let decl = &self.arena.decls[decl_id.0 as usize];
                 match decl {
-                    Decl::Var { name, initializer, pattern, .. } => {
+                    Decl::Var { name, initializer, pattern, is_mutable, .. } => {
                         let init_op = initializer.as_ref().map(|init_expr| self.generate_expr(init_expr));
+                        if !*is_mutable {
+                            if let (Some(pattern), Some(Operand::Global(function))) = (pattern, &init_op) {
+                                if matches!(self.arena.pats.get(pattern.0 as usize), Some(luna_ast::Pattern::Identifier { .. })) {
+                                    if let Some(&symbol) = self.ctx.tables.pat_symbols.get(pattern) {
+                                        if self.get_symbol_type(&symbol).is_some_and(|ty|
+                                            matches!(self.ctx.types.get(ty), luna_semantic::SemanticType::Function { .. })) {
+                                            self.known_function_values.insert(symbol, function.clone());
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         
                         let prev_span = self.current_span.clone();
                         self.current_span = Some(*name);
@@ -1255,6 +1270,7 @@ impl<'a> MvirGenerator<'a> {
                 values: Vec::new(),
             });
             self.locals.clear();
+            self.known_function_values.clear();
             self.lexical_scopes.clear();
             self.temporary_drop_scopes.clear();
             self.loop_scopes.clear();
@@ -1354,7 +1370,7 @@ impl<'a> MvirGenerator<'a> {
                     fn_name = self.ctx.symbol_table.symbols[sym_id.0 as usize].name.clone();
                 }
                 if let Some(fn_ty_id) = self.get_symbol_type(&sym_id) {
-                    if let luna_semantic::SemanticType::Function { return_type, params } = self.ctx.types.get(fn_ty_id) {
+                    if let luna_semantic::SemanticType::Function { return_type, params, .. } = self.ctx.types.get(fn_ty_id) {
                         ret_ty_id = *return_type;
                         param_types = params.clone();
                     }
@@ -1417,7 +1433,7 @@ impl<'a> MvirGenerator<'a> {
                     fn_name = self.ctx.symbol_table.symbols[sym_id.0 as usize].name.clone();
                 }
                 if let Some(fn_ty_id) = self.get_symbol_type(&sym_id) {
-                    if let luna_semantic::SemanticType::Function { return_type, params } = self.ctx.types.get(fn_ty_id) {
+                    if let luna_semantic::SemanticType::Function { return_type, params, .. } = self.ctx.types.get(fn_ty_id) {
                         ret_ty_id = *return_type;
                         resolved_param_types = Some(params.clone());
                     }
@@ -1456,7 +1472,9 @@ impl<'a> MvirGenerator<'a> {
 
             let is_async = if let Decl::Function { is_async, .. } = decl { *is_async } else { false };
 
-            let is_extern = body.is_none() || {
+            let memory_intrinsic = sym_id_opt.and_then(|symbol| self.ctx.lang_items.from_symbol(symbol))
+                .filter(|item| item.is_memory_intrinsic());
+            let is_extern = (body.is_none() && memory_intrinsic.is_none()) || {
                 instance.instance.subst.is_empty() && !self.is_comptime
                     && sym_id_opt.is_some_and(|symbol| self.ctx.tables.object_backed_functions.contains(&symbol))
             };
@@ -1482,6 +1500,7 @@ impl<'a> MvirGenerator<'a> {
             }
 
             self.locals.clear();
+            self.known_function_values.clear();
             self.lexical_scopes.clear();
             self.temporary_drop_scopes.clear();
             self.loop_scopes.clear();
@@ -1525,7 +1544,9 @@ impl<'a> MvirGenerator<'a> {
                 self.current_async_future = None;
             }
             
-            if let Some(body_stmt) = body {
+            if let Some(item) = memory_intrinsic {
+                self.generate_memory_intrinsic_body(item, decl, ret_ty_id);
+            } else if let Some(body_stmt) = body {
                 self.generate_fn_body(&body_stmt, ret_ty_id);
             }
             
@@ -1534,6 +1555,53 @@ impl<'a> MvirGenerator<'a> {
             }
         }
         self.current_instance = None;
+    }
+
+    fn generate_memory_intrinsic_body(&mut self, item: luna_semantic::lang_item::LangItem,
+        decl: &Decl, return_type: luna_semantic::SemanticTypeId) {
+        use luna_semantic::{SemanticType, lang_item::LangItem};
+        let result = (|| {
+            let Decl::Function { params, .. } = decl else { return Err("missing declaration"); };
+            let mut operands = Vec::new();
+            let mut types = Vec::new();
+            for parameter in params {
+                let symbol = self.ctx.tables.decl_symbols.get(parameter).ok_or("missing parameter symbol")?;
+                let ty = self.get_symbol_type(symbol).ok_or("missing parameter type")?;
+                let storage = self.locals.get(symbol).copied().ok_or("missing parameter storage")?;
+                let value = self.push_inst(Instruction::Load { ptr: Operand::Value(storage) }, ty);
+                operands.push(Operand::Value(value));
+                types.push(ty);
+            }
+            match item {
+                LangItem::DropInPlace if operands.len() == 1 => {
+                    let SemanticType::Pointer(_, element) = self.ctx.types.get(types[0]) else {
+                        return Err("drop operand is not a pointer");
+                    };
+                    let element = *element;
+                    if self.ctx.needs_drop(element) {
+                        let callee = self.get_drop_glue_global_id(element);
+                        self.push_inst(Instruction::Drop { value: operands[0].clone(), callee, ty: element }, element);
+                    }
+                    Ok(None)
+                }
+                LangItem::SliceFromRawParts | LangItem::SliceFromRawPartsMut if operands.len() == 2 => {
+                    let value = self.push_inst(Instruction::MakeSlice {
+                        data_ptr: operands[0].clone(), len: operands[1].clone(),
+                    }, return_type);
+                    Ok(Some(Operand::Value(value)))
+                }
+                _ => Err("incorrect intrinsic arity or kind"),
+            }
+        })();
+        match result {
+            Ok(value) => self.terminate_block(Terminator::Ret { value }),
+            Err(message) => {
+                self.diagnostics.push(luna_common::Diagnostic::error(format!(
+                    "memory intrinsic lowering invariant: {message}"))
+                    .with_code(luna_common::DiagnosticCode::BackendInvariantViolation));
+                self.terminate_block(Terminator::Unreachable);
+            }
+        }
     }
 
     // Transfer the return place before scope cleanup. In particular, returning
@@ -1802,14 +1870,14 @@ impl<'a> MvirGenerator<'a> {
                                 false_target: end_label.clone(),
                             });
                         } else {
-                            // No condition → infinite loop (always true)
+                            // No condition -> infinite loop (always true)
                             self.terminate_block(Terminator::Br { target: body_label.clone() });
                         }
                         
                         // Body
                         self.start_block(body_label.clone());
                         
-                        // Push loop targets: break→end, continue→step
+                        // Push loop targets: break -> end, continue -> step
                         self.loop_scopes.push(self.lexical_scopes.len());
                         self.loop_break_targets.push(end_label.clone());
                         self.loop_continue_targets.push(step_label.clone());
@@ -2404,39 +2472,36 @@ impl<'a> MvirGenerator<'a> {
                     let callee_ty_id = self.ctx.tables.expr_types.get(callee).copied().unwrap_or(luna_semantic::SemanticTypeId(0));
                     let is_closure = matches!(self.ctx.types.get(callee_ty_id), luna_semantic::SemanticType::Closure(..));
                     
-                    if let Operand::Global(ref id) = callee_op {
-                        if id.name.contains("slice_from_raw_parts") {
-                            let slice_val = self.push_inst(Instruction::MakeSlice {
-                                data_ptr: arg_ops[0].clone(),
-                                len: arg_ops[1].clone(),
+                    let intrinsic = match &callee_op {
+                        Operand::Global(function) => function.symbol_id.and_then(|symbol| self.ctx.lang_items.from_symbol(symbol)),
+                        _ => None,
+                    };
+                    use luna_semantic::lang_item::LangItem;
+                    match intrinsic {
+                        Some(LangItem::SliceFromRawParts | LangItem::SliceFromRawPartsMut) if arg_ops.len() == 2 => {
+                            let value = self.push_inst(Instruction::MakeSlice {
+                                data_ptr: arg_ops[0].clone(), len: arg_ops[1].clone(),
                             }, ty_id);
-                            return Operand::Value(slice_val);
+                            return Operand::Value(value);
                         }
-                        if id.name.ends_with("drop_in_place") || id.name.contains("drop_in_place") {
-                            let mut pointee_ty = None;
-                            if !args.is_empty() {
-                                let arg_expr = &args[0].value;
-                                let arg_ty_id = self.ctx.tables.expr_types.get(arg_expr).copied().unwrap_or(luna_semantic::SemanticTypeId(0));
-                                if let luna_semantic::SemanticType::Pointer(_, inner) = self.ctx.types.get(arg_ty_id) {
-                                    pointee_ty = Some(*inner);
+                        Some(LangItem::DropInPlace) if arg_ops.len() == 1 => {
+                            let argument_type = self.get_expr_type(&args[0].value);
+                            if let luna_semantic::SemanticType::Pointer(_, element) = self.ctx.types.get(argument_type) {
+                                let element = *element;
+                                if self.ctx.needs_drop(element) {
+                                    let callee = self.get_drop_glue_global_id(element);
+                                    self.push_inst(Instruction::Drop { value: arg_ops[0].clone(), callee, ty: element }, element);
                                 }
-                                if let Some(inst_ptr) = self.current_instance {
-                                    let inst = unsafe { &*inst_ptr };
-                                    if let Some(&mono_ty) = inst.expr_types.get(arg_expr) {
-                                        if let luna_semantic::SemanticType::Pointer(_, inner) = self.ctx.types.get(mono_ty) {
-                                            pointee_ty = Some(*inner);
-                                        }
-                                    }
-                                }
+                                return Operand::Number("0".to_string());
                             }
-                            if let Some(elem_ty) = pointee_ty {
-                                if self.ctx.needs_drop(elem_ty) {
-                                    let callee = self.get_drop_glue_global_id(elem_ty);
-                                    self.push_inst(Instruction::Drop { value: arg_ops[0].clone(), callee, ty: elem_ty }, elem_ty);
-                                }
-                            }
-                            return Operand::Number("0".to_string());
+                            self.diagnostics.push(luna_common::Diagnostic::error("drop intrinsic operand is not a checked pointer")
+                                .with_code(luna_common::DiagnosticCode::BackendInvariantViolation));
                         }
+                        Some(item) if item.is_memory_intrinsic() => {
+                            self.diagnostics.push(luna_common::Diagnostic::error("memory intrinsic call has incorrect checked arity")
+                                .with_code(luna_common::DiagnosticCode::BackendInvariantViolation));
+                        }
+                        _ => {}
                     }
 
                     let call_val = self.push_inst(if is_closure {
@@ -2446,15 +2511,10 @@ impl<'a> MvirGenerator<'a> {
                             Operand::Global(mut id) => {
                                 if let Some(canonical_name) = self.resolve_mono_call_name(expr_id, &id.name) {
                                     id.name = canonical_name;
-                                } else if let Some(sym_id) = id.symbol_id {
-                                    if let Some(decl_id) = self.ctx.symbol_table.get_symbol(sym_id).decl_id {
-                                        let canonical_id = luna_semantic::CanonicalInstanceIdentity {
-                                            kind: luna_semantic::CanonicalInstanceKind::Decl(decl_id),
-                                            subst: Vec::new(),
-                                        };
-                                        id.name = canonical_id.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, &id.name);
-                                    }
                                 }
+                                // Global operands already carry their canonical instance name.
+                                // An immutable function value may select a generic instance at
+                                // its initializer, without a new substitution at this call.
                                 Instruction::CallDirect { callee: id, args: arg_ops }
                             }
                             _ => Instruction::CallIndirect { callee: callee_op, args: arg_ops },
@@ -2465,6 +2525,9 @@ impl<'a> MvirGenerator<'a> {
             }
             Expr::Identifier { segments, .. } => {
                 if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id).copied() {
+                    if let Some(function) = self.known_function_values.get(&sym_id) {
+                        return Operand::Global(function.clone());
+                    }
                     if let Some(&val_id) = self.locals.get(&sym_id) {
                         // Let's check if the local is a pointer. Wait, locals is a map to Alloca.
                         // Wait, what if sym_id is EnumVariant? Locals won't have it.

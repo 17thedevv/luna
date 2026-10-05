@@ -1,0 +1,26 @@
+{
+  "revision": "9e45ca96f58e7e735cc9b2ed007d25c43a3be260",
+  "cli_sha256": "99df144d81805edbf5da5abc1766648eae6e68a402b3c7daae8c7dd9e773fe94",
+  "records": [
+    {
+      "fixture": "drop_substring",
+      "expected_native_exit": 0,
+      "check_exit": 0,
+      "build_exit": 0,
+      "native_exit": 4294967284
+    },
+    {
+      "fixture": "drop_exact",
+      "expected_native_exit": 0,
+      "check_exit": 0,
+      "build_exit": 0,
+      "native_exit": 4294967284
+    },
+    {
+      "fixture": "slice_exact",
+      "expected_native_exit": 0,
+      "check_exit": 101,
+      "build_exit": 101
+    }
+  ]
+}

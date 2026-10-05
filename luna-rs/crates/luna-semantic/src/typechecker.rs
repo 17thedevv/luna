@@ -285,7 +285,7 @@ impl<'a> TypeChecker<'a> {
                 }
                 Ok(())
             }
-            (SemanticType::Function { params: p1, return_type: r1 }, SemanticType::Function { params: p2, return_type: r2 }) if p1.len() == p2.len() => {
+            (SemanticType::Function { params: p1, return_type: r1, is_unsafe: u1 }, SemanticType::Function { params: p2, return_type: r2, is_unsafe: u2 }) if p1.len() == p2.len() && u1 == u2 => {
                 for (a1, a2) in p1.into_iter().zip(p2.into_iter()) {
                     self.unify(a1, a2)?;
                 }
@@ -363,7 +363,7 @@ impl<'a> TypeChecker<'a> {
             SemanticType::Primitive(_) | SemanticType::Void => Ok(()),
             SemanticType::Pointer(_, _) => Ok(()),
             SemanticType::Reference(_, _, _inner) => Ok(()),
-            SemanticType::Function { ref params, return_type } => {
+            SemanticType::Function { ref params, return_type, .. } => {
                 for &p in params {
                     self.is_ffi_safe_param(p)?;
                 }
@@ -409,7 +409,7 @@ impl<'a> TypeChecker<'a> {
             SemanticType::Reference(..) => {
                 Err("Extern function returning safe reference is not supported without an explicit lifetime contract".to_string())
             }
-            SemanticType::Function { ref params, return_type } => {
+            SemanticType::Function { ref params, return_type, .. } => {
                 for &p in params {
                     self.is_ffi_safe_param(p)?;
                 }
@@ -457,7 +457,7 @@ impl<'a> TypeChecker<'a> {
             SemanticType::Reference(..) => {
                 Err("By-value aggregate containing safe reference is not supported across FFI boundary".to_string())
             }
-            SemanticType::Function { ref params, return_type } => {
+            SemanticType::Function { ref params, return_type, .. } => {
                 for &p in params {
                     self.is_ffi_safe_param(p)?;
                 }
@@ -492,7 +492,7 @@ impl<'a> TypeChecker<'a> {
         let resolved_id = self.ctx.types.resolve(ty_id);
         let ty = self.ctx.types.get(resolved_id).clone();
         match ty {
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, .. } => {
                 for p in params {
                     self.is_ffi_safe_param(p)?;
                 }
@@ -803,7 +803,7 @@ impl<'a> TypeChecker<'a> {
                     ty_id
                 }
             }
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, is_unsafe } => {
                 let mut changed = false;
                 let mut new_params = Vec::with_capacity(params.len());
                 for p in params {
@@ -814,7 +814,7 @@ impl<'a> TypeChecker<'a> {
                 let nr = self.normalize_type(return_type);
                 if nr != return_type { changed = true; }
                 if changed {
-                    self.ctx.types.intern(SemanticType::Function { params: new_params, return_type: nr })
+                    self.ctx.types.intern(SemanticType::Function { params: new_params, return_type: nr, is_unsafe })
                 } else {
                     ty_id
                 }
@@ -1900,7 +1900,7 @@ impl<'a> TypeChecker<'a> {
                         } else {
                             ret_ty
                         };
-                        let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty });
+                        let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                         if let Some(sym_id) = sym_id_opt {
                             self.ctx.tables.symbol_types.insert(sym_id, func_ty);
                             self.ctx.tables.function_effects.entry(sym_id).or_insert_with(crate::effect::EffectSet::pure);
@@ -1951,7 +1951,7 @@ impl<'a> TypeChecker<'a> {
                                 } else {
                                     ret_ty
                                 };
-                                let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty });
+                                let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                                 if let Some(sym_id) = sym_id_opt {
                                     self.ctx.tables.symbol_types.insert(sym_id, func_ty);
                                     if *is_unsafe {
@@ -2003,7 +2003,7 @@ impl<'a> TypeChecker<'a> {
                                     } else {
                                         ret_ty
                                     };
-                                    let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty });
+                                    let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                                     if let Some(sym_id) = sym_id_opt {
                                         self.ctx.tables.symbol_types.insert(sym_id, func_ty);
                                         if *is_unsafe {
@@ -2059,10 +2059,69 @@ impl<'a> TypeChecker<'a> {
         }
     }
 
+    fn validate_memory_intrinsics(&mut self) {
+        use crate::lang_item::LangItem;
+        use crate::ty::Mutability;
+        let hooks: Vec<_> = self.ctx.lang_items.iter()
+            .filter(|(item, _)| item.is_memory_intrinsic()).collect();
+        for (item, symbol) in hooks {
+            let declaration = self.ctx.tables.symbol_decls.get(&symbol)
+                .and_then(|id| self.arena.decls.get(id.0 as usize));
+            let mut valid = false;
+            if let Some(Decl::Function { generic_params, params: declarations, body,
+                is_unsafe, is_intrinsic, is_async, is_comptime, is_variadic, .. }) = declaration {
+                if *is_unsafe && *is_intrinsic && !*is_async && !*is_comptime
+                    && !*is_variadic && body.is_none() && generic_params.len() == 1
+                    && generic_params[0].kind == luna_ast::GenericParamKind::Type
+                    && generic_params[0].bounds.is_empty() {
+                    if let Some(&function_ty) = self.ctx.tables.symbol_types.get(&symbol) {
+                        if let SemanticType::Function { params, return_type, is_unsafe } = self.ctx.types.get(function_ty) {
+                            let binder = self.ctx.tables.symbol_decls.get(&symbol)
+                                .and_then(|id| self.ctx.tables.generic_param_symbols.get(&(*id, 0)));
+                            let element = params.first().and_then(|ty| match self.ctx.types.get(*ty) {
+                                SemanticType::Pointer(mutable, element) => {
+                                    let expected = if item == LangItem::SliceFromRawParts {
+                                        Mutability::Immutable
+                                    } else { Mutability::Mutable };
+                                    if *mutable == expected && matches!(self.ctx.types.get(*element),
+                                        SemanticType::GenericParam(id) if Some(id) == binder) { Some(*element) }
+                                    else { None }
+                                }, _ => None,
+                            });
+                            if let Some(element) = element {
+                                valid = if item == LangItem::DropInPlace {
+                                    params.len() == 1 && matches!(self.ctx.types.get(*return_type), SemanticType::Void)
+                                } else {
+                                    let expected = if item == LangItem::SliceFromRawParts {
+                                        Mutability::Immutable
+                                    } else { Mutability::Mutable };
+                                    params.len() == 2
+                                        && matches!(self.ctx.types.get(params[1]), SemanticType::Primitive(BuiltinType::U64))
+                                        && matches!(self.ctx.types.get(*return_type),
+                                            SemanticType::Reference(_, mutable, slice) if *mutable == expected
+                                                && matches!(self.ctx.types.get(*slice), SemanticType::Slice(inner) if *inner == element))
+                                };
+                            valid &= *is_unsafe && declarations.iter().all(|id| matches!(self.arena.decls.get(id.0 as usize),
+                                    Some(Decl::Param { is_variadic: false, is_self: false, .. })));
+                            }
+                        }
+                    }
+                }
+            }
+            if !valid {
+                self.ctx.diagnostics.push(Diagnostic::error(format!(
+                    "invalid declaration for memory intrinsic `{}`: expected an unsafe, bodyless, non-variadic intrinsic with the canonical generic signature", item.name()))
+                    .with_code(DiagnosticCode::InvalidAnnotation)
+                    .with_span(self.ctx.symbol_table.get_symbol(symbol).span));
+            }
+        }
+    }
+
     fn populate_signatures(&mut self, items: &[Item]) {
         self.populate_signatures_pass1(items);
         self.populate_trait_bounds(items);
         self.populate_signatures_pass2(items);
+        self.validate_memory_intrinsics();
 
         // Pass 1.5: Early evaluation of top-level constants
         let mut const_inits = Vec::new();
@@ -2883,10 +2942,7 @@ impl<'a> TypeChecker<'a> {
                     param_tys.push(self.lower_type(p));
                 }
                 let ret_ty = if let Some(r) = return_type { self.lower_type(*r) } else { self.ctx.types.intern(SemanticType::Void) };
-                let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: ret_ty });
-                if *is_unsafe {
-                    self.ctx.tables.unsafe_function_types.insert(func_ty);
-                }
+                let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: ret_ty, is_unsafe: *is_unsafe });
                 func_ty
             }
             Type::Slice { inner } => {
@@ -3694,7 +3750,7 @@ impl<'a> TypeChecker<'a> {
         };
         let (next_receiver_type, option_type) =
             match self.ctx.types.get(next_fn_ty).clone() {
-                SemanticType::Function { params, return_type } if !params.is_empty() => (
+                SemanticType::Function { params, return_type, .. } if !params.is_empty() => (
                     self.ctx.types.subst(params[0], &next_subst),
                     self.ctx.types.subst(return_type, &next_subst),
                 ),
@@ -4126,7 +4182,7 @@ impl<'a> TypeChecker<'a> {
                                         }
                                         self.ctx.types.intern(SemanticType::Enum(e_sym, concrete_args, variant_tys))
                                     }
-                                    SemanticType::Function { params, return_type } => {
+                                    SemanticType::Function { params, return_type, is_unsafe } => {
                                         let mut new_params = Vec::new();
                                         for p in params {
                                             new_params.push(self.ctx.types.subst(p, &subst));
@@ -4135,7 +4191,7 @@ impl<'a> TypeChecker<'a> {
                                         if !subst.map.is_empty() {
                                             self.ctx.tables.expr_substs.insert(*expr_id, subst.clone());
                                         }
-                                        self.ctx.types.intern(SemanticType::Function { params: new_params, return_type: new_ret })
+                                        self.ctx.types.intern(SemanticType::Function { params: new_params, return_type: new_ret, is_unsafe })
                                     }
                                     _ => self.ctx.types.subst(ty, &subst),
                                 }
@@ -4343,7 +4399,7 @@ impl<'a> TypeChecker<'a> {
                     }
                 }
 
-                let is_callee_unsafe = self.ctx.tables.unsafe_function_types.contains(&callee_ty_id)
+                let is_callee_unsafe = matches!(callee_ty, SemanticType::Function { is_unsafe: true, .. })
                     || if let Some(&callee_sym) = self.ctx.tables.expr_symbols.get(callee) {
                         let sym = self.ctx.symbol_table.get_symbol(callee_sym);
                         self.ctx.tables.unsafe_functions.contains(&callee_sym) || matches!(sym.kind, crate::symbol::SymbolKind::ExternFunction)
@@ -4359,10 +4415,13 @@ impl<'a> TypeChecker<'a> {
                 }
 
                 let is_closure_call = matches!(callee_ty, SemanticType::Closure(..));
-                if let SemanticType::Function { params, return_type } | SemanticType::Closure(_, params, return_type) = callee_ty {
-                    if is_closure_call && params.len() != args.len() {
+                if let SemanticType::Function { params, return_type, .. } | SemanticType::Closure(_, params, return_type) = callee_ty {
+                    let is_memory_intrinsic = self.ctx.tables.expr_symbols.get(callee)
+                        .and_then(|symbol| self.ctx.lang_items.from_symbol(*symbol))
+                        .is_some_and(|item| item.is_memory_intrinsic());
+                    if (is_closure_call || is_memory_intrinsic) && params.len() != args.len() {
                         self.ctx.diagnostics.push(Diagnostic::error(format!(
-                            "Closure expects {} arguments, but {} were provided", params.len(), args.len(),
+                            "Callable expects {} arguments, but {} were provided", params.len(), args.len(),
                         )).with_code(DiagnosticCode::TypeMismatch).with_span(self.get_expr_span_for_diag(expr_id).unwrap_or_default()));
                     }
                     ret_ty_id = if has_generics { self.ctx.types.subst(return_type, &subst) } else { return_type };
@@ -5174,7 +5233,7 @@ impl<'a> TypeChecker<'a> {
                                     }
                                 }
                                 if let Some(&m_ty) = self.ctx.tables.symbol_types.get(&m_sym) {
-                                    if let SemanticType::Function { params, return_type } = self.ctx.types.get(m_ty).clone() {
+                                    if let SemanticType::Function { params, return_type, .. } = self.ctx.types.get(m_ty).clone() {
                                         if params.len() != args.len() + 1 || !generic_args.is_empty() {
                                             self.ctx.diagnostics.push(Diagnostic::error(format!(
                                                 "Dynamic method requires {} arguments and no generic arguments; got {} arguments",

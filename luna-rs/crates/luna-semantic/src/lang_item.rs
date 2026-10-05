@@ -85,6 +85,15 @@ lang_item_table! {
     (OptionNone, "none", EnumVariant);
     (Iterator, "iterator", Trait);
     (IntoIterator, "into_iterator", Trait);
+    (DropInPlace, "drop_in_place", Function);
+    (SliceFromRawParts, "slice_from_raw_parts", Function);
+    (SliceFromRawPartsMut, "slice_from_raw_parts_mut", Function);
+}
+
+impl LangItem {
+    pub fn is_memory_intrinsic(self) -> bool {
+        matches!(self, Self::DropInPlace | Self::SliceFromRawParts | Self::SliceFromRawPartsMut)
+    }
 }
 
 #[derive(Clone, Debug)]

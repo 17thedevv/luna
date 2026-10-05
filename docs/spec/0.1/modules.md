@@ -42,10 +42,17 @@ root Option, Iterator or Drop bindings. Other ordinary APIs require explicit
 provider imports. `Result` remains an ordinary library type implementing generic
 Try contracts; it is not a compiler-native container.
 
-Exact language hook mappings are documented in
+Exact bootstrap language hook mappings are documented in
 [core-language-contract.md](../../core-language-contract.md) and represented by
 `luna-driver/src/lang_contracts.rs`. Provider names choose acquisition, while
 canonical declaration identities identify semantics.
+
+Explicitly imported canonical memory providers identify their existing unsafe
+drop/raw-slice primitives with checked `#[lang]` declarations. These three hook
+identities do not add auto-loaded families or namespace visibility. Ordinary
+functions with matching API names retain ordinary behavior. Implementation and
+remaining raw-slice loan gaps are recorded in the
+[memory audit](../../audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md).
 
 ## Artifact discovery, validity and parity
 
@@ -72,7 +79,8 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 12 rejects compiler versions 1–11. This revision requires
+protocol version 13 rejects compiler versions 1–12. This revision requires
+checked memory-hook identities and callable safety in addition to
 native integrity envelopes and portable payload checksums, and retains
 ordered nominal representations, validated target contracts, public generic
 constraints and individual impl contracts, alongside the earlier
@@ -81,7 +89,7 @@ version 4 carries portable immutable static data whose initializer and type
 shape contain no semantic-session IDs or VM addresses. Rebuild incompatible
 artifacts through build tooling; import never rebuilds or falls back from a
 selected invalid artifact. File format version remains 2; semantic metadata
-version is 5. These are internal compatibility revisions, not a declaration of
+version is 6. These are internal compatibility revisions, not a declaration of
 language release readiness.
 
 Target identity binds the selected triple, CPU/features, emitted object format,

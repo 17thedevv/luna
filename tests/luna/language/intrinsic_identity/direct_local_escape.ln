@@ -1,0 +1,6 @@
+import <mem>;
+fn escape() -> &[i32] {
+    dec rw local = [1, 2];
+    unsafe { return std::mem::slice_from_raw_parts<i32>(&rw local[0] as *rw i32 as *i32, 2 as u64); }
+}
+fn main() {}

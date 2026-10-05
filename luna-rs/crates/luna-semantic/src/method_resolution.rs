@@ -417,10 +417,7 @@ impl<'a> TypeChecker<'a> {
             );
             return self.ctx.types.error_id();
         };
-        let SemanticType::Function {
-            params,
-            return_type,
-        } = self.ctx.types.get(function_type).clone()
+        let SemanticType::Function { params, return_type, .. } = self.ctx.types.get(function_type).clone()
         else {
             self.ctx.diagnostics.push(
                 Diagnostic::error("Method candidate is not callable")

@@ -19,6 +19,15 @@ The baseline has six families and **16** manifest hook identities. Exact canonic
 
 ## Identification, policy and identity
 
+The 16 mappings above describe bootstrap acquisition. Explicit imports of
+canonical ptr/mem providers additionally register three checked tags for the
+existing unsafe primitives: `drop_in_place`, `slice_from_raw_parts` and
+`slice_from_raw_parts_mut`. Their source callee names may change without
+changing their role. No provider autoload/prelude family was added. Signature,
+provenance authorization and source/artifact/native evidence, including the
+remaining reference-loan blocker, are recorded in the
+[memory audit](audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md).
+
 A hook identifies a semantic role; ownership, traits, borrow analysis and lowering enforce its policy. Renaming a declaration does not change its role. Provider-local SymbolId/DeclId are not portable semantic identity; import reconstructs fresh IDs from canonical identities.
 
 Drop, Copy, iteration, Option advancement and generic Try/FromResidual retain their contracts. Result implements ordinary generic protocols. if/match/while are language syntax, not artificial providers. Bootstrap exposes selected qualified std paths only; it does not create unqualified root names or auto-load all ordinary core/alloc APIs.

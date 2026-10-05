@@ -1,0 +1,11 @@
+{
+  "luna_target": "x86_64-pc-windows-gnu",
+  "error_mode": "0x8003 inherited by owned test process tree",
+  "started_utc": "2026-10-05T01:31:30.7240918Z",
+  "rust_host": "x86_64-pc-windows-msvc",
+  "temp_root": "D:/fdlang/.tmp-interface-debug/verification-temp",
+  "cli_sha256": "99DF144D81805EDBF5DA5ABC1766648EAE6E68A402B3C7DAAE8C7DD9E773FE94",
+  "command": "cargo test --workspace --no-fail-fast",
+  "revision": "9e45ca96f58e7e735cc9b2ed007d25c43a3be260",
+  "runtime_sha256": "D8AEA737AA7929E79AB70F24DB5705D7370570295DDAB9F569B3085EE230F5DE"
+}

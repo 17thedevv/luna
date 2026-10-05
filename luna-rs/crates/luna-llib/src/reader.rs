@@ -101,7 +101,7 @@ mod raw_anchor_validation_tests {
         });
         let interface = CanonicalInterface {
             exported_symbols: BTreeMap::from([("relay".into(), function)]),
-            types: vec![CanonicalType::Function { params: vec![1], return_type: 2 }],
+            types: vec![CanonicalType::Function { params: vec![1], return_type: 2, is_unsafe: false }],
             traits: BTreeMap::new(),
             impl_headers: Vec::new(),
             nominal_layouts: BTreeMap::new(),

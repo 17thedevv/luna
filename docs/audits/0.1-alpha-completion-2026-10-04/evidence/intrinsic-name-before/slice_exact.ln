@@ -1,0 +1,1 @@
+fn slice_from_raw_parts() -> i32 { return 9; } fn main() -> i32 { return slice_from_raw_parts() - 9; }

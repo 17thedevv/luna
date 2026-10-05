@@ -222,14 +222,12 @@ impl<'a> TypeChecker<'a> {
             (
                 SemanticType::Function {
                     params: left,
-                    return_type: lr,
-                },
+                    return_type: lr, is_unsafe: lu },
                 SemanticType::Function {
                     params: right,
-                    return_type: rr,
-                },
+                    return_type: rr, is_unsafe: ru },
             ) => {
-                left.len() == right.len()
+                lu == ru && left.len() == right.len()
                     && left
                         .into_iter()
                         .zip(right)

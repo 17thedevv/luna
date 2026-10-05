@@ -1,0 +1,1 @@
+import <mem>; fn main() { unsafe { std::mem::slice_from_raw_parts<i32>(); } }

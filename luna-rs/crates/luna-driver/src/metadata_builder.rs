@@ -384,11 +384,8 @@ impl<'a> MetadataBuilder<'a> {
             SemanticType::Reference(_, m, ty) => {
                 format!("ref({m:?},{})", self.type_shape(*ty, parameters))
             }
-            SemanticType::Function {
-                params,
-                return_type,
-            } => format!(
-                "fn({:?},{})",
+            SemanticType::Function { params, return_type, is_unsafe } => format!(
+                "fn(unsafe={is_unsafe},{:?},{})",
                 params
                     .iter()
                     .map(|&ty| self.type_shape(ty, parameters))
@@ -865,13 +862,9 @@ impl<'a> MetadataBuilder<'a> {
             }
             SemanticType::Array(t, len) => CanonicalType::Array(self.convert_type_id(*t), *len),
             SemanticType::Slice(t) => CanonicalType::Slice(self.convert_type_id(*t)),
-            SemanticType::Function {
-                params,
-                return_type,
-            } => CanonicalType::Function {
+            SemanticType::Function { params, return_type, is_unsafe } => CanonicalType::Function {
                 params: params.iter().map(|t| self.convert_type_id(*t)).collect(),
-                return_type: self.convert_type_id(*return_type),
-            },
+                return_type: self.convert_type_id(*return_type), is_unsafe: *is_unsafe },
             SemanticType::Pointer(mutability, t) => {
                 CanonicalType::Pointer(mutability.clone(), self.convert_type_id(*t))
             }

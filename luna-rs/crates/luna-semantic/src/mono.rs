@@ -567,7 +567,29 @@ impl<'a> MonoCollector<'a> {
                                 self.visit_stmt(body_stmt);
                             }
                         },
-                        Decl::Function { body: None, .. } => {},
+                        Decl::Function { body: None, params, .. } => {
+                            if let Some(&function) = self.ctx.tables.decl_symbols.get(&instance.decl_id) {
+                                if let Some(&ty) = self.ctx.tables.symbol_types.get(&function) {
+                                    let ty = self.substitute(ty);
+                                    self.current_symbol_types.insert(function, ty);
+                                }
+                                let drop_hook = self.ctx.lang_items.from_symbol(function)
+                                    == Some(crate::lang_item::LangItem::DropInPlace);
+                                for param in params {
+                                    if let Some(&symbol) = self.ctx.tables.decl_symbols.get(param) {
+                                        if let Some(&ty) = self.ctx.tables.symbol_types.get(&symbol) {
+                                            let ty = self.substitute(ty);
+                                            self.current_symbol_types.insert(symbol, ty);
+                                            if drop_hook {
+                                                if let SemanticType::Pointer(_, element) = self.ctx.types.get(ty) {
+                                                    self.discover_drop_obligations(*element);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
                         _ => {}
                     }
                 }
@@ -836,7 +858,7 @@ impl<'a> MonoCollector<'a> {
                     ty_id
                 }
             }
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, is_unsafe } => {
                 let mut changed = false;
                 let mut new_params = Vec::with_capacity(params.len());
                 for p in params {
@@ -849,8 +871,7 @@ impl<'a> MonoCollector<'a> {
                 if changed {
                     self.ctx.types.intern(SemanticType::Function {
                         params: new_params,
-                        return_type: nr,
-                    })
+                        return_type: nr, is_unsafe })
                 } else {
                     ty_id
                 }
@@ -954,7 +975,7 @@ impl<'a> MonoCollector<'a> {
 
             // Check signature if method has type info
             if let Some(&m_ty) = self.ctx.tables.symbol_types.get(&m_sym) {
-                if let SemanticType::Function { params, return_type } = self.ctx.types.get(m_ty).clone() {
+                if let SemanticType::Function { params, return_type, .. } = self.ctx.types.get(m_ty).clone() {
                     let instantiated_return = self.ctx.types.subst(return_type, &method_call_subst);
                     // Check return type
                     if let Some(exp_ret) = expected_ret_ty {
@@ -1145,10 +1166,10 @@ impl<'a> MonoCollector<'a> {
                 let new_args: Vec<_> = args.iter().map(|&a| self.substitute(a)).collect();
                 self.ctx.types.intern(crate::ty::SemanticType::Tuple(new_args))
             }
-            crate::ty::SemanticType::Function { params, return_type } => {
+            crate::ty::SemanticType::Function { params, return_type, is_unsafe } => {
                 let new_params: Vec<_> = params.iter().map(|&p| self.substitute(p)).collect();
                 let new_ret = self.substitute(return_type);
-                self.ctx.types.intern(crate::ty::SemanticType::Function { params: new_params, return_type: new_ret })
+                self.ctx.types.intern(crate::ty::SemanticType::Function { params: new_params, return_type: new_ret, is_unsafe })
             }
             crate::ty::SemanticType::Pointer(mutability, inner) => {
                 let new_inner = self.substitute(inner);
@@ -1586,25 +1607,6 @@ impl<'a> MonoCollector<'a> {
                     }
                 }
 
-                // Special check for std::ptr::drop_in_place<T>(p)
-                let callee_name = if let Some(&sym_id) = self.ctx.tables.expr_symbols.get(callee) {
-                    if (sym_id.0 as usize) < self.ctx.symbol_table.symbols.len() {
-                        Some(self.ctx.symbol_table.symbols[sym_id.0 as usize].name.clone())
-                    } else { None }
-                } else { None };
-                if let Some(ref name) = callee_name {
-                    if name.ends_with("drop_in_place") || name.contains("drop_in_place") {
-                        if let Some(first_arg) = args.first() {
-                            if let Some(&arg_ty) = self.ctx.tables.expr_types.get(&first_arg.value) {
-                                let sub_arg_ty = self.substitute(arg_ty);
-                                if let SemanticType::Pointer(_, inner) = self.ctx.types.get(sub_arg_ty) {
-                                    let pointee = *inner;
-                                    self.discover_drop_obligations(pointee);
-                                }
-                            }
-                        }
-                    }
-                }
                 if let Some(&ty) = self.current_expr_types.get(expr_id) {
                     self.discover_drop_obligations(ty);
                 }
@@ -1895,7 +1897,12 @@ impl<'a> MonoCollector<'a> {
                     let symbol = self.ctx.symbol_table.get_symbol(sym_id);
                     if matches!(symbol.kind, crate::SymbolKind::Function) {
                         if let Some(&decl_id) = self.ctx.tables.symbol_decls.get(&sym_id) {
-                            if let Some(subst) = self.ctx.tables.expr_substs.get(expr_id).cloned() {
+                            let value_subst = self.ctx.tables.expr_substs.get(expr_id).cloned().or_else(|| {
+                                matches!(self.arena.decls.get(decl_id.0 as usize),
+                                    Some(Decl::Function { generic_params, .. }) if generic_params.is_empty())
+                                    .then(crate::ty::Substitution::new)
+                            });
+                            if let Some(subst) = value_subst {
                                 let mut instance_subst = Vec::new();
                                 for (sym, ty) in subst.map {
                                     let sub_ty = self.substitute(ty);

@@ -1,0 +1,224 @@
+{
+  "captured_utc": "2026-10-05T04:37:55.014628+00:00",
+  "base_revision": "9e45ca96f58e7e735cc9b2ed007d25c43a3be260",
+  "source_files_sha256": {
+    "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs": "3256bd00c8dd86d1f8d7fd00c6247b079c396838eca7d6164d788758c3615076",
+    "luna-rs/crates/luna-borrowck/src/lib.rs": "e085f94314f0758b98c1d29c96caf4a59d2b9b9ef5696ef9643d6dc2dcc23487",
+    "luna-rs/crates/luna-borrowck/src/memory_intrinsic_body.rs": "b18d444a32b7f5a68e37ec1817f309bfb017254957374befb16996254099f939",
+    "luna-rs/crates/luna-cli/tests/memory_intrinsic_identity_cli.rs": "ea2d291e11905bce15d1a86b60c95cbfc67a1c1591b64f30725584e4274ab561",
+    "luna-rs/crates/luna-cli/tests/support/stdlib.rs": "e37fe83641dc8ef1be4b30c2107621b15d5db3bbbf03253310e3dfb0eb38a1c3",
+    "luna-rs/crates/luna-driver/src/metadata_builder.rs": "943734466151562b84606813fc1e08818f066494026f21d02de6a08e037fabae",
+    "luna-rs/crates/luna-driver/src/metadata_decoder.rs": "2989b7c0c1d825c02ffbf105d36e6ec9b80754be1183f4885dd40f8170dc8e27",
+    "luna-rs/crates/luna-driver/src/registry.rs": "9dda3206b98381ff0ca9ef7c95a3847f71f1d93f82aa278630ef545cb4293de3",
+    "luna-rs/crates/luna-driver/tests/compiler_gap_c_gap_12_safe_loan_effect_tests.rs": "f82c030571e79a9c6ce51964dc9c0fc6d2ed2c3f473c8c738348c9f36c60bee0",
+    "luna-rs/crates/luna-llib/src/format.rs": "a30a6fb6bd83ee357109bafe23c782493b64587f9eb111f3cb26995813dd98b2",
+    "luna-rs/crates/luna-llib/src/metadata.rs": "6e9c42352291748d04993d8e7112b190325f33cb3b74c84ce54cb3ae3297eca1",
+    "luna-rs/crates/luna-llib/src/reader.rs": "76acbc42e23178fe3efcfdd8c67185bc9f6792c2c493776cd1b15b8219ffcd50",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "b1e48126a7936db60016b2668e0cf6a84aa1328d42f9a6906eee261771663ec9",
+    "luna-rs/crates/luna-mvir/src/interp.rs": "7087f2c60e9c12576cd76fc0861582cbe17cc9eef78f92835d960e553176704c",
+    "luna-rs/crates/luna-parser/src/expr.rs": "e28994f000ba98aee6f8fb06ca230576f47936a6b952b272ef09a5d04864646f",
+    "luna-rs/crates/luna-parser/tests/generic_function_value_parser_tests.rs": "79f30c207d06fd7bce340bb4dfd1911f5042497893d64ca7dfd737bcae99a0a9",
+    "luna-rs/crates/luna-semantic/src/comptime/type_repr.rs": "53c8413bc5d92b607b836048104ffe4aacd179d2b4f07263de0d3c894f1a5e7f",
+    "luna-rs/crates/luna-semantic/src/lang_item.rs": "c0502d4995c8b4b39f9f2d94d601e100dfa4340e845d7ce8a56016cf90933af9",
+    "luna-rs/crates/luna-semantic/src/mangler.rs": "7f53aae14d2023dc070e37975419559bd9c4b224e4ab6d6fd7e860f069639c06",
+    "luna-rs/crates/luna-semantic/src/method_resolution.rs": "c3860d554890b278f2b3cae3152522388eb0a05a7fc49f8fefd23e65fff9612e",
+    "luna-rs/crates/luna-semantic/src/mono.rs": "b74e69fb598e1e9d6f07eb6bcc7f39b5a07f2978c098e7d9344b9354feb76465",
+    "luna-rs/crates/luna-semantic/src/semantic_tables.rs": "daace5a7b7980767797ea5c3e7900ad9700965c2cfbc70c8ce93d44c06899126",
+    "luna-rs/crates/luna-semantic/src/trait_bound_proof.rs": "86b723f0707ed5e697fa2d7bcd7b921f6498369eb5fd1f59c3d8b00d598f2758",
+    "luna-rs/crates/luna-semantic/src/ty.rs": "105395016b0711d82f33d37e86ea7bcd7a9db207fcc89c92590084581ec7ee64",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "7e808486a5ae213af0caa0d447a08477071973c65fdeaf6acd6b6c2225b87a17",
+    "luna-rs/crates/luna-semantic/tests/memory_intrinsic_contract_tests.rs": "d7807235ebb4fbcab5e53db6a3e9a83ac524e56baa3eaf899fb0945a9d0f82c4",
+    "luna-rs/libs/external/core/mem.ln": "00bfb76ce4a4f6a68a221b70de5b4b058a558ab2694689fb67a31ba5900e561c",
+    "luna-rs/libs/external/core/ptr.ln": "b6a5c782f1d384d06f7a9d0a66fcbb3f02fd02019acb6ec9cb76777aeff6f544",
+    "tests/luna/language/intrinsic_identity/direct_borrow_conflict.ln": "c4b0b20853b4030fda800728712b128f3d7fc2445e2796c65ef15dbb97e3b6b7",
+    "tests/luna/language/intrinsic_identity/direct_local_escape.ln": "ce4b8b102b8094f97f922c0b94ebda37887b205fe33e1cbd6c757424dccee4ab",
+    "tests/luna/language/intrinsic_identity/excess_intrinsic_argument.ln": "ec65a611d80f2c15ee1e09e6ee469b75bcd716431be28de153b79deb339ce130",
+    "tests/luna/language/intrinsic_identity/genuine_memory.ln": "46794802d8cc94f4e89c80bca7531f7219e3f8f7c3f24a155d43f791023da5d0",
+    "tests/luna/language/intrinsic_identity/indirect_borrow_conflict.ln": "005b581c761b25a144784c7b16824a9f17a6484192b8ddc1b88b520a7d5a34fd",
+    "tests/luna/language/intrinsic_identity/indirect_local_escape.ln": "051462a7e13c177c0e39283d652a33dd76c3788848ad10a7fa9006a314dd8e31",
+    "tests/luna/language/intrinsic_identity/indirect_unsafe_call.ln": "9424eb385d2a6266b1d9ae95ed2cc98c7cec17711829e0b660f1235b5b3ea7c2",
+    "tests/luna/language/intrinsic_identity/missing_intrinsic_argument.ln": "1fda2392d00317b3c568186c4b8208d8eded78dbc5e9cd5a7ec4989483b41188",
+    "tests/luna/language/intrinsic_identity/ordinary_calls.ln": "2e9b476a74169220ef5d579eedee8fb5eb9919b23b201adf285d952ada5f1805",
+    "tests/luna/language/intrinsic_identity/ordinary_owned_pointer.ln": "11559f93a9023e35474b8b7339cbea589f9e90029d9eaef5c310cfa0ae956fe9",
+    "tests/luna/language/intrinsic_identity/provider.ln": "e86e26d29f8ec9ed1f54880623a1293edd3a9f730dc848b3145af2764c55ddb9",
+    "tests/luna/language/intrinsic_identity/spoof_hook.ln": "f57d997f6e28bd27f2dcc0e762d08cfd7c6daf5861f14e0f7933c12f7412ddbb",
+    "tests/luna/language/intrinsic_identity/unsafe_callback_erasure.ln": "ef126210e53809ef47abe4de3eb40bccb93df7d00c3f2840aaa09d39aa9063fb",
+    "tests/luna/language/intrinsic_identity/unsafe_generic_callback.ln": "2da5a02cef901075267f4c8bb22224b6a5351f0f1a969eaee6f88024a3421ce5",
+    "tests/luna/language/intrinsic_identity/unsafe_intrinsic_call.ln": "6b305d74a0ffdfca4d853106b71e17dfda63e1a3cda30749a7dd85054a47431c",
+    "tests/luna/language/intrinsic_identity/unsafe_returned_callback.ln": "87b2d8fe44356d52734b128b37dde100bf145f1d706c60a3192c792b63287efc",
+    "tests/luna/language/intrinsic_identity/unsafe_user_callback.ln": "772c7f6c131fc2e407bccef46616274050ac35961d486f949e7fcd0b3ec2534a"
+  },
+  "source_snapshot_sha256": "4a400bb1734065b30735e2db9dd1f96f937cf566a82f3a8669488f8daff3b8cf",
+  "cli_sha256": "73b4c35a1d59698a4a71abe6f8b7abd7c98187b8e5519906b9f27a4ea67c9fcc",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "host": "x86_64-pc-windows-msvc",
+  "target": "x86_64-pc-windows-gnu",
+  "temp_root": "D:\\fdlang\\.tmp-interface-debug\\verification-temp",
+  "error_mode": "0x8003 in owned invocation process trees",
+  "compiler_protocol": 13,
+  "semantic_metadata": 6,
+  "raw_logs_sha256": {
+    "memory-callable-final-semantic.txt": "a3e1c496b3fb682fb5c59574f73ed03508375cfb6f735bccddf4d07ce26acbc0",
+    "memory-callable-final-borrowck.txt": "556b7fc4816357884e5297d009b5ec6587ef329364f7af0464d4fbec50959211",
+    "memory-callable-final-parser.txt": "213b7844d6a93a0177c08859534a5bc667dae5f3e112ebf5787803de0ba4ec07",
+    "memory-callable-final-sysroot.txt": "e0c04c6d2e8752ae848b9647f9af300223329e3ea6b0e86dbeed27c6411ab8f7",
+    "memory-callable-final-driver.txt": "953cfe9133284c3c494482a9fca0e5ef02615910891c248729b4b013d76cf674",
+    "memory-callable-final-cli.txt": "d641aea51c15119de920bb2064ee3e69835f6250daa3008957956fa7d56fbfef",
+    "memory-callable-final-exit.json": "65442000e17298850ff3b7e00f3df896cb4d587d9ef9b536b75a84f5d54503a5",
+    "memory-callable-oracle-cli.txt": "0a02cecae9ab696cabadf3aa8dfb072b15e85eb3e371ab1d348390b6d1d2fa9a",
+    "memory-callable-oracle-exit.json": "6229d7aca2ee9b9204d55030a6e1d088f56ce4643b48e38e32d60aa938574539",
+    "memory-callable-doc-validation.txt": "ac268cf46bc4c02b04894da7e233aff44e85fc4c943bfc5f723308275f67dc90"
+  },
+  "results": {
+    "memory-callable-final-semantic.txt": {
+      "passed": 194,
+      "failed": 0,
+      "ignored": 0,
+      "completed_suites": 24
+    },
+    "memory-callable-final-borrowck.txt": {
+      "passed": 61,
+      "failed": 0,
+      "ignored": 0,
+      "completed_suites": 12
+    },
+    "memory-callable-final-parser.txt": {
+      "passed": 2,
+      "failed": 0,
+      "ignored": 0,
+      "completed_suites": 1
+    },
+    "memory-callable-final-sysroot.txt": {
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "completed_suites": 0
+    },
+    "memory-callable-final-driver.txt": {
+      "passed": 18,
+      "failed": 0,
+      "ignored": 0,
+      "completed_suites": 3
+    },
+    "memory-callable-final-cli.txt": {
+      "passed": 0,
+      "failed": 3,
+      "ignored": 0,
+      "completed_suites": 1
+    },
+    "memory-callable-oracle-cli.txt": {
+      "passed": 2,
+      "failed": 1,
+      "ignored": 0,
+      "completed_suites": 1
+    },
+    "memory-callable-doc-validation.txt": {
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0,
+      "completed_suites": 0
+    }
+  },
+  "cli_native_success_observations": 12,
+  "cli_typed_rejection_observations": 88,
+  "canonical_provider_builds": 49,
+  "verdict": "PARTIAL. CLI2/3; raw-slice reference conflict remains incorrectly accepted in both modes. Full workspace not rerun for this candidate.",
+  "lossless_log_archives": {
+    "drop_exact-build.txt": {
+      "archive": "intrinsic-name-before/drop_exact-build.txt.gz",
+      "compressed_sha256": "5dccdec0e347e45408282f8a9c49f488739ab4eeb4a911600a741b54be4dd719",
+      "uncompressed_sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9"
+    },
+    "drop_exact-check.txt": {
+      "archive": "intrinsic-name-before/drop_exact-check.txt.gz",
+      "compressed_sha256": "5dccdec0e347e45408282f8a9c49f488739ab4eeb4a911600a741b54be4dd719",
+      "uncompressed_sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9"
+    },
+    "drop_substring-build.txt": {
+      "archive": "intrinsic-name-before/drop_substring-build.txt.gz",
+      "compressed_sha256": "5dccdec0e347e45408282f8a9c49f488739ab4eeb4a911600a741b54be4dd719",
+      "uncompressed_sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9"
+    },
+    "drop_substring-check.txt": {
+      "archive": "intrinsic-name-before/drop_substring-check.txt.gz",
+      "compressed_sha256": "5dccdec0e347e45408282f8a9c49f488739ab4eeb4a911600a741b54be4dd719",
+      "uncompressed_sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9"
+    },
+    "slice_exact-build.txt": {
+      "archive": "intrinsic-name-before/slice_exact-build.txt.gz",
+      "compressed_sha256": "64fd75da46a7c2f46c74258b61742bc95d2b47c8e3605731a5f95220952d5e89",
+      "uncompressed_sha256": "c5641685662c92d3c20e1b1f1fc4434e377d1ae1fbf7fda1ebccf4c28d2194e6"
+    },
+    "slice_exact-check.txt": {
+      "archive": "intrinsic-name-before/slice_exact-check.txt.gz",
+      "compressed_sha256": "e70b9e663a7bec6f96124d60e180a6536d0145951527af88308cb05723d94ce5",
+      "uncompressed_sha256": "3edd928e0d639556ae0dbdc63cf3a88da661d40dfdc58dca7085a5e9792c2374"
+    },
+    "memory-callable-doc-validation.txt": {
+      "archive": "memory-callable-doc-validation.txt.gz",
+      "compressed_sha256": "526a2bdec2166aec49e73f7e476e779714d42420e2584f6d2151228abba5b7b2",
+      "uncompressed_sha256": "ac268cf46bc4c02b04894da7e233aff44e85fc4c943bfc5f723308275f67dc90"
+    },
+    "memory-callable-final-borrowck.txt": {
+      "archive": "memory-callable-final-borrowck.txt.gz",
+      "compressed_sha256": "08be017a71c9f9bd9615459d39c4ed6fb54ec52850d2e9c8df34a78ebd729554",
+      "uncompressed_sha256": "556b7fc4816357884e5297d009b5ec6587ef329364f7af0464d4fbec50959211"
+    },
+    "memory-callable-final-cli.txt": {
+      "archive": "memory-callable-final-cli.txt.gz",
+      "compressed_sha256": "6298b7cc74e6ad391365d24ead6ac9d02c4e22c33f623bc4448f88d3269bd5f2",
+      "uncompressed_sha256": "d641aea51c15119de920bb2064ee3e69835f6250daa3008957956fa7d56fbfef"
+    },
+    "memory-callable-final-driver.txt": {
+      "archive": "memory-callable-final-driver.txt.gz",
+      "compressed_sha256": "f8d7120cb6b9ed5c15b90d3a06a3754537f4b1b3ab203b209f28878301a083b1",
+      "uncompressed_sha256": "953cfe9133284c3c494482a9fca0e5ef02615910891c248729b4b013d76cf674"
+    },
+    "memory-callable-final-exit.json": {
+      "archive": "memory-callable-final-exit.json.gz",
+      "compressed_sha256": "f5bd562037010334c8f7a98237e71c574daed39259cbc8e5d02855f1e3d31562",
+      "uncompressed_sha256": "65442000e17298850ff3b7e00f3df896cb4d587d9ef9b536b75a84f5d54503a5"
+    },
+    "memory-callable-final-parser.txt": {
+      "archive": "memory-callable-final-parser.txt.gz",
+      "compressed_sha256": "7ef2d5b27dbefd6b904482ea3d068612e2573544c1bac53171e0bf8c4878b3b2",
+      "uncompressed_sha256": "213b7844d6a93a0177c08859534a5bc667dae5f3e112ebf5787803de0ba4ec07"
+    },
+    "memory-callable-final-semantic.txt": {
+      "archive": "memory-callable-final-semantic.txt.gz",
+      "compressed_sha256": "2e28162dec4a8d7d612cafcc4575cc92b9198a1fa3461dfaeeedd7e0ede29c6c",
+      "uncompressed_sha256": "a3e1c496b3fb682fb5c59574f73ed03508375cfb6f735bccddf4d07ce26acbc0"
+    },
+    "memory-callable-final-sysroot.txt": {
+      "archive": "memory-callable-final-sysroot.txt.gz",
+      "compressed_sha256": "f87b64ea19e6a4df6d619cd2f41450f4e31b21b97ef175756ccf8228ab76164b",
+      "uncompressed_sha256": "e0c04c6d2e8752ae848b9647f9af300223329e3ea6b0e86dbeed27c6411ab8f7"
+    },
+    "memory-callable-oracle-cli.txt": {
+      "archive": "memory-callable-oracle-cli.txt.gz",
+      "compressed_sha256": "9540dac8258414982ac2633a0518fbc625ee0eb1aa308d2dad64729e43a20289",
+      "uncompressed_sha256": "0a02cecae9ab696cabadf3aa8dfb072b15e85eb3e371ab1d348390b6d1d2fa9a"
+    },
+    "memory-callable-oracle-exit.json": {
+      "archive": "memory-callable-oracle-exit.json.gz",
+      "compressed_sha256": "117e3b241bba905d9ed4e0d7cb7248ee6aef8d9d78f02c459278f75deb475ea3",
+      "uncompressed_sha256": "6229d7aca2ee9b9204d55030a6e1d088f56ce4643b48e38e32d60aa938574539"
+    },
+    "memory-callable-workspace-no-run.txt": {
+      "archive": "memory-callable-workspace-no-run.txt.gz",
+      "compressed_sha256": "243e36e814db7d45d8b5718845cfbea81fedca212e4123b6727f345e7638f961",
+      "uncompressed_sha256": "ae6c727860cbd65b76b05c518f5b41ec8f355d47b6def106f8dd633dc7ce88e1"
+    },
+    "memory-intrinsic-cli-canonical.txt": {
+      "archive": "memory-intrinsic-cli-canonical.txt.gz",
+      "compressed_sha256": "9d1fc6d5f3b3fd19509bf61286572f3621b751c81fad6156e5e30428bc6f1211",
+      "uncompressed_sha256": "ed604ebf4630c3f3062afc613a4ec276b300c0cd34b8dcc3888a53c04f5e2717"
+    },
+    "memory-intrinsic-cli-loans.txt": {
+      "archive": "memory-intrinsic-cli-loans.txt.gz",
+      "compressed_sha256": "78b50bcc65603cd46eaea0c7478b0b70ac70fb017e6757221abcb07172d2f78d",
+      "uncompressed_sha256": "d9e47039c506ce4bdc2cc9f2fccaa4cb780474f687e61138a461e17eb1660a8f"
+    }
+  },
+  "source_formatting_after_test": "Removed whitespace on an otherwise empty fixture line; program tokens and compiler source unchanged."
+}

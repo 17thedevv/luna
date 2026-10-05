@@ -210,6 +210,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/0.1-alpha-completion-2026-10-04/README.md",
     "role": "evidence",
     "owner": "conformance"

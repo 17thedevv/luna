@@ -61,6 +61,10 @@ pub fn render(output: &Output) -> String {
 
 impl ProviderModes {
     pub fn fresh() -> Self {
+        Self::fresh_with_source_edit(|_| {})
+    }
+
+    pub fn fresh_with_source_edit(edit: impl FnOnce(&Path)) -> Self {
         let work = std::env::temp_dir().join(format!(
             "luna_cli_parity_{}_{}_{}",
             std::process::id(),
@@ -86,6 +90,7 @@ impl ProviderModes {
             &built.join("libs/external"),
             &["ln", "toml"],
         );
+        edit(&built.join("libs/external"));
         assert_eq!(count_extension(&built, "llib"), 0);
         assert_eq!(count_extension(&built, "obj"), 0);
         let build = Command::new(env!("CARGO_BIN_EXE_luna"))

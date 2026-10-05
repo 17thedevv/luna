@@ -258,3 +258,28 @@ environment gate. Closure capture destruction still fails independently. The raw
 log and intervention are preserved; focused repair passes do not turn this into
 a release PASS. Named/default calls, broader contract validation and R3–R5 remain
 open. See the [execution ledger](../../audits/0.1-alpha-completion-2026-10-04/EXECUTION.md).
+
+
+### Memory-hook and callable-safety checkpoint — 2026-10-05, PARTIAL
+
+The completed workspace run at 9e45ca9 exits101: 1,297 pass, 2 fail, 1 ignored.
+The failures are moved-closure cleanup and a Windows sharing violation while
+copying a safe-loan test's inputs. These results remain failures at that revision.
+
+Independent ordinary user functions whose names contain `drop_in_place` or
+`slice_from_raw_parts` exposed incorrect intrinsic substitution, including a
+compiler panic for a zero-argument ordinary function. The current repair uses
+checked language-hook identity for these existing unsafe memory primitives,
+keeps unsafe callable safety in semantic/portable types, and preserves canonical
+generic function-value identity through lowering. Protocol13/metadata6 require
+fresh artifact rebuilds. The CLI checkpoint reports2 pass and1 fail: ordinary
+names, renamed canonical hooks and native callbacks work in both modes, but
+raw-slice construction still fails to establish required reference loans.
+
+The raw-slice mutation rejection remains an active, nonignored regression.
+Reusing the normal raw-to-safe promotion gate exposed additional existing CStr
+and primitive-str provenance gaps during the official sysroot build. That strict
+prototype and its failure evidence are preserved; no broad safety exemption was
+applied to make source library bodies pass. This capability is incomplete.
+Closure cleanup, named/default calls, broader contracts and R3–R5 remain open.
+See the [memory audit](../../audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md).

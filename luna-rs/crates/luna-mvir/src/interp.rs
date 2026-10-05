@@ -1401,7 +1401,7 @@ fn has_unresolved_projection(ctx: &SemanticContext, ty_id: SemanticTypeId) -> bo
         SemanticType::Tuple(elems) => {
             elems.iter().any(|&e| has_unresolved_projection(ctx, e))
         }
-        SemanticType::Function { params, return_type } => {
+        SemanticType::Function { params, return_type, .. } => {
             has_unresolved_projection(ctx, *return_type) || params.iter().any(|&p| has_unresolved_projection(ctx, p))
         }
         _ => false,
