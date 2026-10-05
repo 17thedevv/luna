@@ -1,0 +1,1 @@
+import <string>; fn main() { dec view = std::cstr_from_ptr(0 as *u8); }

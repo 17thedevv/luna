@@ -1,0 +1,1 @@
+import <string>; fn bad() -> std::CStr { dec data = [65 as u8, 0 as u8]; return std::cstr_from_bytes_with_nul(&data).unwrap(); } fn main() {}

@@ -1016,22 +1016,26 @@ module std {
     export struct CStr {
         private ptr: *u8,
         private len_with_nul: u64,
-    };
+    } requires anchor(ptr) = self;
 
-    export fn cstr_from_ptr(p: *u8) -> CStr {
+    // Safety: p addresses readable NUL-terminated storage which remains valid
+    // for the entire lifetime of the returned view and all borrows from it.
+    export unsafe fn cstr_from_ptr(p: *u8) -> CStr {
         dec rw l: u64 = 0 as u64;
         unsafe {
             while (*(std::ptr::add<u8>(p, l))) != (0 as u8) {
                 l = l + (1 as u64);
             }
         }
-        return CStr {
-            ptr: p,
-            len_with_nul: l + (1 as u64),
-        };
+        unsafe {
+            return CStr {
+                ptr: p,
+                len_with_nul: l + (1 as u64),
+            };
+        }
     }
 
-    export fn cstr_from_bytes_with_nul(bytes: &[u8]) -> std::Result<CStr, NulError> {
+    export fn cstr_from_bytes_with_nul(bytes: &[u8]) -> std::Result<CStr, NulError> life_from(bytes) {
         dec total = bytes.len as u64;
         if total == (0 as u64) || bytes[total - (1 as u64)] != (0 as u8) {
             return std::Result::Err(NulError::NotNulTerminated);
@@ -1043,18 +1047,21 @@ module std {
             }
             i = i + (1 as u64);
         }
-        return std::Result::Ok(CStr {
-            ptr: bytes.data as *u8,
-            len_with_nul: total,
-        });
+        unsafe {
+            return std::Result::Ok(CStr {
+                ptr: bytes.data as *u8,
+                len_with_nul: total,
+            });
+        }
     }
 
     impl CStr {
-        export fn from_ptr(p: *u8) -> CStr {
-            return cstr_from_ptr(p);
+        // Safety: same storage-validity contract as cstr_from_ptr.
+        export unsafe fn from_ptr(p: *u8) -> CStr {
+            unsafe { return cstr_from_ptr(p); }
         }
 
-        export fn from_bytes_with_nul(bytes: &[u8]) -> std::Result<CStr, NulError> {
+        export fn from_bytes_with_nul(bytes: &[u8]) -> std::Result<CStr, NulError> life_from(bytes) {
             return cstr_from_bytes_with_nul(bytes);
         }
 
@@ -1118,11 +1125,13 @@ module std {
             return cstring_new(s);
         }
 
-        export fn as_c_str(self: &Self) -> CStr {
-            return CStr {
-                ptr: self.vec.as_slice().data as *u8,
-                len_with_nul: self.vec.len(),
-            };
+        export fn as_c_str(self: &Self) -> CStr life_from(self) {
+            unsafe {
+                return CStr {
+                    ptr: self.vec.as_slice().data as *u8,
+                    len_with_nul: self.vec.len(),
+                };
+            }
         }
 
         export fn as_ptr(self: &Self) -> *u8 {

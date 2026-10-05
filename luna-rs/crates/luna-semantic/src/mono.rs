@@ -1457,6 +1457,10 @@ impl<'a> MonoCollector<'a> {
     }
 
     fn visit_expr(&mut self, expr_id: &ExprId) {
+        self.visit_expr_with_role(expr_id, false);
+    }
+
+    fn visit_expr_with_role(&mut self, expr_id: &ExprId, direct_callee: bool) {
         let expr = &self.arena.exprs[expr_id.0 as usize];
         
         // Save the substituted type of the expression
@@ -1467,7 +1471,10 @@ impl<'a> MonoCollector<'a> {
 
         match expr {
             Expr::Call { callee, args, .. } => {
-                self.visit_expr(callee);
+                // The call selects its concrete instance below. Do not also queue an
+                // abstract trait/impl callee as a standalone function value. Nested
+                // argument and value expressions keep their ordinary visitor role.
+                self.visit_expr_with_role(callee, true);
                 for arg in args {
                     self.visit_expr(&arg.value);
                 }
@@ -1895,7 +1902,7 @@ impl<'a> MonoCollector<'a> {
             Expr::Identifier { .. } => {
                 if let Some(&sym_id) = self.ctx.tables.expr_symbols.get(expr_id) {
                     let symbol = self.ctx.symbol_table.get_symbol(sym_id);
-                    if matches!(symbol.kind, crate::SymbolKind::Function) {
+                    if !direct_callee && matches!(symbol.kind, crate::SymbolKind::Function) {
                         if let Some(&decl_id) = self.ctx.tables.symbol_decls.get(&sym_id) {
                             let value_subst = self.ctx.tables.expr_substs.get(expr_id).cloned().or_else(|| {
                                 matches!(self.arena.decls.get(decl_id.0 as usize),

@@ -42,6 +42,11 @@ pub struct MoveAnalyzer<'a> {
     pub summaries: Option<&'a HashMap<luna_mvir::GlobalId, crate::effect::CallEffectSummary>>,
     pub values_to_places: HashMap<luna_mvir::ValueId, Place>,
     pub load_origins: HashMap<luna_mvir::ValueId, luna_mvir::ValueId>,
+    /// Consumed storage operands at each instruction. Loan analysis checks
+    /// invalidation against its own provenance facts; move analysis owns the
+    /// decision whether a transfer actually consumes a value.
+    pub(crate) consumed_places: HashMap<luna_mvir::ValueId, Vec<Operand>>,
+    current_instruction: luna_mvir::ValueId,
 }
 
 impl<'a> MoveAnalyzer<'a> {
@@ -56,6 +61,8 @@ impl<'a> MoveAnalyzer<'a> {
             summaries,
             values_to_places: HashMap::new(),
             load_origins: HashMap::new(),
+            consumed_places: HashMap::new(),
+            current_instruction: luna_mvir::ValueId(0),
         }
     }
 
@@ -178,6 +185,14 @@ impl<'a> MoveAnalyzer<'a> {
             }
 
             if let Some(place) = self.values_to_places.get(val).cloned() {
+                if self.emit_diagnostics {
+                    let source = match &self.func.value(*val).inst {
+                        Instruction::Load { ptr } => ptr.clone(),
+                        _ => op.clone(),
+                    };
+                    let places = self.consumed_places.entry(self.current_instruction).or_default();
+                    if !places.contains(&source) { places.push(source); }
+                }
                 if self.emit_diagnostics && !place.projections.is_empty() {
                     if let Some(ctx) = self.semantic_ctx {
                         for len in 0..place.projections.len() {
@@ -332,6 +347,7 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
         inst: &Instruction,
         state: &mut MoveStateData,
     ) {
+        self.current_instruction = val_id;
         match inst {
             Instruction::Alloca | Instruction::HeapAlloc => {
                 let p = Place::new(val_id);

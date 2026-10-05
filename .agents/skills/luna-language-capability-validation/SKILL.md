@@ -108,6 +108,20 @@ observable output. Use `luna-testing-strategy` to choose the highest faithful
 test boundary; Rust tests are appropriate for compiler-internal invariants
 and for orchestrating genuine CLI/artifact E2E tests.
 
+For borrowed headers with raw fields and validity/anchor contracts, test
+transport through generic forwarding and enum wrapping/unwrapping. An existing
+validity borrow must survive those transfers; an anchor or raw address alone
+must not originate a safe loan. Include independent owned-copy and scalar
+return controls to catch phantom borrows, plus owner move, backing mutation,
+local escape and mutation after the view dies. Exercise mixed return paths
+with different direct and carried borrow sources; their effect join and
+portable representation must preserve every possible source. Opaque callbacks
+need return-loan transport as well as pointee access checks; missing body
+evidence is not proof of independence or non-escape. Keep callback scalar/read
+controls to detect phantom borrows. Check raw pointee writes through
+helpers and FFI as well as direct writes; reading a pointer's storage slot is
+not the same access effect as writing its pointee.
+
 ### 4. Validate source and artifact paths
 
 When provider/module boundaries or artifacts are involved, compare source

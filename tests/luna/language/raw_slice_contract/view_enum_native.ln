@@ -1,0 +1,13 @@
+import "provider";
+fn main() -> i32 {
+    dec rw data = [65 as u8, 0 as u8];
+    {
+        dec wrapped = views::wrap<views::View>(views::make(&data));
+        match wrapped {
+            views::Wrapped::Value(view) -> { if view.bytes()[0] != 65 as u8 { return 1; } },
+            views::Wrapped::Empty -> { return 2; },
+        }
+    }
+    data[0] = 66 as u8;
+    return data[0] as i32 - 66;
+}

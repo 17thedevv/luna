@@ -764,6 +764,7 @@ impl<'a> MetadataBuilder<'a> {
                     })
                     .collect();
                 Some(CanonicalRawPointerEffects {
+                    call: crate::encode_call_effects(summary),
                     returned: canonical_raw_effect(
                         &summary.raw_pointer_ret,
                         &summary.raw_pointer_anchor_ret,

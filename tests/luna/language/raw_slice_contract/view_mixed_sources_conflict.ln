@@ -1,0 +1,9 @@
+import "provider";
+fn main() {
+    dec rw first = [65 as u8, 0 as u8];
+    dec second = [70 as u8, 0 as u8];
+    dec source = views::make(&second);
+    dec result = views::pick(false, &source, views::make(&first));
+    first[0] = 66 as u8;
+    dec byte = result.bytes()[0];
+}

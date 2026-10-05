@@ -1,0 +1,16 @@
+trait Read { fn value(self: &Self) -> i32; }
+struct Counter { current: i32 };
+impl Read for Counter {
+    fn value(self: &Self) -> i32 { return self.current; }
+}
+fn identity<T>(value: T) -> T { return value; }
+fn apply(callback: fn(i32) -> i32, value: i32) -> i32 { return callback(value); }
+fn selected() -> fn(i32) -> i32 { return identity<i32>; }
+fn main() -> i32 {
+    dec counter = Counter { current: 17 };
+    dec callback = identity<i32>;
+    if apply(identity<i32>, Read::value(&counter)) != 17 { return 1; }
+    if apply(selected(), identity<i32>(Read::value(&counter))) != 17 { return 2; }
+    if callback(Read::value(&counter)) != 17 { return 3; }
+    return 0;
+}

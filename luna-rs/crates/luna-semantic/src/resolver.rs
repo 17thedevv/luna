@@ -61,13 +61,13 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         &self,
         segments: &[Span],
     ) -> Option<luna_common::ids::SymbolId> {
-        if segments.len() != 2 {
+        if segments.len() < 2 {
             return None;
         }
 
         let type_name = self.get_span_text(segments[0]);
-        let function_name = self.get_span_text(segments[1]);
-        let type_sym = self
+        let function_name = self.get_span_text(*segments.last()?);
+        let mut type_sym = self
             .ctx
             .symbol_table
             .lookup_with_ctxt(type_name, segments[0].ctxt, self.current_scope)
@@ -78,6 +78,11 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                     crate::ScopeId(0),
                 )
             })?;
+
+        for segment in &segments[1..segments.len() - 1] {
+            let scope = self.ctx.symbol_table.get_symbol(type_sym).inner_scope?;
+            type_sym = self.ctx.symbol_table.lookup_exact_with_ctxt(self.get_span_text(*segment), segment.ctxt, scope)?;
+        }
 
         if !matches!(
             self.ctx.symbol_table.get_symbol(type_sym).kind,

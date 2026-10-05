@@ -1,0 +1,9 @@
+import "provider";
+fn identity(value: views::View) -> views::View { return value; }
+fn forward(value: views::View, callback: fn(views::View) -> views::View) -> views::View { return callback(value); }
+fn main() {
+    dec rw data = [65 as u8, 0 as u8];
+    dec result = forward(views::make(&data), identity);
+    data[0] = 66 as u8;
+    dec byte = result.bytes()[0];
+}

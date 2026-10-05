@@ -1,6 +1,6 @@
 # Luna 0.1 documentation inventory
 
-Updated 2026-10-05. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
+Updated 2026-10-03. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
 
 All repository-authored tracked Markdown and new versioned/archived/audit documents are classified below. Agent guidance is included. Vendor documentation, generated build logs and test-failure dumps are excluded. Website pages are generated from the same baseline.
 
@@ -50,7 +50,9 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/architecture.md](architecture.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/ast.md](ast.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md](audits/0.1-alpha-completion-2026-10-04/EXECUTION.md) | evidence | [conformance](spec/0.1/conformance.md) |
-| [docs/audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md](audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md](audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md) | evidence | [semantics](spec/0.1/semantics.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md](audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md](audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/README.md](audits/0.1-alpha-completion-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/alpha-modules-2026-10-03/README.md](audits/alpha-modules-2026-10-03/README.md) | evidence | [modules](spec/0.1/modules.md) |
 | [docs/audits/provider-config-relative-2026-10-04/README.md](audits/provider-config-relative-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |

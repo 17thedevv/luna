@@ -283,3 +283,32 @@ prototype and its failure evidence are preserved; no broad safety exemption was
 applied to make source library bodies pass. This capability is incomplete.
 Closure cleanup, named/default calls, broader contracts and R3–R5 remain open.
 See the [memory audit](../../audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md).
+
+
+### Raw slice/view checkpoint — 2026-10-05, scoped checks pass; release incomplete
+
+The active repair applies raw-to-safe promotion/loan checking to reference-valued
+MakeSlice, preserves borrowed-header and callback validity facts, and keeps
+mixed direct/carried return sources. Body-derived call facts remain canonical
+across .llib import. Safe CStr constructors retain input validity; raw pointer
+constructors require unsafe caller proof. Protocol14/metadata7 require rebuilding
+previous artifacts; import does not rebuild them.
+
+The [scoped audit](../../audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md)
+reports 273 internal and 20 selected driver passes, a 3/3 memory CLI matrix,
+and 12 native plus 68 typed rejection view observations in independent source/
+artifact modes. Earlier counterexamples and failed candidate logs are retained.
+The completed expanded workspace exits101: 1,305 pass, seven fail, one ignored.
+Five targets expose an abstract-callee monomorphization regression; closure
+cleanup and a stale metadata-version oracle account for the other two. The
+[evidence](../../audits/0.1-alpha-completion-2026-10-04/evidence/workspace-raw-slice-exit.json)
+is a failing release gate, not provider certification. Closure cleanup, the adopted named/default call
+contract and broader R3–R5 obligations remain open.
+
+
+The [subsequent mono repair](../../audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md)
+passes five CLI, 43 driver and 211 semantic/metadata tests, with an expanded
+raw-view matrix of 14 native and 72 typed rejections. It removes spurious abstract
+trait callee instances without weakening the generic barrier. These focused
+results require a new full-workspace verdict; they do not subtract failures
+from the recorded full run or establish release readiness.

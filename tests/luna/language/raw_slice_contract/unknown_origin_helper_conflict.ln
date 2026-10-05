@@ -1,0 +1,11 @@
+import <mem>;
+unsafe fn write(pointer: *rw i32) { *pointer = 9; }
+unsafe fn forward_write(pointer: *rw i32) { write(pointer); }
+fn bad(pointer: *rw i32) -> i32 {
+    unsafe {
+        dec slice = std::mem::slice_from_raw_parts<i32>(pointer as *i32, 1 as u64);
+        forward_write(pointer);
+        return slice[0];
+    }
+}
+fn main() { dec rw value = 7; bad(&rw value as *rw i32); }

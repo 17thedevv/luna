@@ -33,7 +33,8 @@ pub struct TaintState {
     pub carried: HashMap<ValueId, HashSet<TaintSource>>,
     /// Provenance that represents a safe loan carried by a value or place.
     /// These sets are intentionally separate from generic data/raw-pointer
-    /// taints above: only safe-reference-bearing values may export them.
+    /// taints above: safe references and validity-contracted borrowed headers
+    /// may transport them; raw pointer fields do not originate safe loans.
     pub safe_direct: HashMap<ValueId, HashSet<TaintSource>>,
     pub safe_carried: HashMap<ValueId, HashSet<TaintSource>>,
     /// Safe-loan provenance attached to address computations. These tags are
@@ -182,7 +183,7 @@ impl<'a> EffectInference<'a> {
 
     fn can_carry_safe_loan(&self, ty: luna_semantic::SemanticTypeId) -> bool {
         self.ctx
-            .map(|ctx| ctx.types.contains_safe_reference(ty))
+            .map(|ctx| ctx.may_carry_validity_borrow(ty))
             // Context-free tests retain their conservative pre-contract model.
             .unwrap_or(true)
     }
@@ -191,6 +192,26 @@ impl<'a> EffectInference<'a> {
         self.ctx
             .map(|ctx| matches!(ctx.types.get(ctx.types.resolve(ty)), luna_semantic::SemanticType::Pointer(..)))
             .unwrap_or(false)
+    }
+
+    fn record_raw_pointee_access(&mut self, pointer: &Operand, access: &AccessKind, state: &TaintState) {
+        let Operand::Value(value) = pointer else { return; };
+        if !self.is_raw_pointer(self.func.value(*value).ty)
+            || matches!(self.func.value(*value).inst, Instruction::Alloca | Instruction::FieldPtr { .. })
+        { return; }
+        // Raw VALUE provenance identifies the parameter whose pointee is
+        // accessed. Generic data taint from loading the parameter slot has a
+        // different meaning and must not erase a subsequent pointee write.
+        for source in self.get_raw_direct_taints(state, pointer).into_iter().chain(self.get_raw_carried_taints(state, pointer)) {
+            let index = match source {
+                RawPointerSource::RawDirect(index) | RawPointerSource::RawCarried(index)
+                    | RawPointerSource::SafeDirect(index) | RawPointerSource::SafeCarried(index) => index,
+                RawPointerSource::Unknown => continue,
+            };
+            if let Some(parameter) = self.summary.args.get_mut(index) {
+                parameter.access = parameter.access.merge(access);
+            }
+        }
     }
 
     fn add_safe_value_provenance(&self, state: &mut TaintState, dest: ValueId, src: &Operand) {
@@ -523,6 +544,7 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
                 }
             }
             Instruction::Load { ptr } => {
+                self.record_raw_pointee_access(ptr, &AccessKind::Read, state);
                 for taint in self.get_direct_taints(state, ptr) {
                     if let TaintSource::Direct(arg_idx) = taint {
                         self.summary.args[arg_idx].access =
@@ -586,6 +608,7 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
                 }
             }
             Instruction::Store { ptr, value } | Instruction::StoreAnchored { ptr, value } => {
+                self.record_raw_pointee_access(ptr, &AccessKind::Write, state);
                 for taint in self.get_direct_taints(state, ptr) {
                     if let TaintSource::Direct(arg_idx) = taint {
                         self.summary.args[arg_idx].access =
@@ -750,6 +773,7 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
                                 let formal_effect = &sum.args[i];
                                 (formal_effect.access.clone(), formal_effect.ownership.clone(), formal_effect.escape.clone())
                             });
+                            self.record_raw_pointee_access(actual_arg, &access, state);
                             for taint in self.get_direct_taints(state, actual_arg) {
                                 if let TaintSource::Direct(arg_idx) = taint {
                                     self.summary.args[arg_idx].access = self.summary.args[arg_idx]
@@ -766,37 +790,22 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
                         }
                     }
 
-                    // Return mapping
-                    match &sum.ret {
-                        ReturnEffect::BorrowsFrom(indices) => {
-                            if self.can_carry_safe_loan(self.func.value(val_id).ty) {
-                                let mut ret_direct = HashSet::new();
-                                for formal_idx in indices.iter().copied() {
-                                    if formal_idx < args.len() {
-                                        ret_direct.extend(self.get_safe_direct_taints(state, &args[formal_idx]));
-                                    }
-                                }
-                                if !ret_direct.is_empty() {
-                                    state.safe_direct.insert(val_id, ret_direct);
+                    // Safe validity loans are orthogonal to raw pointer origin/anchor facts.
+                    if self.can_carry_safe_loan(self.func.value(val_id).ty) {
+                        let (direct_sources, carried_sources) = sum.ret.sources();
+                        for (indices, carried) in [(direct_sources, false), (carried_sources, true)] {
+                            let mut taints = HashSet::new();
+                            for &formal_idx in indices {
+                                if let Some(actual) = args.get(formal_idx) {
+                                    if !carried { taints.extend(self.get_safe_direct_taints(state, actual)); }
+                                    taints.extend(self.get_safe_carried_taints(state, actual));
                                 }
                             }
-                        }
-                        ReturnEffect::BorrowsCarried(indices) => {
-                            if self.can_carry_safe_loan(self.func.value(val_id).ty) {
-                                let mut ret_carried = HashSet::new();
-                                for formal_idx in indices.iter().copied() {
-                                    if formal_idx < args.len() {
-                                        // The return value carries the argument's safe-loan set,
-                                        // not its generic data/raw-pointer provenance.
-                                        ret_carried.extend(self.get_safe_carried_taints(state, &args[formal_idx]));
-                                    }
-                                }
-                                if !ret_carried.is_empty() {
-                                    state.safe_carried.insert(val_id, ret_carried);
-                                }
+                            if !taints.is_empty() {
+                                if carried { state.safe_carried.entry(val_id).or_default().extend(taints); }
+                                else { state.safe_direct.entry(val_id).or_default().extend(taints); }
                             }
                         }
-                        _ => {}
                     }
                     if self.is_raw_pointer(self.func.value(val_id).ty) {
                         match &sum.raw_pointer_ret {
@@ -957,10 +966,28 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
                         state.raw_pointer_anchor_carried.entry(val_id).or_default().insert(RawPointerAnchorSource::Unknown);
                     }
                 }
+                // A declared validity relation can attach an existing safe
+                // loan to a borrowed header even when its fields are raw. It
+                // propagates only safe loan facts, never raw address taints.
+                if self.can_carry_safe_loan(self.func.value(val_id).ty) {
+                    if let Some(contract) = self.ctx.and_then(|ctx| callee.symbol_id.and_then(|symbol| ctx.tables.fn_lifetime_contracts.get(&symbol))) {
+                        if let Some(provenance) = &contract.return_provenance {
+                            for index in provenance.indices() {
+                                if let Some(argument) = args.get(*index as usize) {
+                                    let direct = self.get_safe_direct_taints(state, argument);
+                                    let carried = self.get_safe_carried_taints(state, argument);
+                                    state.safe_direct.entry(val_id).or_default().extend(direct);
+                                    state.safe_carried.entry(val_id).or_default().extend(carried);
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            Instruction::CallIndirect { args, .. } | Instruction::CallClosure { args, .. } => {
+            Instruction::CallIndirect { args, callee } | Instruction::CallClosure { args, closure: callee } => {
                 // Fallback to conservative unknown
                 for arg in args.iter() {
+                    self.record_raw_pointee_access(arg, &AccessKind::Unknown, state);
                     for taint in self.get_direct_taints(state, arg) {
                         if let TaintSource::Direct(arg_idx) = taint {
                             self.summary.args[arg_idx].access = self.summary.args[arg_idx]
@@ -974,6 +1001,22 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
                                 .merge(&OwnershipKind::Unknown);
                         }
                     }
+                }
+                // Opaque calls may return any validity loan in their arguments
+                // or closure environment. Absence of a body is not independence.
+                if self.can_carry_safe_loan(self.func.value(val_id).ty) {
+                    for carrier in args.iter().chain(std::iter::once(callee)) {
+                        let direct = self.get_safe_direct_taints(state, carrier);
+                        let carried = self.get_safe_carried_taints(state, carrier);
+                        state.safe_direct.entry(val_id).or_default().extend(direct);
+                        state.safe_carried.entry(val_id).or_default().extend(carried);
+                    }
+                }
+                if self.is_raw_pointer(self.func.value(val_id).ty) {
+                    state.raw_direct.entry(val_id).or_default().insert(RawPointerSource::Unknown);
+                    state.raw_carried.entry(val_id).or_default().insert(RawPointerSource::Unknown);
+                    state.raw_pointer_anchor_direct.entry(val_id).or_default().insert(RawPointerAnchorSource::Unknown);
+                    state.raw_pointer_anchor_carried.entry(val_id).or_default().insert(RawPointerAnchorSource::Unknown);
                 }
             }
             Instruction::MakeTraitObject { data_ptr, .. } => {
@@ -999,6 +1042,15 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
                 }
             }
             Instruction::MakeSlice { data_ptr, .. } => {
+                if let Some(ctx) = self.ctx {
+                    if let luna_semantic::SemanticType::Reference(_, mutability, element) = ctx.types.get(ctx.types.resolve(self.func.value(val_id).ty)) {
+                        if matches!(ctx.types.get(ctx.types.resolve(*element)), luna_semantic::SemanticType::Slice(_)) {
+                            let borrow = Instruction::Borrow { is_rw: *mutability == luna_semantic::ty::Mutability::Mutable, base: data_ptr.clone() };
+                            self.transfer_instruction(val_id, &borrow, state);
+                            return;
+                        }
+                    }
+                }
                 self.add_direct_taint(state, val_id, data_ptr);
                 self.add_carried_taint(state, val_id, data_ptr);
                 self.add_safe_value_provenance(state, val_id, data_ptr);
@@ -1202,7 +1254,7 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
             }
             let ret_can_borrow = if let Some(ctx) = self.ctx {
                 let sem_ty = self.func.ret_ty;
-                ctx.types.contains_safe_reference(sem_ty)
+                ctx.may_carry_validity_borrow(sem_ty)
             } else {
                 true
             };
@@ -1253,10 +1305,24 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
                     // Notice: We don't necessarily Consume the base pointer,
                     // but the borrow checker will handle the carried loan.
                 }
-            } else if !carried_taints.is_empty() {
-                // If it returns a struct with carried provenance,
-                // we don't currently track it via ReturnEffect.
-                // It just returns a value, and the caller will construct the struct.
+            }
+            if !carried_taints.is_empty() {
+                let mut direct_args = Vec::new();
+                let mut carried_args = Vec::new();
+                for taint in carried_taints {
+                    match taint {
+                        TaintSource::Direct(index) => direct_args.push(index),
+                        TaintSource::Carried(index) => carried_args.push(index),
+                    }
+                }
+                direct_args.sort_unstable(); direct_args.dedup();
+                carried_args.sort_unstable(); carried_args.dedup();
+                if !direct_args.is_empty() {
+                    self.summary.ret = self.summary.ret.merge(&ReturnEffect::BorrowsFrom(direct_args));
+                }
+                if !carried_args.is_empty() {
+                    self.summary.ret = self.summary.ret.merge(&ReturnEffect::BorrowsCarried(carried_args));
+                }
             }
         }
     }
@@ -1776,7 +1842,9 @@ mod tests {
         );
 
         let summary = EffectInference::infer(&func, vec![ValueId(0)], None);
-        assert_eq!(summary.ret, ReturnEffect::BorrowsFrom(vec![0]));
+        // Without semantic types, the formal may itself carry another loan.
+        // Both source channels must survive rather than discarding the latter.
+        assert_eq!(summary.ret, ReturnEffect::BorrowsBoth { direct: vec![0], carried: vec![0] });
     }
 
     #[test]
@@ -1889,7 +1957,7 @@ mod tests {
         });
 
         let summary = EffectInference::infer(&func, vec![ValueId(0), ValueId(1)], None);
-        assert_eq!(summary.ret, ReturnEffect::BorrowsFrom(vec![0, 1])); // Merged provenance
+        assert_eq!(summary.ret, ReturnEffect::BorrowsBoth { direct: vec![0, 1], carried: vec![0, 1] });
     }
 
     #[test]
@@ -1931,6 +1999,3 @@ mod tests {
         assert_eq!(summary.args[0].ownership, OwnershipKind::Copy); // Kept at default Copy, not Consume!
     }
 }
-
-
-

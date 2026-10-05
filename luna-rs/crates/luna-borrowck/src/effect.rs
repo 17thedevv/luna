@@ -77,6 +77,8 @@ pub enum ReturnEffect {
     Independent,
     BorrowsFrom(Vec<usize>), // Arg indices
     BorrowsCarried(Vec<usize>),
+    /// Preserve formal-storage and carried-loan sources from all return paths.
+    BorrowsBoth { direct: Vec<usize>, carried: Vec<usize> },
     Unknown,
 }
 
@@ -203,87 +205,52 @@ impl RawPointerAnchorReturnEffect {
 
 impl PartialOrd for ReturnEffect {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self == other {
-            return Some(std::cmp::Ordering::Equal);
-        }
+        use std::cmp::Ordering;
+        if self == other { return Some(Ordering::Equal); }
         match (self, other) {
-            (ReturnEffect::Independent, _) => Some(std::cmp::Ordering::Less),
-            (_, ReturnEffect::Independent) => Some(std::cmp::Ordering::Greater),
-            (ReturnEffect::Unknown, _) => Some(std::cmp::Ordering::Greater),
-            (_, ReturnEffect::Unknown) => Some(std::cmp::Ordering::Less),
-            // Partial ordering between BorrowsFrom and BorrowsCarried is complex,
-            // we will treat them as incomparable if they mix, but we can compare same types
-            (ReturnEffect::BorrowsFrom(a), ReturnEffect::BorrowsFrom(b)) |
-            (ReturnEffect::BorrowsCarried(a), ReturnEffect::BorrowsCarried(b)) => {
-                let a_is_subset = a.iter().all(|x| b.contains(x));
-                let b_is_subset = b.iter().all(|x| a.contains(x));
-                if a_is_subset && b_is_subset {
-                    Some(std::cmp::Ordering::Equal)
-                } else if a_is_subset {
-                    Some(std::cmp::Ordering::Less)
-                } else if b_is_subset {
-                    Some(std::cmp::Ordering::Greater)
-                } else {
-                    None
+            (Self::Independent, _) | (_, Self::Unknown) => Some(Ordering::Less),
+            (_, Self::Independent) | (Self::Unknown, _) => Some(Ordering::Greater),
+            _ => {
+                let (ad, ac) = self.sources();
+                let (bd, bc) = other.sources();
+                let a_subset = ad.iter().all(|i| bd.contains(i)) && ac.iter().all(|i| bc.contains(i));
+                let b_subset = bd.iter().all(|i| ad.contains(i)) && bc.iter().all(|i| ac.contains(i));
+                match (a_subset, b_subset) {
+                    (true, true) => Some(Ordering::Equal),
+                    (true, false) => Some(Ordering::Less),
+                    (false, true) => Some(Ordering::Greater),
+                    (false, false) => None,
                 }
             }
-            _ => None,
         }
     }
 }
 
 impl ReturnEffect {
-    pub fn merge(&self, other: &Self) -> Self {
-        match (self, other) {
-            (ReturnEffect::Unknown, _) | (_, ReturnEffect::Unknown) => ReturnEffect::Unknown,
-            (ReturnEffect::BorrowsFrom(a), ReturnEffect::BorrowsFrom(b)) => {
-                let mut merged = a.clone();
-                for &idx in b {
-                    if !merged.contains(&idx) {
-                        merged.push(idx);
-                    }
-                }
-                merged.sort();
-                ReturnEffect::BorrowsFrom(merged)
-            }
-            (ReturnEffect::BorrowsCarried(a), ReturnEffect::BorrowsCarried(b)) => {
-                let mut merged = a.clone();
-                for &idx in b {
-                    if !merged.contains(&idx) {
-                        merged.push(idx);
-                    }
-                }
-                merged.sort();
-                ReturnEffect::BorrowsCarried(merged)
-            }
-            // If they mix, we could upgrade to a combined effect, but for now we fallback to Unknown
-            // or just take BorrowsFrom which is more conservative (since it borrows the object itself)
-            (ReturnEffect::BorrowsFrom(_), ReturnEffect::BorrowsCarried(_)) |
-            (ReturnEffect::BorrowsCarried(_), ReturnEffect::BorrowsFrom(_)) => {
-                // If a function returns something that borrows BOTH from the argument and what it carries,
-                // borrowing from the argument is strictly more restrictive.
-                if let ReturnEffect::BorrowsFrom(_) = self {
-                    self.clone()
-                } else {
-                    other.clone()
-                }
-            }
-            (ReturnEffect::BorrowsFrom(a), ReturnEffect::Independent) => {
-                ReturnEffect::BorrowsFrom(a.clone())
-            }
-            (ReturnEffect::Independent, ReturnEffect::BorrowsFrom(b)) => {
-                ReturnEffect::BorrowsFrom(b.clone())
-            }
-            (ReturnEffect::BorrowsCarried(a), ReturnEffect::Independent) => {
-                ReturnEffect::BorrowsCarried(a.clone())
-            }
-            (ReturnEffect::Independent, ReturnEffect::BorrowsCarried(b)) => {
-                ReturnEffect::BorrowsCarried(b.clone())
-            }
-            (ReturnEffect::Independent, ReturnEffect::Independent) => ReturnEffect::Independent,
+    pub fn sources(&self) -> (&[usize], &[usize]) {
+        match self {
+            Self::BorrowsFrom(indices) => (indices, &[]),
+            Self::BorrowsCarried(indices) => (&[], indices),
+            Self::BorrowsBoth { direct, carried } => (direct, carried),
+            Self::Independent | Self::Unknown => (&[], &[]),
         }
     }
 
+    pub fn merge(&self, other: &Self) -> Self {
+        if matches!(self, Self::Unknown) || matches!(other, Self::Unknown) { return Self::Unknown; }
+        let (ad, ac) = self.sources();
+        let (bd, bc) = other.sources();
+        let mut direct = ad.iter().chain(bd).copied().collect::<Vec<_>>();
+        let mut carried = ac.iter().chain(bc).copied().collect::<Vec<_>>();
+        direct.sort_unstable(); direct.dedup();
+        carried.sort_unstable(); carried.dedup();
+        match (direct.is_empty(), carried.is_empty()) {
+            (true, true) => Self::Independent,
+            (false, true) => Self::BorrowsFrom(direct),
+            (true, false) => Self::BorrowsCarried(carried),
+            (false, false) => Self::BorrowsBoth { direct, carried },
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

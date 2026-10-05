@@ -1287,3 +1287,89 @@ SKILL IMPACT: REFINE capability-validation guidance for same-signature
 safe/unsafe callbacks, generic value identity, mutable/opaque dispatch and
 portable identity. The changed skill was reread fully and checked against
 semantic/testing/boundary guidance; no freeze authority or unsafe waiver added.
+
+
+## 2026-10-05 — raw slice/view validity and portable call effects
+
+This checkpoint continues the complete R0–R5 plan. The maintainer's independent
+impl/method binder decision remains in force; no name-based binder joining is
+introduced. The [scoped audit](RAW-SLICE-VIEWS.md) and
+[candidate pin](evidence/raw-slice-candidate-pin.json) are relative to f832db2.
+
+The existing nonignored memory raw-slice regression now passes. The fix applies
+normal raw-to-safe promotion to reference-valued MakeSlice; separates pointer
+value origin from slot address; preserves empty/unknown evidence; checks pointee
+access through direct calls, helpers, FFI and opaque callbacks; and transports
+existing validity loans through generic/enum/header and callback returns. Mixed
+return paths retain both direct and carried source sets. Actual return loans
+trigger region checks; consumed storage events trigger loan invalidation checks.
+No anchor or raw address creates a safe loan by itself.
+
+Unsafe CStr raw constructors now state caller proof obligations; safe byte and
+CString view APIs retain legitimate lifetime relations. An ordinary `views::View`
+is the independent reproducer. Metadata7/protocol14 preserve typed canonical
+body-derived call facts; earlier artifacts require rebuilding through tooling.
+No stdlib-specific type/API spelling branch or new language operation was added.
+
+| Focused gate | Final result |
+|---|---|
+| Canonical sysroot | 49 providers built |
+| Full semantic / borrowck / metadata | 195 / 62 / 16 pass; 0 fail, 0 ignored |
+| Selected driver suites | 20 pass; owned-copy/scalar/unanchored controls retained |
+| Memory CLI | 3/3 pass; 12 native and 88 typed rejection observations |
+| View/provenance CLI | 1 harness pass; 12 native and 68 typed rejection observations in source/artifact modes |
+
+Counterexamples found while broadening the matrix (helper writes, mixed return
+sources, opaque writes and opaque view returns) remain evidence, alongside
+intermediate fixture-syntax/lattice-test failures. No failing oracle was ignored
+or weakened. One overlapping workspace build failed on a Windows executable
+lock; a later partial run was stopped before a discovered callback repair.
+Both attempts are preserved separately. The expanded run completed with a
+FAIL verdict; the uninterrupted result and input audit are recorded below.
+
+Closure environment destruction and its pending consuming-call policy,
+adopted named/default arguments, broader retained-contract/provider/diagnostic
+coverage and R3–R5 final-candidate gates remain open. No merge/tag/freeze
+readiness is asserted. The completed result below does not rewrite the earlier
+9e45ca9 failures.
+
+SKILL IMPACT: REFINE capability acceptance for borrowed headers, mixed sources
+and opaque callbacks. CORRECT semantic guidance that overstated unsafe waivers,
+container guarantees and implementation authority. Canonical/adopted contracts
+remain governing; code/examples use current component providers. Full reread
+and cross-skill conflict checks are recorded in the scoped audit.
+
+
+### Completed workspace gate — 2026-10-05
+
+The [uninterrupted raw log](evidence/workspace-raw-slice.txt.gz) and
+[exit record](evidence/workspace-raw-slice-exit.json) report **exit101:
+1,305 passed, seven failed, one ignored**. Five failed targets expose E5001
+at the generic barrier during source trait calls; the remaining failures are
+owned closure capture cleanup and an outdated metadata-v5 test oracle.
+They remain failures pending repair, with no release PASS claimed.
+
+The [input audit](evidence/workspace-raw-slice-audit.json) verifies all 39
+start-pinned source inputs were unchanged. The raw dynamic-path comparison
+reported false after tests created a tracked generated MVIR dump; that
+[output diff](evidence/workspace-raw-slice-generated-model.patch.gz) is preserved
+and the generated file restored. Cargo rebuilt the CLI during workspace
+compilation; the final workspace binary and earlier focused binary have
+separate hashes. Raw flags are preserved without rewriting them as PASS.
+
+
+### Direct-callee mono repair and expanded view matrix — 2026-10-05
+
+The [scoped mono audit](MONO-CALLEE-ROLE.md) traces the E5001 regression to
+f832db2's function-value fallback traversing abstract trait callees. The visitor
+now distinguishes a call's immediate callee from actual values; nested generic
+callback values still instantiate normally. The stale metadata oracle now
+requires metadata7, retaining incompatible-version rejection.
+
+The [new pin](evidence/mono-role-candidate-pin.json) and lossless logs record
+fresh 49-provider build, five CLI, 43 driver and 211 semantic/metadata passes.
+The expanded raw-view harness adds generic enum transport and passes 14 native
+plus 72 typed rejections in both modes. These are scoped results, not a recomputed
+workspace PASS. The earlier full FAIL 1305/7/1 remains unchanged; the next full
+run must establish a new verdict. Closure cleanup, named/defaults and broader
+R3–R5 remain open.

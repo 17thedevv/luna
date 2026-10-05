@@ -1,0 +1,6 @@
+{
+  "utc": "2026-10-05T05:59:17.196870+00:00",
+  "status": "aborted, not a completed workspace result",
+  "reason": "New opaque raw-pointer callback counterexample passes check incorrectly; stop owned verification tree before changing candidate sources and rerun after generic access fix",
+  "raw_log_sha256": "8a39b0aba5cf92832b2c2c32db7b64efd3e99cd366d6c87d60b43ba72764da54"
+}

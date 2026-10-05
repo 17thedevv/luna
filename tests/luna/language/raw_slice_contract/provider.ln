@@ -1,0 +1,31 @@
+import <mem>;
+export module views {
+    export struct View { private pointer: *u8, private length: u64, } requires anchor(pointer) = self;
+    export fn make(bytes: &[u8]) -> View life_from(bytes) {
+        unsafe { return View { pointer: bytes.data as *u8, length: bytes.len as u64 }; }
+    }
+    export fn forward<T>(value: T) -> T { return value; }
+    export enum Wrapped<T> { Value(T), Empty }
+    export fn wrap<T>(value: T) -> Wrapped<T> { return Wrapped<T>::Value(value); }
+    export fn read_first(bytes: &[i32]) -> i32 { return bytes[0]; }
+    export fn forward_byte(bytes: &[u8], predicate: fn(u8) -> bool) -> u8 {
+        if predicate(bytes[0]) { return bytes[0]; }
+        return 0 as u8;
+    }
+    export fn forward_ref_byte(bytes: &[u8], predicate: fn(&u8) -> bool) -> u8 {
+        if predicate(&bytes[0]) { return bytes[0]; }
+        return 0 as u8;
+    }
+    export fn pick(flag: bool, source: &View, incoming: View) -> View {
+        if flag {
+            unsafe { return make(std::mem::slice_from_raw_parts<u8>(source.pointer, source.length)); }
+        }
+        return incoming;
+    }
+    impl View {
+        export fn from_bytes(bytes: &[u8]) -> Self life_from(bytes) { return make(bytes); }
+        export fn bytes(self: &Self) -> &[u8] life_from(self) {
+            unsafe { return std::mem::slice_from_raw_parts<u8>(self.pointer, self.length); }
+        }
+    }
+}

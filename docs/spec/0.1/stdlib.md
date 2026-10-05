@@ -28,6 +28,17 @@ storage that was not allocated. Library preconditions must distinguish unsafe
 raw operations from safe public methods. Generic helpers must not reinterpret
 arbitrary `T` storage as i32 or another particular library element type.
 
+`CStr` is a borrowed raw-backed view. `cstr_from_bytes_with_nul` and
+`CStr::from_bytes_with_nul` retain the input byte-slice validity relation;
+`CString::as_c_str` retains its receiver relation. These relations survive
+Result extraction and generic forwarding. `cstr_from_ptr` and
+`CStr::from_ptr` require `unsafe`: the caller proves readable, initialized,
+NUL-terminated storage that remains valid for the view and all its borrows.
+The raw constructor supplies no safe provenance proof by itself. A safe
+view cannot escape local backing storage or permit invalidation of a live
+borrow. See the [scoped repair audit](../../audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md)
+for current verification rather than a blanket release claim.
+
 ## Numeric, text and optimization boundaries
 
 Convert and Display inherit correct generic integer widening; they must not

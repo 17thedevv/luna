@@ -55,6 +55,7 @@ fn method_applicability_and_binder_identity_survive_provider_modes_and_order() {
             fs::rename(project, &relocated).unwrap();
             for name in [
                 "qualified_traits",
+                "nested_callable_role",
                 "inapplicable_inherent_bound",
                 "inapplicable_inherent_arity",
                 "inapplicable_inherent_type",

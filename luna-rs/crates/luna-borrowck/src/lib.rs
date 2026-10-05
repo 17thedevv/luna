@@ -95,10 +95,11 @@ fn analyze_with_guarded_drops(
     let (mut borrow_diagnostics, shadow_comparisons) = if intrinsic_body.is_some() {
         (Vec::new(), Vec::new())
     } else {
-        crate::borrow_analysis::BorrowAnalyzer::analyze_with_shadow(
+        crate::borrow_analysis::BorrowAnalyzer::analyze_with_consumed_places(
             &cleaned_func,
             Some(summaries),
             Some(_ctx),
+            &move_analyzer.consumed_places,
         )
     };
     diagnostics.append(&mut borrow_diagnostics);

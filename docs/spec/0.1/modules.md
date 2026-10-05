@@ -79,8 +79,9 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 13 rejects compiler versions 1–12. This revision requires
-checked memory-hook identities and callable safety in addition to
+protocol version 14 rejects compiler versions 1–13. This revision requires
+revalidated raw-to-safe slice promotion and checked memory-hook identities
+and callable safety in addition to
 native integrity envelopes and portable payload checksums, and retains
 ordered nominal representations, validated target contracts, public generic
 constraints and individual impl contracts, alongside the earlier
@@ -89,7 +90,12 @@ version 4 carries portable immutable static data whose initializer and type
 shape contain no semantic-session IDs or VM addresses. Rebuild incompatible
 artifacts through build tooling; import never rebuilds or falls back from a
 selected invalid artifact. File format version remains 2; semantic metadata
-version is 6. These are internal compatibility revisions, not a declaration of
+version is 7. Body-derived call access, ownership, escape and safe-return
+effects are stored using canonical parameter positions independently of raw
+origin and anchor effects. Mixed direct/carried safe-return sources retain
+both canonical index sets. Imports retain the non-escaping proof instead of
+replacing it with an opaque fallback; absent facts remain conservative.
+These are internal compatibility revisions, not a declaration of
 language release readiness.
 
 Target identity binds the selected triple, CPU/features, emitted object format,

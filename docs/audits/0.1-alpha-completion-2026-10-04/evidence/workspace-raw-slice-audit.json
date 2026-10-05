@@ -1,0 +1,8 @@
+{
+  "pinned_input_count": 39,
+  "pinned_input_differences": [],
+  "added_generated_output": "luna-rs/crates/luna-driver/test_model.mvir",
+  "raw_source_unchanged_flag_explanation": "Dynamic changed-path enumeration added the generated test_model.mvir output; all start-pinned input bytes remained identical.",
+  "workspace_cli_sha256": "ea6770a0619dda064593f6fa8affd998a732cb8d6ae13a67f86ac1858503a90e",
+  "cli_changed_explanation": "Cargo rebuilt the workspace CLI; focused-suite binary identity and workspace-end binary identity are separate."
+}

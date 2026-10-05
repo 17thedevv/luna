@@ -1,0 +1,10 @@
+import <mem>;
+extern fn mutate(pointer: *rw i32);
+fn bad(pointer: *rw i32) -> i32 {
+    unsafe {
+        dec slice = std::mem::slice_from_raw_parts<i32>(pointer as *i32, 1 as u64);
+        mutate(pointer);
+        return slice[0];
+    }
+}
+fn main() {}
