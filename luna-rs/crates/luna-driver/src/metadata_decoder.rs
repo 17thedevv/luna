@@ -554,16 +554,12 @@ impl InterfaceDecoder {
             }
             CanonicalType::Array(t, len) => SemanticType::Array(self.decode_type_index(t), len),
             CanonicalType::Slice(t) => SemanticType::Slice(self.decode_type_index(t)),
-            CanonicalType::Function {
-                params,
-                return_type,
-            } => SemanticType::Function {
+            CanonicalType::Function { params, return_type, is_unsafe } => SemanticType::Function {
                 params: params
                     .into_iter()
                     .map(|p| self.decode_type_index(p))
                     .collect(),
-                return_type: self.decode_type_index(return_type),
-            },
+                return_type: self.decode_type_index(return_type), is_unsafe },
             CanonicalType::Pointer(mutability, t) => {
                 SemanticType::Pointer(mutability, self.decode_type_index(t))
             }

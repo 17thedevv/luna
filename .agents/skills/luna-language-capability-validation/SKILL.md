@@ -93,6 +93,15 @@ Negative cases must reject for the right semantic reason where observable.
 Do not suppress diagnostics or weaken safety checks to make positive cases
 pass.
 
+For callable identity/safety, compare safe and unsafe functions with identical
+parameter/return shapes. Exercise local values, returned/generic callbacks,
+known immutable targets, mutable reassignment and genuinely opaque indirect
+calls. A value-selected generic instance must retain its substitution at later
+calls; parser acceptance or a direct-call success does not prove this path.
+Verify portable callable safety and public interface identity as well as AST
+rechecking. Keep unresolved reference/loan failures separate from native ABI
+success; a callable matrix cannot waive an independent safety regression.
+
 For executable language behavior, include a real `.ln` fixture compiled,
 linked, and run through the supported toolchain, checking exit code and/or
 observable output. Use `luna-testing-strategy` to choose the highest faithful

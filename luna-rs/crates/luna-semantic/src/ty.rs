@@ -80,7 +80,7 @@ pub enum SemanticType {
     Tuple(Vec<SemanticTypeId>),
     Array(SemanticTypeId, u64),
     Slice(SemanticTypeId),
-    Function { params: Vec<SemanticTypeId>, return_type: SemanticTypeId },
+    Function { params: Vec<SemanticTypeId>, return_type: SemanticTypeId, is_unsafe: bool },
     Pointer(Mutability, SemanticTypeId),
     Reference(LifetimeId, Mutability, SemanticTypeId),
     Void,
@@ -220,10 +220,10 @@ impl TypeContext {
                 let new_args: Vec<_> = args.iter().map(|&a| self.subst(a, subst)).collect();
                 self.intern(SemanticType::Tuple(new_args))
             }
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, is_unsafe } => {
                 let new_params: Vec<_> = params.iter().map(|&p| self.subst(p, subst)).collect();
                 let new_ret = self.subst(return_type, subst);
-                self.intern(SemanticType::Function { params: new_params, return_type: new_ret })
+                self.intern(SemanticType::Function { params: new_params, return_type: new_ret, is_unsafe })
             }
             SemanticType::Pointer(mutability, inner) => {
                 let new_inner = self.subst(inner, subst);
@@ -273,7 +273,7 @@ impl TypeContext {
             SemanticType::Array(inner, _) | SemanticType::Slice(inner) | SemanticType::Pointer(_, inner) | SemanticType::Reference(_, _, inner) => {
                 self.occurs_check(var, inner)
             }
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, .. } => {
                 params.iter().any(|&p| self.occurs_check(var, p)) || self.occurs_check(var, return_type)
             }
             SemanticType::Closure(_, captures, ret) => captures.iter().any(|&c| self.occurs_check(var, c)) || self.occurs_check(var, ret),
@@ -427,7 +427,7 @@ impl TypeContext {
             SemanticType::Range(inner) => {
                 self.type_flags(inner)
             }
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, .. } => {
                 let mut has_infer = false;
                 let mut has_gen = false;
                 let mut has_err = false;
@@ -495,10 +495,10 @@ impl TypeContext {
                 let new_elem = self.clone_type_from(elem, source_ctx, lookup_sym);
                 self.intern(SemanticType::Slice(new_elem))
             }
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, is_unsafe } => {
                 let new_params: Vec<_> = params.iter().map(|&p| self.clone_type_from(p, source_ctx, lookup_sym)).collect();
                 let new_ret = self.clone_type_from(return_type, source_ctx, lookup_sym);
-                self.intern(SemanticType::Function { params: new_params, return_type: new_ret })
+                self.intern(SemanticType::Function { params: new_params, return_type: new_ret, is_unsafe })
             }
             SemanticType::Pointer(mutability, inner) => {
                 let new_inner = self.clone_type_from(inner, source_ctx, lookup_sym);

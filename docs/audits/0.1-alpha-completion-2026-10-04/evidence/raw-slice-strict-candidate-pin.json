@@ -1,0 +1,9 @@
+{
+  "base_revision": "9e45ca96f58e7e735cc9b2ed007d25c43a3be260",
+  "diff_sha256": "c6d8d46f3a8e74896a39467ee8c4690a186c823030ab6a76875855bc2e5081a2",
+  "cli_sha256": "15f2e8831953cf3ceb263bbb55c3f7145267626ae56f40eb0733aa5d5295ffe8",
+  "log_sha256": "d9e47039c506ce4bdc2cc9f2fccaa4cb780474f687e61138a461e17eb1660a8f",
+  "verdict": "FAILED: stricter reference promotion exposes CStr lifetime and str/raw conversion gaps; not a release gate or deployed repair",
+  "changed_sources_snapshot_sha256": "a12e2e73fe709b123a4f2d563142db03b7bd7d28cbfe4b3f77d408963b5bdb31",
+  "archived_patch_uncompressed_sha256": "c6d8d46f3a8e74896a39467ee8c4690a186c823030ab6a76875855bc2e5081a2"
+}

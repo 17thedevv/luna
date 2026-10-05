@@ -1202,3 +1202,88 @@ SKILL IMPACT: REFINE capability-validation guidance with distinct integrity and
 coherent target controls, generic portable-body corruption, publication failure
 and checksum limitations. The changed skill was reread in full and checked
 against testing/boundary guidance; no semantic authority was added.
+
+
+## Memory primitive identity and callable safety — 2026-10-05
+
+Base revision:9e45ca96f58e7e735cc9b2ed007d25c43a3be260. The
+[uninterrupted workspace gate](evidence/workspace-integrity.txt.gz) exits101:
+1,297 pass,2 fail,1 ignored. Its start/exit pins retain the exact binary/runtime
+hashes and target. `generic_drop_cli::closure_capture` exits3 in both modes;
+the safe-loan aggregate test encounters a Windows code32 input-copy sharing
+violation. No earlier failed run has been changed to PASS.
+
+The [independent before probes](evidence/intrinsic-name-before/observations.json)
+expose ordinary user-function names incorrectly selecting Drop/MakeSlice and a
+zero-argument compiler panic. The [detailed repair/audit](MEMORY-CALLABLES.md)
+records typed memory-hook identity, validated signatures, native thunks,
+semantic/portable callable safety and canonical generic function-value identity.
+Three tags describe existing unsafe primitives; no autoload/prelude family or
+container-specific branch was added. Impl/method binder independence remains
+the adopted policy; Eq/Clone constraints belong on the impl binder.
+
+### Verification and oracle correction
+
+The initial [CLI checkpoint](evidence/memory-intrinsic-cli-canonical.txt.gz) is
+2 pass,1 fail. A later [metadata run](evidence/memory-callable-final-cli.txt.gz) is
+0 pass,3 fail because its new hash assertion read the builder's zero placeholder
+rather than the authoritative manifest fingerprint, alongside the independent
+loan failure. That failure is preserved. The corrected test compares manifest
+identity with the serialized canonical interface hash and requires safety
+changes to alter it; expected language behavior was not changed.
+
+The [final CLI run](evidence/memory-callable-oracle-cli.txt.gz) is2 pass,1 fail,
+0 ignored. It establishes12 native success observations and88 typed rejection
+observations across original/renamed canonical hooks and independent source-only/
+artifact-only roots. Two public callback signature comparisons preserve the
+serialized safety bit and change the canonical interface identity.
+
+| Gate | Completed result |
+|---|---|
+| [Full semantic](evidence/memory-callable-final-semantic.txt.gz) | 194 pass,0 fail |
+| [Full borrowck](evidence/memory-callable-final-borrowck.txt.gz) | 61 pass,0 fail; exact generated thunk recipe mutation rejection included |
+| [Parser function values](evidence/memory-callable-final-parser.txt.gz) | 2 pass,0 fail |
+| [Driver safe-loan/metadata/strict artifact](evidence/memory-callable-final-driver.txt.gz) | 4+9+5=18 pass,0 fail |
+| [Official canonical sysroot](evidence/memory-callable-final-sysroot.txt.gz) | 49 providers built successfully |
+| [Workspace compile/no-run](evidence/memory-callable-workspace-no-run.txt.gz) | exit0 before the later metadata test addition; final test harness also compiles/runs |
+| [Documentation validator](evidence/memory-callable-doc-validation.txt.gz) | no errors; does not certify language conformance |
+
+The [candidate pin](evidence/memory-callable-candidate-pin.json) records binary,
+runtime, changed source and raw-log hashes, target and protocol13/metadata6.
+Its [source snapshot](evidence/memory-callable-candidate-sources.json.gz) retains
+the uncommitted candidate relative to9e45ca9. These focused checks do not replace
+a complete workspace/CI gate on the final candidate.
+
+### Remaining correctness blocker and rejected prototype
+
+Direct and known immutable callback raw-slice construction fail to create the
+required shared loan. A later mutation before the slice's last read incorrectly
+passes check/build in both modes. All eight expected E3003 observations remain
+failures in the permanent nonignored regression; no xfail/ignore was added.
+
+The [strict prototype](evidence/raw-slice-strict-candidate.patch.gz),
+[source snapshot](evidence/raw-slice-strict-candidate-sources.json.gz),
+[pin](evidence/raw-slice-strict-candidate-pin.json) and
+[failed log](evidence/memory-intrinsic-cli-loans.txt.gz) retain the attempt to apply
+normal raw-to-safe promotion to MakeSlice. It exposes CStr and primitive-str
+origin/escape gaps in the string sysroot build. This prototype was not adopted;
+no arbitrary source-body safety exemption or invented owner provenance was used.
+
+Next work: establish legitimate raw-slice loans/extent and string-view lifetime
+contracts, finish moved-closure cleanup, implement the adopted named/default
+call contract, and close R3–R5/exact-revision release gates. Code-inspected CStr
+safe raw-pointer construction needs independent misuse probes before a broader
+completion claim. No merge/tag/release readiness is asserted.
+
+Compiler Change
+- Capability: memory-hook/callable identity and canonical function-value dispatch.
+- Why stdlib exposed it: generic ptr/mem primitives and source/artifact providers.
+- Why generic: typed hooks and ordinary SymbolId/binder identity, independent of API/container spelling.
+- User-defined beneficiary/tests: ordinary generic/non-generic callbacks, Tracker Drop and the CLI/invariant matrices above.
+- New intrinsic/lang_item: three explicit tags for existing primitives; no new operation or bootstrap acquisition family.
+- Stdlib-specific branch: NO.
+
+SKILL IMPACT: REFINE capability-validation guidance for same-signature
+safe/unsafe callbacks, generic value identity, mutable/opaque dispatch and
+portable identity. The changed skill was reread fully and checked against
+semantic/testing/boundary guidance; no freeze authority or unsafe waiver added.

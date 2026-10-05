@@ -1,0 +1,33 @@
+import "provider";
+fn drop_in_place(x: i32) -> i32 { return x + 17; }
+fn slice_from_raw_parts() -> i32 { return 19; }
+fn main() -> i32 {
+    if drop_in_place(5) != 22 { return 1; }
+    if slice_from_raw_parts() != 19 { return 2; }
+    if ordinary::drop_in_place(5) != 12 { return 3; }
+    if ordinary::innocent_drop_in_place(5) != 13 { return 4; }
+    if ordinary::slice_from_raw_parts() != 9 { return 5; }
+    if ordinary::slice_from_raw_parts_mut() != 10 { return 6; }
+    if ordinary::my_slice_from_raw_parts<i32>(17) != 17 { return 7; }
+    dec callback = ordinary::drop_in_place;
+    if callback(9) != 16 { return 8; }
+    dec generic_callback = ordinary::my_slice_from_raw_parts<i32>;
+    if generic_callback(23) != 23 { return 9; }
+    dec dangerous = ordinary::dangerous;
+    unsafe { if dangerous(4) != 7 { return 10; } }
+    dec safe_callback: fn(i32) -> i32 = ordinary::safe;
+    if safe_callback(4) != 6 { return 11; }
+    dec returned = ordinary::return_dangerous();
+    unsafe { if returned(5) != 8 { return 12; } }
+    dec generic_effect = ordinary::identity<unsafe fn(i32) -> i32>(ordinary::dangerous);
+    unsafe { if generic_effect(6) != 9 { return 13; } }
+    dec rw reassigned: fn(i32) -> i32 = ordinary::safe;
+    reassigned = ordinary::drop_in_place;
+    if reassigned(4) != 11 { return 14; }
+    dec alias = generic_callback;
+    if alias(29) != 29 { return 15; }
+    dec rw selected: fn(i32) -> i32 = ordinary::safe;
+    if callback(9) == 16 { selected = ordinary::innocent_drop_in_place; }
+    if selected(4) != 12 { return 16; }
+    return 0;
+}

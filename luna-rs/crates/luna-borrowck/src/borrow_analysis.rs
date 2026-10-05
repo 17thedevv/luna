@@ -1645,7 +1645,7 @@ let val_op = Operand::Value(*val);
         let symbol = callee.symbol_id?;
         let fn_ty = ctx.tables.symbol_types.get(&symbol).copied()?;
         let fn_ty = ctx.types.resolve(fn_ty);
-        let SemanticType::Function { params, return_type } = ctx.types.get(fn_ty) else {
+        let SemanticType::Function { params, return_type, .. } = ctx.types.get(fn_ty) else {
             return None;
         };
         let param_ty = ctx.types.resolve(*params.get(arg_index)?);

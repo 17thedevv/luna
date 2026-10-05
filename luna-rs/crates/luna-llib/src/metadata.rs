@@ -34,7 +34,7 @@ pub enum CanonicalType {
     Tuple(Vec<u32>),
     Array(u32, u64),
     Slice(u32),
-    Function { params: Vec<u32>, return_type: u32 },
+    Function { params: Vec<u32>, return_type: u32, is_unsafe: bool },
     Pointer(Mutability, u32),
     Reference(CanonicalLifetime, Mutability, u32),
     Void,

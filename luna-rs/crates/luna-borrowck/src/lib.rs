@@ -2,6 +2,7 @@ pub mod borrow_analysis;
 pub mod cfg;
 pub mod cleanup;
 mod drop_flags;
+mod memory_intrinsic_body;
 pub mod dataflow;
 pub mod effect;
 pub mod effect_inference;
@@ -64,6 +65,10 @@ fn analyze_with_guarded_drops(
     guarded_drops: std::collections::HashSet<luna_mvir::ValueId>,
 ) -> (Vec<Diagnostic>, std::collections::HashSet<luna_mvir::ValueId>, Vec<ShadowComparison>) {
     let mut diagnostics = Vec::new();
+    let intrinsic_body = memory_intrinsic_body::validate(func, _ctx);
+    if let Some(Err(diagnostic)) = intrinsic_body.as_ref() {
+        return (vec![diagnostic.clone()], Default::default(), Vec::new());
+    }
 
     // 1. Run Move Analysis
     let mut move_analyzer = MoveAnalyzer::new(func, Some(_ctx), Some(summaries));
@@ -83,12 +88,19 @@ fn analyze_with_guarded_drops(
     // 2. Run Borrow Analysis (Loans) with Shadow Region Validation
     let mut cleaned_func = func.clone();
     crate::cleanup::eliminate_redundant_drops(&mut cleaned_func, &dead_drops);
-    let (mut borrow_diagnostics, shadow_comparisons) =
+    // The exact compiler-generated primitive thunk implements the declared
+    // unsafe raw-memory operation, not a source-level lifetime proof. Its
+    // callers still undergo the ordinary loan/escape analysis below and in
+    // their own bodies; move and return validation also remain active here.
+    let (mut borrow_diagnostics, shadow_comparisons) = if intrinsic_body.is_some() {
+        (Vec::new(), Vec::new())
+    } else {
         crate::borrow_analysis::BorrowAnalyzer::analyze_with_shadow(
             &cleaned_func,
             Some(summaries),
             Some(_ctx),
-        );
+        )
+    };
     diagnostics.append(&mut borrow_diagnostics);
 
     // 3. Run Return Analysis

@@ -161,6 +161,7 @@ pub struct FnRepr {
     pub params: Vec<FnParamRepr>,
     pub return_type: Box<TypeRepr>,
     pub is_method: bool,
+    pub is_unsafe: bool,
 }
 
 /// Enum variant representation.
@@ -354,7 +355,7 @@ impl TypeRepr {
                     type_params: type_args.iter().map(|&t| Self::from_semantic_type(t, ctx)).collect(),
                 }
             }
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, is_unsafe } => {
                 TypeRepr::Fn(FnRepr {
                     params: params
                         .iter()
@@ -365,6 +366,7 @@ impl TypeRepr {
                         .collect(),
                     return_type: Box::new(Self::from_semantic_type(*return_type, ctx)),
                     is_method: false,
+                    is_unsafe: *is_unsafe,
                 })
             }
             SemanticType::Void => TypeRepr::Primitive(PrimitiveRepr::Void),
@@ -472,7 +474,7 @@ impl TypeRepr {
             }
             TypeRepr::Fn(f) => {
                 let params: Vec<String> = f.params.iter().map(|p| p.type_repr.type_name()).collect();
-                format!("fn({}) -> {}", params.join(", "), f.return_type.type_name())
+                format!("{}fn({}) -> {}", if f.is_unsafe { "unsafe " } else { "" }, params.join(", "), f.return_type.type_name())
             }
             TypeRepr::TypeType => "type".to_string(),
             TypeRepr::TypeParam(name) => name.clone(),

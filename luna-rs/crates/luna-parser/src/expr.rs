@@ -10,12 +10,8 @@ impl<'a> Parser<'a> {
         }
         let mut p = self.pos + 1;
         let mut depth = 1;
-        let mut has_type_token = false;
         while p < self.tokens.len() {
             let kind = self.tokens[p].kind;
-            if matches!(kind, TokenKind::BuiltinType(_) | TokenKind::KwFn) {
-                has_type_token = true;
-            }
             if kind == TokenKind::LessThan {
                 depth += 1;
             } else if kind == TokenKind::GreaterThan {
@@ -25,7 +21,7 @@ impl<'a> Parser<'a> {
                     if matches!(next_kind, TokenKind::ColonColon | TokenKind::LParen | TokenKind::LBrace) {
                         return true;
                     }
-                    if has_type_token && matches!(next_kind, TokenKind::Semi | TokenKind::Comma | TokenKind::RParen | TokenKind::RBracket) {
+                    if matches!(next_kind, TokenKind::Semi | TokenKind::Comma | TokenKind::RParen | TokenKind::RBracket) {
                         return true;
                     }
                     return false;
@@ -36,7 +32,7 @@ impl<'a> Parser<'a> {
                     if matches!(next_kind, TokenKind::ColonColon | TokenKind::LParen | TokenKind::LBrace) {
                         return true;
                     }
-                    if has_type_token && matches!(next_kind, TokenKind::Semi | TokenKind::Comma | TokenKind::RParen | TokenKind::RBracket) {
+                    if matches!(next_kind, TokenKind::Semi | TokenKind::Comma | TokenKind::RParen | TokenKind::RBracket) {
                         return true;
                     }
                     return false;

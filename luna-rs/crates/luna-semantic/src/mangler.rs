@@ -117,13 +117,13 @@ impl Mangler {
                 }
                 format!("U{}E", elems_enc)
             }
-            SemanticType::Function { params, return_type } => {
+            SemanticType::Function { params, return_type, is_unsafe } => {
                 let mut params_enc = String::new();
                 for &p in params {
                     params_enc.push_str(&Self::mangle_type_with_substs(types, symbol_table, p, substs));
                 }
                 let ret_enc = Self::mangle_type_with_substs(types, symbol_table, *return_type, substs);
-                format!("W{}E{}", params_enc, ret_enc)
+                format!("{}W{}E{}", if *is_unsafe { "U" } else { "" }, params_enc, ret_enc)
             }
             _ => {
                 // Fallback for inference or unresolved vars

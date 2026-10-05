@@ -5,8 +5,10 @@ export module std {
     // NOTE: `slice_from_raw_parts` and `slice_from_raw_parts_mut` are unsafe intrinsic boundaries
     // bridging raw pointers to fat-pointer slices. They must NOT be treated as a precedent for safe
     // reference construction without explicit lifetime provenance contracts.
-    export unsafe fn slice_from_raw_parts<T>(ptr: *T, len: u64) -> &[T];
-    export unsafe fn slice_from_raw_parts_mut<T>(ptr: *rw T, len: u64) -> &rw [T];
+    #[lang("slice_from_raw_parts")]
+    export unsafe intrinsic fn slice_from_raw_parts<T>(ptr: *T, len: u64) -> &[T];
+    #[lang("slice_from_raw_parts_mut")]
+    export unsafe intrinsic fn slice_from_raw_parts_mut<T>(ptr: *rw T, len: u64) -> &rw [T];
     
     export unsafe fn copy(src: *u8, dst: *rw u8, bytes: u64) {
         dec rw i: u64 = 0 as u64;

@@ -39,8 +39,12 @@ fn copy_tree(source: &Path, destination: &Path) {
         let to = destination.join(entry.file_name());
         if from.is_dir() {
             copy_tree(&from, &to);
-        } else {
-            fs::copy(from, to).expect("copy isolated source/artifact");
+        } else if matches!(from.extension().and_then(|extension| extension.to_str()),
+            Some("ln" | "toml" | "llib" | "obj")) {
+            // Publication temporaries are not provider inputs and may be held
+            // exclusively by a concurrent builder on Windows.
+            fs::copy(&from, &to).unwrap_or_else(|error| panic!(
+                "copy isolated provider input {} -> {}: {error}", from.display(), to.display()));
         }
     }
 }

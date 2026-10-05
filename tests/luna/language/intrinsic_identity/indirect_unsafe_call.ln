@@ -1,0 +1,2 @@
+import <ptr>;
+fn main() { dec destroy = std::ptr::drop_in_place<i32>; destroy(0 as *rw i32); }

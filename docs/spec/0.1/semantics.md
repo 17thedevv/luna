@@ -99,6 +99,15 @@ supported dynamic interfaces. Defined unsizing admits only the specified
 array/slice and reference/trait-object coercions. Unsized values by value and
 owning unsized Box support remain outside the retained baseline.
 
+## Callable safety
+
+Calling an unsafe function requires its unsafe call boundary even when the
+function is stored in a local, returned from another function or substituted
+through a generic type. A callable's unsafe requirement must not be erased by
+assignment or a provider/artifact boundary. Identical parameter and return
+shapes do not make safe and unsafe callables interchangeable. This repair does
+not adopt a new implicit conversion between callable safety types.
+
 ## FFI
 
 Extern calls follow the target C ABI and the SPEC-HARDENING-02 restrictions.

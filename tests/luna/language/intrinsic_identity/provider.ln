@@ -1,0 +1,11 @@
+export module ordinary {
+    export unsafe fn dangerous(x: i32) -> i32 { return x + 3; }
+    export fn safe(x: i32) -> i32 { return x + 2; }
+    export fn return_dangerous() -> unsafe fn(i32) -> i32 { return dangerous; }
+    export fn identity<T>(value: T) -> T { return value; }
+    export fn drop_in_place(x: i32) -> i32 { return x + 7; }
+    export fn innocent_drop_in_place(x: i32) -> i32 { return x + 8; }
+    export fn slice_from_raw_parts() -> i32 { return 9; }
+    export fn slice_from_raw_parts_mut() -> i32 { return 10; }
+    export fn my_slice_from_raw_parts<T>(x: T) -> T { return x; }
+}

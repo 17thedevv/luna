@@ -1,0 +1,1 @@
+fn innocent_drop_in_place(x: i32) -> i32 { return x + 7; } fn main() -> i32 { return innocent_drop_in_place(5) - 12; }
