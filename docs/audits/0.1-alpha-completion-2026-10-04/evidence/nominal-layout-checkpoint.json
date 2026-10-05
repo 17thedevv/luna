@@ -1,0 +1,43 @@
+{
+  "base_revision": "ba3f0dd",
+  "status": "PARTIAL; focused nominal ABI reducers closed; full workspace last FAIL remains recorded.",
+  "compiler_protocol": 11,
+  "semantic_metadata": 5,
+  "cli_sha256": "67979a52da3582814f3bc8b1dd8a89421ece84cca410703b41bb774042fec33f",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "raw_file_sha256": {
+    "nominal-layout-before-struct.json": "37d0cfd535b26773416779068e1f6c8d429459230fba5ba72533771d8f6a8730",
+    "nominal-layout-before-enum.json": "a53a214e65b7701ee505c814b33c821357e210a3d1fb98ae1804f4b7b4520051",
+    "nominal-layout-before-private.json": "6e6b9cff25677d196e9c14e3120d9353e2ea9c6f9cf65aa3dc080ab0a01b3caa",
+    "r2-layout-check-initial.txt": "b087379f8dfeedbe7e9438f93c70dd003cf46b1b42a7eaff0004f0a18ae3249c",
+    "r2-layout-check-second.txt": "ebf4be62699c52ae0bd909d690c6fbc3436442accf22b6a0349c535dc2cabeb8",
+    "r2-layout-check.txt": "5b7c84f6f77d9eab20577a89c9aac1a05ed8a9d2fb5409f0fc3451a25fdb9807",
+    "r2-layout-cli-initial.txt": "ed8aa19966adb32957bd931a50e715d9e533f3a028132ffd8475a97f0484ff51",
+    "r2-layout-cli-invocation-error.txt": "cc816e254e3f2a26274ae2594460df507b7a7dd0353619c72f11a13cf60dbc5a",
+    "r2-layout-cli-regressions.txt": "c689f96026ed156b464d381a9806ec57fa2d38f65693dda84e19a9d5b3ef32ba",
+    "r2-layout-internal-invocation-error.txt": "5c886180981c7281845e6fb8132616fe26a8101728d2c4c39bd1ab1dab309f93",
+    "r2-layout-internal-regressions.txt": "54bea7d70296f20340e2586aa239034c4b1542a5964814582ad3a74dce1ce0ea",
+    "r2-layout-sysroot.txt": "39d5c5fa19267584fc6037f6d2471fbc65afc594289b39f60415aa51ea040d6c"
+  },
+  "results": {
+    "cli_suites": 5,
+    "cli_exit": 0,
+    "internal_passed": 82,
+    "internal_exit": 0,
+    "sysroot_exit": 0,
+    "workspace_check_exit": 0
+  },
+  "scope": [
+    "ordered struct fields",
+    "enum variant discriminants and payloads",
+    "reachable private nominal layout",
+    "recursive representation identity",
+    "private unreachable and binder/body identity controls"
+  ],
+  "limitations": [
+    "not a full workspace candidate pass",
+    "no native cross-target certification",
+    "legacy metadata-only imports retain earlier layout reconstruction limitations",
+    "closure capture cleanup and named/default argument implementation remain open"
+  ]
+}

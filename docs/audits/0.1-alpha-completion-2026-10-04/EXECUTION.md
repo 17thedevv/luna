@@ -1022,3 +1022,57 @@ After a fresh canonical build, the [eight-suite rerun](evidence/r0-isolation-foc
 passes **96/96**, exit 0; [sysroot rebuild](evidence/r0-isolation-sysroot.txt) exits 0.
 These focused results close those exact failures only. The full 39a2a9b run,
 closure drop failure and nominal representation reducers remain recorded FAIL.
+
+## Ordered nominal representation checkpoint — 2026-10-05
+
+Intended contract: dependency identity protects layouts/discriminants required
+by consumer code, even when a type in a public signature is private. Names and
+nominal IDs alone do not certify ABI compatibility.
+
+The [pre-repair struct](evidence/nominal-layout-before-struct.json) and
+[enum](evidence/nominal-layout-before-enum.json) reducers record matching
+fingerprints despite changed representation: stale consumers execute exit 6
+instead of baseline 0. The [private-type probe](evidence/nominal-layout-before-private.json)
+records acceptance of an old wrapper after changing the hidden type; the new
+acceptance fixture separately verifies rebuilt size 8 versus original size 16.
+
+Compiler11 / semantic metadata5 now fingerprint a separate ordered nominal
+representation table. Traversal includes public contracts, owned impl contracts
+and transitive private nominal types; foreign layouts belong to dependency
+identity. Recursive references remain nominal rather than recursively expanding
+layout in type identity. Unreachable private declarations are excluded.
+Public struct fields and enum discriminants recover their order in metadata;
+reader validation rejects missing definitions, bad indices, duplicate members,
+wrong kind/owner and disagreement with exported field contracts.
+
+Permanent CLI fixtures are in `tests/luna/language/nominal_layout`, orchestrated
+by `nominal_layout_cli`: nine native executions across source, relocated
+artifact-only and rebuilt consumers; six typed stale-dependency rejections;
+representation corruption/decoder checks; recursive hidden-type reachability
+and binder/body/unreachable-private identity controls. Matching sidecars ensure
+stale tests reach dependency identity rather than object mismatch rejection.
+
+[Five CLI regression suites](evidence/r2-layout-cli-regressions.txt) pass:
+nominal layout, generic constraints, target identity, execution dependencies and
+module constants. [Internal/driver regression](evidence/r2-layout-internal-regressions.txt)
+passes **82/82**. [Canonical rebuild](evidence/r2-layout-sysroot.txt) and
+[workspace check](evidence/r2-layout-check.txt) succeed. The
+[checkpoint record](evidence/nominal-layout-checkpoint.json) pins binary/runtime
+and raw evidence hashes. Intermediate compile errors and mistyped test-target
+invocations remain in the evidence directory; they are not counted as executed
+test failures or rewritten into passing logs.
+
+Scope remains bounded: canonical artifacts require portable AST. Legacy
+metadata-only layout reconstruction retains earlier limitations. Broader ABI,
+malformed type-graph validation, closure cleanup, named/default calls and R5
+full-candidate gates remain open. Last full workspace verdict remains FAIL.
+
+Compiler Change
+- Capability: canonical dependency identity for ordered, ABI-reachable nominal representations.
+- Why it is generic: one representation traversal covers arbitrary user-defined structs/enums and hidden types, independently of stdlib names.
+- User-defined beneficiaries/tests: Record, Color, Hidden/Visible and native stale-dependent probes above.
+- New intrinsic/lang_item: NO. Stdlib-specific branch: NO.
+
+SKILL IMPACT: REFINE capability validation with nominal ABI/reachability controls;
+REFINE testing strategy with isolated artifact mutation and genuine parity.
+Both changed skills were reread and related guidance checked for conflicts.

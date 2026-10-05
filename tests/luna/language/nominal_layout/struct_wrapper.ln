@@ -1,0 +1,7 @@
+import "provider";
+module client {
+    export fn read() -> i32 {
+        dec value = api::Record { a: 7, b: 13u64 };
+        return api::get_a(&value);
+    }
+}

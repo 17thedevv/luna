@@ -1,0 +1,4 @@
+import "provider";
+module client {
+    export fn read() -> i32 { return api::score(api::Color::Red); }
+}

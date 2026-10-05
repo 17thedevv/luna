@@ -72,14 +72,15 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 10 rejects compiler versions 1–9. This revision retains
-validated target contracts, public generic constraints and individual impl contracts, alongside the earlier
+protocol version 11 rejects compiler versions 1–10. This revision retains
+ordered nominal representations, validated target contracts, public generic
+constraints and individual impl contracts, alongside the earlier
 method-identity, ownership-cleanup and module-constant-storage repairs. MVIR
 version 4 carries portable immutable static data whose initializer and type
 shape contain no semantic-session IDs or VM addresses. Rebuild incompatible
 artifacts through build tooling; import never rebuilds or falls back from a
 selected invalid artifact. File format version remains 2; semantic metadata
-version is 4. These are internal compatibility revisions, not a declaration of
+version is 5. These are internal compatibility revisions, not a declaration of
 language release readiness.
 
 Target identity binds the selected triple, CPU/features, emitted object format,
@@ -106,6 +107,17 @@ session ID. Changing a public constraint must change interface identity;
 renaming generic binders, reordering independent declarations or changing a
 body without changing its public effects must preserve that identity. Function
 body locals do not belong to its exported symbol children.
+
+Canonical interface identity includes the ordered fields of a struct and the
+ordered variants/payloads of an enum. Variant position determines its
+discriminant. This representation contract covers owned nominal types reachable
+from public signatures and impl contracts, including nested or private types;
+it does not make private declarations accessible. Foreign representations are
+validated through their owning dependency's interface identity. Recursive
+pointer/reference graphs retain nominal identity and a separate representation
+table. Reordering fields/variants or changing a reachable field/payload type
+must invalidate stale dependent artifacts. Changes to unreachable private types
+must not change public interface identity.
 
 Comptime dependency collection remains conservative: a compilation that
 evaluates comptime retains execution identities for its loaded dependencies.
