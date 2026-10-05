@@ -68,16 +68,14 @@ fn check_with_sysroot(test_name: &str, source: &str) -> Result<(), Vec<luna_comm
 fn test_language_contract_visibility_is_controlled() {
     let contracts = r#"
         fn accepts_drop<T: std::Drop>(value: &T) {}
-        fn accepts_iterator<I: std::Iterator>(value: &I) {}
-        fn accepts_into_iterator<I: std::IntoIterator>(value: &I) {}
+        fn accepts_iterator<I: std::Iterator<i32>>(value: &I) {}
+        fn accepts_into_iterator<Iter: std::Iterator<i32>, I: std::IntoIterator<i32, Iter>>(value: &I) {}
         fn main() {
             dec value: std::Option<i32> = std::Option::Some(1);
         }
     "#;
-    assert!(
-        check_with_sysroot("implicit_contracts", contracts).is_ok(),
-        "Drop, Option, Iterator and IntoIterator are compiler contracts"
-    );
+    let result = check_with_sysroot("implicit_contracts", contracts);
+    assert!(result.is_ok(), "Drop, Option, Iterator and IntoIterator are compiler contracts: {result:?}");
 
     let ordinary_api = "fn main() { dec value: Result<i32, i32> = Result::Ok(1); }";
     assert!(

@@ -90,8 +90,11 @@ fn compile_and_run_fixture(
 /// IO-0: The canonical SysrootBuilder owns canonical artifact generation.
 #[test]
 fn test_0_sysroot_builder_rebuilds_nested_io_artifacts() {
-    let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
-    let io_path = locate_canonical_io_ln();
+    let canonical = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let root = create_temp_dir("builder_isolated");
+    copy_tree(canonical.external_dir(), &root.join("libs/external"));
+    let sysroot = Sysroot::from_root(root).expect("isolated sysroot");
+    let io_path = sysroot.external_dir().join("io/io.ln");
     let external_dir = sysroot.external_dir().to_path_buf();
     let builder = SysrootBuilder::new(sysroot);
     builder

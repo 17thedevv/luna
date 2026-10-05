@@ -19,18 +19,17 @@ fn locate_canonical_string_ln() -> PathBuf {
     panic!("Unable to locate canonical libs/external/alloc/string.ln");
 }
 
-fn locate_canonical_string_llib() -> PathBuf {
-    let mut dir = std::env::current_dir().expect("Failed to get current directory");
-    for _ in 0..6 {
-        let p = dir.join("libs").join("external").join("alloc").join("string.llib");
-        if p.parent().unwrap().exists() {
-            return p;
-        }
-        if !dir.pop() {
-            break;
+fn copy_tree(source: &Path, destination: &Path) {
+    fs::create_dir_all(destination).expect("create isolated sysroot");
+    for entry in fs::read_dir(source).expect("enumerate sysroot") {
+        let entry = entry.expect("read sysroot entry");
+        let from = entry.path();
+        let to = destination.join(entry.file_name());
+        if from.is_dir() { copy_tree(&from, &to); }
+        else if !entry.file_name().to_string_lossy().starts_with('.') {
+            fs::copy(from, to).expect("copy sysroot file");
         }
     }
-    panic!("Unable to locate canonical libs/external/alloc/string.llib");
 }
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
@@ -698,12 +697,15 @@ fn main() -> i32 {
 /// S14: Source `.ln` and `.llib` parity for `String`
 #[test]
 fn test_s14_string_source_and_llib_parity() {
-    let sysroot = Sysroot::discover_for_test().expect("Failed to locate sysroot");
+    let canonical = Sysroot::discover_for_test().expect("Failed to locate sysroot");
     let dir = create_temp_dir("s14_parity");
-    let string_ln = locate_canonical_string_ln();
+    let artifact_root = dir.join("artifact_sysroot");
+    copy_tree(canonical.external_dir(), &artifact_root.join("libs/external"));
+    let sysroot = Sysroot::from_root(artifact_root.clone()).expect("isolated artifact sysroot");
+    let string_ln = sysroot.external_dir().join("alloc/string.ln");
     let string_src = fs::read_to_string(&string_ln).expect("Failed to read string.ln");
 
-    let out_llib = dir.join("string.llib");
+    let out_llib = string_ln.with_extension("llib");
     let compile_opts = CompilerOptions {
         output_path: Some(out_llib.to_string_lossy().to_string()),
         emit_mlib: true,
@@ -717,10 +719,14 @@ fn test_s14_string_source_and_llib_parity() {
     let res_compile = compile(string_ln.to_str().unwrap(), string_src, &compile_opts);
     assert!(res_compile.is_ok(), "Compiling string.ln to string.llib must succeed: {:?}", res_compile.err());
 
-    let canonical_llib = locate_canonical_string_llib();
-    let tmp = canonical_llib.with_file_name(format!("{}.publish{}", canonical_llib.file_name().unwrap().to_string_lossy(), std::process::id()));
-    let _ = fs::copy(&out_llib, &tmp);
-    let _ = fs::rename(&tmp, &canonical_llib);
+    let source_root = dir.join("source_sysroot");
+    copy_tree(sysroot.external_dir(), &source_root.join("libs/external"));
+    let source_string = source_root.join("libs/external/alloc/string.ln");
+    fs::remove_file(source_string.with_extension("llib")).expect("force String source path");
+    fs::remove_file(source_string.with_extension("obj")).expect("remove String source sidecar");
+    fs::remove_file(&string_ln).expect("force String artifact-only path");
+    assert!(!string_ln.exists() && out_llib.exists());
+    assert!(source_string.exists() && !source_string.with_extension("llib").exists());
 
     let opts = CompilerOptions {
         search_paths: vec![sysroot.root().to_string_lossy().to_string()],
@@ -764,6 +770,13 @@ fn main() -> i32 {
 
     let (code, _stdout, stderr) = run_binary_with_output(&dir, src, &opts, &[]).expect("Failed to run");
     assert_eq!(code, 0, "S14 Source/.llib parity must pass (code: {}, stderr: {})", code, stderr);
+    let source_opts = CompilerOptions {
+        search_paths: vec![source_root.to_string_lossy().into_owned()],
+        quiet: true,
+        ..Default::default()
+    };
+    let source_run = run_binary_with_output(&dir, src, &source_opts, &[]).expect("source String run");
+    assert_eq!((code, _stdout, stderr), source_run, "String source/artifact observable parity");
 }
 
 /// S15: Native execution with `<io>` output
