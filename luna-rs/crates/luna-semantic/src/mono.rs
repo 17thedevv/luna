@@ -1550,6 +1550,10 @@ impl<'a> MonoCollector<'a> {
                                     .unwrap_or(SemanticTypeId(0));
                                 self.substitute(aty)
                             }).collect();
+                            let expected_arg_tys = self.ctx.tables.call_argument_bindings.get(expr_id)
+                                .map(|binding| binding.in_parameter_order(&expected_arg_tys)
+                                    .expect("ICE: checked call binding is not a permutation"))
+                                .unwrap_or(expected_arg_tys);
 
                             let mut call_substs = HashMap::new();
                             if let Some(subst) = self.ctx.tables.expr_substs.get(expr_id).cloned() {
@@ -1671,6 +1675,10 @@ impl<'a> MonoCollector<'a> {
                             .unwrap_or(SemanticTypeId(0));
                         self.substitute(aty)
                     }).collect();
+                    let expected_arg_tys = self.ctx.tables.call_argument_bindings.get(expr_id)
+                        .map(|binding| binding.in_parameter_order(&expected_arg_tys)
+                            .expect("ICE: checked call binding is not a permutation"))
+                        .unwrap_or(expected_arg_tys);
 
                     let mut call_substs = HashMap::new();
                     if let Some(subst) = self.ctx.tables.expr_substs.get(expr_id).cloned() {

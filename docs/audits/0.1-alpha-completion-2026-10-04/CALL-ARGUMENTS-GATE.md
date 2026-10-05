@@ -1,8 +1,9 @@
 # Call arguments and rigid generic fixture gate — 2026-10-05
 
 The adopted [call contract](../../spec/0.1/call-arguments-v1.md) remains required
-for 0.1. This checkpoint does not claim named/default argument support or a
-release freeze.
+for 0.1. The dated baseline and positional repair below are followed by the
+named-binding checkpoint. Defaults and generic comptime remain incomplete;
+this document does not establish a release freeze.
 
 ## Correcting two invalid method fixtures
 
@@ -178,3 +179,100 @@ on Ubuntu/macOS, Ubuntu ASan and whole-file I/O on both platforms pass within
 their job scopes. The 1a9ea27 workflows were still running at the recorded
 snapshot; no later verdict is inferred. Closure cleanup, defaults and broader
 R3–R5 gates remain open.
+
+## Named-binding implementation checkpoint — 2026-10-05
+
+**CALL-ARGUMENTS-v1: PARTIAL.** Direct declarations now bind both `name=value`
+and historical `name: value` arguments to parameter ordinals. Checking uses the
+bound parameter's type for inference; evaluation still follows source order.
+Each value is captured/transferred when evaluated, before call operands are
+permuted. This preserves scalar snapshots, reads before ownership moves and
+cleanup when a later argument returns early. Invalid labels, duplicate binding,
+missing/excess arguments and positional-after-named calls reject with E2001.
+Structural function values reject named calls even when an immutable target is
+known. Trait declaration labels govern calls to implementations whose private
+parameter spellings differ. Receiver, unsafe, generic, lifetime and move rules
+remain independent of label ordering.
+
+Portable callable signatures carry public labels separately from structural
+function type and lifetime/provenance identity. Checked call plans contain
+ordinals, not session-local IDs. Exported functions, trait methods and impl
+contracts preserve signatures; the independent decoder validates/reconstructs
+them. Public parameter renaming changes the interface hash and rejects stale
+dependents. Impl parameter spelling, generic binder renaming and a body-only
+edit preserve the tested interface. Compiler protocol is now **16**, semantic
+metadata **8** (file schema 2, MVIR 4 unchanged). The canonical isolated sysroot
+was rebuilt officially: all 49 providers succeeded.
+
+Comptime argument temporaries receive ordinary cleanup scopes and reachable
+typed drop glue. References retain the same VM handle across reads; a required
+destructor sees live storage before its slot becomes moved. User-defined owned
+values establish one-drop behavior; moved values and escaping local references
+still reject. No missing callee or required destructor becomes a no-op.
+
+### Evidence and limits
+
+[Terminal report](evidence/named-arguments/exit.json) preserves exact commands,
+input/runtime/compiler hashes and all raw logs, including earlier failed
+harness/API/setup attempts. The broad candidate is pinned separately from the
+amended candidate; broad results are not retrospectively assigned to a new
+binary. After broad verification, two UTF-8 comments were restored and scalar
+snapshot/return-loan controls plus a borrow negative were added. The amended
+pin was observed during its run, not claimed as a pre-command pin; all 887
+recorded inputs, binary and runtime agree at the final observation.
+
+- The final named CLI harness passes in independent fresh source-only and
+  artifact-only roots, with the user provider source removed and the project
+  relocated. It observes 56 typed `check`/`build` rejections, ten positive native
+  executions, a fresh dependent native control, four interface controls and
+  stale-dependent rejection in both commands.
+- The broad internal run passes 324 tests across semantic, metadata, MVIR,
+  borrowck and parser crates. A separate run passes 41 existing driver/comptime/
+  lifetime/interface tests. Their complete terminal Cargo summaries are retained;
+  numeric shell exit statuses were unavailable after tool handles were lost.
+- The amended named harness and seven existing comptime execution-availability
+  invariants pass with observed shell exit0. This includes missing-body and
+  required-destructor rejection, already-dropped/uninitialized controls and
+  forbidden effectful/extern destructors.
+- The broad seven-target CLI command remains **FAIL: eight tests passed, one
+  failed**. `generic_drop_cli` reports `closure_capture` native exit3 in both
+  modes. All raw failure evidence is retained; this known independent baseline
+  issue is not closed by named-call success.
+- Both named and positional generic comptime reproducers fail source-only
+  `check` and `build`: E4005 cannot find concrete callee `_MFN5named7consumeE`.
+  These four probes establish a generic early-instantiation gap; they are
+  required positive cases, not intentionally unsupported or waived behavior.
+- Parameter defaults still lack AST/evaluation/portable implementation. The
+  grammar now records adopted syntax, which is not implementation evidence.
+  Omission-entry ownership, definition-site hygiene, earlier-parameter borrows,
+  generic/trait defaults and source/artifact execution remain required.
+
+The impl/method binder decision remains independent: matching names never join
+two generic binders. Bound-sensitive stdlib methods use separate bounded impls.
+Named declaration labels do not alter that rule.
+
+```text
+Compiler Change
+    Capability: Declaration argument binding, ordered value capture, portable
+                callable labels and generic owned temporary cleanup at comptime.
+    Why stdlib exposed it: Adopted calls and owned values require correct ordinary
+                         invocation; no library API supplies special lowering.
+    Why it is generic: Operates on callable/parameter/type identities and existing
+                       ownership/drop primitives, for arbitrary declarations.
+    User-defined type benefiting: named::Owned and named::Counter in CLI fixtures.
+    Tests: named_arguments_cli, call_argument_parser_tests, semantic/metadata
+           invariants, comptime_execution_availability and scoped regressions.
+    New intrinsic/lang_item?: NO; full-arity native ABI unchanged.
+    Stdlib-specific branch?: NO
+```
+
+SKILL IMPACT: **REFINEMENT** of mellis-grammar (adopted named/default surface with
+an explicit implementation gate) and luna-semantic-compliance (public callable
+labels are distinct from ordinal lifetime/provenance identity). Both changed
+skills were reread in full and checked for conflicting guidance. No release
+authority, name-based generic identity or new intrinsic is introduced.
+
+Next: repair concrete generic callee availability at the early comptime root,
+then complete default expressions through the logical callee parameter frame.
+Closure policy awaits maintainer input; R3–R5 and the full retained contract
+map remain required. This checkpoint does not close the overarching goal.

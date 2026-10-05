@@ -364,7 +364,22 @@ impl<'a> MvirGenerator<'a> {
                     | Instruction::CallIndirect { callee: Operand::Global(global), .. } => {
                         callees.push(global.clone());
                     }
-                    Instruction::Drop { callee: Some(global), .. } => callees.push(global.clone()),
+                    Instruction::Drop { callee: Some(global), ty, .. } => {
+                        // Early evaluation runs before the ordinary whole-program
+                        // drop discovery pass. Materialize only reachable glue.
+                        if crate::drop_glue_global_id(self.ctx, *ty).is_some_and(|expected| expected.name == global.name) {
+                            let concrete_ty = self.ctx.types.resolve(*ty);
+                            let struct_sym = match self.ctx.types.get(concrete_ty) {
+                                luna_semantic::SemanticType::Struct(symbol, ..) | luna_semantic::SemanticType::Enum(symbol, ..) => *symbol,
+                                _ => luna_common::ids::SymbolId(0),
+                            };
+                            self.generate_drop_glue(&luna_semantic::CanonicalInstanceIdentity {
+                                kind: luna_semantic::CanonicalInstanceKind::DropGlue { struct_sym, concrete_ty },
+                                subst: Vec::new(),
+                            });
+                        }
+                        callees.push(global.clone());
+                    }
                     Instruction::MakeTraitObject { trait_sym, concrete_sym, .. } => {
                         let key = luna_semantic::semantic_tables::ImplKey {
                             trait_id: Some(*trait_sym),
@@ -659,7 +674,9 @@ impl<'a> MvirGenerator<'a> {
             values: Vec::new(),
         });
         self.start_block(LabelId { name: "entry".to_string() });
-        let val_op = self.generate_expr(expr_id);
+        self.push_scope();
+        let val_op = self.transfer_return_value(expr_id);
+        self.pop_scope_and_drop(None);
         self.terminate_block(Terminator::Ret { value: Some(val_op) });
         if let Some(block) = self.current_block.take() {
             self.current_function.as_mut().unwrap().blocks.push(block);
@@ -684,7 +701,15 @@ impl<'a> MvirGenerator<'a> {
             values: Vec::new(),
         });
         self.start_block(LabelId { name: "entry".to_string() });
+        self.push_scope();
         let ret_val = self.generate_block_expr(stmt_id);
+        let ret_val = if matches!(self.ctx.types.get(ret_ty), luna_semantic::SemanticType::Void | luna_semantic::SemanticType::Never) {
+            ret_val
+        } else {
+            let transferred = self.push_inst(Instruction::Assign(ret_val), ret_ty);
+            Operand::Value(transferred)
+        };
+        self.pop_scope_and_drop(None);
         if let Some(mut block) = self.current_block.take() {
             if block.terminator.is_none() {
                 block.terminator = Some(Terminator::Ret { value: Some(ret_val) });
@@ -2183,6 +2208,41 @@ impl<'a> MvirGenerator<'a> {
         }
     }
 
+    fn generate_call_arguments(&mut self, expression: luna_ast::ExprId, arguments: &[luna_ast::CallArg]) -> Vec<Operand> {
+        // Evaluate once in source order; only the resulting operands are reordered.
+        let mut values = Vec::new();
+        for argument in arguments {
+            let value = self.generate_expr(&argument.value);
+            let ty = match &value {
+                Operand::Value(value) => self.current_function.as_ref().expect("Must be in a function").values[value.0 as usize].ty,
+                _ => self.get_expr_type(&argument.value),
+            };
+            if matches!(self.ctx.types.get(ty), luna_semantic::SemanticType::Void | luna_semantic::SemanticType::Never) {
+                values.push(value);
+            } else if self.ctx.needs_drop(ty) {
+                // Transfer now, before evaluating the next source argument.
+                // Ordinary temporary cleanup also covers a later argument's return.
+                let slot = self.push_inst_span(Instruction::Alloca, ty, self.extract_expr_span(&argument.value));
+                self.push_inst_span(Instruction::Store { ptr: Operand::Value(slot), value }, ty, self.extract_expr_span(&argument.value));
+                self.temporary_drop_scopes.last_mut().expect("ICE: call argument has no cleanup scope").push((slot, ty));
+                let value = self.push_inst_span(Instruction::Load { ptr: Operand::Value(slot) }, ty, self.extract_expr_span(&argument.value));
+                values.push(Operand::Value(value));
+            } else {
+                // An SSA snapshot severs delayed place loads; Assign performs
+                // the same generic ownership transfer as an ordinary return.
+                let transferred = self.push_inst_span(Instruction::Assign(value), ty, self.extract_expr_span(&argument.value));
+                values.push(Operand::Value(transferred));
+            }
+        }
+        if let Some(binding) = self.ctx.tables.call_argument_bindings.get(&expression) {
+            binding.in_parameter_order(&values).expect("ICE: checked call binding is not a permutation")
+        } else {
+            assert!(arguments.iter().all(|argument| argument.label.is_none()),
+                "ICE: named call reached lowering without a checked binding");
+            values
+        }
+    }
+
     fn generate_expr(&mut self, expr_id: &luna_ast::ExprId) -> Operand {
         let expr = &self.arena.exprs[expr_id.0 as usize];
         let span = self.get_expr_span(expr);
@@ -2389,10 +2449,7 @@ impl<'a> MvirGenerator<'a> {
                     let callee_expr = &self.arena.exprs[callee.0 as usize];
                     if let luna_ast::Expr::Member { object, .. } = callee_expr {
                         let obj_op = self.generate_expr(object);
-                        let mut arg_ops = Vec::new();
-                        for arg in args {
-                            arg_ops.push(self.generate_expr(&arg.value));
-                        }
+                        let arg_ops = self.generate_call_arguments(*expr_id, args);
                         let call_val = self.push_inst(Instruction::CallVirt {
                             obj: obj_op,
                             method_idx,
@@ -2418,9 +2475,7 @@ impl<'a> MvirGenerator<'a> {
                         }
                         let obj_op = self.generate_expr(object);
                         let mut arg_ops = vec![obj_op];
-                        for arg in args {
-                            arg_ops.push(self.generate_expr(&arg.value));
-                        }
+                        arg_ops.extend(self.generate_call_arguments(*expr_id, args));
                         let call_val = self.push_inst(Instruction::CallDirect {
                             callee: GlobalId {
                                 name: m_name,
@@ -2433,10 +2488,7 @@ impl<'a> MvirGenerator<'a> {
                 }
                 
                 let callee_op = self.generate_expr(callee);
-                let mut arg_ops = Vec::new();
-                for arg in args {
-                    arg_ops.push(self.generate_expr(&arg.value));
-                }
+                let arg_ops = self.generate_call_arguments(*expr_id, args);
                 
                 // Check if callee is an enum variant
                 let is_variant = if let Some(sym_id) = self.ctx.tables.expr_symbols.get(callee) {
@@ -2829,10 +2881,7 @@ impl<'a> MvirGenerator<'a> {
 
                 if let Some(&method_idx) = self.ctx.tables.dyn_method_indices.get(expr_id) {
                     let obj_op = self.generate_expr(object);
-                    let mut arg_ops = Vec::new();
-                    for arg in args {
-                        arg_ops.push(self.generate_expr(&arg.value));
-                    }
+                    let arg_ops = self.generate_call_arguments(*expr_id, args);
                     let call_val = self.push_inst(Instruction::CallVirt {
                         obj: obj_op,
                         method_idx,
@@ -2921,10 +2970,7 @@ impl<'a> MvirGenerator<'a> {
                         PreparedReceiver::Value(self.generate_expr(object))
                     };
 
-                    let mut arg_ops = Vec::new();
-                    for arg in args {
-                        arg_ops.push(self.generate_expr(&arg.value));
-                    }
+                    let arg_ops = self.generate_call_arguments(*expr_id, args);
 
                     let obj_op = match prepared_receiver {
                         PreparedReceiver::Place(place) => {

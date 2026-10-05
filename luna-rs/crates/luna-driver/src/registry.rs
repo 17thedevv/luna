@@ -129,6 +129,8 @@ pub struct ProviderInterface {
     pub pat_types: HashMap<luna_ast::PatId, luna_semantic::ty::SemanticTypeId>,
     pub expr_types: HashMap<luna_ast::ExprId, luna_semantic::ty::SemanticTypeId>,
     pub expr_substs: HashMap<luna_ast::ExprId, Vec<(luna_common::ids::SymbolId, luna_semantic::ty::SemanticTypeId)>>,
+    pub callable_signatures: HashMap<luna_common::ids::SymbolId, luna_semantic::CallableSignature>,
+    pub call_argument_bindings: HashMap<luna_ast::ExprId, luna_semantic::CallArgumentBinding>,
     pub expr_struct_init_indices: HashMap<luna_ast::ExprId, Vec<u32>>,
     pub expr_member_indices: HashMap<luna_ast::ExprId, u32>,
     pub raw_generic_param_symbols: HashMap<(luna_ast::DeclId, usize), luna_common::ids::SymbolId>,
@@ -832,6 +834,12 @@ impl ModuleRegistry {
                     new_subst.insert(new_gp, new_ty);
                 }
                 ctx.tables.expr_substs.insert(expr_id, new_subst);
+            }
+            for (&symbol, signature) in &interface.callable_signatures {
+                ctx.tables.callable_signatures.insert(lookup_sym(symbol), signature.clone());
+            }
+            for (&expression, binding) in &interface.call_argument_bindings {
+                ctx.tables.call_argument_bindings.insert(expression, binding.clone());
             }
             for (&expr_id, indices) in &interface.expr_struct_init_indices {
                 ctx.tables.expr_struct_init_indices.insert(expr_id, indices.clone());
@@ -1540,6 +1548,13 @@ impl ModuleRegistry {
             pat_types,
             expr_types,
             expr_substs,
+            callable_signatures: ctx.tables.callable_signatures.keys().filter(|symbol| {
+                ctx.tables.symbol_decls.get(symbol).is_some_and(|decl| ranges.decls.contains(&decl.0))
+            }).filter_map(|&symbol| ctx.tables.callable_signature(symbol, &ctx.symbol_table)
+                .map(|signature| (symbol, signature.clone()))).collect(),
+            call_argument_bindings: ctx.tables.call_argument_bindings.iter()
+                .filter(|(expression, _)| ranges.exprs.contains(&expression.0))
+                .map(|(&expression, binding)| (expression, binding.clone())).collect(),
             expr_struct_init_indices,
             expr_member_indices,
             raw_generic_param_symbols,

@@ -1435,3 +1435,22 @@ restores the retained unsized-value cast category without weakening rejection;
 the unchanged adversarial driver suite passes 14/14. Final cast/span/char checks
 have their own pin. Named/defaults remain incomplete, and the immutable Ubuntu
 e3b4402 workspace independently fails owned closure capture in both modes.
+
+### Named declaration binding checkpoint — 2026-10-05
+
+[CALL-ARGUMENTS-GATE](CALL-ARGUMENTS-GATE.md) now distinguishes implemented named
+binding from unimplemented defaults. Declaration ordinals drive inference and
+call operands while provided arguments evaluate/capture in source order.
+Portable labels participate in public interface identity; protocol16/metadata8
+artifacts were officially rebuilt for all 49 providers. The amended CLI matrix
+passes 56 typed rejections, ten positive native executions, relocation and
+interface/stale-dependent controls in fresh source/artifact modes. Seven
+comptime execution invariants also pass; final pin inputs/binary/runtime agree.
+
+The broad candidate passes 324 internal and 41 separate metadata/comptime/
+lifetime tests. Its seven-target CLI regression remains FAIL (eight tests
+passed, one failed): owned closure_capture exits3 in both modes. Four source-only
+named/positional generic comptime probes expose a missing concrete callee E4005.
+Defaults, that generic early-instantiation defect, closure cleanup and R3–R5
+remain open. Exact scoped evidence and failed attempts are retained; neither
+focused success nor the revised grammar establishes full release readiness.

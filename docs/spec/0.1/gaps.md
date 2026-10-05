@@ -346,3 +346,19 @@ harness did not emit a test-result summary. It cannot certify an immutable
 candidate. Independent Ubuntu e3b4402 CI still rejects release readiness through
 owned closure capture native exit3 in both provider modes. All broader R3–R5
 and retained contract gates remain required.
+
+### Named binding update — 2026-10-05; CALL-ARGUMENTS-v1 still PARTIAL
+
+The [named checkpoint](../../audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md#named-binding-implementation-checkpoint--2026-10-05)
+implements declaration label binding, source-order value capture and portable
+public signature identity (compiler16/metadata8). Its final fresh source/
+artifact CLI matrix passes, including generic/method/trait calls, ownership,
+early return, non-generic comptime, relocated source removal and stale-dependent
+rejection. These results supersede the named-label baseline for their stated
+scope; older findings retain their dated evidence.
+
+Defaults remain unimplemented. Generic comptime calls fail E4005 for both named
+and positional arguments because an early concrete callee is unavailable; this
+is an implementation gap, not a deferred contract. The broad CLI regression
+still fails closure_capture native exit3 in both modes. No new full-workspace,
+cross-platform or release PASS is established; all R3–R5 obligations remain.

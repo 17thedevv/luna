@@ -254,9 +254,9 @@ impl<'a> MvirInterpreter<'a> {
         match sem_ty {
             SemanticType::Primitive(luna_semantic::ty::BuiltinType::String) => false,
             SemanticType::Primitive(_) => true,
-            SemanticType::Reference(_, mutability, _) => {
-                matches!(mutability, luna_semantic::ty::Mutability::Immutable)
-            }
+            // Loading a reference handle does not consume its referenced owner.
+            // Write/alias admission remains in the semantic and loan checkers.
+            SemanticType::Reference(..) => true,
             SemanticType::Pointer(..) => true,
             SemanticType::Tuple(elems) => elems.iter().all(|&e| self.is_copy_type(e)),
             SemanticType::Array(elem, _) => self.is_copy_type(*elem),
@@ -1040,13 +1040,12 @@ impl<'a> MvirInterpreter<'a> {
                         if matches!(val, RuntimeValue::Pointer(Address::Heap { alloc_id, .. }) if self.static_slots.contains_key(&alloc_id)) {
                             return Err(ComptimeError::Custom("cannot drop module constant storage".into()));
                         }
+                        let dropped_address = match &val { RuntimeValue::Pointer(address) => Some(*address), _ => None };
                         let mut should_drop = true;
                         if let RuntimeValue::Pointer(addr) = val {
                             if let Ok(slot) = self.get_slot_mut(addr) {
                                 if slot.state == PlaceState::Moved || slot.state == PlaceState::Uninitialized {
                                     should_drop = false;
-                                } else {
-                                    slot.state = PlaceState::Moved;
                                 }
                             }
                         }
@@ -1059,6 +1058,13 @@ impl<'a> MvirInterpreter<'a> {
                             } else if let RuntimeValue::Pointer(Address::Heap { alloc_id, .. }) = val {
                                 self.heap.allocations.remove(&alloc_id);
                                 self.heap.freed.insert(alloc_id, true);
+                            }
+                            // The destructor receives a live value. End its storage
+                            // lifetime only after its body has finished reading fields.
+                            if let Some(address) = dropped_address {
+                                if let Ok(slot) = self.get_slot_mut(address) {
+                                    slot.state = PlaceState::Moved;
+                                }
                             }
                         }
                         RuntimeValue::Unit

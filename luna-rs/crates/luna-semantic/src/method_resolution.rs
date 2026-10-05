@@ -450,6 +450,10 @@ impl<'a> TypeChecker<'a> {
             );
             return self.ctx.types.error_id();
         }
+        let Some(binding) = self.bind_call_arguments(expression, Some(candidate.method), true,
+            params.len() - 1, false, arguments, span) else {
+            return self.ctx.types.error_id();
+        };
         let mut subst = Substitution::new();
         let header = candidate.implementation.and_then(|implementation| {
             self.ctx
@@ -609,7 +613,8 @@ impl<'a> TypeChecker<'a> {
                     .with_span(span),
             );
         }
-        for (&parameter, argument) in params[1..].iter().zip(arguments) {
+        for (source_index, argument) in arguments.iter().enumerate() {
+            let parameter = params[1 + binding.source_to_parameter[source_index] as usize];
             let expected = self.ctx.types.subst(parameter, &subst);
             let actual = self.typecheck_expr_expected(&argument.value, expected);
             if !self.try_coerce(argument.value, actual, expected) {

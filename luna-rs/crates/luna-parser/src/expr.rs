@@ -434,10 +434,10 @@ impl<'a> Parser<'a> {
                     loop {
                         let mut label = None;
                         if self.check(TokenKind::Identifier)
-                            && self.peek_next().kind == TokenKind::Colon
+                            && matches!(self.peek_next().kind, TokenKind::Colon | TokenKind::Equal)
                         {
                             label = Some(self.advance().span);
-                            self.advance(); // consume ':'
+                            self.advance(); // consume label delimiter
                         }
                         args.push(CallArg {
                             label,
@@ -521,10 +521,10 @@ impl<'a> Parser<'a> {
                         loop {
                             let mut label = None;
                             if self.check(TokenKind::Identifier)
-                                && self.peek_next().kind == TokenKind::Colon
+                                && matches!(self.peek_next().kind, TokenKind::Colon | TokenKind::Equal)
                             {
                                 label = Some(self.advance().span);
-                                self.advance(); // consume ':'
+                                self.advance(); // consume label delimiter
                             }
                             args.push(CallArg {
                                 label,

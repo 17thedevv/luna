@@ -35,6 +35,7 @@ mod raw_anchor_validation_tests {
 
     fn symbol(kind: &str, path: &str, ty_index: Option<u32>) -> ExportedSymbol {
         ExportedSymbol {
+            callable_signature: None,
             kind: kind.into(),
             ty_index,
             visibility: 1,
@@ -48,6 +49,34 @@ mod raw_anchor_validation_tests {
             raw_pointer_effects: None,
             is_unsafe: false,
         }
+    }
+
+    #[test]
+    fn callable_signature_rejects_missing_malformed_and_non_callable_metadata() {
+        let mut function = symbol("Function", "subtract", Some(0));
+        function.callable_signature = Some(luna_semantic::CallableSignature {
+            parameter_names: vec!["left".into(), "right".into()], has_receiver: false, is_variadic: false,
+        });
+        let baseline = CanonicalInterface {
+            exported_symbols: BTreeMap::from([("subtract".into(), function)]),
+            types: vec![CanonicalType::Function { params: vec![1, 1], return_type: 1, is_unsafe: false }, CanonicalType::Primitive(BuiltinType::I32)],
+            traits: BTreeMap::new(), impl_headers: Vec::new(), nominal_layouts: BTreeMap::new(),
+        };
+        assert!(validate_callable_signatures(&baseline).is_ok());
+        let mut missing = baseline.clone();
+        missing.exported_symbols.get_mut("subtract").unwrap().callable_signature = None;
+        assert!(matches!(validate_callable_signatures(&missing), Err(MlibError::CorruptedData)));
+        for names in [vec!["left"], vec!["left", "left"], vec!["", "right"]] {
+            let mut malformed = baseline.clone();
+            malformed.exported_symbols.get_mut("subtract").unwrap().callable_signature.as_mut().unwrap().parameter_names = names.into_iter().map(String::from).collect();
+            assert!(matches!(validate_callable_signatures(&malformed), Err(MlibError::CorruptedData)));
+        }
+        let mut receiver = baseline.clone();
+        receiver.exported_symbols.get_mut("subtract").unwrap().callable_signature.as_mut().unwrap().has_receiver = true;
+        assert!(matches!(validate_callable_signatures(&receiver), Err(MlibError::CorruptedData)));
+        let mut non_callable = baseline.clone();
+        non_callable.exported_symbols.get_mut("subtract").unwrap().kind = "Variable".into();
+        assert!(matches!(validate_callable_signatures(&non_callable), Err(MlibError::CorruptedData)));
     }
 
     fn interface(contract: luna_semantic::CanonicalRawStorageAnchorContract) -> CanonicalInterface {
@@ -156,6 +185,34 @@ mod raw_anchor_validation_tests {
         interface.exported_symbols.get_mut("read").unwrap().raw_pointer_effects.as_mut().unwrap().call.parameters.clear();
         assert!(matches!(validate_raw_pointer_effects(&interface), Err(MlibError::CorruptedData)));
     }
+}
+
+/// Validate callable names before using portable signature metadata for binding.
+pub fn validate_callable_signatures(interface: &crate::metadata::CanonicalInterface) -> Result<(), MlibError> {
+    fn symbol(value: &crate::metadata::ExportedSymbol, interface: &crate::metadata::CanonicalInterface) -> Result<(), MlibError> {
+        let callable = matches!(value.kind.as_str(), "Function" | "ExternFunction" | "TraitMethod");
+        match &value.callable_signature {
+            Some(signature) if callable => {
+                let Some(crate::metadata::CanonicalType::Function { params, .. }) = value.ty_index
+                    .and_then(|index| interface.types.get(index as usize)) else { return Err(MlibError::CorruptedData); };
+                let mut names = std::collections::HashSet::new();
+                if signature.parameter_names.len() != params.len()
+                    || (signature.has_receiver && signature.parameter_names.first().map(String::as_str) != Some("self"))
+                    || signature.parameter_names.iter().any(|name| name.is_empty() || !names.insert(name)) {
+                    return Err(MlibError::CorruptedData);
+                }
+            }
+            None if !callable => {}
+            _ => return Err(MlibError::CorruptedData),
+        }
+        for child in value.children.values() { symbol(child, interface)?; }
+        Ok(())
+    }
+    for value in interface.exported_symbols.values() { symbol(value, interface)?; }
+    for header in &interface.impl_headers {
+        for method in header.method_contracts.values() { symbol(method, interface)?; }
+    }
+    Ok(())
 }
 
 /// Validate declaration ownership and index references before trusting generic
@@ -609,6 +666,7 @@ impl LlibReader {
                     validate_raw_storage_anchor_contracts(&metadata.interface)?;
                     validate_raw_pointer_effects(&metadata.interface)?;
                     validate_generic_contracts(&metadata.interface)?;
+                    validate_callable_signatures(&metadata.interface)?;
                     semantic_opt = Some(metadata);
                 }
                 SectionType::TypeMetadata => {

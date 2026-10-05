@@ -34,7 +34,7 @@ pub use comptime::{ComptimeValue, ComptimeError, IntWidth, FloatWidth, TypeRepr,
 pub use symbol::{SymbolTable, ScopeId, SymbolKind, ProviderId, ImportSymbolResult};
 pub use luna_common::ids::SymbolId;
 
-pub use semantic_tables::{CaptureBinding, CaptureMode, SemanticTables, IntrinsicKind};
+pub use semantic_tables::{CaptureBinding, CaptureMode, SemanticTables, IntrinsicKind, CallableSignature, CallArgumentBinding};
 pub use ty::{TypeContext, SemanticTypeId, SemanticType, BuiltinType};
 pub use lifetime::{
     LifetimeIdent, LifetimeVar, LifetimeConstraintExpr, Provenance,

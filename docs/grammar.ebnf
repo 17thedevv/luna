@@ -13,7 +13,7 @@ function_decl = { annotation }, [ "export" ], [ "extern" ], [ "unsafe" ],
                 [ generic_params ], "(", [ parameters ], ")",
                 [ "->", type ], { function_contract }, ( block | ";" ) ;
 parameters = parameter, { ",", parameter } ;
-parameter = identifier, ":", type | "self" | "&", [ "rw" ], "self" ;
+parameter = identifier, ":", type, [ "=", expression ] | "self" | "&", [ "rw" ], "self" ;
 generic_params = "<", generic_param, { ",", generic_param }, ">" ;
 generic_param = identifier, [ ":", type_path, { "+", type_path } ] ;
 generic_arguments = "<", type, { ",", type }, ">" ;
@@ -60,6 +60,11 @@ reference_type = "&", [ "rw" ], type ;
 pointer_type = "*", [ "rw" ], type ;
 array_type = "[", type, ";", expression, "]" ;
 slice_type = "[", type, "]" ;
+(* CALL-ARGUMENTS-v1: labels affect binding, never source evaluation order.
+   Default parameter expressions are an adopted, still pending capability. *)
+call_arguments = call_argument, { ",", call_argument } ;
+call_argument = [ identifier, ( "=" | ":" ) ], expression ;
+
 function_type = [ "unsafe" ], "fn", "(", [ type, { ",", type } ], ")",
                 [ "->", type ] ;
 

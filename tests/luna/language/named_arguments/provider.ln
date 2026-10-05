@@ -1,0 +1,24 @@
+module named {
+    export fn subtract(left: i32, right: i32) -> i32 { return left - right; }
+    export fn choose<T>(left: T, right: i32) -> T { return left; }
+    export fn forward<T>(value: T, ignored: i32) -> T { return choose(right=ignored, left=value); }
+    export fn mixed(left: i64, right: bool) -> i64 { if right { return left; } return 0i64; }
+    export struct Counter {};
+    impl Counter {
+        export fn inherent(&self, left: i32, right: i32) -> i32 { return left - right; }
+    }
+    export trait Operation {
+        fn subtract(&self, left: i32, right: i32) -> i32;
+        fn choose<T>(&self, left: T, right: i32) -> T;
+    }
+    impl Operation for Counter {
+        fn subtract(&self, minuend: i32, subtrahend: i32) -> i32 { return minuend - subtrahend; }
+        fn choose<U>(&self, selected: U, ignored: i32) -> U { return selected; }
+    }
+    export fn select(first: &i32, second: &i32) -> &i32 life_from(first) { return first; }
+    export unsafe fn unsafe_subtract(left: i32, right: i32) -> i32 { return left - right; }
+    export struct Owned { counter: *rw i32, value: i32 };
+    impl std::Drop for Owned { fn drop(&rw self) { unsafe { *self.counter = *self.counter + 1; } } }
+    export fn consume<T>(value: T, marker: i32) {}
+    export fn consume_owned(value: Owned, marker: i32) {}
+}

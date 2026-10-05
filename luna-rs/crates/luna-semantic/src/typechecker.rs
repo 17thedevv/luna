@@ -4,6 +4,8 @@ use luna_lexer::{BuiltinKind, TokenKind};
 use luna_common::diagnostic::{Diagnostic, DiagnosticCode};
 #[path = "method_resolution.rs"]
 mod method_resolution;
+#[path = "call_binding.rs"]
+mod call_binding;
 #[path = "trait_bound_proof.rs"]
 mod trait_bound_proof;
 
@@ -1903,6 +1905,7 @@ impl<'a> TypeChecker<'a> {
                         let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                         if let Some(sym_id) = sym_id_opt {
                             self.ctx.tables.symbol_types.insert(sym_id, func_ty);
+                            self.register_callable_signature(sym_id);
                             self.ctx.tables.function_effects.entry(sym_id).or_insert_with(crate::effect::EffectSet::pure);
                             if *is_unsafe {
                                 self.ctx.tables.unsafe_functions.insert(sym_id);
@@ -1954,6 +1957,7 @@ impl<'a> TypeChecker<'a> {
                                 let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                                 if let Some(sym_id) = sym_id_opt {
                                     self.ctx.tables.symbol_types.insert(sym_id, func_ty);
+                                    self.register_callable_signature(sym_id);
                                     if *is_unsafe {
                                         self.ctx.tables.unsafe_functions.insert(sym_id);
                                     }
@@ -2006,6 +2010,7 @@ impl<'a> TypeChecker<'a> {
                                     let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                                     if let Some(sym_id) = sym_id_opt {
                                         self.ctx.tables.symbol_types.insert(sym_id, func_ty);
+                                        self.register_callable_signature(sym_id);
                                         if *is_unsafe {
                                             self.ctx.tables.unsafe_functions.insert(sym_id);
                                         }
@@ -4432,16 +4437,12 @@ impl<'a> TypeChecker<'a> {
                         .and_then(|decl| self.arena.decls.get(decl.0 as usize))
                         .is_some_and(|decl| matches!(decl, Decl::Function { is_variadic: true, .. }));
                     let required = params.len().saturating_sub(usize::from(is_method_call));
-                    if args.len() < required || (!is_variadic && args.len() != required) {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!(
-                            "Callable expects {}{} arguments, but {} were provided",
-                            if is_variadic { "at least " } else { "" }, required, args.len(),
-                        )).with_code(DiagnosticCode::TypeMismatch).with_span(self.get_expr_span_for_diag(expr_id).unwrap_or_default()));
-                        for arg in args {
-                            self.typecheck_expr(&arg.value);
-                        }
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+                    let Some(binding) = self.bind_call_arguments(*expr_id, func_sym_opt, is_method_call,
+                        required, is_variadic, args, span) else {
+                        for arg in args { self.typecheck_expr(&arg.value); }
                         return self.ctx.types.error_id();
-                    }
+                    };
                     ret_ty_id = if has_generics { self.ctx.types.subst(return_type, &subst) } else { return_type };
                     if has_generics {
                         if let Some(expected) = self.expected_expr_type.last().copied() {
@@ -4456,11 +4457,12 @@ impl<'a> TypeChecker<'a> {
                         &params[..]
                     };
                     for (i, arg) in args.iter().enumerate() {
-                        let expected = expected_params.get(i).map(|&ty| if has_generics { self.ctx.types.subst(ty, &subst) } else { ty });
+                        let parameter = binding.source_to_parameter[i] as usize;
+                        let expected = expected_params.get(parameter).map(|&ty| if has_generics { self.ctx.types.subst(ty, &subst) } else { ty });
                         let arg_ty = if let Some(expected) = expected {
                             self.typecheck_expr_expected(&arg.value, expected)
                         } else { self.typecheck_expr(&arg.value) };
-                        if let Some(&expected_p) = expected_params.get(i) {
+                        if let Some(&expected_p) = expected_params.get(parameter) {
                             let expected_p = if has_generics { self.ctx.types.subst(expected_p, &subst) } else { expected_p };
                             if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                 if let Err(e) = self.unify(expected_p, arg_ty) {
@@ -4504,6 +4506,11 @@ impl<'a> TypeChecker<'a> {
                         }
                     }
                 } else if let SemanticType::Enum(enum_sym_id, enum_args, variants) = callee_ty {
+                    if let Some(label) = args.iter().find_map(|argument| argument.label) {
+                        self.ctx.diagnostics.push(Diagnostic::error("Enum constructors do not expose named callable parameters")
+                            .with_code(DiagnosticCode::TypeMismatch).with_span(label));
+                        return self.ctx.types.error_id();
+                    }
                     if let Some(func_sym) = func_sym_opt {
                         if let crate::SymbolKind::EnumVariant(variant_idx) = self.ctx.symbol_table.get_symbol(func_sym).kind {
                             let mut enum_subst = crate::ty::Substitution::new();
@@ -5262,10 +5269,15 @@ impl<'a> TypeChecker<'a> {
                                             return self.ctx.types.error_id();
                                         }
                                         let expected_params = &params[1..];
+                                        let Some(binding) = self.bind_call_arguments(*expr_id, Some(m_sym), true,
+                                            expected_params.len(), false, args, *method_name) else {
+                                            return self.ctx.types.error_id();
+                                        };
                                         for (i, arg) in args.iter().enumerate() {
-                                            let arg_ty = expected_params.get(i).map(|&expected| self.typecheck_expr_expected(&arg.value, expected))
+                                            let parameter = binding.source_to_parameter[i] as usize;
+                                            let arg_ty = expected_params.get(parameter).map(|&expected| self.typecheck_expr_expected(&arg.value, expected))
                                                 .unwrap_or_else(|| self.typecheck_expr(&arg.value));
-                                            if let Some(&expected_p) = expected_params.get(i) {
+                                            if let Some(&expected_p) = expected_params.get(parameter) {
                                                 if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                                     if let Err(e) = self.unify(expected_p, arg_ty) {
                                                         let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
