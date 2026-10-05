@@ -72,7 +72,8 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 11 rejects compiler versions 1–10. This revision retains
+protocol version 12 rejects compiler versions 1–11. This revision requires
+native integrity envelopes and portable payload checksums, and retains
 ordered nominal representations, validated target contracts, public generic
 constraints and individual impl contracts, alongside the earlier
 method-identity, ownership-cleanup and module-constant-storage repairs. MVIR
@@ -93,6 +94,17 @@ endianness where represented by the object container. An existing object
 sidecar must match the embedded object bytes and target identity; its mere
 existence cannot authorize a different implementation. Invalid selected
 artifacts/sidecars reject without falling back or silently replacing them.
+Every emitted native payload has writer-owned object metadata containing its
+format, byte length and SHA-256 digest. Missing/orphaned metadata, empty native
+payloads and inconsistent size/hash/format reject before use. Each section-table
+checksum is the first eight SHA-256 digest bytes interpreted as a little-endian
+`u64`. Readers validate section ranges and checksums before decoding manifest,
+AST, semantic metadata or MVIR. These checks establish payload consistency;
+they do not authenticate a publisher or prove native/source semantic equivalence.
+Build output failures propagate diagnostics and failure status independently of
+CLI verbosity. Failed `.llib` serialization/publication must not report success;
+publication keeps incomplete bytes in a sibling temporary file and cleans that
+temporary on failure.
 Descriptor probes for another target do not certify Luna's lowering, runtime
 or native-language conformance on that target. Current native lowering rejects
 non-64-bit pointers until its remaining word-size assumptions are repaired;

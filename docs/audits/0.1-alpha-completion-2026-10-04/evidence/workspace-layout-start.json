@@ -1,0 +1,9 @@
+{
+  "revision": "20f682f0f41c952fdaa848e2e1333638e44d099b",
+  "rust_host": "x86_64-pc-windows-msvc",
+  "runtime_sha256": "D8AEA737AA7929E79AB70F24DB5705D7370570295DDAB9F569B3085EE230F5DE",
+  "started_utc": "2026-10-05T00:43:53.4633276Z",
+  "command": "cargo test --workspace --no-fail-fast",
+  "cli_sha256": "AAC7F73CB5F1C76A0B3FFEE292B8DC5054A252D4A339474C73689515160DBB96",
+  "luna_target": "x86_64-pc-windows-gnu"
+}

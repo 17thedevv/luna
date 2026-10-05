@@ -6,6 +6,10 @@ Current state remains **PARTIAL**. Revision-specific checkpoints are recorded
 chronologically below. The last completed full workspace run remains FAIL at
 `39a2a9b`: **1,262 passed, 34 failed, 1 ignored**, exit 101. Later focused
 results do not change that immutable verdict.
+The newer workspace invocation at `20f682f` also exits101: completed suites
+report **1,143 passed, 116 failed, 1 ignored**, excluding an aborted target.
+StorageFull and a hung native child prevent complete certification; see the
+artifact-trust checkpoint below for preserved evidence and bounded reruns.
 
 Earlier artifact-compatibility checkpoint: `f5936c3344788168320dfd4b661532c2cfad8a8d`
 (artifact compatibility), following the async/closure repair `363eaf5`.
@@ -1112,3 +1116,89 @@ separately. [Semantic tests](evidence/r1-module-private-semantic.txt) pass
 191/191. This fixes module-constant scope; it does not implement named/default
 arguments. Their definition-site evaluation still needs its own call-binding,
 ownership, generic and provider acceptance matrix.
+
+## Artifact payload integrity and publication — 2026-10-05
+
+Status: **PARTIAL; three confirmed reducers repaired, release gates open.**
+The [before checkpoint](evidence/artifact-trust-before-checkpoint.json) pins
+compiler/runtime hashes and standalone observations at `20f682f`:
+
+| Reducer | Actual pre-repair behavior |
+|---|---|
+| Valid native object substituted into an otherwise unchanged provider | No object metadata/hash was emitted. Artifact-only check/build succeeded and native exit6 replaced the correct exit0 |
+| Generic AST literal changed, with original source text/object intact | Artifact-only check/build succeeded and native exit2 replaced exit0 |
+| Destination `.llib` is an existing directory | Atomic rename failed, but quiet CLI returned exit0 without publishing an artifact |
+
+Compiler header protocol12 rejects versions1–11. Format2, MVIR4 and semantic
+metadata5 remain unchanged. The writer populates native format/size/SHA-256
+metadata and all existing section checksum fields. Readers validate section
+ranges and streaming checksums before decoding, then validate the native
+envelope. Object digests use SHA-256; section `u64` checksums use its first eight
+bytes in little-endian order. Typed E6001 rejects invalid selected artifacts.
+The driver now propagates object-read, serialization, temporary-write/flush and
+rename failures; publication failure reports E6006 in ordinary and quiet modes.
+Temporary cleanup and complete-byte replacement are retained.
+
+The [final integrity CLI run](evidence/artifact-trust-cli-final.txt), plus the
+target suite in the [initial regression run](evidence/artifact-trust-cli-initial.txt),
+establish **seven native executions, 86 typed CLI rejection observations and
+two readable replacement controls**. The matrix covers missing/stale native
+metadata, valid object replacement with absent or matching sidecars, empty or
+missing payload, invalid section ranges, altered AST/MVIR/semantic/manifest/native
+bytes, the exact changed generic literal and quiet/ordinary publication failure.
+Coherent checksum/native envelopes around architecture/container mutations
+ensure those older controls still reach their intended target validator.
+
+[Library](evidence/artifact-trust-llib.txt),
+[publication](evidence/artifact-trust-publication-unit.txt) and
+[driver regression](evidence/artifact-trust-driver.txt) pass **71/71**.
+[Workspace check](evidence/artifact-trust-workspace-check.txt) and the
+[official sysroot rebuild](evidence/artifact-trust-sysroot.txt) succeed. The
+[after checkpoint](evidence/artifact-trust-after-checkpoint.json) records source,
+binary/runtime and raw-log hashes. New fixtures use ordinary user-defined
+providers; compiler machinery has no stdlib/provider-name branches or new
+intrinsics/lang items.
+
+### Workspace failure and environment rerun
+
+The [workspace summary](evidence/workspace-layout-summary.json) and lossless
+[raw log](evidence/workspace-layout.txt.gz) preserve exit101 at the unchanged
+`20f682f` binary/runtime. Completed suites report1,143 passes,116 failures and1
+ignored test; these are not exhaustive testcase counts because the slice-index
+target was aborted. Source/artifact moved-closure cleanup still exits3. Many
+other failures explicitly report StorageFull; the C drive reached zero free
+bytes. An out-of-bounds native child then hung for over three minutes. The
+[intervention](evidence/workspace-layout-intervention.json) records termination
+of only that owned test target and child, allowing `--no-fail-fast` to continue.
+No aborted output is classified as PASS. Twenty-four completed test roots from
+this exact invocation were archived intact to D, rather than deleting unrelated
+temporary data.
+
+After moving TEMP/TMP to D and suppressing system error dialogs in the test
+process tree, [the 25 affected driver targets](evidence/artifact-trust-environment-rerun.txt)
+pass **169/169**, including genuine native out-of-bounds rejection. This is a
+focused current-candidate rerun, not a revision of the old log or a complete
+compiler12 workspace gate. No full release PASS is claimed.
+
+### Limits and next work
+
+Checksums establish payload consistency; they do not authenticate a publisher
+or prove native/source semantic equivalence. Broader malformed semantic graph
+validation remains separate work. Object sidecar and `.llib` publication still
+use separate atomic renames; an interrupted pair can become incoherent and must
+be rejected. Transactional publication of the pair is not implemented here.
+Moved closure destruction, adopted named/default calls, retained contract
+coverage, native target scope and the final clean/full-candidate gates remain
+open. Neither a tag nor a merge/release recommendation is issued.
+
+Compiler Change
+- Capability: generic artifact payload integrity and observable publication failure.
+- Why stdlib exposed it: source/artifact acceptance and sysroot identity gates exercised shared provider infrastructure.
+- Why it is generic: validation covers arbitrary provider payloads and filesystem outputs, independently of declaration/container names.
+- User-defined beneficiary/tests: integrity::value, imported generic value<T>, the CLI matrix above.
+- New intrinsic/lang_item: NO. Stdlib-specific branch: NO.
+
+SKILL IMPACT: REFINE capability-validation guidance with distinct integrity and
+coherent target controls, generic portable-body corruption, publication failure
+and checksum limitations. The changed skill was reread in full and checked
+against testing/boundary guidance; no semantic authority was added.

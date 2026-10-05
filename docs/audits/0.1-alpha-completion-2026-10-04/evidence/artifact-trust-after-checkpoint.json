@@ -1,0 +1,137 @@
+{
+  "base_revision": "20f682f0f41c952fdaa848e2e1333638e44d099b",
+  "compiler_protocol": 12,
+  "format_version": 2,
+  "semantic_metadata_version": 5,
+  "mvir_version": 4,
+  "cli_sha256": "2022384fb1923721d7d3035901ad79cd66e967237da31f6ddc275b72f2720924",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "luna_target": "x86_64-pc-windows-gnu",
+  "focused_cli_final": {
+    "passed": 2,
+    "failed": 0,
+    "ignored": 0
+  },
+  "native_executions": 7,
+  "typed_cli_rejections": 86,
+  "readable_publication_controls": 2,
+  "llib_cases": {
+    "passed": 15,
+    "failed": 0,
+    "ignored": 0
+  },
+  "publication_internal_cases": {
+    "passed": 3,
+    "failed": 0,
+    "ignored": 0
+  },
+  "driver_cases": {
+    "passed": 53,
+    "failed": 0,
+    "ignored": 0
+  },
+  "environment_rerun": {
+    "passed": 169,
+    "failed": 0,
+    "ignored": 0
+  },
+  "environment_test_targets": 25,
+  "environment_settings": {
+    "TEMP": "D:\\fdlang\\.tmp-interface-debug\\verification-temp",
+    "TMP": "D:\\fdlang\\.tmp-interface-debug\\verification-temp",
+    "child_process_error_mode": "SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX | SEM_NOOPENFILEERRORBOX"
+  },
+  "source_files": [
+    {
+      "file": "luna-rs/crates/luna-llib/src/format.rs",
+      "sha256": "710faa14186741e7930c8d8eaca6e0850fde7510d010ebce6efe3ba09b26c15b"
+    },
+    {
+      "file": "luna-rs/crates/luna-llib/src/reader.rs",
+      "sha256": "d5e5612f00842fcd77f87e9843cb1163a2c88a0f0ab4af8775f49350b5b57d31"
+    },
+    {
+      "file": "luna-rs/crates/luna-llib/src/writer.rs",
+      "sha256": "115cf9a210c6c4c24773a53523f0c2c4fc8925cee87fe08aa2f6c95fefa4e705"
+    },
+    {
+      "file": "luna-rs/crates/luna-driver/src/lib.rs",
+      "sha256": "376209a3650432e12ce14a1cd85d02fb5497fb7d39722d4547516bc44b2ab60c"
+    },
+    {
+      "file": "luna-rs/crates/luna-cli/Cargo.toml",
+      "sha256": "fe3120afc5690b067b8118665e8bf177a3a46671024d99ca82af1be84ed27878"
+    },
+    {
+      "file": "luna-rs/Cargo.lock",
+      "sha256": "fba19a48883fe81aa959f903b2f5ec470c33b67ed068bd16b98dddce968ba704"
+    },
+    {
+      "file": "luna-rs/crates/luna-cli/tests/artifact_native_integrity_cli.rs",
+      "sha256": "3e5cbe3ef85b9da48e1a5419378b708d2fb586103974a02dde24eba20db1fa6c"
+    },
+    {
+      "file": "luna-rs/crates/luna-cli/tests/support/artifact_payload.rs",
+      "sha256": "23bc1325ead26cb635db539babda3b02c0a0fdf6efbb4dfb7a9ae4dc400269d2"
+    },
+    {
+      "file": "luna-rs/crates/luna-cli/tests/artifact_target_contract_cli.rs",
+      "sha256": "0eabda5914181e73c9a4d8e0e55171d1ca678988ecc3575c8cec6ef3247313f5"
+    },
+    {
+      "file": "tests/luna/language/artifact_integrity/changed.ln",
+      "sha256": "13e2f1138eabecaef19a38a09b9f33305c738f6bace19e37967d2fe794eca77b"
+    },
+    {
+      "file": "tests/luna/language/artifact_integrity/consumer.ln",
+      "sha256": "46bbbe72a63fdc8135e4bae0f483c2156760fcda0b73d6cef26ded00a68e80bd"
+    },
+    {
+      "file": "tests/luna/language/artifact_integrity/generic.ln",
+      "sha256": "2f07e8b281c24d596f716a298caeb7013b02eb71853b7fb46df17e1b5febf4d5"
+    },
+    {
+      "file": "tests/luna/language/artifact_integrity/generic_consumer.ln",
+      "sha256": "4816b1a8cfae7db8349dc10ca02289a658b05a8d4b1ccb88b63bd22087fc354a"
+    },
+    {
+      "file": "tests/luna/language/artifact_integrity/provider.ln",
+      "sha256": "9b3cf21cb7ffc57f569c35a204355ec5b65b962a5bdb6fbe80f6afdcf06d7a0f"
+    }
+  ],
+  "records": [
+    {
+      "file": "artifact-trust-workspace-check.txt",
+      "sha256": "10d8e3195ea1fc3f4fa7582732b455ba027b379bf01c5676fc11a46cf40b70e0"
+    },
+    {
+      "file": "artifact-trust-cli-prebuild.txt",
+      "sha256": "7c664c90becbec050c48f173a0ce3429b2f4524e4d7ca550d4699507d3c0922d"
+    },
+    {
+      "file": "artifact-trust-llib.txt",
+      "sha256": "726e93346b881ec7dbfe8defe5788a6b14a2600e92faadbf381e08190fe9ecfa"
+    },
+    {
+      "file": "artifact-trust-sysroot.txt",
+      "sha256": "39d5c5fa19267584fc6037f6d2471fbc65afc594289b39f60415aa51ea040d6c"
+    },
+    {
+      "file": "artifact-trust-publication-unit.txt",
+      "sha256": "18c4db80131ff2b723a6b28787a61e88322c43c59be3019023e5c05e95b63e39"
+    },
+    {
+      "file": "artifact-trust-driver.txt",
+      "sha256": "3faa2dae83fe32d2caf6d270784e7888c71ab760ace4fb70b37270ee37f23325"
+    },
+    {
+      "file": "artifact-trust-cli-final.txt",
+      "sha256": "86262a6cdb548f955758f76b678c0ba195f61931d2595df4208c920140c44f6c"
+    },
+    {
+      "file": "artifact-trust-environment-rerun.txt",
+      "sha256": "d4c9ddd5c362628238ce99e582e4672af425e23599a59d3a4e0011e887ab39c1"
+    }
+  ],
+  "release_verdict": "PARTIAL. Three artifact reducers repaired; no complete compiler12 workspace/release certification. Closure cleanup and named/default arguments remain open."
+}

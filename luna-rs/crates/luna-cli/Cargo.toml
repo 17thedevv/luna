@@ -16,3 +16,6 @@ luna-llib = { path = "../luna-llib" }
 luna-common = { path = "../luna-common" }
 serde = { version = "1.0", features = ["derive"] }
 toml = "0.8"
+
+[dev-dependencies]
+bincode = "1.3"

@@ -1,0 +1,12 @@
+{
+  "revision": "20f682f0f41c952fdaa848e2e1333638e44d099b",
+  "cli_sha256": "aac7f73cb5f1c76a0b3ffee292b8dc5054a252d4a339474c73689515160dbb96",
+  "old_object_sha256": "2ad8fd0b05656ba0eed7f9f85f50e763dc88fab7e3d59b5d39fc8eedfaaa8ab9",
+  "selected_object_sha256": "d71dc54aa408e3cefb4132e02e7f1ec3921d1ebe8e0aa83ea53489cfaf555a6f",
+  "same_object_size": true,
+  "manifest_records_old_object_hash": false,
+  "source_absent": true,
+  "check_exit": 0,
+  "build_exit": 0,
+  "run_exit": 6
+}
