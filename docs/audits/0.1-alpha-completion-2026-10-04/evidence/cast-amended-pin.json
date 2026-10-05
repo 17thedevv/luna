@@ -1,0 +1,54 @@
+{
+  "base_commit": "9558701462a36e1699a70bd25defb3e53d20f68c",
+  "scope": "Windows GNU focused cast identity/move/drop and source-span acceptance. Not complete cast/provider/target/workspace certification.",
+  "protocol": 15,
+  "metadata": 7,
+  "file": 2,
+  "mvir": 4,
+  "sources": {
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs": "0ff364ac8621f5b4280fc18d147ca56b0304722eb6a549f40d743fc3083df9ee",
+    "luna-rs/crates/luna-cli/tests/cast_contract_cli.rs": "2d2108aaae9f588fbb4597a24277b26a602a29f9d42303bd087231d158ba84a9",
+    "luna-rs/crates/luna-cli/tests/expression_diagnostic_spans_cli.rs": "b5ee9edd1b81ef92df471f750ad61894e25061272b060e10c866e13ccaaaf120",
+    "luna-rs/crates/luna-llib/src/format.rs": "9d60198d058445eaccb90222c1728bbac58d4943f5dc5dd70f9bf247b9489eb9",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "0b1bf14f7395a5fdfbcdc9cdf865caa44a14aec5b2f35c9f55fcdc4f4a218195",
+    "luna-rs/crates/luna-semantic/src/cast.rs": "9a3064d93c464877966fa1eac140ed68d4eb7588d353e0612a6d5da97a579bb2",
+    "luna-rs/crates/luna-semantic/src/lib.rs": "e46c464cf20111f1048f147fe05c49695dda8fc056e24f33f0a4c40b912979f9",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "1f53c95689b98b07b49a6e17f8d3659c6f3d2672b79c8f1f262622ec69e4c59c",
+    "tests/luna/language/cast_contract/controls.ln": "166a5ea3d19dd52e2cd057339b4650ede8f3c2a36945f73e48f8e02b2bb1532d",
+    "tests/luna/language/cast_contract/generic_nominal_to_integer.ln": "a7c7e10ad6b4839f1299df908f01a1e7ddc73aea44fdcaec7f80ade69dc5a8b5",
+    "tests/luna/language/cast_contract/identity_drop.ln": "71c79a5f3e0f8fcaf99a1b4b28d0762edad7dbe30e451d7da7a363e73aee45c1",
+    "tests/luna/language/cast_contract/identity_move_reject.ln": "05bb879d3774efdd2e5b65063d742077324fc06d7a0bae65e964af7510f56122",
+    "tests/luna/language/cast_contract/nominal_privacy.ln": "36e2cdfdb2881a94b0f40158764ef911d588fe61de0814ce0f8bf11bd16f6bbb",
+    "tests/luna/language/cast_contract/private_direct_control.ln": "bd5432b4262572524a91eeeadf8b510da00a1f3ec10ee333d6c89bace8e0c741",
+    "tests/luna/language/cast_contract/raw_callable_abi_control.ln": "90262dd10d5cc10edc6a4fd901cc40347f6ccf325d4decb75b0dcd9a4919542f",
+    "tests/luna/language/cast_contract/raw_reference_without_unsafe.ln": "534c67690abeba483e59bb1bd55f86acd7489092cb91f4f09648beb51c711a2a",
+    "tests/luna/language/cast_contract/reference_reinterpret.ln": "cd56e61f3d34db72f0f4250bcabb44c0d8f653495c5323e80b7920e8a9825c4c",
+    "tests/luna/language/cast_contract/shared_to_mutable.ln": "a5f9f897375a3a967c8adbf2a137aa096b94c40ae31bdc097a2f484d2649ce0a",
+    "tests/luna/language/cast_contract/unsafe_callable_erasure.ln": "1385bcc55dd2c2281070980701eeaf9f660c27a106e048166d1513579df08653",
+    "tests/luna/language/diagnostic_spans/char_invalid.ln": "f093fe710998004cbeea5e0ce6c058a7a281e87a8de468738a5fea1bc88216e5",
+    "tests/luna/language/diagnostic_spans/deref_scalar.ln": "dbbf9b7942585864edd95abf96edb5feac7b52e1f0d5a26d464f90459be6b81a",
+    "tests/luna/language/diagnostic_spans/index_scalar.ln": "6a9e16487b58457524142ce9160fa26d3d99edd0bfafcf7b176a9d219a966101",
+    "tests/luna/language/diagnostic_spans/neg_bool.ln": "1a85a901c8eaf693fe81a56752e0bf44d412cab0a463b6239dbbd5f9da2a97ad",
+    "tests/luna/language/diagnostic_spans/tuple_scalar.ln": "0a5b4c58c6dca50c4d897c974b90e2bb2768e9cabf863c04fce87f1a06ddd5cb"
+  },
+  "cli_sha256": "c6af423b42e54749b303b818c4fdbc407b349c599ef72a156331722d43294130",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "cli_suites": {
+    "passed": 3,
+    "failed": 0
+  },
+  "cast_reject_commands": 32,
+  "cast_native_controls": 6,
+  "span_reject_commands": 20,
+  "logs": {
+    "cast-final-char-cli.txt": "d08576d028be50bc915f1c48dbe9a998ba5b3a30deea08ec3373a69bd028d72f",
+    "cast-final-char-internals.txt": "ffc1a569a638e43e95cee04da695350a207f9f7482ce00a05936c932e61c4970",
+    "cast-final-doc-validation.txt": "43f330d83c8b29c0783d777ed60ad831a0b60aed84fe2c4bef70c49cc46554e2"
+  },
+  "internal_counts": {
+    "passed": 286,
+    "failed": 0,
+    "ignored": 0
+  },
+  "stage": "Amended char diagnostic admission; includes identity lowering"
+}

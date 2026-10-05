@@ -102,6 +102,14 @@ Verify portable callable safety and public interface identity as well as AST
 rechecking. Keep unresolved reference/loan failures separate from native ABI
 success; a callable matrix cannot waive an independent safety regression.
 
+For casts, validate language type identity, reference capability, callable
+safety and unsafe admission independently of equal backend representations.
+Include same-layout distinct nominal types, reference reinterpretation,
+shared-to-mutable promotion and unsafe-callable erasure as negative controls.
+A true identity cast must preserve ownership/place accounting: test one drop
+and rejection of use after moving through the cast. Keep legitimate numeric,
+raw-address and unsafe ABI-adaptation controls separate from these rejections.
+
 For executable language behavior, include a real `.ln` fixture compiled,
 linked, and run through the supported toolchain, checking exit code and/or
 observable output. Use `luna-testing-strategy` to choose the highest faithful

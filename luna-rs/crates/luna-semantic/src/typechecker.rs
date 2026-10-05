@@ -5101,18 +5101,20 @@ impl<'a> TypeChecker<'a> {
             Expr::TupleIndex { object, index } => {
                 let base_ty_id = self.typecheck_expr(object);
                 let base_ty = self.ctx.types.get(base_ty_id).clone();
+                let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
                 match base_ty {
                     SemanticType::Tuple(elem_tys) => {
                         if *index as usize >= elem_tys.len() {
-                            self.ctx.diagnostics.push(Diagnostic::error(format!("Tuple index {} out of bounds (tuple has {} elements)", index, elem_tys.len())).with_code(DiagnosticCode::CannotIndex));
-                            self.ctx.types.new_inference_var()
+                            self.ctx.diagnostics.push(Diagnostic::error(format!("Tuple index {} out of bounds (tuple has {} elements)", index, elem_tys.len())).with_code(DiagnosticCode::CannotIndex).with_span(span));
+                            self.ctx.types.error_id()
                         } else {
                             elem_tys[*index as usize]
                         }
                     }
+                    SemanticType::Error => self.ctx.types.error_id(),
                     _ => {
-                        self.ctx.diagnostics.push(Diagnostic::error("Cannot index into a non-tuple type").with_code(DiagnosticCode::CannotIndex));
-                        self.ctx.types.new_inference_var()
+                        self.ctx.diagnostics.push(Diagnostic::error("Cannot index into a non-tuple type").with_code(DiagnosticCode::CannotIndex).with_span(span));
+                        self.ctx.types.error_id()
                     }
                 }
             }
@@ -5344,112 +5346,87 @@ impl<'a> TypeChecker<'a> {
                 let source_ty = self.ctx.types.get(source_ty_id).clone();
                 let target_ty = self.ctx.types.get(target_ty_id).clone();
 
-                // Luna `char` denotes a Unicode scalar value, not an arbitrary
-                // 32-bit integer. Keep that semantic invariant in the frontend
-                // so known-invalid values never reach code generation.
-                if matches!(target_ty, SemanticType::Primitive(BuiltinType::Char)) {
-                    let source_is_char = matches!(source_ty, SemanticType::Primitive(BuiltinType::Char));
-                    let source_is_integer = matches!(source_ty, SemanticType::Primitive(b) if b.is_integer());
-                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
-
-                    if source_is_integer {
-                        if crate::const_eval::is_const_evaluable(
-                            self.arena,
-                            self.ctx,
-                            self.source_manager,
-                            *e,
-                        )
-                        .is_ok()
-                        {
-                            if let Ok(crate::ComptimeValue::Int { val, .. }) = self.eval_comptime_expr(*e) {
-                                if !Self::is_unicode_scalar(val) {
-                                    self.ctx.diagnostics.push(
-                                        Diagnostic::error(
-                                            "invalid integer-to-char cast: value is not a Unicode scalar",
-                                        )
-                                        .with_code(DiagnosticCode::InvalidCast)
-                                        .with_span(span),
-                                    );
-                                }
-                            }
-                        }
-                    } else if !source_is_char {
-                        self.ctx.diagnostics.push(
-                            Diagnostic::error(
-                                "invalid cast to char: source must be an integer or char",
-                            )
-                            .with_code(DiagnosticCode::InvalidCast)
-                            .with_span(span),
-                        );
+                let cast_span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+                let admission = self.ctx.types.cast_admission(source_ty_id, target_ty_id);
+                let diagnostic_start = self.ctx.diagnostics.len();
+                let invalid_operand = matches!(source_ty, SemanticType::Error) || matches!(target_ty, SemanticType::Error);
+                if !invalid_operand {
+                    match admission {
+                        Err(reason) => self.ctx.diagnostics.push(
+                            Diagnostic::error(format!("E_INVALID_CAST: {reason}"))
+                                .with_code(DiagnosticCode::InvalidCast).with_span(cast_span)),
+                        Ok(crate::cast::CastAdmission::RequiresUnsafe) if !self.is_unsafe_context =>
+                            self.ctx.diagnostics.push(Diagnostic::error("Cast requires an unsafe block")
+                                .with_code(DiagnosticCode::UnsafeOperationOutsideUnsafe).with_span(cast_span)),
+                        _ => {}
                     }
                 }
+                if invalid_operand || self.ctx.diagnostics.len() != diagnostic_start {
+                    self.ctx.types.error_id()
+                } else {
+                    // Luna `char` denotes a Unicode scalar value, not an arbitrary
+                    // 32-bit integer. Keep that semantic invariant in the frontend
+                    // so known-invalid values never reach code generation.
+                    if matches!(target_ty, SemanticType::Primitive(BuiltinType::Char)) {
+                        let source_is_char = matches!(source_ty, SemanticType::Primitive(BuiltinType::Char));
+                        let source_is_integer = matches!(source_ty, SemanticType::Primitive(b) if b.is_integer());
+                        let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
 
-                // Diagnose statically-known float-to-integer overflow before lowering.
-                // This keeps comptime casts out of the backend's runtime trap path and
-                // prevents malformed/unsupported numeric literals from reaching codegen.
-                if matches!(source_ty, SemanticType::Primitive(BuiltinType::F32 | BuiltinType::F64)) {
-                    if let (Some(value), Some((min, max))) = (self.constant_float_literal(*e), Self::integer_float_bounds(&target_ty)) {
-                        let truncated = value.trunc();
-                        if !truncated.is_finite() || truncated < min || truncated >= max {
-                            let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+                        if source_is_integer {
+                            if crate::const_eval::is_const_evaluable(
+                                self.arena,
+                                self.ctx,
+                                self.source_manager,
+                                *e,
+                            )
+                            .is_ok()
+                            {
+                                if let Ok(crate::ComptimeValue::Int { val, .. }) = self.eval_comptime_expr(*e) {
+                                    if !Self::is_unicode_scalar(val) {
+                                        self.ctx.diagnostics.push(
+                                            Diagnostic::error(
+                                                "invalid integer-to-char cast: value is not a Unicode scalar",
+                                            )
+                                            .with_code(DiagnosticCode::InvalidCast)
+                                            .with_span(span),
+                                        );
+                                    }
+                                }
+                            }
+                        } else if !source_is_char {
                             self.ctx.diagnostics.push(
-                                Diagnostic::error("numeric conversion out of range in float-to-integer cast")
-                                    .with_code(DiagnosticCode::InvalidCast)
-                                    .with_span(span),
+                                Diagnostic::error(
+                                    "invalid cast to char: source must be an integer or char",
+                                )
+                                .with_code(DiagnosticCode::InvalidCast)
+                                .with_span(span),
                             );
                         }
                     }
-                }
 
-                // G1 Vector 4: Strict cast validation.
-                // Reject casts that would silently strip or fabricate fat pointer metadata.
-
-                // Helper: check if a type is a fat pointer (pointer/ref to unsized)
-                let is_fat = |ty: &SemanticType| -> bool {
-                    match ty {
-                        SemanticType::Pointer(_, inner) | SemanticType::Reference(_, _, inner) => {
-                            self.ctx.types.is_unsized(*inner)
+                    // Diagnose statically-known float-to-integer overflow before lowering.
+                    // This keeps comptime casts out of the backend's runtime trap path and
+                    // prevents malformed/unsupported numeric literals from reaching codegen.
+                    if matches!(source_ty, SemanticType::Primitive(BuiltinType::F32 | BuiltinType::F64)) {
+                        if let (Some(value), Some((min, max))) = (self.constant_float_literal(*e), Self::integer_float_bounds(&target_ty)) {
+                            let truncated = value.trunc();
+                            if !truncated.is_finite() || truncated < min || truncated >= max {
+                                let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+                                self.ctx.diagnostics.push(
+                                    Diagnostic::error("numeric conversion out of range in float-to-integer cast")
+                                        .with_code(DiagnosticCode::InvalidCast)
+                                        .with_span(span),
+                                );
+                            }
                         }
-                        _ => false,
                     }
-                };
-                let is_thin_ptr = |ty: &SemanticType| -> bool {
-                    match ty {
-                        SemanticType::Pointer(_, inner) | SemanticType::Reference(_, _, inner) => {
-                            !self.ctx.types.is_unsized(*inner)
-                        }
-                        _ => false,
+
+                    if self.ctx.diagnostics.len() != diagnostic_start {
+                        self.ctx.types.error_id()
+                    } else {
+                        target_ty_id
                     }
-                };
-
-                let source_is_fat = is_fat(&source_ty);
-                let target_is_fat = is_fat(&target_ty);
-                let source_is_thin = is_thin_ptr(&source_ty);
-                let target_is_thin = is_thin_ptr(&target_ty);
-
-                // Rule: Cannot cast fat pointer to thin pointer (strips metadata)
-                if source_is_fat && (target_is_thin || matches!(target_ty, SemanticType::Primitive(_))) {
-                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error("E_INVALID_CAST: Cannot cast fat pointer (pointer to unsized type) to thin pointer or integer; this would silently strip metadata (vtable or length)")
-                        .with_code(DiagnosticCode::InvalidCast)
-                        .with_span(span));
                 }
-                // Rule: Cannot cast thin pointer to fat pointer (fabricates metadata)
-                if (source_is_thin || matches!(source_ty, SemanticType::Primitive(_))) && target_is_fat {
-                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error("E_INVALID_CAST: Cannot cast thin pointer or integer to fat pointer (pointer to unsized type); metadata (vtable or length) cannot be fabricated from thin representation")
-                        .with_code(DiagnosticCode::InvalidCast)
-                        .with_span(span));
-                }
-                // Rule: Cannot cast directly to unsized value type
-                if self.ctx.types.is_unsized(target_ty_id) {
-                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                    self.ctx.diagnostics.push(Diagnostic::error("E_UNSIZED_TYPE_IN_VALUE_POSITION: Cannot cast to unsized type in value position")
-                        .with_code(DiagnosticCode::TypeMismatch)
-                        .with_span(span));
-                }
-
-                target_ty_id
             }
             Expr::Match { subject, arms, match_span } => {
                 let subject_ty_id = self.typecheck_expr_expected(subject, self.ctx.types.error_id());
@@ -6042,7 +6019,16 @@ impl<'a> TypeChecker<'a> {
             Expr::Identifier { segments, .. } => segments.first().copied(),
             Expr::Call { callee, .. } => self.get_expr_span_for_diag(callee),
             Expr::MethodCall { method_name, .. } => Some(*method_name),
-            Expr::Await { expr } => self.get_expr_span_for_diag(expr),
+            Expr::Unary { operand, .. } => self.get_expr_span_for_diag(operand),
+            Expr::Cast { expr, .. } | Expr::Await { expr } => self.get_expr_span_for_diag(expr),
+            Expr::TupleIndex { object, .. } => self.get_expr_span_for_diag(object),
+            Expr::Index { base, .. } => self.get_expr_span_for_diag(base),
+            Expr::Member { member, .. } => Some(*member),
+            Expr::Binary { left, .. } => self.get_expr_span_for_diag(left),
+            Expr::Assign { lvalue, .. } => self.get_expr_span_for_diag(lvalue),
+            Expr::StructInit { path, .. } => path.first().copied(),
+            Expr::Match { match_span, .. } => Some(*match_span),
+            Expr::MacroCall { span, .. } => Some(*span),
             Expr::Try { try_span, .. } => Some(*try_span),
             _ => None,
         }

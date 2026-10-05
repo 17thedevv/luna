@@ -1,0 +1,23 @@
+struct Record { value: i32, };
+fn identity<T>(value: T) -> T { return value as T; }
+fn increment(value: i32) -> i32 { return value + 1; }
+unsafe fn guarded(value: i32) -> i32 { return value + 2; }
+fn main() -> i32 {
+    dec record = identity<Record>(Record { value: 31 });
+    if record.value != 31 { return 1; }
+    dec numeric = 255 as u8 as u64;
+    if numeric != 255 as u64 { return 2; }
+    dec rw value: i32 = 10;
+    dec borrowed = &rw value;
+    dec shared = borrowed as &i32;
+    if *shared != 10 { return 3; }
+    dec pointer = &value as *i32;
+    unsafe {
+        dec reference = pointer as &i32;
+        if *reference != 10 { return 4; }
+        dec callable = guarded as unsafe fn(i32) -> i32;
+        if callable(3) != 5 { return 5; }
+    }
+    dec callable = increment as fn(i32) -> i32;
+    return callable(3) - 4;
+}

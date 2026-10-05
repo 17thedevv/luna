@@ -49,6 +49,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/agent-handoff/phase-15-completion-audit.md](agent-handoff/phase-15-completion-audit.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/architecture.md](architecture.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/ast.md](ast.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md](audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md](audits/0.1-alpha-completion-2026-10-04/EXECUTION.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md](audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md) | evidence | [semantics](spec/0.1/semantics.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md](audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md) | evidence | [conformance](spec/0.1/conformance.md) |

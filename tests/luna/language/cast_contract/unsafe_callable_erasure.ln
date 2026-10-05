@@ -1,0 +1,5 @@
+unsafe fn guarded(value: i32) -> i32 { return value + 1; }
+fn main() -> i32 {
+ dec erased = guarded as fn(i32) -> i32;
+ return erased(3) - 4;
+}

@@ -1,0 +1,6 @@
+fn main() -> i32 {
+ dec value: i32 = 10;
+ dec pointer = &value as *i32;
+ dec reference = pointer as &i32;
+ return *reference - 10;
+}

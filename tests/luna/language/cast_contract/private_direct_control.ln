@@ -1,0 +1,5 @@
+module sealed {
+ export struct Secret { private value: i32, };
+ export fn make() -> Secret { return Secret { value: 73 }; }
+}
+fn main() -> i32 { dec secret = sealed::make(); return secret.value; }
