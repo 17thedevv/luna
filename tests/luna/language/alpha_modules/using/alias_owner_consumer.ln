@@ -1,0 +1,4 @@
+import "provider";
+fn main() -> i32 {
+    return first::make() * 10 + second::make() + facade::run() - 14;
+}

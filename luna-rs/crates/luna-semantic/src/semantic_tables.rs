@@ -110,6 +110,9 @@ pub enum IntrinsicKind {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct CallableSignature {
     pub parameter_names: Vec<String>,
+    /// Canonical token contracts, without source offsets or session identities.
+    /// Executable definitions live in the portable AST, not in this interface.
+    pub default_contracts: Vec<Option<String>>,
     pub has_receiver: bool,
     pub is_variadic: bool,
 }
@@ -308,13 +311,16 @@ impl SemanticTables {
     }
 
     /// A trait implementation's spelling is private; calls use the trait contract.
-    pub fn callable_signature(&self, symbol: SymbolId, symbols: &SymbolTable) -> Option<&CallableSignature> {
-        let contract = self.method_impls.get(&symbol).and_then(|key| key.trait_id)
+    pub fn callable_contract_symbol(&self, symbol: SymbolId, symbols: &SymbolTable) -> SymbolId {
+        self.method_impls.get(&symbol).and_then(|key| key.trait_id)
             .and_then(|owner| self.trait_methods.get(&owner))
             .and_then(|methods| methods.iter().find(|&&method|
                 symbols.get_symbol(method).name == symbols.get_symbol(symbol).name))
-            .copied().unwrap_or(symbol);
-        self.callable_signatures.get(&contract)
+            .copied().unwrap_or(symbol)
+    }
+
+    pub fn callable_signature(&self, symbol: SymbolId, symbols: &SymbolTable) -> Option<&CallableSignature> {
+        self.callable_signatures.get(&self.callable_contract_symbol(symbol, symbols))
     }
 
     pub fn new() -> Self {

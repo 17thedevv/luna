@@ -708,6 +708,7 @@ impl<'a> Parser<'a> {
                         visibility: luna_ast::Visibility::Private,
                         name,
                         ty,
+                        default: None,
                         is_variadic: false,
                         is_self: false,
                     });
@@ -889,7 +890,6 @@ impl<'a> Parser<'a> {
         }
     }
 }
-
 
 
 

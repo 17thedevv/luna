@@ -1429,18 +1429,34 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                 
                 let decl = &self.arena.decls[decl_id.0 as usize];
                 match decl {
-                    Decl::Function { body, .. } => {
-                        if let Some(body_stmt) = body {
-                            if let Some(&sym_id) = self.ctx.tables.decl_symbols.get(decl_id) {
-                                if let Some(scope) =
-                                    self.ctx.symbol_table.get_symbol(sym_id).inner_scope
-                                {
-                                    let prev_scope = self.current_scope;
-                                    self.current_scope = scope;
-                                    self.resolve_stmt(body_stmt);
-                                    self.current_scope = prev_scope;
+                    Decl::Function { body, params, .. } => {
+                        if let Some(scope) = self.ctx.tables.decl_scopes.get(decl_id).copied() {
+                            let prev_scope = self.current_scope;
+                            self.current_scope = scope;
+                            // Reuse declaration identities while resolving the prefix scope.
+                            // Later parameters never enter an earlier default's lookup.
+                            let all_symbols = self.ctx.symbol_table.scopes[scope.0 as usize].symbols.clone();
+                            let parameter_symbols = params.iter().filter_map(|parameter|
+                                self.ctx.tables.decl_symbols.get(parameter).copied()).collect::<std::collections::HashSet<_>>();
+                            for candidates in self.ctx.symbol_table.scopes[scope.0 as usize].symbols.values_mut() {
+                                candidates.retain(|symbol| !parameter_symbols.contains(symbol));
+                            }
+                            self.ctx.symbol_table.scopes[scope.0 as usize].symbols.retain(|_, candidates| !candidates.is_empty());
+                            for parameter in params {
+                                if let Decl::Param { default, .. } = &self.arena.decls[parameter.0 as usize] {
+                                    if let Some(default) = default { self.resolve_expr(&default.value); }
+                                }
+                                if let Some(&symbol) = self.ctx.tables.decl_symbols.get(parameter) {
+                                    let value = self.ctx.symbol_table.get_symbol(symbol);
+                                    let key = crate::symbol::IdentKey::new(&value.name, value.ctxt);
+                                    self.ctx.symbol_table.scopes[scope.0 as usize].symbols.entry(key).or_default().push(symbol);
                                 }
                             }
+                            self.ctx.symbol_table.scopes[scope.0 as usize].symbols = all_symbols;
+                            if let Some(body_stmt) = body {
+                                    self.resolve_stmt(body_stmt);
+                            }
+                            self.current_scope = prev_scope;
                         }
                     }
                     Decl::Var { initializer, .. } => {
@@ -1895,8 +1911,9 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
             Expr::Unary { operand, .. } => {
                 self.resolve_expr(operand);
             }
-            Expr::Call { callee, args, .. } => {
+            Expr::Call { callee, args, generic_args } => {
                 self.resolve_expr(callee);
+                for ty in generic_args { self.resolve_type(ty); }
                 for arg in args {
                     self.resolve_expr(&arg.value);
                 }
@@ -1905,8 +1922,9 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                 self.resolve_expr(lvalue);
                 self.resolve_expr(value);
             }
-            Expr::MethodCall { object, args, .. } => {
+            Expr::MethodCall { object, args, generic_args, .. } => {
                 self.resolve_expr(object);
+                for ty in generic_args { self.resolve_type(ty); }
                 for arg in args {
                     self.resolve_expr(&arg.value);
                 }
@@ -1914,7 +1932,8 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
             Expr::Member { object, .. } => {
                 self.resolve_expr(object);
             }
-            Expr::StructInit { fields, .. } => {
+            Expr::StructInit { fields, generic_args, .. } => {
+                for ty in generic_args { self.resolve_type(ty); }
                 for field in fields {
                     self.resolve_expr(&field.value);
                 }
@@ -1926,9 +1945,11 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
             Expr::TupleIndex { object, .. } => {
                 self.resolve_expr(object);
             }
-            Expr::Cast { expr: e, .. } => {
+            Expr::Cast { expr: e, target_type } => {
                 self.resolve_expr(e);
+                self.resolve_type(target_type);
             }
+            Expr::Sizeof { target_type } | Expr::Alignof { target_type } => self.resolve_type(target_type),
             Expr::Match { subject, arms, .. } => {
                 self.resolve_expr(subject);
                 for arm in arms {

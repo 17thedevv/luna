@@ -381,3 +381,19 @@ controls pass. Final immutable verification passes workspace/all-target
 compilation, 324 internal and 43 CLI/driver tests, exit0. Defaults remain
 unimplemented; the known closure failure and broader release gates are not
 closed by this checkpoint.
+
+### Default declarations update — 2026-10-05; omission remains required
+
+The [default declaration gate](../../audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md)
+adds parameter defaults to AST/parser/relocation and checks their definition-site
+prefix scope, types, rigid independent binders, unsafe admission and trait
+signature compatibility. Compiler17/metadata9 carries public default contracts.
+Binder/alias renaming preserves verified interface identity; changed defaults
+and retargeted aliases invalidate stale dependents. A generic export repair
+keeps local namespace aliases from replacing original namespace owners.
+
+This supersedes the absent declaration representation within the recorded
+scope. Omitted-argument calls still reject E2001 in both provider modes;
+per-call execution, ownership/effect mapping and full default acceptance remain
+unimplemented requirements, not a const-only restriction or deferred feature.
+The known closure failure and all remaining R0–R5 release gates stay open.

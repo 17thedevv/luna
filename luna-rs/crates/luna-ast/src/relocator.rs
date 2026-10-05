@@ -258,10 +258,14 @@ pub trait AstMapping {
                 if let Some(t) = type_annot { *t = self.shift_type_id(*t); }
                 if let Some(i) = initializer { *i = self.shift_expr_id(*i); }
             }
-            Decl::Param { annotations, name, ty, .. } => {
+            Decl::Param { annotations, name, ty, default, .. } => {
                 self.relocate_annotations(annotations);
                 self.shift_span(name);
                 if let Some(t) = ty { *t = self.shift_type_id(*t); }
+                if let Some(default) = default {
+                    default.value = self.shift_expr_id(default.value);
+                    self.shift_span(&mut default.span);
+                }
             }
             Decl::Function { annotations, name, generic_params, params, return_type, body, lifetime_signature, .. } => {
                 self.relocate_annotations(annotations);

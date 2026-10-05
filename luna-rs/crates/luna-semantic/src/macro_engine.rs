@@ -142,9 +142,7 @@ impl<'a> MacroEngine<'a> {
                     }
                 }
 
-                let mut bindings: Vec<_> = generic_params.iter().map(|parameter| parameter.name).collect();
-                for &parameter in &params { self.declaration_bindings(parameter, &mut bindings); }
-                self.push_bindings(bindings);
+                self.push_bindings(generic_params.iter().map(|parameter| parameter.name).collect());
                 // Expand parameter types
                 for &param_id in &params {
                     let old_ty = if let Decl::Param { ty, .. } = &self.arena.decls[param_id.0 as usize] {
@@ -155,6 +153,21 @@ impl<'a> MacroEngine<'a> {
                     let new_ty = old_ty.map(|t| self.expand_type(t));
                     if let Decl::Param { ty, .. } = &mut self.arena.decls[param_id.0 as usize] {
                         *ty = new_ty;
+                    }
+                    let default = if let Decl::Param { default, .. } = &self.arena.decls[param_id.0 as usize] {
+                        default.clone()
+                    } else { None };
+                    if let Some(mut default) = default {
+                        default.value = self.expand_expr(default.value);
+                        if let Decl::Param { default: target, .. } = &mut self.arena.decls[param_id.0 as usize] {
+                            *target = Some(default);
+                        }
+                    }
+                    let mut names = Vec::new();
+                    self.declaration_bindings(param_id, &mut names);
+                    for name in names {
+                        let key = crate::symbol::IdentKey::new(self.get_span_text(name), name.ctxt);
+                        self.lexical_bindings.last_mut().unwrap().insert(key);
                     }
                 }
 

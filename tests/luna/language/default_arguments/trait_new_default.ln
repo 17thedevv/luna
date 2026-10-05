@@ -1,0 +1,4 @@
+trait Compute { fn eval(&self, value: i32) -> i32; }
+struct Counter {};
+impl Compute for Counter { fn eval(&self, item: i32 = 2) -> i32 { return item; } }
+fn main() -> i32 { return 0; }

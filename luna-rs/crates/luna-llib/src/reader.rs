@@ -56,6 +56,7 @@ mod raw_anchor_validation_tests {
         let mut function = symbol("Function", "subtract", Some(0));
         function.callable_signature = Some(luna_semantic::CallableSignature {
             parameter_names: vec!["left".into(), "right".into()], has_receiver: false, is_variadic: false,
+            default_contracts: vec![None, None],
         });
         let baseline = CanonicalInterface {
             exported_symbols: BTreeMap::from([("subtract".into(), function)]),
@@ -63,6 +64,14 @@ mod raw_anchor_validation_tests {
             traits: BTreeMap::new(), impl_headers: Vec::new(), nominal_layouts: BTreeMap::new(),
         };
         assert!(validate_callable_signatures(&baseline).is_ok());
+        for defaults in [vec![None], vec![Some(String::new()), None], vec![Some("x".into()), None]] {
+            let mut malformed = baseline.clone();
+            malformed.exported_symbols.get_mut("subtract").unwrap().callable_signature.as_mut().unwrap().default_contracts = defaults;
+            assert!(matches!(validate_callable_signatures(&malformed), Err(MlibError::CorruptedData)));
+        }
+        let mut defaulted = baseline.clone();
+        defaulted.exported_symbols.get_mut("subtract").unwrap().callable_signature.as_mut().unwrap().default_contracts[1] = Some("literal:1:3|".into());
+        assert!(validate_callable_signatures(&defaulted).is_ok());
         let mut missing = baseline.clone();
         missing.exported_symbols.get_mut("subtract").unwrap().callable_signature = None;
         assert!(matches!(validate_callable_signatures(&missing), Err(MlibError::CorruptedData)));
@@ -197,9 +206,20 @@ pub fn validate_callable_signatures(interface: &crate::metadata::CanonicalInterf
                     .and_then(|index| interface.types.get(index as usize)) else { return Err(MlibError::CorruptedData); };
                 let mut names = std::collections::HashSet::new();
                 if signature.parameter_names.len() != params.len()
+                    || signature.default_contracts.len() != params.len()
                     || (signature.has_receiver && signature.parameter_names.first().map(String::as_str) != Some("self"))
+                    || (signature.has_receiver && signature.default_contracts.first().is_some_and(Option::is_some))
                     || signature.parameter_names.iter().any(|name| name.is_empty() || !names.insert(name)) {
                     return Err(MlibError::CorruptedData);
+                }
+                let mut seen_default = false;
+                for default in &signature.default_contracts {
+                    match default {
+                        Some(contract) if !contract.is_empty() => seen_default = true,
+                        Some(_) => return Err(MlibError::CorruptedData),
+                        None if seen_default => return Err(MlibError::CorruptedData),
+                        None => {}
+                    }
                 }
             }
             None if !callable => {}

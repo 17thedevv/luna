@@ -1588,6 +1588,9 @@ impl ModuleRegistry {
         let scope = &ctx.symbol_table.scopes[scope_id.0 as usize];
         for (_name, sym_ids) in &scope.symbols {
             if let Some(&sym_id) = sym_ids.last() {
+                // An alias is a local lookup view, never an exported scope owner.
+                // Visiting its shared target first would suppress the real module.
+                if ctx.symbol_table.namespace_aliases.contains(&sym_id) { continue; }
                 let mut sym = ctx.symbol_table.get_symbol(sym_id).clone();
                 if sym.provider_id.is_some() && sym.provider_id != Some(provider_id) {
                     if sym.kind == SymbolKind::Module {

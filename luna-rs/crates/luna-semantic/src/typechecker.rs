@@ -6,6 +6,8 @@ use luna_common::diagnostic::{Diagnostic, DiagnosticCode};
 mod method_resolution;
 #[path = "call_binding.rs"]
 mod call_binding;
+#[path = "call_defaults.rs"]
+mod call_defaults;
 #[path = "trait_bound_proof.rs"]
 mod trait_bound_proof;
 
@@ -3217,6 +3219,7 @@ impl<'a> TypeChecker<'a> {
                             }
                         }
                         self.current_return_type.push(ret_ty);
+                        self.typecheck_parameter_defaults(*decl_id);
                         if let Some(body_stmt) = body {
                             self.typecheck_function_body(body_stmt, ret_ty);
                         }
@@ -3325,6 +3328,17 @@ impl<'a> TypeChecker<'a> {
                             self.typecheck_pattern(pat_id, init_ty);
                         }
                     }
+                    Decl::Trait { methods, .. } => {
+                        let previous_scope = self.current_scope;
+                        let previous_self = self.current_self_type;
+                        if let Some(&scope) = self.ctx.tables.decl_scopes.get(decl_id) { self.current_scope = scope; }
+                        if let Some(&symbol) = self.ctx.tables.decl_symbols.get(decl_id) {
+                            self.current_self_type = Some(self.ctx.types.intern(SemanticType::GenericParam(symbol)));
+                        }
+                        for method in methods { self.typecheck_item(&Item::Decl(*method)); }
+                        self.current_self_type = previous_self;
+                        self.current_scope = previous_scope;
+                    }
                     Decl::Impl { generic_params: _, self_type, methods, .. } => {
                         let prev_scope = self.current_scope;
                         let impl_scope = *self.ctx.tables.decl_scopes.get(decl_id).unwrap_or(&crate::ScopeId(0));
@@ -3358,6 +3372,7 @@ impl<'a> TypeChecker<'a> {
                                     self.ctx.types.intern(SemanticType::Void)
                                 };
                                 self.current_return_type.push(ret_ty);
+                                self.typecheck_parameter_defaults(*method_id);
                                 self.typecheck_function_body(body_stmt, ret_ty);
                                 self.current_return_type.pop();
                                 self.is_unsafe_context = prev_unsafe;
@@ -3369,6 +3384,7 @@ impl<'a> TypeChecker<'a> {
                         self.current_scope = prev_scope;
                     }
                     Decl::Extern { func, .. } => {
+                        self.typecheck_item(&Item::Decl(*func));
                         // The inner func is registered, we must check its FFI safety
                         if let Some(sym_id) = self.ctx.tables.decl_symbols.get(func).copied() {
                             let mut eff = crate::effect::EffectSet::pure();

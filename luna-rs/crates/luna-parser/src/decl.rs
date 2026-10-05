@@ -287,11 +287,19 @@ impl<'a> Parser<'a> {
                     return Err(());
                 }
 
+                let default = if self.match_token(TokenKind::Equal) {
+                    let start = self.peek().span;
+                    let value = self.parse_expr()?;
+                    let end = self.previous().span;
+                    Some(luna_ast::ParamDefault { value, span: luna_common::Span::new(start.file_id, start.start, end.end) })
+                } else { None };
+
                 params.push(self.arena.alloc_decl(Decl::Param {
                     annotations: p_annotations,
                     visibility: Visibility::Private,
                     name: p_name,
                     ty,
+                    default,
                     is_variadic: false,
                     is_self,
                 }));
@@ -548,6 +556,7 @@ impl<'a> Parser<'a> {
                             visibility: Visibility::Public,
                             name: p_name,
                             ty,
+                            default: None,
                             is_variadic: false,
                             is_self: false,
                         }));

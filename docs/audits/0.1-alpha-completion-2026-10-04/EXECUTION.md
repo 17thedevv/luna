@@ -1481,3 +1481,44 @@ The unchanged final 774-input pin passes workspace/all-target compilation,
 324 internal and 43 CLI/driver tests with observed exit0. Raw failed development
 oracles and setup attempts remain recorded separately. Defaults, owned closure
 policy/cleanup and all broader R0–R5 release obligations remain open.
+
+### Default declaration and namespace ownership checkpoint — 2026-10-05
+
+[DEFAULT-ARGUMENTS-GATE](DEFAULT-ARGUMENTS-GATE.md) records declaration AST,
+definition-site prefix resolution/type checking and compiler17/metadata9
+portable contracts. It retains failed development oracles and genuine binder
+identity failures. Function/method/owner generic roles remain independent;
+canonicalization preserves field identity and resolved helper bindings.
+An alias export walker defect is repaired using original namespace ownership,
+with source/artifact native and private-alias rejection controls.
+
+The earlier 788-input candidate passes workspace/all-target compilation,
+331 internal and 46 CLI/driver tests with matching input/binary/runtime hashes.
+It precedes the alias/owner amendments; the amended candidate's separate record
+must be used for those repairs. No full-workspace or release PASS is implied.
+Calls omitting defaults remain required positives which currently reject E2001.
+Complete their logical parameter frame, mono and effect/ownership checks next;
+closure policy/cleanup and all broader R0–R5 obligations remain active.
+
+The final amended 792-input pin separately passes workspace/all-target
+compilation, 331 internal and 48 CLI/driver tests, all exit0. Inputs, executable
+and runtime hashes agree at completion. The complete alpha module matrix,
+method binder/impl-bound matrix and new original-namespace artifact controls
+pass. Final omission probes still reject the required positive E2001 in both
+modes. Lossless logs, failed development observations and both candidate pins
+are retained; their distinct revision boundaries are not combined.
+
+A subsequent module-constant default probe finds a further interface-identity
+defect: retargeting the alias leaves the fingerprint unchanged. The generic
+canonicalizer now includes module/global value declaration paths, with separate
+constant-alias rename/retarget and stale-dependent controls. Its focused
+candidate is separate from the 331/48 amended run; use DEFAULT-ARGUMENTS-GATE
+for the final verification boundary. Default omission remains open.
+
+The last constant-identity candidate passes workspace/all-target check,
+213 semantic/metadata tests and three CLI suites, all exit0, with matching
+792-input/compiler/runtime hashes. Constant-alias rename/retarget and stale
+dependent controls now pass; the final omission-positive probes still reject
+E2001. The next implementation step remains per-call default materialization
+through mono and the logical callee frame, followed by ownership/effect and
+complete source/artifact acceptance. The full R0–R5 goal remains active.

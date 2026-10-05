@@ -54,6 +54,13 @@ pub struct EnumVariant {
     pub fields: Vec<crate::DeclId>, // ParamDecl
 }
 
+/// Definition-site expression; the span preserves the complete source contract.
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
+pub struct ParamDefault {
+    pub value: ExprId,
+    pub span: Span,
+}
+
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub enum Decl {
@@ -72,6 +79,7 @@ pub enum Decl {
         visibility: Visibility,
         name: Span,
         ty: Option<TypeId>,
+        default: Option<ParamDefault>,
         is_variadic: bool,
         is_self: bool,
     },

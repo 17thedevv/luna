@@ -1,0 +1,2 @@
+fn invalid(first: i32 = 1, second: i32) -> i32 { return second; }
+fn main() -> i32 { return 0; }

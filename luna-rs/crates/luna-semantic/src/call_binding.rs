@@ -18,6 +18,7 @@ impl TypeChecker<'_> {
             return;
         };
         let mut parameter_names = Vec::new();
+        let default_contracts = self.parameter_default_contracts(*declaration);
         let mut has_receiver = false;
         for (index, parameter) in params.iter().enumerate() {
             if let Decl::Param { name, is_self, .. } = self.arena.decls[parameter.0 as usize] {
@@ -29,6 +30,7 @@ impl TypeChecker<'_> {
             symbol,
             CallableSignature {
                 parameter_names,
+                default_contracts,
                 has_receiver,
                 is_variadic: *is_variadic,
             },

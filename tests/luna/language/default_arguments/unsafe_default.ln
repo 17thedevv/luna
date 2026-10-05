@@ -1,0 +1,3 @@
+unsafe fn danger() -> i32 { return 1; }
+fn invalid(first: i32 = danger()) -> i32 { return first; }
+fn main() -> i32 { return 0; }

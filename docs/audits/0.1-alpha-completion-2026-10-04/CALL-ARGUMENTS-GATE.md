@@ -305,3 +305,19 @@ compilation, 324 internal and 43 CLI/driver tests, all exit0.
 
 Defaults remain mandatory and unimplemented. The known closure failure and
 broader R3–R5 gates are unchanged; scoped comptime success is not release PASS.
+
+### Follow-up: default declarations and namespace export identity
+
+The [default declaration checkpoint](DEFAULT-ARGUMENTS-GATE.md) supersedes the
+missing AST/parser/definition-site metadata finding within its stated scope.
+Defaults are parsed, relocated and checked under earlier-parameter scope,
+rigid independent binders, ordinary unsafe admission and trait signature rules.
+Compiler17/metadata9 preserves public default contracts. Binder/alias renaming
+controls retain identity; changed defaults and retargeted aliases invalidate
+stale dependents. A related artifact export defect is repaired generically:
+local aliases no longer suppress the original namespace owner.
+
+CALL-ARGUMENTS-v1 remains PARTIAL. Calls which omit arguments still reject E2001,
+including required positive source/artifact probes. Per-call default execution,
+the logical parameter frame and ownership/effect remapping remain mandatory.
+The checkpoint is not a full-workspace or release verdict.

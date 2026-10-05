@@ -149,6 +149,17 @@ cannot compensate for constraints omitted from the public dependency identity.
 Include unchanged-contract controls for generic binder renaming, declaration
 order and body edits which preserve public effects.
 
+For public parameter defaults, validate definition-site binding identity as
+well as expression text. Distinguish impl/trait-owner and method/function
+generic roles, preserve field names when a parameter shares their spelling,
+and retain explicit generic arguments. Renaming a local namespace alias must
+preserve the resolved contract; retargeting it to another declaration must
+invalidate affected dependent interfaces. An alias is a lookup view, not an
+exported namespace owner: verify original paths, private alias rejection and
+native artifact execution, since metadata/check success can conceal a build
+failure. Declaration/default metadata checks do not establish omitted-call
+evaluation, ownership or effect correctness.
+
 Nominal ABI identity must include field order and enum discriminants/payloads,
 including private types reachable through public contracts. Test stale dependent
 execution after replacing a complete dependency bundle, recursive reachability,

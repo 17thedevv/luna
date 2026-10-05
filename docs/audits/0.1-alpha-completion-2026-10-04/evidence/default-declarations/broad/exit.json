@@ -1,0 +1,211 @@
+{
+  "recorded_utc": "2026-10-05T15:02:17.961972+00:00",
+  "base_commit": "f36a5abc70fb24066de783c233c579878decfd43",
+  "input_count": 788,
+  "input_differences": [],
+  "compiler_sha256": "3b8d045a10bff5f26fe4f6dbc36217fd7804385ca5b7647444574b4f66e03adc",
+  "compiler_matches_start": true,
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "runtime_matches_start": true,
+  "raw_files": {
+    "default-binding-probes/alias_before/build.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-binding-probes/alias_before/metadata.txt": {
+      "sha256": "7b0014f7394b7d32575abc6e05c49a454bb454c01d1803d4cf917cfb81e23ff5",
+      "bytes": 9378
+    },
+    "default-binding-probes/alias_before/provider.ln": {
+      "sha256": "5d681f8db64b2a831bba3dd7945109a64725ef38ba6916aa670c8aeaf78a99ef",
+      "bytes": 228
+    },
+    "default-binding-probes/alias_retargeted/build.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-binding-probes/alias_retargeted/metadata.txt": {
+      "sha256": "f5fc22dd5d91f4373bdc2dc5bc3e3f712ff797f96dc65933a0ecae3e0c45633d",
+      "bytes": 9381
+    },
+    "default-binding-probes/alias_retargeted/provider.ln": {
+      "sha256": "0e46eb7a52baae1c009bbc105159ccd8e12472e2052a562f467f0ec68ab371d0",
+      "bytes": 229
+    },
+    "default-binding-probes/compile.txt": {
+      "sha256": "a3680b6601c39b586ea892ad2bbaa58a7f72b62a64f73917b09aa8c5f188110e",
+      "bytes": 8
+    },
+    "default-binding-probes/dump.rs": {
+      "sha256": "c184ecaf0f0739fbc8d5bc3bd92c3271738cf30b4437a15a197094965169b97d",
+      "bytes": 309
+    },
+    "default-binding-probes/observations.json": {
+      "sha256": "cfda3c9bddb2961ca96a373e82b9bb3b737c445cbe7054884cff9b74cf428851",
+      "bytes": 906
+    },
+    "default-binding-probes/owner_before/build.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-binding-probes/owner_before/metadata.txt": {
+      "sha256": "ac7c29fd7dc19a3b2c78152c81308514fef520b9ff7329b25ca1bfba57a191c8",
+      "bytes": 8518
+    },
+    "default-binding-probes/owner_before/provider.ln": {
+      "sha256": "bb75e217cceb9705673190050008c76a9f19fdf9131f4805f90591d7fb178c3f",
+      "bytes": 151
+    },
+    "default-binding-probes/owner_renamed/build.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-binding-probes/owner_renamed/metadata.txt": {
+      "sha256": "134453925f6032a94afc44ea15de447e89a9a152b189268c7b1f26ee4a9b26a1",
+      "bytes": 8509
+    },
+    "default-binding-probes/owner_renamed/provider.ln": {
+      "sha256": "8cc30083081b44a349a8eb7b7b1d80102e6640fe243b95a8b97af28254c89c5a",
+      "bytes": 151
+    },
+    "default-declarations-check.txt": {
+      "sha256": "42eed1637adc917b79b67e655717e68d49b3d32f26426e5248d4bee817301a65",
+      "bytes": 48704
+    },
+    "default-declarations-cli-fourth.txt": {
+      "sha256": "a2e055bd42fd27771ddcd054f54b7e526e8c54b47fda00cb30d06b255e09fadf",
+      "bytes": 27795
+    },
+    "default-declarations-cli-second.txt": {
+      "sha256": "ba4b541f3325a3f6d28bcddc618c0589b9c97f6310e17ceb4bb66b4490baec34",
+      "bytes": 26573
+    },
+    "default-declarations-cli-third.txt": {
+      "sha256": "9b973c57846e77db965a84c9331df73fc4a9aa2e3c712d7b4c188a04e1dbe49d",
+      "bytes": 28048
+    },
+    "default-declarations-cli.txt": {
+      "sha256": "54722bf0bce672e4417688ec3e0c15af87d5392fad4955f2cd3a8223acecc8cb",
+      "bytes": 27412
+    },
+    "default-declarations-final/check.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-final/check.txt": {
+      "sha256": "3a79689db24c9f1642f3e059375f4465b0aba2097f72fc8077df806a34ef4c1d",
+      "bytes": 48708
+    },
+    "default-declarations-final/cli-driver.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-final/cli-driver.txt": {
+      "sha256": "26b487dd9352ccb0c794c1c3df3ff307fa099e1db940e93d99de6688462e29c9",
+      "bytes": 91274
+    },
+    "default-declarations-final/internal.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-final/internal.txt": {
+      "sha256": "6207037f209db20390d3e8a0e1c5f4ed204f00865226e27a8cd8c61fdc2943e5",
+      "bytes": 62795
+    },
+    "default-declarations-final/start.json": {
+      "sha256": "6123a04bf6c5d3031536622e69af355a3dfd239f817ddfa5eee2b34032e47ce8",
+      "bytes": 104110
+    },
+    "default-declarations-final-build.txt": {
+      "sha256": "4b5284530e0c9279ee92b899d83471de226c040492edecad03b8324f9dcbe33b",
+      "bytes": 24505
+    },
+    "default-declarations-internal.txt": {
+      "sha256": "b983df1890a46b222c33706bc6f13dc22de0db17423fa9b247c0993fc40f5a13",
+      "bytes": 48553
+    },
+    "default-declarations-sysroot.txt": {
+      "sha256": "39d5c5fa19267584fc6037f6d2471fbc65afc594289b39f60415aa51ea040d6c",
+      "bytes": 50017
+    },
+    "default-omission-before/artifact/build.txt": {
+      "sha256": "fb782d01a49c1011fc04ac81cece674804bdb4e06a40272515664e095987a5b6",
+      "bytes": 1150
+    },
+    "default-omission-before/artifact/check.txt": {
+      "sha256": "fb782d01a49c1011fc04ac81cece674804bdb4e06a40272515664e095987a5b6",
+      "bytes": 1150
+    },
+    "default-omission-before/artifact/omission.ln": {
+      "sha256": "25be26dec273ca0aecaabd113d7d2d551763bd7bb7634aa4ad7efd4f4ca6ad8e",
+      "bytes": 75
+    },
+    "default-omission-before/artifact/publish.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-omission-before/observations.json": {
+      "sha256": "71db1252a3c3c1ea782f5e3fa4f8dab02bbb610cef8486d3bc8766917db8091e",
+      "bytes": 5221
+    },
+    "default-omission-before/source/build.txt": {
+      "sha256": "779ffb4a37bd3a3cca624b558046fe34366a06747c169075b08743a2114ec477",
+      "bytes": 1148
+    },
+    "default-omission-before/source/check.txt": {
+      "sha256": "779ffb4a37bd3a3cca624b558046fe34366a06747c169075b08743a2114ec477",
+      "bytes": 1148
+    },
+    "default-omission-before/source/omission.ln": {
+      "sha256": "25be26dec273ca0aecaabd113d7d2d551763bd7bb7634aa4ad7efd4f4ca6ad8e",
+      "bytes": 75
+    },
+    "default-omission-before/source/provider.ln": {
+      "sha256": "a3244523c6a53ad1916e5c59000d131cb9ba49a10c67b531c7a7b8e859bcf1f6",
+      "bytes": 700
+    }
+  },
+  "commands": {
+    "check": "cargo check --workspace --all-targets",
+    "internal": "cargo test -p luna-ast -p luna-semantic -p luna-llib -p luna-mvir -p luna-borrowck -p luna-parser --no-fail-fast",
+    "cli-driver": "cargo test -p luna-cli --test named_arguments_cli --test default_arguments_cli --test comptime_loans_cli --test module_const_storage_cli --test method_resolution_cli --test interface_constraints_cli -p luna-driver --test adv_comptime_dyn_tests --test struct_lifetime_contract_acceptance_tests --no-fail-fast -- --nocapture"
+  },
+  "terminal_summaries": {
+    "check": {
+      "shell_exit": 0,
+      "summary_blocks": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "internal": {
+      "shell_exit": 0,
+      "summary_blocks": 57,
+      "passed": 331,
+      "failed": 0,
+      "ignored": 0
+    },
+    "cli-driver": {
+      "shell_exit": 0,
+      "summary_blocks": 8,
+      "passed": 46,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "scope": "Parameter default declaration AST, lexical resolution, rigid type/unsafe/trait validation and portable interface contract; omission execution remains unimplemented",
+  "protocol": 17,
+  "semantic_metadata_version": 9,
+  "limitations": [
+    "Default omission still rejects E2001 in both modes; it is a required positive gap, not waived semantics.",
+    "Omission entry mono/IR, ownership/effect remapping and complete runtime default evaluation remain required.",
+    "Known closure failure and all broader R0-R5 release requirements remain open. No full workspace test or release verdict."
+  ],
+  "development_attempts": [
+    "Initial CLI exit101: wrong unsafe diagnostic oracle E2031; actual E2025 correctly rejects.",
+    "Second CLI exit0: declaration matrix passes.",
+    "Third CLI exit101: method/function generic binder rename changes default contract fingerprint because cast target was not resolved before canonicalization.",
+    "Fourth CLI exit0: resolver handles expression-embedded types; fingerprint/freshness controls pass.",
+    "Additional owner-binder probe still shows distinct fingerprints before owner role amendment; metadata alias export observation requires separate native/public validation."
+  ]
+}
