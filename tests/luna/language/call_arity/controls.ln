@@ -1,0 +1,21 @@
+import "arity_provider";
+struct Handler { operation: fn(i32, i32) -> i32 };
+fn selected() -> fn(i32, i32) -> i32 { return calls::subtract; }
+fn apply(operation: fn(i32, i32) -> i32, left: i32, right: i32) -> i32 {
+    return operation(left, right);
+}
+fn main() -> i32 {
+    if calls::subtract(9, 2) != 7 { return 1; }
+    if calls::first<i32>(9, 2) != 9 { return 2; }
+    if apply(calls::subtract, 9, 2) != 7 { return 3; }
+    dec callback = selected();
+    if callback(9, 2) != 7 { return 4; }
+    dec handler = Handler { operation: calls::subtract };
+    if (handler.operation)(9, 2) != 7 { return 5; }
+    dec closure = |left: i32, right: i32| -> i32 { left - right };
+    if closure(9, 2) != 7 { return 6; }
+    dec counter = calls::Counter {};
+    if calls::Operation::subtract(&counter, 9, 2) != 7 { return 7; }
+    if counter.subtract(9, 2) != 7 { return 8; }
+    return 0;
+}

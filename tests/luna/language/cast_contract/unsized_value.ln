@@ -1,0 +1,11 @@
+trait Read { fn value(self: &Self) -> i32; }
+struct Source { value: i32 };
+impl Read for Source {
+    fn value(self: &Self) -> i32 { return self.value; }
+}
+fn main() -> i32 {
+    dec source = Source { value: 7 };
+    dec reference: &dyn Read = &source;
+    dec invalid = reference as dyn Read;
+    return 0;
+}

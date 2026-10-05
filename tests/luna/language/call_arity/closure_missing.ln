@@ -1,0 +1,4 @@
+fn main() -> i32 {
+    dec callback = |left: i32, right: i32| -> i32 { left - right };
+    return callback(9);
+}

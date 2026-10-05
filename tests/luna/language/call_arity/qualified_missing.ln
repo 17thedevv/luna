@@ -1,0 +1,5 @@
+import "arity_provider";
+fn main() -> i32 {
+    dec counter = calls::Counter {};
+    return calls::Operation::subtract(&counter, 9);
+}

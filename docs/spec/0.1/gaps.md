@@ -328,3 +328,21 @@ these new paths. A protocol-15 repair candidate passes focused admission/span
 source/artifact acceptance; an additional identity-cast move/drop defect is
 repaired and expanded focused acceptance passes. Whole-workspace, imported
 user-provider and broader diagnostic containment gates remain open.
+
+### Call arguments prerequisite — 2026-10-05, completion still open
+
+[CALL-ARGUMENTS-GATE](../../audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md)
+retains native counterexamples where historical named labels are ignored,
+Python-style label/default syntax is missing, and ordinary arity passed check
+before build rejected it. The isolated positional-arity repair passes focused
+source/fresh-artifact checks and 195 semantic tests. A compatibility amendment
+restores unsized-value cast diagnostics; the unchanged raw/dyn driver suite
+passes 14/14. Neither repair implements named/default binding or its portable
+definition-scope/ownership contract.
+
+The next Windows workspace result is preserved as exit101, 1311/3/1 across four
+failed targets; eight pinned inputs changed during the run, and one failed
+harness did not emit a test-result summary. It cannot certify an immutable
+candidate. Independent Ubuntu e3b4402 CI still rejects release readiness through
+owned closure capture native exit3 in both provider modes. All broader R3–R5
+and retained contract gates remain required.

@@ -4313,7 +4313,19 @@ impl<'a> TypeChecker<'a> {
                 let callee_ty = self.ctx.types.get(callee_ty_id).clone();
                 let is_dyn_call = self.ctx.tables.dyn_method_indices.contains_key(callee);
                 let is_struct_method = if let Expr::Member { .. } = callee_expr { self.ctx.tables.expr_symbols.contains_key(callee) } else { false };
-                let is_method_call = (is_dyn_call || is_struct_method) && if let SemanticType::Function { ref params, .. } = callee_ty { params.len() == args.len() + 1 } else { false };
+                // Receiver identity comes from the declaration, never from the
+                // number of arguments supplied by a potentially invalid call.
+                // A callable struct field has no implicit method receiver.
+                let receiver_declared = self.ctx.tables.expr_symbols.get(callee)
+                    .and_then(|symbol| self.ctx.tables.symbol_decls.get(symbol))
+                    .and_then(|decl| self.arena.decls.get(decl.0 as usize))
+                    .and_then(|decl| match decl {
+                        Decl::Function { params, .. } => params.first(),
+                        _ => None,
+                    })
+                    .and_then(|decl| self.arena.decls.get(decl.0 as usize))
+                    .is_some_and(|decl| matches!(decl, Decl::Param { is_self: true, .. }));
+                let is_method_call = is_dyn_call || (is_struct_method && receiver_declared);
                 let mut subst = crate::ty::Substitution::new();
                 
                 if let Some(&callee_sym) = self.ctx.tables.expr_symbols.get(callee) {
@@ -4414,15 +4426,21 @@ impl<'a> TypeChecker<'a> {
                         .with_span(span));
                 }
 
-                let is_closure_call = matches!(callee_ty, SemanticType::Closure(..));
                 if let SemanticType::Function { params, return_type, .. } | SemanticType::Closure(_, params, return_type) = callee_ty {
-                    let is_memory_intrinsic = self.ctx.tables.expr_symbols.get(callee)
-                        .and_then(|symbol| self.ctx.lang_items.from_symbol(*symbol))
-                        .is_some_and(|item| item.is_memory_intrinsic());
-                    if (is_closure_call || is_memory_intrinsic) && params.len() != args.len() {
+                    let is_variadic = func_sym_opt
+                        .and_then(|symbol| self.ctx.tables.symbol_decls.get(&symbol))
+                        .and_then(|decl| self.arena.decls.get(decl.0 as usize))
+                        .is_some_and(|decl| matches!(decl, Decl::Function { is_variadic: true, .. }));
+                    let required = params.len().saturating_sub(usize::from(is_method_call));
+                    if args.len() < required || (!is_variadic && args.len() != required) {
                         self.ctx.diagnostics.push(Diagnostic::error(format!(
-                            "Callable expects {} arguments, but {} were provided", params.len(), args.len(),
+                            "Callable expects {}{} arguments, but {} were provided",
+                            if is_variadic { "at least " } else { "" }, required, args.len(),
                         )).with_code(DiagnosticCode::TypeMismatch).with_span(self.get_expr_span_for_diag(expr_id).unwrap_or_default()));
+                        for arg in args {
+                            self.typecheck_expr(&arg.value);
+                        }
+                        return self.ctx.types.error_id();
                     }
                     ret_ty_id = if has_generics { self.ctx.types.subst(return_type, &subst) } else { return_type };
                     if has_generics {
@@ -5352,9 +5370,19 @@ impl<'a> TypeChecker<'a> {
                 let invalid_operand = matches!(source_ty, SemanticType::Error) || matches!(target_ty, SemanticType::Error);
                 if !invalid_operand {
                     match admission {
-                        Err(reason) => self.ctx.diagnostics.push(
-                            Diagnostic::error(format!("E_INVALID_CAST: {reason}"))
-                                .with_code(DiagnosticCode::InvalidCast).with_span(cast_span)),
+                        Err(reason) => {
+                            // Preserve the existing unsized-value diagnostic
+                            // classification while central cast admission still
+                            // rejects the operation in every lowering path.
+                            let (code, category) = if self.ctx.types.is_unsized(target_ty_id) {
+                                (DiagnosticCode::TypeMismatch, "E_UNSIZED_TYPE_IN_VALUE_POSITION")
+                            } else {
+                                (DiagnosticCode::InvalidCast, "E_INVALID_CAST")
+                            };
+                            self.ctx.diagnostics.push(
+                                Diagnostic::error(format!("{category}: {reason}"))
+                                    .with_code(code).with_span(cast_span));
+                        }
                         Ok(crate::cast::CastAdmission::RequiresUnsafe) if !self.is_unsafe_context =>
                             self.ctx.diagnostics.push(Diagnostic::error("Cast requires an unsafe block")
                                 .with_code(DiagnosticCode::UnsafeOperationOutsideUnsafe).with_span(cast_span)),
