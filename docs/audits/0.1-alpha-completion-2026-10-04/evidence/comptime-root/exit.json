@@ -1,0 +1,116 @@
+{
+  "recorded_utc": "2026-10-05T14:04:17.280541+00:00",
+  "base_commit": "1b398714195975c13b865a1e90505ea7a97251cc",
+  "input_count": 765,
+  "input_differences": [],
+  "compiler_sha256": "dcc814f39727ad4ad8efacc213e193ddf1b72371b0e729a718f53dfcd6b0fdf9",
+  "compiler_matches_start": true,
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "runtime_matches_start": true,
+  "raw_files": {
+    "comptime_alias_probe-build.txt": {
+      "sha256": "31e50524a159f15c552fce9e78f155e1404dc219f5ae857ffe15c3816974a486",
+      "bytes": 793
+    },
+    "comptime_alias_probe-check.txt": {
+      "sha256": "31e50524a159f15c552fce9e78f155e1404dc219f5ae857ffe15c3816974a486",
+      "bytes": 793
+    },
+    "comptime_alias_probe.ln": {
+      "sha256": "48f6a49eafadf55c3383911dec02bdd73700b9e817b35c7513bda533b09c0b60",
+      "bytes": 240
+    },
+    "generic-comptime-probes/comptime_generic_gap-after-build.txt": {
+      "sha256": "a0bc19b5f75505fb918b1e8d9ff0f1282f504994fe95dca7b76e7ba8819d356a",
+      "bytes": 849
+    },
+    "generic-comptime-probes/comptime_generic_gap-after-check.txt": {
+      "sha256": "a0bc19b5f75505fb918b1e8d9ff0f1282f504994fe95dca7b76e7ba8819d356a",
+      "bytes": 849
+    },
+    "generic-comptime-probes/positional_comptime_generic_gap-after-build.txt": {
+      "sha256": "a0bc19b5f75505fb918b1e8d9ff0f1282f504994fe95dca7b76e7ba8819d356a",
+      "bytes": 849
+    },
+    "generic-comptime-probes/positional_comptime_generic_gap-after-check.txt": {
+      "sha256": "a0bc19b5f75505fb918b1e8d9ff0f1282f504994fe95dca7b76e7ba8819d356a",
+      "bytes": 849
+    },
+    "generic-root-build.txt": {
+      "sha256": "9998fc287cbc1386a11a64ef4edd46f677bc79a6d1510b55a00f7a2c75f30648",
+      "bytes": 24506
+    },
+    "generic-root-final/cli-driver.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "generic-root-final/cli-driver.txt": {
+      "sha256": "4877a4fccc6b94ce0a2043cf43578fdc1e1eec3906cc0ea3959463986a01f3f9",
+      "bytes": 90340
+    },
+    "generic-root-final/internal.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "generic-root-final/internal.txt": {
+      "sha256": "2373af36461c99ab15edb99c0a447e1c0d0214ddffe6807ac4ea98e62ed9d503",
+      "bytes": 61628
+    },
+    "generic-root-final/start.json": {
+      "sha256": "78d9749568d6df703ffea3fde5e565b4c9a7264a26c13d3e02ac4fe63a748435",
+      "bytes": 101079
+    },
+    "generic-root-tests.txt": {
+      "sha256": "6848dcb5bdc7ec33e8049faccff0dd9e9326c47dfe923415695fa66de316d5e8",
+      "bytes": 39449
+    },
+    "local-drop-before.txt": {
+      "sha256": "95b32c9d094d5238971cf2c80d70e7090783573085cd3b6eb9d08ccebc6faacc",
+      "bytes": 1026
+    },
+    "local-drop-build.txt": {
+      "sha256": "31e50524a159f15c552fce9e78f155e1404dc219f5ae857ffe15c3816974a486",
+      "bytes": 793
+    },
+    "local-drop-typed-before.txt": {
+      "sha256": "31e50524a159f15c552fce9e78f155e1404dc219f5ae857ffe15c3816974a486",
+      "bytes": 793
+    },
+    "native_alias_probe-check.txt": {
+      "sha256": "7c8a9998bc63260eee91c5f395ceeac67c215e16f26a3d8284dc8ebb42f942a0",
+      "bytes": 1304
+    },
+    "native_alias_probe.ln": {
+      "sha256": "bdb4d43d6ab9acb75ace9b34013693a40f6db582f87d8b1e3dba34d37422b993",
+      "bytes": 201
+    }
+  },
+  "commands": {
+    "internal": "cargo test -p luna-semantic -p luna-llib -p luna-mvir -p luna-borrowck -p luna-parser --no-fail-fast",
+    "cli-driver": "cargo test -p luna-cli --test named_arguments_cli --test call_arity_cli --test method_resolution_cli --test module_const_storage_cli --test interface_constraints_cli -p luna-driver --test adv_comptime_dyn_tests --test struct_lifetime_contract_acceptance_tests --no-fail-fast -- --nocapture"
+  },
+  "terminal_summaries": {
+    "internal": {
+      "shell_exit": 0,
+      "summary_blocks": 54,
+      "passed": 324,
+      "failed": 0,
+      "ignored": 0
+    },
+    "cli-driver": {
+      "shell_exit": 0,
+      "summary_blocks": 7,
+      "passed": 45,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "loan_probe_verdict": "Native check rejects E3003; comptime check/build accept and executable exits0; required rejection remains a confirmed gap",
+  "scope": "Generic early callee availability scoped repair, not full CALL-ARGUMENTS-v1 or release certification",
+  "limitations": [
+    "Existing closure_capture native exit3 remains open; not rerun in this checkpoint.",
+    "Defaults remain unimplemented.",
+    "Loan checking must precede VM execution; permanent counterexample added after final pin, not counted in its passing harness.",
+    "No new immutable full-workspace/cross-platform release verdict."
+  ]
+}

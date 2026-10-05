@@ -138,6 +138,18 @@ pub struct InstantiatedFunction {
     pub closure_env_ptr_type: Option<SemanticTypeId>,
 }
 
+/// A checked evaluation root has no declaration identity. Keep its concrete
+/// type/call plans separate from the reachable function instances.
+#[derive(Debug, Clone, Default)]
+pub struct MonoRoot {
+    pub expr_types: HashMap<ExprId, SemanticTypeId>,
+    pub symbol_types: HashMap<SymbolId, SemanticTypeId>,
+    pub pat_types: HashMap<luna_ast::PatId, SemanticTypeId>,
+    pub mono_calls: HashMap<ExprId, MonoInstance>,
+    pub try_calls: HashMap<ExprId, MonoTryCalls>,
+    pub mono_for_loops: HashMap<StmtId, MonoForLoop>,
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct MonoTryCalls {
     pub branch: Option<MonoInstance>,
@@ -454,13 +466,8 @@ impl<'a> MonoCollector<'a> {
         self.process_worklist();
     }
 
-    pub fn run_on_expr(&mut self, expr_id: ExprId) {
-        let dummy_instance = MonoInstance {
-            decl_id: DeclId(0), // Dummy for local visit
-            subst: vec![],
-            closure_id: None,
-        };
-        self.current_instance = Some(dummy_instance);
+    pub fn run_on_expr(&mut self, expr_id: ExprId) -> MonoRoot {
+        self.current_instance = None;
         self.current_expr_types.clear();
         self.current_symbol_types.clear();
         self.current_pat_types.clear();
@@ -470,17 +477,13 @@ impl<'a> MonoCollector<'a> {
         self.current_subst.map.clear();
         
         self.visit_expr(&expr_id);
-        
+        let root = self.take_root();
         self.process_worklist();
+        root
     }
 
-    pub fn run_on_stmt(&mut self, stmt_id: StmtId) {
-        let dummy_instance = MonoInstance {
-            decl_id: DeclId(0), // Dummy for local visit
-            subst: vec![],
-            closure_id: None,
-        };
-        self.current_instance = Some(dummy_instance);
+    pub fn run_on_stmt(&mut self, stmt_id: StmtId) -> MonoRoot {
+        self.current_instance = None;
         self.current_expr_types.clear();
         self.current_symbol_types.clear();
         self.current_pat_types.clear();
@@ -490,8 +493,20 @@ impl<'a> MonoCollector<'a> {
         self.current_subst.map.clear();
         
         self.visit_stmt(&stmt_id);
-        
+        let root = self.take_root();
         self.process_worklist();
+        root
+    }
+
+    fn take_root(&mut self) -> MonoRoot {
+        MonoRoot {
+            expr_types: std::mem::take(&mut self.current_expr_types),
+            symbol_types: std::mem::take(&mut self.current_symbol_types),
+            pat_types: std::mem::take(&mut self.current_pat_types),
+            mono_calls: std::mem::take(&mut self.current_mono_calls),
+            try_calls: std::mem::take(&mut self.current_mono_try_calls),
+            mono_for_loops: std::mem::take(&mut self.current_mono_for_loops),
+        }
     }
 
     fn process_worklist(&mut self) {

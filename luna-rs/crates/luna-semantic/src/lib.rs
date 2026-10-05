@@ -96,6 +96,8 @@ pub struct SemanticContext {
     pub types: TypeContext,
     pub instantiated_functions: Vec<InstantiatedFunction>,
     pub drop_glue_instances: Vec<mono::CanonicalInstanceIdentity>,
+    /// Scoped semantic preparation for early evaluation; never artifact metadata.
+    pub comptime_root: Option<mono::MonoRoot>,
     pub diagnostics: Vec<Diagnostic>,
     pub lang_items: lang_item::LangItemRegistry,
     pub needs_drop_cache: RefCell<HashMap<ty::SemanticTypeId, NeedsDropState>>,
@@ -146,6 +148,7 @@ impl SemanticContext {
             lang_items: lang_item::LangItemRegistry::new(),
             instantiated_functions: Vec::new(),
             drop_glue_instances: Vec::new(),
+            comptime_root: None,
             diagnostics: Vec::new(),
             needs_drop_cache: RefCell::new(HashMap::new()),
             comptime_values: HashMap::new(),

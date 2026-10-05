@@ -114,7 +114,8 @@ impl<'a> MvirGenerator<'a> {
                 return Some(ty);
             }
         }
-        self.ctx.tables.symbol_types.get(sym_id).copied()
+        self.ctx.comptime_root.as_ref().and_then(|root| root.symbol_types.get(sym_id)).copied()
+            .or_else(|| self.ctx.tables.symbol_types.get(sym_id).copied())
     }
     
     fn get_pat_type(&self, pat_id: &luna_ast::PatId) -> Option<luna_semantic::SemanticTypeId> {
@@ -124,7 +125,8 @@ impl<'a> MvirGenerator<'a> {
                 return Some(ty);
             }
         }
-        self.ctx.tables.pat_types.get(pat_id).copied()
+        self.ctx.comptime_root.as_ref().and_then(|root| root.pat_types.get(pat_id)).copied()
+            .or_else(|| self.ctx.tables.pat_types.get(pat_id).copied())
     }
 
     fn get_expr_type(&self, expr_id: &luna_ast::ExprId) -> luna_semantic::SemanticTypeId {
@@ -134,7 +136,9 @@ impl<'a> MvirGenerator<'a> {
                 return mono_ty;
             }
         }
-        self.ctx.tables.expr_types.get(expr_id).copied().unwrap_or(luna_semantic::SemanticTypeId(0))
+        self.ctx.comptime_root.as_ref().and_then(|root| root.expr_types.get(expr_id)).copied()
+            .or_else(|| self.ctx.tables.expr_types.get(expr_id).copied())
+            .unwrap_or(luna_semantic::SemanticTypeId(0))
     }
 
     fn get_try_calls(&self, expr_id: &luna_ast::ExprId) -> Option<&luna_semantic::mono::MonoTryCalls> {
@@ -142,19 +146,25 @@ impl<'a> MvirGenerator<'a> {
             // SAFETY: current_instance points into the caller-owned instantiated_functions
             // vector for the duration of this function's lowering.
             unsafe { (&*inst_ptr).try_calls.get(expr_id) }
-        })
+        }).or_else(|| self.ctx.comptime_root.as_ref().and_then(|root| root.try_calls.get(expr_id)))
+    }
+
+    fn get_mono_call(&self, expr_id: &luna_ast::ExprId) -> Option<&luna_semantic::mono::MonoInstance> {
+        if let Some(inst_ptr) = self.current_instance {
+            // SAFETY: this function is called only while the caller-owned unit
+            // remains live during its lowering.
+            return unsafe { (&*inst_ptr).mono_calls.get(expr_id) };
+        }
+        if let Some(root) = self.ctx.comptime_root.as_ref() {
+            return root.mono_calls.get(expr_id);
+        }
+        self.ctx.instantiated_functions.iter().find_map(|function| function.mono_calls.get(expr_id))
     }
 
     /// Resolve the canonical monomorphized name for a function call at `expr_id`.
     /// Returns the properly mangled name if the call has a mono substitution, otherwise None.
     fn resolve_mono_call_name(&self, expr_id: &luna_ast::ExprId, base_name: &str) -> Option<String> {
-        let mono_instance = if let Some(inst_ptr) = self.current_instance {
-            let inst = unsafe { &*inst_ptr };
-            inst.mono_calls.get(expr_id).cloned()
-        } else {
-            self.ctx.instantiated_functions.iter()
-                .find_map(|f| f.mono_calls.get(expr_id).cloned())
-        };
+        let mono_instance = self.get_mono_call(expr_id);
         if let Some(mi) = mono_instance {
             let canonical_id = luna_semantic::CanonicalInstanceIdentity {
                 kind: luna_semantic::CanonicalInstanceKind::Decl(mi.decl_id),
@@ -1993,7 +2003,8 @@ impl<'a> MvirGenerator<'a> {
                             let mono_loop = self.current_instance.and_then(|inst_ptr| {
                                 let inst = unsafe { &*inst_ptr };
                                 inst.mono_for_loops.get(stmt_id).cloned()
-                            });
+                            }).or_else(|| self.ctx.comptime_root.as_ref()
+                                .and_then(|root| root.mono_for_loops.get(stmt_id).cloned()));
                             let semantic_loop = self
                                 .ctx
                                 .tables
@@ -2298,13 +2309,7 @@ impl<'a> MvirGenerator<'a> {
 
     fn generate_expr_inner(&mut self, expr_id: &luna_ast::ExprId) -> Operand {
         let expr = &self.arena.exprs[expr_id.0 as usize];
-        let mut ty_id = self.ctx.tables.expr_types.get(expr_id).copied().unwrap_or(luna_semantic::SemanticTypeId(0));
-        if let Some(inst_ptr) = self.current_instance {
-            let inst = unsafe { &*inst_ptr };
-            if let Some(&mono_ty) = inst.expr_types.get(expr_id) {
-                ty_id = mono_ty;
-            }
-        }
+        let ty_id = self.get_expr_type(expr_id);
         
         if let Some(ct_val) = self.ctx.comptime_values.get(expr_id).cloned() {
             return self.materialize_comptime_value(&ct_val, ty_id);
@@ -2646,14 +2651,7 @@ impl<'a> MvirGenerator<'a> {
                     };
                     if let Some(decl_id) = symbol.decl_id {
                         if matches!(symbol.kind, luna_semantic::SymbolKind::Function) {
-                            let subst = if let Some(inst_ptr) = self.current_instance {
-                                let inst = unsafe { &*inst_ptr };
-                                inst.mono_calls.get(expr_id).map(|m| m.subst.clone()).unwrap_or_default()
-                            } else {
-                                self.ctx.instantiated_functions.iter()
-                                    .find_map(|f| f.mono_calls.get(expr_id).map(|m| m.subst.clone()))
-                                    .unwrap_or_default()
-                            };
+                            let subst = self.get_mono_call(expr_id).map(|instance| instance.subst.clone()).unwrap_or_default();
                             let canonical_id = luna_semantic::CanonicalInstanceIdentity {
                                 kind: luna_semantic::CanonicalInstanceKind::Decl(decl_id),
                                 subst,

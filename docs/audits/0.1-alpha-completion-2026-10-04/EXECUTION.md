@@ -1454,3 +1454,18 @@ named/positional generic comptime probes expose a missing concrete callee E4005.
 Defaults, that generic early-instantiation defect, closure cleanup and R3–R5
 remain open. Exact scoped evidence and failed attempts are retained; neither
 focused success nor the revised grammar establishes full release readiness.
+
+### Generic comptime root repair and new loan counterexample — 2026-10-05
+
+[COMPTIME-PREP-GATE](COMPTIME-PREP-GATE.md) closes the recorded missing concrete
+callee reproducers within fresh source/artifact acceptance. Semantic preparation
+preserves the evaluation root's call plans and scopes reachable instances until
+execution finishes. Final pinned regressions pass 324 internal and 45 CLI/driver
+tests, exit0; inputs/binary/runtime agree at completion. The named matrix now
+includes 68 typed rejections and 18 native positives.
+
+An independent alias probe shows comptime still executes invalid simultaneous
+mutable loans which ordinary check rejects E3003. Preserve this required
+rejection and put ordinary borrow validation before VM execution. Defaults,
+closure policy/cleanup and the full R3–R5 scope remain open; no merge/tag/release
+or full-workspace PASS is implied.

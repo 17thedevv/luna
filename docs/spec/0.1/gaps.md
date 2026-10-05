@@ -362,3 +362,12 @@ and positional arguments because an early concrete callee is unavailable; this
 is an implementation gap, not a deferred contract. The broad CLI regression
 still fails closure_capture native exit3 in both modes. No new full-workspace,
 cross-platform or release PASS is established; all R3–R5 obligations remain.
+
+The [subsequent comptime root repair](../../audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md)
+fixes the missing generic callee reproducers: named/positional, nested and
+multiple instances plus local generic drop pass fresh source/artifact check,
+build and native execution. Pinned regressions pass 324 internal and 45 separate
+CLI/driver tests. A new simultaneous mutable-loan probe rejects E3003 in native
+check but passes inside comptime, including build/native exit0. Borrow admission
+must precede VM execution; it is a correctness gap, not a comptime exemption.
+Defaults and all remaining release gates retain their full scope.

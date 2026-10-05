@@ -45,6 +45,9 @@ fn named_arguments_bind_declaration_ordinals_and_preserve_source_evaluation_in_b
             ("comptime_moved", "E4005", "moved"),
             ("comptime_reference_escape", "E4005", "escape"),
             ("borrow_conflict", "E3003", ""),
+            ("comptime_moved_generic", "E4005", "moved"),
+            ("comptime_escape_generic", "E4005", "escape"),
+            ("comptime_effect_generic", "E4005", "forbidden"),
         ] {
             let source = relocated.join(format!("{name}.ln"));
             fs::copy(fixtures.join(format!("{name}.ln")), &source).unwrap();
@@ -84,6 +87,10 @@ fn named_arguments_bind_declaration_ordinals_and_preserve_source_evaluation_in_b
             "owned_source_order",
             "argument_early_return",
             "comptime_control",
+            "comptime_generic_gap",
+            "positional_comptime_generic_gap",
+            "comptime_generics",
+            "comptime_local_drop",
         ] {
             let controls = relocated.join(format!("{name}.ln"));
             fs::copy(fixtures.join(format!("{name}.ln")), &controls).unwrap();

@@ -1,0 +1,8 @@
+fn conflicting(first: &rw i32, second: &rw i32) -> i32 {
+    *first = 9;
+    return *second;
+}
+fn main() -> i32 {
+    dec rw value = 0;
+    return conflicting(second=&rw value, first=&rw value) - 9;
+}

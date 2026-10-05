@@ -276,3 +276,18 @@ Next: repair concrete generic callee availability at the early comptime root,
 then complete default expressions through the logical callee parameter frame.
 Closure policy awaits maintainer input; R3–R5 and the full retained contract
 map remain required. This checkpoint does not close the overarching goal.
+
+### Follow-up: generic early callee availability repaired
+
+[COMPTIME-PREP-GATE](COMPTIME-PREP-GATE.md) records the subsequent repair:
+semantic analysis retains root call plans and prepares reachable concrete units
+before evaluation. The named and positional generic reproducers now pass check,
+build and native execution in both modes. Expanded generic/trait/drop controls
+and rejection cases pass, with 324 internal and 45 separate CLI/driver tests
+against unchanged pinned inputs and compiler/runtime hashes.
+
+A new independent control exposes unsafe loan admission in comptime: aliased
+mutable arguments reject E3003 in ordinary execution but pass comptime check,
+build and native control. This required rejection remains open. Generic callee
+availability is repaired within its tested scope; defaults, compile-time loan
+validation, closure cleanup and all broader R3–R5 gates remain required.

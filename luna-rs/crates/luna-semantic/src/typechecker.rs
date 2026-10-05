@@ -16,6 +16,12 @@ pub struct AssociatedTypeEqObligation {
     pub span: luna_common::Span,
 }
 
+#[derive(Clone, Copy)]
+enum ComptimeTarget {
+    Expression(luna_ast::ExprId),
+    Statement(luna_ast::StmtId),
+}
+
 pub struct TypeChecker<'a> {
     ctx: &'a mut SemanticContext,
     arena: &'a AstArena,
@@ -93,23 +99,45 @@ impl<'a> TypeChecker<'a> {
     }
 
     pub fn eval_comptime_expr(&mut self, expr_id: luna_ast::ExprId) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
-        self.ctx.tables.evaluated_comptime = true;
-        self.prepare_comptime_bodies();
-        if let Some(engine) = self.comptime_engine {
-            engine.eval_expr(self.arena, self.ctx, self.source_manager, expr_id)
-        } else {
-            Err(crate::comptime::ComptimeError::UnsupportedOperation("comptime engine not configured".to_string()))
-        }
+        self.eval_prepared_comptime(ComptimeTarget::Expression(expr_id))
     }
 
     pub fn eval_comptime_stmt(&mut self, stmt_id: luna_ast::StmtId) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
+        self.eval_prepared_comptime(ComptimeTarget::Statement(stmt_id))
+    }
+
+    fn eval_prepared_comptime(&mut self, target: ComptimeTarget) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
         self.ctx.tables.evaluated_comptime = true;
+        let Some(engine) = self.comptime_engine else {
+            return Err(crate::comptime::ComptimeError::UnsupportedOperation("comptime engine not configured".to_string()));
+        };
         self.prepare_comptime_bodies();
-        if let Some(engine) = self.comptime_engine {
-            engine.eval_stmt(self.arena, self.ctx, self.source_manager, stmt_id)
-        } else {
-            Err(crate::comptime::ComptimeError::UnsupportedOperation("comptime engine not configured".to_string()))
+        let diagnostics_before = self.ctx.diagnostics.len();
+        let mut collector = crate::mono::MonoCollector::new_with_source(self.ctx, self.arena, Some(self.source_manager));
+        let root = match target {
+            ComptimeTarget::Expression(expr) => collector.run_on_expr(expr),
+            ComptimeTarget::Statement(stmt) => collector.run_on_stmt(stmt),
+        };
+        let functions = collector.instantiated.into_values().collect();
+        let glues = collector.drop_glues;
+        if self.ctx.diagnostics.len() != diagnostics_before {
+            return Err(crate::comptime::ComptimeError::TypeMismatch(self.ctx.diagnostics[diagnostics_before..]
+                .iter().map(|diagnostic| diagnostic.message.clone()).collect::<Vec<_>>().join("; ")));
         }
+        // Do not publish partial early instances as whole-program compilation
+        // results. Interned types remain in this session so returned type IDs
+        // stay valid; the evaluation root and reachable units are scoped.
+        let previous_root = self.ctx.comptime_root.replace(root);
+        let previous_functions = std::mem::replace(&mut self.ctx.instantiated_functions, functions);
+        let previous_glues = std::mem::replace(&mut self.ctx.drop_glue_instances, glues);
+        let result = match target {
+            ComptimeTarget::Expression(expr) => engine.eval_expr(self.arena, self.ctx, self.source_manager, expr),
+            ComptimeTarget::Statement(stmt) => engine.eval_stmt(self.arena, self.ctx, self.source_manager, stmt),
+        };
+        self.ctx.comptime_root = previous_root;
+        self.ctx.instantiated_functions = previous_functions;
+        self.ctx.drop_glue_instances = previous_glues;
+        result
     }
     
     /// Body elaboration belongs to semantic analysis, including bodies required
