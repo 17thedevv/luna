@@ -2087,6 +2087,13 @@ impl<'a> TypeChecker<'a> {
                         Decl::Var { type_annot, .. } => (*type_annot, self.ctx.tables.decl_symbols.get(&decl_id).copied()),
                         _ => (None, None),
                     };
+                    // Early evaluation walks a flat dependency order; recover
+                    // the declaration's lexical scope for names, privacy and
+                    // type annotations rather than using the outer/root scope.
+                    let previous_scope = self.current_scope;
+                    if let Some(symbol) = sym_id_opt {
+                        self.current_scope = self.ctx.symbol_table.get_symbol(symbol).scope;
+                    }
                     let init_ty = if let Some(annot) = type_annot {
                         let expected = self.lower_type(annot);
                         self.typecheck_expr_expected(&init, expected)
@@ -2116,6 +2123,7 @@ impl<'a> TypeChecker<'a> {
                             self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
                         }
                     }
+                    self.current_scope = previous_scope;
                 }
             }
             Err(cycle_err) => {

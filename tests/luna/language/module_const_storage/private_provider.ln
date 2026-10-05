@@ -1,0 +1,20 @@
+struct Secret { outer: i32, };
+const BASE: i32 = 100;
+module first {
+    struct Secret { left: i32, right: i32, };
+    const VALUE: Secret = comptime { Secret { left: BASE, right: 13 } };
+    const BASE: i32 = 7;
+    export fn first_ref() -> &i32 { return &VALUE.left; }
+    export fn total() -> i32 { return VALUE.left + VALUE.right; }
+}
+module second {
+    struct Secret { flag: bool, code: i32, };
+    const VALUE: Secret = comptime { Secret { flag: true, code: BASE } };
+    const BASE: i32 = 23;
+    export fn second_ref() -> &i32 { return &VALUE.code; }
+    export fn flag() -> bool { return VALUE.flag; }
+}
+const ROOT_VALUE: Secret = comptime { Secret { outer: BASE } };
+module roots {
+    export fn root_ref() -> &i32 { return &ROOT_VALUE.outer; }
+}

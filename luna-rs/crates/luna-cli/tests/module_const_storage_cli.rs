@@ -14,7 +14,7 @@ fn module_constants_preserve_storage_across_native_portable_and_relocated_provid
     for (mode, root) in [("source", &modes.source), ("artifact", &modes.artifact)] {
         let project = root.join("project");
         fs::create_dir(&project).unwrap();
-        for provider in ["provider", "provider_other"] {
+        for provider in ["provider", "provider_other", "private_provider"] {
             let source = project.join(format!("{provider}.ln"));
             fs::copy(fixtures.join(format!("{provider}.ln")), &source).unwrap();
             if mode == "artifact" {
@@ -38,7 +38,7 @@ fn module_constants_preserve_storage_across_native_portable_and_relocated_provid
         // private module data in both native and portable generic bodies.
         let relocated = root.join("relocated");
         fs::rename(&project, &relocated).unwrap();
-        for name in ["module_reference", "consumer", "comptime_read"] {
+        for name in ["module_reference", "consumer", "comptime_read", "private_scopes"] {
             let input = relocated.join(format!("{name}.ln"));
             fs::copy(fixtures.join(format!("{name}.ln")), &input).unwrap();
             let (exe, build) = modes.build(root, &input, &format!("const_{name}_{mode}"));

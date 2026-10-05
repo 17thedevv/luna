@@ -1091,3 +1091,24 @@ suite is isolated too, and checks the emitted manifest/object/metadata.
 [sysroot invariants](evidence/r0-json-isolation.txt) pass **6/6**. No shared
 canonical publication remains in these parity tests. This is test-harness
 repair, not new language support or a full-workspace PASS.
+
+## Module constant lexical scope repair — 2026-10-05
+
+The [before CLI probe](evidence/r1-module-private-before.txt) rejects valid private
+module constant construction, resolving a same-named root struct instead of
+the module-owned struct. Early evaluation iterates a flat topological list and
+had lost each declaration's lexical scope. Type annotation, initializer and
+comptime checking now use the constant symbol's defining scope and restore the
+previous scope after evaluation. No visibility/ownership relaxation is involved.
+
+Permanent fixtures `module_const_storage/private_provider.ln` and
+`private_scopes.ln` cover two modules with same-named private types/constants,
+an outer shadow, forward dependencies and root-scope restoration. The
+[expanded CLI rerun](evidence/r1-module-private-final.txt) passes eight native
+source/relocated-artifact executions and the existing twenty typed escape,
+mutability, privacy and VM-pointer rejection controls. An
+[earlier focused rerun](evidence/r1-module-private-first-rerun.txt) is preserved
+separately. [Semantic tests](evidence/r1-module-private-semantic.txt) pass
+191/191. This fixes module-constant scope; it does not implement named/default
+arguments. Their definition-site evaluation still needs its own call-binding,
+ownership, generic and provider acceptance matrix.
