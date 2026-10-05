@@ -129,8 +129,40 @@ pub struct ExportedSymbol {
 /// ValueId/PlaceId/DeclId and borrowck implementation state are never stored.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct CanonicalRawPointerEffects {
+    /// Orthogonal body-derived call effects. Raw origin facts alone cannot
+    /// prove that a function does not retain a temporary safe reference.
+    pub call: CanonicalCallEffects,
     pub returned: CanonicalRawPointerEffect,
     pub direct_fields: BTreeMap<String, CanonicalRawPointerEffect>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CanonicalCallEffects {
+    pub parameters: Vec<CanonicalParameterEffect>,
+    pub returned: CanonicalSafeReturnEffect,
+    pub opaque: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct CanonicalParameterEffect {
+    pub access: CanonicalAccessEffect,
+    pub ownership: CanonicalOwnershipEffect,
+    pub escape: CanonicalEscapeEffect,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum CanonicalAccessEffect { None, Read, Write, ReadWrite, Unknown }
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum CanonicalOwnershipEffect { Copy, BorrowShared, BorrowMut, Consume, Unknown }
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum CanonicalEscapeEffect { NoEscape, CallOnly, MayEscape, Unknown }
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum CanonicalSafeReturnEffect {
+    Independent,
+    BorrowsFrom(Vec<u32>),
+    BorrowsCarried(Vec<u32>),
+    BorrowsBoth { direct: Vec<u32>, carried: Vec<u32> },
+    Unknown,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]

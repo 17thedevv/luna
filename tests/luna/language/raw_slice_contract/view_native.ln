@@ -1,0 +1,19 @@
+import "provider";
+fn main() -> i32 {
+    dec rw data = [65 as u8, 0 as u8];
+    { dec view = views::forward<views::View>(views::View::from_bytes(&data)); if view.bytes()[0] != 65 as u8 { return 1; } }
+    data[0] = 66 as u8;
+    dec rw other = [70 as u8, 0 as u8];
+    {
+        dec source = views::make(&other);
+        dec result = views::pick(false, &source, views::make(&data));
+        if result.bytes()[0] != 66 as u8 { return 2; }
+    }
+    {
+        dec source = views::make(&other);
+        dec result = views::pick(true, &source, views::make(&data));
+        if result.bytes()[0] != 70 as u8 { return 3; }
+    }
+    other[0] = 71 as u8;
+    return data[0] as i32 - 66;
+}

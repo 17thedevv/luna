@@ -1,0 +1,89 @@
+[
+  {
+    "name": "sysroot",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "run",
+      "-p",
+      "luna-cli",
+      "--",
+      "build-sysroot",
+      "--quiet"
+    ],
+    "exit": 0,
+    "log": "raw-slice-verified-sysroot.txt",
+    "sha256": "f4ced5e6a37c4e70d9e59f3fe409b0b24d143a69fce8d7c27d145aee19709edb"
+  },
+  {
+    "name": "internal",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "test",
+      "-p",
+      "luna-semantic",
+      "-p",
+      "luna-borrowck",
+      "-p",
+      "luna-llib"
+    ],
+    "exit": 0,
+    "log": "raw-slice-verified-internal.txt",
+    "sha256": "51df4b1be7b9c6094c0ce2a78abf7339c9d71afe1f8e5711f70b6ae7ec4cbdc0"
+  },
+  {
+    "name": "driver",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "test",
+      "-p",
+      "luna-driver",
+      "--test",
+      "compiler_gap_c_gap_12_safe_loan_effect_tests",
+      "--test",
+      "raw_pointer_ffi_call_semantics_tests",
+      "--test",
+      "test_strict_artifact_rejection",
+      "--test",
+      "test_sysroot_build_invariants",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "log": "raw-slice-verified-driver.txt",
+    "sha256": "77b725a0301d32ed3ef766d1c000060d3fdeee839f5b8071af3e0fa7871b4b0d"
+  },
+  {
+    "name": "memory-cli",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "test",
+      "-p",
+      "luna-cli",
+      "--test",
+      "memory_intrinsic_identity_cli",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "log": "raw-slice-verified-memory-cli.txt",
+    "sha256": "2313a7547ad29e762f44179902fef8b7fda89cd7812028b92c1456f3f17e96f7"
+  },
+  {
+    "name": "views-cli",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "test",
+      "-p",
+      "luna-cli",
+      "--test",
+      "raw_slice_provenance_cli",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "log": "raw-slice-verified-views-cli.txt",
+    "sha256": "e89590efefa08efb9295ca5372d527879823880207b393b192fa618b8c91e000"
+  }
+]

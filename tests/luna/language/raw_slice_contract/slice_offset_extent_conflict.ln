@@ -1,0 +1,10 @@
+import <mem>;
+fn main() {
+    dec rw data = [1, 2, 3];
+    unsafe {
+        dec pointer = &rw data[1] as *rw i32;
+        dec slice = std::mem::slice_from_raw_parts<i32>(pointer as *i32, 2 as u64);
+        data[2] = 9;
+        dec value = slice[1];
+    }
+}

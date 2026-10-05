@@ -3,13 +3,13 @@ use std::io::{Read, Write};
 pub const LLIB_MAGIC: [u8; 4] = *b"LLIB";
 pub const MLIB_MAGIC: [u8; 4] = *b"MLIB";
 pub const LLIB_FORMAT_VERSION: u16 = 2;
-pub const LLIB_COMPILER_VERSION: u16 = 13; // Checked memory-hook identity and callable safety must survive import.
+pub const LLIB_COMPILER_VERSION: u16 = 14; // Safe raw-slice promotion/loans require revalidated provider bodies.
 pub const LLIB_MVIR_VERSION: u16 = 4; // Portable StaticAddress data, without semantic-session IDs.
 
 pub const MLIB_FORMAT_VERSION: u16 = LLIB_FORMAT_VERSION;
 pub const MLIB_COMPILER_VERSION: u16 = LLIB_COMPILER_VERSION;
 pub const MLIB_MVIR_VERSION: u16 = LLIB_MVIR_VERSION;
-pub const SEMANTIC_METADATA_VERSION: u16 = 6;
+pub const SEMANTIC_METADATA_VERSION: u16 = 7;
 
 use serde::{Serialize, Deserialize};
 use sha2::{Sha256, Digest};

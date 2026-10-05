@@ -1,0 +1,3 @@
+import <mem>;
+fn bad(pointer: *i32) -> &[i32] { unsafe { return std::mem::slice_from_raw_parts<i32>(pointer, 1 as u64); } }
+fn main() {}

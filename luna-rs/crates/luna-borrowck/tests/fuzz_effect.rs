@@ -4,6 +4,29 @@ use luna_mvir::*;
 use luna_semantic::SemanticTypeId;
 use proptest::prelude::*;
 
+#[test]
+fn mixed_return_sources_form_a_join_without_losing_either_channel() {
+    use ReturnEffect::*;
+    let effects = [
+        Independent, BorrowsFrom(vec![0]), BorrowsFrom(vec![1]),
+        BorrowsCarried(vec![0]), BorrowsCarried(vec![2]),
+        BorrowsBoth { direct: vec![0], carried: vec![2] }, Unknown,
+    ];
+    assert_eq!(BorrowsFrom(vec![0]).merge(&BorrowsCarried(vec![2])),
+        BorrowsBoth { direct: vec![0], carried: vec![2] });
+    for a in &effects {
+        assert_eq!(a.merge(a), *a);
+        for b in &effects {
+            let join = a.merge(b);
+            assert_eq!(join, b.merge(a));
+            assert!(a <= &join && b <= &join);
+            for c in &effects {
+                assert_eq!(a.merge(&b.merge(c)), a.merge(b).merge(c));
+            }
+        }
+    }
+}
+
 // Test 13: Lattice laws
 proptest! {
     #[test]

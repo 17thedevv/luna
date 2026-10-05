@@ -23,7 +23,10 @@ This skill is **mandatory** whenever the agent:
 - adds examples to language documentation;
 - reviews code that claims to use a Luna language feature.
 
-The compiler implementation and frozen language specifications are authoritative. Agent memory, intuition, external language conventions, and generated examples are not.
+The versioned Luna 0.1 specification and adopted amendments define requirements.
+Compiler implementation and executable tests establish conformance or gaps; they
+cannot override a retained contract. Agent memory and foreign conventions are
+not language authority.
 
 ---
 
@@ -136,8 +139,8 @@ Raw Pointers:
 
 Imports:
 ```rust
-import <core>;
-import <alloc>;
+import <ptr>;
+import <vec>;
 import "local_module";
 ```
 
@@ -146,7 +149,7 @@ Do NOT invent extension-bearing imports such as `import "core.ln";` or `import <
 Modules (inline namespaces):
 ```rust
 module math {
-    export struct Point { x: f64, y: f64 }
+    export struct Point { x: f64, y: f64 };
 }
 ```
 
@@ -163,8 +166,8 @@ Do not introduce Rust turbofish syntax (`foo::<T>()`).
 Match arms use `->`:
 ```rust
 match val {
-    Option::Some(x) -> x,
-    Option::None -> 0,
+    std::Option::Some(x) -> x,
+    std::Option::None -> 0,
 }
 ```
 `=>` is strictly used as macro transcriber separator, NOT match arms.
@@ -186,7 +189,7 @@ Struct field visibility is independent from struct type visibility. The semantic
 - **VIS-STRUCT-3**: Private field access is permitted only from the field's defining module scope and allowed descendants (ancestor rule).
 - **VIS-STRUCT-4**: Struct type visibility is checked before field visibility.
 - **VIS-STRUCT-5**: External construction requires access to every required/private field. Struct literals cannot be constructed from an external scope if the struct contains any private fields.
-- **VIS-STRUCT-6**: Private fields cannot be read, written, borrowed, projected, or destructured from an inaccessible scope. All 6 access paths are enforced:
+- **VIS-STRUCT-6**: Private fields must be protected on all access paths; this is a required acceptance matrix, not a claim every current path is verified:
   1. Field read: `u.field`
   2. Field write / assignment: `u.field = val`
   3. Field borrow: `&u.field`, `&rw u.field`
@@ -212,7 +215,9 @@ The 5 semantic contracts are strictly frozen:
 
 - **PTR-MEM-1 (No Automatic Lifetime Inference & Unsafe Boundary)**:
   Raw pointer operations are explicit `unsafe` escape hatches. Calling `std::ptr::read` or dereferencing a raw pointer does NOT synthesize or infer a safe lifetime relation (`life_from`). Returned values are owned; raw pointers never masquerade as borrowed references.
-  *Rule*: `unsafe` removes the obligation to prove raw-memory safety at that operation boundary; it does not remove lifetime/provenance requirements from safe references produced afterward (see Section 7.1).
+  *Rule*: `unsafe` authorizes the defined raw operation, transferring its validity,
+  alignment, initialization and other safety proof obligations to the caller.
+  It does not remove them or lifetime/provenance obligations of resulting safe references.
 - **PTR-MEM-2 (Semantic Pointer Arithmetic & Allocation Provenance)**:
   Pointer arithmetic (`std::ptr::add`, `std::ptr::add_mut`, `std::ptr::offset`, `std::ptr::offset_mut`, `std::ptr::diff`) is defined at the language semantic level over $T$-sized elements (not defined as source-level integer casts).
   - `std::ptr::diff(a, b)` computes signed element distance $((a - b) / \text{sizeof}(T))$.
@@ -291,7 +296,7 @@ Any Luna API returning a reference MUST answer:
 
 - If it originates from an input/receiver, express it explicitly:
   ```rust
-  fn get(&self, index: usize) -> Option<&T> life_from(self)
+  fn get(self: &Self, index: usize) -> std::Option<&T> life_from(self)
   ```
 - If it has multiple possible sources:
   ```rust
@@ -310,9 +315,15 @@ Do NOT silently return borrowed values without checking whether the language con
 
 > [!IMPORTANT]
 > **UNSAFE-LIFETIME-BOUNDARY**:
-> *unsafe removes the obligation to prove raw-memory safety at that operation boundary; it does not remove lifetime/provenance requirements from safe references produced afterward.*
+> *unsafe authorizes the defined operation while its caller retains the raw-memory
+> safety proof obligations; safe references produced afterward retain all
+> lifetime, provenance and capability requirements.*
 
-When dereferencing a raw pointer (`*p`) or bridging a raw pointer into a safe reference or slice (`slice_from_raw_parts`, `&*raw_ptr`, `as_ref`), the `unsafe` block discharges the immediate memory access check (e.g., pointer validity, alignment, raw dereference authorization).
+For raw dereference or raw-to-safe construction, `unsafe` provides authorization,
+not evidence that an address is valid/aligned/initialized or has a legal owner.
+The caller must establish those preconditions and the enclosing safe API must
+preserve them. Raw-to-safe provenance follows the adopted raw-pointer and anchor
+contracts; a lifetime annotation alone does not establish an unknown raw origin.
 
 However, any safe reference (`&T`, `&rw T`, `&[T]`) produced across that boundary immediately enters the safe type system and MUST obey full lifetime and provenance contracts:
 1. **Explicit Provenance Obligation**: Safe references produced from raw pointers inside an API cannot have their lifetime inferred out of thin air. The enclosing function MUST declare a valid lifetime provenance relation (e.g., `life_from(self)`) linking the reference to a legitimate, outliving borrow root.
@@ -331,9 +342,15 @@ Before implementing:
 verify how Luna represents and propagates provenance:
 1. Never assume Rust-style generic lifetime parameters.
 2. Verify: `Variant`, `Extract`, `Store`, `Load`, `FieldPtr`, `carried_provenance`, aggregate return contracts.
-3. Current Luna v1 treats multiple fields as one whole-value borrow domain. Disjoint field borrowing is deferred to Borrowck v2. Stdlib code must respect that behavior rather than assuming disjoint field borrowing.
-4. `Vec<&T>` guarantees soundness through borrowed container APIs (`&self -> &T life_from(self)`), but does not have element-level heap provenance tracking in v1.
-5. Aggregate functions returning local references must declare `life_from(...)` to trigger full escape checking.
+3. Do not assume disjoint-field borrowing or element-level heap provenance merely
+   because an API resembles another language. Determine the adopted contract and
+   verify the current place/loan propagation before advertising that capability.
+4. Borrowing the container establishes the container loan; it does not by itself
+   prove that references stored as elements still point to live referents.
+   `Vec<&T>` needs its own element-origin/escape/mutation acceptance evidence.
+5. Aggregate returns must preserve canonical provenance and reject escaping local
+   references whether annotations are explicit or elaborated by LLE. An explicit
+   `life_from` is not a switch that turns safety checking on.
 
 ---
 
@@ -381,12 +398,12 @@ The goal is NOT to imitate Rust's API surface. The goal is to create an API that
 > *Any future ownership abstraction must be expressible through existing generic ownership, drop, borrow, lifetime, and memory primitives unless a new language-level semantic contract is explicitly justified and frozen.*
 
 Following the freeze of **Stdlib-02B (Box Ownership Abstraction)**:
-1. **Library-Level Ownership**: `Box<T>`, `Rc<T>`, `Arc<T>`, and custom owning containers are ordinary Luna structs defined in libraries (`<alloc>` / `<core>`), governed solely by standard generic struct rules, traits (`Drop`), lifetime annotations (`life_from`), and raw memory primitives (`ptr`/`mem`/`__luna_alloc`/`__luna_dealloc`).
+1. **Library-Level Ownership**: `Box<T>`, `Rc<T>`, `Arc<T>`, and custom owning containers are ordinary library structs. Import their component providers (`box`, `rc`, `arc`, etc.) from the manifest; physical `alloc/` or `core/` placement does not grant implicit visibility. Generic struct/Drop/lifetime and memory contracts govern them, not container names.
 2. **Strict Ban on Compiler Special-Casing**: The compiler must never re-introduce container-specific semantic types (e.g., `SemanticType::Box`), IR instructions (e.g., `BoxFree`, `BoxNew`), or dedicated compiler branches in borrowck, coherence, monomorphization, reflection, or backend lowering.
 3. **General Primitives over Magic**: Memory operations are expressed universally:
-   - Destruction $\to$ `ptr::drop_in_place<T>` (generic drop glue).
-   - Deallocation $\to$ `Instruction::HeapFree` $\to$ `__luna_dealloc`.
-   - Consumption $\to$ Value extraction + explicit zero/sentinel disarming.
+   - Destruction uses the generic Drop contract, including `std::ptr::drop_in_place<T>` where appropriate.
+   - Deallocation uses adopted memory primitives/runtime ABI; `HeapFree` is a generic internal instruction, not a mandatory source API.
+   - Consumption transfers ownership exactly once. Zero/sentinel disarming is a particular library strategy where valid, not a universal ownership semantic rule.
 
 ---
 

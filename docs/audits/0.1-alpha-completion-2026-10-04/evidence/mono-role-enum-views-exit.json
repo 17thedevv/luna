@@ -1,0 +1,17 @@
+{
+  "command": [
+    "C:/Users/84387/.cargo/bin/cargo.exe",
+    "test",
+    "-p",
+    "luna-cli",
+    "--test",
+    "raw_slice_provenance_cli",
+    "--",
+    "--nocapture",
+    "--test-threads=1"
+  ],
+  "exit": 0,
+  "log": "mono-role-enum-views.txt",
+  "sha256": "07504fb7960461415ffec93aa53754a415b54dd31dfe04ec048c2fc952da11ca",
+  "cli_sha256": "e80605ddc947e0c281de759b9d9f6a1e44c88c04c9ed26cd9333e2369720ad6b"
+}

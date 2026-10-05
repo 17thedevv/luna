@@ -93,6 +93,7 @@ mod raw_anchor_validation_tests {
         };
         let mut function = symbol("Function", "relay", Some(0));
         function.raw_pointer_effects = Some(CanonicalRawPointerEffects {
+            call: crate::metadata::CanonicalCallEffects { parameters: vec![crate::metadata::CanonicalParameterEffect { access: crate::metadata::CanonicalAccessEffect::Read, ownership: crate::metadata::CanonicalOwnershipEffect::BorrowShared, escape: crate::metadata::CanonicalEscapeEffect::CallOnly }], returned: crate::metadata::CanonicalSafeReturnEffect::Independent, opaque: false },
             returned: CanonicalRawPointerEffect {
                 origin: CanonicalRawPointerOrigin::FromParameters(vec![1]),
                 anchor: CanonicalRawPointerAnchor::Unknown,
@@ -106,6 +107,53 @@ mod raw_anchor_validation_tests {
             impl_headers: Vec::new(),
             nominal_layouts: BTreeMap::new(),
         };
+        assert!(matches!(validate_raw_pointer_effects(&interface), Err(MlibError::CorruptedData)));
+    }
+
+    #[test]
+    fn validates_call_effect_arity_and_canonical_return_indices() {
+        use crate::metadata::*;
+        let mut function = symbol("Function", "read", Some(0));
+        function.raw_pointer_effects = Some(CanonicalRawPointerEffects {
+            call: CanonicalCallEffects {
+                parameters: vec![CanonicalParameterEffect { access: CanonicalAccessEffect::Read, ownership: CanonicalOwnershipEffect::BorrowShared, escape: CanonicalEscapeEffect::CallOnly }],
+                returned: CanonicalSafeReturnEffect::Independent, opaque: false,
+            },
+            returned: CanonicalRawPointerEffect { origin: CanonicalRawPointerOrigin::Independent, anchor: CanonicalRawPointerAnchor::Independent },
+            direct_fields: BTreeMap::new(),
+        });
+        let mut interface = CanonicalInterface {
+            exported_symbols: BTreeMap::from([("read".into(), function)]),
+            types: vec![CanonicalType::Function { params: vec![1], return_type: 2, is_unsafe: false }, CanonicalType::Reference(CanonicalLifetime::Static, Mutability::Immutable, 2), CanonicalType::Primitive(BuiltinType::U8)],
+            traits: BTreeMap::new(), impl_headers: Vec::new(), nominal_layouts: BTreeMap::new(),
+        };
+        assert!(validate_raw_pointer_effects(&interface).is_ok());
+        let independent = interface.fingerprint().unwrap();
+        for invalid in [vec![], vec![1], vec![0, 0]] {
+            interface.exported_symbols.get_mut("read").unwrap().raw_pointer_effects.as_mut().unwrap().call.returned = CanonicalSafeReturnEffect::BorrowsFrom(invalid);
+            assert!(matches!(validate_raw_pointer_effects(&interface), Err(MlibError::CorruptedData)));
+        }
+        let effect = &mut interface.exported_symbols.get_mut("read").unwrap().raw_pointer_effects.as_mut().unwrap().call;
+        effect.returned = CanonicalSafeReturnEffect::BorrowsFrom(vec![0]);
+        assert!(validate_raw_pointer_effects(&interface).is_ok());
+        assert_ne!(independent, interface.fingerprint().unwrap());
+        let single = interface.fingerprint().unwrap();
+        for invalid in [vec![], vec![1], vec![0, 0]] {
+            for returned in [
+                CanonicalSafeReturnEffect::BorrowsBoth { direct: invalid.clone(), carried: vec![0] },
+                CanonicalSafeReturnEffect::BorrowsBoth { direct: vec![0], carried: invalid.clone() },
+            ] {
+                interface.exported_symbols.get_mut("read").unwrap().raw_pointer_effects.as_mut().unwrap().call.returned = returned;
+                assert!(matches!(validate_raw_pointer_effects(&interface), Err(MlibError::CorruptedData)));
+            }
+        }
+        interface.exported_symbols.get_mut("read").unwrap().raw_pointer_effects.as_mut().unwrap().call.returned =
+            CanonicalSafeReturnEffect::BorrowsBoth { direct: vec![0], carried: vec![0] };
+        assert!(validate_raw_pointer_effects(&interface).is_ok());
+        assert_ne!(single, interface.fingerprint().unwrap());
+        let round_trip: CanonicalInterface = bincode::deserialize(&bincode::serialize(&interface).unwrap()).unwrap();
+        assert_eq!(interface.fingerprint().unwrap(), round_trip.fingerprint().unwrap());
+        interface.exported_symbols.get_mut("read").unwrap().raw_pointer_effects.as_mut().unwrap().call.parameters.clear();
         assert!(matches!(validate_raw_pointer_effects(&interface), Err(MlibError::CorruptedData)));
     }
 }
@@ -350,6 +398,24 @@ pub fn validate_raw_pointer_effects(
                 return Err(MlibError::CorruptedData);
             };
             validate_effect(&effects.returned, params.len())?;
+            if effects.call.parameters.len() != params.len() {
+                return Err(MlibError::CorruptedData);
+            }
+            use crate::metadata::CanonicalSafeReturnEffect;
+            let source_sets: Vec<&[u32]> = match &effects.call.returned {
+                CanonicalSafeReturnEffect::BorrowsFrom(indices)
+                    | CanonicalSafeReturnEffect::BorrowsCarried(indices) => vec![indices],
+                CanonicalSafeReturnEffect::BorrowsBoth { direct, carried } => vec![direct, carried],
+                _ => Vec::new(),
+            };
+            for indices in source_sets {
+                if indices.is_empty()
+                    || indices.iter().any(|index| *index as usize >= params.len())
+                    || indices.windows(2).any(|pair| pair[0] >= pair[1])
+                {
+                    return Err(MlibError::CorruptedData);
+                }
+            }
             for (field_name, effect) in &effects.direct_fields {
                 if field_name.is_empty() { return Err(MlibError::CorruptedData); }
                 validate_effect(effect, params.len())?;

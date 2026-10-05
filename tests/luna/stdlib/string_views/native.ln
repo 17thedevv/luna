@@ -1,0 +1,14 @@
+import <string>;
+fn main() -> i32 {
+    dec rw data = [65 as u8, 0 as u8];
+    { dec view = std::cstr_from_bytes_with_nul(&data).unwrap(); if view.to_bytes()[0] != 65 as u8 { return 1; } }
+    data[0] = 66 as u8;
+    { dec view = std::CStr::from_bytes_with_nul(&data).unwrap(); if view.to_bytes_with_nul().len != 2 as usize { return 2; } }
+    unsafe { dec view = std::CStr::from_ptr(&data[0] as *u8); if view.to_bytes()[0] != 66 as u8 { return 3; } }
+    dec rw owned = std::cstring_new("hello").unwrap();
+    { dec view = owned.as_c_str(); if view.to_bytes().len != 5 as usize { return 4; } }
+    dec clone = owned.clone();
+    if clone.to_string().len() != 5 as u64 { return 5; }
+    dec rw text = std::string_from_str("a"); text.push_str("bc");
+    return text.len() as i32 - 3;
+}

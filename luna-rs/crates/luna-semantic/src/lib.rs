@@ -57,6 +57,27 @@ use luna_common::Diagnostic;
 use std::cell::RefCell;
 use std::collections::HashMap;
 
+#[cfg(test)]
+mod validity_borrow_shape_tests {
+    use super::*;
+    #[test]
+    fn anchored_headers_transport_loans_without_becoming_raw_origins() {
+        let mut ctx = SemanticContext::new();
+        let byte = ctx.types.intern(SemanticType::Primitive(BuiltinType::U8));
+        let pointer = ctx.types.intern(SemanticType::Pointer(ty::Mutability::Immutable, byte));
+        let unanchored = ctx.types.intern(SemanticType::Struct(SymbolId(100), vec![], vec![pointer]));
+        let anchored = ctx.types.intern(SemanticType::Struct(SymbolId(101), vec![], vec![pointer]));
+        ctx.tables.raw_storage_anchor_contracts.insert(SymbolId(101), CanonicalRawStorageAnchorContract::new(vec!["data".into()]));
+        let aggregate = ctx.types.intern(SemanticType::Enum(SymbolId(102), vec![], vec![anchored]));
+        assert!(!ctx.may_carry_validity_borrow(pointer));
+        assert!(!ctx.may_carry_validity_borrow(unanchored));
+        assert!(ctx.may_carry_validity_borrow(anchored));
+        assert!(ctx.may_carry_validity_borrow(aggregate));
+        assert!(!ctx.types.contains_safe_reference(anchored));
+        assert!(!ctx.types.contains_safe_reference(aggregate));
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum NeedsDropState {
     Visiting,
@@ -89,6 +110,30 @@ pub struct SemanticContext {
 }
 
 impl SemanticContext {
+    /// Whether a value can transport an already established validity borrow.
+    /// An anchored header may be an owning value or a borrowed view. Its
+    /// contract permits transport of an incoming loan; it never creates one
+    /// from a raw address or proves allocation ownership on its own.
+    pub fn may_carry_validity_borrow(&self, ty: SemanticTypeId) -> bool {
+        fn visit(ctx: &SemanticContext, ty: SemanticTypeId, seen: &mut std::collections::HashSet<SemanticTypeId>) -> bool {
+            let ty = ctx.types.resolve(ty);
+            if !seen.insert(ty) { return false; }
+            match ctx.types.get(ty) {
+                SemanticType::Reference(..) => true,
+                SemanticType::Struct(symbol, _, fields) => {
+                    ctx.tables.raw_storage_anchor_contracts.get(symbol).is_some_and(|contract| !contract.is_empty())
+                        || fields.iter().any(|field| visit(ctx, *field, seen))
+                }
+                SemanticType::Enum(_, _, fields) | SemanticType::Tuple(fields) => fields.iter().any(|field| visit(ctx, *field, seen)),
+                SemanticType::Array(element, _) | SemanticType::Future(element) | SemanticType::Range(element) => visit(ctx, *element, seen),
+                SemanticType::Closure(_, captures, _) => captures.iter().any(|capture| visit(ctx, *capture, seen)),
+                SemanticType::GenericParam(_) | SemanticType::InferenceVar(_) | SemanticType::Projection { .. } => true,
+                _ => false,
+            }
+        }
+        visit(self, ty, &mut std::collections::HashSet::new())
+    }
+
     pub fn new() -> Self {
         Self {
             // The current driver emits for its native target. Explicit target

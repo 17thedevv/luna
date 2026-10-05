@@ -38,7 +38,7 @@ fn seed_imported_raw_pointer_effects(
     semantic_ctx: &SemanticContext,
 ) {
     use luna_borrowck::effect::{
-        CallEffectSummary, RawPointerAnchorReturnEffect, RawPointerAnchorSource,
+        RawPointerAnchorReturnEffect, RawPointerAnchorSource,
         RawPointerFieldReturnEffect, RawPointerReturnEffect,
     };
     use luna_llib::metadata::{
@@ -84,9 +84,12 @@ fn seed_imported_raw_pointer_effects(
                 let path = semantic_ctx.symbol_table.get_full_logical_path(symbol_id).join("::");
                 let Some(canonical) = provider.raw_pointer_effects_by_path.get(&path) else { continue; };
 
-                // Preserve conservative non-raw call behavior: this artifact
-                // supplement only refines raw-pointer origin/anchor channels.
-                let mut summary = CallEffectSummary::worst_case(args.len());
+                // Decode body-derived call effects independently from raw
+                // origin and anchor facts. Absence retains the opaque fallback.
+                let mut summary = decode_call_effects(&canonical.call);
+                if summary.args.len() != args.len() {
+                    continue;
+                }
                 let (origin, anchor) = decode_effect(&canonical.returned);
                 summary.raw_pointer_ret = origin;
                 summary.raw_pointer_anchor_ret = anchor;
@@ -101,6 +104,86 @@ fn seed_imported_raw_pointer_effects(
             }
         }
     }
+}
+
+fn encode_call_effects(summary: &luna_borrowck::effect::CallEffectSummary) -> luna_llib::metadata::CanonicalCallEffects {
+    use luna_borrowck::effect::*;
+    use luna_llib::metadata::*;
+    let parameters = summary.args.iter().map(|arg| CanonicalParameterEffect {
+        access: match arg.access {
+            AccessKind::None => CanonicalAccessEffect::None,
+            AccessKind::Read => CanonicalAccessEffect::Read,
+            AccessKind::Write => CanonicalAccessEffect::Write,
+            AccessKind::ReadWrite => CanonicalAccessEffect::ReadWrite,
+            AccessKind::Unknown => CanonicalAccessEffect::Unknown,
+        },
+        ownership: match arg.ownership {
+            OwnershipKind::Copy => CanonicalOwnershipEffect::Copy,
+            OwnershipKind::BorrowShared => CanonicalOwnershipEffect::BorrowShared,
+            OwnershipKind::BorrowMut => CanonicalOwnershipEffect::BorrowMut,
+            OwnershipKind::Consume => CanonicalOwnershipEffect::Consume,
+            OwnershipKind::Unknown => CanonicalOwnershipEffect::Unknown,
+        },
+        escape: match arg.escape {
+            EscapeKind::NoEscape => CanonicalEscapeEffect::NoEscape,
+            EscapeKind::CallOnly => CanonicalEscapeEffect::CallOnly,
+            EscapeKind::MayEscape => CanonicalEscapeEffect::MayEscape,
+            EscapeKind::Unknown => CanonicalEscapeEffect::Unknown,
+        },
+    }).collect();
+    let returned = match &summary.ret {
+        ReturnEffect::Independent => CanonicalSafeReturnEffect::Independent,
+        ReturnEffect::Unknown => CanonicalSafeReturnEffect::Unknown,
+        ReturnEffect::BorrowsFrom(indices) => CanonicalSafeReturnEffect::BorrowsFrom(indices.iter().map(|index| *index as u32).collect()),
+        ReturnEffect::BorrowsCarried(indices) => CanonicalSafeReturnEffect::BorrowsCarried(indices.iter().map(|index| *index as u32).collect()),
+        ReturnEffect::BorrowsBoth { direct, carried } => CanonicalSafeReturnEffect::BorrowsBoth {
+            direct: direct.iter().map(|index| *index as u32).collect(),
+            carried: carried.iter().map(|index| *index as u32).collect(),
+        },
+    };
+    CanonicalCallEffects { parameters, returned, opaque: summary.is_opaque }
+}
+
+fn decode_call_effects(summary: &luna_llib::metadata::CanonicalCallEffects) -> luna_borrowck::effect::CallEffectSummary {
+    use luna_borrowck::effect::*;
+    use luna_llib::metadata::*;
+    let parameters = summary.parameters.iter().map(|arg| ArgEffect {
+        access: match arg.access {
+            CanonicalAccessEffect::None => AccessKind::None,
+            CanonicalAccessEffect::Read => AccessKind::Read,
+            CanonicalAccessEffect::Write => AccessKind::Write,
+            CanonicalAccessEffect::ReadWrite => AccessKind::ReadWrite,
+            CanonicalAccessEffect::Unknown => AccessKind::Unknown,
+        },
+        ownership: match arg.ownership {
+            CanonicalOwnershipEffect::Copy => OwnershipKind::Copy,
+            CanonicalOwnershipEffect::BorrowShared => OwnershipKind::BorrowShared,
+            CanonicalOwnershipEffect::BorrowMut => OwnershipKind::BorrowMut,
+            CanonicalOwnershipEffect::Consume => OwnershipKind::Consume,
+            CanonicalOwnershipEffect::Unknown => OwnershipKind::Unknown,
+        },
+        escape: match arg.escape {
+            CanonicalEscapeEffect::NoEscape => EscapeKind::NoEscape,
+            CanonicalEscapeEffect::CallOnly => EscapeKind::CallOnly,
+            CanonicalEscapeEffect::MayEscape => EscapeKind::MayEscape,
+            CanonicalEscapeEffect::Unknown => EscapeKind::Unknown,
+        },
+    }).collect();
+    let returned = match &summary.returned {
+        CanonicalSafeReturnEffect::Independent => ReturnEffect::Independent,
+        CanonicalSafeReturnEffect::Unknown => ReturnEffect::Unknown,
+        CanonicalSafeReturnEffect::BorrowsFrom(indices) => ReturnEffect::BorrowsFrom(indices.iter().map(|index| *index as usize).collect()),
+        CanonicalSafeReturnEffect::BorrowsCarried(indices) => ReturnEffect::BorrowsCarried(indices.iter().map(|index| *index as usize).collect()),
+        CanonicalSafeReturnEffect::BorrowsBoth { direct, carried } => ReturnEffect::BorrowsBoth {
+            direct: direct.iter().map(|index| *index as usize).collect(),
+            carried: carried.iter().map(|index| *index as usize).collect(),
+        },
+    };
+    let mut result = CallEffectSummary::default_for_args(summary.parameters.len());
+    result.args = parameters;
+    result.ret = returned;
+    result.is_opaque = summary.opaque;
+    result
 }
 
 #[derive(Default, Clone, Debug)]
@@ -1027,6 +1110,4 @@ mod publication_tests {
         let _ = std::fs::remove_dir_all(&temp_dir);
     }
 }
-
-
 

@@ -1,0 +1,4 @@
+import <mem>;
+import "provider";
+fn read(pointer: *i32) -> i32 { unsafe { dec slice = std::mem::slice_from_raw_parts<i32>(pointer, 1 as u64); return views::read_first(slice); } }
+fn main() -> i32 { dec rw value = 7; return read(&value as *i32) - 7; }

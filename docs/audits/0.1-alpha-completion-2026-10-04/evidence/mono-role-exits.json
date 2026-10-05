@@ -1,0 +1,74 @@
+[
+  {
+    "name": "sysroot",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "run",
+      "-p",
+      "luna-cli",
+      "--",
+      "build-sysroot",
+      "--quiet"
+    ],
+    "exit": 0,
+    "log": "mono-role-sysroot.txt",
+    "sha256": "e11babb8fc56a43c3e0313d330e2033ad9fbd3e8dd622c9fbb972cfefdfb1bb9"
+  },
+  {
+    "name": "cli",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "test",
+      "-p",
+      "luna-cli",
+      "--test",
+      "method_resolution_cli",
+      "--test",
+      "interface_constraints_cli",
+      "--test",
+      "memory_intrinsic_identity_cli",
+      "--",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "log": "mono-role-cli.txt",
+    "sha256": "dce5d17771557df89088b497a05c8051674295fa6cbac3511bc6692d83e58393"
+  },
+  {
+    "name": "driver",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "test",
+      "-p",
+      "luna-driver",
+      "--test",
+      "lang_namespace_contract_tests",
+      "--test",
+      "stdlib_phase4c_llib_parity_tests",
+      "--test",
+      "stdlib_phase4c_numerics",
+      "--test",
+      "struct_lifetime_contract_acceptance_tests",
+      "--",
+      "--test-threads=1"
+    ],
+    "exit": 0,
+    "log": "mono-role-driver.txt",
+    "sha256": "9106a16fd25213431cd201dcc3e4c77f49b7abc89b191566105f6515ebd7cf50"
+  },
+  {
+    "name": "semantic",
+    "command": [
+      "C:/Users/84387/.cargo/bin/cargo.exe",
+      "test",
+      "-p",
+      "luna-semantic",
+      "-p",
+      "luna-llib"
+    ],
+    "exit": 0,
+    "log": "mono-role-semantic.txt",
+    "sha256": "2f830b9bca9386db6662de6e4e57e3682ae8a5d730b35f4d6ef5de4f848fbf9e"
+  }
+]

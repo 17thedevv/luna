@@ -1,0 +1,13 @@
+import "provider";
+fn check_value(value: u8) -> bool { return value == 65 as u8; }
+fn check_ref(value: &u8) -> bool { return *value == 65 as u8; }
+fn main() -> i32 {
+    dec rw data = [65 as u8, 0 as u8];
+    dec first = views::forward_byte(&data, check_value);
+    data[0] = 65 as u8;
+    dec second = views::forward_ref_byte(&data, check_ref);
+    data[0] = 66 as u8;
+    if first != 65 as u8 { return 1; }
+    if second != 65 as u8 { return 2; }
+    return 0;
+}

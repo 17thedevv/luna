@@ -1,0 +1,405 @@
+{
+  "base": "f832db24459b5a2675dec1c6836f3bc1502340a9",
+  "utc": "2026-10-05T06:26:39.572491+00:00",
+  "candidate_source_hashes": {
+    ".agents/skills/luna-language-capability-validation/SKILL.md": "2811c3bf71713b26edf4b246b9a071fb7477ff56a8d0306424639c5d197a32f2",
+    ".agents/skills/luna-semantic-compliance/SKILL.md": "2fcfd60a68a88713f6c38b7c291e2947f0dbab629b1214f3e1b67f7ff44bc2ad",
+    "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs": "b6eeebbdb2b2213bb89885ba2f60baefb755a81fa427f113ad7c77045cc63ef3",
+    "luna-rs/crates/luna-borrowck/src/effect.rs": "a85583171d2add49357db140458dcdb7ae69fe984c8b584f0ab65e5b461c95bb",
+    "luna-rs/crates/luna-borrowck/src/effect_inference.rs": "1fc71bd6d74e3ac20b9980e54f169e9fc2104e5d8a48f7d51e69ef68bf42cc2a",
+    "luna-rs/crates/luna-borrowck/src/lib.rs": "041adef413fc19c645af62af472dfb1c5db46cf367fe3fce8335b5aa5a628c8a",
+    "luna-rs/crates/luna-borrowck/src/move_analysis.rs": "2d0a992fbbc53d79244f2e00da70a0a5b7bf295692eff275b8c14464039f78a2",
+    "luna-rs/crates/luna-borrowck/tests/fuzz_effect.rs": "58f354c35c6cf8efd7a01534e4bb47c8ef325def7ee1cae686de00646861c996",
+    "luna-rs/crates/luna-cli/tests/raw_slice_provenance_cli.rs": "c014f9ab15505a10a9a44be3c6cc634bf4b31ec814e7b03862e1478b54660062",
+    "luna-rs/crates/luna-driver/src/lib.rs": "ca5bd404f5811be41d86e92c19b92e7f2c67d7789816d606aa78d3656112eb30",
+    "luna-rs/crates/luna-driver/src/metadata_builder.rs": "9cd0f448f0b3630414736749f5573a049994711c90a4be275cf24b9749c42aa4",
+    "luna-rs/crates/luna-llib/src/format.rs": "a178b38e66e00b207f5a5c2caf61178474a1d221ed50c19477cefc1b47c58f5a",
+    "luna-rs/crates/luna-llib/src/metadata.rs": "4ad02e88327398337dd08274e442d15afed30374f8fdc92172bb7420ca9f1ec9",
+    "luna-rs/crates/luna-llib/src/reader.rs": "1465ff974fd1c5c7d922ff32ad3a7d652a1ed4bffbe0891e6172fcc42eb61433",
+    "luna-rs/crates/luna-semantic/src/lib.rs": "23cd1e7648ec5c0bd0c9e9ce36c7d12a6550dd3a8ced1d20692090991d1bc882",
+    "luna-rs/crates/luna-semantic/src/resolver.rs": "9532c72d2413a978b7ee1c0a69dbd3bd306abe7a1442fc97cc7b7da9da2edff0",
+    "luna-rs/libs/external/alloc/string.ln": "79d095ba982328f0d20c94c4785ffc0435619e474153cfb3487707a065959e2c",
+    "tests/luna/language/raw_slice_contract/callback_scalar_native.ln": "bcc0c55e02dfb883e7c518a70b38edc5a11dad597bba2e47abc6a0f80dc44842",
+    "tests/luna/language/raw_slice_contract/provider.ln": "56d9ae287192bd488bd6997d91004c4ac8b019c433ac0caf43cac0f6426b25df",
+    "tests/luna/language/raw_slice_contract/slice_middle_conflict.ln": "429e97fb34d6321f6452d3a4f9558e2813079705a10873e18d1000158735d6c5",
+    "tests/luna/language/raw_slice_contract/slice_offset_extent_conflict.ln": "7c137fbc12c064979a2b041d496fe7a979fb4bd6ff8c788a21db8287bdb292c0",
+    "tests/luna/language/raw_slice_contract/unknown_origin_callback_argument_conflict.ln": "aca5b2a80ef5fc452a2120ecf05d96d094f2fb7770f8fdfa433068dab39af426",
+    "tests/luna/language/raw_slice_contract/unknown_origin_callback_conflict.ln": "e84bc688b74076095674620248a8f1c64a7c527d126b1bc1a0b9a7b781d1cb39",
+    "tests/luna/language/raw_slice_contract/unknown_origin_callback_read.ln": "e5fa3d0046747b03f2410acbf2cb3d3d381ae1472e090314c9113fc5ec3f3087",
+    "tests/luna/language/raw_slice_contract/unknown_origin_conflict.ln": "ef251c4ae4a7445b544f8d5fa4a421e239e3d5704109d871dbbdd112533978ee",
+    "tests/luna/language/raw_slice_contract/unknown_origin_escape.ln": "aab0f9509ec3d5ae60b714dd4819a127b5b52bf7324db97a500cce40ad0a82c6",
+    "tests/luna/language/raw_slice_contract/unknown_origin_ffi_conflict.ln": "c38b9a6774624159a4b54690694e13e20a2562869887566d4c969595546dea7d",
+    "tests/luna/language/raw_slice_contract/unknown_origin_helper_conflict.ln": "57c2e5e5d95bdcb017797818911705966f86a4a05da91e381dcd8582957d627f",
+    "tests/luna/language/raw_slice_contract/unknown_origin_local.ln": "d80091821aaa38cb6734f30538a7128ff4a48675980ad15828be2f7312173319",
+    "tests/luna/language/raw_slice_contract/view_callback_conflict.ln": "b7b9ba2b92cc25ebaccabf5e44fae61d777bd2aa5a9a9c870a61c215ca08bbc5",
+    "tests/luna/language/raw_slice_contract/view_callback_native.ln": "84f0c53fcd50eb6a621129df797960cf6fd70bc0fb05cf20599478d193dac08b",
+    "tests/luna/language/raw_slice_contract/view_direct_conflict.ln": "7c1e962716e92ee650ed459139c101752f2ce5108e9fac82b4c01c0a55c4fce4",
+    "tests/luna/language/raw_slice_contract/view_generic_conflict.ln": "121888c3be7612ac877cfb80f5b60f2e034d673b0d5ba9fabc3ad998cf3d507d",
+    "tests/luna/language/raw_slice_contract/view_mixed_sources_conflict.ln": "dee6c1af216ed1a37158063ca4cdba2d417a978a3086e8bfce0606369ebbdb73",
+    "tests/luna/language/raw_slice_contract/view_native.ln": "9404e71c6c94b2afc9083d59aa7bb2472ed78bf120a483bbd5f0ad620147e371",
+    "tests/luna/stdlib/string_views/bytes_conflict.ln": "393fd717f48754b901d29b2c13197bd06fee6c2448e08d5e02e7498471358ed4",
+    "tests/luna/stdlib/string_views/bytes_escape.ln": "d0c896b64bebdd124ea36110164cc6f2f7101a8a563e49d99b5fa8d9c6c18a9b",
+    "tests/luna/stdlib/string_views/native.ln": "f44254e9b093b3fb5538ac92a95a1572264db2179f36dbc75116da358c0c22a4",
+    "tests/luna/stdlib/string_views/owner_move_conflict.ln": "fc63858cb800122ff5d648e911308b4a2cc7f03621934024888ba934f5b4e6d6",
+    "tests/luna/stdlib/string_views/raw_constructor_requires_unsafe.ln": "8d888233bd791c759f63f191eb3d9987497cd14fbf0ad6dc05d142419640d801",
+    "tests/luna/stdlib/string_views/raw_method_requires_unsafe.ln": "7c5b82646b66a694dd502f05015956cfd25586969dfc64498e3bf0d8d4e438d3"
+  },
+  "cli_sha256": "ea6770a0619dda064593f6fa8affd998a732cb8d6ae13a67f86ac1858503a90e",
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "source_snapshot_sha256": "092724c8ee61fb098aaf4c55932721622c8eec9ed90cb6c7b6c4fda3d9493c14",
+  "snapshot_scope": "changed production files, fixtures and maintained skills; base plus snapshot reconstructs candidate; docs not in executable source pin",
+  "protocol": 14,
+  "metadata": 7,
+  "file": 2,
+  "mvir": 4,
+  "rust_host": "x86_64-pc-windows-msvc",
+  "luna_target": "x86_64-pc-windows-gnu",
+  "llvm": "18",
+  "focused_commands": [
+    {
+      "name": "sysroot",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "run",
+        "-p",
+        "luna-cli",
+        "--",
+        "build-sysroot",
+        "--quiet"
+      ],
+      "exit": 0,
+      "log": "raw-slice-verified-sysroot.txt",
+      "sha256": "f4ced5e6a37c4e70d9e59f3fe409b0b24d143a69fce8d7c27d145aee19709edb"
+    },
+    {
+      "name": "internal",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "luna-semantic",
+        "-p",
+        "luna-borrowck",
+        "-p",
+        "luna-llib"
+      ],
+      "exit": 0,
+      "log": "raw-slice-verified-internal.txt",
+      "sha256": "51df4b1be7b9c6094c0ce2a78abf7339c9d71afe1f8e5711f70b6ae7ec4cbdc0"
+    },
+    {
+      "name": "driver",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "luna-driver",
+        "--test",
+        "compiler_gap_c_gap_12_safe_loan_effect_tests",
+        "--test",
+        "raw_pointer_ffi_call_semantics_tests",
+        "--test",
+        "test_strict_artifact_rejection",
+        "--test",
+        "test_sysroot_build_invariants",
+        "--",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "log": "raw-slice-verified-driver.txt",
+      "sha256": "77b725a0301d32ed3ef766d1c000060d3fdeee839f5b8071af3e0fa7871b4b0d"
+    },
+    {
+      "name": "memory-cli",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "luna-cli",
+        "--test",
+        "memory_intrinsic_identity_cli",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "log": "raw-slice-verified-memory-cli.txt",
+      "sha256": "2313a7547ad29e762f44179902fef8b7fda89cd7812028b92c1456f3f17e96f7"
+    },
+    {
+      "name": "views-cli",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "-p",
+        "luna-cli",
+        "--test",
+        "raw_slice_provenance_cli",
+        "--",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit": 0,
+      "log": "raw-slice-verified-views-cli.txt",
+      "sha256": "e89590efefa08efb9295ca5372d527879823880207b393b192fa618b8c91e000"
+    }
+  ],
+  "internal_counts": {
+    "passed": 273,
+    "failed": 0,
+    "ignored": 0
+  },
+  "views_native_observations": 12,
+  "views_typed_rejections": 68,
+  "memory_native_observations": 12,
+  "memory_typed_rejections": 88,
+  "logs": [
+    {
+      "file": "raw-slice-access-effects-final.txt.gz",
+      "raw_sha256": "f3c44abcb5f34c7cd6ad9a3eb6b7f58b37e24edbd673c280e11c886b0b1322b9",
+      "gzip_sha256": "e8ea0154a7d3cba42e32a9ed01985fbf4ff8ccb743a30797f0a33d35edd3ed46"
+    },
+    {
+      "file": "raw-slice-access.txt.gz",
+      "raw_sha256": "5d4d3620508ea9d1ab97495476eb6d4954e6214cee36565d04c8c817bf29594d",
+      "gzip_sha256": "ca01437cea3d45bf3df9d7a41e2245e208a4dddab019e196076512f1195a01c1"
+    },
+    {
+      "file": "raw-slice-call-effects.txt.gz",
+      "raw_sha256": "06cfa91857b29d9d26da0acf3181c7d09224e0d4b4ba8687bc425da07eb76061",
+      "gzip_sha256": "e0d841fac48bf6f088f6fba33a04e7f5ba23e1abd9fca4449ca1a7122ae85275"
+    },
+    {
+      "file": "raw-slice-canonical-sysroot.txt.gz",
+      "raw_sha256": "5cc49ba74f34489b0b3133bcc28c24f558f14d08473e99bda7d7e46fe6d6e816",
+      "gzip_sha256": "aa90b5e9f60981fd927dae0b2f20153e10bf907029c283848bde7e08edc2cf21"
+    },
+    {
+      "file": "raw-slice-carrier.txt.gz",
+      "raw_sha256": "402fd69620b753c90130be7349c22460706fc0f54838f89455d1bec156328be0",
+      "gzip_sha256": "68185782e082b325fb968c3222877d98f3061335dffa4f42bee2d43cd78060f9"
+    },
+    {
+      "file": "raw-slice-doc-validation.txt.gz",
+      "raw_sha256": "5b990749e626de08dedcee4087a3fc52a05f12d8001db2b2863f82dde247ead8",
+      "gzip_sha256": "b8dedaad3e033d7ce2d95ef54afb75b10e742215f38ca072814ed9018c95c135"
+    },
+    {
+      "file": "raw-slice-ffi-fixture-syntax-failure.txt.gz",
+      "raw_sha256": "ebc23a40c20002eae7685fb4ed1d35d00d5bab0cc2e7c622efe8280736233e31",
+      "gzip_sha256": "cd21c1a0092bbf818463455aa14a386da0615807199d4e806407b9374a770706"
+    },
+    {
+      "file": "raw-slice-final-cli.txt.gz",
+      "raw_sha256": "41f40409d5115806f1577b403d40672621d2330e8f490f4eeb8cc84e679d0160",
+      "gzip_sha256": "0dca00a255dd089542c6ee63d89e1dc929b22621304153f3e5df022013c425a3"
+    },
+    {
+      "file": "raw-slice-internals.txt.gz",
+      "raw_sha256": "9cabd7ed5c40b91a76518f89af4d6364733a2156f24f387f73b403ed264436f8",
+      "gzip_sha256": "7de02f653ec0df09769266e447380236a4531881341b73540e3e006033cafc33"
+    },
+    {
+      "file": "raw-slice-move-region.txt.gz",
+      "raw_sha256": "33e7773120c3e74ea2f86dcb36788ed158a8152751c7989fe856f932678c1cec",
+      "gzip_sha256": "3335c647264d8622ce05ecaa48ffd1bc113eb473690f8f1ab7bca50e49a0e22a"
+    },
+    {
+      "file": "raw-slice-offset-extent-before-check.txt.gz",
+      "raw_sha256": "85e6f60a0c744ea83ed76bef454e9b9af84c32f9f04343bebda80c5d92a29169",
+      "gzip_sha256": "c37bc3455ac17769847b4ba5afe49b6c75b19ef2bba9a9258cf03b1c3eb81698"
+    },
+    {
+      "file": "raw-slice-opaque-argument-after-check.txt.gz",
+      "raw_sha256": "e2ba4063be8fce14346d7216b2a5cdb7e15c7e3c06eabaeb5bcc447e86cf2425",
+      "gzip_sha256": "f01726c36e4e648a90dbf87c42d4729934770d3fa3f91bd860c878932ca701b7"
+    },
+    {
+      "file": "raw-slice-opaque-read-after-check.txt.gz",
+      "raw_sha256": "2cda508e1d24229e2c019b0434ad302c8a8e149d47cca58787b193f63bdeb519",
+      "gzip_sha256": "a63860efb976475b7d82feb1e2a43352531fb6520576dace8eb6a9e4bf99e5b1"
+    },
+    {
+      "file": "raw-slice-opaque-ref-control-before-check.txt.gz",
+      "raw_sha256": "31e50524a159f15c552fce9e78f155e1404dc219f5ae857ffe15c3816974a486",
+      "gzip_sha256": "9fa1135d4787be7a7ae189255686ca975be7cddbbbb4b7490a96e89883166e48"
+    },
+    {
+      "file": "raw-slice-opaque-scalar-control-before-check.txt.gz",
+      "raw_sha256": "31e50524a159f15c552fce9e78f155e1404dc219f5ae857ffe15c3816974a486",
+      "gzip_sha256": "9fa1135d4787be7a7ae189255686ca975be7cddbbbb4b7490a96e89883166e48"
+    },
+    {
+      "file": "raw-slice-opaque-view-after-check.txt.gz",
+      "raw_sha256": "3a324ae0e4f0d3ab9777d6b45901166255e49f1a0b20008bee1a59193475e714",
+      "gzip_sha256": "4132c590b07e9616c9a4556c30ff58b95d539a742742ee2be7d378a36751de8c"
+    },
+    {
+      "file": "raw-slice-opaque-view-before-check.txt.gz",
+      "raw_sha256": "5bde678b15799e15e20e3359bcf792c88b40c52fb7ef4ef1cfd4e8d1cb0a7878",
+      "gzip_sha256": "dfceb8766e95c0aa75ab578433cdf87ea18c5c0dc62ed06746d9afaf00f95046"
+    },
+    {
+      "file": "raw-slice-opaque-write-after-check.txt.gz",
+      "raw_sha256": "a23d0b8f1a83743e3fe43a57f8038b6f60dac91cc75f2cf48f793880fac16b80",
+      "gzip_sha256": "c8854831735db441beba5b57a35905d60aa0e5069db7e0f7c1faefe52be08978"
+    },
+    {
+      "file": "raw-slice-opaque-write-before-check.txt.gz",
+      "raw_sha256": "2cda508e1d24229e2c019b0434ad302c8a8e149d47cca58787b193f63bdeb519",
+      "gzip_sha256": "a63860efb976475b7d82feb1e2a43352531fb6520576dace8eb6a9e4bf99e5b1"
+    },
+    {
+      "file": "raw-slice-pre-opaque-driver.txt.gz",
+      "raw_sha256": "0642ac61f8efaba345474108d9865a67d33c67a5179574e78f9a786c52f5b9d9",
+      "gzip_sha256": "a088f2e36789aa677345f48595b002936c537b8904af2a5ed8d33af0a03eba8d"
+    },
+    {
+      "file": "raw-slice-pre-opaque-internal.txt.gz",
+      "raw_sha256": "a1838d1275ba8e3e67417c5a51f6ded39e32fa2a4c6b500754f1ed6a1ba741b8",
+      "gzip_sha256": "eb8148ed038f0b8319f928bf134d30a891b8ae575f0a96a525f91453661bb25e"
+    },
+    {
+      "file": "raw-slice-pre-opaque-memory-cli.txt.gz",
+      "raw_sha256": "df3d2cbdb58741a6704b5f4e4160a0f2fcb6f214668fb3b59696efae77bb946d",
+      "gzip_sha256": "30e93a4739d45110b969e4faf67b1a8ea9a222e1f0e48551a5d7de59b59da170"
+    },
+    {
+      "file": "raw-slice-pre-opaque-return-driver.txt.gz",
+      "raw_sha256": "a90e10db1f16428aa075d3af58f8c782e75c07bd7b6412e3ba6dabe655a52f9e",
+      "gzip_sha256": "8ac8cef47fd0a944e224816bb6ad19c1cab7255821f2106ffc2ad4dfd45f2e30"
+    },
+    {
+      "file": "raw-slice-pre-opaque-return-internal.txt.gz",
+      "raw_sha256": "8dc2c3247ba6f98fa97e892554ca99cef1d08628dd6020f6498939afc91e850f",
+      "gzip_sha256": "a71f64ca3b22e3d38ea18673497f0ced845eb957a46167d765d375d35733aea1"
+    },
+    {
+      "file": "raw-slice-pre-opaque-return-memory-cli.txt.gz",
+      "raw_sha256": "b714f72ffd4bfd1d23441d989f6ae07b17e00b6d8370caea08ac7fe64e0f72f2",
+      "gzip_sha256": "cb764560bbd3cfc566703d0a3866beb0498ed528f5435a0587531c40cd1a6f59"
+    },
+    {
+      "file": "raw-slice-pre-opaque-return-sysroot.txt.gz",
+      "raw_sha256": "ea1f817f50f4821de2b802fb535c51b2b6c8331fe48a4d359f1eb1b595b8aad0",
+      "gzip_sha256": "042943b53cba14783dda7974c254383cebdaf4b0da8f567b076a35258b159fc5"
+    },
+    {
+      "file": "raw-slice-pre-opaque-return-views-cli.txt.gz",
+      "raw_sha256": "6466040442bb4d19960192755dda04f5823c2c79caff066ced4673c9430ec278",
+      "gzip_sha256": "ccb30082eb9b823f62065f1dee22b338d48c9faaabcf58fbd23cb45306010571"
+    },
+    {
+      "file": "raw-slice-pre-opaque-sysroot.txt.gz",
+      "raw_sha256": "8abb7b3a5ed84b226567b4ae608dea56c5ece4b7bb074cb78eec4f115097fc96",
+      "gzip_sha256": "2923b24f5c1f78e249a4786026188296b2d84db6a911c2e21071f9839c07a472"
+    },
+    {
+      "file": "raw-slice-pre-opaque-views-cli.txt.gz",
+      "raw_sha256": "bcad14d1370891ad06f6ac91fd71fa526a306dbfab9ad66f6fc5adb160a83118",
+      "gzip_sha256": "737c6d9021a6ff933b72e19af8b1e5ef74670d45710f1293cf11642addb6565a"
+    },
+    {
+      "file": "raw-slice-pre-scalar-controls-views-cli.txt.gz",
+      "raw_sha256": "8e228f1f763da6ea2981f0cd28931c30aace4da221b6463d97a71e26f9cecddd",
+      "gzip_sha256": "e2cf66b146809f9cb4fbd6e88b1024ee6e5de64f0692674b1e72b18910afe0e4"
+    },
+    {
+      "file": "raw-slice-provenance-first.txt.gz",
+      "raw_sha256": "fbd9ae3ed1d3d3fa0dcaa5eb7fa4aae728a8070125731d3b3981d76408361688",
+      "gzip_sha256": "d21dfb2314f38170229a46a74694fd16ec1116b3b1b5f80ed3e964cdddb40d29"
+    },
+    {
+      "file": "raw-slice-provenance-trace.txt.gz",
+      "raw_sha256": "8428b0fe40634a12ceee3652b91df346baacb8e55e908ca70ae1a18ab7e92a7f",
+      "gzip_sha256": "7f71015acd3fbe66e7ec5ac7838ce81e0eb3f05b065a903c19968f8fc9356485"
+    },
+    {
+      "file": "raw-slice-semantic-borrowck.txt.gz",
+      "raw_sha256": "c7269445ec3a7a29640959fd7298b1853aecc1428d3d7b2d176b4967853d1989",
+      "gzip_sha256": "b44c41d2e043a6ce2f747e99428f196f3b3030b45677540e2af2eaab2b3444b2"
+    },
+    {
+      "file": "raw-slice-verified-driver.txt.gz",
+      "raw_sha256": "77b725a0301d32ed3ef766d1c000060d3fdeee839f5b8071af3e0fa7871b4b0d",
+      "gzip_sha256": "ead5df05873f6c2f17de4046ff9e2875c76fff2aae2eae910b3d34497aa5b2eb"
+    },
+    {
+      "file": "raw-slice-verified-internal.txt.gz",
+      "raw_sha256": "51df4b1be7b9c6094c0ce2a78abf7339c9d71afe1f8e5711f70b6ae7ec4cbdc0",
+      "gzip_sha256": "523ace9dbf991a105a424611db686cb4ac027677b1b8e5537fd5ea2b7b6de67d"
+    },
+    {
+      "file": "raw-slice-verified-memory-cli.txt.gz",
+      "raw_sha256": "2313a7547ad29e762f44179902fef8b7fda89cd7812028b92c1456f3f17e96f7",
+      "gzip_sha256": "410c81a2c6e92a74ed99628cbd096570731cc2fb8fe2418ffcccb4f18d1bf94f"
+    },
+    {
+      "file": "raw-slice-verified-sysroot.txt.gz",
+      "raw_sha256": "f4ced5e6a37c4e70d9e59f3fe409b0b24d143a69fce8d7c27d145aee19709edb",
+      "gzip_sha256": "3e99236c668cfb7231ad310d5afa5fc6cd791ab1b83c3ea211c1570f749a31a2"
+    },
+    {
+      "file": "raw-slice-verified-views-cli.txt.gz",
+      "raw_sha256": "e89590efefa08efb9295ca5372d527879823880207b393b192fa618b8c91e000",
+      "gzip_sha256": "3c92a38361f57a7e7e9b2439fb0cfa6fb2db5e44abf6e18ffb2e7cc3eaedff9c"
+    },
+    {
+      "file": "raw-slice-cstr-before-observations.json.gz",
+      "raw_sha256": "72f8c004697967acf83a24bc4640fd318d2391934bd51a796cff992483846591",
+      "gzip_sha256": "4935ae5d8999fab562b9a23b03d2ec9cc286b2d00610e27c7f03e08662776cac"
+    },
+    {
+      "file": "raw-slice-cstr-before-safe_backing_mutation-build.txt.gz",
+      "raw_sha256": "a85e5e3e91872f7094d60170cf9b59b5a22e0da959113bbbff56f1d9ae16ea05",
+      "gzip_sha256": "cb3e9d503f5ebea2cbfb932c7d52b8620c7114f0a2874cb839382f97bb363fcc"
+    },
+    {
+      "file": "raw-slice-cstr-before-safe_backing_mutation-check.txt.gz",
+      "raw_sha256": "a85e5e3e91872f7094d60170cf9b59b5a22e0da959113bbbff56f1d9ae16ea05",
+      "gzip_sha256": "cb3e9d503f5ebea2cbfb932c7d52b8620c7114f0a2874cb839382f97bb363fcc"
+    },
+    {
+      "file": "raw-slice-cstr-before-safe_backing_mutation.ln.gz",
+      "raw_sha256": "79aa74be913effe55e47b7ea6db109243d99e6082ef60add70bd315f8c45f718",
+      "gzip_sha256": "802fac24bf0c21e1c715b94c8ecd6bbfbde25c2e94044d03a97f19d42d05f057"
+    },
+    {
+      "file": "raw-slice-cstr-before-safe_null_constructor-build.txt.gz",
+      "raw_sha256": "a85e5e3e91872f7094d60170cf9b59b5a22e0da959113bbbff56f1d9ae16ea05",
+      "gzip_sha256": "cb3e9d503f5ebea2cbfb932c7d52b8620c7114f0a2874cb839382f97bb363fcc"
+    },
+    {
+      "file": "raw-slice-cstr-before-safe_null_constructor-check.txt.gz",
+      "raw_sha256": "a85e5e3e91872f7094d60170cf9b59b5a22e0da959113bbbff56f1d9ae16ea05",
+      "gzip_sha256": "cb3e9d503f5ebea2cbfb932c7d52b8620c7114f0a2874cb839382f97bb363fcc"
+    },
+    {
+      "file": "raw-slice-cstr-before-safe_null_constructor.ln.gz",
+      "raw_sha256": "8cdffc317c4c778a225c1b395a079f35c6dba42442129efe931a56aee207efd2",
+      "gzip_sha256": "6bcc8b23f32b8dbc91f5f3d9457900c06b73d49ad9af78b9aa0fbfa3b8a9a3c1"
+    },
+    {
+      "file": "raw-slice-mixed-view-before-check-valid.txt.gz",
+      "raw_sha256": "5bde678b15799e15e20e3359bcf792c88b40c52fb7ef4ef1cfd4e8d1cb0a7878",
+      "gzip_sha256": "dfceb8766e95c0aa75ab578433cdf87ea18c5c0dc62ed06746d9afaf00f95046"
+    },
+    {
+      "file": "raw-slice-mixed-view-after-check.txt.gz",
+      "raw_sha256": "8d2278e5af2e2f401d6c5367c7440f39d7e54e8299476ab04af55516bb650c70",
+      "gzip_sha256": "8a5210534a68d20bd0cd39f5166800187614e8416e6da43284d5283a97fc6e06"
+    },
+    {
+      "file": "raw-slice-mixed-effects-internal.txt.gz",
+      "raw_sha256": "7efaeddd8acae05690a0c56ba102e6b58748b9d9d1261e4516ee71bd3ce8e98c",
+      "gzip_sha256": "779b1d383eb585ceb0b002b79d9d099a34f1efd769be0fdd856bdfe60c3a73aa"
+    },
+    {
+      "file": "workspace-raw-slice-overlap-failure.txt.gz",
+      "raw_sha256": "45e2f0fdf041f912bf502103aa52911a297f5c1acb7d721b494b6f56b3eb3a52",
+      "gzip_sha256": "cd02b76808a99064bd384475029eea2b954adaa4d2bc0fb34eb4cd8c89a3c2f2"
+    }
+  ],
+  "workspace_status": "pending sequential full workspace run; overlap build failure is preserved, not a semantic result",
+  "release_status": "NOT READY: closure cleanup, adopted call arguments and broader R0-R5 gates remain open"
+}

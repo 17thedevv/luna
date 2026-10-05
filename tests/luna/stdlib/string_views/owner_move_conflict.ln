@@ -1,0 +1,1 @@
+import <string>; fn main() { dec owned = std::cstring_new("hello").unwrap(); dec view = owned.as_c_str(); dec moved = owned; dec byte = view.to_bytes()[0]; }
