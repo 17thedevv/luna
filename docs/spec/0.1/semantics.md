@@ -136,6 +136,16 @@ A closure borrowing local data must not escape beyond that referent. A moved
 capture transfers ownership; it does not change an unsafe address into a valid
 safe loan. Callable representation is not the source ownership contract.
 
+A closure whose call consumes an owned capture from its environment is a
+one-shot callable: invoking it transfers and consumes the callable and its
+environment (FnOnce semantics). Calling or otherwise using such a closure after
+its callable environment has been consumed MUST be rejected at compile time as
+use-after-move, using the existing canonical move diagnostic; no new diagnostic
+code is introduced, and the condition is not deferred to a runtime failure. A
+closure that is never called still owns its captures, and the whole environment
+MUST be destroyed when the closure goes out of scope, dropping each remaining
+initialized owned capture exactly once.
+
 `const` and `comptime` retain distinct admission rules but share MVIR evaluation.
 Under [MODULE-CONST-STORAGE-v1](module-const-storage-v1.md), a shared reference
 to a module-level constant designates immutable storage lasting for the
