@@ -24,6 +24,12 @@ fn generic_owned_values_drop_once_across_control_flow_and_provider_modes() {
         "future_initial_cancel",
         "closure_borrow_scoped",
         "closure_capture",
+        "closure_env_unused",
+        "closure_env_never_consumed",
+        "closure_env_conditional_move",
+        "closure_env_early_return",
+        "closure_env_borrow_only",
+        "closure_env_multiple_owned",
     ];
     let negatives = [
         ("use_after_move", "E3001"),
@@ -36,6 +42,8 @@ fn generic_owned_values_drop_once_across_control_flow_and_provider_modes() {
         ("closure_borrow_escape", "E3005"),
         ("closure_borrow_local_escape", "E3005"),
         ("closure_borrow_move_escape", "E3005"),
+        ("closure_env_double_call", "E3001"),
+        ("closure_env_use_after_call", "E3001"),
     ];
     let mut failures = Vec::new();
     for (mode, root) in [("source", &modes.source), ("artifact", &modes.artifact)] {

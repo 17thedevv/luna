@@ -511,6 +511,10 @@ impl<'a> MvirGenerator<'a> {
     }
 
     fn generate_drop_glue(&mut self, identity: &luna_semantic::CanonicalInstanceIdentity) {
+        if let luna_semantic::CanonicalInstanceKind::ClosureDropGlue { env_ty } = identity.kind {
+            self.generate_closure_drop_glue(identity, env_ty);
+            return;
+        }
         let (struct_sym, concrete_ty) = match identity.kind {
             luna_semantic::CanonicalInstanceKind::DropGlue { struct_sym, concrete_ty } => (struct_sym, concrete_ty),
             _ => return,
@@ -720,10 +724,80 @@ impl<'a> MvirGenerator<'a> {
         }
     }
 
+    /// Generate `<closure-drop glue>(closure_ptr)`: load the environment pointer
+    /// from the `{ code, env }` closure record, drop the owned captures the
+    /// environment still holds, then release the environment allocation.
+    fn generate_closure_drop_glue(&mut self, identity: &luna_semantic::CanonicalInstanceIdentity, env_ty: luna_semantic::SemanticTypeId) {
+        let glue_fn_name = identity.symbol_name(&self.ctx.types, &self.ctx.symbol_table, "closure");
+        if self.module.functions.iter().any(|f| f.name.name == glue_fn_name) {
+            return;
+        }
+        let Some(ptr_ty) = self.ctx.closure_value_ptr_ty else { return; };
+        let func = Function {
+            name: GlobalId { name: glue_fn_name.clone(), symbol_id: None },
+            is_extern: false,
+            is_async: false,
+            arg_count: 1,
+            link_name: None,
+            param_types: vec![ptr_ty],
+            ret_ty: luna_semantic::SemanticTypeId(0),
+            lifetime_info: Default::default(),
+            blocks: Vec::new(),
+            values: Vec::new(),
+        };
+        self.current_function = Some(func);
+        self.current_block = None;
+        self.locals.clear();
+        self.known_function_values.clear();
+        self.lexical_scopes.clear();
+        self.temporary_drop_scopes.clear();
+        self.loop_scopes.clear();
+        self.loop_break_targets.clear();
+        self.loop_continue_targets.clear();
+        self.push_scope();
+        self.next_label_id = 0;
+        let entry_label = self.new_label("entry");
+        self.start_block(entry_label);
+
+        let alloc_val = self.push_inst(Instruction::Alloca, ptr_ty);
+        let obj_ptr = self.push_inst(Instruction::Load { ptr: Operand::Value(alloc_val) }, ptr_ty);
+        // The environment pointer is field 1 of the { code, env } closure record.
+        let env_field_ty = self.find_pointer_type(env_ty);
+        let env_field = self.push_inst(Instruction::FieldPtr {
+            base: Operand::Value(obj_ptr),
+            field_idx: 1,
+            field_name: None,
+        }, env_field_ty);
+        let env_ptr = self.push_inst(Instruction::Load { ptr: Operand::Value(env_field) }, env_field_ty);
+
+        if let luna_semantic::SemanticType::Tuple(fields) = self.ctx.types.get(env_ty).clone() {
+            for (idx, field_ty) in fields.iter().enumerate().rev() {
+                if self.ctx.needs_drop(*field_ty) {
+                    let field_ptr_ty = self.find_pointer_type(*field_ty);
+                    let field_ptr = self.push_inst(Instruction::FieldPtr {
+                        base: Operand::Value(env_ptr),
+                        field_idx: idx as u32,
+                        field_name: None,
+                    }, field_ptr_ty);
+                    let callee = self.get_drop_glue_global_id(*field_ty);
+                    self.push_inst(Instruction::Drop { value: Operand::Value(field_ptr), ty: *field_ty, callee }, *field_ty);
+                }
+            }
+        }
+        self.push_inst(Instruction::HeapFree { value: Operand::Value(env_ptr) }, luna_semantic::SemanticTypeId(0));
+
+        self.terminate_block(Terminator::Ret { value: None });
+        if let Some(block) = self.current_block.take() {
+            self.current_function.as_mut().unwrap().blocks.push(block);
+        }
+        if let Some(func) = self.current_function.take() {
+            self.module.functions.push(func);
+        }
+    }
+
     pub fn current_module(&self) -> &Module {
         &self.module
     }
-
     pub fn generate_expr_as_function(&mut self, expr_id: &luna_ast::ExprId, ret_ty: luna_semantic::SemanticTypeId) -> Function {
         let global_id = GlobalId {
             name: format!("__comptime_eval_{}", expr_id.0),
@@ -840,6 +914,14 @@ impl<'a> MvirGenerator<'a> {
     fn emit_place_cleanup(&mut self, place: Operand, ty: luna_semantic::SemanticTypeId, span: Option<luna_common::Span>) {
         let ty = self.ctx.types.resolve(ty);
         if !self.ctx.needs_drop(ty) { return; }
+        if let luna_semantic::SemanticType::Closure(..) = self.ctx.types.get(ty) {
+            // Closure destruction is an ordinary whole-place Drop backed by a
+            // closure-environment drop glue. Never read the closure place here:
+            // it may have been consumed (moved) by a call.
+            let callee = self.get_drop_glue_global_id(ty);
+            self.push_inst_span(Instruction::Drop { value: place, callee, ty }, ty, span);
+            return;
+        }
         let fields = match self.ctx.types.get(ty).clone() {
             luna_semantic::SemanticType::Struct(symbol, _, fields)
                 if !self.ctx.tables.drop_impls.contains_key(&symbol) => Some(fields),
@@ -1414,13 +1496,48 @@ impl<'a> MvirGenerator<'a> {
                         luna_semantic::semantic_tables::CaptureMode::MutableBorrow => {
                             self.push_inst(Instruction::Load { ptr: Operand::Value(field_ptr) }, binding.env_ty)
                         }
-                        luna_semantic::semantic_tables::CaptureMode::Move => field_ptr,
+                        luna_semantic::semantic_tables::CaptureMode::Move => {
+                            // A consumed invocation owns its environment. Move each
+                            // owned capture into an ordinary body local so the
+                            // existing path-dependent whole-local cleanup destroys
+                            // whatever is still initialized on every exit path.
+                            let loaded = self.push_inst(Instruction::Load { ptr: Operand::Value(field_ptr) }, binding.ty);
+                            let local = self.push_inst(Instruction::Alloca, binding.ty);
+                            self.push_inst(Instruction::Store { ptr: Operand::Value(local), value: Operand::Value(loaded) }, binding.ty);
+                            self.push_inst(Instruction::MarkInit { value: Operand::Value(local) }, binding.ty);
+                            self.lexical_scopes.last_mut().unwrap().push(binding.symbol);
+                            local
+                        }
                     };
                     self.locals.insert(binding.symbol, val);
                 }
             }
                         
             self.generate_fn_body(body, ret_ty_id);
+
+            // A consuming invocation owns its environment: release the heap
+            // environment allocation on every exit path, after the capture
+            // cleanup above. Exactly one HeapFree runs per executed path.
+            let consuming = closure_bindings.iter().any(|binding| {
+                binding.mode == luna_semantic::semantic_tables::CaptureMode::Move && self.ctx.needs_drop(binding.ty)
+            });
+            if consuming {
+                if let Some(mut func) = self.current_function.take() {
+                    for block in func.blocks.iter_mut() {
+                        if matches!(block.terminator, Some(Terminator::Ret { .. })) {
+                            let id = crate::ValueId(func.values.len() as u32);
+                            func.values.push(crate::ValueData {
+                                inst: Instruction::HeapFree { value: Operand::Value(environment) },
+                                ty: luna_semantic::SemanticTypeId(0),
+                                span: None,
+                                origin: ValueOrigin::Temporary,
+                            });
+                            block.insts.push(id);
+                        }
+                    }
+                    self.current_function = Some(func);
+                }
+            }
 
         if let Some(func) = self.current_function.take() {
             self.module.functions.push(func);

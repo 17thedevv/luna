@@ -38,6 +38,12 @@ pub enum CanonicalInstanceKind {
         struct_sym: SymbolId,
         concrete_ty: SemanticTypeId,
     },
+    /// Destruction of a closure environment: extract the environment pointer,
+    /// drop the owned captures it still holds, then release the heap storage.
+    /// Identity is the structural environment tuple, never a source/session id.
+    ClosureDropGlue {
+        env_ty: SemanticTypeId,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -121,6 +127,9 @@ impl CanonicalInstanceIdentity {
             CanonicalInstanceKind::DropGlue { concrete_ty, .. } => {
                 crate::Mangler::mangle_drop_glue(types, symbol_table, concrete_ty)
             }
+            CanonicalInstanceKind::ClosureDropGlue { env_ty } => {
+                crate::Mangler::mangle_closure_drop_glue(types, symbol_table, env_ty)
+            }
         }
     }
 
@@ -150,6 +159,9 @@ impl CanonicalInstanceIdentity {
             }
             CanonicalInstanceKind::DropGlue { concrete_ty, .. } => {
                 crate::Mangler::mangle_drop_glue(types, symbol_table, concrete_ty)
+            }
+            CanonicalInstanceKind::ClosureDropGlue { env_ty } => {
+                crate::Mangler::mangle_closure_drop_glue(types, symbol_table, env_ty)
             }
         }
     }
@@ -410,6 +422,22 @@ impl<'a> MonoCollector<'a> {
                 self.ctx.types.intern(SemanticType::Pointer(crate::ty::Mutability::Mutable, concrete_ty));
                 self.ctx.types.intern(SemanticType::Pointer(crate::ty::Mutability::Mutable, elem_ty));
                 self.discover_drop_obligations(elem_ty);
+            }
+            SemanticType::Closure(closure_expr, _, _) => {
+                // A closure owns its environment allocation. Its environment
+                // tuple encodes each capture's ownership (move -> the value type,
+                // borrow -> a pointer type), so the environment type alone
+                // determines the destruction plan.
+                if let Some(env_ty) = self.ctx.tables.closure_env_types.get(&closure_expr).copied() {
+                    let glue_id = CanonicalInstanceIdentity {
+                        kind: CanonicalInstanceKind::ClosureDropGlue { env_ty },
+                        subst: Vec::new(),
+                    };
+                    if !self.drop_glues.contains(&glue_id) {
+                        self.drop_glues.push(glue_id);
+                    }
+                    self.discover_drop_obligations(env_ty);
+                }
             }
             _ => {}
         }

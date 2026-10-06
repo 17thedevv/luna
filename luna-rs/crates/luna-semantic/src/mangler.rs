@@ -243,4 +243,16 @@ impl Mangler {
         let type_enc = Self::mangle_type(types, symbol_table, concrete_ty);
         format!("__luna_drop_glue_{}", type_enc)
     }
+
+    /// Mangle a closure-environment destructor: `__luna_closure_drop_glue_<env_type>`.
+    /// The identity is the structural environment tuple; it never embeds a
+    /// source expression or session id.
+    pub fn mangle_closure_drop_glue(
+        types: &TypeContext,
+        symbol_table: &SymbolTable,
+        env_ty: SemanticTypeId,
+    ) -> String {
+        let type_enc = Self::mangle_type(types, symbol_table, env_ty);
+        format!("__luna_closure_drop_glue_{}", type_enc)
+    }
 }
