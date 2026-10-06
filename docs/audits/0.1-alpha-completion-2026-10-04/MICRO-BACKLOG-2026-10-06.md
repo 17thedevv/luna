@@ -155,6 +155,25 @@ H31 audit child timeout · H32 thêm timeout · H33 reproduce StorageFull · H34
 
 Gate R0: mọi failure mới có reducer rõ; harness không nhiễm canonical state.
 
+### R0-H verdict — 2026-10-06
+
+```
+VERDICT: PASS / MEASURING_INSTRUMENT_ESTABLISHED
+REMAINING:
+- H28..H34 temp/process hardening  -> STATUS: DEFERRED_HYGIENE, BLOCKING: NO
+- H12 optional constant centralization -> deferred into VR-01..VR-10
+```
+
+- Provider-count oracle (R0-H01..H08): đã manifest/isolated-based, không còn hardcode
+  `36`/`35/36` (`count_extension`/`count_files_with_extension` + fresh/isolated sysroot).
+- Version oracle (R0-H09..H14): còn một assertion current-version tường minh
+  (`SEMANTIC_METADATA_VERSION == 7`); rejection version cũ do reader tests phủ.
+  Không refactor lúc này — sẽ xử lý trong VR-01..VR-10 khi version thành metadata 9.
+- Isolation (R0-H22..H27): whole-file/path/String parity dùng sysroot riêng.
+- Evidence: baseline workspace 197 target, chỉ 1 fail `generic_drop_cli` (A1) →
+  mọi suite liên quan R0-H PASS.
+- Nếu C1 reconcile xuất hiện hang/process leak: quay lại H28..H34 ngay.
+
 ## Wave 3 — R1 Ownership / Soundness
 
 ### A1 — Closure environment destruction
