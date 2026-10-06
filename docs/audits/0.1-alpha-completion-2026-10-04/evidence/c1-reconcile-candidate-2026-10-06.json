@@ -1,0 +1,69 @@
+{
+  "task": "C1 reconciliation (C1-R01..R30) on candidate codex/luna-0.1-alpha.1-candidate",
+  "date": "2026-10-06",
+  "base_sha": "3601d12e8ae81f001a47a5523b819e7728b85c54",
+  "candidate_branch": "codex/luna-0.1-alpha.1-candidate",
+  "candidate_head": "e679d560",
+  "c1_branch_tip": "2615b5f8410ea59a1d6a4a41ea182120b4d9ef75",
+  "merge_commit": "e679d560",
+  "merge_parents": ["7c8c8925", "2615b5f8"],
+  "ancestry": "merge-base(3601d12e, codex/call-arguments-0.1) = 3601d12e; C1 is 5 linear commits",
+  "c1_commits": [
+    "1b398714 feat(calls): bind named arguments and preserve evaluation order across artifacts",
+    "c0818477 fix(comptime): preserve concrete root call plans before early execution",
+    "f36a5abc fix(comptime): admit prepared programs through ordinary loan checks",
+    "ce417f19 feat(calls): check default declarations and preserve canonical binding identity",
+    "2615b5f8 feat(calls): execute synchronous defaults with concrete binder and lifetime plans"
+  ],
+  "version_transition": {
+    "compiler": "15 -> 16 (named binding) -> 17 (default AST) -> 19 (omitted-call bodies)",
+    "mvir": "4 -> 5 (portable default-entry lifetime)",
+    "metadata": "7 -> 8 (declaration parameter names) -> 9 (default contracts)",
+    "format": "2 (unchanged)"
+  },
+  "review_findings": {
+    "c0818477": "Generic: adds scoped MonoRoot (ctx.comptime_root, never artifact metadata); mono collector run on expr/stmt yields concrete call plans before early comptime eval; MVIR prefers comptime_root then tables. No stdlib-name branch.",
+    "f36a5abc": "Generic: driver-owned CheckedComptimeEngine runs verify_items_lifetime + validate_mvir_module + interprocedural borrow check + redundant-drop elimination before executing prepared comptime; adds ComptimeError::Diagnostics preserving typed codes/spans. Not named-arg-specific but required by C1's early evaluation."
+  },
+  "inventory": {
+    "named_arguments_fixtures": 33,
+    "default_arguments_fixtures": 39,
+    "comptime_loans_fixtures": 7,
+    "new_harnesses": ["named_arguments_cli", "default_arguments_cli", "default_omission_cli", "comptime_loans_cli", "namespace_alias_export_cli"]
+  },
+  "sysroot_rebuild": { "result": "PASS exit 0", "compiler_version": 19, "providers": 49 },
+  "c1_harnesses": {
+    "command": "cargo test -p luna-cli --test named_arguments_cli --test default_arguments_cli --test default_omission_cli --test comptime_loans_cli",
+    "exit_code": 0,
+    "results": { "comptime_loans_cli": "PASS", "default_arguments_cli": "PASS", "default_omission_cli": "PASS", "named_arguments_cli": "PASS" }
+  },
+  "baseline_workspace": { "targets": 197, "passed": 1315, "failed": 1, "ignored": 1, "exit_code": 101 },
+  "candidate_workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "exit_code": 101,
+    "targets": 203,
+    "passed": 1326,
+    "failed": 3,
+    "ignored": 1,
+    "storage_errors": 0,
+    "failing": [
+      "luna-cli --test generic_drop_cli (A1 closure_capture) -- EXPECTED, unchanged",
+      "luna-driver --test p2a_tests::test_case_15_comptime_pointer_escape_rejected -- NEW",
+      "luna-driver --test p2a_tests::test_case_19_comptime_use_of_moved_value -- NEW"
+    ]
+  },
+  "delta_vs_baseline": "+2 new failures in luna-driver::p2a_tests; all other baseline-green suites stay green; C1 harnesses green.",
+  "p2a_finding": {
+    "status": "OPEN — needs resolution before candidate acceptance",
+    "cause": "f36a5abc routes early comptime through ordinary loan checks, so comptime rejection now emits canonical typed diagnostics instead of the old comptime-specific message strings.",
+    "test_case_15": "input still rejected (success=false), but diagnostic is code LocalBorrowEscape message 'LocalBorrowEscape: Reference to local variable escapes function scope'; oracle looks for 'E_COMPTIME_POINTER_ESCAPE' or 'pointer escape'.",
+    "test_case_19": "input still rejected, but diagnostic is code UseAfterMove message 'Use of moved value %v5'; oracle looks for 'E_USE_OF_MOVED_VALUE' or lowercase 'use of moved value'.",
+    "note": "C1's only edit to p2a_tests.rs was an unrelated +1 line (lifetime_info field) in test_case_20; it did not update these two oracles.",
+    "decision_needed": "Accept unification (update oracles to canonical typed diagnostics, preserving rejection) OR preserve comptime-specific diagnostics (code change) OR maintainer decides."
+  },
+  "verdict": "CANDIDATE NOT ACCEPTED — A1 unchanged (expected), plus 2 new p2a oracle/behavior mismatches to resolve.",
+  "logs": {
+    "candidate_workspace": "scratch/workspace-candidate.log",
+    "c1_harnesses": "scratch/c1-harnesses.log"
+  }
+}
