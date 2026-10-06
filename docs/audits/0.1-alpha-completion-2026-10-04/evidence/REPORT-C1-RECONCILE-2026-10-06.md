@@ -68,3 +68,31 @@ changed in this reconcile.
 
 CANDIDATE NOT ACCEPTED. A1 unchanged; two p2a mismatches must be resolved
 before the candidate can be compared as release-candidate-equal-to-baseline.
+
+## Resolution — p2a oracle alignment (commit c5c35c1e)
+
+Maintainer decision (2026-10-06): accept the diagnostic unification. The two
+`p2a_tests` oracles were updated to the canonical typed diagnostics
+(`LocalBorrowEscape`, `UseAfterMove`) while keeping the requirement that the
+invalid programs are rejected. No compiler/library code changed.
+
+Focused rerun: `cargo test -p luna-driver --test p2a_tests` → 20 passed / 0 failed.
+
+Full workspace rerun on `c5c35c1e`:
+
+| | Baseline `3601d12e` | Candidate `c5c35c1e` |
+|---|---|---|
+| targets | 197 | 203 |
+| passed | 1315 | 1328 |
+| failed | 1 | 1 |
+| ignored | 1 | 1 |
+| exit | 101 | 101 |
+| StorageFull | 0 | 0 |
+
+Sole failure on both: `luna-cli --test generic_drop_cli` (A1 `closure_capture`,
+source + artifact exit 3). A1 did NOT disappear; all other baseline-green
+suites stay green; C1 harnesses green.
+
+Verdict: **CANDIDATE ACCEPTED for comparison** — A1 remains the unique failure,
+matching the expected candidate outcome. Release remains BLOCKED on A1 and the
+remaining R-phase gates.
