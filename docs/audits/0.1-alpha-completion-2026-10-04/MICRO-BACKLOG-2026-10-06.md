@@ -197,6 +197,16 @@ workspace candidate · 34 record remaining gaps.
 A1 chỉ đóng khi `generic_drop_cli` pass toàn bộ, positives đếm đúng drop, negatives
 giữ nguyên ở source + fresh artifact.
 
+A1 status — 2026-10-06:
+
+```
+A1: CLOSED / CONFORMANT IN TESTED SCOPE
+evidence: evidence/a1-closure-env-2026-10-06.json, evidence/REPORT-A1-CLOSURE-ENV-2026-10-06.md
+progression: exit3 (leak) -> exit2 (double-drop, debugging evidence only) -> exit0
+workspace: 1329 pass / 0 fail / 1 ignored (exit 0)
+protocol: compiler20 / metadata9 / MVIR5 / format2
+```
+
 ### A2 — Async suspended cleanup
 
 A2-01 re-run initial cleanup controls · 02 re-run `future_initial_cancel` · 03 fixture
