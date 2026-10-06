@@ -1,0 +1,38 @@
+{
+  "task": "C1 reconcile — final candidate verdict",
+  "date": "2026-10-06",
+  "base_sha": "3601d12e8ae81f001a47a5523b819e7728b85c54",
+  "candidate_branch": "codex/luna-0.1-alpha.1-candidate",
+  "merge_commit": "e679d560",
+  "candidate_final_head": "c5c35c1e",
+  "p2a_fix_commit": "c5c35c1e",
+  "version_final": { "compiler": 19, "mvir": 5, "metadata": 9, "format": 2 },
+  "sysroot_rebuild": { "result": "PASS exit 0", "providers": 49 },
+  "c1_harnesses": {
+    "result": "PASS",
+    "targets": ["named_arguments_cli", "default_arguments_cli", "default_omission_cli", "comptime_loans_cli"]
+  },
+  "p2a_resolution": {
+    "decision": "accept diagnostic unification; align oracles to canonical typed codes",
+    "changes": "test_case_15 -> LocalBorrowEscape, test_case_19 -> UseAfterMove; rejection requirement preserved; no compiler change",
+    "focused": "cargo test -p luna-driver --test p2a_tests -> 20 passed / 0 failed"
+  },
+  "baseline_workspace": { "targets": 197, "passed": 1315, "failed": 1, "ignored": 1, "exit_code": 101 },
+  "candidate_final_workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "exit_code": 101,
+    "targets": 203,
+    "passed": 1328,
+    "failed": 1,
+    "ignored": 1,
+    "storage_errors": 0,
+    "failing": ["luna-cli --test generic_drop_cli (A1 closure_capture, source+artifact exit 3)"]
+  },
+  "expected_outcome_met": {
+    "a1_still_fails": true,
+    "other_old_tests_green": true,
+    "new_c1_harnesses_green": true
+  },
+  "verdict": "CANDIDATE ACCEPTED for comparison. A1 remains the unique failure; release still BLOCKED on A1 and remaining R-phase gates.",
+  "logs": { "candidate_final_workspace": "scratch/workspace-candidate2.log", "p2a_focused": "shellout log (p2a 20/20)" }
+}
