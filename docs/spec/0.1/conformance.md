@@ -73,6 +73,22 @@ all providers and completed substantial checks, but did not complete all compile
 tests, sanitizer/fuzzing, all targets or all generic/data domains. Historical
 green test counts do not supersede a later counterexample.
 
+## Retained 0.1 contract scope
+
+Adopted 2026-10-06 (D4). The following contracts remain part of 0.1-alpha.1 and
+are NOT deferred to 0.2:
+
+| Contract | Status |
+|---|---|
+| NAMESPACE-USING-v1 | KEEP |
+| PROVIDER-CONFIG-v1 | KEEP |
+| MODULE-CONST-STORAGE-v1 | KEEP |
+| CALL-ARGUMENTS-v1 | KEEP |
+
+Each is a release requirement. If any of them is not yet conformant, the release
+remains **BLOCKED**; an implementation gap does NOT automatically move a contract
+out of 0.1. Removing or deferring any of these requires a new explicit maintainer
+decision.
 
 ## Documentation refresh validation
 
