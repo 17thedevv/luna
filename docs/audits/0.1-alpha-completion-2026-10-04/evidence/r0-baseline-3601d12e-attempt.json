@@ -1,0 +1,81 @@
+{
+  "task": "R0-B baseline capture",
+  "status": "BLOCKED_INVALID_ENVIRONMENT",
+  "reason": "D: drive reached 0 GB free; cargo test --workspace failed with StorageFull (os error 112) while copying provider bundles. Full-workspace baseline verdict is not valid.",
+  "base_sha": "3601d12e8ae81f001a47a5523b819e7728b85c54",
+  "branch": "codex/antigravity-repair-0.1",
+  "worktree_dirty": true,
+  "worktree_changes_note": "Doc-only: documentation-index.json/.md modified; MICRO-BACKLOG-2026-10-06.md and REMAINING-PLAN-2026-10-06.md untracked; .commandcode/taste/taste.md modified by taste system; .tmp-interface-debug/ and luna-rs/target-lsp/ untracked.",
+  "toolchain": {
+    "cargo": "1.98.0 (797e8a9bc 2026-08-05)",
+    "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
+    "host_triple": "x86_64-pc-windows-msvc",
+    "rustc_bundled_llvm": "22.1.8",
+    "luna_target_triple": "x86_64-pc-windows-gnu (per docs; requires build-time confirmation)",
+    "luna_llvm_c": "18.1.8 (per docs; bin/LLVM-C.dll)"
+  },
+  "artifact_versions": {
+    "LLIB_COMPILER_VERSION": 15,
+    "LLIB_MVIR_VERSION": 4,
+    "LLIB_FORMAT_VERSION": 2,
+    "SEMANTIC_METADATA_VERSION": 7
+  },
+  "provider_count": 49,
+  "binary_hashes_sha256": {
+    "bin/luna.exe": "1d03736cde52297bf5927edc0dcb9b89bd5692ff95550da9f153924ad56bad0d",
+    "luna-rs/target/debug/luna.exe (pre-sysroot-build snapshot)": "635c59ee30ba4b214bcd18d322f5cc193c4e1a643e0f5dd607bc6d4d43bdad9e",
+    "runtime/build-gcc/libluna-runtime.a": "02e7fab138160d91f1c50686558a1b2ed96bfeffca7e903824ca2d6eb47ac5c7",
+    "runtime/luna-runtime.lib": "7ad86e8735b22539a0d9d9ad3970c06ce38f9ec2766c9194d66d6a2d1c92f3ad"
+  },
+  "sysroot_build": {
+    "command": "cargo run -p luna-cli -- build-sysroot",
+    "requires_path": "bin/ (for LLVM-C.dll)",
+    "result": "PASS exit 0; 'Sysroot built successfully.'",
+    "note": "First attempt without bin/ on PATH failed with 0xC0000135 (STATUS_DLL_NOT_FOUND)."
+  },
+  "workspace_attempts": [
+    {
+      "id": "s4ngkft8",
+      "command": "cargo test --workspace --no-fail-fast",
+      "duration_approx_min": 66,
+      "exit_code": 101,
+      "output_captured": false,
+      "note": "Background redirection via && chain produced 0-byte log; output lost. Exit 101 indicates failures but list unavailable."
+    },
+    {
+      "id": "s9f0l966",
+      "command": "cmd /c scratch\\run-workspace-baseline.cmd (cargo test --workspace --no-fail-fast > scratch\\workspace-baseline.log 2>&1)",
+      "duration_approx_min": 37,
+      "exit_code": null,
+      "output_captured": true,
+      "invalid_reason": "D: disk full during run; log truncated mid-suite; no final summary or EXIT line.",
+      "storage_errors_in_log": 60,
+      "storage_error_sample": "copy provider file: Os { code: 112, kind: StorageFull, message: \"There is not enough space on the disk.\" }",
+      "failed_targets_partial": [
+        "luna-cli::generic_drop_cli",
+        "luna-driver::copy_drop_tests",
+        "luna-driver::core_provider_baseline_acceptance_tests",
+        "luna-driver::generic_trait_dispatch_acceptance_tests",
+        "luna-driver::generic_trait_method_monomorphization_tests",
+        "luna-driver::import_invariants_tests",
+        "luna-driver::lang_namespace_contract_tests",
+        "luna-driver::macro_pipeline_tests",
+        "luna-driver::p3_tests",
+        "luna-driver::phase4c_capability_probes",
+        "luna-driver::provider_module_contract_acceptance_tests",
+        "luna-driver::sem_maturity_phase2e_tests",
+        "luna-driver::stdlib_collection_iterators_acceptance_tests",
+        "luna-driver::stdlib_hashmap_acceptance_tests",
+        "luna-driver::stdlib_hashmap_storage_acceptance_tests"
+      ],
+      "note": "Most driver failures are StorageFull-induced (provider copy), not confirmed baseline defects. Run is not a valid baseline."
+    }
+  ],
+  "disk_state": {
+    "D_free_gb": 0,
+    "D_used_gb": 238.47,
+    "C_free_gb": 86.21,
+    "luna-rs_target_gb": 59.5
+  },
+  "conclusion": "R0-B baseline workspace verdict NOT established. Blocker: D: full. Sysroot build and metadata capture succeeded. Need disk space relief (e.g. cargo clean frees ~59.5 GB but forces rebuild, or a separate CARGO_TARGET_DIR plus D: cleanup) before the baseline gate can be rerun."
+}

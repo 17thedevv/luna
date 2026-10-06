@@ -1,0 +1,51 @@
+{
+  "task": "R0-B baseline (valid rerun after disk cleanup)",
+  "status": "ESTABLISHED",
+  "base_sha": "3601d12e8ae81f001a47a5523b819e7728b85c54",
+  "branch": "codex/antigravity-repair-0.1",
+  "worktree_note": "Tracked tree clean except doc-only changes (documentation-index.json/.md modified; MICRO-BACKLOG/REMAINING-PLAN untracked). No compiler/library source modified.",
+  "toolchain": {
+    "cargo": "1.98.0 (797e8a9bc 2026-08-05)",
+    "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
+    "host_triple": "x86_64-pc-windows-msvc",
+    "rustc_bundled_llvm": "22.1.8",
+    "luna_target_triple": "x86_64-pc-windows-gnu",
+    "luna_llvm_c_dll": "bin/LLVM-C.dll (18.1.8 per docs)"
+  },
+  "artifact_versions": {
+    "LLIB_COMPILER_VERSION": 15,
+    "LLIB_MVIR_VERSION": 4,
+    "LLIB_FORMAT_VERSION": 2,
+    "SEMANTIC_METADATA_VERSION": 7
+  },
+  "provider_count": 49,
+  "binary_hashes_sha256": {
+    "luna-rs/target/debug/luna.exe (rebuilt)": "6c7a0b07f6d2b2a41373dc35453caab8eb332b588818b4747579bdb12f1a2a9a",
+    "bin/luna.exe": "1d03736cde52297bf5927edc0dcb9b89bd5692ff95550da9f153924ad56bad0d",
+    "runtime/build-gcc/libluna-runtime.a": "02e7fab138160d91f1c50686558a1b2ed96bfeffca7e903824ca2d6eb47ac5c7",
+    "runtime/luna-runtime.lib": "7ad86e8735b22539a0d9d9ad3970c06ce38f9ec2766c9194d66d6a2d1c92f3ad"
+  },
+  "sysroot_build": {
+    "command": "cargo run -p luna-cli -- build-sysroot",
+    "path_requirement": "bin/ must be on PATH for LLVM-C.dll",
+    "result": "PASS exit 0; 'Sysroot built successfully.' (49 providers)"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "exit_code": 101,
+    "targets_with_results": 197,
+    "passed": 1315,
+    "failed": 1,
+    "ignored": 1,
+    "storage_errors": 0,
+    "failing_target": "luna-cli --test generic_drop_cli",
+    "failing_test": "generic_owned_values_drop_once_across_control_flow_and_provider_modes",
+    "failure_detail": "closure_capture: source run exit 3 and artifact run exit 3 (generic_drop_cli.rs:98). Owned capture not destroyed.",
+    "all_other_targets": "PASS",
+    "log": "scratch/workspace-baseline.log",
+    "log_full_output": "C:/Users/84387/AppData/Local/Temp/commandcode/shellout/2026-10-06T14-21-06-592Z-sbo9oxn3.log"
+  },
+  "disk_note": "First batch attempt was invalidated by D: reaching 0 GB free (StorageFull os error 112). cargo clean freed ~59 GB; TEMP/TMP kept on C: for the valid run. D: free after valid run: 43.6 GB.",
+  "prior_invalid_attempt": "evidence/r0-baseline-3601d12e-attempt.json",
+  "conclusion": "Baseline verdict established: workspace FAIL exit 101, sole failing target generic_drop_cli (closure_capture). Matches documented expectation. This is the baseline to compare against the C1 candidate."
+}
