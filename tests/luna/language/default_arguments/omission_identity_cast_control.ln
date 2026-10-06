@@ -1,0 +1,11 @@
+import "provider";
+fn main() -> i32 {
+    dec rw drops = 0;
+    {
+        dec owner = omitted::Owned { counter: &rw drops as *rw i32, value: 17 };
+        dec result = omitted::cast_identity(owner);
+        if (result.value != 17) { return 1; }
+        if (drops != 0) { return 2; }
+    }
+    return drops - 1;
+}

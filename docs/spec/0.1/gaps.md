@@ -352,3 +352,78 @@ harness did not emit a test-result summary. It cannot certify an immutable
 candidate. Independent Ubuntu e3b4402 CI still rejects release readiness through
 owned closure capture native exit3 in both provider modes. All broader R3–R5
 and retained contract gates remain required.
+
+### Named binding update — 2026-10-05; CALL-ARGUMENTS-v1 still PARTIAL
+
+The [named checkpoint](../../audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md#named-binding-implementation-checkpoint--2026-10-05)
+implements declaration label binding, source-order value capture and portable
+public signature identity (compiler16/metadata8). Its final fresh source/
+artifact CLI matrix passes, including generic/method/trait calls, ownership,
+early return, non-generic comptime, relocated source removal and stale-dependent
+rejection. These results supersede the named-label baseline for their stated
+scope; older findings retain their dated evidence.
+
+Defaults remain unimplemented. Generic comptime calls fail E4005 for both named
+and positional arguments because an early concrete callee is unavailable; this
+is an implementation gap, not a deferred contract. The broad CLI regression
+still fails closure_capture native exit3 in both modes. No new full-workspace,
+cross-platform or release PASS is established; all R3–R5 obligations remain.
+
+The [subsequent comptime root repair](../../audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md)
+fixes the missing generic callee reproducers: named/positional, nested and
+multiple instances plus local generic drop pass fresh source/artifact check,
+build and native execution. Pinned regressions pass 324 internal and 45 separate
+CLI/driver tests. A new simultaneous mutable-loan probe rejects E3003 in native
+check but passes inside comptime, including build/native exit0. Borrow admission
+must precede VM execution; it is a correctness gap, not a comptime exemption.
+Defaults and all remaining release gates retain their full scope.
+
+The [early admission follow-up](../../audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md#follow-up-ordinary-admission-before-execution--2026-10-05)
+supersedes that loan counterexample within its scoped tests: ordinary lifetime/
+borrow/drop validation precedes VM execution and the VM consumes the verified
+prepared program. Mutable alias, shared/mutable and return-loan conflicts reject
+with original typed diagnostics/spans in fresh source/artifact modes; valid
+controls pass. Final immutable verification passes workspace/all-target
+compilation, 324 internal and 43 CLI/driver tests, exit0. Defaults remain
+unimplemented; the known closure failure and broader release gates are not
+closed by this checkpoint.
+
+### Default declarations update — 2026-10-05; omission remains required
+
+The [default declaration gate](../../audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md)
+adds parameter defaults to AST/parser/relocation and checks their definition-site
+prefix scope, types, rigid independent binders, unsafe admission and trait
+signature compatibility. Compiler17/metadata9 carries public default contracts.
+Binder/alias renaming preserves verified interface identity; changed defaults
+and retargeted aliases invalidate stale dependents. A generic export repair
+keeps local namespace aliases from replacing original namespace owners.
+
+This supersedes the absent declaration representation within the recorded
+scope. Omitted-argument calls still reject E2001 in both provider modes;
+per-call execution, ownership/effect mapping and full default acceptance remain
+unimplemented requirements, not a const-only restriction or deferred feature.
+The known closure failure and all remaining R0–R5 release gates stay open.
+
+### Synchronous default omission update — 2026-10-06
+
+The [omission gate](../../audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md)
+supersedes the absent synchronous execution path above. Checked argument
+plans, selected concrete default entries and same-frame initialization now
+retain definition scope, earlier parameters, ordinary ownership/effects and
+full-arity ABI controls. Independent owner/method type arguments and embedded
+layout types retain their checked identities across provider import.
+
+A transitive caller counterexample exposed incorrect receiver offsets when a
+method's lifetime constraint mentions only ordinary parameters. The checked
+signature now governs assumptions, call checks and default helper requirements.
+Its separate 821-input scoped regression passes workspace/all-target check,
+337 internal tests, 89 driver tests and nine CLI suites, all exit0 with
+unchanged input/compiler/runtime hashes. The omission suite observes 18 native
+executions and 60 typed negative check/build processes across both provider
+modes. These scoped passes do not establish full-workspace conformance.
+
+CALL-ARGUMENTS-v1 remains PARTIAL: the independent async creation positive
+delays its default until resume in source mode (native exit2); its freshly
+published source-removed artifact rejects invalid semantic metadata. These
+requirements, the known closure failure and the complete R0–R5 scope remain
+active. Synchronous positives do not establish full workspace or release PASS.

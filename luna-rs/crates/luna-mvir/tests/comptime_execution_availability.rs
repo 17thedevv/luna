@@ -25,6 +25,7 @@ fn function(name: &str, ty: SemanticTypeId, instructions: Vec<Instruction>) -> F
         link_name: None,
         param_types: Vec::new(),
         ret_ty: ty,
+        lifetime_info: Default::default(),
         values: instructions
             .into_iter()
             .map(|i| ValueData::new(i, ty, None))

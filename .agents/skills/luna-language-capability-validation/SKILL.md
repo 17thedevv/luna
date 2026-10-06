@@ -149,6 +149,30 @@ cannot compensate for constraints omitted from the public dependency identity.
 Include unchanged-contract controls for generic binder renaming, declaration
 order and body edits which preserve public effects.
 
+For public parameter defaults, validate definition-site binding identity as
+well as expression text. Distinguish impl/trait-owner and method/function
+generic roles, preserve field names when a parameter shares their spelling,
+and retain explicit generic arguments. Renaming a local namespace alias must
+preserve the resolved contract; retargeting it to another declaration must
+invalidate affected dependent interfaces. An alias is a lookup view, not an
+exported namespace owner: verify original paths, private alias rejection and
+native artifact execution, since metadata/check success can conceal a build
+failure. Declaration/default metadata checks do not establish omitted-call
+evaluation, ownership or effect correctness.
+
+For omitted calls, test source-order explicit evaluation followed by only the
+missing defaults in declaration order, ordinary moves/drops and borrowed
+earlier parameters. Map lifetime obligations through the actual supplied ABI
+slots and initialized logical parameters; helper preconditions remain caller
+proof obligations. Derive receiver presence from the checked signature even
+when no constraint mentions `self`. Test both legal forwarding and inverted
+argument relations under a longer-lived receiver. Embedded cast/layout types
+must retain concrete binder identity through provider transport and mono; a
+generic appearing only in `sizeof(T)` must not silently receive a fallback
+layout. For async defaults, observe creation before polling, as well as
+cancellation and suspension. Source success and artifact publication alone
+do not establish imported execution or correct default timing.
+
 Nominal ABI identity must include field order and enum discriminants/payloads,
 including private types reachable through public contracts. Test stale dependent
 execution after replacing a complete dependency bundle, recursive reachability,
@@ -172,6 +196,14 @@ For ownership, references, raw pointers, FFI, or mutation, preserve Luna's
 separate semantic domains and frozen safety rules. Unsafe does not disable
 ownership, moves, borrow checking, region validity, or provenance. Do not
 solve a failing case by globally weakening safety.
+
+Compile-time execution must obey the same safe move/loan/escape rules before
+the VM runs. Preserve the checked evaluation root and reachable concrete units;
+the driver orchestrates ordinary admission over that prepared program, and
+execution consumes the same verified IR. Checking only a materialized constant
+after evaluation cannot validate the original loans or moves. Keep VM effect,
+resource and pointer-escape guards as independent requirements, with direct
+invariant tests as well as source/artifact CLI acceptance.
 
 ### 5. Fix compiler defects generically
 

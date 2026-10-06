@@ -1,0 +1,205 @@
+{
+  "recorded_utc": "2026-10-05T13:41:24.678295+00:00",
+  "base_commit": "3601d12e8ae81f001a47a5523b819e7728b85c54",
+  "scope": "Named binding checkpoint; CALL-ARGUMENTS-v1 remains PARTIAL; no release verdict",
+  "raw_files": {
+    "amended-tests.txt": {
+      "sha256": "2704d65209fdf936ab8c0716ac36cbe982e6f27f74387f04a2fd08b5675d7c78",
+      "bytes": 29577
+    },
+    "comptime-tests.txt": {
+      "sha256": "93413b09e0a3551c7a54a0540059924f505f9c0f183ed7f9d143d2eba06cbe3b",
+      "bytes": 27935
+    },
+    "final-build.txt": {
+      "sha256": "46892a15cc8cd625b990d9792abccb74ca33a0b595ba68f34ad1c43f97c5271f",
+      "bytes": 24505
+    },
+    "final-cli-tests.txt": {
+      "sha256": "641e9dc0ea652b83b6ecf38581438c5b6f56240b497a1cb44466c81ee75e9d6d",
+      "bytes": 62954
+    },
+    "final-internal-tests.txt": {
+      "sha256": "7e070ac95eb6dabde10529825ff29b009ebfe058275a5c209ab40d584c64ac5e",
+      "bytes": 62831
+    },
+    "final-metadata-comptime-tests.txt": {
+      "sha256": "4ef1ef2bdc05664853947dfcc528951ae678efce60eb2c0b22b6b09123e9a0d9",
+      "bytes": 60749
+    },
+    "final-sysroot.txt": {
+      "sha256": "39d5c5fa19267584fc6037f6d2471fbc65afc594289b39f60415aa51ea040d6c",
+      "bytes": 50017
+    },
+    "first-tests.txt": {
+      "sha256": "d515e49eb60652e51469e7c9c4df55aeb8e70a9ceadf14ab3ee669dff499469b",
+      "bytes": 26793
+    },
+    "glue-build.txt": {
+      "sha256": "6590c806f7fdcc3689239e55852e170decebeef5bfd6dc58618c406d8269f30c",
+      "bytes": 24384
+    },
+    "interface-tests.txt": {
+      "sha256": "28f2377be8a1cb8b36b1a816358bef76a8385ed102dc87cb05aa1677f89d474c",
+      "bytes": 27812
+    },
+    "internal-tests.txt": {
+      "sha256": "d97ade185a417f4634d94e34bc2ab4a2fa7326d0454b098c9477334736fc4fd7",
+      "bytes": 42614
+    },
+    "ownership-tests.txt": {
+      "sha256": "2cb8a810e849928dc93eb048722eb5d12ba83b33050bda3c55a4b9b0aa20fb48",
+      "bytes": 27608
+    },
+    "reference-load-build.txt": {
+      "sha256": "0cd5a1ed34c6f382a1d8197db3b72b0af9dfb9e7fff1d5778832dae7cba328c6",
+      "bytes": 24384
+    },
+    "retire-build.txt": {
+      "sha256": "bb8490f6c244db818a1223f572a4eb4b0c0c7cf28a69e08ab65b88ba322b6463",
+      "bytes": 17787
+    },
+    "retire2-build.txt": {
+      "sha256": "9e150eed0accce8ac3b9e1cff38734c05ae1a6a8af2eb4a31bb49c3c7f716386",
+      "bytes": 24384
+    },
+    "second-tests.txt": {
+      "sha256": "cdefe46f8a66b49d283e1ee5e51e1f8e12544bacb54ba80e33868581f3306aab",
+      "bytes": 27835
+    },
+    "amended-cli-pin.json": {
+      "sha256": "37e21d947de67c56b0f3c26522ffbf77ccf8333fe656d47bcd41646c97c90674",
+      "bytes": 216
+    },
+    "amended-pin.json": {
+      "sha256": "f89c234325ae77b1492b42473c8a6a3ae11cdd6aec3da76d2f27d2c555f64a6a",
+      "bytes": 117532
+    },
+    "final-cli-pin.json": {
+      "sha256": "df821a28bae502e7dcb75a9d81b9c0b874493560ec34a7492dec1acc8255c8c6",
+      "bytes": 216
+    },
+    "final-start.json": {
+      "sha256": "a7e56019703313ce9912b7efafcd6ae9fd3e71de302d715456759ec80dfe5579",
+      "bytes": 117259
+    },
+    "generic-comptime-probes/comptime_generic_gap-build.txt": {
+      "sha256": "f17dd0a067aaa3f0aced10f3e9bb35c78bc9e4972bce451665ea37827cc67db4",
+      "bytes": 1894
+    },
+    "generic-comptime-probes/comptime_generic_gap-check.txt": {
+      "sha256": "f17dd0a067aaa3f0aced10f3e9bb35c78bc9e4972bce451665ea37827cc67db4",
+      "bytes": 1894
+    },
+    "generic-comptime-probes/comptime_generic_gap.ln": {
+      "sha256": "76138b98eac1d24965f9943e50e846216e5f1492d0a1058e28c47993b816b5f9",
+      "bytes": 353
+    },
+    "generic-comptime-probes/positional_comptime_generic_gap-build.txt": {
+      "sha256": "d426949d67d1533ddf31b79a29d9948daa6d6f951d45f7219f65436f55447a02",
+      "bytes": 1938
+    },
+    "generic-comptime-probes/positional_comptime_generic_gap-check.txt": {
+      "sha256": "d426949d67d1533ddf31b79a29d9948daa6d6f951d45f7219f65436f55447a02",
+      "bytes": 1938
+    },
+    "generic-comptime-probes/positional_comptime_generic_gap.ln": {
+      "sha256": "448a601b1b64ea570a65471122d89a212408bb264d9271e537d10ea8bee2054b",
+      "bytes": 330
+    },
+    "generic-comptime-probes/provider.ln": {
+      "sha256": "a9276714936b0f3898e24c229b2de4068f8ad77cf0c5535999b4db5244c5b734",
+      "bytes": 1341
+    }
+  },
+  "input_comparison": {
+    "final-start.json": {
+      "pinned_count": 886,
+      "differences": [
+        {
+          "path": "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
+          "expected": "40de77e904896659e4821deb7c03ddb336cd89e23fa61c8b8969f066e5ffe924",
+          "actual": "65df851f35cb4ca35892de7b97943ead971b9f7e00f9147885de5dbea78ca15f"
+        },
+        {
+          "path": "luna-rs/crates/luna-mvir/src/interp.rs",
+          "expected": "ec4ae34db5c306b29466caabdbe1810395c129528a5219fea49a175b39714777",
+          "actual": "44cced0402854a1fc2c70cf4e0cc087b1d66d9f094a6dea380c4f9722b581c08"
+        },
+        {
+          "path": "tests/luna/language/named_arguments/controls.ln",
+          "expected": "c8e2f730e6011f5ef9a581403b160d730f16204ab3c1504ff2bbe5f9e202ffec",
+          "actual": "a41f0764b97e41860f8d446229c6bc21f6c28abcc589bf3a505c357f41661352"
+        }
+      ]
+    },
+    "amended-pin.json": {
+      "pinned_count": 887,
+      "differences": []
+    }
+  },
+  "amended_binary": {
+    "sha256": "fb75b0d75bb6423886a9b4adc98a1d8c472b932136ac838e1053e65065a9ce47",
+    "agrees_with_recorded_pin": true
+  },
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "terminal_summaries": {
+    "final-cli-tests.txt": {
+      "passed": 8,
+      "failed": 1,
+      "ignored": 0,
+      "summary_blocks": 7,
+      "shell_exit": null,
+      "shell_exit_note": "Handle lost after continuation; terminal Cargo summaries preserved, shell numeric status unavailable"
+    },
+    "final-internal-tests.txt": {
+      "passed": 324,
+      "failed": 0,
+      "ignored": 0,
+      "summary_blocks": 54,
+      "shell_exit": null,
+      "shell_exit_note": "Handle lost after continuation; terminal Cargo summaries preserved, shell numeric status unavailable"
+    },
+    "final-metadata-comptime-tests.txt": {
+      "passed": 41,
+      "failed": 0,
+      "ignored": 0,
+      "summary_blocks": 3,
+      "shell_exit": null,
+      "shell_exit_note": "Handle lost after continuation; terminal Cargo summaries preserved, shell numeric status unavailable"
+    },
+    "amended-tests.txt": {
+      "passed": 8,
+      "failed": 0,
+      "ignored": 0,
+      "summary_blocks": 2,
+      "shell_exit": 0,
+      "shell_exit_note": "amended_exit=0 observed via resumed tool handle"
+    }
+  },
+  "commands": {
+    "final-build.txt": "cargo build -p luna-cli",
+    "final-sysroot.txt": "target/debug/luna.exe build-sysroot",
+    "final-cli-tests.txt": "cargo test -p luna-cli --test named_arguments_cli --test call_arity_cli --test method_resolution_cli --test cast_contract_cli --test memory_intrinsic_identity_cli --test module_const_storage_cli --test generic_drop_cli --no-fail-fast -- --nocapture",
+    "final-internal-tests.txt": "cargo test -p luna-semantic -p luna-llib -p luna-mvir -p luna-borrowck -p luna-parser --no-fail-fast",
+    "final-metadata-comptime-tests.txt": "cargo test -p luna-driver --test adv_comptime_dyn_tests --test struct_lifetime_contract_acceptance_tests -p luna-cli --test interface_constraints_cli --no-fail-fast -- --nocapture",
+    "amended-tests.txt": "cargo test -p luna-cli --test named_arguments_cli -p luna-mvir --test comptime_execution_availability -- --nocapture"
+  },
+  "environment": {
+    "rust_host": "windows-msvc",
+    "luna_native_target": "x86_64-pc-windows-gnu",
+    "LLVM_SYS_180_PREFIX": "D:/Programs/LLVM-DEV",
+    "LUNA_RUNTIME_LIB": "D:\\fdlang\\build\\runtime-win\\libluna-runtime.a",
+    "LUNA_SYSROOT": "D:\\fdlang\\.tmp-interface-debug\\call-arguments-worktree\\luna-rs",
+    "CARGO_PROFILE_DEV_DEBUG": "0",
+    "CARGO_PROFILE_TEST_DEBUG": "0"
+  },
+  "limitations": [
+    "Broad CLI regression FAIL: generic_drop_cli closure_capture exits 3 in source and artifact; preserved rather than excluded.",
+    "Broad pin predates two UTF-8 comment repairs and scalar/borrow fixture amendments. Final focused pin observed during the test, not asserted as pre-command pin.",
+    "No new full-workspace/cross-platform release certification.",
+    "Four source-only generic comptime check/build probes fail E4005 missing concrete callee; named and positional variants both fail.",
+    "Defaults remain unimplemented; generic comptime remains a required capability gap, not intentionally unsupported.",
+    "Earlier raw harness/API/environment failures are retained; final focused success does not rewrite their verdicts."
+  ]
+}

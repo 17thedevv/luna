@@ -1435,3 +1435,112 @@ restores the retained unsized-value cast category without weakening rejection;
 the unchanged adversarial driver suite passes 14/14. Final cast/span/char checks
 have their own pin. Named/defaults remain incomplete, and the immutable Ubuntu
 e3b4402 workspace independently fails owned closure capture in both modes.
+
+### Named declaration binding checkpoint — 2026-10-05
+
+[CALL-ARGUMENTS-GATE](CALL-ARGUMENTS-GATE.md) now distinguishes implemented named
+binding from unimplemented defaults. Declaration ordinals drive inference and
+call operands while provided arguments evaluate/capture in source order.
+Portable labels participate in public interface identity; protocol16/metadata8
+artifacts were officially rebuilt for all 49 providers. The amended CLI matrix
+passes 56 typed rejections, ten positive native executions, relocation and
+interface/stale-dependent controls in fresh source/artifact modes. Seven
+comptime execution invariants also pass; final pin inputs/binary/runtime agree.
+
+The broad candidate passes 324 internal and 41 separate metadata/comptime/
+lifetime tests. Its seven-target CLI regression remains FAIL (eight tests
+passed, one failed): owned closure_capture exits3 in both modes. Four source-only
+named/positional generic comptime probes expose a missing concrete callee E4005.
+Defaults, that generic early-instantiation defect, closure cleanup and R3–R5
+remain open. Exact scoped evidence and failed attempts are retained; neither
+focused success nor the revised grammar establishes full release readiness.
+
+### Generic comptime root repair and new loan counterexample — 2026-10-05
+
+[COMPTIME-PREP-GATE](COMPTIME-PREP-GATE.md) closes the recorded missing concrete
+callee reproducers within fresh source/artifact acceptance. Semantic preparation
+preserves the evaluation root's call plans and scopes reachable instances until
+execution finishes. Final pinned regressions pass 324 internal and 45 CLI/driver
+tests, exit0; inputs/binary/runtime agree at completion. The named matrix now
+includes 68 typed rejections and 18 native positives.
+
+An independent alias probe shows comptime still executes invalid simultaneous
+mutable loans which ordinary check rejects E3003. Preserve this required
+rejection and put ordinary borrow validation before VM execution. Defaults,
+closure policy/cleanup and the full R3–R5 scope remain open; no merge/tag/release
+or full-workspace PASS is implied.
+
+### Early comptime admission checkpoint — 2026-10-05
+
+The [admission record](COMPTIME-PREP-GATE.md#follow-up-ordinary-admission-before-execution--2026-10-05)
+now rejects the recorded unsafe loan counterexample before VM execution, using
+ordinary lifetime/borrow/drop analysis and preserving owning-phase diagnostics.
+Fresh source/artifact matrices retain alias/conflict negatives, legal mutation/
+read/return controls, named generic owned cleanup and module-const storage.
+The unchanged final 774-input pin passes workspace/all-target compilation,
+324 internal and 43 CLI/driver tests with observed exit0. Raw failed development
+oracles and setup attempts remain recorded separately. Defaults, owned closure
+policy/cleanup and all broader R0–R5 release obligations remain open.
+
+### Default declaration and namespace ownership checkpoint — 2026-10-05
+
+[DEFAULT-ARGUMENTS-GATE](DEFAULT-ARGUMENTS-GATE.md) records declaration AST,
+definition-site prefix resolution/type checking and compiler17/metadata9
+portable contracts. It retains failed development oracles and genuine binder
+identity failures. Function/method/owner generic roles remain independent;
+canonicalization preserves field identity and resolved helper bindings.
+An alias export walker defect is repaired using original namespace ownership,
+with source/artifact native and private-alias rejection controls.
+
+The earlier 788-input candidate passes workspace/all-target compilation,
+331 internal and 46 CLI/driver tests with matching input/binary/runtime hashes.
+It precedes the alias/owner amendments; the amended candidate's separate record
+must be used for those repairs. No full-workspace or release PASS is implied.
+Calls omitting defaults remain required positives which currently reject E2001.
+Complete their logical parameter frame, mono and effect/ownership checks next;
+closure policy/cleanup and all broader R0–R5 obligations remain active.
+
+The final amended 792-input pin separately passes workspace/all-target
+compilation, 331 internal and 48 CLI/driver tests, all exit0. Inputs, executable
+and runtime hashes agree at completion. The complete alpha module matrix,
+method binder/impl-bound matrix and new original-namespace artifact controls
+pass. Final omission probes still reject the required positive E2001 in both
+modes. Lossless logs, failed development observations and both candidate pins
+are retained; their distinct revision boundaries are not combined.
+
+A subsequent module-constant default probe finds a further interface-identity
+defect: retargeting the alias leaves the fingerprint unchanged. The generic
+canonicalizer now includes module/global value declaration paths, with separate
+constant-alias rename/retarget and stale-dependent controls. Its focused
+candidate is separate from the 331/48 amended run; use DEFAULT-ARGUMENTS-GATE
+for the final verification boundary. Default omission remains open.
+
+The last constant-identity candidate passes workspace/all-target check,
+213 semantic/metadata tests and three CLI suites, all exit0, with matching
+792-input/compiler/runtime hashes. Constant-alias rename/retarget and stale
+dependent controls now pass; the final omission-positive probes still reject
+E2001. The next implementation step remains per-call default materialization
+through mono and the logical callee frame, followed by ownership/effect and
+complete source/artifact acceptance. The full R0–R5 goal remains active.
+
+### Synchronous omission and receiver mapping — 2026-10-06
+
+[DEFAULT-OMISSION-GATE](DEFAULT-OMISSION-GATE.md) records checked omission
+plans, declaration/trait defaults, concrete same-frame initialization and
+compiler19/metadata9/MVIR5 transport. The generic cast drop, owner/method path,
+imported layout and missing foreign declaration reproducers led to generic
+repairs. The later receiver-only-by-constraint heuristic is corrected using
+checked callable signatures, with transitive invalid callers and valid method
+forwarding controls.
+
+The 821-input final candidate passes workspace/all-target compilation,
+337 internal tests, 89 driver tests and nine CLI suites, all exit0. Official
+sysroot regeneration completes 49 providers. The omission suite observes
+18 native executions and 60 typed negative check/build processes in the two
+provider modes. Input/compiler/runtime hashes match; commands and lossless
+logs are retained in the gate's terminal record. Earlier development successes
+and failures remain separate revision evidence.
+No full-workspace test or native target certification is inferred from these
+checks. The async creation positive still fails timing in source mode and its
+fresh artifact rejects semantic metadata. Async default initialization/drop,
+closure policy/cleanup and every remaining R0–R5 obligation stay active.

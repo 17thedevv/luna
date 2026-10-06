@@ -370,7 +370,9 @@ For lifetime-aware signatures, verify:
 
 Never:
 - serialize session-local IDs;
-- serialize AST parameter names as semantic identity;
+- encode lifetime/provenance parameter roles using AST names instead of ordinals;
+  public callable labels are a separate interface contract under
+  [CALL-ARGUMENTS-v1](../../../docs/spec/0.1/call-arguments-v1.md);
 - serialize Borrowck implementation structs as the ABI contract;
 - silently drop semantic lifetime relations.
 

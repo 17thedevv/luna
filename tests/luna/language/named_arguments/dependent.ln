@@ -1,0 +1,2 @@
+import "provider";
+module client { export fn result() -> i32 { return named::subtract(right=2, left=9); } }

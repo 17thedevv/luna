@@ -307,6 +307,24 @@ pub struct BasicBlock {
     pub terminator: Option<Terminator>,
 }
 
+/// Definition/call obligations refer only to MVIR values and ABI parameter slots.
+/// They are proof metadata, never executable language operations or assumptions
+/// about initialized local defaults.
+#[derive(Clone, Debug, Default)]
+pub struct FunctionLifetimeInfo {
+    pub infer_input_requirements: bool,
+    pub input_assumptions: Vec<(u16, u16)>,
+    pub checks: std::collections::BTreeMap<ValueId, Vec<OutlivesCheck>>,
+}
+
+#[derive(Clone, Debug)]
+pub struct OutlivesCheck {
+    pub longer_subject: luna_semantic::CanonicalContractSubject,
+    pub shorter_subject: luna_semantic::CanonicalContractSubject,
+    pub longer: Operand,
+    pub shorter: Operand,
+}
+
 #[derive(Clone, Debug)]
 pub struct Function {
     pub name: GlobalId,
@@ -316,6 +334,7 @@ pub struct Function {
     pub link_name: Option<String>,
     pub param_types: Vec<SemanticTypeId>,
     pub ret_ty: SemanticTypeId,
+    pub lifetime_info: FunctionLifetimeInfo,
     pub blocks: Vec<BasicBlock>,
     pub values: Vec<ValueData>,
 }

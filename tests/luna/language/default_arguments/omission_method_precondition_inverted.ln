@@ -1,0 +1,6 @@
+import "provider";
+fn inverted(counter: &omitted::Counter, first: &i32, second: &i32)
+    requires life(counter) >= life(first), life(first) >= life(second) {
+    dec value = counter.require_order(second, first);
+}
+fn main() -> i32 { return 0; }

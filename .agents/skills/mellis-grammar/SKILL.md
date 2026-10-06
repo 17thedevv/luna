@@ -300,6 +300,17 @@ fn do_something(x: i32) -> i32 {
 }
 ```
 
+### Named arguments and defaults
+
+[CALL-ARGUMENTS-v1](../../../docs/spec/0.1/call-arguments-v1.md) adopts
+`function(right=2, left=9)` and retains historical `right: 2` labels. Labels
+bind declaration parameter positions; source order still governs evaluation.
+Structural callable types have no declaration labels/defaults, including
+known immutable function values. The contract also adopts per-call defaults
+such as `fn rectangle(width: i32, height: i32 = 20)`; consult the implementation
+gate before claiming this whole capability works. Parser acceptance alone
+cannot establish named binding, default evaluation or artifact parity.
+
 ### Declarative Macros (Phase 14B)
 Declarative macros use `@` for placeholders, `=>` to separate pattern and transcriber, and `!` for invocation.
 ```rust

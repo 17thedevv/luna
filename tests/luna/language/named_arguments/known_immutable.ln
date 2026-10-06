@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { dec callback = named::subtract; return callback(right=2, left=9); }

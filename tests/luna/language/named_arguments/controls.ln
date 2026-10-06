@@ -1,0 +1,32 @@
+import "provider";
+fn step(log: &rw i32, value: i32) -> i32 { *log = *log * 10 + value; return value; }
+fn set(value: &rw i32) -> i32 { *value = 2; return 2; }
+fn main() -> i32 {
+    if named::subtract(right=2, left=9) != 7 { return 1; }
+    if named::subtract(right:2, left:9) != 7 { return 2; }
+    if named::subtract(9, right=2) != 7 { return 3; }
+    if named::choose(right=2, left=9i64) != 9i64 { return 4; }
+    if named::mixed(right=true, left=9i64) != 9i64 { return 5; }
+    if named::forward(ignored=2, value=9i64) != 9i64 { return 6; }
+    dec counter = named::Counter {};
+    if counter.inherent(right=2, left=9) != 7 { return 7; }
+    if counter.subtract(right=2, left=9) != 7 { return 8; }
+    if named::Operation::subtract(&counter, right=2, left=9) != 7 { return 9; }
+    if counter.choose(right=2, left=9i64) != 9i64 { return 10; }
+    if named::Operation::choose(&counter, right=2, left=9i64) != 9i64 { return 11; }
+    dec rw log = 0;
+    dec answer = named::subtract(right=step(&rw log, 2), left=step(&rw log, 9));
+    if log != 29 || answer != 7 { return 12; }
+    dec first = 9;
+    dec second = 2;
+    if *named::select(second=&second, first=&first) != 9 { return 13; }
+    unsafe { if named::unsafe_subtract(right=2, left=9) != 7 { return 14; } }
+    dec rw snapshot = 9;
+    if named::subtract(left=snapshot, right=set(&rw snapshot)) != 7 { return 15; }
+    dec first_borrow = 9;
+    dec rw unrelated = 2;
+    dec selected = named::select(second=&unrelated, first=&first_borrow);
+    unrelated = 7;
+    if *selected != 9 { return 16; }
+    return 0;
+}

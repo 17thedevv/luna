@@ -1,0 +1,13 @@
+import "provider";
+const VALUE: i32 = comptime {
+    dec rw first = 9;
+    dec rw second = 2;
+    dec selected = loans::select(second=&second, first=&first);
+    second = 7;
+    dec chosen = *selected;
+    dec a = loans::set(replacement=3, value=&rw first);
+    dec b = loans::set(replacement=4, value=&rw first);
+    dec shared = &first;
+    chosen + a + b + *shared + *shared
+};
+fn main() -> i32 { return VALUE - 24; }

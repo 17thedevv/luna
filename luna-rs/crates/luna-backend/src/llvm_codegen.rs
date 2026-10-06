@@ -2087,7 +2087,7 @@ mod cast_invariant_tests {
             let function = MvirFunction {
                 name: luna_mvir::GlobalId { name: "malformed".into(), symbol_id: None },
                 is_extern: false, is_async: false, arg_count: 0, link_name: None,
-                param_types: vec![], ret_ty: semantic.types.void_id(), blocks: vec![],
+                param_types: vec![], ret_ty: semantic.types.void_id(), lifetime_info: Default::default(), blocks: vec![],
                 values: vec![ValueData::new(Instruction::Assign(Operand::Number("0".into())), source, None)],
             };
             let cast = ValueData::new(Instruction::Cast { value: Operand::Value(ValueId(0)), target_ty: target }, target, None);

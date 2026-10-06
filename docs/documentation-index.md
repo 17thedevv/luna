@@ -1,6 +1,6 @@
 # Luna 0.1 documentation inventory
 
-Updated 2026-10-03. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
+Updated 2026-10-06. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
 
 All repository-authored tracked Markdown and new versioned/archived/audit documents are classified below. Agent guidance is included. Vendor documentation, generated build logs and test-failure dumps are excluded. Website pages are generated from the same baseline.
 
@@ -50,6 +50,10 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/architecture.md](architecture.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/ast.md](ast.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md](audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md](audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md](audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md](audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md](audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md](audits/0.1-alpha-completion-2026-10-04/EXECUTION.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md](audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md) | evidence | [semantics](spec/0.1/semantics.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md](audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md) | evidence | [conformance](spec/0.1/conformance.md) |

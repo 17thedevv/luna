@@ -13,6 +13,7 @@ fn dummy_module() -> Module {
         is_extern: false,
         is_async: false,
         ret_ty: SemanticTypeId(0),
+        lifetime_info: Default::default(),
         values: Vec::new(),
         blocks: Vec::new(),
     };
@@ -51,20 +52,7 @@ fn test_golden_roundtrip() {
     let arena = luna_ast::AstArena::new();
     let source = "";
     
-    let manifest = luna_llib::Manifest {
-        identity: luna_llib::ArtifactIdentity { package_id: "".into(), version: "".into(), module_id: "".into(), artifact_id: "".into() },
-        target: luna_llib::TargetContract { target_triple: "".into(), cpu: "".into(), features: "".into(), object_format: "".into(), abi: "".into(), pointer_width: 64, endianness: "".into() },
-        dependencies: luna_llib::DependencyTable::default(),
-        object_metadata: None,
-        provenance: luna_llib::Provenance {
-            source_fingerprint: luna_llib::Fingerprint([0; 32]),
-            compiler_version: "".into(),
-            codegen_options: "".into(),
-            interface_fingerprint: luna_llib::Fingerprint([0; 32]),
-            execution_fingerprint: None,
-        },
-        export_table: Default::default(),
-    };
+    let manifest = dummy_manifest();
     MlibWriter::write_module(&module, &arena, &[], source, manifest, None, None, &mut buffer).expect("write failed");
     
     let mut cursor = Cursor::new(buffer);
@@ -163,4 +151,58 @@ fn test_unknown_section() {
     let result = MlibReader::read_module(&mut cursor).map(|(m, _, _, _)| m);
     // The reader errors because of Unknown section during reading the entry
     assert!(result.is_err());
+}
+
+fn dummy_manifest() -> luna_llib::Manifest {
+    luna_llib::Manifest {
+        identity: luna_llib::ArtifactIdentity { package_id: "".into(), version: "".into(), module_id: "".into(), artifact_id: "".into() },
+        target: luna_llib::TargetContract { target_triple: "".into(), cpu: "".into(), features: "".into(), object_format: "".into(), abi: "".into(), pointer_width: 64, endianness: "".into() },
+        dependencies: luna_llib::DependencyTable::default(),
+        object_metadata: None,
+        provenance: luna_llib::Provenance {
+            source_fingerprint: luna_llib::Fingerprint([0; 32]),
+            compiler_version: "".into(),
+            codegen_options: "".into(),
+            interface_fingerprint: luna_llib::Fingerprint([0; 32]),
+            execution_fingerprint: None,
+        },
+        export_table: Default::default(),
+    }
+}
+
+#[test]
+fn lifetime_annotations_roundtrip_and_reject_nonexistent_abi_or_value_slots() {
+    let mut module = dummy_module();
+    let function = &mut module.functions[0];
+    function.arg_count = 2;
+    function.lifetime_info.infer_input_requirements = true;
+    function.lifetime_info.input_assumptions = vec![(0,1)];
+    function.lifetime_info.checks.insert(ValueId(1), vec![luna_mvir::OutlivesCheck {
+        longer_subject: luna_semantic::CanonicalContractSubject::Param(0),
+        shorter_subject: luna_semantic::CanonicalContractSubject::SelfVal,
+        longer: Operand::Value(ValueId(0)), shorter: Operand::Value(ValueId(1)),
+    }]);
+    let encode = |module: &Module| {
+        let mut buffer = Vec::new();
+        MlibWriter::write_module(module, &luna_ast::AstArena::new(), &[], "", dummy_manifest(), None, None, &mut buffer).unwrap();
+        MlibReader::read_module(&mut Cursor::new(buffer))
+    };
+    let (decoded, ..) = encode(&module).unwrap();
+    let info = &decoded.functions[0].lifetime_info;
+    assert!(info.infer_input_requirements);
+    assert_eq!(info.input_assumptions, vec![(0,1)]);
+    let check = &info.checks[&1][0];
+    assert_eq!(check.longer_subject, luna_semantic::CanonicalContractSubject::Param(0));
+    assert_eq!(check.shorter_subject, luna_semantic::CanonicalContractSubject::SelfVal);
+    assert_eq!(check.longer, luna_llib::MlibOperand::Value(0));
+    for invalid_kind in 0..3 {
+        let mut invalid = module.clone();
+        let info = &mut invalid.functions[0].lifetime_info;
+        match invalid_kind {
+            0 => info.input_assumptions = vec![(0,2)],
+            1 => { let checks = info.checks.remove(&ValueId(1)).unwrap(); info.checks.insert(ValueId(99), checks); }
+            _ => info.checks.get_mut(&ValueId(1)).unwrap()[0].shorter = Operand::Value(ValueId(99)),
+        }
+        assert!(encode(&invalid).is_err(), "invalid lifetime annotation accepted: {invalid_kind}");
+    }
 }

@@ -794,7 +794,10 @@ impl<'a> MetadataBuilder<'a> {
             symbol_path = self.convert_symbol_id(canon).symbol_path;
         }
 
+        let callable_signature = self.provider.callable_signatures.get(&sid).cloned()
+            .or_else(|| sym.merged_ids.iter().find_map(|(_, symbol)| self.provider.callable_signatures.get(symbol).cloned()));
         ExportedSymbol {
+            callable_signature,
             kind: kind_str,
             ty_index,
             visibility: match sym.sym.visibility {

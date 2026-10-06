@@ -49,6 +49,21 @@ fn literal_and_literal_pattern_and_try_diagnostics_relocate() {
     check(token.span);
 }
 
+#[test]
+fn parameter_default_expression_and_contract_span_relocate() {
+    let mut arena = AstArena::new();
+    let value = arena.alloc_expr(Expr::Literal(token(), "3".into()));
+    arena.alloc_decl(luna_ast::Decl::Param {
+        annotations: Vec::new(), visibility: luna_ast::Visibility::Private,
+        name: token().span, ty: None, is_self: false, is_variadic: false,
+        default: Some(luna_ast::ParamDefault { value, span: token().span }),
+    });
+    relocate(&mut arena);
+    let luna_ast::Decl::Param { default: Some(default), .. } = &arena.decls[0] else { panic!() };
+    assert_eq!(default.value.0, 11);
+    check(default.span);
+}
+
 fn tree() -> TokenTree {
     TokenTree::Group {
         delimiter: MacroDelimiter::Paren,

@@ -1,0 +1,9 @@
+fn conflicting(first: &rw i32, second: &rw i32) -> i32 {
+    *first = 9;
+    return *second;
+}
+const VALUE: i32 = comptime {
+    dec rw value = 0;
+    conflicting(second=&rw value, first=&rw value)
+};
+fn main() -> i32 { return VALUE - 9; }

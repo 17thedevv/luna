@@ -1,0 +1,15 @@
+import "provider";
+import <result>;
+import <try>;
+fn failed() -> std::Result<i32, i32> { return std::Result::Err(17); }
+fn interrupted(counter: *rw i32) -> std::Result<i32, i32> {
+    named::consume(value=named::Owned { counter: counter, value: 9 }, marker=failed()?);
+    return std::Result::Ok(0);
+}
+fn main() -> i32 {
+    dec rw count = 0;
+    dec result = interrupted(&rw count as *rw i32);
+    dec code = match result { std::Result::Err(error) -> error, std::Result::Ok(value) -> 0 };
+    if code != 17 { return 2; }
+    return count - 1;
+}

@@ -1,0 +1,208 @@
+{
+  "recorded_utc": "2026-10-05T15:30:13.296090+00:00",
+  "base_commit": "f36a5abc70fb24066de783c233c579878decfd43",
+  "input_count": 792,
+  "input_differences": [],
+  "compiler_sha256": "fbe2e7d1bbac4d1dab35a416a4dbdfc0ecb6a2fe45873eb8f96500b90bcd69c6",
+  "compiler_matches_start": true,
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "runtime_matches_start": true,
+  "raw_files": {
+    "default-alias-behavior/alias_before-artifact/build.txt": {
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2",
+      "bytes": 839
+    },
+    "default-alias-behavior/alias_before-artifact/check.txt": {
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2",
+      "bytes": 839
+    },
+    "default-alias-behavior/alias_before-artifact/main.ln": {
+      "sha256": "7eec5b81f3657caae82fb2ef2b00d9026905853b6798401877c4d927e7df0a83",
+      "bytes": 90
+    },
+    "default-alias-behavior/alias_before-artifact/run.txt": {
+      "sha256": "a3680b6601c39b586ea892ad2bbaa58a7f72b62a64f73917b09aa8c5f188110e",
+      "bytes": 8
+    },
+    "default-alias-behavior/alias_before-source/build.txt": {
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2",
+      "bytes": 839
+    },
+    "default-alias-behavior/alias_before-source/check.txt": {
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2",
+      "bytes": 839
+    },
+    "default-alias-behavior/alias_before-source/main.ln": {
+      "sha256": "7eec5b81f3657caae82fb2ef2b00d9026905853b6798401877c4d927e7df0a83",
+      "bytes": 90
+    },
+    "default-alias-behavior/alias_before-source/provider.ln": {
+      "sha256": "5d681f8db64b2a831bba3dd7945109a64725ef38ba6916aa670c8aeaf78a99ef",
+      "bytes": 228
+    },
+    "default-alias-behavior/alias_before-source/run.txt": {
+      "sha256": "a3680b6601c39b586ea892ad2bbaa58a7f72b62a64f73917b09aa8c5f188110e",
+      "bytes": 8
+    },
+    "default-alias-behavior/alias_retargeted-artifact/build.txt": {
+      "sha256": "5ecde4e75a2932758a32283a218c04c4c1d3634476bf5c33d89b38dab50a768f",
+      "bytes": 1178
+    },
+    "default-alias-behavior/alias_retargeted-artifact/check.txt": {
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2",
+      "bytes": 839
+    },
+    "default-alias-behavior/alias_retargeted-artifact/main.ln": {
+      "sha256": "7eec5b81f3657caae82fb2ef2b00d9026905853b6798401877c4d927e7df0a83",
+      "bytes": 90
+    },
+    "default-alias-behavior/alias_retargeted-source/build.txt": {
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2",
+      "bytes": 839
+    },
+    "default-alias-behavior/alias_retargeted-source/check.txt": {
+      "sha256": "b62c5589abe8da5479439400b463ef6e62f65cd36547b03106b8d0a3f1c9f5d2",
+      "bytes": 839
+    },
+    "default-alias-behavior/alias_retargeted-source/main.ln": {
+      "sha256": "7eec5b81f3657caae82fb2ef2b00d9026905853b6798401877c4d927e7df0a83",
+      "bytes": 90
+    },
+    "default-alias-behavior/alias_retargeted-source/provider.ln": {
+      "sha256": "0e46eb7a52baae1c009bbc105159ccd8e12472e2052a562f467f0ec68ab371d0",
+      "bytes": 229
+    },
+    "default-alias-behavior/alias_retargeted-source/run.txt": {
+      "sha256": "a3680b6601c39b586ea892ad2bbaa58a7f72b62a64f73917b09aa8c5f188110e",
+      "bytes": 8
+    },
+    "default-alias-behavior/observations.json": {
+      "sha256": "fa9e21cf080c189761afad95c867dd84de90600e77b2b99d81fe5de94ed90318",
+      "bytes": 522
+    },
+    "default-declarations-alias-tests.txt": {
+      "sha256": "74eb7e7b6ac0c2d59606d884d472e1cf72c69ab8a107752e4e92a32c86fe7be4",
+      "bytes": 28471
+    },
+    "default-declarations-amended/check.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-amended/check.txt": {
+      "sha256": "bc7d824ff720f4394c65066d282828aea7d14dc10ad1e4a0f77c0c48547c2994",
+      "bytes": 47464
+    },
+    "default-declarations-amended/cli-driver.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-amended/cli-driver.txt": {
+      "sha256": "c9df47839b4283435e8d48fd64bcdfb46f13e0d54863eb4555c7be861f163630",
+      "bytes": 92945
+    },
+    "default-declarations-amended/internal.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-amended/internal.txt": {
+      "sha256": "35492bb904a3d557ebced187c13c107be4a03cd557a3ea7787af6614cb3e6749",
+      "bytes": 62637
+    },
+    "default-declarations-amended/start.json": {
+      "sha256": "04b0b964db6dd06bc159453979c5b2ccbd48265cf389bde7f4e7c45f8d045724",
+      "bytes": 104671
+    },
+    "default-declarations-amended-build.txt": {
+      "sha256": "3a83831c985e629dea83ea47caf2945e60d7e19ef45ed80a0270fb146736492c",
+      "bytes": 23567
+    },
+    "default-declarations-binding-check.txt": {
+      "sha256": "2f2e353a7a5057c88e6c0a3978fbf159afad4fd618982daaad6582d775d0903d",
+      "bytes": 48291
+    },
+    "default-declarations-binding-expanded-tests.txt": {
+      "sha256": "d5fe63ed7b746aa670b59bc16a8943d2cea15bf8b01a8b0df527a7827f1fd98d",
+      "bytes": 27246
+    },
+    "default-declarations-binding-tests.txt": {
+      "sha256": "282240f28e431f23d5b577d5664fe1d9de65ea864284e465e3bfa1b88267b124",
+      "bytes": 28471
+    },
+    "default-declarations-owner-tests.txt": {
+      "sha256": "621c4a60dee3bf2a8c53fd924fa4066628a4711790537f23abebe7ebc4166d13",
+      "bytes": 27839
+    },
+    "default-omission-amended/artifact/build.txt": {
+      "sha256": "3c52569852f7b53851ad7f2efac680e857882c3510c1ffefbf583d949c7c0fc9",
+      "bytes": 1151
+    },
+    "default-omission-amended/artifact/check.txt": {
+      "sha256": "3c52569852f7b53851ad7f2efac680e857882c3510c1ffefbf583d949c7c0fc9",
+      "bytes": 1151
+    },
+    "default-omission-amended/artifact/omission.ln": {
+      "sha256": "25be26dec273ca0aecaabd113d7d2d551763bd7bb7634aa4ad7efd4f4ca6ad8e",
+      "bytes": 75
+    },
+    "default-omission-amended/artifact/publish.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-omission-amended/observations.json": {
+      "sha256": "a142cd66977a97c80c9864aa51aeb7acba4a0a0618274085a740c994b3d29713",
+      "bytes": 5225
+    },
+    "default-omission-amended/source/build.txt": {
+      "sha256": "1c621294008b3e99a1d3cbec5a7753209c70970ed973f0429ef27e6ba392b762",
+      "bytes": 1149
+    },
+    "default-omission-amended/source/check.txt": {
+      "sha256": "1c621294008b3e99a1d3cbec5a7753209c70970ed973f0429ef27e6ba392b762",
+      "bytes": 1149
+    },
+    "default-omission-amended/source/omission.ln": {
+      "sha256": "25be26dec273ca0aecaabd113d7d2d551763bd7bb7634aa4ad7efd4f4ca6ad8e",
+      "bytes": 75
+    },
+    "default-omission-amended/source/provider.ln": {
+      "sha256": "d858a64416d4632b3282e4349e60cc076289746f503af386a3aea3fdb026151b",
+      "bytes": 1460
+    }
+  },
+  "commands": {
+    "check": "cargo check --workspace --all-targets",
+    "internal": "cargo test -p luna-ast -p luna-semantic -p luna-llib -p luna-mvir -p luna-borrowck -p luna-parser --no-fail-fast",
+    "cli-driver": "cargo test -p luna-cli --test named_arguments_cli --test default_arguments_cli --test namespace_alias_export_cli --test alpha_modules_cli --test comptime_loans_cli --test module_const_storage_cli --test method_resolution_cli --test interface_constraints_cli -p luna-driver --test adv_comptime_dyn_tests --test struct_lifetime_contract_acceptance_tests --no-fail-fast -- --nocapture"
+  },
+  "terminal_summaries": {
+    "check": {
+      "shell_exit": 0,
+      "summary_blocks": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "internal": {
+      "shell_exit": 0,
+      "summary_blocks": 57,
+      "passed": 331,
+      "failed": 0,
+      "ignored": 0
+    },
+    "cli-driver": {
+      "shell_exit": 0,
+      "summary_blocks": 10,
+      "passed": 48,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "scope": "Parameter default declaration AST, lexical resolution, rigid type/unsafe/trait validation and portable interface contract; omission execution remains unimplemented",
+  "protocol": 17,
+  "semantic_metadata_version": 9,
+  "limitations": [
+    "Default omission still rejects E2001 in both modes; it is a required positive gap, not waived semantics.",
+    "Omission entry mono/IR, ownership/effect remapping and complete runtime default evaluation remain required.",
+    "Known closure failure and all broader R0-R5 release requirements remain open. No full workspace test or release verdict."
+  ]
+}

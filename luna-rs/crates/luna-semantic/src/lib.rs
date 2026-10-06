@@ -34,7 +34,7 @@ pub use comptime::{ComptimeValue, ComptimeError, IntWidth, FloatWidth, TypeRepr,
 pub use symbol::{SymbolTable, ScopeId, SymbolKind, ProviderId, ImportSymbolResult};
 pub use luna_common::ids::SymbolId;
 
-pub use semantic_tables::{CaptureBinding, CaptureMode, SemanticTables, IntrinsicKind};
+pub use semantic_tables::{CaptureBinding, CaptureMode, SemanticTables, IntrinsicKind, CallableSignature, CallArgumentBinding};
 pub use ty::{TypeContext, SemanticTypeId, SemanticType, BuiltinType};
 pub use lifetime::{
     LifetimeIdent, LifetimeVar, LifetimeConstraintExpr, Provenance,
@@ -96,6 +96,8 @@ pub struct SemanticContext {
     pub types: TypeContext,
     pub instantiated_functions: Vec<InstantiatedFunction>,
     pub drop_glue_instances: Vec<mono::CanonicalInstanceIdentity>,
+    /// Scoped semantic preparation for early evaluation; never artifact metadata.
+    pub comptime_root: Option<mono::MonoRoot>,
     pub diagnostics: Vec<Diagnostic>,
     pub lang_items: lang_item::LangItemRegistry,
     pub needs_drop_cache: RefCell<HashMap<ty::SemanticTypeId, NeedsDropState>>,
@@ -146,6 +148,7 @@ impl SemanticContext {
             lang_items: lang_item::LangItemRegistry::new(),
             instantiated_functions: Vec::new(),
             drop_glue_instances: Vec::new(),
+            comptime_root: None,
             diagnostics: Vec::new(),
             needs_drop_cache: RefCell::new(HashMap::new()),
             comptime_values: HashMap::new(),

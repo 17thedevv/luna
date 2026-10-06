@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { return named::subtract(right=2, 9); }

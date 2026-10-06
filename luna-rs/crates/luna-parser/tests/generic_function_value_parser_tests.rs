@@ -51,3 +51,25 @@ fn relational_and_shift_expressions_remain_ordinary_operators() {
         ));
     }
 }
+
+#[test]
+fn qualified_owner_and_method_arguments_keep_their_declaration_roles() {
+    let (mut arena, value) = initializer("dec result = api::Processor<i32>::choose<bool>(true);");
+    let Expr::Call { callee, generic_args, .. } = &arena.exprs[value.0 as usize] else { panic!() };
+    assert_eq!(generic_args.len(), 1);
+    let callee = *callee;
+    let method_argument = generic_args[0];
+    let Expr::Identifier { segments, owner_generic_args, generic_args } = &arena.exprs[callee.0 as usize] else { panic!() };
+    assert_eq!(segments.len(), 3);
+    assert!(generic_args.is_empty());
+    assert_eq!(owner_generic_args.len(), 1);
+    assert_eq!(owner_generic_args[0].0, 1);
+    let owner_argument = owner_generic_args[0].1[0];
+    assert_ne!(method_argument, owner_argument);
+    luna_ast::AstRelocator::new(0, 0, 0, 17, 0, luna_common::ids::FileId(9)).relocate_arena(&mut arena);
+    let Expr::Call { generic_args, .. } = &arena.exprs[value.0 as usize] else { panic!() };
+    assert_eq!(generic_args[0].0, method_argument.0 + 17);
+    let Expr::Identifier { segments, owner_generic_args, .. } = &arena.exprs[callee.0 as usize] else { panic!() };
+    assert_eq!(owner_generic_args[0].1[0].0, owner_argument.0 + 17);
+    assert!(segments.iter().all(|span| span.file_id == luna_common::ids::FileId(9)));
+}

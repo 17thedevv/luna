@@ -128,7 +128,11 @@ pub struct ProviderInterface {
     pub pat_symbols: HashMap<luna_ast::PatId, luna_common::ids::SymbolId>,
     pub pat_types: HashMap<luna_ast::PatId, luna_semantic::ty::SemanticTypeId>,
     pub expr_types: HashMap<luna_ast::ExprId, luna_semantic::ty::SemanticTypeId>,
+    pub ast_types: HashMap<luna_ast::TypeId, luna_semantic::ty::SemanticTypeId>,
+    pub path_generic_bindings: HashMap<luna_ast::ExprId, Vec<(luna_common::ids::SymbolId, luna_ast::TypeId)>>,
     pub expr_substs: HashMap<luna_ast::ExprId, Vec<(luna_common::ids::SymbolId, luna_semantic::ty::SemanticTypeId)>>,
+    pub callable_signatures: HashMap<luna_common::ids::SymbolId, luna_semantic::CallableSignature>,
+    pub call_argument_bindings: HashMap<luna_ast::ExprId, luna_semantic::CallArgumentBinding>,
     pub expr_struct_init_indices: HashMap<luna_ast::ExprId, Vec<u32>>,
     pub expr_member_indices: HashMap<luna_ast::ExprId, u32>,
     pub raw_generic_param_symbols: HashMap<(luna_ast::DeclId, usize), luna_common::ids::SymbolId>,
@@ -824,6 +828,14 @@ impl ModuleRegistry {
                 let new_ty_id = ctx.types.clone_type_from(old_ty_id, &interface.types, &lookup_sym);
                 ctx.tables.expr_types.insert(expr_id, new_ty_id);
             }
+            for (&type_id, &old_ty) in &interface.ast_types {
+                let ty = ctx.types.clone_type_from(old_ty, &interface.types, &lookup_sym);
+                ctx.tables.ast_type_to_semantic.insert(type_id, ty);
+            }
+            for (&expression, bindings) in &interface.path_generic_bindings {
+                ctx.tables.path_generic_bindings.insert(expression, bindings.iter()
+                    .map(|&(symbol, ty)| (lookup_sym(symbol), ty)).collect());
+            }
             for (&expr_id, subst_list) in &interface.expr_substs {
                 let mut new_subst = luna_semantic::ty::Substitution::new();
                 for &(old_gp, old_ty) in subst_list {
@@ -832,6 +844,12 @@ impl ModuleRegistry {
                     new_subst.insert(new_gp, new_ty);
                 }
                 ctx.tables.expr_substs.insert(expr_id, new_subst);
+            }
+            for (&symbol, signature) in &interface.callable_signatures {
+                ctx.tables.callable_signatures.insert(lookup_sym(symbol), signature.clone());
+            }
+            for (&expression, binding) in &interface.call_argument_bindings {
+                ctx.tables.call_argument_bindings.insert(expression, binding.clone());
             }
             for (&expr_id, indices) in &interface.expr_struct_init_indices {
                 ctx.tables.expr_struct_init_indices.insert(expr_id, indices.clone());
@@ -1081,6 +1099,7 @@ pub struct ArenaRanges {
     pub exprs: std::ops::Range<u32>,
     pub decls: std::ops::Range<u32>,
     pub pats: std::ops::Range<u32>,
+    pub types: std::ops::Range<u32>,
 }
 
 /// Aggregate values emitted by the VM are structural. Drop optional source
@@ -1539,7 +1558,18 @@ impl ModuleRegistry {
             pat_symbols,
             pat_types,
             expr_types,
+            ast_types: ctx.tables.ast_type_to_semantic.iter().filter(|(ty, _)| ranges.types.contains(&ty.0))
+                .map(|(&source, &ty)| (source, ty)).collect(),
+            path_generic_bindings: ctx.tables.path_generic_bindings.iter().filter(|(expression, _)| ranges.exprs.contains(&expression.0))
+                .map(|(&expression, bindings)| (expression, bindings.clone())).collect(),
             expr_substs,
+            callable_signatures: ctx.tables.callable_signatures.keys().filter(|symbol| {
+                ctx.tables.symbol_decls.get(symbol).is_some_and(|decl| ranges.decls.contains(&decl.0))
+            }).filter_map(|&symbol| ctx.tables.callable_signature(symbol, &ctx.symbol_table)
+                .map(|signature| (symbol, signature.clone()))).collect(),
+            call_argument_bindings: ctx.tables.call_argument_bindings.iter()
+                .filter(|(expression, _)| ranges.exprs.contains(&expression.0))
+                .map(|(&expression, binding)| (expression, binding.clone())).collect(),
             expr_struct_init_indices,
             expr_member_indices,
             raw_generic_param_symbols,
@@ -1573,6 +1603,9 @@ impl ModuleRegistry {
         let scope = &ctx.symbol_table.scopes[scope_id.0 as usize];
         for (_name, sym_ids) in &scope.symbols {
             if let Some(&sym_id) = sym_ids.last() {
+                // An alias is a local lookup view, never an exported scope owner.
+                // Visiting its shared target first would suppress the real module.
+                if ctx.symbol_table.namespace_aliases.contains(&sym_id) { continue; }
                 let mut sym = ctx.symbol_table.get_symbol(sym_id).clone();
                 if sym.provider_id.is_some() && sym.provider_id != Some(provider_id) {
                     if sym.kind == SymbolKind::Module {

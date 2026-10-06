@@ -1,0 +1,13 @@
+import "provider";
+fn main() -> i32 {
+    dec counter = omitted::Counter { value: 8 };
+    if (counter.add() != 16) { return 1; }
+    if (omitted::Compute::eval(&counter) != 39) { return 3; }
+    if (omitted::Processor<i32>::choose(&counter, first=7) != 7) { return 4; }
+    if (omitted::Processor<i32>::choose(&counter, first=true) != true) { return 5; }
+    if (omitted::Processor<i32>::choose<bool>(&counter, first=true) != true) { return 6; }
+    if (counter.choose(first=true) != true) { return 7; }
+    if (omitted::Processor<i32>::control<bool>(&counter, item=true, owner=3) != true) { return 8; }
+    if (omitted::Processor<i32>::choose<bool>(&counter, first=true, second=false) != false) { return 9; }
+    return 0;
+}

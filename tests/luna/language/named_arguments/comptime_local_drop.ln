@@ -1,0 +1,12 @@
+struct Owner<T> { counter: *rw i32, value: T };
+const COUNT: i32 = comptime {
+    dec rw count = 0;
+    dec owner = Owner<i32> { counter: &rw count as *rw i32, value: 9 };
+    consume(value=owner);
+    count
+};
+fn consume<T>(value: T) {}
+impl<T> std::Drop for Owner<T> {
+    fn drop(&rw self) { unsafe { *self.counter = *self.counter + 1; } }
+}
+fn main() -> i32 { return COUNT - 1; }

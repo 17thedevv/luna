@@ -108,6 +108,9 @@ pub enum ComptimeValue {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ComptimeError {
+    /// A compiler phase rejected the prepared program before execution.
+    /// Preserve its typed codes and source spans rather than reclassifying it.
+    Diagnostics(Vec<luna_common::Diagnostic>),
     DivisionByZero,
     IntegerOverflow,
     TypeMismatch(String),
@@ -130,6 +133,7 @@ pub enum ComptimeError {
 impl std::fmt::Display for ComptimeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            ComptimeError::Diagnostics(diagnostics) => write!(f, "comptime admission rejected: {}", diagnostics.iter().map(|diagnostic| diagnostic.message.as_str()).collect::<Vec<_>>().join("; ")),
             ComptimeError::DivisionByZero => write!(f, "attempt to divide by zero in comptime evaluation"),
             ComptimeError::IntegerOverflow => write!(f, "integer overflow during comptime evaluation"),
             ComptimeError::TypeMismatch(msg) => write!(f, "comptime type mismatch: {}", msg),

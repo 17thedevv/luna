@@ -110,6 +110,7 @@ mod tests {
             link_name: None,
             param_types: vec![pointer, length],
             ret_ty: result,
+            lifetime_info: Default::default(),
             values: vec![
                 ValueData::new(Instruction::Alloca, pointer, None)
                     .with_origin(ValueOrigin::Parameter(0)),

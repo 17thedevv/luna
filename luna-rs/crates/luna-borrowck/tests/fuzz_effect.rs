@@ -63,6 +63,7 @@ fn generate_linear_function(num_args: u32, ops: Vec<u8>) -> Function {
         blocks: vec![],
         values: vec![],
         ret_ty: SemanticTypeId(0),
+        lifetime_info: Default::default(),
     };
 
     let mut block = BasicBlock {

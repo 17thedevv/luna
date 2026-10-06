@@ -1,0 +1,7 @@
+module timing {
+    unsafe fn tick(counter: *rw i32) -> i32 { *counter += 1; return *counter; }
+    export async unsafe fn schedule(counter: *rw i32, value: i32 = tick(counter)) -> i32 {
+        tick(counter);
+        return value;
+    }
+}

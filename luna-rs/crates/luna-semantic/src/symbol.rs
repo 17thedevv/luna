@@ -526,7 +526,7 @@ impl SymbolTable {
                 break;
             }
             for s in &self.symbols {
-                if s.inner_scope == Some(sc_id) {
+                if s.inner_scope == Some(sc_id) && !self.namespace_aliases.contains(&s.id) {
                     if matches!(s.kind, SymbolKind::Module | SymbolKind::Struct | SymbolKind::Enum | SymbolKind::Trait) {
                         path.push(s.name.clone());
                         break;

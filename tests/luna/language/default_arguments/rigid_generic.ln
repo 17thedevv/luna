@@ -1,0 +1,2 @@
+fn invalid<T>(first: T = 0 as T) -> T { return first; }
+fn main() -> i32 { return 0; }

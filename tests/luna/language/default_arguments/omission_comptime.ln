@@ -1,0 +1,5 @@
+import "provider";
+const VALUE: i32 = comptime { omitted::compute(first=2) };
+const FLAG: bool = comptime { omitted::generic<bool>(first=true) };
+const LAYOUT: usize = comptime { omitted::footprint<i64>(value=7i64) };
+fn main() -> i32 { if (VALUE != 564 || FLAG != true || LAYOUT != 1608usize) { return 1; } return 0; }

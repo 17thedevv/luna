@@ -90,6 +90,7 @@ fn check_generated_case(insts_per_block: &[Vec<u8>], term_kinds_raw: &[u8]) {
         blocks: vec![],
         values: vec![],
         ret_ty: prim,
+        lifetime_info: Default::default(),
     };
 
     let mut val_id_counter = 0;

@@ -1,0 +1,2 @@
+trait Compute { fn eval(&self, value: i32 = true) -> i32; }
+fn main() -> i32 { return 0; }

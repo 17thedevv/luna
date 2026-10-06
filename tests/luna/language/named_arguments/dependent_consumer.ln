@@ -1,0 +1,2 @@
+import "dependent";
+fn main() -> i32 { return client::result() - 7; }

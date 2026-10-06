@@ -34,8 +34,24 @@ pub struct MlibFunction {
     pub arg_count: u32,
     #[serde(default)]
     pub is_async: bool,
+    pub lifetime_info: MlibFunctionLifetimeInfo,
     pub values: Vec<MlibValue>,
     pub blocks: Vec<MlibBlock>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
+pub struct MlibFunctionLifetimeInfo {
+    pub infer_input_requirements: bool,
+    pub input_assumptions: Vec<(u16, u16)>,
+    pub checks: std::collections::BTreeMap<u32, Vec<MlibOutlivesCheck>>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct MlibOutlivesCheck {
+    pub longer_subject: luna_semantic::CanonicalContractSubject,
+    pub shorter_subject: luna_semantic::CanonicalContractSubject,
+    pub longer: MlibOperand,
+    pub shorter: MlibOperand,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]

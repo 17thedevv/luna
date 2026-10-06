@@ -222,6 +222,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         is_extern: false,
         is_async: false,
         ret_ty: void_ptr_ty,
+        lifetime_info: Default::default(),
         arg_count: func.arg_count,
         link_name: None,
         param_types: func.param_types.clone(),
@@ -373,6 +374,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         is_extern: false,
         is_async: false,
         ret_ty: func.ret_ty,
+        lifetime_info: Default::default(),
         arg_count: 1, // takes only the Env Struct pointer
         link_name: None,
         param_types: vec![void_ptr_ty],
@@ -959,6 +961,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         is_extern: false,
         is_async: false,
         ret_ty: SemanticTypeId(0), // void
+        lifetime_info: Default::default(),
         arg_count: 1, // takes only the Env Struct pointer
         link_name: None,
         param_types: vec![void_ptr_ty],
@@ -1381,6 +1384,7 @@ mod tests {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(3),
+        lifetime_info: Default::default(),
             blocks: vec![
                 BasicBlock {
                     label: LabelId { name: "entry".to_string() },
@@ -1431,6 +1435,7 @@ mod tests {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(3),
+        lifetime_info: Default::default(),
             blocks: vec![
                 BasicBlock {
                     label: LabelId { name: "entry".to_string() },
@@ -1515,6 +1520,7 @@ mod tests {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(3),
+        lifetime_info: Default::default(),
             blocks: vec![
                 BasicBlock {
                     label: LabelId { name: "entry".to_string() },

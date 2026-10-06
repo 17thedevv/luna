@@ -1,0 +1,5 @@
+import "provider";
+fn inverted(first: &i32, second: &i32) requires life(first) >= life(second) {
+    omitted::deferred_order(second, first);
+}
+fn main() -> i32 { return 0; }

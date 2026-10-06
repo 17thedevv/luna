@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { dec counter = omitted::Counter { value: 8 }; dec result = omitted::Processor<i32>::choose<bool, i32>(&counter, first=true); return 0; }

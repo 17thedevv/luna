@@ -222,6 +222,7 @@ impl ExternalComponentLoader {
             let expr_start = global_arena.exprs.len() as u32;
             let decl_start = global_arena.decls.len() as u32;
             let pat_start = global_arena.pats.len() as u32;
+            let type_start = global_arena.types.len() as u32;
             
             // Relocate AST to global arena
             let relocator = luna_ast::relocator::AstRelocator::new(
@@ -278,7 +279,7 @@ impl ExternalComponentLoader {
                 return Err(ExternalComponentError::SemanticFailed(semantic_ctx.diagnostics));
             }
 
-            let comptime_engine = luna_mvir::MvirComptimeEngine {
+            let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
                 max_steps: 1_000_000,
                 max_depth: 512,
             };
@@ -299,6 +300,7 @@ impl ExternalComponentLoader {
                 exprs: expr_start..(global_arena.exprs.len() as u32),
                 decls: decl_start..(global_arena.decls.len() as u32),
                 pats: pat_start..(global_arena.pats.len() as u32),
+                types: type_start..(global_arena.types.len() as u32),
             };
             let mut interface = ModuleRegistry::extract_interface_from_ctx(
                 descriptor.name.clone(),
@@ -569,6 +571,7 @@ impl ExternalComponentLoader {
         let expr_start = global_arena.exprs.len() as u32;
         let decl_start = global_arena.decls.len() as u32;
         let pat_start = global_arena.pats.len() as u32;
+        let type_start = global_arena.types.len() as u32;
 
         let relocator = luna_ast::relocator::AstRelocator::new(
             expr_start,
@@ -621,7 +624,7 @@ impl ExternalComponentLoader {
             return Err(ExternalComponentError::SemanticFailed(semantic_ctx.diagnostics));
         }
 
-        let comptime_engine = luna_mvir::MvirComptimeEngine {
+        let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
             max_steps: 1_000_000,
             max_depth: 512,
         };
@@ -674,6 +677,7 @@ impl ExternalComponentLoader {
             exprs: expr_start..(global_arena.exprs.len() as u32),
             decls: decl_start..(global_arena.decls.len() as u32),
             pats: pat_start..(global_arena.pats.len() as u32),
+            types: type_start..(global_arena.types.len() as u32),
         };
         let mut interface = ModuleRegistry::extract_interface_from_ctx(
             descriptor.name.clone(),

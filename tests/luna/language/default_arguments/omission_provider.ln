@@ -1,0 +1,50 @@
+module omitted {
+    fn seed() -> i32 { return 31; }
+    export fn compute(first: i32, second: i32 = seed() + first, third: i32 = second + 1) -> i32 {
+        return first * 100 + second * 10 + third;
+    }
+    export fn all(first: i32 = 3, second: i32 = first + 1) -> i32 { return first * 10 + second; }
+    export fn footprint<T>(value: T, bytes: usize = sizeof((T, T)) as usize, alignment: usize = alignof(T) as usize) -> usize { return bytes * 100 + alignment; }
+    export fn generic<T>(first: T, second: T = first as T) -> T { return second; }
+    export fn cast_identity<T>(value: T) -> T { return value as T; }
+    export fn cast_moved<T>(value: T) -> T { dec converted = value as T; return value; }
+    export unsafe fn tick(counter: *rw i32) -> i32 { *counter += 1; return *counter; }
+    export unsafe fn trace(counter: *rw i32, first: i32 = tick(counter), second: i32 = tick(counter)) -> i32 {
+        return first * 10 + second;
+    }
+    export struct Owned { counter: *rw i32, value: i32 };
+    impl std::Drop for Owned { fn drop(&rw self) { unsafe { *self.counter += 1; } } }
+    export fn fresh(counter: *rw i32, item: Owned = Owned { counter: counter, value: 9 }) -> i32 { return item.value; }
+    export fn borrow_owned(item: Owned, view: &Owned = &item) -> i32 { return view.value; }
+    export fn escape_owned(item: Owned, view: &Owned = &item) -> &Owned life_from(view) { return view; }
+    fn require_order(longer: &i32, shorter: &i32) -> i32 requires life(longer) >= life(shorter) { return *longer; }
+    export fn helper_default(longer: &i32, shorter: &i32, value: i32 = require_order(longer, shorter)) -> i32 { return value; }
+    export fn helper_method_default(counter: &Counter, longer: &i32, shorter: &i32, value: i32 = counter.require_order(longer, shorter)) -> i32 { return value; }
+    #[link(name = "abs")]
+    export extern unsafe fn native_abs(value: i32 = -9) -> i32;
+    #[link(name = "printf")]
+    export extern unsafe fn native_variadic(template: str = "abc", ...) -> i32;
+    export fn only_layout<T>(bytes: usize = sizeof(T) as usize) -> usize { return bytes; }
+    export fn ordered(longer: &i32, shorter: &i32, tag: i32 = 0) requires life(longer) >= life(shorter) {}
+    export fn deferred_order(longer: &i32, shorter: &i32, view: &i32 = shorter) requires life(longer) >= life(view) {}
+    export fn borrowed_return(value: &i32, view: &i32 = value) -> &i32 life_from(view) { return view; }
+    export fn ordered_default(longer: &i32, shorter: &i32 = longer) requires life(longer) >= life(shorter) {}
+    export fn moved(item: Owned, other: Owned = item) -> i32 { return item.value; }
+    export struct Counter { value: i32 };
+    impl Counter {
+        export fn add(&self, amount: i32 = self.value) -> i32 { return self.value + amount; }
+        export fn require_order(&self, longer: &i32, shorter: &i32) -> i32 requires life(longer) >= life(shorter) { return *longer; }
+        export fn forward_order(&self, longer: &i32, shorter: &i32) -> i32 requires life(longer) >= life(shorter) { return self.require_order(longer, shorter); }
+    }
+    export fn through_trait(counter: &Counter, value: i32 = Processor<i32>::choose(counter, first=7)) -> i32 { return value; }
+    export trait Compute { fn eval(&self, value: i32 = seed()) -> i32; }
+    impl Compute for Counter { fn eval(&self, supplied: i32) -> i32 { return self.value + supplied; } }
+    export trait Processor<U> {
+        fn choose<T>(&self, first: T, second: T = first as T) -> T;
+        fn control<T>(&self, owner: U, item: T) -> T;
+    }
+    impl Processor<i32> for Counter {
+        fn choose<V>(&self, input: V, output: V) -> V { return output; }
+        fn control<V>(&self, owner: i32, item: V) -> V { return item; }
+    }
+}

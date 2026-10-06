@@ -1,0 +1,15 @@
+import "provider";
+fn helper(value: i32) -> bool { return false; }
+fn main() -> i32 {
+    if (defaults::combine(second=9, first=2) != 11) { return 1; }
+    if (defaults::identity<i32>(second=9, first=2) != 9) { return 2; }
+    dec number = 7;
+    if (defaults::borrowed(second=&number, first=&number) != 14) { return 3; }
+    dec counter = defaults::Counter { base: 8 };
+    if (counter.add(base=4) != 12) { return 4; }
+    if (defaults::Compute::eval(&counter, value=5) != 13) { return 5; }
+    dec cell = defaults::Cell<i32> { value: number };
+    if (cell.read(value=&number) != 0) { return 6; }
+    if (defaults::Processor<i32>::identity(&counter, second=9, first=3) != 9) { return 7; }
+    return 0;
+}

@@ -1,0 +1,6 @@
+import "provider";
+const VALUE: i32 = comptime {
+    dec rw value = 0;
+    loans::conflicting(second=&rw value, first=&rw value)
+};
+fn main() -> i32 { return VALUE; }

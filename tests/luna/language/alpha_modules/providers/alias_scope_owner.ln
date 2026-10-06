@@ -1,0 +1,4 @@
+module first { export fn make() -> i32 { return 1; } }
+module second { export fn make() -> i32 { return 2; } }
+using second as selected;
+module facade { export fn run() -> i32 { return selected::make(); } }

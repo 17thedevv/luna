@@ -1,6 +1,6 @@
 use std::io::{Write, Cursor};
 use crate::format::{LlibHeader, SectionEntry, SectionType};
-use crate::ir::{MlibModule, MlibFunction, MlibValue, MlibBlock, MlibInstruction, MlibTerminator, MlibOperand, MlibTypeEntry};
+use crate::ir::{MlibFunctionLifetimeInfo, MlibOutlivesCheck, MlibModule, MlibFunction, MlibValue, MlibBlock, MlibInstruction, MlibTerminator, MlibOperand, MlibTypeEntry};
 use luna_mvir::{Module, Function, ValueData, BasicBlock, CaptureInfo, Instruction, Terminator, Operand};
 use luna_semantic::CaptureMode;
 
@@ -185,6 +185,14 @@ impl LlibWriter {
             name: func.name.name.clone(),
             arg_count: func.arg_count as u32,
             is_async: func.is_async,
+            lifetime_info: MlibFunctionLifetimeInfo {
+                infer_input_requirements: func.lifetime_info.infer_input_requirements,
+                input_assumptions: func.lifetime_info.input_assumptions.clone(),
+                checks: func.lifetime_info.checks.iter().map(|(value, checks)| (value.0, checks.iter().map(|check| MlibOutlivesCheck {
+                    longer_subject: check.longer_subject, shorter_subject: check.shorter_subject,
+                    longer: Self::convert_operand(&check.longer), shorter: Self::convert_operand(&check.shorter),
+                }).collect())).collect(),
+            },
             values: func.values.iter().enumerate().map(|(i, v)| MlibValue {
                 id: i as u32,
                 inst: Self::convert_instruction(&v.inst),
@@ -820,6 +828,10 @@ impl LlibWriter {
         Self::write_string(w, &func.name)?;
         w.write_all(&func.arg_count.to_le_bytes())?;
         w.write_all(&(func.is_async as u8).to_le_bytes())?;
+        let lifetime = bincode::serialize(&func.lifetime_info)
+            .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
+        w.write_all(&(lifetime.len() as u32).to_le_bytes())?;
+        w.write_all(&lifetime)?;
         w.write_all(&(func.values.len() as u32).to_le_bytes())?;
         for val in &func.values {
             Self::serialize_value(w, val)?;

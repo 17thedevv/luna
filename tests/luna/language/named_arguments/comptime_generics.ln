@@ -1,0 +1,26 @@
+import "provider";
+fn identity<T>(value: T) -> T { return value; }
+fn local_consume<T>(value: T, marker: i32) {}
+fn first<T>(left: &T, right: &T) -> &T life_from(left) { return left; }
+const FORWARD: i64 = comptime { named::forward(ignored=2, value=9i64) };
+const MULTIPLE: i32 = comptime {
+    dec small = identity(value=7i32);
+    dec wide = identity(value=9i64);
+    dec counter = named::Counter {};
+    dec trait_small = counter.choose(right=2, left=small);
+    dec trait_wide = named::Operation::choose(&counter, right=2, left=wide);
+    dec a = 9;
+    dec b = 2;
+    if trait_small == 7 && trait_wide == 9i64 && *first(right=&b, left=&a) == 9 { 0 } else { 1 }
+};
+const LOCAL_DROP: i32 = comptime {
+    dec rw count = 0;
+    dec owned = named::Owned { counter: &rw count as *rw i32, value: 9 };
+    local_consume(marker=owned.value, value=owned);
+    count
+};
+fn main() -> i32 {
+    if FORWARD != 9i64 { return 1; }
+    if MULTIPLE != 0 { return 2; }
+    return LOCAL_DROP - 1;
+}

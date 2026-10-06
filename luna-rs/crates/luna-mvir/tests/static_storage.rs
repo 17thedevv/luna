@@ -26,6 +26,7 @@ fn function(ty: SemanticTypeId, extra: Option<Instruction>) -> Function {
         link_name: None,
         param_types: vec![],
         ret_ty: ty,
+        lifetime_info: Default::default(),
         blocks: vec![BasicBlock {
             label: LabelId {
                 name: "entry".into(),

@@ -1,0 +1,6 @@
+module loans {
+    export fn conflicting(first: &rw i32, second: &rw i32) -> i32 { *first = 9; return *second; }
+    export fn mixed(shared: &i32, exclusive: &rw i32) -> i32 { *exclusive = 9; return *shared; }
+    export fn select(first: &i32, second: &i32) -> &i32 life_from(first) { return first; }
+    export fn set(value: &rw i32, replacement: i32) -> i32 { *value = replacement; return replacement; }
+}

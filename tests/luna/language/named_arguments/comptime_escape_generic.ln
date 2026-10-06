@@ -1,0 +1,3 @@
+fn identity<T>(value: T) -> T { return value; }
+const INVALID: &i32 = comptime { dec local = 9; identity(value=&local) };
+fn main() -> i32 { return *INVALID; }

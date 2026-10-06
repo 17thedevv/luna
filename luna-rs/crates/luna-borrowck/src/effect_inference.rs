@@ -109,6 +109,26 @@ impl<'a> EffectInference<'a> {
         analyzer.summary
     }
 
+    fn input_dependencies(&self, state: &TaintState, operand: &Operand) -> std::collections::BTreeSet<u16> {
+        self.get_safe_direct_taints(state, operand).into_iter().chain(self.get_safe_carried_taints(state, operand))
+            .filter_map(|source| match source {
+                TaintSource::Carried(index) => Some(index as u16),
+                TaintSource::Direct(index) => {
+                    let ty = self.func.param_types.get(index).copied()?;
+                    self.ctx.filter(|ctx| matches!(ctx.types.get(ctx.types.resolve(ty)), luna_semantic::SemanticType::Reference(..)))
+                        .map(|_| index as u16)
+                }
+            }).collect()
+    }
+
+    fn record_input_requirement(&mut self, state: &TaintState, longer: &Operand, shorter: &Operand) {
+        let longer = self.input_dependencies(state, longer);
+        let shorter = self.input_dependencies(state, shorter);
+        for &a in &longer { for &b in &shorter {
+            if a != b { self.summary.input_outlives.insert((a,b)); }
+        } }
+    }
+
     fn add_direct_taint(&self, state: &mut TaintState, dest: ValueId, src: &Operand) {
         if let Operand::Value(src_val) = src {
             if let Some(taints) = state.direct.get(src_val).cloned() {
@@ -1206,6 +1226,32 @@ impl<'a> DataflowAnalysis<TaintState> for EffectInference<'a> {
             Instruction::AlignOf { .. } => {}
             _ => {}
         }
+        if self.func.lifetime_info.infer_input_requirements {
+            for check in self.func.lifetime_info.checks.get(&val_id).into_iter().flatten() {
+                self.record_input_requirement(state, &check.longer, &check.shorter);
+            }
+            if let Instruction::CallDirect { callee, args } = inst {
+                let mut obligations = self.callee_summaries.and_then(|summaries| summaries.get(callee))
+                    .map(|summary| summary.input_outlives.clone()).unwrap_or_default();
+                if let Some(contract) = self.ctx.and_then(|ctx| callee.symbol_id.and_then(|symbol| ctx.tables.fn_lifetime_contracts.get(&symbol))) {
+                    let receiver = self.ctx.and_then(|ctx| callee.symbol_id
+                        .and_then(|symbol| ctx.tables.callable_signature(symbol, &ctx.symbol_table)))
+                        .map(|signature| signature.has_receiver).unwrap_or_else(||
+                            contract.outlives_constraints.iter().any(|constraint| matches!(constraint.longer, luna_semantic::CanonicalContractSubject::SelfVal)
+                                || matches!(constraint.shorter, luna_semantic::CanonicalContractSubject::SelfVal)));
+                    let index = |subject| match subject {
+                        luna_semantic::CanonicalContractSubject::SelfVal => 0,
+                        luna_semantic::CanonicalContractSubject::Param(index) => index + u16::from(receiver),
+                    };
+                    obligations.extend(contract.outlives_constraints.iter().map(|constraint| (index(constraint.longer), index(constraint.shorter))));
+                }
+                for (a,b) in obligations {
+                    if let (Some(a), Some(b)) = (args.get(a as usize), args.get(b as usize)) {
+                        self.record_input_requirement(state, a, b);
+                    }
+                }
+            }
+        }
     }
 
     fn transfer_terminator(&mut self, term: &Terminator, state: &mut TaintState) {
@@ -1469,6 +1515,7 @@ mod tests {
             is_extern: false,
             is_async: false,
             ret_ty: SemanticTypeId(0),
+            lifetime_info: Default::default(),
             blocks: vec![],
             values: vec![],
         };
@@ -1589,6 +1636,7 @@ mod tests {
             is_extern: false,
             is_async: false,
             ret_ty: SemanticTypeId(0),
+            lifetime_info: Default::default(),
             blocks: vec![],
             values: vec![],
         };
@@ -1671,6 +1719,7 @@ mod tests {
             is_extern: false,
             is_async: false,
             ret_ty: SemanticTypeId(0),
+            lifetime_info: Default::default(),
             blocks: vec![],
             values: vec![],
         };
@@ -1857,6 +1906,7 @@ mod tests {
             is_extern: false,
             is_async: false,
             ret_ty: SemanticTypeId(0),
+            lifetime_info: Default::default(),
             blocks: vec![],
             values: vec![],
         };

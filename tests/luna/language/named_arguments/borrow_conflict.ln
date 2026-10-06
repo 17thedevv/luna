@@ -1,0 +1,8 @@
+import "provider";
+fn main() -> i32 {
+    dec rw first = 9;
+    dec second = 2;
+    dec borrowed = named::select(second=&second, first=&first);
+    first = 7;
+    return *borrowed;
+}
