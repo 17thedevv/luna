@@ -55,6 +55,8 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md](audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md](audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/README.md](audits/0.1-alpha-completion-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/REMAINING-PLAN-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/REMAINING-PLAN-2026-10-06.md) | guidance | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/alpha-modules-2026-10-03/README.md](audits/alpha-modules-2026-10-03/README.md) | evidence | [modules](spec/0.1/modules.md) |
 | [docs/audits/provider-config-relative-2026-10-04/README.md](audits/provider-config-relative-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/repair-0.1/README.md](audits/repair-0.1/README.md) | evidence | [conformance](spec/0.1/conformance.md) |

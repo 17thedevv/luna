@@ -235,6 +235,16 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/REMAINING-PLAN-2026-10-06.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/alpha-modules-2026-10-03/README.md",
     "role": "evidence",
     "owner": "modules"

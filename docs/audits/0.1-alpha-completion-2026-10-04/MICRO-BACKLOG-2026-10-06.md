@@ -1,0 +1,366 @@
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Micro-backlog thực thi cho 0.1-alpha.1. Không thêm
+> contract/ngôn ngữ mới; chỉ phân rã công việc đã có trong tài liệu. Baseline và
+> adopted amendment vẫn là authority; tài liệu này không phải nghiệm thu compiler.
+
+# Micro-backlog thực thi — Luna 0.1-alpha.1 (2026-10-06)
+
+Tách từ [kế hoạch còn lại](REMAINING-PLAN-2026-10-06.md) và
+[kế hoạch gốc 2026-10-04](README.md). Tham chiếu ledger [EXECUTION](EXECUTION.md),
+contract [CALL-ARGUMENTS-v1](../../spec/0.1/call-arguments-v1.md) và
+[conformance gates](../../spec/0.1/conformance.md).
+
+## 0. Quy ước thực thi
+
+```
+1 task → 1 mục tiêu → 1 finding/root cause hoặc 1 thay đổi
+      → focused test → evidence → commit riêng nếu có code change
+```
+
+Không giao kiểu "fix toàn bộ ownership"; chỉ giao một lát nhỏ, ví dụ
+"A1-06: Add MVIR cleanup emission for one unused owned closure capture".
+
+## Definition of Done (template bắt buộc)
+
+```
+TASK:
+PARENT TASK:
+DEPENDENCIES:
+BASE SHA:
+IMPLEMENTATION SHA:
+TARGET:
+MODE:
+REPRODUCER:
+ORIGINAL FAILURE:
+ROOT CAUSE:
+CONTRACT:
+CHANGED FILES:
+FOCUSED COMMAND:
+FOCUSED RESULT:
+REGRESSION COMMAND:
+REGRESSION RESULT:
+ARTIFACT MODE:
+REMAINING GAPS:
+VERDICT:
+```
+
+`VERDICT=PASS` chỉ hợp lệ khi evidence đúng layer. Focused PASS không được dùng
+để biến một workspace FAIL trước đó thành PASS; verdict mới phải chạy lại trên
+exact candidate SHA.
+
+## Phát hiện C1 (đổi backlog)
+
+C1 **không** còn là feature "chưa triển khai". Nhánh `codex/call-arguments-0.1`
+có 5 commit trên nền `3601d12e`:
+
+```
+2615b5f8 feat(calls): execute synchronous defaults with concrete binder and lifetime plans
+ce417f19 feat(calls): check default declarations and preserve canonical binding identity
+f36a5abc fix(comptime): admit prepared programs through ordinary loan checks
+c0818477 fix(comptime): preserve concrete root call plans before early execution
+1b398714 feat(calls): bind named arguments and preserve evaluation order across artifacts
+```
+
+Có 3 harness (`named_arguments_cli`, `default_arguments_cli`, `default_omission_cli`),
+72 fixture (`tests/luna/language/named_arguments`, `default_arguments`), và bump
+artifact compiler 19 / MVIR 5 / metadata 9. Do đó C1-01..C1-52 đổi trạng thái
+thành `IMPLEMENTED_ON_SIDE_BRANCH` (chỉ trace) và thay bằng nhóm reconcile C1-R*.
+
+## Execution sequence
+
+```
+PHASE 0  DOC-01
+PHASE 1  R0-B01..R0-B24
+PHASE 2  R0-H01..R0-H34
+PHASE 3  C1-R01..C1-R30 + VR-01..VR-10
+PHASE 4  baseline verdict vs candidate verdict
+PHASE 5  A1 + A4 + D2, then A2/A3/A5/A6
+PHASE 6  C2/C3/C4/C5
+PHASE 7  D1/D3/D4
+PHASE 8  E1/E2
+PHASE 9  R4
+PHASE 10 R5
+```
+
+Baseline (`codex/antigravity-repair-0.1` @ exact SHA) phải lấy trước mọi merge C1.
+Reconcile C1 chỉ trong candidate branch `codex/luna-0.1-alpha.1-candidate`.
+
+## Wave 0 — Quyết định maintainer
+
+| ID | Micro-task | Output |
+|---|---|---|
+| DEC-01 | Đọc lại contract closure/callable hiện tại | Note 1 trang |
+| DEC-02 | Liệt kê hành vi khi closure consume owned capture | Matrix |
+| DEC-03 | Reducer cho closure gọi lại sau consume | .ln fixture |
+| DEC-04 | So sánh 3 policy: allow / compile reject / runtime fail | Decision table |
+| DEC-05 | Chọn D1 policy | Maintainer decision |
+| DEC-06 | Gán E-code nếu D1 chọn compile reject | Contract amendment |
+| DEC-07 | Xác định signed overflow cases | Matrix |
+| DEC-08 | Xác định unsigned overflow cases | Matrix |
+| DEC-09 | Xác định shift overflow/invalid shift cases | Matrix |
+| DEC-10 | Xác định integer division edge cases | Matrix |
+| DEC-11 | Chọn debug/release consistency policy | D2 decision |
+| DEC-12 | Liệt kê targets compiler hiện chạy thực tế | Target inventory |
+| DEC-13 | Chốt Windows GNU support | D3 |
+| DEC-14 | Chốt Ubuntu support + ASan | D3 |
+| DEC-15 | Chốt macOS support status | D3 |
+| DEC-16 | Chốt freestanding advertised/not advertised | D3 |
+| DEC-17 | Review NAMESPACE-USING-v1 scope | retain/defer |
+| DEC-18 | Review PROVIDER-CONFIG-v1 scope | retain/defer |
+| DEC-19 | Review MODULE-CONST-STORAGE-v1 scope | retain/defer |
+| DEC-20 | Review CALL-ARGUMENTS-v1 scope | retain/defer |
+| DEC-21 | Ghi D1–D4 vào authority docs | committed decision |
+
+Gate: không bắt đầu patch phụ thuộc D1/D2/D3 trước khi decision được ghi lại.
+
+## Wave 1 — R0 Baseline
+
+| ID | Task | ID | Task |
+|---|---|---|---|
+| R0-B01 | Checkout exact candidate SHA | R0-B13 | Xác nhận provider count từ manifest |
+| R0-B02 | Ghi git rev-parse HEAD | R0-B14 | Xác nhận 49 provider |
+| R0-B03 | Ghi branch hiện tại | R0-B15 | CARGO_TARGET_DIR riêng baseline |
+| R0-B04 | Ghi dirty/clean status | R0-B16 | CARGO_TARGET_DIR riêng candidate |
+| R0-B05 | Ghi rustc --version | R0-B17 | Tạo source-only test root |
+| R0-B06 | Ghi cargo --version | R0-B18 | Tạo artifact-only test root |
+| R0-B07 | Ghi LLVM version | R0-B19 | Artifact-only không source fallback |
+| R0-B08 | Ghi host triple | R0-B20 | Build canonical sysroot |
+| R0-B09 | Ghi target triple | R0-B21 | Lưu command + exit code |
+| R0-B10 | Hash compiler binary | R0-B22 | Workspace baseline --no-fail-fast |
+| R0-B11 | Hash runtime binary/library | R0-B23 | Lưu full failure list |
+| R0-B12 | Đọc artifact format versions | R0-B24 | Pin baseline report vào SHA |
+
+## Wave 2 — R0 Harness repair
+
+Provider oracle: R0-H01 search hardcode provider count · H02 liệt kê `36`, `35/36`
+và biến thể · H03 xác định source of truth manifest · H04 helper đọc provider count ·
+H05 chuyển Whole-File I/O oracle sang helper · H06 chuyển path suite · H07 focused
+tests · H08 kiểm tra không còn hardcode.
+
+Version oracle: R0-H09 search metadata version hardcode · H10 phân loại v3/v5/v7 ·
+H11 tách stale-version khỏi current-version · H12 centralize current version
+constants · H13 giữ incompatible-version rejection · H14 chạy stale artifact controls.
+
+Raw-storage harness: R0-H15 reproduce `E_RAW_STORAGE_ANCHOR_FIELD` · H16 reproduce
+`E_RAW_STORAGE_ANCHOR_COPY` · H17 fixture parse thành công · H18 diagnostic identity ·
+H19 reason · H20 span · H21 thay text-only assertion bằng typed assertion.
+
+Artifact isolation: R0-H22 search tests ghi vào canonical sysroot · H23 kiểm HT7 ·
+H24 kiểm String parity · H25 chuyển sang temp root · H26 chạy hai lần liên tiếp ·
+H27 xác minh run #2 không phụ thuộc run #1.
+
+Temp/process: R0-H28 audit TEMP · H29 audit TMP · H30 chuẩn hóa temp root ·
+H31 audit child timeout · H32 thêm timeout · H33 reproduce StorageFull · H34 harness stress.
+
+Gate R0: mọi failure mới có reducer rõ; harness không nhiễm canonical state.
+
+## Wave 3 — R1 Ownership / Soundness
+
+### A1 — Closure environment destruction
+
+Investigation: A1-01 chạy riêng `generic_drop_cli::closure_capture` · 02 output
+source · 03 output artifact · 04 reducer tối thiểu · 05 dump AST · 06 dump semantic
+capture facts · 07 dump MVIR · 08 cleanup block closure scope · 09 capture nào có
+ownership · 10 capture nào đã move · 11 trace backend drop glue · 12 root-cause note.
+
+Tests trước patch: A1-13 unused owned capture · 14 used owned capture · 15 borrowed
+capture · 16 multiple owned captures · 17 negative double-destroy · 18 negative use-after-move.
+
+Implementation: A1-19 representation closure env · 20 drop order · 21 emit cleanup 1
+capture · 22 generalize N captures · 23 skip captures transferred · 24 không fake loan ·
+25 không fake provenance · 26 wire backend drop glue · 27 destructor chạy đúng một lần.
+
+Verification: A1-28 run reducer source · 29 build fresh artifact · 30 run reducer
+artifact-only · 31 run `generic_drop_cli` đầy đủ · 32 run ownership focused · 33 run
+workspace candidate · 34 record remaining gaps.
+
+A1 chỉ đóng khi `generic_drop_cli` pass toàn bộ, positives đếm đúng drop, negatives
+giữ nguyên ở source + fresh artifact.
+
+### A2 — Async suspended cleanup
+
+A2-01 re-run initial cleanup controls · 02 re-run `future_initial_cancel` · 03 fixture
+conditional suspend before init · 04 after init · 05 projected field initialized ·
+06 projected field uninitialized · 07 generic owned resource · 08 cancel tại mỗi
+suspension point · 09 count destructors · 10 E3001 negative · 11 E3005 negative ·
+12 run source · 13 run artifact · 14 document cleanup state transitions.
+
+### A3 — Partial aggregate cleanup
+
+A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
+04 indexed move · 05 projected aggregate move · 06 partially-moved destruction ·
+07 verify drop count per field · 08 verify remaining fields drop · 09 negative move
+field from Drop owner · 10 verify E3001 · 11 run source · 12 run artifact.
+
+### A4 — Cast + poison containment
+
+A4-01 re-run 5 cast rejection reducers · 02 isolate poisoned private-member secondary
+diagnostic · 03 trace Type sau failed cast · 04 poison/Error path · 05 suppress
+secondary diagnostic · 06 verify original diagnostic · 07 fixture imported provider
+cast body · 08 build provider artifact · 09 relocate artifact · 10 run artifact-only ·
+11 verify identity cast drop count · 12 verify E3001 controls.
+
+### A5 — Raw slice/view
+
+A5-01 inventory CStr raw constructors · 02 safe misuse probe #1 · 03 safe misuse
+probe #2 · 04 borrowed-header coverage · 05 mixed ownership coverage · 06 opaque
+callback coverage · 07 opaque view-return coverage · 08 source positives · 09 source
+negatives · 10 artifact positives/negatives.
+
+### A6 — Unary logical Not
+
+A6-01 reproduce `boolean_not_observation.ln` · 02 confirm parser representation `!` ·
+03 confirm adopted syntax contract · 04 trace E2012 origin · 05 bool positive
+fixture · 06 non-bool negative fixture · 07 implement semantic behavior · 08 verify
+expression span · 09 run source · 10 run artifact.
+
+## Wave 4 — R2 Artifact + adopted features
+
+### C1 — CALL-ARGUMENTS-v1 (trace-only + reconcile)
+
+| ID range | STATUS | SOURCE | ACTION |
+|---|---|---|---|
+| C1-01..C1-52 | IMPLEMENTED_ON_SIDE_BRANCH | codex/call-arguments-0.1 | RECONCILE / AUDIT / VERIFY |
+
+Không giao agent implement named/default args lần nữa. Các ID gốc giữ để trace:
+C1-01..C1-13 named binding; C1-14..C1-21 lowering; C1-22..C1-28 artifact interface;
+C1-29..C1-40 default parameters; C1-41..C1-46 portability; C1-47..C1-52 gate.
+
+Reconcile tasks:
+
+| ID | Task | ID | Task |
+|---|---|---|---|
+| C1-R01 | Verify branch ancestry từ 3601d12e | C1-R16 | Verify default_arguments_cli |
+| C1-R02 | Review commit 1b398714 | C1-R17 | Verify default_omission_cli |
+| C1-R03 | Review commit c0818477 | C1-R18 | Verify source mode |
+| C1-R04 | Review commit f36a5abc | C1-R19 | Verify fresh artifact mode |
+| C1-R05 | Review commit ce417f19 | C1-R20 | Verify relocated artifact-only |
+| C1-R06 | Review commit 2615b5f8 | C1-R21 | Review comptime c0818477 độc lập |
+| C1-R07 | Inventory named fixtures | C1-R22 | Review comptime f36a5abc độc lập |
+| C1-R08 | Inventory default fixtures | C1-R23 | Check unrelated behavioral changes |
+| C1-R09 | Inventory omission fixtures | C1-R24 | Run impacted artifact suites |
+| C1-R10 | Map fixtures → CALL-ARGUMENTS-v1 | C1-R25 | Run impacted method-resolution |
+| C1-R11 | Audit compiler 15→19 | C1-R26 | Run cast suites |
+| C1-R12 | Audit MVIR 4→5 | C1-R27 | Run module/config suites |
+| C1-R13 | Audit metadata 7→9 | C1-R28 | Produce reconciliation report |
+| C1-R14 | Find all stale version oracles | C1-R29 | Integrate vào candidate branch |
+| C1-R15 | Verify named_arguments_cli | C1-R30 | Workspace verdict trên exact candidate SHA |
+
+Hai commit comptime (c0818477, f36a5abc) là task độc lập: original failure →
+reducer → root cause → fix → affected semantic invariant → regression. Không suy
+`C1 tests pass ⇒ comptime fixes hợp lệ`.
+
+### VERSION-RECONCILE
+
+VR-01 inventory version changes · VR-02 identify schema change cho mỗi bump ·
+VR-03 verify mỗi bump có justification · VR-04 verify old artifact rejects ·
+VR-05 verify current artifact accepts · VR-06 verify stale dependency rejects ·
+VR-07 verify fresh sysroot rebuild · VR-08 eliminate test hardcodes không phù hợp ·
+VR-09 preserve explicit incompatible-version tests · VR-10 record compatibility boundary.
+
+Không sửa mọi `15` thành `19` máy móc.
+
+### C2 — Per-impl-header metadata
+
+C2-01 locate impl-header canonicalization · 02 identify grouping by nominal head ·
+03 dump metadata hai impl header khác nhau · 04 compare fingerprints · 05 change
+public bound · 06 verify dependent artifact stale · 07 rename binder · 08 verify
+invariance · 09 reorder irrelevant syntax · 10 verify invariance · 11 change body
+only · 12 verify interface fingerprint unchanged · 13 verify no session-ID dependency.
+
+### C3 — Projection/fallback + 64-frame
+
+C3-01 associated projection reducer · 02 fallback reducer · 03 valid deep graph below
+64 · 04 graph at boundary · 05 graph above boundary · 06 observe current diagnostic ·
+07 distinguish exhaustion vs unsatisfied bound · 08 deterministic diagnostic ·
+09 verify valid deeper graph.
+
+### C4 — Comptime dependency precision
+
+C4-01 public-signature change · 02 private-body-only change · 03 generic-body change ·
+04 comptime-body change · 05 compiler-version change · 06 target change · 07 record
+current invalidation · 08 identify over-invalidation · 09 refine dependency selection ·
+10 verify fail-closed · 11 run complete matrix.
+
+### C5 — Freshness classification
+
+C5-01 define interface identity inputs · 02 execution identity inputs · 03 target/compiler
+identity inputs · 04 map artifact fields · 05 private non-inlined body test ·
+06 materialized generic body test · 07 comptime body test · 08 inlined body test ·
+09 run implementation-only validity test · 10 reconcile validator với contract.
+
+## Wave 5 — R3 Diagnostics
+
+### D1 — DIAG-1..10
+
+D1-01 requirement inventory · 02 map requirement → constructor · 03 mark missing
+constructor coverage · 04 mark optional code usages · 05 mark optional span usages ·
+06 source diagnostics lacking span · 07 I/O diagnostics incorrectly given spans ·
+08 structured related-label model · 09 enforce constructor rules · 10 deterministic
+ordering · 11 deterministic dedup · 12 one negative CLI fixture per requirement ·
+13 registry parity · 14 docs parity · 15 run full diagnostic suite.
+
+### D2 — Expression spans
+
+D2-01 exact-span assertion deref · 02 negation · 03 char cast · 04 tuple projection ·
+05 scalar index positive control · 06 trace `get_expr_span_for_diag` · 07 add missing
+deref shape · 08 add missing unary shape · 09 add missing cast shape · 10 TupleIndex
+primary span · 11 return poison Error · 12 verify no file-start fallback · 13 run
+`expression_diagnostic_spans_cli`.
+
+### D3 — Provider conformance
+
+D3-01 snapshot provider matrix · 02 enumerate Tier-2 · 03 enumerate Tier-3 ·
+04 map Resources API · 05 Resources positives · 06 Resources ownership negatives ·
+07 repeat concurrency · 08 repeat file · 09 repeat net · 10 repeat remaining
+collections · 11 repeat error APIs · 12 repeat borrow APIs · 13 run source ·
+14 build fresh artifacts · 15 run artifact-only · 16 run required targets ·
+17 downgrade false CERTIFIED row · 18 mark legitimate UNKNOWN.
+
+### D4 — Retained contracts
+
+Nhóm: D4-LIFE, D4-FFI, D4-DYN, D4-CLOSURE, D4-ASYNC, D4-COMPTIME, D4-UTF8,
+D4-ENTRY, D4-BACKEND. Mỗi nhóm: -01 inventory · -02 coverage map · -03 gap ·
+-04 fixture · -05 source verification · -06 artifact verification.
+
+## Wave 6 — Spec debt
+
+E1 overflow: E1-01 implement D2 decision vào semantics · 02 signed add overflow ·
+03 signed sub · 04 signed mul · 05 unsigned overflow · 06 invalid shift ·
+07 division edge · 08 debug build · 09 release build · 10 compare · 11 normative evidence.
+
+E2 formal grammar: E2-01 inventory adopted surface syntax · 02 inventory formal
+productions · 03 diff surface vs grammar · 04 mark parser-only legacy · 05 add missing
+adopted productions · 06 remove/mark non-adopted · 07 reproduce V01-GRAMMAR-01 ·
+08 reproduce V01-GRAMMAR-02 · 09 reproduce V01-GRAMMAR-03 · 10 reconcile gaps register ·
+11 reconcile repair ledger · 12 run docs/example validators.
+
+## Wave 7 — R4 Provenance + docs
+
+Ledger: R4-L01 freeze ledger backup · L02 define schema · L03 nullable
+implementation_commit · L04 verified_at_commit · L05 separate contract status ·
+L06 separate implementation status · L07 structured evidence · L08 remaining gaps ·
+L09 preexisting_at_baseline · L10 write migration · L11 verify no evidence lost ·
+L12 validate ledger.
+
+Docs: R4-D01 Status.md · D02 current gaps · D03 spec chapters · D04 repair ledger ·
+D05 provider ledger · D06 README · D07 quick start · D08 limitations · D09 runtime
+compatibility · D10 artifact compatibility · D11 generated site · D12 move audit
+3dac3ac to historical · D13 repair missing agent-handoff reference · D14 docs
+validator · D15 example checker.
+
+## Wave 8 — R5 Release candidate
+
+R5-01 select candidate SHA · 02 push candidate · 03 fresh clone · 04 verify clean ·
+05 record tested SHA · 06 build compiler · 07 build runtime · 08 build canonical
+sysroot · 09 verify provider count · 10 run A1 focused · 11 ownership suite ·
+12 cast suite · 13 call arguments suite · 14 diagnostics suite · 15 provider matrix ·
+16 57-fixture module/config matrix · 17 formatting tests · 18 Unicode tests ·
+19 artifact parity · 20 docs validator · 21 example validator · 22 workspace
+--no-fail-fast · 23 fix all failures; do not tag yet · 24 select new candidate SHA
+if code changed · 25 repeat clean checkout · 26 final release workspace · 27 require
+exit 0 · 28 Windows GNU CI · 29 Ubuntu CI · 30 Ubuntu ASan · 31 macOS if advertised ·
+32 save every command exit code · 33 freeze evidence · 34 verify report commit ≠
+tested commit semantics · 35 tag exact verified SHA 0.1-alpha.1 · 36 verify tag points
+to exact SHA · 37 merge only after gate · 38 if merge changes tree, rerun release gate.
