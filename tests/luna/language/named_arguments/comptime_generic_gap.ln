@@ -1,0 +1,9 @@
+import "provider";
+const VALUE: i32 = comptime { named::subtract(right=2, left=9) };
+const MOVED: i32 = comptime {
+    dec rw count = 0;
+    dec owned = named::Owned { counter: &rw count as *rw i32, value: 9 };
+    named::consume(marker=owned.value, value=owned);
+    count
+};
+fn main() -> i32 { if VALUE != 7 { return 1; } return MOVED - 1; }

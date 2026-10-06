@@ -4,6 +4,10 @@ use luna_lexer::{BuiltinKind, TokenKind};
 use luna_common::diagnostic::{Diagnostic, DiagnosticCode};
 #[path = "method_resolution.rs"]
 mod method_resolution;
+#[path = "call_binding.rs"]
+mod call_binding;
+#[path = "call_defaults.rs"]
+mod call_defaults;
 #[path = "trait_bound_proof.rs"]
 mod trait_bound_proof;
 
@@ -12,6 +16,12 @@ pub struct AssociatedTypeEqObligation {
     pub projection: SemanticTypeId,
     pub target_ty: SemanticTypeId,
     pub span: luna_common::Span,
+}
+
+#[derive(Clone, Copy)]
+enum ComptimeTarget {
+    Expression(luna_ast::ExprId),
+    Statement(luna_ast::StmtId),
 }
 
 pub struct TypeChecker<'a> {
@@ -91,22 +101,57 @@ impl<'a> TypeChecker<'a> {
     }
 
     pub fn eval_comptime_expr(&mut self, expr_id: luna_ast::ExprId) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
-        self.ctx.tables.evaluated_comptime = true;
-        self.prepare_comptime_bodies();
-        if let Some(engine) = self.comptime_engine {
-            engine.eval_expr(self.arena, self.ctx, self.source_manager, expr_id)
-        } else {
-            Err(crate::comptime::ComptimeError::UnsupportedOperation("comptime engine not configured".to_string()))
-        }
+        self.eval_prepared_comptime(ComptimeTarget::Expression(expr_id))
     }
 
     pub fn eval_comptime_stmt(&mut self, stmt_id: luna_ast::StmtId) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
+        self.eval_prepared_comptime(ComptimeTarget::Statement(stmt_id))
+    }
+
+    fn eval_prepared_comptime(&mut self, target: ComptimeTarget) -> Result<crate::comptime::ComptimeValue, crate::comptime::ComptimeError> {
         self.ctx.tables.evaluated_comptime = true;
+        let Some(engine) = self.comptime_engine else {
+            return Err(crate::comptime::ComptimeError::UnsupportedOperation("comptime engine not configured".to_string()));
+        };
         self.prepare_comptime_bodies();
-        if let Some(engine) = self.comptime_engine {
-            engine.eval_stmt(self.arena, self.ctx, self.source_manager, stmt_id)
-        } else {
-            Err(crate::comptime::ComptimeError::UnsupportedOperation("comptime engine not configured".to_string()))
+        let return_type = match target {
+            ComptimeTarget::Expression(expr) => self.ctx.tables.expr_types.get(&expr).copied(),
+            ComptimeTarget::Statement(stmt) => self.infer_stmt_value_type(&stmt),
+        }.unwrap_or_else(|| self.ctx.types.intern(SemanticType::Void));
+        let diagnostics_before = self.ctx.diagnostics.len();
+        let mut collector = crate::mono::MonoCollector::new_with_source(self.ctx, self.arena, Some(self.source_manager));
+        let mut root = match target {
+            ComptimeTarget::Expression(expr) => collector.run_on_expr(expr),
+            ComptimeTarget::Statement(stmt) => collector.run_on_stmt(stmt),
+        };
+        root.return_type = Some(return_type);
+        let functions = collector.instantiated.into_values().collect();
+        let glues = collector.drop_glues;
+        if self.ctx.diagnostics.len() != diagnostics_before {
+            return Err(crate::comptime::ComptimeError::TypeMismatch(self.ctx.diagnostics[diagnostics_before..]
+                .iter().map(|diagnostic| diagnostic.message.clone()).collect::<Vec<_>>().join("; ")));
+        }
+        // Do not publish partial early instances as whole-program compilation
+        // results. Interned types remain in this session so returned type IDs
+        // stay valid; the evaluation root and reachable units are scoped.
+        let previous_root = self.ctx.comptime_root.replace(root);
+        let previous_functions = std::mem::replace(&mut self.ctx.instantiated_functions, functions);
+        let previous_glues = std::mem::replace(&mut self.ctx.drop_glue_instances, glues);
+        let result = match target {
+            ComptimeTarget::Expression(expr) => engine.eval_expr(self.arena, self.ctx, self.source_manager, expr),
+            ComptimeTarget::Statement(stmt) => engine.eval_stmt(self.arena, self.ctx, self.source_manager, stmt),
+        };
+        self.ctx.comptime_root = previous_root;
+        self.ctx.instantiated_functions = previous_functions;
+        self.ctx.drop_glue_instances = previous_glues;
+        result
+    }
+
+    fn report_comptime_error(&mut self, error: crate::ComptimeError, span: luna_common::Span, context: &str) {
+        match error {
+            crate::ComptimeError::Diagnostics(diagnostics) => self.ctx.diagnostics.extend(diagnostics),
+            other => self.ctx.diagnostics.push(Diagnostic::error(format!("{context}: {other}"))
+                .with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span)),
         }
     }
     
@@ -1903,6 +1948,7 @@ impl<'a> TypeChecker<'a> {
                         let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                         if let Some(sym_id) = sym_id_opt {
                             self.ctx.tables.symbol_types.insert(sym_id, func_ty);
+                            self.register_callable_signature(sym_id);
                             self.ctx.tables.function_effects.entry(sym_id).or_insert_with(crate::effect::EffectSet::pure);
                             if *is_unsafe {
                                 self.ctx.tables.unsafe_functions.insert(sym_id);
@@ -1954,6 +2000,7 @@ impl<'a> TypeChecker<'a> {
                                 let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                                 if let Some(sym_id) = sym_id_opt {
                                     self.ctx.tables.symbol_types.insert(sym_id, func_ty);
+                                    self.register_callable_signature(sym_id);
                                     if *is_unsafe {
                                         self.ctx.tables.unsafe_functions.insert(sym_id);
                                     }
@@ -2006,6 +2053,7 @@ impl<'a> TypeChecker<'a> {
                                     let func_ty = self.ctx.types.intern(SemanticType::Function { params: param_tys, return_type: actual_ret_ty, is_unsafe: *is_unsafe || sym_id_opt.is_some_and(|symbol| matches!(self.ctx.symbol_table.get_symbol(symbol).kind, crate::SymbolKind::ExternFunction)) });
                                     if let Some(sym_id) = sym_id_opt {
                                         self.ctx.tables.symbol_types.insert(sym_id, func_ty);
+                                        self.register_callable_signature(sym_id);
                                         if *is_unsafe {
                                             self.ctx.tables.unsafe_functions.insert(sym_id);
                                         }
@@ -2157,6 +2205,11 @@ impl<'a> TypeChecker<'a> {
                         let expected = self.lower_type(annot);
                         self.typecheck_expr_expected(&init, expected)
                     } else { self.typecheck_expr(&init) };
+                    if matches!(self.ctx.types.get(init_ty), SemanticType::Error) {
+                        if let Some(symbol) = sym_id_opt { self.ctx.tables.symbol_types.insert(symbol, init_ty); }
+                        self.current_scope = previous_scope;
+                        continue;
+                    }
                     let final_ty = if let Some(annot) = type_annot {
                         let annot_ty = self.lower_type(annot);
                         if let Err(e) = self.unify(annot_ty, init_ty) {
@@ -2179,7 +2232,7 @@ impl<'a> TypeChecker<'a> {
                         }
                         Err(e) => {
                             let span = self.get_expr_span_for_diag(&init).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
+                            self.report_comptime_error(e, span, "cannot evaluate constant in comptime");
                         }
                     }
                     self.current_scope = previous_scope;
@@ -2956,7 +3009,7 @@ impl<'a> TypeChecker<'a> {
                     Ok(val) => val.as_usize().unwrap_or(0) as u64,
                     Err(e) => {
                         let span = self.get_expr_span_for_diag(size).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate array size in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
+                        self.report_comptime_error(e, span, "cannot evaluate array size in comptime");
                         0
                     }
                 };
@@ -3166,6 +3219,7 @@ impl<'a> TypeChecker<'a> {
                             }
                         }
                         self.current_return_type.push(ret_ty);
+                        self.typecheck_parameter_defaults(*decl_id);
                         if let Some(body_stmt) = body {
                             self.typecheck_function_body(body_stmt, ret_ty);
                         }
@@ -3188,6 +3242,12 @@ impl<'a> TypeChecker<'a> {
                         } else {
                             self.ctx.types.new_inference_var()
                         };
+                        if matches!(self.ctx.types.get(init_ty), SemanticType::Error) {
+                            if let Some(symbol) = self.ctx.tables.decl_symbols.get(decl_id).copied() {
+                                self.ctx.tables.symbol_types.insert(symbol, init_ty);
+                            }
+                            return;
+                        }
                         
                         if let Some(annot) = type_annot {
                             let expected_ty = self.lower_type(*annot);
@@ -3242,7 +3302,7 @@ impl<'a> TypeChecker<'a> {
                                             }
                                         }
                                         Err(e) => {
-                                            self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate constant in comptime: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(*name));
+                                            self.report_comptime_error(e, *name, "cannot evaluate constant in comptime");
                                         }
                                     }
                                 }
@@ -3267,6 +3327,17 @@ impl<'a> TypeChecker<'a> {
                         if let Some(pat_id) = pattern {
                             self.typecheck_pattern(pat_id, init_ty);
                         }
+                    }
+                    Decl::Trait { methods, .. } => {
+                        let previous_scope = self.current_scope;
+                        let previous_self = self.current_self_type;
+                        if let Some(&scope) = self.ctx.tables.decl_scopes.get(decl_id) { self.current_scope = scope; }
+                        if let Some(&symbol) = self.ctx.tables.decl_symbols.get(decl_id) {
+                            self.current_self_type = Some(self.ctx.types.intern(SemanticType::GenericParam(symbol)));
+                        }
+                        for method in methods { self.typecheck_item(&Item::Decl(*method)); }
+                        self.current_self_type = previous_self;
+                        self.current_scope = previous_scope;
                     }
                     Decl::Impl { generic_params: _, self_type, methods, .. } => {
                         let prev_scope = self.current_scope;
@@ -3301,6 +3372,7 @@ impl<'a> TypeChecker<'a> {
                                     self.ctx.types.intern(SemanticType::Void)
                                 };
                                 self.current_return_type.push(ret_ty);
+                                self.typecheck_parameter_defaults(*method_id);
                                 self.typecheck_function_body(body_stmt, ret_ty);
                                 self.current_return_type.pop();
                                 self.is_unsafe_context = prev_unsafe;
@@ -3312,6 +3384,7 @@ impl<'a> TypeChecker<'a> {
                         self.current_scope = prev_scope;
                     }
                     Decl::Extern { func, .. } => {
+                        self.typecheck_item(&Item::Decl(*func));
                         // The inner func is registered, we must check its FFI safety
                         if let Some(sym_id) = self.ctx.tables.decl_symbols.get(func).copied() {
                             let mut eff = crate::effect::EffectSet::pure();
@@ -4080,12 +4153,12 @@ impl<'a> TypeChecker<'a> {
                 self.ctx.types.intern(kind)
             }
             Expr::Identifier { generic_args, .. } => {
-                if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id) {
+                if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id).copied() {
                     let mut base_ty = None;
-                    if let Some(ty) = self.ctx.tables.symbol_types.get(sym_id) {
+                    if let Some(ty) = self.ctx.tables.symbol_types.get(&sym_id) {
                         base_ty = Some(*ty);
                     } else {
-                        let symbol = self.ctx.symbol_table.get_symbol(*sym_id);
+                        let symbol = self.ctx.symbol_table.get_symbol(sym_id);
                         if let crate::SymbolKind::EnumVariant(_) = symbol.kind {
                             if let Some(decl_id) = symbol.decl_id {
                                 if let Some(enum_sym_id) = self.ctx.tables.decl_symbols.get(&decl_id) {
@@ -4097,8 +4170,15 @@ impl<'a> TypeChecker<'a> {
                         }
                     }
                     if let Some(ty) = base_ty {
+                        let mut owner_subst = crate::ty::Substitution::new();
+                        for (binder, argument) in self.ctx.tables.path_generic_bindings.get(expr_id).cloned().unwrap_or_default() {
+                            let concrete = self.lower_type(argument);
+                            owner_subst.insert(binder, concrete);
+                        }
+                        let ty = self.ctx.types.subst(ty, &owner_subst);
+                        if !owner_subst.map.is_empty() { self.ctx.tables.expr_substs.insert(*expr_id, owner_subst); }
                         if generic_args.is_empty() {
-                            let sym_kind = self.ctx.symbol_table.get_symbol(*sym_id).kind.clone();
+                            let sym_kind = self.ctx.symbol_table.get_symbol(sym_id).kind.clone();
                             if matches!(sym_kind, crate::SymbolKind::EnumVariant(_) | crate::SymbolKind::Enum) {
                                 let resolved = self.ctx.types.get(ty).clone();
                                 match resolved {
@@ -4133,7 +4213,7 @@ impl<'a> TypeChecker<'a> {
                             }
                         } else {
                             // Substitute generic arguments
-                            let symbol = self.ctx.symbol_table.get_symbol(*sym_id);
+                            let symbol = self.ctx.symbol_table.get_symbol(sym_id);
                             let decl_id_opt = symbol.decl_id.or_else(|| {
                                 if let crate::SymbolKind::EnumVariant(_) = symbol.kind {
                                     symbol.decl_id
@@ -4326,7 +4406,7 @@ impl<'a> TypeChecker<'a> {
                     .and_then(|decl| self.arena.decls.get(decl.0 as usize))
                     .is_some_and(|decl| matches!(decl, Decl::Param { is_self: true, .. }));
                 let is_method_call = is_dyn_call || (is_struct_method && receiver_declared);
-                let mut subst = crate::ty::Substitution::new();
+                let mut subst = self.ctx.tables.expr_substs.get(callee).cloned().unwrap_or_default();
                 
                 if let Some(&callee_sym) = self.ctx.tables.expr_symbols.get(callee) {
                     if Some(callee_sym) == self.ctx.lang_items.get(crate::lang_item::LangItem::DropFn) {
@@ -4336,7 +4416,7 @@ impl<'a> TypeChecker<'a> {
                     }
                 }
                 
-                let mut has_generics = false;
+                let mut has_generics = !subst.map.is_empty();
                 let mut func_sym_opt = None;
 
                 let id_gen_args = if let Expr::Identifier { generic_args, .. } = callee_expr {
@@ -4358,6 +4438,15 @@ impl<'a> TypeChecker<'a> {
                             let mut concrete_args = Vec::new();
                             for arg in effective_gen_args {
                                 concrete_args.push(self.lower_type(*arg));
+                            }
+                            let declared = match self.arena.decls.get(callee_decl_id.0 as usize) {
+                                Some(Decl::Function { generic_params, .. }) => generic_params.len(),
+                                _ => concrete_args.len(),
+                            };
+                            if declared != concrete_args.len() {
+                                self.ctx.diagnostics.push(Diagnostic::error(format!(
+                                    "Method/function type argument count: expected {}, got {}", declared, concrete_args.len()))
+                                    .with_code(DiagnosticCode::TypeMismatch).with_span(self.get_expr_span_for_diag(callee).unwrap_or_default()));
                             }
                             for (gp_idx, &c_arg) in concrete_args.iter().enumerate() {
                                 if let Some(gp_sym) = self.ctx.tables.generic_param_symbols.get(&(callee_decl_id, gp_idx)) {
@@ -4432,16 +4521,12 @@ impl<'a> TypeChecker<'a> {
                         .and_then(|decl| self.arena.decls.get(decl.0 as usize))
                         .is_some_and(|decl| matches!(decl, Decl::Function { is_variadic: true, .. }));
                     let required = params.len().saturating_sub(usize::from(is_method_call));
-                    if args.len() < required || (!is_variadic && args.len() != required) {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!(
-                            "Callable expects {}{} arguments, but {} were provided",
-                            if is_variadic { "at least " } else { "" }, required, args.len(),
-                        )).with_code(DiagnosticCode::TypeMismatch).with_span(self.get_expr_span_for_diag(expr_id).unwrap_or_default()));
-                        for arg in args {
-                            self.typecheck_expr(&arg.value);
-                        }
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+                    let Some(binding) = self.bind_call_arguments(*expr_id, func_sym_opt, is_method_call,
+                        required, is_variadic, args, span) else {
+                        for arg in args { self.typecheck_expr(&arg.value); }
                         return self.ctx.types.error_id();
-                    }
+                    };
                     ret_ty_id = if has_generics { self.ctx.types.subst(return_type, &subst) } else { return_type };
                     if has_generics {
                         if let Some(expected) = self.expected_expr_type.last().copied() {
@@ -4456,11 +4541,12 @@ impl<'a> TypeChecker<'a> {
                         &params[..]
                     };
                     for (i, arg) in args.iter().enumerate() {
-                        let expected = expected_params.get(i).map(|&ty| if has_generics { self.ctx.types.subst(ty, &subst) } else { ty });
+                        let parameter = binding.source_to_parameter[i] as usize;
+                        let expected = expected_params.get(parameter).map(|&ty| if has_generics { self.ctx.types.subst(ty, &subst) } else { ty });
                         let arg_ty = if let Some(expected) = expected {
                             self.typecheck_expr_expected(&arg.value, expected)
                         } else { self.typecheck_expr(&arg.value) };
-                        if let Some(&expected_p) = expected_params.get(i) {
+                        if let Some(&expected_p) = expected_params.get(parameter) {
                             let expected_p = if has_generics { self.ctx.types.subst(expected_p, &subst) } else { expected_p };
                             if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                 if let Err(e) = self.unify(expected_p, arg_ty) {
@@ -4504,6 +4590,11 @@ impl<'a> TypeChecker<'a> {
                         }
                     }
                 } else if let SemanticType::Enum(enum_sym_id, enum_args, variants) = callee_ty {
+                    if let Some(label) = args.iter().find_map(|argument| argument.label) {
+                        self.ctx.diagnostics.push(Diagnostic::error("Enum constructors do not expose named callable parameters")
+                            .with_code(DiagnosticCode::TypeMismatch).with_span(label));
+                        return self.ctx.types.error_id();
+                    }
                     if let Some(func_sym) = func_sym_opt {
                         if let crate::SymbolKind::EnumVariant(variant_idx) = self.ctx.symbol_table.get_symbol(func_sym).kind {
                             let mut enum_subst = crate::ty::Substitution::new();
@@ -5262,10 +5353,15 @@ impl<'a> TypeChecker<'a> {
                                             return self.ctx.types.error_id();
                                         }
                                         let expected_params = &params[1..];
+                                        let Some(binding) = self.bind_call_arguments(*expr_id, Some(m_sym), true,
+                                            expected_params.len(), false, args, *method_name) else {
+                                            return self.ctx.types.error_id();
+                                        };
                                         for (i, arg) in args.iter().enumerate() {
-                                            let arg_ty = expected_params.get(i).map(|&expected| self.typecheck_expr_expected(&arg.value, expected))
+                                            let parameter = binding.source_to_parameter[i] as usize;
+                                            let arg_ty = expected_params.get(parameter).map(|&expected| self.typecheck_expr_expected(&arg.value, expected))
                                                 .unwrap_or_else(|| self.typecheck_expr(&arg.value));
-                                            if let Some(&expected_p) = expected_params.get(i) {
+                                            if let Some(&expected_p) = expected_params.get(parameter) {
                                                 if !self.try_coerce(arg.value, arg_ty, expected_p) {
                                                     if let Err(e) = self.unify(expected_p, arg_ty) {
                                                         let span = self.get_expr_span_for_diag(&arg.value).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
@@ -5949,16 +6045,19 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             Expr::Comptime { body } => {
+                if self.ctx.tables.expr_types.get(expr_id).is_some_and(|&ty| matches!(self.ctx.types.get(ty), SemanticType::Error)) {
+                    return self.ctx.types.error_id();
+                }
                 self.typecheck_stmt(body);
                 let ty = self.infer_stmt_value_type(body).unwrap_or_else(|| self.ctx.types.intern(SemanticType::Void));
                 match self.eval_comptime_stmt(*body) {
-                    Ok(v) => { self.ctx.comptime_values.insert(*expr_id, v); }
+                    Ok(v) => { self.ctx.comptime_values.insert(*expr_id, v); ty }
                     Err(e) => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("cannot evaluate comptime block: {}", e)).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
+                        self.report_comptime_error(e, span, "cannot evaluate comptime block");
+                        self.ctx.types.error_id()
                     }
                 }
-                ty
             }
             other => {
                 let mut diag = Diagnostic::error(format!("Unsupported or unrecognized expression construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax);

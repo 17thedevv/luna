@@ -1,0 +1,366 @@
+{
+  "recorded_utc": "2026-10-06T06:46:48.777401+00:00",
+  "base_commit": "ce417f199ed3e00294e54ee2bb6a778f8469e61a",
+  "input_count": 821,
+  "input_differences": [],
+  "compiler_sha256": "0067c991607d5008256ad3cdb5d9612defd2bc654a6add485beac18796d38379",
+  "compiler_matches_start": true,
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "runtime_matches_start": true,
+  "protocol": {
+    "compiler": 19,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "commands": {
+    "workspace-check": "cargo check --workspace --all-targets",
+    "internals": "cargo test -p luna-ast -p luna-parser -p luna-semantic -p luna-llib -p luna-mvir -p luna-borrowck -p luna-optimizer --no-fail-fast",
+    "driver-regression": "cargo test -p luna-driver --lib --test adv_comptime_dyn_tests --test struct_lifetime_contract_acceptance_tests --test backend_fail_closed_tests --test test_sysroot_build_invariants --test lifetime_outlives_acceptance_tests --test canonical_syntax_acceptance_tests --no-fail-fast -- --nocapture",
+    "cli-regression": "cargo test -p luna-cli --test default_omission_cli --test default_arguments_cli --test named_arguments_cli --test method_resolution_cli --test namespace_alias_export_cli --test alpha_modules_cli --test comptime_loans_cli --test module_const_storage_cli --test interface_constraints_cli --no-fail-fast -- --nocapture",
+    "sysroot": "target/debug/luna.exe build-sysroot"
+  },
+  "terminal_summaries": {
+    "workspace-check": {
+      "shell_exit": 0,
+      "summary_blocks": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "internals": {
+      "shell_exit": 0,
+      "summary_blocks": 60,
+      "passed": 337,
+      "failed": 0,
+      "ignored": 0
+    },
+    "driver-regression": {
+      "shell_exit": 0,
+      "summary_blocks": 7,
+      "passed": 89,
+      "failed": 0,
+      "ignored": 0
+    },
+    "cli-regression": {
+      "shell_exit": 0,
+      "summary_blocks": 9,
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0
+    },
+    "sysroot": {
+      "shell_exit": 0,
+      "summary_blocks": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "raw_files": {
+    "archive_omission.py": {
+      "sha256": "3cff4e50e15b21efa93330b57df7c6be8a83c54d703075882113082ff32bc44a",
+      "bytes": 5728
+    },
+    "async-metadata-inspector-build.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "default-omission-amended-build-ready.txt": {
+      "sha256": "d1c1a7a1e3783e5d8c13b2f8d6a07e16185a60ac0d186b6811c8461b167ecf5c",
+      "bytes": 25584
+    },
+    "default-omission-amended-build.txt": {
+      "sha256": "ad37bf301d2e2a08ace010168ba7f3f7cbbaa3d44b89cbad08e018056aa4d886",
+      "bytes": 120
+    },
+    "default-omission-async-before/artifact-build.txt": {
+      "sha256": "3e94639b6196975e150d557f0c4a0eeada1f32058bafd861c73651423971dd36",
+      "bytes": 1412
+    },
+    "default-omission-async-before/artifact-check.txt": {
+      "sha256": "b77b0b9b1652b5dab26a7595dfd48eadb2ca0aa9ac31afb22caa560cd984a86f",
+      "bytes": 1285
+    },
+    "default-omission-async-before/artifact-publish.txt": {
+      "sha256": "bf7f873782d72c5cec75074b16ed6d44ab63038eda7d5e52e594bc38499dd78a",
+      "bytes": 1110
+    },
+    "default-omission-async-before/heapfree-probe-build.txt": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "default-omission-async-before/heapfree-wire.txt": {
+      "sha256": "1b8ea28df74e0f1af016496d152861e8eeaf0efac6bbe98bd7037941a11df760",
+      "bytes": 43
+    },
+    "default-omission-async-before/metadata-inspection.txt": {
+      "sha256": "44d070aaf7ebf8c6d502417653ae9576f8d13350ec9f5f4cfec0cf4bab019633",
+      "bytes": 2067
+    },
+    "default-omission-async-before/observations.json": {
+      "sha256": "e1b913601b898e58174fbf2092b844f2b344774c25bc0788efdf1c26423278f2",
+      "bytes": 743
+    },
+    "default-omission-async-before/opcode-inspection.json": {
+      "sha256": "76e2517dabb0b56fa623901e78b43945d50bce06ed4eec2096ec81e038adda14",
+      "bytes": 4436
+    },
+    "default-omission-async-before/source-build.txt": {
+      "sha256": "675f3f440c653db9856e477649dbd7e064aed6c3ac442e40765d0ea684cb3327",
+      "bytes": 1129
+    },
+    "default-omission-async-before/source-check.txt": {
+      "sha256": "653f4e5ec76ab34c99bbf9ca7500d19353334bca6d0cb0cae9c8dd0e7b69cd0b",
+      "bytes": 1004
+    },
+    "default-omission-async-before/source-native.txt": {
+      "sha256": "668a02d0b8632fba32247b8c18cce9e23454e98ce5b624d91f6f0a3e22d1a289",
+      "bytes": 25
+    },
+    "default-omission-development-build.txt": {
+      "sha256": "6dca4bc52f6b0d6f58121da1ae0f0d3a92d0b71a76da6386bc40e4177e7aa0f8",
+      "bytes": 24505
+    },
+    "default-omission-development-check.txt": {
+      "sha256": "3e25664b615fd27ea4b7faf2217bd2693e3a05c16cde396a9d99c2ed8dfc7933",
+      "bytes": 48378
+    },
+    "default-omission-development-cli-eighth.txt": {
+      "sha256": "019751f2bc076816850f59aace14d56413cc831edbbee22f796d9032e0ea043e",
+      "bytes": 27852
+    },
+    "default-omission-development-cli-eleventh.txt": {
+      "sha256": "f45655f760fdb628c706d9bbdd65f2a95bb4cae6e96679474beb4360d40c0839",
+      "bytes": 28259
+    },
+    "default-omission-development-cli-fifth.txt": {
+      "sha256": "cd9ddb1938013fed5b53ef7a1978fc98590a2f1d1bc61dacfcf7b6184a4bbbac",
+      "bytes": 27158
+    },
+    "default-omission-development-cli-fourth.txt": {
+      "sha256": "9550905a21cec41a169b507d9e44a85f95489823be6d8bfb337297b006b3e5f8",
+      "bytes": 26452
+    },
+    "default-omission-development-cli-ninth.txt": {
+      "sha256": "36b130dddb0eb01701491d94b866d175d5f8e9fe8d009158b50f2fdf2f81681d",
+      "bytes": 26920
+    },
+    "default-omission-development-cli-second.txt": {
+      "sha256": "3083453af80567feadeb7bcba06d464d2fd40e8fc452e7f7ea01c6e6d306f30e",
+      "bytes": 27292
+    },
+    "default-omission-development-cli-seventh.txt": {
+      "sha256": "f98a995cf4a65c224fc1fdeecd1c8a44802b2979eb5934f740b60e70738abeb1",
+      "bytes": 27663
+    },
+    "default-omission-development-cli-sixth.txt": {
+      "sha256": "9376f2ee4e897f6ad2cf3ca5be882cd9dcac0cad2eab2011685fb29e32b4114b",
+      "bytes": 13531
+    },
+    "default-omission-development-cli-tenth.txt": {
+      "sha256": "42858c780e66e96315f9aa9ca2fea9a390c1ebb6692fb96cdbf7bec79ae7e2a2",
+      "bytes": 27888
+    },
+    "default-omission-development-cli-third.txt": {
+      "sha256": "760c9ce556457afe94ad0191b1fa26b5d1fcc7d4459e326fae7c06a3dd6c446d",
+      "bytes": 25962
+    },
+    "default-omission-development-cli-thirteenth.txt": {
+      "sha256": "d93899422e3fee0c61eb78cd0291d950995a164f7b396dafc40d683c33643e57",
+      "bytes": 28610
+    },
+    "default-omission-development-cli-twelfth.txt": {
+      "sha256": "34d6c6d2b969f4721d9ea820a8e75a9d34f17e68cdc55ff0f70d2eef45beddfc",
+      "bytes": 27565
+    },
+    "default-omission-development-cli.txt": {
+      "sha256": "d313738eaf6a0dbd8e818acee071fb4e72d8308993428f09a16093cb7ff8b23d",
+      "bytes": 24649
+    },
+    "default-omission-development-internals.txt": {
+      "sha256": "3e89a6e505645e38bdb6c6a47470afaf5072d79ae1ab976f3aabc430dda2a0df",
+      "bytes": 65873
+    },
+    "default-omission-development-sysroot.txt": {
+      "sha256": "51507c3c1d39c57b113c0d62ce1de0b631ad169a746b8d8ba977b83c35300229",
+      "bytes": 76067
+    },
+    "default-omission-development-workspace-check-second.txt": {
+      "sha256": "f7941c1023d584eaaa7067c89155b4a95f5adcf45ac0b8c5f6251c8ecfedf37b",
+      "bytes": 48660
+    },
+    "default-omission-development-workspace-check.txt": {
+      "sha256": "e36cc1eb7e65b5fdfb392cddd983b429f3f545d560494dedf550c924a716e959",
+      "bytes": 38082
+    },
+    "default-omission-final/cli-regression.txt": {
+      "sha256": "2babc69038af61c802b0cfe3b27851373f8e975ee68d28c71275dc8bb568ee1a",
+      "bytes": 68677
+    },
+    "default-omission-final/doc-validation-development.txt": {
+      "sha256": "36d07bf797fa2817d7d85f5d6f6197d9795c03473cd45cbc84eddf991d8ba530",
+      "bytes": 96
+    },
+    "default-omission-final/driver-regression.txt": {
+      "sha256": "af61af66c9899553ff25a0dcd8c54751914b78adf09f32f67c11cf41c55534de",
+      "bytes": 89269
+    },
+    "default-omission-final/end.json": {
+      "sha256": "eb6223ad1416142ad6b2c775ff8db6e6367dad6b820da163155653a2f1bfd718",
+      "bytes": 359
+    },
+    "default-omission-final/internal-exits.json": {
+      "sha256": "a0f766f103c827f9972f16c4e33cfb4373bc40883f6da15235f4afd021d88566",
+      "bytes": 39
+    },
+    "default-omission-final/internals.txt": {
+      "sha256": "6042fe60d45a787236f9bdcaaecd2a649dc7dcc3b083e99154f25bd4c537d874",
+      "bytes": 65716
+    },
+    "default-omission-final/start.json": {
+      "sha256": "e36317a769890b3e572fadfc1881eba5a77756b242fb6c663937b6e1d7a5503d",
+      "bytes": 108737
+    },
+    "default-omission-final/sysroot.txt": {
+      "sha256": "05c745567ad24d25da1419938eac645a96c3b77f7119ac702c6621854575914c",
+      "bytes": 52448
+    },
+    "default-omission-final/terminal-exits.json": {
+      "sha256": "ec4f44004fde7c3788e42fd457be874841a6f997147530b0c565f8c45335cac4",
+      "bytes": 117
+    },
+    "default-omission-final/workspace-check.txt": {
+      "sha256": "b88851c263b255183a9c512a465b75d22dc2978fb73f0940e8f956bd4b2e1445",
+      "bytes": 49458
+    },
+    "default-omission-final-build.txt": {
+      "sha256": "c9ef8deaf4be31436346d27f74859cd70173f3f65a452557783b2e6cc2cd11e8",
+      "bytes": 24874
+    },
+    "default-omission-final-sysroot.txt": {
+      "sha256": "05c745567ad24d25da1419938eac645a96c3b77f7119ac702c6621854575914c",
+      "bytes": 52448
+    },
+    "default-omission-final-test-prebuild.txt": {
+      "sha256": "a7a90c0a08fa884206e3ac20ce32dd3d588fe16c896e8525f6e709b76ac62bc8",
+      "bytes": 54426
+    },
+    "default-omission-lifetime-development-check-fourth.txt": {
+      "sha256": "ac8d919f3f0cfa79083f21e2739375e9c2ad920aa46133498d96c1988721bf21",
+      "bytes": 35303
+    },
+    "default-omission-lifetime-development-check-second.txt": {
+      "sha256": "f7b9b48c8e9fafbe73af8a1beef1804202cf7441a84160323aa04df6d6260f16",
+      "bytes": 32461
+    },
+    "default-omission-lifetime-development-check-third.txt": {
+      "sha256": "d49031b63cc243f8d1f6cd61073c1f80a1fb46d1a39f8554da7d315192f864e2",
+      "bytes": 35723
+    },
+    "default-omission-lifetime-development-check.txt": {
+      "sha256": "0ae712f41b3be9cecb449dd576f607fe3e230f6ce8e5d85bfda04638aec7ed80",
+      "bytes": 28384
+    },
+    "default-omission-method-contract-before/observations.json": {
+      "sha256": "4877e033b99e71ff3475eed58a7d9a8d3d833b03c3374b5a4e46644480d238d3",
+      "bytes": 461
+    },
+    "default-omission-method-contract-before/omission_helper_method_inverted-build.txt": {
+      "sha256": "960fc612527086bd972b7afcd9ba4af8ec3f74fd3fc22fcfaac19038a8eb59db",
+      "bytes": 34
+    },
+    "default-omission-method-contract-before/omission_helper_method_inverted-check.txt": {
+      "sha256": "960fc612527086bd972b7afcd9ba4af8ec3f74fd3fc22fcfaac19038a8eb59db",
+      "bytes": 34
+    },
+    "default-omission-method-contract-before/omission_method_precondition_inverted-build.txt": {
+      "sha256": "960fc612527086bd972b7afcd9ba4af8ec3f74fd3fc22fcfaac19038a8eb59db",
+      "bytes": 34
+    },
+    "default-omission-method-contract-before/omission_method_precondition_inverted-check.txt": {
+      "sha256": "960fc612527086bd972b7afcd9ba4af8ec3f74fd3fc22fcfaac19038a8eb59db",
+      "bytes": 34
+    },
+    "default-omission-method-contract-before-ready/after-default-transitive-check.txt": {
+      "sha256": "4d582fe8048b41b1488a652f6270fc332635e6f0294bdf01a65c0e7a9a92d231",
+      "bytes": 1227
+    },
+    "default-omission-method-contract-before-ready/after-method-transitive-check.txt": {
+      "sha256": "67a62b5f2998341ea1c813279df43f6508102264c153d48ee719d24712bd832a",
+      "bytes": 1229
+    },
+    "default-omission-method-contract-before-ready/observations.json": {
+      "sha256": "335e48059ac7235db19b80805a24164d141e831d76844662bff4c3bc8ed322cb",
+      "bytes": 425
+    },
+    "default-omission-method-contract-before-ready/omission-helper-method-transitive-check.txt": {
+      "sha256": "a0bc19b5f75505fb918b1e8d9ff0f1282f504994fe95dca7b76e7ba8819d356a",
+      "bytes": 849
+    },
+    "default-omission-method-contract-before-ready/omission-method-transitive-check.txt": {
+      "sha256": "a0bc19b5f75505fb918b1e8d9ff0f1282f504994fe95dca7b76e7ba8819d356a",
+      "bytes": 849
+    },
+    "default-omission-method-contract-before-ready/omission_helper_method_inverted-build.txt": {
+      "sha256": "adedecfa1481f795551b3c214a7aae448e2652bef32254dd09a1de687ebc5818",
+      "bytes": 1228
+    },
+    "default-omission-method-contract-before-ready/omission_helper_method_inverted-check.txt": {
+      "sha256": "adedecfa1481f795551b3c214a7aae448e2652bef32254dd09a1de687ebc5818",
+      "bytes": 1228
+    },
+    "default-omission-method-contract-before-ready/omission_method_precondition_inverted-build.txt": {
+      "sha256": "4be19ea38e86260b6e3476726eae981fb1a1a7ae09871db834aa66ab533eb4a5",
+      "bytes": 1230
+    },
+    "default-omission-method-contract-before-ready/omission_method_precondition_inverted-check.txt": {
+      "sha256": "4be19ea38e86260b6e3476726eae981fb1a1a7ae09871db834aa66ab533eb4a5",
+      "bytes": 1230
+    },
+    "default-omission-owner-development-build.txt": {
+      "sha256": "5bbe91a9b34f0890e946ac915b9f5e4a48278506b1bdd3a1767cdfa551b038e9",
+      "bytes": 24027
+    },
+    "default-omission-owner-development-check-second.txt": {
+      "sha256": "4a4c3c4f35998447ca3d3db765757b383d1b7ea744799e6431fb4410273c8d97",
+      "bytes": 48388
+    },
+    "default-omission-owner-development-check.txt": {
+      "sha256": "fcef313b7a312e1070b299b1e41bad3df74c1c7ea62549d3128da73d301e4d76",
+      "bytes": 15197
+    },
+    "default-omission-owner-development-sysroot.txt": {
+      "sha256": "05c745567ad24d25da1419938eac645a96c3b77f7119ac702c6621854575914c",
+      "bytes": 52448
+    },
+    "inspect_async_metadata.rs": {
+      "sha256": "06cbd5787943b7abd5a83171cd8545e288f852f0049df33b9aca00f18b555f71",
+      "bytes": 1175
+    },
+    "probe_async_default.py": {
+      "sha256": "d403331fb0db8e694ceec7ef6c03c0a44c582e6bb183dcda9de9d649600d7ba8",
+      "bytes": 2496
+    },
+    "probe_heapfree_wire.rs": {
+      "sha256": "7d54877183f42a9fe4090e076af8cecdcaa8a52ac519987d2b632d1e4ab113e0",
+      "bytes": 1536
+    }
+  },
+  "scope": "Synchronous omitted defaults, independent owner/method binders, generic layout and identity casts, extern forwarding, compact ABI lifetime obligations and actual receiver mapping.",
+  "limitations": [
+    "Async default creation-time initialization remains incorrect; native source counterexample exits 2.",
+    "Fresh async artifact import rejects CorruptedData; independent HeapFree wire roundtrip demonstrates writer tag17 versus reader tag15 mismatch.",
+    "Full CALL-ARGUMENTS-v1 remains PARTIAL; no full-workspace test, merge, tag, release or complete R0-R5 verdict.",
+    "Consuming owned closure policy and broader provider/diagnostic/target requirements remain open."
+  ],
+  "input_snapshot_encoding": "JSON path to base64 original file bytes; lossless gzip",
+  "omission_cli_observations": {
+    "modes": [
+      "source",
+      "source_removed_relocated_artifact"
+    ],
+    "native_executions": 18,
+    "typed_negative_check_build_processes": 60
+  }
+}

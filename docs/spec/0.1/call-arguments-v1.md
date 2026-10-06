@@ -2,8 +2,15 @@
 
 Maintainer-authorized 2026-10-04 addition to the 0.1 completion scope:
 Python-style named arguments and default values. The maintainer chose per-call
-default evaluation in the function's defining scope. Implementation is pending;
-parser recognition of historical labels is not evidence of correct binding.
+default evaluation in the function's defining scope. The
+[implementation gate](../../audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md)
+tracks named binding and default evaluation separately. This adopted contract
+is not narrowed by implementation gaps.
+
+The [2026-10-06 omission checkpoint](../../audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md)
+tracks synchronous execution, compact ABI lifetime mapping and independent
+owner/method binders. Full support remains PARTIAL because async timing and
+artifact import still fail required positives.
 
 ## Source surface and binding
 

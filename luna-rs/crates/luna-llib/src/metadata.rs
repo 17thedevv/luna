@@ -103,6 +103,8 @@ impl CanonicalInterface {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExportedSymbol {
+    /// Public argument labels; contains no AST or compiler-session identities.
+    pub callable_signature: Option<luna_semantic::CallableSignature>,
     pub kind: String, // "Function", "Struct", etc.
     pub ty_index: Option<u32>, // Index into CanonicalInterface::types, None for modules
     pub visibility: u8,
@@ -250,6 +252,7 @@ mod raw_storage_anchor_interface_tests {
             symbol_path: "RawOwner".into(),
         };
         let owner = ExportedSymbol {
+            callable_signature: None,
             kind: "Struct".into(),
             ty_index: None,
             visibility: 1,

@@ -1,0 +1,198 @@
+{
+  "recorded_utc": "2026-10-05T15:37:40.628406+00:00",
+  "base_commit": "f36a5abc70fb24066de783c233c579878decfd43",
+  "input_count": 792,
+  "input_differences": [],
+  "compiler_sha256": "fccc2d009ad54980180636a25b405bb88a78aec8192e3734d693eadaf4cd7f6f",
+  "compiler_matches_start": true,
+  "runtime_sha256": "d8aea737aa7929e79ab70f24db5705d7370570295ddab9f569b3085ee230f5de",
+  "runtime_matches_start": true,
+  "raw_files": {
+    "default-constant-binding-after/alias_before/build.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-constant-binding-after/alias_before/metadata.txt": {
+      "sha256": "f740266ef67eb3adf377c288a42dc64b7b6a932833578f516b39ea1d75506388",
+      "bytes": 7470
+    },
+    "default-constant-binding-after/alias_before/provider.ln": {
+      "sha256": "7ced1ca7a4bdff93d3620282f1fe2402fa29e87f17140327db704efde7043705",
+      "bytes": 209
+    },
+    "default-constant-binding-after/alias_retargeted/build.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-constant-binding-after/alias_retargeted/metadata.txt": {
+      "sha256": "4db45f238afb9750693476b90ac8f4369aeef0a727b3b92dc02e249408c49177",
+      "bytes": 7467
+    },
+    "default-constant-binding-after/alias_retargeted/provider.ln": {
+      "sha256": "0d9767e97d3f6b7a6482f08cc4447e82a91afe55e2acc9edd72815b6de7f7902",
+      "bytes": 210
+    },
+    "default-constant-binding-after/compile.txt": {
+      "sha256": "a3680b6601c39b586ea892ad2bbaa58a7f72b62a64f73917b09aa8c5f188110e",
+      "bytes": 8
+    },
+    "default-constant-binding-after/dump.rs": {
+      "sha256": "c184ecaf0f0739fbc8d5bc3bd92c3271738cf30b4437a15a197094965169b97d",
+      "bytes": 309
+    },
+    "default-constant-binding-after/observations.json": {
+      "sha256": "fa8b5fb4262b9071c58cab662def15d054ac5daa98e89e845e3e46a6c10432b8",
+      "bytes": 457
+    },
+    "default-constant-binding-before/alias_before/build.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-constant-binding-before/alias_before/metadata.txt": {
+      "sha256": "5b7a83b77b158f15e57b1877560159ca1fb0964fc929a6598162878229ae0eff",
+      "bytes": 7488
+    },
+    "default-constant-binding-before/alias_before/provider.ln": {
+      "sha256": "7ced1ca7a4bdff93d3620282f1fe2402fa29e87f17140327db704efde7043705",
+      "bytes": 209
+    },
+    "default-constant-binding-before/alias_retargeted/build.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-constant-binding-before/alias_retargeted/metadata.txt": {
+      "sha256": "5b7a83b77b158f15e57b1877560159ca1fb0964fc929a6598162878229ae0eff",
+      "bytes": 7488
+    },
+    "default-constant-binding-before/alias_retargeted/provider.ln": {
+      "sha256": "0d9767e97d3f6b7a6482f08cc4447e82a91afe55e2acc9edd72815b6de7f7902",
+      "bytes": 210
+    },
+    "default-constant-binding-before/compile.txt": {
+      "sha256": "a3680b6601c39b586ea892ad2bbaa58a7f72b62a64f73917b09aa8c5f188110e",
+      "bytes": 8
+    },
+    "default-constant-binding-before/dump.rs": {
+      "sha256": "c184ecaf0f0739fbc8d5bc3bd92c3271738cf30b4437a15a197094965169b97d",
+      "bytes": 309
+    },
+    "default-constant-binding-before/observations.json": {
+      "sha256": "d25f9531c205ef629f286f335127d454965dbf54369fa181f1d646f7a631087f",
+      "bytes": 463
+    },
+    "default-declarations-constant/check.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-constant/check.txt": {
+      "sha256": "4461302b9564c11d6398c64547c408f073bc1833ff9900eef6d17d1863efce22",
+      "bytes": 48291
+    },
+    "default-declarations-constant/cli.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-constant/cli.txt": {
+      "sha256": "1868c9ac1894203c9c9a77a875142785c6a64a5c09699be1f00d70a34e94ce16",
+      "bytes": 35865
+    },
+    "default-declarations-constant/internal.exit": {
+      "sha256": "13bf7b3039c63bf5a50491fa3cfd8eb4e699d1ba1436315aef9cbe5711530354",
+      "bytes": 3
+    },
+    "default-declarations-constant/internal.txt": {
+      "sha256": "32ed3a6ca804629aaf71b17960c74360625664b8a8444b4e114b0e701e25a75f",
+      "bytes": 42482
+    },
+    "default-declarations-constant/start.json": {
+      "sha256": "da5bee4473a36ddf327e0784ffd469605c909c3ddb7b483f6dc633ca237178a8",
+      "bytes": 104671
+    },
+    "default-declarations-constant-build-failed.txt": {
+      "sha256": "bdc6318a06072f5fbd19eb2f99ab9302e5f3908ae620982c3063ab5500c0c7af",
+      "bytes": 14296
+    },
+    "default-declarations-constant-build.txt": {
+      "sha256": "e519269274270ffb7d3004b74067f0cf4334b5171fe54410edaa41120321484b",
+      "bytes": 24505
+    },
+    "default-omission-constant/artifact/build.txt": {
+      "sha256": "d5e5f3fadfdf3e4af53fb3afb27dd6371b87cc288e14d98a259351ba76e9f5b4",
+      "bytes": 1152
+    },
+    "default-omission-constant/artifact/check.txt": {
+      "sha256": "d5e5f3fadfdf3e4af53fb3afb27dd6371b87cc288e14d98a259351ba76e9f5b4",
+      "bytes": 1152
+    },
+    "default-omission-constant/artifact/omission.ln": {
+      "sha256": "25be26dec273ca0aecaabd113d7d2d551763bd7bb7634aa4ad7efd4f4ca6ad8e",
+      "bytes": 75
+    },
+    "default-omission-constant/artifact/publish.txt": {
+      "sha256": "1233dc12921e24d3bad7b33e7b17393d08a30e5add70a241e6566116f31da2a9",
+      "bytes": 784
+    },
+    "default-omission-constant/observations.json": {
+      "sha256": "f603a61a1c4a453991f2288745f0dcc5cbc0606201ca91b216808608478fcc38",
+      "bytes": 5229
+    },
+    "default-omission-constant/source/build.txt": {
+      "sha256": "e6b2929cbf326ff1d90417f3fb2d1e0fa625d7e425929dfb48ad83ce9e8dcfdd",
+      "bytes": 1150
+    },
+    "default-omission-constant/source/check.txt": {
+      "sha256": "e6b2929cbf326ff1d90417f3fb2d1e0fa625d7e425929dfb48ad83ce9e8dcfdd",
+      "bytes": 1150
+    },
+    "default-omission-constant/source/omission.ln": {
+      "sha256": "25be26dec273ca0aecaabd113d7d2d551763bd7bb7634aa4ad7efd4f4ca6ad8e",
+      "bytes": 75
+    },
+    "default-omission-constant/source/provider.ln": {
+      "sha256": "e245ca273f472185179254a99d7a937078ecad8613a1bb08d0710ee14ada507a",
+      "bytes": 1641
+    }
+  },
+  "commands": {
+    "check": "cargo check --workspace --all-targets",
+    "internal": "cargo test -p luna-semantic -p luna-llib --no-fail-fast",
+    "cli": "cargo test -p luna-cli --test default_arguments_cli --test namespace_alias_export_cli --test interface_constraints_cli -- --nocapture"
+  },
+  "terminal_summaries": {
+    "check": {
+      "shell_exit": 0,
+      "summary_blocks": 0,
+      "passed": 0,
+      "failed": 0,
+      "ignored": 0
+    },
+    "internal": {
+      "shell_exit": 0,
+      "summary_blocks": 27,
+      "passed": 213,
+      "failed": 0,
+      "ignored": 0
+    },
+    "cli": {
+      "shell_exit": 0,
+      "summary_blocks": 3,
+      "passed": 3,
+      "failed": 0,
+      "ignored": 0
+    }
+  },
+  "scope": "Parameter default declaration AST, lexical resolution, rigid type/unsafe/trait validation and portable interface contract; omission execution remains unimplemented",
+  "protocol": 17,
+  "semantic_metadata_version": 9,
+  "limitations": [
+    "Default omission still rejects E2001 in both modes; it is a required positive gap, not waived semantics.",
+    "Omission entry mono/IR, ownership/effect remapping and complete runtime default evaluation remain required.",
+    "Known closure failure and all broader R0-R5 release requirements remain open. No full workspace test or release verdict."
+  ],
+  "amendment": "Canonical definition-site identities for module/global constant/value references in parameter defaults.",
+  "development_observations": [
+    "Before: retargeting constant alias yields equal interface fingerprints despite different declaration binding.",
+    "After: fingerprints differ; alias rename and stale dependent controls pass.",
+    "Initial development build exits101 for a mistaken crate-root ScopeKind path; corrected before the recorded pin."
+  ]
+}

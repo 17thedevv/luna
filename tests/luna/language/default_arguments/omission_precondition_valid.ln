@@ -1,0 +1,10 @@
+import "provider";
+fn ordered(counter: &omitted::Counter, first: &i32, second: &i32) requires life(first) >= life(second) {
+    omitted::ordered(first, second);
+    omitted::ordered_default(first);
+    omitted::deferred_order(first, second);
+    dec result = omitted::helper_default(first, second);
+    dec method_result = omitted::helper_method_default(counter, first, second);
+    dec forwarded = counter.forward_order(first, second);
+}
+fn main() -> i32 { dec value = 7; dec counter = omitted::Counter { value: 5 }; ordered(&counter, &value, &value); dec view = omitted::borrowed_return(&value); if (*view != 7) { return 1; } return 0; }

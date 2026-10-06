@@ -1429,18 +1429,34 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                 
                 let decl = &self.arena.decls[decl_id.0 as usize];
                 match decl {
-                    Decl::Function { body, .. } => {
-                        if let Some(body_stmt) = body {
-                            if let Some(&sym_id) = self.ctx.tables.decl_symbols.get(decl_id) {
-                                if let Some(scope) =
-                                    self.ctx.symbol_table.get_symbol(sym_id).inner_scope
-                                {
-                                    let prev_scope = self.current_scope;
-                                    self.current_scope = scope;
-                                    self.resolve_stmt(body_stmt);
-                                    self.current_scope = prev_scope;
+                    Decl::Function { body, params, .. } => {
+                        if let Some(scope) = self.ctx.tables.decl_scopes.get(decl_id).copied() {
+                            let prev_scope = self.current_scope;
+                            self.current_scope = scope;
+                            // Reuse declaration identities while resolving the prefix scope.
+                            // Later parameters never enter an earlier default's lookup.
+                            let all_symbols = self.ctx.symbol_table.scopes[scope.0 as usize].symbols.clone();
+                            let parameter_symbols = params.iter().filter_map(|parameter|
+                                self.ctx.tables.decl_symbols.get(parameter).copied()).collect::<std::collections::HashSet<_>>();
+                            for candidates in self.ctx.symbol_table.scopes[scope.0 as usize].symbols.values_mut() {
+                                candidates.retain(|symbol| !parameter_symbols.contains(symbol));
+                            }
+                            self.ctx.symbol_table.scopes[scope.0 as usize].symbols.retain(|_, candidates| !candidates.is_empty());
+                            for parameter in params {
+                                if let Decl::Param { default, .. } = &self.arena.decls[parameter.0 as usize] {
+                                    if let Some(default) = default { self.resolve_expr(&default.value); }
+                                }
+                                if let Some(&symbol) = self.ctx.tables.decl_symbols.get(parameter) {
+                                    let value = self.ctx.symbol_table.get_symbol(symbol);
+                                    let key = crate::symbol::IdentKey::new(&value.name, value.ctxt);
+                                    self.ctx.symbol_table.scopes[scope.0 as usize].symbols.entry(key).or_default().push(symbol);
                                 }
                             }
+                            self.ctx.symbol_table.scopes[scope.0 as usize].symbols = all_symbols;
+                            if let Some(body_stmt) = body {
+                                    self.resolve_stmt(body_stmt);
+                            }
+                            self.current_scope = prev_scope;
                         }
                     }
                     Decl::Var { initializer, .. } => {
@@ -1729,10 +1745,13 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     fn resolve_expr(&mut self, expr_id: &luna_ast::ExprId) {
         let expr = &self.arena.exprs[expr_id.0 as usize];
         match expr {
-            Expr::Identifier { segments, generic_args } => {
+            Expr::Identifier { segments, generic_args, owner_generic_args } => {
                 if self.reject_ambiguous_path(segments) { return; }
                 for arg in generic_args {
                     self.resolve_type(arg);
+                }
+                for (_, args) in owner_generic_args {
+                    for arg in args { self.resolve_type(arg); }
                 }
                 if !segments.is_empty() {
                     let name_str = segments
@@ -1747,7 +1766,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         self.current_scope,
                     );
 
-                    if resolved_sym.is_none() {
+                    if resolved_sym.is_none() || !owner_generic_args.is_empty() {
                         let mut current_scope = self.current_scope;
 
                         for (i, seg) in segments.iter().enumerate() {
@@ -1781,6 +1800,27 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                     break;
                                 }
                                 resolved_sym = Some(id);
+                                if let Some((_, args)) = owner_generic_args.iter().find(|(segment, _)| *segment as usize == i) {
+                                    let owner = self.ctx.symbol_table.get_symbol(id);
+                                    if let Some(declaration) = owner.decl_id {
+                                        let mut bindings = Vec::new();
+                                        let mut ordinal = 0;
+                                        while let Some(&binder) = self.ctx.tables.generic_param_symbols.get(&(declaration, ordinal)) {
+                                            if let Some(&argument) = args.get(ordinal) { bindings.push((binder, argument)); }
+                                            ordinal += 1;
+                                        }
+                                        if ordinal == args.len() && ordinal > 0 {
+                                            self.ctx.tables.path_generic_bindings.entry(*expr_id).or_default().extend(bindings);
+                                        } else {
+                                            self.ctx.diagnostics.push(luna_common::Diagnostic::error(
+                                                format!("Type argument count for `{}`: expected {}, got {}", owner.name, ordinal, args.len()))
+                                                .with_code(DiagnosticCode::TypeMismatch).with_span(*seg));
+                                        }
+                                    } else {
+                                        self.ctx.diagnostics.push(luna_common::Diagnostic::error("Namespace cannot receive type arguments")
+                                            .with_code(DiagnosticCode::TypeMismatch).with_span(*seg));
+                                    }
+                                }
                                 if let Some(inner) =
                                     self.ctx.symbol_table.symbols[id.0 as usize].inner_scope
                                 {
@@ -1895,8 +1935,9 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
             Expr::Unary { operand, .. } => {
                 self.resolve_expr(operand);
             }
-            Expr::Call { callee, args, .. } => {
+            Expr::Call { callee, args, generic_args } => {
                 self.resolve_expr(callee);
+                for ty in generic_args { self.resolve_type(ty); }
                 for arg in args {
                     self.resolve_expr(&arg.value);
                 }
@@ -1905,8 +1946,9 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                 self.resolve_expr(lvalue);
                 self.resolve_expr(value);
             }
-            Expr::MethodCall { object, args, .. } => {
+            Expr::MethodCall { object, args, generic_args, .. } => {
                 self.resolve_expr(object);
+                for ty in generic_args { self.resolve_type(ty); }
                 for arg in args {
                     self.resolve_expr(&arg.value);
                 }
@@ -1914,7 +1956,8 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
             Expr::Member { object, .. } => {
                 self.resolve_expr(object);
             }
-            Expr::StructInit { fields, .. } => {
+            Expr::StructInit { fields, generic_args, .. } => {
+                for ty in generic_args { self.resolve_type(ty); }
                 for field in fields {
                     self.resolve_expr(&field.value);
                 }
@@ -1926,9 +1969,11 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
             Expr::TupleIndex { object, .. } => {
                 self.resolve_expr(object);
             }
-            Expr::Cast { expr: e, .. } => {
+            Expr::Cast { expr: e, target_type } => {
                 self.resolve_expr(e);
+                self.resolve_type(target_type);
             }
+            Expr::Sizeof { target_type } | Expr::Alignof { target_type } => self.resolve_type(target_type),
             Expr::Match { subject, arms, .. } => {
                 self.resolve_expr(subject);
                 for arm in arms {

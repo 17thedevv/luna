@@ -438,6 +438,7 @@ fn test_case_20_comptime_resource_leak() {
         link_name: None,
         param_types: Vec::new(),
         ret_ty: luna_semantic::SemanticTypeId(0),
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };

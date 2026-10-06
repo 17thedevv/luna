@@ -115,6 +115,7 @@ fn test_case_02_suspended_future_cleanup_of_live_drop_locals() {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(3),
+        lifetime_info: Default::default(),
         blocks: vec![
             BasicBlock {
                 label: LabelId { name: "entry".to_string() },
@@ -160,6 +161,7 @@ fn test_case_03_completed_future_destruction_without_double_drop() {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(3),
+        lifetime_info: Default::default(),
         blocks: vec![
             BasicBlock {
                 label: LabelId { name: "entry".to_string() },
@@ -206,6 +208,7 @@ fn test_case_04_nested_future_cancellation_cascades() {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(3),
+        lifetime_info: Default::default(),
         blocks: vec![
             BasicBlock {
                 label: LabelId { name: "entry".to_string() },
@@ -224,6 +227,7 @@ fn test_case_04_nested_future_cancellation_cascades() {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(3),
+        lifetime_info: Default::default(),
         blocks: vec![
             BasicBlock {
                 label: LabelId { name: "entry".to_string() },
@@ -548,6 +552,7 @@ fn test_case_14_child_future_null_absent_path_is_safe() {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(3),
+        lifetime_info: Default::default(),
         blocks: vec![
             BasicBlock {
                 label: LabelId { name: "entry".to_string() },

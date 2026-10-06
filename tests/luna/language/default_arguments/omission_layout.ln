@@ -1,0 +1,11 @@
+import "provider";
+fn main() -> i32 {
+    if (omitted::footprint<i32>(value=7) != 804usize) { return 1; }
+    if (omitted::footprint<i64>(value=7i64) != 1608usize) { return 2; }
+    if (omitted::footprint<bool>(value=true) != 201usize) { return 3; }
+    if (omitted::only_layout<i64>() != 8usize) { return 5; }
+    if (omitted::only_layout<bool>() != 1usize) { return 6; }
+    dec counter = omitted::Counter { value: 8 };
+    if (omitted::through_trait(&counter) != 7) { return 4; }
+    return 0;
+}

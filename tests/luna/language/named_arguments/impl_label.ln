@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { dec counter = named::Counter {}; return counter.subtract(subtrahend=2, minuend=9); }

@@ -1,0 +1,6 @@
+import "provider";
+fn main() -> i32 {
+    dec rw drops = 0;
+    dec item = omitted::Owned { counter: &rw drops as *rw i32, value: 9 };
+    return omitted::moved(item);
+}

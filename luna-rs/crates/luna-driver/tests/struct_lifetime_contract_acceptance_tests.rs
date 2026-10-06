@@ -581,6 +581,7 @@ fn test_struct_life_16_missing_provenance_shadow_gap() {
         is_extern: false,
         is_async: false,
         ret_ty: luna_semantic::SemanticTypeId(0),
+        lifetime_info: Default::default(),
         arg_count: 0,
         link_name: None,
         param_types: Vec::new(),
@@ -630,7 +631,7 @@ fn test_struct_life_17_llib_version_compatibility() {
 
     assert_eq!(CanonicalTypeLifetimeContract::CURRENT_VERSION, 1, "STRUCT-LIFE-17: Contract schema version must be 1");
     assert_eq!(LLIB_FORMAT_VERSION, 2, "RAW-STORAGE-ANCHOR reuses the outer format; the semantic metadata section has its own gate");
-    assert_eq!(SEMANTIC_METADATA_VERSION, 7, "portable call effects, including distinct direct/carried return sources, require semantic metadata v7");
+    assert_eq!(SEMANTIC_METADATA_VERSION, 9, "portable declaration parameter names and default contracts require semantic metadata v9");
 
     // An artifact with an incompatible version (e.g. 999) must be rejected with VersionMismatch
     let mut header = LlibHeader::new();
@@ -700,6 +701,7 @@ fn test_struct_life_19_provenance_survives_loan_state_change() {
         is_extern: false,
         is_async: false,
         ret_ty: SemanticTypeId(0),
+        lifetime_info: Default::default(),
         arg_count: 0,
         link_name: None,
         param_types: Vec::new(),
@@ -831,6 +833,7 @@ fn test_struct_life_20_alias_identity_is_place_based() {
         is_extern: false,
         is_async: false,
         ret_ty: SemanticTypeId(0),
+        lifetime_info: Default::default(),
         arg_count: 0,
         link_name: None,
         param_types: Vec::new(),
@@ -954,5 +957,4 @@ struct RawHolder {
         "STRUCT-LIFE-21: Expected E2016 non-reference type error, got: {:?}", errs
     );
 }
-
 

@@ -9,6 +9,7 @@ fn dummy_module() -> Module {
         is_extern: false,
         is_async: false,
         ret_ty: SemanticTypeId(0), // void
+        lifetime_info: Default::default(),
         arg_count: 0,
         link_name: None,
         param_types: vec![SemanticTypeId(1)],

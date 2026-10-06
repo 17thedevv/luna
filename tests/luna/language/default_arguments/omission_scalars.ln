@@ -1,0 +1,21 @@
+import "provider";
+fn seed() -> bool { return false; }
+fn main() -> i32 {
+    if (omitted::compute(2) != 564) { return 1; }
+    if (omitted::compute(2, third=1) != 531) { return 2; }
+    if (omitted::compute(second=3, first=2) != 234) { return 3; }
+    if (omitted::compute(third=7, second=3, first=2) != 237) { return 4; }
+    if (omitted::all() != 34) { return 5; }
+    if (omitted::all(second=9) != 39) { return 6; }
+    if (omitted::generic<i32>(7) != 7) { return 7; }
+    if (omitted::generic<bool>(true) != true) { return 8; }
+    dec rw count = 0;
+    dec raw = &rw count as *rw i32;
+    unsafe {
+        if (omitted::trace(raw) != 12) { return 9; }
+        if (omitted::trace(raw) != 34) { return 10; }
+        if (omitted::trace(raw, first=100) != 1005) { return 11; }
+        if (omitted::trace(raw, second=omitted::tick(raw), first=omitted::tick(raw)) != 76) { return 12; }
+    }
+    return count - 7;
+}

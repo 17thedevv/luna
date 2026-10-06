@@ -1,0 +1,7 @@
+import "provider";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec owned = named::Owned { counter: &rw count as *rw i32, value: 9 };
+    named::consume(value=owned, marker=owned.value);
+    return count;
+}

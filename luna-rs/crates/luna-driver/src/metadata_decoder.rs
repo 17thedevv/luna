@@ -28,6 +28,7 @@ pub struct InterfaceDecoder {
         HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalTypeLifetimeContract>,
     symbol_raw_storage_anchor_contracts:
         HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalRawStorageAnchorContract>,
+    callable_signatures: HashMap<luna_common::ids::SymbolId, luna_semantic::CallableSignature>,
     unsafe_functions: std::collections::HashSet<luna_common::ids::SymbolId>,
     trait_bounds: HashMap<CanonicalSymbolId, Vec<crate::registry::ExternalTraitBound>>,
     assoc_type_bounds: HashMap<CanonicalSymbolId, Vec<crate::registry::ExternalAssocTypeBound>>,
@@ -59,6 +60,7 @@ impl InterfaceDecoder {
             symbol_lifetime_contracts: HashMap::new(),
             symbol_type_lifetime_contracts: HashMap::new(),
             symbol_raw_storage_anchor_contracts: HashMap::new(),
+            callable_signatures: HashMap::new(),
             unsafe_functions: std::collections::HashSet::new(),
             trait_bounds: HashMap::new(),
             assoc_type_bounds: HashMap::new(),
@@ -88,6 +90,7 @@ impl InterfaceDecoder {
         luna_llib::reader::validate_raw_storage_anchor_contracts(&self.interface)?;
         luna_llib::reader::validate_raw_pointer_effects(&self.interface)?;
         luna_llib::reader::validate_generic_contracts(&self.interface)?;
+        luna_llib::reader::validate_callable_signatures(&self.interface)?;
         luna_llib::reader::validate_nominal_layouts(&self.interface, &self.provider_name)?;
         // Decode all types to populate type context first
         for i in 0..self.interface.types.len() {
@@ -277,7 +280,11 @@ impl InterfaceDecoder {
             pat_symbols: HashMap::new(),
             pat_types: HashMap::new(),
             expr_types: HashMap::new(),
+            ast_types: HashMap::new(),
+            path_generic_bindings: HashMap::new(),
             expr_substs: HashMap::new(),
+            callable_signatures: self.callable_signatures,
+            call_argument_bindings: HashMap::new(),
             expr_struct_init_indices: HashMap::new(),
             expr_member_indices: HashMap::new(),
             raw_generic_param_symbols,
@@ -352,6 +359,9 @@ impl InterfaceDecoder {
         exported: &luna_llib::metadata::ExportedSymbol,
     ) -> ExternalSymbol {
         let sym_id = self.allocate_sym(&exported.symbol_id);
+        if let Some(signature) = &exported.callable_signature {
+            self.callable_signatures.insert(sym_id, signature.clone());
+        }
         let kind = match exported.kind.as_str() {
             "Function" => luna_semantic::symbol::SymbolKind::Function,
             "ExternFunction" => luna_semantic::symbol::SymbolKind::ExternFunction,
