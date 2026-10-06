@@ -162,6 +162,22 @@ impl<'a> MoveAnalyzer<'a> {
         }
     }
 
+    /// True when invoking this closure must consume the callable value: its
+    /// environment owns at least one move-captured, non-Copy (drop-obligated)
+    /// value. Consuming-ness is decided by environment ownership, never by what
+    /// the closure body happens to do.
+    fn is_consuming_closure(&self, closure: &Operand) -> bool {
+        let Some(ctx) = self.semantic_ctx else { return false; };
+        let Operand::Value(val) = closure else { return false; };
+        let ty = self.func.value(*val).ty;
+        let luna_semantic::SemanticType::Closure(expr_id, _, _) = ctx.types.get(ty).clone() else { return false; };
+        ctx.tables.closure_capture_bindings.get(&expr_id).is_some_and(|bindings| {
+            bindings.iter().any(|binding| {
+                binding.mode == luna_semantic::CaptureMode::Move && ctx.needs_drop(binding.ty)
+            })
+        })
+    }
+
     fn mark_moved(&mut self, op: &Operand, state: &mut MoveStateData) {
         if let Operand::Value(val) = op {
             if let Some(ctx) = self.semantic_ctx {
@@ -410,6 +426,13 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                 for arg in args {
                     self.check_operand(arg, state, val_id);
                     self.mark_moved(arg, state);
+                }
+                // D1: a closure whose environment owns at least one move-captured,
+                // non-Copy value is a one-shot callable. Invoking it consumes the
+                // callable value itself, transferring environment ownership into
+                // the invocation, so the closure place becomes moved.
+                if self.is_consuming_closure(closure) {
+                    self.mark_moved(closure, state);
                 }
             }
             Instruction::MakeClosure { captures, .. } => {

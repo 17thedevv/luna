@@ -1,0 +1,16 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec a = resources::tracked(counter, 1);
+        dec b = resources::tracked(counter, 2);
+        dec unused = move || {
+            resources::consume(a);
+            resources::consume(b);
+            return 0;
+        };
+    }
+    if count != 2 { return 2; }
+    return 0;
+}

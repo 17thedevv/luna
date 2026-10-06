@@ -96,6 +96,9 @@ pub struct SemanticContext {
     pub types: TypeContext,
     pub instantiated_functions: Vec<InstantiatedFunction>,
     pub drop_glue_instances: Vec<mono::CanonicalInstanceIdentity>,
+    /// Canonical closure-value ABI: a pointer to a two-pointer { code, env }
+    /// record. Structural and fixed, independent of any closure expression.
+    pub closure_value_ptr_ty: Option<ty::SemanticTypeId>,
     /// Scoped semantic preparation for early evaluation; never artifact metadata.
     pub comptime_root: Option<mono::MonoRoot>,
     pub diagnostics: Vec<Diagnostic>,
@@ -138,7 +141,7 @@ impl SemanticContext {
     }
 
     pub fn new() -> Self {
-        Self {
+        let mut context = Self {
             // The current driver emits for its native target. Explicit target
             // contexts may override this before semantic analysis starts.
             target_pointer_bits: usize::BITS,
@@ -160,7 +163,14 @@ impl SemanticContext {
             current_provider: None,
             current_provider_name: None,
             is_slice_authorized: false,
-        }
+            closure_value_ptr_ty: None,
+        };
+        // Canonical closure-value ABI: a pointer to a two-pointer { code, env }
+        // record. Fixed shape, independent of any closure expression.
+        let usize_ty = context.types.usize_id();
+        let abi = context.types.intern(ty::SemanticType::Tuple(vec![usize_ty, usize_ty]));
+        context.closure_value_ptr_ty = Some(context.types.intern(ty::SemanticType::Pointer(ty::Mutability::Immutable, abi)));
+        context
     }
 
     pub fn get_symbol_type(&self, sym_id: SymbolId) -> Option<&SemanticType> {
@@ -213,9 +223,12 @@ impl SemanticContext {
             ty::SemanticType::Tuple(fields) => {
                 fields.iter().any(|&f| self.needs_drop(f))
             }
-            ty::SemanticType::Closure(_, _, env_ty) => {
-                self.needs_drop(*env_ty)
-            }
+            ty::SemanticType::Closure(closure_expr, _, _) => self
+                .tables
+                .closure_env_types
+                .get(closure_expr)
+                .copied()
+                .map_or(false, |env_ty| self.needs_drop(env_ty)),
             ty::SemanticType::Array(elem_ty, _) => {
                 self.needs_drop(*elem_ty)
             }

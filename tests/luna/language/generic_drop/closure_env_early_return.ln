@@ -1,0 +1,18 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    dec flag = true;
+    dec value = resources::tracked(counter, 42);
+    // Early return before consuming: the exit path must still drop the remaining
+    // capture and release the environment.
+    dec f = move || {
+        if flag { return 1; }
+        resources::consume(value);
+        return 0;
+    };
+    dec out = f();
+    if out != 1 { return 1; }
+    if count != 1 { return 2; }
+    return 0;
+}

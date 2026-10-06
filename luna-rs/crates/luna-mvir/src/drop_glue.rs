@@ -6,6 +6,16 @@ use luna_semantic::{CanonicalInstanceIdentity, CanonicalInstanceKind, SemanticCo
 pub fn drop_glue_global_id(ctx: &SemanticContext, ty: SemanticTypeId) -> Option<GlobalId> {
     let ty = ctx.types.resolve(ty);
     if !ctx.needs_drop(ty) { return None; }
+    if let SemanticType::Closure(closure_expr, _, _) = ctx.types.get(ty) {
+        let env_ty = ctx.tables.closure_env_types.get(closure_expr).copied()?;
+        let identity = CanonicalInstanceIdentity {
+            kind: CanonicalInstanceKind::ClosureDropGlue { env_ty },
+            subst: Vec::new(),
+        };
+        return Some(GlobalId {
+            name: identity.symbol_name(&ctx.types, &ctx.symbol_table, "closure"), symbol_id: None,
+        });
+    }
     let (symbol, base_name, symbol_id) = match ctx.types.get(ty) {
         SemanticType::Struct(symbol, ..) | SemanticType::Enum(symbol, ..) => {
             let name = ctx.symbol_table.symbols.get(symbol.0 as usize)
