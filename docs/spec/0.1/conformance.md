@@ -44,6 +44,22 @@ already satisfies them.
 6. Target claims: runtime ABI, linker and executable evidence per advertised
    target/profile. A Windows pass cannot certify POSIX or freestanding behavior.
 
+## Release 0.1-alpha.1 target matrix
+
+Adopted 2026-10-06 (D3). Supported, release-gated targets:
+
+| Target | Status | Required evidence |
+|---|---|---|
+| `x86_64-pc-windows-gnu` | SUPPORTED / RELEASE-GATED | native/full regression |
+| `x86_64-unknown-linux-gnu` (Ubuntu) | SUPPORTED / RELEASE-GATED | normal CI + ASan |
+
+NOT ADVERTISED in 0.1-alpha.1: macOS, freestanding and every other target. A
+target that currently compiles but is not listed here remains
+experimental/unverified and is not release-supported. The host toolchain triple
+(for example `x86_64-pc-windows-msvc`) is not a Luna target and MUST NOT be
+advertised as one. The maintainer confirms the final advertised matrix before
+tagging.
+
 ## Release 0.1 gate
 
 Before declaring the release conformant, address confirmed compiler/library and

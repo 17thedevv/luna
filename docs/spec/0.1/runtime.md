@@ -47,8 +47,12 @@ the defined contract does not silently gain exception unwinding or recovery.
 
 ## Target evidence
 
-The audit verifies Windows x86_64 GNU with LLVM 18 and a CMake Release runtime.
-The contracts retain their stated hosted/freestanding intent. Linux, macOS,
-MSVC, other architectures and freestanding targets are **not declared verified**
-by that evidence. CTest passing is runtime ABI evidence, not proof of language
-argument lowering, every safe stdlib invariant or every target ABI.
+Under the adopted 0.1-alpha.1 target matrix (see [conformance](conformance.md)),
+the supported release-gated targets are `x86_64-pc-windows-gnu` (native/full
+regression) and `x86_64-unknown-linux-gnu` (Ubuntu; normal CI + ASan). The audit
+verifies Windows x86_64 GNU with LLVM 18 and a CMake Release runtime. macOS,
+freestanding, other architectures and the MSVC host triple are **not advertised**
+for 0.1-alpha.1; a target that currently compiles is not thereby release-supported.
+CTest passing is runtime ABI evidence, not proof of language argument lowering,
+every safe stdlib invariant or every target ABI. The contracts retain their
+stated hosted/freestanding intent.
