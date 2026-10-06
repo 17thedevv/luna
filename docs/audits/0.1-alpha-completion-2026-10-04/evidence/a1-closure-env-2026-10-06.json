@@ -1,0 +1,56 @@
+{
+  "task": "A1 — closure environment destruction and consume-on-call",
+  "status": "PASS",
+  "date": "2026-10-06",
+  "branch": "codex/a1-closure-environment-destruction",
+  "base_sha": "bbe5ea29",
+  "implementation_sha": "cdeb976a",
+  "progression": {
+    "original": "exit 3  // unused owned capture leaked (environment never destroyed)",
+    "intermediate": "exit 2  // double-drop after mechanism 1 only; preserved debugging evidence, NOT an accepted checkpoint",
+    "final": "exit 0"
+  },
+  "root_cause": {
+    "primary": "closure environment was not part of the ownership/drop lifecycle; no drop obligation and no HeapFree",
+    "secondary": "needs_drop(Closure) inspected the return type (Closure(expr, params, ret)) instead of the environment",
+    "not_backend": "drop glue for the captured type already existed"
+  },
+  "mechanism_1_unused": "whole-place Drop(closure) -> ClosureDropGlue { env_ty }: load env_ptr (field 1) -> drop owned (move) captures -> HeapFree(env)",
+  "mechanism_2_consumed": "CallClosure on a closure owning a move capture consumes the closure (caller local moved); the invocation moves owned captures into body locals and every exit path runs path-sensitive capture cleanup then HeapFree(env) exactly once",
+  "identity_invariant": "ClosureDropGlue { env_ty } is sufficient: move captures carry the value type (drop iff needs_drop(T)), borrow captures carry a pointer type (never dropped), so the environment tuple fully determines the destruction plan; symbol is __luna_closure_drop_glue_<EnvTuple> with no ExprId/session id",
+  "protocol": { "compiler": 20, "metadata": 9, "mvir": 5, "format": 2 },
+  "regressions_public": [
+    "closure_env_unused (exit0)",
+    "closure_env_never_consumed (exit0)",
+    "closure_env_conditional_move (exit0)",
+    "closure_env_early_return (exit0)",
+    "closure_env_borrow_only (exit0)",
+    "closure_env_multiple_owned (exit0)",
+    "closure_env_double_call (E3001)",
+    "closure_env_use_after_call (E3001)",
+    "closure_capture (existing, now exit0 both modes)"
+  ],
+  "evidence_tests": [
+    "luna-semantic/tests/closure_drop_glue_identity.rs (structural identity, move T vs borrow &T differ, no ExprId)",
+    "luna-cli/tests/closure_env_teardown_mvir.rs (every consuming-closure exit path frees env; initialized capture dropped before HeapFree)"
+  ],
+  "gate_results": {
+    "generic_drop_cli": "PASS (source + fresh artifact, all positives exit0, all negatives reject)",
+    "comptime_loans_cli": "PASS",
+    "adv_comptime_dyn_tests": "PASS",
+    "p2a_tests": "PASS",
+    "closure_drop_glue_identity": "PASS",
+    "closure_env_teardown_mvir": "PASS"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "exit_code": 0,
+    "targets": 203,
+    "passed": 1329,
+    "failed": 0,
+    "ignored": 1,
+    "storage_errors": 0
+  },
+  "verdict": "A1 PASS — CLOSED / CONFORMANT IN TESTED SCOPE",
+  "logs": { "workspace": "scratch/workspace-a1.log" }
+}
