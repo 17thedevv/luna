@@ -23,9 +23,17 @@ owned value exactly once; moved values do not receive an additional drop.
 Arrays and slice indexing SHALL enforce bounds instead of exposing an unchecked
 out-of-bounds safe operation. Enum matches must be exhaustive; unreachable
 patterns receive the appropriate diagnostic. Integer casts must preserve the
-value for representable widening, using source signedness. Runtime overflow
-policy outside already defined checked APIs remains specification debt; an
-observed LLVM wrap is not by itself a language-wide arithmetic contract.
+value for representable widening, using source signedness. Ordinary integer
+arithmetic is checked and MUST be identical across debug and release builds. For
+the ordinary signed and unsigned operators, signed overflow, unsigned overflow,
+division by zero, `MIN / -1` and a shift amount greater than or equal to the
+operand width each produce a deterministic failure (trap/panic); they never wrap
+silently. A compile-time/constant expression that reaches one of these conditions
+MUST produce a diagnostic instead of emitting a faulty runtime program. Wrapping,
+saturating and checked-result behavior are available only through explicit
+APIs/intrinsics and are never implicit; LLVM's default wrapping is not language
+semantics. This adopts V01-DESIGN-03 and applies to both source and artifact
+modes.
 
 The recovered approved formatting contract defines char as a Unicode scalar,
 excluding surrogates and values above U+10FFFF. Invalid known integer-to-char

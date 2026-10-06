@@ -54,8 +54,14 @@ examples under a historical-role notice.
 
 | ID | Question / boundary |
 |---|---|
-| V01-DESIGN-03 | Runtime integer overflow policy outside defined checked/compile-time operations; avoid declaring current LLVM wrapping normative |
 | V01-DESIGN-04 | Complete formal grammar beyond the consolidated productions; parser acceptance of legacy/uncontracted syntax is not adoption |
+
+V01-DESIGN-03 was resolved by maintainer adoption on 2026-10-06: ordinary
+integer arithmetic is checked and identical across debug/release; overflow,
+division by zero, `MIN / -1` and out-of-range shifts are deterministic failures,
+and compile-time instances are diagnostics. See [Semantics](semantics.md).
+Implementation and acceptance for the checked-arithmetic behavior remain a
+separate task (E1); this entry records the adopted decision only.
 
 No new format-macro hook, interpolation syntax, runtime opcode or container
 language item is adopted. These require their own complete generic contract.
