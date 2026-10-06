@@ -317,7 +317,7 @@ fn test_case_14_comptime_recursion_limit_exceeded() {
     assert!(depth_err.is_some(), "Expected E_COMPTIME_RECURSION_LIMIT error, got: {:?}", diags);
 }
 
-// 15. Pointer escape from comptime is rejected with E_COMPTIME_POINTER_ESCAPE
+// 15. Pointer escape from comptime is rejected with the canonical LocalBorrowEscape code
 #[test]
 fn test_case_15_comptime_pointer_escape_rejected() {
     let src = r#"
@@ -332,8 +332,10 @@ fn test_case_15_comptime_pointer_escape_rejected() {
     "#;
     let (success, diags) = run_compiler("test_15", src);
     assert!(!success, "Expected pointer escape to be rejected");
-    let esc_err = diags.iter().find(|d| d.message.contains("E_COMPTIME_POINTER_ESCAPE") || d.message.contains("pointer escape"));
-    assert!(esc_err.is_some(), "Expected pointer escape error, got: {:?}", diags);
+    // Comptime admission now runs ordinary loan checks, so a local reference
+    // escaping a comptime block is reported with the canonical typed code.
+    let esc_err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::LocalBorrowEscape) || d.message.contains("pointer escape"));
+    assert!(esc_err.is_some(), "Expected local borrow escape error, got: {:?}", diags);
 }
 
 // 16. Comptime expressions directly embedded inside runtime functions materialize correctly
@@ -397,7 +399,7 @@ fn test_case_18_comptime_closure_escape_rejected() {
     assert!(esc_err.is_some(), "Expected resource escape error, got: {:?}", diags);
 }
 
-// 19. Reading moved value in compile-time evaluation is rejected with E_USE_OF_MOVED_VALUE
+// 19. Reading a moved value in compile-time evaluation is rejected with the canonical UseAfterMove code
 #[test]
 fn test_case_19_comptime_use_of_moved_value() {
     let src = r#"
@@ -418,8 +420,10 @@ fn test_case_19_comptime_use_of_moved_value() {
     "#;
     let (success, diags) = run_compiler("test_19", src);
     assert!(!success, "Expected use of moved value to be rejected in comptime");
-    let move_err = diags.iter().find(|d| d.message.contains("E_USE_OF_MOVED_VALUE") || d.message.contains("use of moved value"));
-    assert!(move_err.is_some(), "Expected E_USE_OF_MOVED_VALUE error, got: {:?}", diags);
+    // Comptime admission now runs ordinary loan checks, so a moved-value read
+    // is reported with the canonical typed code.
+    let move_err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::UseAfterMove) || d.message.contains("Use of moved value") || d.message.contains("use of moved value"));
+    assert!(move_err.is_some(), "Expected UseAfterMove error, got: {:?}", diags);
 }
 
 // 20. Resource leak: unfreed compile-time heap memory is rejected with E_COMPTIME_RESOURCE_LEAK
