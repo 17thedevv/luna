@@ -1522,3 +1522,25 @@ dependent controls now pass; the final omission-positive probes still reject
 E2001. The next implementation step remains per-call default materialization
 through mono and the logical callee frame, followed by ownership/effect and
 complete source/artifact acceptance. The full R0–R5 goal remains active.
+
+### Synchronous omission and receiver mapping — 2026-10-06
+
+[DEFAULT-OMISSION-GATE](DEFAULT-OMISSION-GATE.md) records checked omission
+plans, declaration/trait defaults, concrete same-frame initialization and
+compiler19/metadata9/MVIR5 transport. The generic cast drop, owner/method path,
+imported layout and missing foreign declaration reproducers led to generic
+repairs. The later receiver-only-by-constraint heuristic is corrected using
+checked callable signatures, with transitive invalid callers and valid method
+forwarding controls.
+
+The 821-input final candidate passes workspace/all-target compilation,
+337 internal tests, 89 driver tests and nine CLI suites, all exit0. Official
+sysroot regeneration completes 49 providers. The omission suite observes
+18 native executions and 60 typed negative check/build processes in the two
+provider modes. Input/compiler/runtime hashes match; commands and lossless
+logs are retained in the gate's terminal record. Earlier development successes
+and failures remain separate revision evidence.
+No full-workspace test or native target certification is inferred from these
+checks. The async creation positive still fails timing in source mode and its
+fresh artifact rejects semantic metadata. Async default initialization/drop,
+closure policy/cleanup and every remaining R0–R5 obligation stay active.

@@ -1745,10 +1745,13 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     fn resolve_expr(&mut self, expr_id: &luna_ast::ExprId) {
         let expr = &self.arena.exprs[expr_id.0 as usize];
         match expr {
-            Expr::Identifier { segments, generic_args } => {
+            Expr::Identifier { segments, generic_args, owner_generic_args } => {
                 if self.reject_ambiguous_path(segments) { return; }
                 for arg in generic_args {
                     self.resolve_type(arg);
+                }
+                for (_, args) in owner_generic_args {
+                    for arg in args { self.resolve_type(arg); }
                 }
                 if !segments.is_empty() {
                     let name_str = segments
@@ -1763,7 +1766,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         self.current_scope,
                     );
 
-                    if resolved_sym.is_none() {
+                    if resolved_sym.is_none() || !owner_generic_args.is_empty() {
                         let mut current_scope = self.current_scope;
 
                         for (i, seg) in segments.iter().enumerate() {
@@ -1797,6 +1800,27 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                     break;
                                 }
                                 resolved_sym = Some(id);
+                                if let Some((_, args)) = owner_generic_args.iter().find(|(segment, _)| *segment as usize == i) {
+                                    let owner = self.ctx.symbol_table.get_symbol(id);
+                                    if let Some(declaration) = owner.decl_id {
+                                        let mut bindings = Vec::new();
+                                        let mut ordinal = 0;
+                                        while let Some(&binder) = self.ctx.tables.generic_param_symbols.get(&(declaration, ordinal)) {
+                                            if let Some(&argument) = args.get(ordinal) { bindings.push((binder, argument)); }
+                                            ordinal += 1;
+                                        }
+                                        if ordinal == args.len() && ordinal > 0 {
+                                            self.ctx.tables.path_generic_bindings.entry(*expr_id).or_default().extend(bindings);
+                                        } else {
+                                            self.ctx.diagnostics.push(luna_common::Diagnostic::error(
+                                                format!("Type argument count for `{}`: expected {}, got {}", owner.name, ordinal, args.len()))
+                                                .with_code(DiagnosticCode::TypeMismatch).with_span(*seg));
+                                        }
+                                    } else {
+                                        self.ctx.diagnostics.push(luna_common::Diagnostic::error("Namespace cannot receive type arguments")
+                                            .with_code(DiagnosticCode::TypeMismatch).with_span(*seg));
+                                    }
+                                }
                                 if let Some(inner) =
                                     self.ctx.symbol_table.symbols[id.0 as usize].inner_scope
                                 {

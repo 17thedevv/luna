@@ -1,5 +1,10 @@
 # Default declarations and namespace identity checkpoint — 2026-10-05
 
+The [2026-10-06 omission follow-up](DEFAULT-OMISSION-GATE.md) supersedes the
+absent synchronous execution path below. This record preserves its original
+declaration-only revision and evidence boundary; the complete contract remains
+PARTIAL.
+
 **CALL-ARGUMENTS-v1 remains PARTIAL.** This checkpoint implements parameter
 default declarations, definition-site checking and portable interface identity.
 It does not implement calls which omit a defaulted argument. Those calls remain

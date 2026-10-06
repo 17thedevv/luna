@@ -280,6 +280,8 @@ impl InterfaceDecoder {
             pat_symbols: HashMap::new(),
             pat_types: HashMap::new(),
             expr_types: HashMap::new(),
+            ast_types: HashMap::new(),
+            path_generic_bindings: HashMap::new(),
             expr_substs: HashMap::new(),
             callable_signatures: self.callable_signatures,
             call_argument_bindings: HashMap::new(),

@@ -7,6 +7,11 @@ default evaluation in the function's defining scope. The
 tracks named binding and default evaluation separately. This adopted contract
 is not narrowed by implementation gaps.
 
+The [2026-10-06 omission checkpoint](../../audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md)
+tracks synchronous execution, compact ABI lifetime mapping and independent
+owner/method binders. Full support remains PARTIAL because async timing and
+artifact import still fail required positives.
+
 ## Source surface and binding
 
 ```luna

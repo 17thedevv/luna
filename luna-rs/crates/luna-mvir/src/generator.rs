@@ -93,8 +93,10 @@ impl<'a> MvirGenerator<'a> {
                 decl_id,
                 subst: Vec::new(),
                 closure_id: None,
+                defaults: None,
             },
             expr_types: std::collections::HashMap::new(),
+            ast_types: std::collections::HashMap::new(),
             symbol_types: std::collections::HashMap::new(),
             pat_types: std::collections::HashMap::new(),
             mono_calls: std::collections::HashMap::new(),
@@ -166,10 +168,7 @@ impl<'a> MvirGenerator<'a> {
     fn resolve_mono_call_name(&self, expr_id: &luna_ast::ExprId, base_name: &str) -> Option<String> {
         let mono_instance = self.get_mono_call(expr_id);
         if let Some(mi) = mono_instance {
-            let canonical_id = luna_semantic::CanonicalInstanceIdentity {
-                kind: luna_semantic::CanonicalInstanceKind::Decl(mi.decl_id),
-                subst: mi.subst.clone(),
-            };
+            let canonical_id = mi.canonical_identity();
             return Some(canonical_id.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, base_name));
         }
         None
@@ -181,10 +180,7 @@ impl<'a> MvirGenerator<'a> {
         instance: &luna_semantic::mono::MonoInstance,
     ) -> GlobalId {
         let base_name = self.ctx.symbol_table.get_symbol(method_sym).name.clone();
-        let canonical_id = luna_semantic::CanonicalInstanceIdentity {
-            kind: luna_semantic::CanonicalInstanceKind::Decl(instance.decl_id),
-            subst: instance.subst.clone(),
-        };
+        let canonical_id = instance.canonical_identity();
         GlobalId {
             name: canonical_id.symbol_name_with_tables(
                 &self.ctx.types,
@@ -192,24 +188,92 @@ impl<'a> MvirGenerator<'a> {
                 &self.ctx.tables,
                 &base_name,
             ),
-            symbol_id: Some(method_sym),
+            symbol_id: if instance.defaults.is_some() { None } else { Some(method_sym) },
         }
     }
 
+    fn call_symbol_id(&self, expression: &luna_ast::ExprId, symbol: luna_common::ids::SymbolId) -> Option<luna_common::ids::SymbolId> {
+        // A synthesized entry has different input ordinals. Its ordinary
+        // body-derived effects must not inherit the full-arity declaration's facts.
+        if self.get_mono_call(expression).is_some_and(|instance| instance.defaults.is_some()) { None }
+        else { Some(symbol) }
+    }
+
+    fn default_contract(&self, instance: &luna_semantic::mono::MonoInstance)
+        -> Option<(luna_semantic::CanonicalLifetimeContract, bool, Vec<usize>)> {
+        let defaults = instance.defaults.as_ref()?;
+        let Decl::Function { params, .. } = &self.arena.decls[defaults.declaration.0 as usize] else { return None; };
+        let symbol = self.ctx.tables.decl_symbols[&defaults.declaration];
+        let contract = self.ctx.tables.fn_lifetime_contracts.get(&symbol).cloned().unwrap_or_default();
+        let receiver = params.first().is_some_and(|p| matches!(self.arena.decls[p.0 as usize], Decl::Param { is_self: true, .. }));
+        let supplied = (0..params.len()).filter(|p| !defaults.omitted.contains(&(*p as u32))).collect();
+        Some((contract, receiver, supplied))
+    }
+
+    fn contract_ordinal(subject: luna_semantic::CanonicalContractSubject, receiver: bool) -> usize {
+        match subject {
+            luna_semantic::CanonicalContractSubject::SelfVal => 0,
+            luna_semantic::CanonicalContractSubject::Param(index) => index as usize + usize::from(receiver),
+        }
+    }
+
+    fn annotate_default_call(&mut self, expression: luna_ast::ExprId, value: ValueId) {
+        let Some(instance) = self.get_mono_call(&expression) else { return; };
+        let Some((contract, receiver, supplied)) = self.default_contract(instance) else { return; };
+        let function = self.current_function.as_mut().expect("call in function");
+        let Instruction::CallDirect { args, .. } = &function.values[value.0 as usize].inst else { return; };
+        let mut checks = Vec::new();
+        for constraint in contract.outlives_constraints {
+            let longer = Self::contract_ordinal(constraint.longer, receiver);
+            let shorter = Self::contract_ordinal(constraint.shorter, receiver);
+            if let (Some(longer), Some(shorter)) = (supplied.iter().position(|p| *p == longer), supplied.iter().position(|p| *p == shorter)) {
+                checks.push(OutlivesCheck { longer_subject: constraint.longer, shorter_subject: constraint.shorter,
+                    longer: args[longer].clone(), shorter: args[shorter].clone() });
+            }
+        }
+        if !checks.is_empty() { function.lifetime_info.checks.insert(value, checks); }
+    }
+
+    fn annotate_default_entry(&mut self, instance: &luna_semantic::mono::MonoInstance, parameters: &[luna_ast::DeclId]) {
+        let Some((contract, receiver, supplied)) = self.default_contract(instance) else { return; };
+        self.current_function.as_mut().unwrap().lifetime_info.infer_input_requirements = true;
+        let mut checks = Vec::new();
+        let mut last = None;
+        for constraint in contract.outlives_constraints {
+            let longer = Self::contract_ordinal(constraint.longer, receiver);
+            let shorter = Self::contract_ordinal(constraint.shorter, receiver);
+            if let (Some(a), Some(b)) = (supplied.iter().position(|p| *p == longer), supplied.iter().position(|p| *p == shorter)) {
+                self.current_function.as_mut().unwrap().lifetime_info.input_assumptions.push((a as u16, b as u16));
+                continue;
+            }
+            let mut operands = Vec::new();
+            for ordinal in [longer, shorter] {
+                let symbol = self.ctx.tables.decl_symbols[&parameters[ordinal]];
+                let ty = self.get_symbol_type(&symbol).expect("checked contract parameter type");
+                let loaded = self.push_inst(Instruction::Load { ptr: Operand::Value(self.locals[&symbol]) }, ty);
+                last = Some(loaded);
+                operands.push(Operand::Value(loaded));
+            }
+            checks.push(OutlivesCheck { longer_subject: constraint.longer, shorter_subject: constraint.shorter,
+                longer: operands[0].clone(), shorter: operands[1].clone() });
+        }
+        if let Some(last) = last { self.current_function.as_mut().unwrap().lifetime_info.checks.insert(last, checks); }
+    }
+
     fn resolve_ast_type(&self, type_id: &luna_ast::TypeId) -> luna_semantic::SemanticTypeId {
+        if let Some(instance) = self.current_instance {
+            if let Some(&ty) = unsafe { &*instance }.ast_types.get(type_id) { return ty; }
+        }
+        if let Some(&ty) = self.ctx.comptime_root.as_ref().and_then(|root| root.ast_types.get(type_id)) { return ty; }
         if let Some(&ty) = self.ctx.tables.ast_type_to_semantic.get(type_id) {
             if ty != luna_semantic::SemanticTypeId(0) {
                 if let Some(inst_ptr) = self.current_instance {
                     let inst = unsafe { &*inst_ptr };
-                    if !inst.instance.subst.is_empty() {
-                        let mut subst = luna_semantic::ty::Substitution::new();
-                        for &(sym, t) in &inst.instance.subst {
-                            subst.insert(sym, t);
-                        }
-                        if let luna_semantic::SemanticType::GenericParam(sym) = self.ctx.types.get(ty) {
-                            if let Some(&new_ty) = subst.get(*sym) {
-                                return new_ty;
-                            }
+                    if let luna_semantic::SemanticType::GenericParam(sym) = self.ctx.types.get(ty) {
+                        if let Some(&new_ty) = inst.instance.subst.iter().find(|(symbol, _)| symbol == sym).map(|(_, ty)| ty)
+                            .or_else(|| inst.instance.defaults.as_ref()
+                                .and_then(|defaults| defaults.subst.iter().find(|(symbol, _)| symbol == sym).map(|(_, ty)| ty))) {
+                            return new_ty;
                         }
                     }
                 }
@@ -272,16 +336,14 @@ impl<'a> MvirGenerator<'a> {
                         }
                     }
                 }
-                luna_ast::Type::Named { segments, .. } => {
-                    if let Some(first) = segments.first() {
-                        let name = self.get_span_text(*first);
+                luna_ast::Type::Named { .. } => {
+                    if let Some(symbol) = self.ctx.tables.type_symbols.get(type_id) {
                         if let Some(inst_ptr) = self.current_instance {
                             let inst = unsafe { &*inst_ptr };
-                            for &(sym, t) in &inst.instance.subst {
-                                let sym_name = &self.ctx.symbol_table.get_symbol(sym).name;
-                                if sym_name == name {
-                                    return t;
-                                }
+                            if let Some(&ty) = inst.instance.subst.iter().find(|(binder, _)| binder == symbol).map(|(_, ty)| ty)
+                                .or_else(|| inst.instance.defaults.as_ref().and_then(|defaults|
+                                    defaults.subst.iter().find(|(binder, _)| binder == symbol).map(|(_, ty)| ty))) {
+                                return ty;
                             }
                         }
                     }
@@ -424,10 +486,7 @@ impl<'a> MvirGenerator<'a> {
                         let symbol = self.ctx.tables.decl_symbols.get(&instance.instance.decl_id);
                         symbol.is_some_and(|symbol| {
                             let name = &self.ctx.symbol_table.get_symbol(*symbol).name;
-                            let identity = luna_semantic::CanonicalInstanceIdentity {
-                                kind: luna_semantic::CanonicalInstanceKind::Decl(instance.instance.decl_id),
-                                subst: instance.instance.subst.clone(),
-                            };
+                            let identity = instance.instance.canonical_identity();
                             identity.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, name) == callee.name
                         })
                     }).cloned();
@@ -485,6 +544,7 @@ impl<'a> MvirGenerator<'a> {
             link_name: None,
             param_types: vec![ptr_ty],
             ret_ty: luna_semantic::SemanticTypeId(0),
+            lifetime_info: Default::default(),
             blocks: Vec::new(),
             values: Vec::new(),
         };
@@ -524,10 +584,7 @@ impl<'a> MvirGenerator<'a> {
                 if let Some(&m_sym) = self.ctx.tables.decl_symbols.get(&inst_fn.instance.decl_id) {
                     if m_sym == drop_meth_sym && inst_fn.instance.subst == identity.subst {
                         let fn_base_name = self.ctx.symbol_table.symbols[m_sym.0 as usize].name.clone();
-                        let canonical_id = luna_semantic::CanonicalInstanceIdentity {
-                            kind: luna_semantic::CanonicalInstanceKind::Decl(inst_fn.instance.decl_id),
-                            subst: inst_fn.instance.subst.clone(),
-                        };
+                        let canonical_id = inst_fn.instance.canonical_identity();
                         user_drop_fn_name = Some(canonical_id.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, &fn_base_name));
                         break;
                     }
@@ -680,6 +737,7 @@ impl<'a> MvirGenerator<'a> {
             link_name: None,
             param_types: Vec::new(),
             ret_ty,
+            lifetime_info: Default::default(),
             blocks: Vec::new(),
             values: Vec::new(),
         });
@@ -707,6 +765,7 @@ impl<'a> MvirGenerator<'a> {
             link_name: None,
             param_types: Vec::new(),
             ret_ty,
+            lifetime_info: Default::default(),
             blocks: Vec::new(),
             values: Vec::new(),
         });
@@ -1260,10 +1319,7 @@ impl<'a> MvirGenerator<'a> {
         if let Expr::Lambda { body, params, return_type: _, is_move: _ } = expr {
             let mut fn_name = format!("closure_{}", expr_id.0);
             if !instance.instance.subst.is_empty() {
-                let canonical_id = luna_semantic::CanonicalInstanceIdentity {
-                    kind: luna_semantic::CanonicalInstanceKind::Decl(instance.instance.decl_id),
-                    subst: instance.instance.subst.clone(),
-                };
+                let canonical_id = instance.instance.canonical_identity();
                 fn_name = canonical_id.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, &fn_name);
             }
             let global_id = GlobalId {
@@ -1302,6 +1358,7 @@ impl<'a> MvirGenerator<'a> {
                 is_extern: false,
                 is_async: false,
                 ret_ty: ret_ty_id,
+                lifetime_info: Default::default(),
                 arg_count: params.len() + 1, // environment is the extra argument (first)
                 link_name: None,
                 param_types,
@@ -1427,6 +1484,7 @@ impl<'a> MvirGenerator<'a> {
                 link_name: None,
                 param_types,
                 ret_ty: ret_ty_id,
+                lifetime_info: Default::default(),
                 blocks: Vec::new(),
                 values: Vec::new(),
             };
@@ -1479,17 +1537,18 @@ impl<'a> MvirGenerator<'a> {
                 }
             }
             
-            let canonical_id = luna_semantic::CanonicalInstanceIdentity {
-                kind: luna_semantic::CanonicalInstanceKind::Decl(instance.instance.decl_id),
-                subst: instance.instance.subst.clone(),
-            };
+            let canonical_id = instance.instance.canonical_identity();
             let name_str = canonical_id.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, &fn_name);
             let global_id = GlobalId {
                 name: name_str,
-                symbol_id: sym_id_opt,
+                symbol_id: if instance.instance.defaults.is_some() { None } else { sym_id_opt },
             };
             
-            let arg_count = if let Decl::Function { params, .. } = decl { params.len() } else { 0 };
+            let supplied_ordinals: Vec<_> = if let Decl::Function { params, .. } = decl {
+                (0..params.len()).filter(|ordinal| !instance.instance.defaults.as_ref()
+                    .is_some_and(|defaults| defaults.omitted.contains(&(*ordinal as u32)))).collect()
+            } else { Vec::new() };
+            let arg_count = supplied_ordinals.len();
             let param_types = resolved_param_types.unwrap_or_else(|| {
                 let mut p = Vec::new();
                 if let Decl::Function { params, .. } = decl {
@@ -1509,22 +1568,24 @@ impl<'a> MvirGenerator<'a> {
                 p
             });
 
+            let param_types = supplied_ordinals.iter().map(|&ordinal| param_types[ordinal]).collect();
             let is_async = if let Decl::Function { is_async, .. } = decl { *is_async } else { false };
 
             let memory_intrinsic = sym_id_opt.and_then(|symbol| self.ctx.lang_items.from_symbol(symbol))
                 .filter(|item| item.is_memory_intrinsic());
-            let is_extern = (body.is_none() && memory_intrinsic.is_none()) || {
+            let is_extern = instance.instance.defaults.is_none() && ((body.is_none() && memory_intrinsic.is_none()) || {
                 instance.instance.subst.is_empty() && !self.is_comptime
                     && sym_id_opt.is_some_and(|symbol| self.ctx.tables.object_backed_functions.contains(&symbol))
-            };
+            });
             self.current_function = Some(Function {
                 name: global_id,
                 is_extern,
                 is_async,
                 arg_count,
-                link_name,
+                link_name: if instance.instance.defaults.is_some() { None } else { link_name },
                 param_types,
                 ret_ty: ret_ty_id,
+                lifetime_info: Default::default(),
                 blocks: Vec::new(),
                 values: Vec::new(),
             });
@@ -1552,7 +1613,10 @@ impl<'a> MvirGenerator<'a> {
             self.start_block(entry_label);
             
             if let Decl::Function { params, .. } = decl {
-                for (idx, param_id) in params.iter().enumerate() {
+                // The actual ABI parameters occupy the first arg_count values.
+                // Defaults are ordinary local storage in the same callee frame.
+                for (idx, &ordinal) in supplied_ordinals.iter().enumerate() {
+                    let param_id = &params[ordinal];
                     if let Decl::Param { .. } = &self.arena.decls[param_id.0 as usize] {
                         if let Some(sym_id) = self.ctx.tables.decl_symbols.get(&param_id).copied() {
                             let ty_id = self.get_symbol_type(&sym_id).unwrap_or(luna_semantic::SemanticTypeId(0));
@@ -1562,6 +1626,33 @@ impl<'a> MvirGenerator<'a> {
                             self.lexical_scopes.last_mut().unwrap().push(sym_id);
                         }
                     }
+                }
+                if let Some(defaults) = &instance.instance.defaults {
+                    let Decl::Function { params: source_parameters, .. } = &self.arena.decls[defaults.declaration.0 as usize] else {
+                        panic!("ICE: checked default source is not a function");
+                    };
+                    for &ordinal in &defaults.omitted {
+                        let symbol = self.ctx.tables.decl_symbols[&params[ordinal as usize]];
+                        let ty = self.get_symbol_type(&symbol).expect("checked default parameter type");
+                        let storage = self.push_inst(Instruction::Alloca, ty);
+                        self.locals.insert(symbol, storage);
+                        self.lexical_scopes.last_mut().unwrap().push(symbol);
+                    }
+                    for (&source, &target) in source_parameters.iter().zip(params) {
+                        let source = self.ctx.tables.decl_symbols[&source];
+                        let target = self.ctx.tables.decl_symbols[&target];
+                        self.locals.insert(source, self.locals[&target]);
+                    }
+                    for &ordinal in &defaults.omitted {
+                        let Decl::Param { default: Some(default), .. } = &self.arena.decls[source_parameters[ordinal as usize].0 as usize] else {
+                            panic!("ICE: omitted argument has no checked default");
+                        };
+                        let value = self.generate_expr(&default.value);
+                        let symbol = self.ctx.tables.decl_symbols[&params[ordinal as usize]];
+                        let ty = self.get_symbol_type(&symbol).expect("checked default type");
+                        self.push_inst_span(Instruction::Store { ptr: Operand::Value(self.locals[&symbol]), value }, ty, Some(default.span));
+                    }
+                    self.annotate_default_entry(&instance.instance, params);
                 }
             }
 
@@ -1587,6 +1678,18 @@ impl<'a> MvirGenerator<'a> {
                 self.generate_memory_intrinsic_body(item, decl, ret_ty_id);
             } else if let Some(body_stmt) = body {
                 self.generate_fn_body(&body_stmt, ret_ty_id);
+            } else if instance.instance.defaults.is_some() {
+                let Decl::Function { params, .. } = decl else { unreachable!() };
+                let mut arguments = Vec::new();
+                for parameter in params {
+                    let symbol = self.ctx.tables.decl_symbols[parameter];
+                    let ty = self.get_symbol_type(&symbol).expect("checked extern parameter");
+                    arguments.push(Operand::Value(self.push_inst(Instruction::Load { ptr: Operand::Value(self.locals[&symbol]) }, ty)));
+                }
+                let identity = luna_semantic::CanonicalInstanceIdentity { kind: luna_semantic::CanonicalInstanceKind::Decl(instance.instance.decl_id), subst: instance.instance.subst.clone() };
+                let result = self.push_inst(Instruction::CallDirect { callee: GlobalId {
+                    name: identity.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, &fn_name), symbol_id: sym_id_opt }, args: arguments }, ret_ty_id);
+                self.terminate_block(Terminator::Ret { value: Some(Operand::Value(result)) });
             }
             
             if let Some(func) = self.current_function.take() {
@@ -2464,6 +2567,7 @@ impl<'a> MvirGenerator<'a> {
                             method_idx,
                             args: arg_ops,
                         }, ty_id);
+                        self.annotate_default_call(*expr_id, call_val);
                         return Operand::Value(call_val);
                     }
                 }
@@ -2488,10 +2592,11 @@ impl<'a> MvirGenerator<'a> {
                         let call_val = self.push_inst(Instruction::CallDirect {
                             callee: GlobalId {
                                 name: m_name,
-                                symbol_id: Some(m_sym),
+                                symbol_id: self.call_symbol_id(expr_id, m_sym),
                             },
                             args: arg_ops,
                         }, ty_id);
+                        self.annotate_default_call(*expr_id, call_val);
                         return Operand::Value(call_val);
                     }
                 }
@@ -2528,6 +2633,7 @@ impl<'a> MvirGenerator<'a> {
                         variant_idx,
                         args: arg_ops,
                     }, enum_ty);
+                    self.annotate_default_call(*expr_id, call_val);
                     return Operand::Value(call_val);
                 } else {
                     let callee_ty_id = self.ctx.tables.expr_types.get(callee).copied().unwrap_or(luna_semantic::SemanticTypeId(0));
@@ -2572,6 +2678,7 @@ impl<'a> MvirGenerator<'a> {
                             Operand::Global(mut id) => {
                                 if let Some(canonical_name) = self.resolve_mono_call_name(expr_id, &id.name) {
                                     id.name = canonical_name;
+                                    id.symbol_id = id.symbol_id.and_then(|symbol| self.call_symbol_id(expr_id, symbol));
                                 }
                                 // Global operands already carry their canonical instance name.
                                 // An immutable function value may select a generic instance at
@@ -2581,6 +2688,7 @@ impl<'a> MvirGenerator<'a> {
                             _ => Instruction::CallIndirect { callee: callee_op, args: arg_ops },
                         }
                     }, ty_id);
+                    self.annotate_default_call(*expr_id, call_val);
                     Operand::Value(call_val)
                 }
             }
@@ -2889,6 +2997,7 @@ impl<'a> MvirGenerator<'a> {
                         method_idx,
                         args: arg_ops,
                     }, ty_id);
+                    self.annotate_default_call(*expr_id, call_val);
                     return Operand::Value(call_val);
                 }
 
@@ -2988,10 +3097,11 @@ impl<'a> MvirGenerator<'a> {
                     let call_val = self.push_inst(Instruction::CallDirect {
                         callee: GlobalId {
                             name: m_name,
-                            symbol_id: Some(m_sym),
+                            symbol_id: self.call_symbol_id(expr_id, m_sym),
                         },
                         args: final_args,
                     }, ty_id);
+                    self.annotate_default_call(*expr_id, call_val);
                     return Operand::Value(call_val);
                 }
                 let method_text = self.get_span_text(*method_name);
@@ -3119,10 +3229,7 @@ impl<'a> MvirGenerator<'a> {
                 if let Some(inst_ptr) = self.current_instance {
                     let inst = unsafe { &*inst_ptr };
                     if !inst.instance.subst.is_empty() {
-                        let canonical_id = luna_semantic::CanonicalInstanceIdentity {
-                            kind: luna_semantic::CanonicalInstanceKind::Decl(inst.instance.decl_id),
-                            subst: inst.instance.subst.clone(),
-                        };
+                        let canonical_id = inst.instance.canonical_identity();
                         fn_name = canonical_id.symbol_name_with_tables(&self.ctx.types, &self.ctx.symbol_table, &self.ctx.tables, &fn_name);
                     }
                 }
@@ -3361,10 +3468,9 @@ impl<'a> MvirGenerator<'a> {
                 // A true semantic identity cast preserves the operand's place
                 // and ownership. Introducing a detached Cast value here would
                 // hide the source place from normal move/drop accounting.
-                if let Some(source_ty) = self.ctx.tables.expr_types.get(expr).copied() {
-                    if self.ctx.types.resolve(source_ty) == self.ctx.types.resolve(target_ty_id) {
-                        return val_op;
-                    }
+                let source_ty = self.get_expr_type(expr);
+                if self.ctx.types.resolve(source_ty) == self.ctx.types.resolve(target_ty_id) {
+                    return val_op;
                 }
                 
                 let val = self.push_inst(Instruction::Cast {

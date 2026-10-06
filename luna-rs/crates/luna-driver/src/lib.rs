@@ -502,6 +502,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             let main_expr_end = arena.exprs.len() as u32;
             let main_decl_end = arena.decls.len() as u32;
             let main_pat_end = arena.pats.len() as u32;
+            let main_type_end = arena.types.len() as u32;
             
             let mut items_mut = items.clone();
             
@@ -885,6 +886,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     exprs: 0..main_expr_end,
                     decls: 0..main_decl_end,
                     pats: 0..main_pat_end,
+                    types: 0..main_type_end,
                 };
                 let interface = crate::registry::ModuleRegistry::extract_interface_from_ctx(provider_name.clone(), main_provider_id, &semantic_ctx, &ranges);
                 let builder = crate::metadata_builder::MetadataBuilder::new(&registry, &interface, &summaries);

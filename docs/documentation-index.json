@@ -205,7 +205,27 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md",
     "role": "evidence",
     "owner": "conformance"
   },

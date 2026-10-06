@@ -128,6 +128,8 @@ pub struct ProviderInterface {
     pub pat_symbols: HashMap<luna_ast::PatId, luna_common::ids::SymbolId>,
     pub pat_types: HashMap<luna_ast::PatId, luna_semantic::ty::SemanticTypeId>,
     pub expr_types: HashMap<luna_ast::ExprId, luna_semantic::ty::SemanticTypeId>,
+    pub ast_types: HashMap<luna_ast::TypeId, luna_semantic::ty::SemanticTypeId>,
+    pub path_generic_bindings: HashMap<luna_ast::ExprId, Vec<(luna_common::ids::SymbolId, luna_ast::TypeId)>>,
     pub expr_substs: HashMap<luna_ast::ExprId, Vec<(luna_common::ids::SymbolId, luna_semantic::ty::SemanticTypeId)>>,
     pub callable_signatures: HashMap<luna_common::ids::SymbolId, luna_semantic::CallableSignature>,
     pub call_argument_bindings: HashMap<luna_ast::ExprId, luna_semantic::CallArgumentBinding>,
@@ -826,6 +828,14 @@ impl ModuleRegistry {
                 let new_ty_id = ctx.types.clone_type_from(old_ty_id, &interface.types, &lookup_sym);
                 ctx.tables.expr_types.insert(expr_id, new_ty_id);
             }
+            for (&type_id, &old_ty) in &interface.ast_types {
+                let ty = ctx.types.clone_type_from(old_ty, &interface.types, &lookup_sym);
+                ctx.tables.ast_type_to_semantic.insert(type_id, ty);
+            }
+            for (&expression, bindings) in &interface.path_generic_bindings {
+                ctx.tables.path_generic_bindings.insert(expression, bindings.iter()
+                    .map(|&(symbol, ty)| (lookup_sym(symbol), ty)).collect());
+            }
             for (&expr_id, subst_list) in &interface.expr_substs {
                 let mut new_subst = luna_semantic::ty::Substitution::new();
                 for &(old_gp, old_ty) in subst_list {
@@ -1089,6 +1099,7 @@ pub struct ArenaRanges {
     pub exprs: std::ops::Range<u32>,
     pub decls: std::ops::Range<u32>,
     pub pats: std::ops::Range<u32>,
+    pub types: std::ops::Range<u32>,
 }
 
 /// Aggregate values emitted by the VM are structural. Drop optional source
@@ -1547,6 +1558,10 @@ impl ModuleRegistry {
             pat_symbols,
             pat_types,
             expr_types,
+            ast_types: ctx.tables.ast_type_to_semantic.iter().filter(|(ty, _)| ranges.types.contains(&ty.0))
+                .map(|(&source, &ty)| (source, ty)).collect(),
+            path_generic_bindings: ctx.tables.path_generic_bindings.iter().filter(|(expression, _)| ranges.exprs.contains(&expression.0))
+                .map(|(&expression, bindings)| (expression, bindings.clone())).collect(),
             expr_substs,
             callable_signatures: ctx.tables.callable_signatures.keys().filter(|symbol| {
                 ctx.tables.symbol_decls.get(symbol).is_some_and(|decl| ranges.decls.contains(&decl.0))

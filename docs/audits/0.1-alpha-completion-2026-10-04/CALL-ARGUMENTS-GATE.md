@@ -1,5 +1,9 @@
 # Call arguments and rigid generic fixture gate — 2026-10-05
 
+Later [default omission evidence](DEFAULT-OMISSION-GATE.md) tracks execution
+and newly exposed lifetime/async gaps separately from the dated checkpoints
+below. The contract remains PARTIAL.
+
 The adopted [call contract](../../spec/0.1/call-arguments-v1.md) remains required
 for 0.1. The dated baseline and positional repair below are followed by the
 named-binding checkpoint. Defaults and generic comptime remain incomplete;

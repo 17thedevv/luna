@@ -379,9 +379,10 @@ impl<'a> Parser<'a> {
                 if let Expr::Identifier {
                     segments,
                     generic_args,
+                    owner_generic_args,
                 } = &self.arena.exprs[expr.0 as usize]
                 {
-                    if generic_args.is_empty() && !segments.is_empty() {
+                    if generic_args.is_empty() && owner_generic_args.is_empty() && !segments.is_empty() {
                         let path = segments.clone();
                         let name_span = *path.last().unwrap();
                         let (delimiter, close_kind) = if self.match_token(TokenKind::LParen) {
@@ -452,11 +453,12 @@ impl<'a> Parser<'a> {
                 
                 let mut generic_args = Vec::new();
                 let mut final_callee = expr;
-                if let Expr::Identifier { segments, generic_args: id_args } = &self.arena.exprs[expr.0 as usize] {
+                if let Expr::Identifier { segments, owner_generic_args, generic_args: id_args } = &self.arena.exprs[expr.0 as usize] {
                     if !id_args.is_empty() {
                         generic_args = id_args.clone();
                         final_callee = self.arena.alloc_expr(Expr::Identifier {
                             segments: segments.clone(),
+                            owner_generic_args: owner_generic_args.clone(),
                             generic_args: Vec::new(),
                         });
                     }
@@ -556,8 +558,13 @@ impl<'a> Parser<'a> {
                 if let Expr::Identifier {
                     segments,
                     generic_args,
+                    owner_generic_args,
                 } = self.arena.exprs[expr.0 as usize].clone()
                 {
+                    if !owner_generic_args.is_empty() {
+                        self.error_at_current("Struct literal type arguments belong to the final type", segments[0]);
+                        return Err(());
+                    }
                     self.advance(); // consume '{'
                     let mut fields = Vec::new();
                     while !self.check(TokenKind::RBrace) && !self.is_at_end() {
@@ -613,6 +620,7 @@ impl<'a> Parser<'a> {
 
     pub fn parse_value_path(&mut self) -> Result<ExprId, ()> {
         let mut segments = Vec::new();
+        let mut owner_generic_args = Vec::new();
         let mut generic_args = Vec::new();
 
         loop {
@@ -646,12 +654,16 @@ impl<'a> Parser<'a> {
             if !self.match_token(TokenKind::ColonColon) {
                 break;
             }
+            if !generic_args.is_empty() {
+                owner_generic_args.push(((segments.len() - 1) as u32, std::mem::take(&mut generic_args)));
+            }
         }
 
         if segments.len() > 0 && segments[0].start == 495 {
         }
         Ok(self.arena.alloc_expr(Expr::Identifier {
             segments,
+            owner_generic_args,
             generic_args,
         }))
     }

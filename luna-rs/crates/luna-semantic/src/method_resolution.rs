@@ -438,7 +438,7 @@ impl<'a> TypeChecker<'a> {
             })
             .and_then(|decl| self.arena.decls.get(decl.0 as usize))
             .is_some_and(|decl| matches!(decl, Decl::Param { is_self: true, .. }));
-        if !receiver_declared || params.len() != arguments.len() + 1 {
+        if !receiver_declared {
             self.ctx.diagnostics.push(
                 Diagnostic::error(format!(
                     "Method requires a receiver and {} arguments; got {}",

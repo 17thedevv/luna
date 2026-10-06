@@ -77,6 +77,9 @@ pub enum Expr {
     Literal(Token, String), // Integer, Float, Char, Str, etc.
     Identifier {
         segments: Vec<Span>,
+        /// Type arguments on prefix owners, keyed by source path segment.
+        owner_generic_args: Vec<(u32, Vec<TypeId>)>,
+        /// Type arguments belonging to the final value declaration only.
         generic_args: Vec<TypeId>,
     },
     Binary {

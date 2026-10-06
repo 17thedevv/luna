@@ -8,6 +8,7 @@ fn drop_module(callee: &str) -> Module {
         name: GlobalId { name: "drop_test".into(), symbol_id: None },
         is_extern: false, is_async: false, arg_count: 0, link_name: None,
         param_types: vec![], ret_ty: SemanticTypeId(0),
+        lifetime_info: Default::default(),
         blocks: vec![BasicBlock {
             label: LabelId { name: "entry".into() },
             insts: vec![ValueId(0), ValueId(1)],
@@ -42,6 +43,7 @@ fn valid_external_drop_declaration_is_called() {
         name: GlobalId { name: "external_drop_glue".into(), symbol_id: None },
         is_extern: true, is_async: false, arg_count: 1, link_name: None,
         param_types: vec![ptr_ty], ret_ty: SemanticTypeId(0), blocks: vec![], values: vec![],
+        lifetime_info: Default::default(),
     });
     test_backend_compile(&module, &ctx).expect("a declared external destructor remains valid");
 }
@@ -69,6 +71,7 @@ fn test_unhandled_instruction_fails_closed() {
         link_name: None,
         param_types: vec![],
         ret_ty: SemanticTypeId(0),
+        lifetime_info: Default::default(),
         blocks: vec![
             BasicBlock {
                 label: LabelId { name: "entry".into() },

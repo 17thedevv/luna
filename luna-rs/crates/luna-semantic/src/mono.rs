@@ -2,17 +2,38 @@ use luna_ast::{AstArena, Item, Stmt, Expr, Decl, DeclId, ExprId, StmtId};
 use crate::{SemanticContext, ty::{SemanticTypeId, SemanticType, Substitution}};
 use luna_common::ids::SymbolId;
 use std::collections::{HashSet, HashMap};
+#[path = "default_mono.rs"]
+mod default_mono;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct MonoInstance {
     pub decl_id: DeclId,
     pub subst: Vec<(SymbolId, SemanticTypeId)>,
     pub closure_id: Option<luna_ast::ExprId>,
+    pub defaults: Option<MonoDefaults>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MonoDefaults {
+    pub declaration: DeclId,
+    pub omitted: Vec<u32>,
+    pub subst: Vec<(SymbolId, SemanticTypeId)>,
+}
+
+impl MonoInstance {
+    pub fn canonical_identity(&self) -> CanonicalInstanceIdentity {
+        CanonicalInstanceIdentity {
+            kind: self.defaults.as_ref().map_or(CanonicalInstanceKind::Decl(self.decl_id), |defaults|
+                CanonicalInstanceKind::DefaultEntry { decl_id: self.decl_id, omitted: defaults.omitted.clone() }),
+            subst: self.subst.clone(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CanonicalInstanceKind {
     Decl(DeclId),
+    DefaultEntry { decl_id: DeclId, omitted: Vec<u32> },
     DropGlue {
         struct_sym: SymbolId,
         concrete_ty: SemanticTypeId,
@@ -38,6 +59,11 @@ impl CanonicalInstanceIdentity {
         nominal_name: &str,
     ) -> String {
         match self.kind {
+            CanonicalInstanceKind::DefaultEntry { decl_id, ref omitted } => {
+                let base = Self { kind: CanonicalInstanceKind::Decl(decl_id), subst: self.subst.clone() }
+                    .symbol_name_with_tables(types, symbol_table, tables, nominal_name);
+                return format!("{base}$defaults${}", omitted.iter().map(u32::to_string).collect::<Vec<_>>().join("_"));
+            }
             CanonicalInstanceKind::Decl(decl_id) => {
                 if nominal_name == "main" || nominal_name.starts_with("__luna_") {
                     return nominal_name.to_string();
@@ -100,6 +126,11 @@ impl CanonicalInstanceIdentity {
 
     pub fn symbol_name(&self, types: &crate::ty::TypeContext, symbol_table: &crate::SymbolTable, nominal_name: &str) -> String {
         match self.kind {
+            CanonicalInstanceKind::DefaultEntry { decl_id, ref omitted } => {
+                let base = Self { kind: CanonicalInstanceKind::Decl(decl_id), subst: self.subst.clone() }
+                    .symbol_name(types, symbol_table, nominal_name);
+                format!("{base}$defaults${}", omitted.iter().map(u32::to_string).collect::<Vec<_>>().join("_"))
+            }
             CanonicalInstanceKind::Decl(decl_id) => {
                 if nominal_name == "main" || nominal_name.starts_with("__luna_") {
                     return nominal_name.to_string();
@@ -128,6 +159,7 @@ impl CanonicalInstanceIdentity {
 pub struct InstantiatedFunction {
     pub instance: MonoInstance,
     pub expr_types: HashMap<ExprId, SemanticTypeId>,
+    pub ast_types: HashMap<luna_ast::TypeId, SemanticTypeId>,
     pub symbol_types: HashMap<SymbolId, SemanticTypeId>,
     pub pat_types: HashMap<luna_ast::PatId, SemanticTypeId>,
     pub mono_calls: HashMap<ExprId, MonoInstance>,
@@ -144,6 +176,7 @@ pub struct InstantiatedFunction {
 pub struct MonoRoot {
     pub return_type: Option<SemanticTypeId>,
     pub expr_types: HashMap<ExprId, SemanticTypeId>,
+    pub ast_types: HashMap<luna_ast::TypeId, SemanticTypeId>,
     pub symbol_types: HashMap<SymbolId, SemanticTypeId>,
     pub pat_types: HashMap<luna_ast::PatId, SemanticTypeId>,
     pub mono_calls: HashMap<ExprId, MonoInstance>,
@@ -185,6 +218,7 @@ pub struct MonoCollector<'a> {
     // Temporary state
     current_instance: Option<MonoInstance>,
     current_expr_types: HashMap<ExprId, SemanticTypeId>,
+    current_ast_types: HashMap<luna_ast::TypeId, SemanticTypeId>,
     current_symbol_types: HashMap<SymbolId, SemanticTypeId>,
     current_pat_types: HashMap<luna_ast::PatId, SemanticTypeId>,
     current_mono_calls: HashMap<ExprId, MonoInstance>,
@@ -210,6 +244,7 @@ impl<'a> MonoCollector<'a> {
             visited_drop_types: HashSet::new(),
             current_instance: None,
             current_expr_types: HashMap::new(),
+            current_ast_types: HashMap::new(),
             current_symbol_types: HashMap::new(),
             current_pat_types: HashMap::new(),
             current_mono_calls: HashMap::new(),
@@ -267,6 +302,7 @@ impl<'a> MonoCollector<'a> {
                                         decl_id: m_decl_id,
                                         subst: instance_subst.clone(),
                                         closure_id: None,
+                                        defaults: None,
                                     };
                                     if !self.instantiated.contains_key(&instance) && !self.worklist.contains(&instance) {
                                         self.worklist.push(instance);
@@ -316,6 +352,7 @@ impl<'a> MonoCollector<'a> {
                                         decl_id: m_decl_id,
                                         subst: instance_subst.clone(),
                                         closure_id: None,
+                                        defaults: None,
                                     };
                                     if !self.instantiated.contains_key(&instance) && !self.worklist.contains(&instance) {
                                         self.worklist.push(instance);
@@ -389,6 +426,7 @@ impl<'a> MonoCollector<'a> {
                                 decl_id: *decl_id,
                                 subst: vec![],
                                 closure_id: None,
+                                defaults: None,
                             });
                         }
                     }
@@ -401,6 +439,7 @@ impl<'a> MonoCollector<'a> {
                                             decl_id: *m_id,
                                             subst: vec![],
                                             closure_id: None,
+                                            defaults: None,
                                         });
                                     }
                                 }
@@ -436,6 +475,7 @@ impl<'a> MonoCollector<'a> {
                                         decl_id: *m_id,
                                         subst: vec![],
                                         closure_id: None,
+                                        defaults: None,
                                     });
                                 }
                             }
@@ -455,6 +495,7 @@ impl<'a> MonoCollector<'a> {
                                         decl_id: *m_id,
                                         subst: vec![],
                                         closure_id: None,
+                                        defaults: None,
                                     });
                                 }
                             }
@@ -470,6 +511,7 @@ impl<'a> MonoCollector<'a> {
     pub fn run_on_expr(&mut self, expr_id: ExprId) -> MonoRoot {
         self.current_instance = None;
         self.current_expr_types.clear();
+        self.current_ast_types.clear();
         self.current_symbol_types.clear();
         self.current_pat_types.clear();
         self.current_mono_calls.clear();
@@ -486,6 +528,7 @@ impl<'a> MonoCollector<'a> {
     pub fn run_on_stmt(&mut self, stmt_id: StmtId) -> MonoRoot {
         self.current_instance = None;
         self.current_expr_types.clear();
+        self.current_ast_types.clear();
         self.current_symbol_types.clear();
         self.current_pat_types.clear();
         self.current_mono_calls.clear();
@@ -503,6 +546,7 @@ impl<'a> MonoCollector<'a> {
         MonoRoot {
             return_type: None,
             expr_types: std::mem::take(&mut self.current_expr_types),
+            ast_types: std::mem::take(&mut self.current_ast_types),
             symbol_types: std::mem::take(&mut self.current_symbol_types),
             pat_types: std::mem::take(&mut self.current_pat_types),
             mono_calls: std::mem::take(&mut self.current_mono_calls),
@@ -521,6 +565,7 @@ impl<'a> MonoCollector<'a> {
 
             self.current_instance = Some(instance.clone());
             self.current_expr_types.clear();
+            self.current_ast_types.clear();
             self.current_symbol_types.clear();
             self.current_pat_types.clear();
             self.current_mono_calls.clear();
@@ -576,7 +621,8 @@ impl<'a> MonoCollector<'a> {
                                     }
                                 }
                             }
-                            let object_backed = instance.subst.is_empty()
+                            self.visit_parameter_defaults(&instance);
+                            let object_backed = instance.defaults.is_none() && instance.subst.is_empty()
                                 && self.ctx.tables.decl_symbols.get(&instance.decl_id)
                                     .is_some_and(|symbol| self.ctx.tables.object_backed_functions.contains(symbol))
                                 && !matches!(decl, Decl::Function { is_comptime: true, .. });
@@ -585,6 +631,14 @@ impl<'a> MonoCollector<'a> {
                             }
                         },
                         Decl::Function { body: None, params, .. } => {
+                            self.visit_parameter_defaults(&instance);
+                            if instance.defaults.is_some() {
+                                // The default entry forwards to the complete foreign ABI.
+                                // Emit its declaration even when no full-arity source call exists.
+                                let mut foreign = instance.clone();
+                                foreign.defaults = None;
+                                self.worklist.push(foreign);
+                            }
                             if let Some(&function) = self.ctx.tables.decl_symbols.get(&instance.decl_id) {
                                 if let Some(&ty) = self.ctx.tables.symbol_types.get(&function) {
                                     let ty = self.substitute(ty);
@@ -672,6 +726,16 @@ impl<'a> MonoCollector<'a> {
                 }
             }
 
+            let mut current_ast_types = std::mem::take(&mut self.current_ast_types);
+            for ty in current_ast_types.values_mut() {
+                let resolved = self.substitute(*ty);
+                *ty = resolved;
+                if !self.ctx.types.is_monomorphic(resolved) {
+                    self.emit_monomorphization_barrier_error(resolved, None);
+                    is_concrete = false;
+                }
+            }
+
             if !is_concrete {
                 self.failed_instances.insert(instance);
                 continue; // Barrier: do not insert unresolved mono unit
@@ -680,6 +744,7 @@ impl<'a> MonoCollector<'a> {
             let instantiated_fn = InstantiatedFunction {
                 instance: instance.clone(),
                 expr_types: current_expr_types,
+                ast_types: current_ast_types,
                 symbol_types: current_symbol_types,
                 pat_types: current_pat_types,
                 mono_calls: std::mem::take(&mut self.current_mono_calls),
@@ -903,7 +968,7 @@ impl<'a> MonoCollector<'a> {
         sym_id: SymbolId,
         receiver_ty: SemanticTypeId,
         expected_ret_ty: Option<SemanticTypeId>,
-        expected_arg_tys: &[SemanticTypeId],
+        expected_arg_tys: &[Option<SemanticTypeId>],
         call_substs: &HashMap<SymbolId, SemanticTypeId>,
     ) -> Option<(DeclId, Option<DeclId>, crate::ty::Substitution)> {
         let method_name = self.ctx.symbol_table.get_symbol(sym_id).name.clone();
@@ -1012,6 +1077,7 @@ impl<'a> MonoCollector<'a> {
                     };
                     let mut args_match = true;
                     for (&p_ty, &a_ty) in method_args.iter().zip(expected_arg_tys.iter()) {
+                        let Some(a_ty) = a_ty else { continue; };
                         let instantiated_param = self.ctx.types.subst(p_ty, &method_call_subst);
                         if !self.ctx.matches_impl_pattern(instantiated_param, a_ty, &candidate_generic_params, &mut test_subst) {
                             args_match = false;
@@ -1159,6 +1225,13 @@ impl<'a> MonoCollector<'a> {
         ordered
     }
 
+    fn visit_embedded_type(&mut self, source: luna_ast::TypeId) {
+        if let Some(&ty) = self.ctx.tables.ast_type_to_semantic.get(&source) {
+            let ty = self.substitute(ty);
+            self.current_ast_types.insert(source, ty);
+        }
+    }
+
     fn substitute(&mut self, ty: SemanticTypeId) -> SemanticTypeId {
         let resolved = self.ctx.types.resolve(ty);
         let sem_ty = self.ctx.types.get(resolved).clone();
@@ -1273,6 +1346,7 @@ impl<'a> MonoCollector<'a> {
                             decl_id,
                             subst: instance_subst,
                             closure_id: None,
+                            defaults: None,
                         })
                     };
 
@@ -1568,9 +1642,9 @@ impl<'a> MonoCollector<'a> {
                                 self.substitute(aty)
                             }).collect();
                             let expected_arg_tys = self.ctx.tables.call_argument_bindings.get(expr_id)
-                                .map(|binding| binding.in_parameter_order(&expected_arg_tys)
+                                .map(|binding| binding.in_declaration_slots(&expected_arg_tys)
                                     .expect("ICE: checked call binding is not a permutation"))
-                                .unwrap_or(expected_arg_tys);
+                                .unwrap_or_else(|| expected_arg_tys.into_iter().map(Some).collect());
 
                             let mut call_substs = HashMap::new();
                             if let Some(subst) = self.ctx.tables.expr_substs.get(expr_id).cloned() {
@@ -1626,7 +1700,10 @@ impl<'a> MonoCollector<'a> {
                                 decl_id,
                                 subst: instance_subst,
                                 closure_id: None,
+                                defaults: None,
                             };
+                            let mut instance = instance;
+                            self.attach_call_defaults(*expr_id, &mut instance);
                             self.current_mono_calls.insert(*expr_id, instance.clone());
                             if !self.instantiated.contains_key(&instance) {
                                 self.worklist.push(instance);
@@ -1693,9 +1770,9 @@ impl<'a> MonoCollector<'a> {
                         self.substitute(aty)
                     }).collect();
                     let expected_arg_tys = self.ctx.tables.call_argument_bindings.get(expr_id)
-                        .map(|binding| binding.in_parameter_order(&expected_arg_tys)
+                        .map(|binding| binding.in_declaration_slots(&expected_arg_tys)
                             .expect("ICE: checked call binding is not a permutation"))
-                        .unwrap_or(expected_arg_tys);
+                        .unwrap_or_else(|| expected_arg_tys.into_iter().map(Some).collect());
 
                     let mut call_substs = HashMap::new();
                     if let Some(subst) = self.ctx.tables.expr_substs.get(expr_id).cloned() {
@@ -1794,8 +1871,11 @@ impl<'a> MonoCollector<'a> {
                             decl_id,
                             subst: instance_subst,
                             closure_id: None,
+                            defaults: None,
                         };
-                        self.current_mono_calls.insert(*expr_id, instance.clone());
+                        let mut instance = instance;
+                            self.attach_call_defaults(*expr_id, &mut instance);
+                            self.current_mono_calls.insert(*expr_id, instance.clone());
                         if !self.instantiated.contains_key(&instance) {
                             self.worklist.push(instance);
                         }
@@ -1832,6 +1912,7 @@ impl<'a> MonoCollector<'a> {
                     decl_id,
                     subst: instance_subst,
                     closure_id: Some(*expr_id),
+                    defaults: None,
                 };
                 if !self.instantiated.contains_key(&instance) {
                     self.worklist.push(instance);
@@ -1858,8 +1939,12 @@ impl<'a> MonoCollector<'a> {
                     self.visit_expr(element);
                 }
             }
-            Expr::Cast { expr: inner, .. } => {
+            Expr::Cast { expr: inner, target_type } => {
+                self.visit_embedded_type(*target_type);
                 self.visit_expr(inner);
+            }
+            Expr::Sizeof { target_type } | Expr::Alignof { target_type } => {
+                self.visit_embedded_type(*target_type);
             }
             Expr::Unary { op, operand } => {
                 self.visit_expr(operand);
@@ -1892,6 +1977,7 @@ impl<'a> MonoCollector<'a> {
                         decl_id,
                         subst: self.order_subst_for_decl(decl_id, impl_decl_id, subst_pairs),
                         closure_id: None,
+                        defaults: None,
                     };
                     calls.branch = Some(instance.clone());
                     calls.branch_return_type = self.ctx.tables.try_branch_return_types.get(expr_id)
@@ -1910,6 +1996,7 @@ impl<'a> MonoCollector<'a> {
                         decl_id,
                         subst: self.order_subst_for_decl(decl_id, impl_decl_id, subst_pairs),
                         closure_id: None,
+                        defaults: None,
                     };
                     calls.from_residual = Some(instance.clone());
                     if !self.instantiated.contains_key(&instance) {
@@ -1945,8 +2032,11 @@ impl<'a> MonoCollector<'a> {
                                     decl_id,
                                     subst: instance_subst,
                                     closure_id: None,
+                                    defaults: None,
                                 };
-                                self.current_mono_calls.insert(*expr_id, instance.clone());
+                                let mut instance = instance;
+                            self.attach_call_defaults(*expr_id, &mut instance);
+                            self.current_mono_calls.insert(*expr_id, instance.clone());
                                 if !self.instantiated.contains_key(&instance) {
                                     self.worklist.push(instance);
                                 }

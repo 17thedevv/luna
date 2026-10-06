@@ -108,6 +108,7 @@ fn test_adv_comptime_02_make_trait_object_and_call() {
         link_name: None,
         param_types: vec![ref_struct_ty],
         ret_ty: i32_ty,
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };
@@ -161,6 +162,7 @@ fn test_adv_comptime_02_make_trait_object_and_call() {
         link_name: None,
         param_types: Vec::new(),
         ret_ty: i32_ty,
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };
@@ -501,6 +503,7 @@ fn test_adv_comptime_11_comptime_dyn_trait_drop_glue() {
         link_name: None,
         param_types: vec![struct_ty],
         ret_ty: ctx.types.intern(SemanticType::Void),
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };
@@ -519,6 +522,7 @@ fn test_adv_comptime_11_comptime_dyn_trait_drop_glue() {
         link_name: None,
         param_types: Vec::new(),
         ret_ty: i32_ty,
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };
@@ -580,6 +584,7 @@ fn test_adv_comptime_12_comptime_dyn_heap_leak_rejected() {
         link_name: None,
         param_types: Vec::new(),
         ret_ty: i32_ty,
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };
@@ -628,6 +633,7 @@ fn test_adv_comptime_13_virtual_call_on_missing_method_trapped() {
         link_name: None,
         param_types: Vec::new(),
         ret_ty: i32_ty,
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };

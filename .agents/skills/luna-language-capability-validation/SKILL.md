@@ -160,6 +160,19 @@ native artifact execution, since metadata/check success can conceal a build
 failure. Declaration/default metadata checks do not establish omitted-call
 evaluation, ownership or effect correctness.
 
+For omitted calls, test source-order explicit evaluation followed by only the
+missing defaults in declaration order, ordinary moves/drops and borrowed
+earlier parameters. Map lifetime obligations through the actual supplied ABI
+slots and initialized logical parameters; helper preconditions remain caller
+proof obligations. Derive receiver presence from the checked signature even
+when no constraint mentions `self`. Test both legal forwarding and inverted
+argument relations under a longer-lived receiver. Embedded cast/layout types
+must retain concrete binder identity through provider transport and mono; a
+generic appearing only in `sizeof(T)` must not silently receive a fallback
+layout. For async defaults, observe creation before polling, as well as
+cancellation and suspension. Source success and artifact publication alone
+do not establish imported execution or correct default timing.
+
 Nominal ABI identity must include field order and enum discriminants/payloads,
 including private types reachable through public contracts. Test stale dependent
 execution after replacing a complete dependency bundle, recursive reachability,

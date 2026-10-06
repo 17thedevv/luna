@@ -121,17 +121,41 @@ pub struct CallableSignature {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CallArgumentBinding {
     pub source_to_parameter: Vec<u32>,
+    pub defaults: Option<DefaultArgumentBinding>,
+}
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct DefaultArgumentBinding {
+    pub declaration: luna_ast::DeclId,
+    /// Ordinals of the public declaration, including its receiver.
+    pub omitted: Vec<u32>,
+    pub parameter_count: usize,
+    pub implicit_receiver: bool,
 }
 impl CallArgumentBinding {
-    pub fn in_parameter_order<T: Clone>(&self, source_values: &[T]) -> Option<Vec<T>> {
+    pub fn in_declaration_slots<T: Clone>(&self, source_values: &[T]) -> Option<Vec<Option<T>>> {
         if source_values.len() != self.source_to_parameter.len() { return None; }
-        let mut ordered = vec![None; source_values.len()];
+        let count = match &self.defaults {
+            Some(defaults) => defaults.parameter_count.checked_sub(usize::from(defaults.implicit_receiver))?,
+            None => source_values.len(),
+        };
+        let mut ordered = vec![None; count];
         for (value, &ordinal) in source_values.iter().zip(&self.source_to_parameter) {
             let slot = ordered.get_mut(ordinal as usize)?;
             if slot.is_some() { return None; }
             *slot = Some(value.clone());
         }
-        ordered.into_iter().collect()
+        if let Some(defaults) = &self.defaults {
+            let offset = usize::from(defaults.implicit_receiver);
+            let omitted: Vec<_> = ordered.iter().enumerate().filter_map(|(index, slot)|
+                slot.is_none().then_some((index + offset) as u32)).collect();
+            if omitted != defaults.omitted { return None; }
+        }
+        Some(ordered)
+    }
+    pub fn in_parameter_order<T: Clone>(&self, source_values: &[T]) -> Option<Vec<T>> {
+        let ordered = self.in_declaration_slots(source_values)?;
+        if self.defaults.is_some() { Some(ordered.into_iter().flatten().collect()) }
+        else { ordered.into_iter().collect() }
     }
 }
 
@@ -141,12 +165,28 @@ mod call_binding_tests {
 
     #[test]
     fn checked_binding_reorders_values_and_rejects_non_bijective_plans() {
-        let plan = CallArgumentBinding { source_to_parameter: vec![1, 0] };
+        let plan = CallArgumentBinding { source_to_parameter: vec![1, 0], defaults: None };
         assert_eq!(plan.in_parameter_order(&[2, 9]), Some(vec![9, 2]));
         for ordinals in [vec![0, 0], vec![0, 2], vec![0], vec![0, 1, 2]] {
-            assert!(CallArgumentBinding { source_to_parameter: ordinals }.in_parameter_order(&[2, 9]).is_none());
+            assert!(CallArgumentBinding { source_to_parameter: ordinals, defaults: None }.in_parameter_order(&[2, 9]).is_none());
         }
     }
+    #[test]
+    fn omission_slots_retain_receiver_offsets_and_reject_incoherent_plans() {
+        let plan = CallArgumentBinding { source_to_parameter: vec![2, 0], defaults: Some(super::DefaultArgumentBinding {
+            declaration: luna_ast::DeclId(1), omitted: vec![2], parameter_count: 4, implicit_receiver: true,
+        }) };
+        assert_eq!(plan.in_declaration_slots(&[11, 7]), Some(vec![Some(7), None, Some(11)]));
+        assert_eq!(plan.in_parameter_order(&[11, 7]), Some(vec![7, 11]));
+        for omitted in [vec![], vec![1], vec![2,2], vec![0,2]] {
+            let mut invalid = plan.clone(); invalid.defaults.as_mut().unwrap().omitted = omitted;
+            assert!(invalid.in_parameter_order(&[11,7]).is_none());
+        }
+        let mut invalid = plan;
+        invalid.defaults.as_mut().unwrap().parameter_count = 0;
+        assert!(invalid.in_parameter_order(&[11,7]).is_none());
+    }
+
 }
 
 #[derive(Clone)]
@@ -156,6 +196,7 @@ pub struct SemanticTables {
     pub expr_types: HashMap<ExprId, SemanticTypeId>,
     pub expr_symbols: HashMap<ExprId, SymbolId>,
     pub expr_substs: HashMap<ExprId, crate::ty::Substitution>,
+    pub path_generic_bindings: HashMap<ExprId, Vec<(SymbolId, AstTypeId)>>,
     pub expr_trait_resolutions: HashMap<ExprId, TraitResolution>,
     pub try_branch_methods: HashMap<ExprId, luna_ast::DeclId>,
     pub try_branch_substs: HashMap<ExprId, crate::ty::Substitution>,
@@ -330,6 +371,7 @@ impl SemanticTables {
             expr_types: HashMap::new(),
             expr_symbols: HashMap::new(),
             expr_substs: HashMap::new(),
+            path_generic_bindings: HashMap::new(),
             expr_trait_resolutions: HashMap::new(),
             try_branch_methods: HashMap::new(),
             try_branch_substs: HashMap::new(),

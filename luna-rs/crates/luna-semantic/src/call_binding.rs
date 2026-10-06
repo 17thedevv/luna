@@ -1,5 +1,5 @@
 use super::TypeChecker;
-use crate::semantic_tables::{CallArgumentBinding, CallableSignature};
+use crate::semantic_tables::{CallArgumentBinding, CallableSignature, DefaultArgumentBinding};
 use luna_ast::{CallArg, Decl, ExprId};
 use luna_common::ids::SymbolId;
 use luna_common::{Diagnostic, DiagnosticCode, Span};
@@ -127,7 +127,17 @@ impl TypeChecker<'_> {
             occupied[ordinal] = true;
             source_to_parameter.push(ordinal as u32);
         }
-        if occupied[..parameter_count].iter().any(|bound| !bound) {
+        let offset = usize::from(implicit_receiver);
+        let omitted: Vec<_> = occupied[..parameter_count].iter().enumerate()
+            .filter_map(|(ordinal, bound)| (!bound).then_some((ordinal + offset) as u32)).collect();
+        let default_declaration = symbol.map(|symbol|
+            self.ctx.tables.callable_contract_symbol(symbol, &self.ctx.symbol_table))
+            .and_then(|symbol| self.ctx.tables.symbol_decls.get(&symbol).copied());
+        let valid_defaults = (!variadic || arguments.len() <= parameter_count)
+            && !self.ctx.tables.dyn_method_indices.contains_key(&expression)
+            && default_declaration.is_some() && signature.as_ref().is_some_and(|signature|
+            omitted.iter().all(|&ordinal| signature.default_contracts.get(ordinal as usize).is_some_and(Option::is_some)));
+        if !omitted.is_empty() && !valid_defaults {
             self.ctx.diagnostics.push(
                 Diagnostic::error(format!(
                     "Callable expects {}{parameter_count} arguments, but {} were provided",
@@ -141,6 +151,12 @@ impl TypeChecker<'_> {
         }
         let binding = CallArgumentBinding {
             source_to_parameter,
+            defaults: (!omitted.is_empty()).then(|| DefaultArgumentBinding {
+                declaration: default_declaration.expect("checked default declaration"),
+                omitted,
+                parameter_count: parameter_count + offset,
+                implicit_receiver,
+            }),
         };
         self.ctx
             .tables

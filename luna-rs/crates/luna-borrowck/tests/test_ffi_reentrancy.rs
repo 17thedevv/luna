@@ -8,6 +8,7 @@ fn make_func(name: &str, num_args: u32, instructions: Vec<Instruction>) -> Funct
         is_extern: false,
         is_async: false,
         ret_ty: SemanticTypeId(0),
+        lifetime_info: Default::default(),
         arg_count: num_args as usize,
         link_name: None,
         param_types: vec![SemanticTypeId(1); num_args as usize],

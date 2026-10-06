@@ -4153,12 +4153,12 @@ impl<'a> TypeChecker<'a> {
                 self.ctx.types.intern(kind)
             }
             Expr::Identifier { generic_args, .. } => {
-                if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id) {
+                if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id).copied() {
                     let mut base_ty = None;
-                    if let Some(ty) = self.ctx.tables.symbol_types.get(sym_id) {
+                    if let Some(ty) = self.ctx.tables.symbol_types.get(&sym_id) {
                         base_ty = Some(*ty);
                     } else {
-                        let symbol = self.ctx.symbol_table.get_symbol(*sym_id);
+                        let symbol = self.ctx.symbol_table.get_symbol(sym_id);
                         if let crate::SymbolKind::EnumVariant(_) = symbol.kind {
                             if let Some(decl_id) = symbol.decl_id {
                                 if let Some(enum_sym_id) = self.ctx.tables.decl_symbols.get(&decl_id) {
@@ -4170,8 +4170,15 @@ impl<'a> TypeChecker<'a> {
                         }
                     }
                     if let Some(ty) = base_ty {
+                        let mut owner_subst = crate::ty::Substitution::new();
+                        for (binder, argument) in self.ctx.tables.path_generic_bindings.get(expr_id).cloned().unwrap_or_default() {
+                            let concrete = self.lower_type(argument);
+                            owner_subst.insert(binder, concrete);
+                        }
+                        let ty = self.ctx.types.subst(ty, &owner_subst);
+                        if !owner_subst.map.is_empty() { self.ctx.tables.expr_substs.insert(*expr_id, owner_subst); }
                         if generic_args.is_empty() {
-                            let sym_kind = self.ctx.symbol_table.get_symbol(*sym_id).kind.clone();
+                            let sym_kind = self.ctx.symbol_table.get_symbol(sym_id).kind.clone();
                             if matches!(sym_kind, crate::SymbolKind::EnumVariant(_) | crate::SymbolKind::Enum) {
                                 let resolved = self.ctx.types.get(ty).clone();
                                 match resolved {
@@ -4206,7 +4213,7 @@ impl<'a> TypeChecker<'a> {
                             }
                         } else {
                             // Substitute generic arguments
-                            let symbol = self.ctx.symbol_table.get_symbol(*sym_id);
+                            let symbol = self.ctx.symbol_table.get_symbol(sym_id);
                             let decl_id_opt = symbol.decl_id.or_else(|| {
                                 if let crate::SymbolKind::EnumVariant(_) = symbol.kind {
                                     symbol.decl_id
@@ -4399,7 +4406,7 @@ impl<'a> TypeChecker<'a> {
                     .and_then(|decl| self.arena.decls.get(decl.0 as usize))
                     .is_some_and(|decl| matches!(decl, Decl::Param { is_self: true, .. }));
                 let is_method_call = is_dyn_call || (is_struct_method && receiver_declared);
-                let mut subst = crate::ty::Substitution::new();
+                let mut subst = self.ctx.tables.expr_substs.get(callee).cloned().unwrap_or_default();
                 
                 if let Some(&callee_sym) = self.ctx.tables.expr_symbols.get(callee) {
                     if Some(callee_sym) == self.ctx.lang_items.get(crate::lang_item::LangItem::DropFn) {
@@ -4409,7 +4416,7 @@ impl<'a> TypeChecker<'a> {
                     }
                 }
                 
-                let mut has_generics = false;
+                let mut has_generics = !subst.map.is_empty();
                 let mut func_sym_opt = None;
 
                 let id_gen_args = if let Expr::Identifier { generic_args, .. } = callee_expr {
@@ -4431,6 +4438,15 @@ impl<'a> TypeChecker<'a> {
                             let mut concrete_args = Vec::new();
                             for arg in effective_gen_args {
                                 concrete_args.push(self.lower_type(*arg));
+                            }
+                            let declared = match self.arena.decls.get(callee_decl_id.0 as usize) {
+                                Some(Decl::Function { generic_params, .. }) => generic_params.len(),
+                                _ => concrete_args.len(),
+                            };
+                            if declared != concrete_args.len() {
+                                self.ctx.diagnostics.push(Diagnostic::error(format!(
+                                    "Method/function type argument count: expected {}, got {}", declared, concrete_args.len()))
+                                    .with_code(DiagnosticCode::TypeMismatch).with_span(self.get_expr_span_for_diag(callee).unwrap_or_default()));
                             }
                             for (gp_idx, &c_arg) in concrete_args.iter().enumerate() {
                                 if let Some(gp_sym) = self.ctx.tables.generic_param_symbols.get(&(callee_decl_id, gp_idx)) {

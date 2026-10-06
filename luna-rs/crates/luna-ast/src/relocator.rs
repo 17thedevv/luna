@@ -94,7 +94,10 @@ pub trait AstMapping {
     fn relocate_expr(&self, expr: &mut Expr) {
         match expr {
             Expr::Literal(token, _) => self.shift_span(&mut token.span),
-            Expr::Identifier { segments, generic_args } => {
+            Expr::Identifier { segments, generic_args, owner_generic_args } => {
+                for (_, args) in owner_generic_args {
+                    for arg in args { *arg = self.shift_type_id(*arg); }
+                }
                 for s in segments { self.shift_span(s); }
                 for ga in generic_args { *ga = self.shift_type_id(*ga); }
             }

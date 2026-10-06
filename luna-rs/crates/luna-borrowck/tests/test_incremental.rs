@@ -13,6 +13,7 @@ fn make_base_graph() -> Function {
         is_extern: false,
             is_async: false,
         ret_ty: SemanticTypeId(0),
+        lifetime_info: Default::default(),
         blocks: vec![],
         values: vec![],
     };

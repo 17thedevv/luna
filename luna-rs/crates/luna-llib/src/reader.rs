@@ -1256,6 +1256,19 @@ impl LlibReader {
         let mut is_async_buf = [0u8; 1];
         r.read_exact(&mut is_async_buf)?;
         let is_async = is_async_buf[0] != 0;
+        let mut lifetime_len = [0u8; 4];
+        r.read_exact(&mut lifetime_len)?;
+        let lifetime_len = u32::from_le_bytes(lifetime_len) as usize;
+        if lifetime_len > 16 * 1024 * 1024 {
+            return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "MVIR lifetime annotation exceeds size limit"));
+        }
+        let mut bytes = vec![0; lifetime_len];
+        r.read_exact(&mut bytes)?;
+        let lifetime_info: crate::ir::MlibFunctionLifetimeInfo = {
+            use bincode::Options;
+            bincode::DefaultOptions::new().with_fixint_encoding().with_limit(16 * 1024 * 1024).reject_trailing_bytes().deserialize(&bytes)
+        }
+            .map_err(|error| std::io::Error::new(std::io::ErrorKind::InvalidData, error))?;
         let mut val_count_buf = [0u8; 4];
         r.read_exact(&mut val_count_buf)?;
         let val_count = u32::from_le_bytes(val_count_buf) as usize;
@@ -1270,7 +1283,13 @@ impl LlibReader {
         for _ in 0..block_count {
             blocks.push(Self::deserialize_block(r)?);
         }
-        Ok(MlibFunction { name, arg_count, is_async, values, blocks })
+        if lifetime_info.input_assumptions.iter().any(|&(a,b)| a as u32 >= arg_count || b as u32 >= arg_count)
+            || lifetime_info.checks.iter().any(|(value, checks)| *value as usize >= values.len()
+                || checks.iter().any(|check| [&check.longer, &check.shorter].iter().any(|operand|
+                    matches!(operand, crate::ir::MlibOperand::Value(id) if *id as usize >= values.len())))) {
+            return Err(std::io::Error::new(std::io::ErrorKind::InvalidData, "MVIR lifetime annotation uses nonexistent parameter/value"));
+        }
+        Ok(MlibFunction { name, arg_count, is_async, lifetime_info, values, blocks })
     }
 
     fn deserialize_type_entry<R: Read>(r: &mut R) -> std::io::Result<MlibTypeEntry> {

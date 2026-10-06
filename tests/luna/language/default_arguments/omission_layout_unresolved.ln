@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { dec bytes = omitted::only_layout(); return 0; }

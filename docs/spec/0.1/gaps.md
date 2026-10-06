@@ -397,3 +397,27 @@ scope. Omitted-argument calls still reject E2001 in both provider modes;
 per-call execution, ownership/effect mapping and full default acceptance remain
 unimplemented requirements, not a const-only restriction or deferred feature.
 The known closure failure and all remaining R0–R5 release gates stay open.
+
+### Synchronous default omission update — 2026-10-06
+
+The [omission gate](../../audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md)
+supersedes the absent synchronous execution path above. Checked argument
+plans, selected concrete default entries and same-frame initialization now
+retain definition scope, earlier parameters, ordinary ownership/effects and
+full-arity ABI controls. Independent owner/method type arguments and embedded
+layout types retain their checked identities across provider import.
+
+A transitive caller counterexample exposed incorrect receiver offsets when a
+method's lifetime constraint mentions only ordinary parameters. The checked
+signature now governs assumptions, call checks and default helper requirements.
+Its separate 821-input scoped regression passes workspace/all-target check,
+337 internal tests, 89 driver tests and nine CLI suites, all exit0 with
+unchanged input/compiler/runtime hashes. The omission suite observes 18 native
+executions and 60 typed negative check/build processes across both provider
+modes. These scoped passes do not establish full-workspace conformance.
+
+CALL-ARGUMENTS-v1 remains PARTIAL: the independent async creation positive
+delays its default until resume in source mode (native exit2); its freshly
+published source-removed artifact rejects invalid semantic metadata. These
+requirements, the known closure failure and the complete R0–R5 scope remain
+active. Synchronous positives do not establish full workspace or release PASS.

@@ -224,6 +224,7 @@ fn test_adv_06_callvirt_future_loan_propagation() {
         link_name: None,
         param_types: vec![ref_mut_dyn_ty],
         ret_ty: fut_i32_ty,
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };
@@ -628,6 +629,7 @@ fn test_adv_16_futureloan_does_not_capture_by_value_argument() {
         link_name: None,
         param_types: vec![ref_dyn_ty, i32_ty],
         ret_ty: fut_i32_ty,
+        lifetime_info: Default::default(),
         blocks: Vec::new(),
         values: Vec::new(),
     };

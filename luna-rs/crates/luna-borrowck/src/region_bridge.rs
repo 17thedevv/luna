@@ -357,6 +357,11 @@ fn compute_local_storage_extents(func: &Function) -> HashMap<ValueId, HashSet<Pr
 impl RegionBorrowContext {
     /// Synthesizes region graphs, constraints, points, and boundary facts from MVIR.
     pub fn build(func: &Function, loop_info: &LoopInfo, ctx: Option<&SemanticContext>) -> Self {
+        Self::build_with_input_requirements(func, loop_info, ctx, &Default::default())
+    }
+
+    pub(crate) fn build_with_input_requirements(func: &Function, loop_info: &LoopInfo, ctx: Option<&SemanticContext>,
+        inferred: &std::collections::BTreeSet<(u16, u16)>) -> Self {
         let mut graph = RegionGraph::new();
         let mut facts = RealizationFacts::new();
         let mut val_to_point = HashMap::new();
@@ -405,6 +410,13 @@ impl RegionBorrowContext {
             }
         }
 
+        for &(longer, shorter) in func.lifetime_info.input_assumptions.iter().chain(inferred.iter()) {
+            if let (Some(&sup), Some(&sub)) = (param_regions.get(&longer), param_regions.get(&shorter)) {
+                graph.add_constraint(ConstraintKind::Outlives { sup, sub }, ConstraintOrigin::structural(), None)
+                    .expect("validated ABI contract slots");
+            } else { panic!("ICE: input precondition uses a nonexistent ABI slot"); }
+        }
+
         // 1c. Seed caller's declared input preconditions as assumptions before solve (REGION-02A)
         // Architectural Invariant: Only declared input preconditions are seeded as assumptions.
         // Return guarantees are NEVER seeded into the caller graph.
@@ -416,11 +428,19 @@ impl RegionBorrowContext {
         });
 
         if let Some(contract) = caller_contract {
+            let receiver = caller_sym_id.and_then(|symbol| ctx.and_then(|ctx|
+                ctx.tables.callable_signature(symbol, &ctx.symbol_table)))
+                .map(|signature| signature.has_receiver).unwrap_or_else(||
+                    contract.outlives_constraints.iter().any(|constraint|
+                        matches!(constraint.longer, luna_semantic::CanonicalContractSubject::SelfVal)
+                            || matches!(constraint.shorter, luna_semantic::CanonicalContractSubject::SelfVal)));
             let mut bindings = luna_semantic::region::LifetimeRegionBindings::new();
             for (&p_idx, &r_param) in &param_regions {
-                bindings.insert(luna_semantic::region::LifetimeSubject::param(p_idx), r_param);
+                if let Some(index) = p_idx.checked_sub(u16::from(receiver)) {
+                    bindings.insert(luna_semantic::region::LifetimeSubject::param(index), r_param);
+                }
             }
-            if let Some(&r_self) = param_regions.get(&0) {
+            if let Some(&r_self) = param_regions.get(&0).filter(|_| receiver) {
                 bindings.insert(luna_semantic::region::LifetimeSubject::self_val(), r_self);
             }
 
@@ -1176,6 +1196,22 @@ impl<'a> RegionBorrowBridge<'a> {
     ) -> Option<Diagnostic> {
         match self.check_call_outlives(longer_subject, longer_op, shorter_subject, shorter_op, state, span) {
             ShadowRegionVerdict::Invalid(failure) => Some(failure.into_diagnostic()),
+            _ => None,
+        }
+    }
+
+    /// Generated default obligations require a proof; missing provenance must
+    /// not silently grant an input relation.
+    pub fn diagnose_default_outlives(&self, longer_subject: &luna_semantic::region::LifetimeSubject,
+        longer: &Operand, shorter_subject: &luna_semantic::region::LifetimeSubject,
+        shorter: &Operand, state: &crate::borrow_analysis::BorrowStateData, span: Option<Span>) -> Option<Diagnostic> {
+        match self.check_call_outlives(longer_subject, longer, shorter_subject, shorter, state, span) {
+            ShadowRegionVerdict::Invalid(failure) => Some(failure.into_diagnostic()),
+            ShadowRegionVerdict::Incomplete(gap) => {
+                let diagnostic = Diagnostic::error(format!("Default argument lifetime obligation has no complete provenance proof: {gap:?}"))
+                    .with_code(luna_common::DiagnosticCode::LifetimeConstraintViolation);
+                Some(if let Some(span) = span { diagnostic.with_span(span) } else { diagnostic })
+            }
             _ => None,
         }
     }

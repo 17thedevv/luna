@@ -404,7 +404,10 @@ impl<'a> BorrowAnalyzer<'a> {
 
         // Build Region context, solve, and realize for shadow checking
         let loop_info = crate::cfg::analyze_loops(func);
-        let region_context = crate::region_bridge::RegionBorrowContext::build(func, &loop_info, ctx);
+        let inferred = if func.lifetime_info.infer_input_requirements {
+            summaries.and_then(|summaries| summaries.get(&func.name)).map(|summary| summary.input_outlives.clone()).unwrap_or_default()
+        } else { Default::default() };
+        let region_context = crate::region_bridge::RegionBorrowContext::build_with_input_requirements(func, &loop_info, ctx, &inferred);
         let region_solution = luna_semantic::region::solve_region_graph(&region_context.graph);
         let region_realization = match luna_semantic::region::realize_regions(&region_solution, &region_context.facts) {
             Ok(r) => Some(r),
@@ -434,9 +437,30 @@ impl<'a> BorrowAnalyzer<'a> {
                         realization,
                     ).with_aliases(current_state.aliases.clone());
 
+                    for check in func.lifetime_info.checks.get(&val_id).into_iter().flatten() {
+                        if let Some(diagnostic) = bridge.diagnose_default_outlives(
+                            &check.longer_subject.to_subject(), &check.longer,
+                            &check.shorter_subject.to_subject(), &check.shorter,
+                            &current_state, val_data.span) {
+                            if !analyzer.diagnostics.iter().any(|d| d.message == diagnostic.message && d.span == diagnostic.span) {
+                                analyzer.diagnostics.push(diagnostic);
+                            }
+                        }
+                    }
+
                     // Authoritative Region Engine check on call-site outlives preconditions (REGION-02A)
                     match &val_data.inst {
                         Instruction::CallDirect { callee, args } => {
+                            for &(longer_index,shorter_index) in summaries.and_then(|summaries| summaries.get(callee)).into_iter().flat_map(|summary| &summary.input_outlives) {
+                                if let (Some(a), Some(b)) = (args.get(longer_index as usize), args.get(shorter_index as usize)) {
+                                    if let Some(diagnostic) = bridge.diagnose_default_outlives(
+                                        &luna_semantic::region::LifetimeSubject::param(longer_index), a,
+                                        &luna_semantic::region::LifetimeSubject::param(shorter_index), b,
+                                        &current_state, val_data.span) {
+                                        analyzer.diagnostics.push(diagnostic);
+                                    }
+                                }
+                            }
                             let mut callee_sym_id = callee.symbol_id;
                             if callee_sym_id.is_none() {
                                 if let Some(ctx) = analyzer.ctx {
@@ -448,10 +472,11 @@ impl<'a> BorrowAnalyzer<'a> {
                             if let Some(sym_id) = callee_sym_id {
                                 if let Some(ctx) = analyzer.ctx {
                                     if let Some(contract) = ctx.tables.fn_lifetime_contracts.get(&sym_id) {
-                                        let has_receiver = contract.outlives_constraints.iter().any(|c| {
+                                        let has_receiver = ctx.tables.callable_signature(sym_id, &ctx.symbol_table)
+                                            .map(|signature| signature.has_receiver).unwrap_or_else(|| contract.outlives_constraints.iter().any(|c| {
                                             matches!(c.longer, luna_semantic::CanonicalContractSubject::SelfVal)
                                                 || matches!(c.shorter, luna_semantic::CanonicalContractSubject::SelfVal)
-                                        });
+                                        }));
                                         for obligation in contract.instantiate_call_preconditions(false) {
                                             let longer_idx = match obligation.longer_subject {
                                                 luna_semantic::region::LifetimeSubject::Root(

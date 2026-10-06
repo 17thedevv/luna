@@ -395,9 +395,11 @@ impl<'a> MacroEngine<'a> {
                 let new_ty = self.expand_type(target_type);
                 self.arena.alloc_expr(Expr::Cast { expr: new_expr, target_type: new_ty })
             }
-            Expr::Identifier { segments, generic_args } => {
+            Expr::Identifier { segments, generic_args, owner_generic_args } => {
                 let new_generic_args = generic_args.into_iter().map(|t| self.expand_type(t)).collect();
-                self.arena.alloc_expr(Expr::Identifier { segments, generic_args: new_generic_args })
+                let owner_generic_args = owner_generic_args.into_iter().map(|(segment, args)|
+                    (segment, args.into_iter().map(|ty| self.expand_type(ty)).collect())).collect();
+                self.arena.alloc_expr(Expr::Identifier { segments, owner_generic_args, generic_args: new_generic_args })
             }
             Expr::Call { callee, generic_args, args } => {
                 let new_callee = self.expand_expr(callee);

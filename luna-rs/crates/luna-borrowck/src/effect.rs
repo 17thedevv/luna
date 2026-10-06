@@ -320,6 +320,8 @@ impl ArgEffect {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CallEffectSummary {
+    /// ABI-relative obligations inferred for generated default entry bodies.
+    pub input_outlives: std::collections::BTreeSet<(u16, u16)>,
     pub args: Vec<ArgEffect>,
     pub ret: ReturnEffect,
     pub raw_pointer_ret: RawPointerReturnEffect,
@@ -402,6 +404,7 @@ impl PartialOrd for CallEffectSummary {
             _ => {}
         }
 
+        if self.input_outlives != other.input_outlives { return None; }
         if self.raw_pointer_field_ret != other.raw_pointer_field_ret {
             // Field-wise effects are a product lattice. The fixed-point engine
             // uses equality; do not invent an ordering across unrelated fields.
@@ -428,6 +431,7 @@ impl Default for CallEffectSummary {
             raw_pointer_ret: RawPointerReturnEffect::Independent,
             raw_pointer_anchor_ret: RawPointerAnchorReturnEffect::Independent,
             raw_pointer_field_ret: std::collections::BTreeMap::new(),
+            input_outlives: Default::default(),
             is_opaque: false,
         }
     }
@@ -441,6 +445,7 @@ impl CallEffectSummary {
             raw_pointer_ret: RawPointerReturnEffect::Independent,
             raw_pointer_anchor_ret: RawPointerAnchorReturnEffect::Independent,
             raw_pointer_field_ret: std::collections::BTreeMap::new(),
+            input_outlives: Default::default(),
             is_opaque: false,
         }
     }
@@ -452,6 +457,7 @@ impl CallEffectSummary {
             raw_pointer_ret: RawPointerReturnEffect::Unknown,
             raw_pointer_anchor_ret: RawPointerAnchorReturnEffect::Unknown,
             raw_pointer_field_ret: std::collections::BTreeMap::new(),
+            input_outlives: Default::default(),
             is_opaque: true,
         }
     }
