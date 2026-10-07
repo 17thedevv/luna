@@ -30,6 +30,14 @@ fn generic_owned_values_drop_once_across_control_flow_and_provider_modes() {
         "closure_env_early_return",
         "closure_env_borrow_only",
         "closure_env_multiple_owned",
+        "enum_partial_move",
+        "indexed_move",
+        "indexed_move_index1",
+        "indexed_move_middle",
+        "projected_partial",
+        "projected_call_arg",
+        "path_dependent_partial",
+        "nested_partial",
     ];
     let negatives = [
         ("use_after_move", "E3001"),

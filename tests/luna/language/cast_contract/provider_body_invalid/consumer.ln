@@ -1,0 +1,2 @@
+import "provider";
+fn main() -> i32 { return castbed::extract(castbed::Record { value: 1 }); }

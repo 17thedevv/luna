@@ -1,0 +1,47 @@
+{
+  "task": "A4 — cast / poison containment",
+  "status": "PASS (coverage certification; no counterexample found)",
+  "date": "2026-10-07",
+  "branch": "a4-cast-poison-containment",
+  "base": "c3e55f4f",
+  "class": "COVERAGE / certification — no implementation change was required",
+  "invariant": "an invalid static cast must fail in the semantic/type layer with one typed diagnostic (E2026) that poisons the operand, and must not reach MVIR or the backend; a cast the contract defines as runtime-trapping must stay well-typed with a deterministic runtime trap",
+  "harness": "luna-rs/crates/luna-cli/tests/cast_poison_cli.rs",
+  "reducers": {
+    "invalid_static_cast_positions": [
+      "nested_cast_invalid (cast nested in an expression)",
+      "cast_in_argument_invalid (cast in a call argument)",
+      "cast_in_return_invalid (cast in a return)",
+      "cast_in_condition_invalid (cast in a condition)",
+      "cast_in_comptime_invalid (cast inside comptime)",
+      "poison_many_uses_invalid (one bad cast feeding many downstream uses)"
+    ],
+    "provider_body": "provider_body_invalid/{provider,consumer}.ln",
+    "runtime_trap": [
+      "char_cast_runtime_valid (in-range integer-to-char runs, exit 0)",
+      "char_cast_runtime_trap (out-of-range integer-to-char builds, traps at runtime)"
+    ],
+    "artifact_round_trip": "provider_valid_cast/{provider,consumer}.ln (widening, narrowing, identity pointer cast across a .llib provider)"
+  },
+  "checks": [
+    "check and build both exit 1 and report E2026 (source + fresh artifact)",
+    "exactly one error line per invalid cast — no diagnostic cascade",
+    "no executable is published for an invalid static cast",
+    "`--emit mvir` fails and emits no .mvir for an invalid static cast",
+    "an invalid cast in a provider body is rejected where the provider is compiled",
+    "runtime-trapping cast: build succeeds (well-typed IR) and the program traps at runtime (non-zero)",
+    "valid casts survive the provider source/artifact round trip and run to exit 0"
+  ],
+  "focused": {
+    "command": "cargo test -p luna-cli --test cast_poison_cli",
+    "result": "5 passed / 0 failed"
+  },
+  "existing_coverage": "cast_contract_cli already covers E2026 (nominal privacy, mutability/referent reinterpret, callable erasure, rigid generic, generic nominal), E2001 (unsized), E2025 (raw reference without unsafe), E1003 (privacy), E3001 (identity move), and control casts (numeric widening/narrowing, shared/mutable reference, pointer/reference, function pointer)",
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 208 binaries, 1340 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "root_cause_layer": "not applicable — no failure to localize",
+  "verdict": "A4: CLOSED / CONFORMANT IN TESTED SCOPE (semantic-layer rejection + poison containment + runtime trap + artifact round trip)"
+}

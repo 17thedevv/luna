@@ -1,0 +1,26 @@
+{
+  "task": "A2-FU2 — CLI source/fresh-artifact async cleanup matrix",
+  "status": "PASS",
+  "date": "2026-10-07",
+  "branch": "a2-async-suspended-cleanup",
+  "harness": "luna-rs/crates/luna-cli/tests/async_cleanup_cli.rs",
+  "provider": "tests/luna/language/async_cleanup/provider.ln",
+  "fixtures": [
+    "value_across_suspend (captured owned value cancelled before polling -> dropped once)",
+    "borrow_only_across_suspend (borrowed capture cancelled -> pointee not destroyed)",
+    "generic_owned_across_suspend (two generic owned captures -> each dropped once)"
+  ],
+  "modes": ["source", "fresh artifact"],
+  "result": "3/3 positive fixtures build and exit 0 in source and fresh artifact-only modes",
+  "focused_suites": {
+    "a2_suspension_cleanup_tests": "3 passed",
+    "p1c_tests": "15 passed"
+  },
+  "observation": {
+    "summary": "a provider exporting a parameterless `async fn` produced `Invalid semantic metadata: CorruptedData` when its .llib was imported.",
+    "workaround": "provider now uses parameterized async fns (future_consume/future_pair), mirroring the already-artifact-safe resource.ln pattern.",
+    "classification": "separate finding for investigation; not an A2 correctness blocker (FU2 passes with the supported pattern)."
+  },
+  "scope_note": "CLI cancels before polling (state 0); suspend-state cleanup (conditional/partial/projected) is covered by the driver-level a2_suspension_cleanup_tests.",
+  "verdict": "A2 remains CLOSED / CONFORMANT IN TESTED SCOPE; coverage strengthened."
+}

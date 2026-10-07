@@ -1,0 +1,12 @@
+import "resource";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec arr = [resources::tracked(counter, 1), resources::tracked(counter, 2)];
+        resources::consume(arr[1]);
+    }
+    // arr[1] consumed (1) + remaining arr[0] dropped once (1) = 2.
+    if count != 2 { return count; }
+    return 0;
+}

@@ -1,0 +1,6 @@
+struct Record { value: i32, };
+fn main() -> i32 {
+    dec record = Record { value: 1 };
+    dec total = (record as i32) + 2;
+    return total;
+}

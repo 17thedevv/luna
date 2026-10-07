@@ -1,0 +1,13 @@
+import "provider";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec a = resources::tracked(counter, 42);
+        dec b = resources::tracked(counter, true);
+        dec fut = resources::future_pair(a, b);
+    }
+    // Two generic owned captures cancelled before polling: each dropped exactly once.
+    if count != 2 { return 2; }
+    return 0;
+}

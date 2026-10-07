@@ -1,0 +1,11 @@
+import "provider";
+fn main() -> i32 {
+    dec rw count = 0;
+    dec counter = &rw count as *rw i32;
+    {
+        dec v = resources::tracked(counter, 42);
+        dec fut = resources::future_consume(v);
+    }
+    if count != 1 { return 2; }
+    return 0;
+}
