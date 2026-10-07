@@ -1,0 +1,43 @@
+{
+  "task": "A5 — raw slice / view contract",
+  "status": "PASS (coverage certification; no counterexample found)",
+  "date": "2026-10-07",
+  "branch": "a5-raw-slice-view-contract",
+  "base": "7aee1528",
+  "class": "COVERAGE / certification — no implementation change was required",
+  "invariant": "a raw pointer/slice projection is not an owned aggregate subplace: a live shared/mutable view conflicts with competing access (E3003) and a view escaping its backing lifetime is rejected (E3005); meanwhile valid reads/mutations, multiple shared views, projected views, zero-length slices and slice copies behave, and an out-of-bounds slice index traps deterministically",
+  "harness": "luna-rs/crates/luna-cli/tests/raw_slice_view_a5_cli.rs",
+  "reducers": {
+    "negatives": [
+      "a5_shared_view_rw_conflict (shared view + conflicting rw write) -> E3003",
+      "a5_mut_view_competing_read (mutable view + competing read) -> E3003",
+      "a5_projected_view_conflict (pointer-arithmetic-derived view + backing write) -> E3003",
+      "a5_view_escape_backing_lifetime (view escape beyond backing lifetime) -> E3005"
+    ],
+    "positives": [
+      "a5_shared_view_read",
+      "a5_mut_view_mutate",
+      "a5_multiple_shared_views",
+      "a5_slice_copy_keeps_backing_owner",
+      "a5_projected_view_read (sub-slice via pointer arithmetic)",
+      "a5_zero_length_slice"
+    ],
+    "trap": "a5_slice_index_oob_trap (build OK; run traps)"
+  },
+  "guard": "raw_slice_provenance_cli PASS — the mandatory A3 regression guard (slice_middle_conflict -> E3003) still holds",
+  "focused": {
+    "command": "cargo test -p luna-cli --test raw_slice_view_a5_cli --test raw_slice_provenance_cli",
+    "result": "raw_slice_view_a5_cli 1 passed; raw_slice_provenance_cli 1 passed"
+  },
+  "borrowck": {
+    "command": "cargo test -p luna-borrowck",
+    "result": "all binaries pass / 0 failed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 209 binaries, 1341 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "root_cause_layer": "not applicable — no failure to localize",
+  "verdict": "A5: CLOSED / CONFORMANT IN TESTED SCOPE (conflict rejection + lifetime escape + projected/sub/zero-length views + slice copy + OOB trap)"
+}

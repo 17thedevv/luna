@@ -302,6 +302,28 @@ release: still BLOCKED
 next correctness blocker: A5
 ```
 
+### A5 — Raw slice / view contract
+
+Freeze matrix found **no counterexample**. Invariant locked: a raw pointer/slice
+projection is not an owned aggregate subplace. Conflicts (shared view + rw write,
+mutable view + competing read, pointer-arithmetic-derived view + backing write)
+are rejected with E3003; a view escaping its backing lifetime is rejected with
+E3005; valid reads/mutations, multiple shared views, slice copy, projected
+(sub-slice) and zero-length views behave; an OOB slice index traps. Closes as a
+coverage certification; no compiler change was required. `raw_slice_provenance_cli`
+(A3 regression guard) stays green.
+
+```
+A5
+status: CLOSED / CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2
+focused: raw_slice_view_a5_cli PASS + raw_slice_provenance_cli PASS (source + artifact)
+borrowck: cargo test -p luna-borrowck -> 0 failed
+workspace: 209 binaries, 1341 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: A6
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·

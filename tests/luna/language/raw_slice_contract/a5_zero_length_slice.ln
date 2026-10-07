@@ -1,0 +1,10 @@
+import <mem>;
+fn main() -> i32 {
+    dec data = [1, 2, 3];
+    dec base = &data[0] as *i32;
+    unsafe {
+        dec empty = std::mem::slice_from_raw_parts<i32>(base, 0 as u64);
+        if empty.len != 0 as usize { return 1; }
+    }
+    return 0;
+}

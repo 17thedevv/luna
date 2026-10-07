@@ -1,0 +1,13 @@
+import <mem>;
+fn main() -> i32 {
+    dec data = [1, 2, 3, 4];
+    dec base = &data[0] as *i32;
+    unsafe {
+        dec whole = std::mem::slice_from_raw_parts<i32>(base, 4 as u64);
+        dec sub = std::mem::slice_from_raw_parts<i32>((base as u64 + 4 as u64) as *i32, 2 as u64);
+        if whole[3] != 4 { return 1; }
+        if sub[0] != 2 { return 2; }
+        if sub[1] != 3 { return 3; }
+    }
+    return 0;
+}

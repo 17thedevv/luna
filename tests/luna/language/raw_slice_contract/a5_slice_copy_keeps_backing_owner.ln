@@ -1,0 +1,14 @@
+import "provider";
+fn main() -> i32 {
+    dec rw data = [65 as u8, 0 as u8];
+    {
+        dec view = views::make(&data);
+        dec first = view.bytes();
+        dec second = first;
+        if first[0] != 65 as u8 { return 1; }
+        if second[1] != 0 as u8 { return 2; }
+    }
+    // The backing storage is still owned and mutable after the copied slices drop.
+    data[0] = 66 as u8;
+    return data[0] as i32 - 66;
+}

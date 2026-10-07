@@ -1,0 +1,7 @@
+import "provider";
+fn leak() -> &[u8] {
+    dec data = [65 as u8, 0 as u8];
+    dec view = views::make(&data);
+    return view.bytes();
+}
+fn main() {}
