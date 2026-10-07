@@ -25,7 +25,6 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [.agents/skills/mellis-grammar/SKILL.md](../.agents/skills/mellis-grammar/SKILL.md) | guidance | [syntax](spec/0.1/syntax.md) |
 | [.agents/skills/mellis-research/SKILL.md](../.agents/skills/mellis-research/SKILL.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [.commandcode/taste/taste.md](../.commandcode/taste/taste.md) | historical | [conformance](spec/0.1/conformance.md) |
-| [CLAUDE.md](../CLAUDE.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [INCOMPLETE_FEATURES_PLAN.md](../INCOMPLETE_FEATURES_PLAN.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [README.md](../README.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [ROADMAP.md](../ROADMAP.md) | guidance | [conformance](spec/0.1/conformance.md) |
@@ -185,7 +184,6 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [luna-rs/docs/std_namespace_01_canonical_namespace.md](../luna-rs/docs/std_namespace_01_canonical_namespace.md) | adopted-contract | [stdlib](spec/0.1/stdlib.md) |
 | [luna-rs/docs/whole_file_io_v1.md](../luna-rs/docs/whole_file_io_v1.md) | adopted-contract | [stdlib](spec/0.1/stdlib.md) |
 | [luna-web/AGENTS.md](../luna-web/AGENTS.md) | historical | [conformance](spec/0.1/conformance.md) |
-| [luna-web/CLAUDE.md](../luna-web/CLAUDE.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [luna-web/README.md](../luna-web/README.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [luna-web/src/content/docs/guides/example.md](../luna-web/src/content/docs/guides/example.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [luna-web/src/content/docs/reference/example.md](../luna-web/src/content/docs/reference/example.md) | historical | [conformance](spec/0.1/conformance.md) |

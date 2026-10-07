@@ -85,11 +85,6 @@
     "owner": "conformance"
   },
   {
-    "path": "CLAUDE.md",
-    "role": "guidance",
-    "owner": "conformance"
-  },
-  {
     "path": "INCOMPLETE_FEATURES_PLAN.md",
     "role": "guidance",
     "owner": "conformance"
@@ -881,11 +876,6 @@
   },
   {
     "path": "luna-web/AGENTS.md",
-    "role": "historical",
-    "owner": "conformance"
-  },
-  {
-    "path": "luna-web/CLAUDE.md",
     "role": "historical",
     "owner": "conformance"
   },
