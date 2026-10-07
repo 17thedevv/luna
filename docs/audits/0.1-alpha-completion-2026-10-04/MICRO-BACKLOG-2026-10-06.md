@@ -227,6 +227,19 @@ next correctness blocker: A3
 remaining: A2-FU1 (shared DropFlagPlan/Transition), A2-FU2 (full CLI matrix)
 ```
 
+A2-FU2 — 2026-10-07: DONE (commit f330edc5). CLI async cleanup matrix passes in
+source + fresh artifact (value / borrow-only / generic-owned). A2 remains
+CLOSED; coverage strengthened.
+
+A2-FU1:
+
+```
+A2-FU1
+STATUS: DEFERRED_NON_BLOCKING
+CLASS: maintainability / anti-drift
+MUST COMPLETE BEFORE: R5 final release gate
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
