@@ -1,0 +1,4 @@
+export module castbed {
+    export struct Record { value: i32, };
+    export fn extract(value: Record) -> i32 { return value as i32; }
+}

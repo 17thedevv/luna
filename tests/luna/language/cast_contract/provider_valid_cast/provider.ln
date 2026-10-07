@@ -1,0 +1,7 @@
+export module castbed2 {
+    export struct Rec { value: i32, };
+    export fn widen(r: Rec) -> i64 { return r.value as i64; }
+    export fn widen_numeric(x: i32) -> i64 { return x as i64; }
+    export fn narrow_bits(x: i64) -> u8 { return x as u8; }
+    export fn identity_pointer(p: *i32) -> *i32 { return p as *i32; }
+}
