@@ -284,6 +284,24 @@ reproducer: tests/luna/language/async_provider_export/
 SCHEDULE: after A3 (or C2/C3, per root cause)
 ```
 
+### A4 — Cast / poison containment
+
+Freeze matrix found **no counterexample**: an invalid static cast already fails in
+the semantic layer with one typed E2026 diagnostic that poisons the operand (no
+cascade, no MVIR/backend, no published executable); runtime-trapping casts
+(integer-to-char) stay well-typed and trap deterministically. Closes as a
+coverage certification; no compiler change was required.
+
+```
+A4
+status: CLOSED / CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2
+focused: cast_poison_cli 5 passed (source + artifact)
+workspace: 208 binaries, 1340 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: A5
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
