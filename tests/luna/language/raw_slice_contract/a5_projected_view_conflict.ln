@@ -1,0 +1,10 @@
+import <mem>;
+fn main() {
+    dec rw data = [1, 2, 3];
+    dec base = &rw data[0] as *rw i32;
+    unsafe {
+        dec sub = std::mem::slice_from_raw_parts_mut<i32>((base as u64 + 4 as u64) as *rw i32, 2 as u64);
+        data[0] = 9;
+        sub[0] = 5;
+    }
+}
