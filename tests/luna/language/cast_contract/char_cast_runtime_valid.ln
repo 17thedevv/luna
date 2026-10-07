@@ -1,0 +1,8 @@
+fn to_char(v: i32) -> char { return v as char; }
+fn runtime() -> i32 { return 65; }
+fn main() -> i32 {
+    dec c = to_char(runtime());
+    dec u = c as u32;
+    if u != 65 as u32 { return 1; }
+    return 0;
+}

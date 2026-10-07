@@ -1,0 +1,6 @@
+struct Record { value: i32, };
+fn take(value: i32) -> i32 { return value; }
+fn main() -> i32 {
+    dec record = Record { value: 1 };
+    return take(record as i32);
+}

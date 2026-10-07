@@ -1,0 +1,16 @@
+import "provider";
+fn main() -> i32 {
+    dec r = castbed2::Rec { value: 300 };
+    dec w = castbed2::widen(r);
+    if w != 300 as i64 { return 1; }
+    dec widened = castbed2::widen_numeric(7);
+    if widened != 7 as i64 { return 2; }
+    dec narrowed = castbed2::narrow_bits(300 as i64);
+    if narrowed != 44 as u8 { return 3; }
+    dec rw value: i32 = 9;
+    dec p = castbed2::identity_pointer(&rw value as *i32);
+    unsafe {
+        if *p != 9 { return 4; }
+    }
+    return 0;
+}
