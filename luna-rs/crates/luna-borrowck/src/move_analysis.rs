@@ -387,7 +387,7 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                 self.check_operand(ptr, state, val_id);
                 if let Operand::Value(ptr_val) = ptr {
                     let is_lvalue_addr = if let Some(val_data) = self.func.values.get(ptr_val.0 as usize) {
-                        matches!(val_data.inst, Instruction::Alloca | Instruction::HeapAlloc | Instruction::FieldPtr { .. })
+                        matches!(val_data.inst, Instruction::Alloca | Instruction::HeapAlloc | Instruction::FieldPtr { .. } | Instruction::PtrOffset { .. })
                     } else {
                         false
                     };
@@ -497,8 +497,39 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
             Instruction::SizeOf { .. } |
             Instruction::AlignOf { .. } |
             Instruction::Null { .. } |
-            Instruction::Cast { .. } |
-            Instruction::PtrOffset { .. } => {}
+            Instruction::Cast { .. } => {}
+            Instruction::PtrOffset { ptr, offset } => {
+                // A constant offset into an array base addresses a statically
+                // known element subplace. Tracking it as a field projection
+                // lets a moved element be marked moved so caller-side array
+                // cleanup drops only the remaining elements. A dynamic offset
+                // (or a non-array base such as a raw-slice pointer) has no
+                // statically known subplace and produces no place.
+                if let (Operand::Value(ptr_val), Operand::Number(text)) = (ptr, offset) {
+                    if let Some(idx) = text.parse::<usize>().ok() {
+                        if let Some(base_place) = self.values_to_places.get(ptr_val).cloned() {
+                            let array_base = self.semantic_ctx.is_some_and(|ctx| {
+                                let ty = ctx.types.resolve(self.func.value(*ptr_val).ty);
+                                let target = match ctx.types.get(ty) {
+                                    luna_semantic::SemanticType::Pointer(_, inner)
+                                    | luna_semantic::SemanticType::Reference(_, _, inner) => *inner,
+                                    _ => ty,
+                                };
+                                matches!(
+                                    ctx.types.get(ctx.types.resolve(target)),
+                                    luna_semantic::SemanticType::Array(..)
+                                )
+                            });
+                            if array_base {
+                                self.values_to_places.insert(
+                                    val_id,
+                                    base_place.projected(crate::place::Projection::Field(idx)),
+                                );
+                            }
+                        }
+                    }
+                }
+            }
             Instruction::FieldPtr { base, field_idx, .. } => {
                 if let Operand::Value(base_val) = base {
                     if let Some(base_place) = self.values_to_places.get(base_val).cloned() {
