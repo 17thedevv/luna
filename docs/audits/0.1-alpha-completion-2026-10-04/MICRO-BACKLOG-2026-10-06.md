@@ -215,6 +215,18 @@ conditional suspend before init · 04 after init · 05 projected field initializ
 suspension point · 09 count destructors · 10 E3001 negative · 11 E3005 negative ·
 12 run source · 13 run artifact · 14 document cleanup state transitions.
 
+A2 status — 2026-10-07:
+
+```
+A1: CLOSED
+A2: CLOSED / CONFORMANT IN TESTED SCOPE
+workspace: 1334 pass / 0 fail / 1 ignored (exit 0)
+protocol: compiler21 / metadata9 / MVIR5 / format2
+release: still BLOCKED
+next correctness blocker: A3
+remaining: A2-FU1 (shared DropFlagPlan/Transition), A2-FU2 (full CLI matrix)
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
