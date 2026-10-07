@@ -31,7 +31,7 @@ ADOPTED = {
 }
 CURRENT = {
     'README.md', 'ROADMAP.md', 'Status.md', 'INCOMPLETE_FEATURES_PLAN.md',
-    'CLAUDE.md', '.agents/AGENTS.md', 'docs/LanguageReference.md',
+    '.agents/AGENTS.md', 'docs/LanguageReference.md',
     'docs/grammar.md', 'docs/core-language-contract.md', 'docs/architecture.md',
     'docs/SemanticInvariants.md', 'docs/PROJECT_STATUS.md', 'docs/RoadMap.md',
     'docs/site/README.md',
