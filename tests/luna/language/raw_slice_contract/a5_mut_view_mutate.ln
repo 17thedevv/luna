@@ -1,0 +1,12 @@
+import <mem>;
+fn main() -> i32 {
+    dec rw data = [1, 2, 3];
+    dec pointer = &rw data[0] as *rw i32;
+    unsafe {
+        dec slice = std::mem::slice_from_raw_parts_mut<i32>(pointer, 3 as u64);
+        slice[1] = 7;
+        if slice[1] != 7 { return 1; }
+    }
+    if data[1] != 7 { return 2; }
+    return 0;
+}

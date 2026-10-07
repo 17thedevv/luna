@@ -1,0 +1,8 @@
+import "provider";
+fn main() -> i32 {
+    dec data = [65 as u8, 0 as u8];
+    dec view = views::make(&data);
+    if view.bytes()[0] != 65 as u8 { return 1; }
+    if view.bytes()[1] != 0 as u8 { return 2; }
+    return 0;
+}
