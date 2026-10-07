@@ -1,0 +1,37 @@
+{
+  "task": "A3 — partial aggregate cleanup",
+  "status": "PASS",
+  "date": "2026-10-07",
+  "branch": "a3-partial-aggregate-cleanup",
+  "base": "47f402ea",
+  "reproducer": "tests/luna/language/generic_drop/indexed_move.ln",
+  "original_failure": "consume(arr[0]) dropped the moved element again at scope exit (exit 3, expected 2), source and artifact",
+  "root_cause": "constant array indexing lowered to PtrOffset with an opaque (materialized-constant) offset operand; move analysis does not treat a PtrOffset as a place-producing lvalue address and the Load of it inherited no place, so the moved element was never marked moved and caller-side array cleanup re-dropped it. emit_place_cleanup also emitted a single whole-array Drop instead of descending.",
+  "contract": "a moved array element must not be dropped again; only remaining initialized elements are dropped",
+  "changed_files": [
+    "luna-rs/crates/luna-mvir/src/generator.rs (emit_place_cleanup descends arrays per element; constant index emitted as a literal PtrOffset offset)",
+    "luna-rs/crates/luna-borrowck/src/move_analysis.rs (constant PtrOffset on an array base maps to the element subplace; Load inherits PtrOffset places)",
+    "luna-rs/crates/luna-llib/src/format.rs (compiler 21 -> 22)",
+    "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs (8 reducer fixtures wired)",
+    "tests/luna/language/generic_drop/{enum_partial_move,indexed_move,indexed_move_index1,indexed_move_middle,projected_partial,projected_call_arg,path_dependent_partial,nested_partial}.ln"
+  ],
+  "regression_guard": "raw_slice_provenance_cli (slice_middle_conflict -> E3003) caught an earlier variant that lowered constant indexing to FieldPtr and lost raw-slice provenance; the shipped fix keeps PtrOffset intact",
+  "focused": {
+    "command": "cargo test -p luna-cli --test generic_drop_cli",
+    "result": "PASS (21 positives + 12 negatives, source + artifact)"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 207 binaries, 1335 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "regression_guard_result": "raw_slice_provenance_cli PASS (slice_middle_conflict -> E3003 retained)",
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "dynamic_index": "unchanged (PtrOffset); no partial-move support claimed",
+  "separate_finding": {
+    "id": "FIND-ASYNC-PROVIDER-01",
+    "summary": "provider exporting a parameterless async fn yields Invalid semantic metadata: CorruptedData on .llib import",
+    "reproducer": "tests/luna/language/async_provider_export/",
+    "classification": "independent artifact/export-async bug; filed to backlog (after A3, or C2/C3 by root cause)"
+  },
+  "verdict": "A3: CLOSED / CONFORMANT IN TESTED SCOPE (constant-index array element moves); dynamic-index element moves remain unsupported"
+}
