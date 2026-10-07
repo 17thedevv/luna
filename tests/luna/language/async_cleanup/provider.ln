@@ -1,0 +1,22 @@
+export module resources {
+    export struct Tracked<T> { value: T, counter: *rw i32, };
+    impl<T> std::Drop for Tracked<T> {
+        fn drop(&rw self) {
+            unsafe { *self.counter = *self.counter + 1; }
+        }
+    }
+    export fn tracked<T>(counter: *rw i32, value: T) -> Tracked<T> {
+        return Tracked<T> { value: value, counter: counter };
+    }
+    export fn consume<T>(value: T) {}
+    export fn identity<T>(value: T) -> T { return value; }
+    export async fn future_consume<T>(value: T) -> i32 {
+        consume(value);
+        return 1;
+    }
+    export async fn future_pair<A, B>(first: A, second: B) -> i32 {
+        consume(first);
+        consume(second);
+        return 2;
+    }
+}

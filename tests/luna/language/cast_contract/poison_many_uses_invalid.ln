@@ -1,0 +1,10 @@
+struct Record { value: i32, };
+fn main() -> i32 {
+    dec record = Record { value: 1 };
+    dec bad = record as i32;
+    dec a = bad + bad;
+    dec b = a * bad;
+    dec c = b - a;
+    if c > 0 { return c; }
+    return a + b + c;
+}

@@ -215,6 +215,93 @@ conditional suspend before init · 04 after init · 05 projected field initializ
 suspension point · 09 count destructors · 10 E3001 negative · 11 E3005 negative ·
 12 run source · 13 run artifact · 14 document cleanup state transitions.
 
+A2 status — 2026-10-07:
+
+```
+A1: CLOSED
+A2: CLOSED / CONFORMANT IN TESTED SCOPE
+workspace: 1334 pass / 0 fail / 1 ignored (exit 0)
+protocol: compiler21 / metadata9 / MVIR5 / format2
+release: still BLOCKED
+next correctness blocker: A3
+remaining: A2-FU1 (shared DropFlagPlan/Transition), A2-FU2 (full CLI matrix)
+```
+
+A2-FU2 — 2026-10-07: DONE (commit f330edc5). CLI async cleanup matrix passes in
+source + fresh artifact (value / borrow-only / generic-owned). A2 remains
+CLOSED; coverage strengthened.
+
+A2-FU1:
+
+```
+A2-FU1
+STATUS: DEFERRED_NON_BLOCKING
+CLASS: maintainability / anti-drift
+MUST COMPLETE BEFORE: R5 final release gate
+```
+
+### A3 — Partial aggregate cleanup
+
+Freeze result: `indexed_move` counterexample — `consume(arr[0])` double-dropped the
+moved element (exit 3, expected 2), source + fresh artifact.
+
+First mismatch: constant array indexing lowered to `PtrOffset` with an opaque
+offset operand, which move analysis does not treat as a place-producing lvalue
+address, and caller-side array cleanup emitted a single whole-array `Drop`. The
+element subplace was untracked, so the moved element was dropped again.
+
+Fix (generic): `emit_place_cleanup` descends arrays per element (`FieldPtr`); a
+constant array index is emitted as a literal `PtrOffset` offset and move analysis
+maps a constant `PtrOffset` on an array base to the element subplace (with `Load`
+inheriting `PtrOffset` places). Indexing stays a raw pointer offset, so raw-slice
+provenance is preserved; the whole-array drop glue is unchanged. A dynamic index
+stays opaque; no partial-move support is claimed for it.
+
+Regression caught by `raw_slice_provenance_cli`: an earlier variant lowering
+constant indexing to `FieldPtr` lost `slice_middle_conflict`'s E3003 and was
+rejected.
+
+```
+A3
+status: CLOSED / CONFORMANT IN TESTED SCOPE (constant-index array element moves)
+protocol: compiler22 / metadata9 / MVIR5 / format2
+focused: generic_drop_cli 21 positives + 12 negatives PASS (source + artifact)
+workspace: 207 binaries, 1335 passed / 0 failed / 1 ignored (exit 0)
+dynamic index: unchanged / unsupported for partial move
+release: still BLOCKED
+next correctness blocker: A4
+```
+
+`FIND-ASYNC-PROVIDER-01`
+
+```
+FIND-ASYNC-PROVIDER-01
+STATUS: OPEN
+CLASS: artifact / async export
+summary: a provider exporting a parameterless `async fn` yields
+         `Invalid semantic metadata: CorruptedData` when its .llib is imported
+reproducer: tests/luna/language/async_provider_export/
+SCHEDULE: after A3 (or C2/C3, per root cause)
+```
+
+### A4 — Cast / poison containment
+
+Freeze matrix found **no counterexample**: an invalid static cast already fails in
+the semantic layer with one typed E2026 diagnostic that poisons the operand (no
+cascade, no MVIR/backend, no published executable); runtime-trapping casts
+(integer-to-char) stay well-typed and trap deterministically. Closes as a
+coverage certification; no compiler change was required.
+
+```
+A4
+status: CLOSED / CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2
+focused: cast_poison_cli 5 passed (source + artifact)
+workspace: 208 binaries, 1340 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: A5
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
