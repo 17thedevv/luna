@@ -1,0 +1,37 @@
+{
+  "task": "A2 — async suspension-state cleanup via environment drop flags",
+  "status": "PASS",
+  "date": "2026-10-07",
+  "branch": "a2-async-suspended-cleanup",
+  "base_sha": "04b273a9",
+  "implementation_sha": "6e93f2a7",
+  "design_flaw": "async drop_fn iterated `live_places` (liveness) and `emit_drop_for_place` emitted an unconditional `Drop`; suspension state (which await) and ownership are separate axes, so state alone cannot decide cleanup.",
+  "failure_modes": {
+    "conditionally_moved": "a place moved only on one path before a suspension was in `live_places` -> destroyed unconditionally -> double-drop on the moved branch (proven by A2-PROOF test, FAILED before fix).",
+    "partially_moved": "PartialMoved was excluded from the unconditional set; remaining initialized subplaces are represented as their own places, so they remain covered (PROOF-5 passed)."
+  },
+  "implementation_boundary": {
+    "suspension": "ConditionallyMoved extracted from `live_places` into `conditional_places`; `compute_async_cleanup_plan` returns flagged places + per-instruction ownership transitions.",
+    "async_env": "runtime ownership flag fields appended after existing fields (ordinals unchanged); kickoff initializes parameter-owned places to true.",
+    "poll_resume": "ownership transitions (initialize -> true, move -> false, reinit -> true) recorded into env flags.",
+    "drop_fn": "definitely-live places dropped directly; conditionally-moved places guarded by Load(flag)/CondBr/Drop; then HeapFree(env)."
+  },
+  "protocol": { "compiler": 21, "metadata": 9, "mvir": 5, "format": 2 },
+  "focused": {
+    "a2_suspension_cleanup_tests": "3 passed (conditional guarded-drop; partial covered; guard present in generated drop_fn)",
+    "p1c_tests (async x drop/cancel)": "15 passed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "exit_code": 0,
+    "targets": 206,
+    "passed": 1334,
+    "failed": 0,
+    "ignored": 1
+  },
+  "remaining": [
+    "A2-FU1: extract shared DropFlagPlan/DropFlagTransition abstraction so sync (alloca) and async (env field) cleanup do not drift (maintainability/anti-drift; semantics currently correct).",
+    "A2-FU2: complete the CLI source/fresh-artifact async cleanup matrix (borrow-only, generic owned, projected reinit, cancel at state #1/#2; suspend-state cases currently covered by the driver test)."
+  ],
+  "verdict": "A2 CLOSED / CONFORMANT IN TESTED SCOPE. Release remains BLOCKED; next correctness blocker: A3."
+}
