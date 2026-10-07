@@ -1,0 +1,10 @@
+import "provider";
+fn main() -> i32 {
+    dec rw x = 7;
+    {
+        dec fut = resources::future_consume(&rw x as *rw i32);
+    }
+    // Cancelling a borrowed capture must not destroy the pointee.
+    if x != 7 { return 1; }
+    return 0;
+}

@@ -10,5 +10,13 @@ export module resources {
     }
     export fn consume<T>(value: T) {}
     export fn identity<T>(value: T) -> T { return value; }
-    export async fn helper() -> i32 { return 10; }
+    export async fn future_consume<T>(value: T) -> i32 {
+        consume(value);
+        return 1;
+    }
+    export async fn future_pair<A, B>(first: A, second: B) -> i32 {
+        consume(first);
+        consume(second);
+        return 2;
+    }
 }
