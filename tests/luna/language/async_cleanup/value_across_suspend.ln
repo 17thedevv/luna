@@ -1,15 +1,10 @@
 import "provider";
-async fn work(v: resources::Tracked<i32>) -> i32 {
-    dec h = await resources::helper();
-    resources::consume(v);
-    return h;
-}
 fn main() -> i32 {
     dec rw count = 0;
     dec counter = &rw count as *rw i32;
     {
         dec v = resources::tracked(counter, 42);
-        dec fut = work(v);
+        dec fut = resources::future_consume(v);
     }
     if count != 1 { return 2; }
     return 0;
