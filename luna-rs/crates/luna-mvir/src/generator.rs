@@ -922,6 +922,24 @@ impl<'a> MvirGenerator<'a> {
             self.push_inst_span(Instruction::Drop { value: place, callee, ty }, ty, span);
             return;
         }
+        if let luna_semantic::SemanticType::Array(elem_ty, len) = self.ctx.types.get(ty).clone() {
+            // Descend per element so a partially moved array drops only its
+            // remaining initialized elements: each element is a distinct place
+            // that move analysis can eliminate when moved out. The whole-array
+            // drop glue is retained for dropping an entire array value.
+            if self.ctx.needs_drop(elem_ty) {
+                let elem_ptr_ty = self.find_pointer_type(elem_ty);
+                for index in 0..len {
+                    let elem_ptr = self.push_inst_span(Instruction::FieldPtr {
+                        base: place.clone(),
+                        field_idx: index as u32,
+                        field_name: None,
+                    }, elem_ptr_ty, span);
+                    self.emit_place_cleanup(Operand::Value(elem_ptr), elem_ty, span);
+                }
+            }
+            return;
+        }
         let fields = match self.ctx.types.get(ty).clone() {
             luna_semantic::SemanticType::Struct(symbol, _, fields)
                 if !self.ctx.tables.drop_impls.contains_key(&symbol) => Some(fields),
@@ -1368,9 +1386,23 @@ impl<'a> MvirGenerator<'a> {
                             base_lval = Operand::Value(self.push_inst(Instruction::Load { ptr: base_lval }, address_ty));
                             address_ty = inner;
                         }
+                        // A constant index is emitted as a literal offset so
+                        // move analysis can map it to the element subplace; a
+                        // dynamic index stays an opaque operand. Both remain a
+                        // raw pointer offset, leaving raw-slice provenance
+                        // analysis unaffected.
+                        let offset_operand = match &self.arena.exprs[index.0 as usize] {
+                            Expr::Literal(tok, text) if tok.kind == luna_lexer::TokenKind::IntegerLiteral => {
+                                match text.parse::<u32>() {
+                                    Ok(const_index) => Operand::Number(const_index.to_string()),
+                                    Err(_) => index_op.clone(),
+                                }
+                            }
+                            _ => index_op.clone(),
+                        };
                         let elem_ptr = self.push_inst(Instruction::PtrOffset {
                             ptr: base_lval,
-                            offset: index_op,
+                            offset: offset_operand,
                         }, elem_ty_id);
                         Operand::Value(elem_ptr)
                     }
