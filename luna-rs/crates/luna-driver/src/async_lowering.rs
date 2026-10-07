@@ -4,7 +4,9 @@ pub const FUTURE_STATE_INITIAL: i64 = 0;
 pub const FUTURE_STATE_COMPLETED: i64 = -1;
 pub const FUTURE_STATE_POISONED: i64 = -2;
 use luna_semantic::{SemanticContext, SemanticType, SemanticTypeId};
-use std::collections::HashMap;
+use luna_borrowck::place::Place;
+use luna_borrowck::suspension::compute_async_cleanup_plan;
+use std::collections::{HashMap, HashSet};
 
 // A parameter Alloca is a slot holding the incoming handle, not the environment
 // itself. Load it and give the opaque ABI pointer its concrete environment view.
@@ -213,6 +215,17 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         }
     }
 
+    // Runtime ownership flags for places whose ownership is path-dependent at
+    // some suspension (ConditionallyMoved). Appended after existing fields so
+    // existing env-field ordinals are unchanged.
+    let cleanup_plan = compute_async_cleanup_plan(func, Some(ctx));
+    let mut flag_field_index: HashMap<Place, u32> = HashMap::new();
+    for place in &cleanup_plan.conditional_places {
+        let idx = env_fields.len() as u32;
+        env_fields.push(ctx.types.bool_id());
+        flag_field_index.insert(place.clone(), idx);
+    }
+
     let env_ty_id = ctx.types.intern(SemanticType::Tuple(env_fields.clone()));
     let env_ptr_ty = ctx.types.intern(SemanticType::Pointer(luna_semantic::ty::Mutability::Mutable, env_ty_id));
     
@@ -362,6 +375,24 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
         }
     }
     
+    // Initialize runtime ownership flags. Parameters are owned at kickoff
+    // (copied into the environment); body locals start uninitialized.
+    for (place, &flag_idx) in &flag_field_index {
+        let is_param = matches!(func.value(place.local).origin, ValueOrigin::Parameter(_));
+        let flag_ptr = ValueId(kickoff.values.len() as u32);
+        kickoff.values.push(ValueData {
+            inst: Instruction::FieldPtr { base: Operand::Value(env_val_id), field_idx: flag_idx, field_name: None },
+            ty: ctx.types.bool_id(), span: None, origin: ValueOrigin::Temporary,
+        });
+        k_entry.insts.push(flag_ptr);
+        let flag_store = ValueId(kickoff.values.len() as u32);
+        kickoff.values.push(ValueData {
+            inst: Instruction::Store { ptr: Operand::Value(flag_ptr), value: Operand::Boolean(is_param) },
+            ty: SemanticTypeId(0), span: None, origin: ValueOrigin::Temporary,
+        });
+        k_entry.insts.push(flag_store);
+    }
+
     k_entry.terminator = Some(Terminator::Ret { value: Some(Operand::Value(env_val_id)) });
     kickoff.blocks.push(k_entry);
 
@@ -697,6 +728,31 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
             });
             val_map.insert(old_vid, new_id);
             curr_insts.push(new_id);
+
+            // Record runtime ownership transitions (initialize -> true,
+            // move -> false, reinit -> true) for path-dependent places.
+            if let Some(events) = cleanup_plan.transitions.get(&old_vid) {
+                for (place, initialized) in events {
+                    if let Some(&flag_idx) = flag_field_index.get(place) {
+                        let flag_ptr = ValueId(resume.values.len() as u32);
+                        resume.values.push(ValueData {
+                            inst: Instruction::FieldPtr { base: Operand::Value(env_arg_id), field_idx: flag_idx, field_name: None },
+                            ty: ctx.types.bool_id(),
+                            span: None,
+                            origin: ValueOrigin::Temporary,
+                        });
+                        curr_insts.push(flag_ptr);
+                        let flag_store = ValueId(resume.values.len() as u32);
+                        resume.values.push(ValueData {
+                            inst: Instruction::Store { ptr: Operand::Value(flag_ptr), value: Operand::Boolean(*initialized) },
+                            ty: SemanticTypeId(0),
+                            span: None,
+                            origin: ValueOrigin::Temporary,
+                        });
+                        curr_insts.push(flag_store);
+                    }
+                }
+            }
         }
         
         let mut term = block.terminator.clone();
@@ -1023,6 +1079,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
     let num_states = await_points.len();
 
     // Generate dispatch blocks and cleanup blocks for state 0..=num_states
+    let mut cond_label_counter: u32 = 0;
     for state_idx in 0..=num_states {
         let curr_dispatch_label = LabelId { name: format!("drop_dispatch_{}", state_idx) };
         let next_dispatch_label = if state_idx < num_states {
@@ -1060,7 +1117,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
             let mut cleanup_block = BasicBlock {
                 label: cleanup_label,
                 insts: Vec::new(),
-                terminator: Some(Terminator::Br { target: free_env_label.clone() }),
+                terminator: None,
             };
 
             let mut places: Vec<_> = async_state_map.initial_state.live_places.iter().collect();
@@ -1081,7 +1138,12 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                 }
             }
 
-            drop_fn.blocks.push(cleanup_block);
+            let final_block = emit_conditional_guards(
+                &mut drop_fn, cleanup_block, drop_env_arg_id, &flag_field_index,
+                &async_state_map.initial_state.conditional_places, &env_fields, &alloca_map,
+                func, ctx, &free_env_label, &mut cond_label_counter,
+            );
+            drop_fn.blocks.push(final_block);
         } else {
             // Build cleanup blocks for state_idx > 0 (suspended at await point)
             let (_, _, await_vid) = await_points[state_idx - 1];
@@ -1161,7 +1223,7 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
             let mut locals_block = BasicBlock {
                 label: drop_locals_label,
                 insts: Vec::new(),
-                terminator: Some(Terminator::Br { target: free_env_label.clone() }),
+                terminator: None,
             };
 
             let suspension_state = async_state_map.await_states.get(&await_vid).unwrap_or(&async_state_map.initial_state);
@@ -1184,7 +1246,12 @@ fn lower_single_async_func(func: &Function, ctx: &mut SemanticContext) -> (Funct
                 }
             }
 
-            drop_fn.blocks.push(locals_block);
+            let final_block = emit_conditional_guards(
+                &mut drop_fn, locals_block, drop_env_arg_id, &flag_field_index,
+                &suspension_state.conditional_places, &env_fields, &alloca_map,
+                func, ctx, &free_env_label, &mut cond_label_counter,
+            );
+            drop_fn.blocks.push(final_block);
         }
     }
 
@@ -1242,6 +1309,69 @@ fn resolve_place_type(
         }
     }
     Some(current_ty)
+}
+
+/// Append guarded cancellation drops for places whose ownership is
+/// path-dependent at this suspension. Each drop is guarded by the runtime
+/// ownership flag recorded in the environment; the block is then chained to
+/// `free_env_label`. Returns the final (continuation) block to be pushed.
+#[allow(clippy::too_many_arguments)]
+fn emit_conditional_guards(
+    drop_fn: &mut Function,
+    mut block: BasicBlock,
+    drop_env_arg_id: ValueId,
+    flag_field_index: &HashMap<Place, u32>,
+    conditional: &HashSet<Place>,
+    env_fields: &[SemanticTypeId],
+    alloca_map: &HashMap<ValueId, u32>,
+    func: &Function,
+    ctx: &SemanticContext,
+    free_env_label: &LabelId,
+    label_counter: &mut u32,
+) -> BasicBlock {
+    let bool_ty = ctx.types.bool_id();
+    let mut conds: Vec<_> = conditional.iter().collect();
+    conds.sort_unstable_by(|a, b| b.cmp(a));
+    for place in conds {
+        let Some(&flag_idx) = flag_field_index.get(place) else { continue; };
+        let flag_ptr = ValueId(drop_fn.values.len() as u32);
+        drop_fn.values.push(ValueData {
+            inst: Instruction::FieldPtr { base: Operand::Value(drop_env_arg_id), field_idx: flag_idx, field_name: None },
+            ty: bool_ty, span: None, origin: ValueOrigin::Temporary,
+        });
+        block.insts.push(flag_ptr);
+        let live = ValueId(drop_fn.values.len() as u32);
+        drop_fn.values.push(ValueData {
+            inst: Instruction::Load { ptr: Operand::Value(flag_ptr) },
+            ty: bool_ty, span: None, origin: ValueOrigin::Temporary,
+        });
+        block.insts.push(live);
+
+        *label_counter += 1;
+        let drop_label = LabelId { name: format!("drop_cond_{}", *label_counter) };
+        *label_counter += 1;
+        let cont_label = LabelId { name: format!("after_cond_{}", *label_counter) };
+        block.terminator = Some(Terminator::CondBr {
+            condition: Operand::Value(live),
+            true_target: drop_label.clone(),
+            false_target: cont_label.clone(),
+        });
+        drop_fn.blocks.push(std::mem::replace(&mut block, BasicBlock {
+            label: cont_label.clone(), insts: Vec::new(), terminator: None,
+        }));
+
+        let mut drop_block = BasicBlock {
+            label: drop_label, insts: Vec::new(),
+            terminator: Some(Terminator::Br { target: cont_label }),
+        };
+        if let Some(&env_field_idx) = alloca_map.get(&place.local) {
+            let env_field_ty = env_fields[env_field_idx as usize];
+            emit_drop_for_place(func, drop_fn, &mut drop_block, drop_env_arg_id, env_field_idx as usize, env_field_ty, place, ctx);
+        }
+        drop_fn.blocks.push(drop_block);
+    }
+    block.terminator = Some(Terminator::Br { target: free_env_label.clone() });
+    block
 }
 
 fn emit_drop_for_place(
