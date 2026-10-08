@@ -1,0 +1,79 @@
+{
+  "task": "D4 — retained contracts",
+  "status": "PASS (coverage certification)",
+  "date": "2026-10-08",
+  "branch": "d4-retained-contracts",
+  "base": "70002d84",
+  "class": "COVERAGE — ledger of existing acceptance suites plus reducers only where coverage was missing",
+  "groups": {
+    "lifetime": {
+      "positive": "retained_contracts/lifetime_positive.ln (move + borrow end + second move + rw reference write) builds and runs",
+      "negative": "diagnostic_conformance/use_after_move.ln -> E3001",
+      "suites": ["generic_drop_cli", "raw_slice_provenance_cli", "luna-borrowck tests"]
+    },
+    "ffi": {
+      "positive": "retained_contracts/ffi_positive.ln (`#[link(name = \"abs\")] extern fn abs(i32) -> i32`, called and run)",
+      "negative": "retained_contracts/ffi_non_ffi_safe.ln -> E2030 (struct without #[repr(C)] in an extern signature)",
+      "suites": ["struct_contract_cli_parity"]
+    },
+    "dyn": {
+      "positive": "retained_contracts/dyn_positive.ln (&dyn trait object dispatch) builds and runs",
+      "negative": "retained_contracts/dyn_not_object_safe.ln -> E2010 (generic method)",
+      "suites": ["adv_comptime_dyn_tests", "adv_async_dyn_tests", "generic_trait_dispatch_acceptance_tests"]
+    },
+    "closure": {
+      "suites": ["generic_drop_cli (closure_env_* regressions)", "A1 closure-environment destruction regressions"]
+    },
+    "async": {
+      "suites": ["a2_suspension_cleanup_tests (3)", "async_cleanup_cli (1)", "future_initial_cancel"]
+    },
+    "comptime": {
+      "suites": ["comptime_dependency_precision_cli", "artifact_execution_dependencies_cli", "comptime_loans_cli"]
+    },
+    "utf8": {
+      "positive": "retained_contracts/utf8_positive.ln (valid Unicode scalar round-trip)",
+      "negative": "diagnostic_spans/char_invalid.ln -> E2026",
+      "suites": ["stdlib_string_acceptance_tests", "diagnostic_conformance_cli"]
+    },
+    "entry": {
+      "positive": "retained_contracts/entry_argv.ln (`fn main(args: [str]) -> i32`, argv contract) builds and runs",
+      "negative": "retained_contracts/entry_bad_main.ln -> E2024 (allowed signatures: fn main() -> void, fn main() -> i32, fn main(args: [str]) -> i32)",
+      "suites": ["diagnostic_conformance_cli"]
+    },
+    "backend": {
+      "suites": ["fresh_artifact_classification_cli", "artifact_target_contract_cli", "test_sysroot_build_invariants"]
+    }
+  },
+  "guard_results": {
+    "generic_drop_cli": "1 passed",
+    "async_cleanup_cli": "1 passed",
+    "a2_suspension_cleanup_tests": "3 passed",
+    "comptime_dependency_precision_cli": "1 passed",
+    "artifact_execution_dependencies_cli": "1 passed",
+    "provider_tiers_cli": "4 passed",
+    "fresh_artifact_classification_cli": "1 passed",
+    "retained_contracts_cli": "1 passed"
+  },
+  "async_finding": {
+    "id": "FIND-ASYNC-PROVIDER-01",
+    "decision": "PROMOTE to its own task immediately after D4 (option B)",
+    "rationale": "reproduced at least twice (FU2 and D3) and is real artifact corruption rather than an ambiguous observation; D4 async runtime contracts pass, so the async runtime contract is not marked fully conformant while the provider-serialization finding stays open"
+  },
+  "a2_fu1": "still OPEN (anti-drift debt). The D4 async matrix is green, so the A2 contract remains conformant, but A2-FU1 must complete before R5.",
+  "observations_non_blocking": [
+    "D4-FU1: a source file whose first item is `#[link(...)]` fails to parse with E0003 ('Modifiers must be attached to a declaration'); the FFI fixture works around it by placing another declaration first — recorded, not fixed in D4"
+  ],
+  "harness": "luna-rs/crates/luna-cli/tests/retained_contracts_cli.rs",
+  "focused": {
+    "command": "cargo test -p luna-cli --test retained_contracts_cli (plus the guard batch below)",
+    "result": "retained_contracts_cli 1 passed; guard batch all passed (see guard_results)"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 218 binaries, 1358 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — test-only",
+  "next_sequence": ["FIND-ASYNC-PROVIDER-01", "A2-FU1", "decide C4-FU1 / D1-FU1 / D1-FU2", "E-wave / R4", "R5 exact release gate"],
+  "verdict": "D4: CLOSED / CONFORMANT IN TESTED SCOPE (all nine retained contract groups covered; no newly regressed behaviour) with FIND-ASYNC-PROVIDER-01 explicitly excluded and promoted to its own task"
+}
