@@ -1,0 +1,4 @@
+fn main() -> i32 {
+    if !false { return 0; }
+    return 1;
+}
