@@ -396,6 +396,31 @@ release: still BLOCKED
 next correctness blocker: C4
 ```
 
+### C4 — Comptime execution-dependency precision
+
+Freeze matrix (no counterexample in the tested scope). C4-1 direct body change
+(interface unchanged) rejects with a typed stale diagnostic; C4-2 transitive leaf
+change rejects; **C4-3 unused imported provider change does NOT invalidate** (no
+false-positive); C4-5 covered by C4-1; C4-6 source/artifact parity; C4-7 typed
+`dependency execution fingerprint mismatch`. `interface fingerprint != execution
+fingerprint` holds.
+
+Recorded limitation **C4-FU1** (non-blocking): branch-sensitive dependency
+selection. The comptime dependency set is a static call-graph walk, so a provider
+reachable only through an untaken branch can still be recorded — **sound but
+imprecise** (over-approximation), never a missing (unsound) dependency.
+
+```
+C4
+status: CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: comptime_dependency_precision_cli PASS (source + artifact)
+workspace: 213 binaries, 1345 passed / 0 failed / 1 ignored (exit 0)
+open follow-ups: C4-FU1 branch-sensitive dependency selection (non-blocking, precision)
+release: still BLOCKED
+next correctness blocker: C5
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·

@@ -1,0 +1,46 @@
+{
+  "task": "C4 — comptime execution-dependency precision",
+  "status": "PASS (coverage certification for the tested scope; one precision limitation recorded)",
+  "date": "2026-10-08",
+  "branch": "c4-comptime-dependency",
+  "base": "bf265798",
+  "class": "COVERAGE / certification — no implementation change required",
+  "invariants": [
+    "a comptime result depends on exactly the providers it actually executed",
+    "a changed execution dependency invalidates the dependent artifact",
+    "a changed provider that was only imported (never executed) does not",
+    "interface fingerprint != execution fingerprint"
+  ],
+  "reducers": {
+    "C4-1": "direct body dependency — dep body changes (interface unchanged) -> consumer rejected",
+    "C4-2": "transitive body dependency — leaf body changes -> top/consumer rejected",
+    "C4-3": "unused imported provider — unused body changes -> consumer NOT invalidated (precision confirmed)",
+    "C4-5": "same interface, changed comptime body — covered by C4-1",
+    "C4-6": "source vs fresh artifact parity — source-mode consumer builds and runs; artifact-mode consumer builds and runs",
+    "C4-7": "stale rejection typed diagnostic — 'dependency execution fingerprint mismatch for provider ...'"
+  },
+  "observed_behavior": {
+    "changed_execution_dependency": "rejected with a typed stale diagnostic (no published executable)",
+    "changed_unused_imported_provider": "accepted (no false-positive invalidation)"
+  },
+  "limitation": {
+    "id": "C4-FU1",
+    "what": "branch-sensitive dependency selection",
+    "severity": "SOUND BUT IMPRECISE (over-approximation), not a missing dependency",
+    "detail": "the comptime dependency set is a static call-graph walk from the evaluated function (luna-mvir generate_comptime_dependencies); a provider reachable only through an untaken branch can still be recorded",
+    "reducer": "not retained as a fixture: a `comptime { if false { A } else { B } }` probe returned 0 rather than the else-branch value, so comptime if-expression semantics were not confirmed and the reducer was withdrawn rather than shipped with a wrong expectation",
+    "not_unsound": "no reducer produced a missing (unsound) invalidation"
+  },
+  "guard": "artifact_execution_dependencies_cli (native relink vs materialized invalidation) remains green",
+  "focused": {
+    "command": "cargo test -p luna-cli --test comptime_dependency_precision_cli",
+    "result": "1 passed / 0 failed (source + fresh artifact)"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 213 binaries, 1345 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — test-only; no serialized payload or codegen change",
+  "verdict": "C4: CONFORMANT IN TESTED SCOPE (direct/transitive/unused dependency precision, source/artifact parity, typed stale rejection); precision limitation C4-FU1 recorded as non-blocking"
+}
