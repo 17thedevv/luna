@@ -453,6 +453,31 @@ release: still BLOCKED
 next: D-wave
 ```
 
+### D1 — DIAG-1..10 diagnostic conformance
+
+Implementation fix + coverage. Counterexample **D1-1**: DIAG-10 requires parity
+between `docs/diagnostics/diagnostics-v1.md` and `DiagnosticCode::ALL`, but `ALL`
+did not exist. Fix: added `DiagnosticCode::ALL` (68 codes) + `registry_parity`
+unit tests (doc<->enum parity, uniqueness, naming; range rows excluded).
+
+Matrix: DIAG-1 typed code ✓, DIAG-2 source span ✓, DIAG-3 related spans ✓,
+DIAG-4 poison containment ✓, DIAG-5 determinism ✓, DIAG-6 dedup ✓, DIAG-7 phase
+ownership ✓, DIAG-8 origin traceability ✓, DIAG-9 source/artifact parity ✓,
+DIAG-10 FIXED.
+
+Non-blocking observations: D1-FU1 (E3001 message renders internal `%v5.0`);
+D1-FU2 (comptime failure emits E1001 + E4005 for one root).
+
+```
+D1
+status: CONFORMANT IN TESTED SCOPE (implementation fix + coverage)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: diagnostic_conformance_cli 4 PASS + luna-common 10 PASS
+workspace: 215 binaries, 1352 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: D2
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
