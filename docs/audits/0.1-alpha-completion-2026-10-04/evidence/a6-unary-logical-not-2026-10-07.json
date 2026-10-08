@@ -1,0 +1,48 @@
+{
+  "task": "A6 — unary logical NOT",
+  "status": "PASS (implementation fix)",
+  "date": "2026-10-07",
+  "branch": "a6-unary-logical-not",
+  "base": "54df3f43",
+  "class": "IMPLEMENTATION FIX",
+  "original_failure": "`!x` was rejected with E2012 'Unary operator `Not` is not yet supported' for every operand, including bool",
+  "reproducer": "tests/luna/language/unary_not/not_invalid_type.ln (and scratch/a6/not_free.ln)",
+  "layers": {
+    "lexer_parser": "already correct — `!` parses to UnaryOp::Not (luna-parser/src/expr.rs)",
+    "typechecker": "FIX — Not was grouped with the unsupported BitNot/PostInc/PostDec; now admits bool -> bool and rejects a non-bool operand with E2012",
+    "mvir_generator": "FIX — no Not lowering existed; now lowers `!x` to `Eq { x, false }`",
+    "interpreter_backend": "no change — Eq already lowers/executes for bool"
+  },
+  "contract": "`!` is a logical operator over `bool` producing `bool`; a non-bool operand is a typed E2012 diagnostic that poisons the value; comptime and runtime semantics are identical",
+  "not_extended": "bitwise NOT on integers is NOT added — the contract defines logical NOT only",
+  "changed_files": [
+    "luna-rs/crates/luna-semantic/src/typechecker.rs (UnaryOp::Not admission + poison)",
+    "luna-rs/crates/luna-mvir/src/generator.rs (lower `!x` to Eq{x, false})",
+    "luna-rs/crates/luna-cli/tests/unary_not_cli.rs (A6 harness)",
+    "tests/luna/language/unary_not/*.ln (7 positive reducers + 2 negative reducers)"
+  ],
+  "protocol": {
+    "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+    "bump": "none",
+    "justification": "no new MVIR instruction or serialized schema change (logical NOT reuses Eq), and no pre-existing artifact could contain `!` because it was rejected before"
+  },
+  "reducers": {
+    "positives": [
+      "not_true", "not_false", "double_not", "not_and",
+      "not_in_condition", "not_generic", "not_comptime"
+    ],
+    "negatives": [
+      "not_invalid_type (! on i32) -> E2012",
+      "not_poison_no_cascade (poisoned value feeding many uses) -> exactly one E2012"
+    ]
+  },
+  "focused": {
+    "command": "cargo test -p luna-cli --test unary_not_cli (plus -p luna-semantic and expression_diagnostic_spans_cli)",
+    "result": "unary_not_cli 1 passed; luna-semantic 0 failed; expression_diagnostic_spans_cli 1 passed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 210 binaries, 1342 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "verdict": "A6: CLOSED / CONFORMANT IN TESTED SCOPE (bool-only logical NOT; typed rejection + poison containment; comptime/runtime parity; source + artifact parity)"
+}
