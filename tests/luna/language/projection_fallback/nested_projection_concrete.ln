@@ -1,0 +1,10 @@
+export module proj3 {
+    export trait Outer { type Middle; }
+    export trait Inner { type Leaf; }
+    export struct Mid {};
+    export struct Top {};
+    impl Inner for Mid { type Leaf = i32; }
+    impl Outer for Top { type Middle = Mid; }
+}
+fn deep() -> proj3::Top::Middle::Leaf { return 0; }
+fn main() -> i32 { return deep(); }

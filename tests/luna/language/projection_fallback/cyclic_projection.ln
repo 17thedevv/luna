@@ -1,0 +1,7 @@
+export module cyc {
+    export trait Loop { type Item; }
+    export struct Cycler {};
+    impl Loop for Cycler { type Item = Cycler::Item; }
+}
+fn trigger(x: cyc::Cycler::Item) -> i32 { return 0; }
+fn main() -> i32 { return 0; }

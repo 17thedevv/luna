@@ -1,0 +1,10 @@
+export module proj {
+    export trait Container { type Item; fn get(&self) -> Self::Item; }
+    export struct Boxed { value: i32 };
+    impl Container for Boxed { type Item = i32; fn get(&self) -> i32 { return self.value; } }
+}
+fn extract<T: proj::Container>(c: &T) -> T::Item { return c.get(); }
+fn main() -> i32 {
+    dec boxed = proj::Boxed { value: 5 };
+    return extract(&boxed) - 5;
+}
