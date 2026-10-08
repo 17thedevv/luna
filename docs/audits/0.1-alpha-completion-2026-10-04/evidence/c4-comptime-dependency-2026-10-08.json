@@ -6,7 +6,7 @@
   "base": "bf265798",
   "class": "COVERAGE / certification — no implementation change required",
   "invariants": [
-    "a comptime result depends on exactly the providers it actually executed",
+    "sound and sufficiently precise in the tested scope: a comptime result depends on the execution dependencies it actually ran (direct, transitive, unused-import), while branch-sensitive selection remains unconfirmed (C4-FU1)",
     "a changed execution dependency invalidates the dependent artifact",
     "a changed provider that was only imported (never executed) does not",
     "interface fingerprint != execution fingerprint"
@@ -42,5 +42,5 @@
   },
   "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
   "bump": "none — test-only; no serialized payload or codegen change",
-  "verdict": "C4: CONFORMANT IN TESTED SCOPE (direct/transitive/unused dependency precision, source/artifact parity, typed stale rejection); precision limitation C4-FU1 recorded as non-blocking"
+  "verdict": "C4: CONFORMANT IN TESTED SCOPE (sound and sufficiently precise for the tested scope: direct/transitive/unused dependency, source/artifact parity, typed stale rejection); global 'exactly executed providers' is NOT claimed — branch-sensitive precision is C4-FU1, recorded as non-blocking"
 }

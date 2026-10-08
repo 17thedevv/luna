@@ -403,7 +403,9 @@ Freeze matrix (no counterexample in the tested scope). C4-1 direct body change
 change rejects; **C4-3 unused imported provider change does NOT invalidate** (no
 false-positive); C4-5 covered by C4-1; C4-6 source/artifact parity; C4-7 typed
 `dependency execution fingerprint mismatch`. `interface fingerprint != execution
-fingerprint` holds.
+fingerprint` holds. Verdict wording: **sound and sufficiently precise in the
+tested scope** — the global claim "depends on exactly the executed providers" is
+NOT made, because branch-sensitive selection is unconfirmed (C4-FU1).
 
 Recorded limitation **C4-FU1** (non-blocking): branch-sensitive dependency
 selection. The comptime dependency set is a static call-graph walk, so a provider
