@@ -367,6 +367,35 @@ release: still BLOCKED
 next correctness blocker: C3
 ```
 
+### C3 — Projection / fallback + proof depth
+
+Implementation fix. Two counterexamples:
+
+1. **Proof-depth guard leaked into the language** — a valid 70-deep blanket-impl
+   chain was rejected with `E2021 does not implement L70` (depth 60 passed) because
+   `prove_trait_goal` returned false at a fixed `stack.len() >= 64`. Fixed with a
+   named `MAX_PROOF_DEPTH = 256`; exact-cycle detection unchanged, so a genuinely
+   cyclic blanket bound still rejects.
+2. **Chained projection not resolved** — `Module::Type::Assoc::Nested` was rejected
+   with `E1001` because the prefix was resolved only through the symbol table.
+   Fixed by resolving the prefix left to right (descend modules, stop at a type,
+   then project the remaining segments).
+
+Structured diagnostics confirmed: `E2008` cyclic projection, `E2019` ambiguous
+projection (single, no cascade), `E2021` cyclic bound. Generic chained projection
+(`T::Assoc::Nested`) needs associated-type bounds (`type Assoc: Trait`), which the
+grammar does not accept — recorded, fail-closed. No protocol bump.
+
+```
+C3
+status: CONFORMANT IN TESTED SCOPE (implementation fix)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: projection_fallback_cli PASS + trait_argument_bounds_cli PASS + interface_constraints_cli PASS + luna-semantic 0 failed
+workspace: 212 binaries, 1344 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: C4
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
