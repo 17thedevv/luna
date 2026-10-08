@@ -1,0 +1,2 @@
+import "c4_top";
+fn main() -> i32 { return c4_top::value() - 4; }

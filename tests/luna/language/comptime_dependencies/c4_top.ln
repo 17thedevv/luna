@@ -1,0 +1,7 @@
+import "c4_mid";
+module c4_top {
+    export fn value() -> i32 {
+        dec result = comptime { c4_mid::value() };
+        return result;
+    }
+}

@@ -1,0 +1,4 @@
+import "c4_leaf";
+module c4_mid {
+    export fn value() -> i32 { return c4_leaf::value() + 1; }
+}

@@ -1,0 +1,7 @@
+import "c4_dep";
+module c4_used {
+    export fn value() -> i32 {
+        dec result = comptime { c4_dep::value() };
+        return result;
+    }
+}

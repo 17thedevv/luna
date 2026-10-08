@@ -1,0 +1,3 @@
+import "c4_used";
+import "c4_unused";
+fn main() -> i32 { return c4_used::value() - 1; }
