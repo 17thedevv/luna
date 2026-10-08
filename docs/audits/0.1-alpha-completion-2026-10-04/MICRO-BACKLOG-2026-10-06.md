@@ -423,6 +423,36 @@ release: still BLOCKED
 next correctness blocker: C5
 ```
 
+### C5 — Artifact freshness classification
+
+Implementation fix. Format/compiler/MVIR/semantic-metadata version mismatches all
+surfaced as the same `MlibError::VersionMismatch(u16)` (`invalid manifest:
+VersionMismatch(N)`), so the failing boundary was not identifiable. Fix: classify
+the boundary with `VersionMismatch { component, found, expected }` where
+`component ∈ {format, compiler, mvir, semantic-metadata}`. Target mismatch
+(`TargetMismatch`), object identity (`ObjectIntegrityMismatch`), section tampering
+(`SectionChecksumMismatch`), and interface/execution fingerprint staleness were
+already classified.
+
+Harness `fresh_artifact_classification_cli` mutates one boundary per case
+(header format/compiler/mvir/target triple, metadata section version, object
+payload — with the section checksum refreshed so validation reaches the boundary).
+Every stale class rejects deterministically with a classified reason; no
+executable is published; a fresh artifact builds and runs.
+
+`FIND-ASYNC-PROVIDER-01` stays independent (deeper serialization/`CorruptedData`
+issue, not a freshness class).
+
+```
+C5
+status: CONFORMANT IN TESTED SCOPE (implementation fix)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: fresh_artifact_classification_cli PASS + luna-llib 24 PASS + struct_lifetime_contract_acceptance_tests PASS
+workspace: 214 binaries, 1346 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: D-wave
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
