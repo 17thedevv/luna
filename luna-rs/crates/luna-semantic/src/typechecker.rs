@@ -2915,52 +2915,73 @@ impl<'a> TypeChecker<'a> {
                         ctxt: segments[0].ctxt,
                     };
 
-                    let prefix_ty: Option<SemanticTypeId> = if prefix_segments.len() == 1 && (self.get_span_text(prefix_segments[0]) == "Self" || self.get_span_text(prefix_segments[0]) == "self") {
-                        self.current_self_type
-                    } else {
+                    let prefix_ty: Option<SemanticTypeId> = {
+                        // Resolve the prefix left to right: consume leading
+                        // segments as symbols (module path or type), then project
+                        // any remaining segments as associated types. This keeps
+                        // single-segment and module-qualified paths unchanged
+                        // while allowing chained projections such as
+                        // `Module::Type::Assoc::Nested`.
                         let mut scope = self.current_scope;
-                        let mut prefix_sym = None;
-                        for (i, seg) in prefix_segments.iter().enumerate() {
-                            let seg_name = self.get_span_text(*seg);
-                            let sym_id = if i == 0 {
-                                self.ctx.symbol_table.lookup_with_ctxt(seg_name, seg.ctxt, scope)
-                                    .or_else(|| self.ctx.symbol_table.lookup_with_ctxt(seg_name, seg.ctxt, crate::ScopeId(0)))
+                        let mut resolved: Option<SemanticTypeId> = None;
+                        let mut index = 0usize;
+                        while index < prefix_segments.len() {
+                            let seg_name = self.get_span_text(prefix_segments[index]).to_string();
+                            if index == 0 && (seg_name == "Self" || seg_name == "self") {
+                                resolved = self.current_self_type;
+                                index += 1;
+                                continue;
+                            }
+                            let sym_id = if index == 0 {
+                                self.ctx.symbol_table.lookup_with_ctxt(&seg_name, prefix_segments[index].ctxt, scope)
+                                    .or_else(|| self.ctx.symbol_table.lookup_with_ctxt(&seg_name, prefix_segments[index].ctxt, crate::ScopeId(0)))
                             } else {
-                                self.ctx.symbol_table.lookup_exact_with_ctxt(seg_name, seg.ctxt, scope)
+                                self.ctx.symbol_table.lookup_exact_with_ctxt(&seg_name, prefix_segments[index].ctxt, scope)
                             };
-                            if let Some(id) = sym_id {
-                                prefix_sym = Some(id);
-                                if let Some(inner) = self.ctx.symbol_table.symbols[id.0 as usize].inner_scope {
-                                    scope = inner;
-                                } else if i < prefix_segments.len() - 1 {
-                                    prefix_sym = None;
-                                    break;
+                            let Some(id) = sym_id else { break };
+                            let is_last = index + 1 == prefix_segments.len();
+                            let inner_scope = self.ctx.symbol_table.symbols[id.0 as usize].inner_scope;
+                            if is_last {
+                                let is_type_param = matches!(self.ctx.symbol_table.get_symbol(id).kind, crate::SymbolKind::TypeParam);
+                                if is_type_param {
+                                    resolved = Some(self.ctx.types.intern(SemanticType::GenericParam(id)));
+                                } else if let Some(base_ty) = self.ctx.tables.symbol_types.get(&id).copied() {
+                                    resolved = Some(if generic_args.is_empty() {
+                                        base_ty
+                                    } else {
+                                        self.instantiate_generic_named_type(id, base_ty, generic_args)
+                                    });
                                 }
+                                index += 1;
                             } else {
-                                prefix_sym = None;
+                                // A non-final segment is only a path component
+                                // when it names a module; a type (or type
+                                // parameter) ends the symbol walk and the
+                                // remaining segments become projections.
+                                let kind = self.ctx.symbol_table.get_symbol(id).kind.clone();
+                                if matches!(kind, crate::SymbolKind::Module) {
+                                    if let Some(inner) = inner_scope {
+                                        scope = inner;
+                                        index += 1;
+                                        continue;
+                                    }
+                                }
+                                resolved = if let crate::SymbolKind::TypeParam = kind {
+                                    Some(self.ctx.types.intern(SemanticType::GenericParam(id)))
+                                } else {
+                                    self.ctx.tables.symbol_types.get(&id).copied()
+                                };
+                                index += 1;
                                 break;
                             }
                         }
-
-                        if let Some(sym) = prefix_sym {
-                            let sym_kind = self.ctx.symbol_table.get_symbol(sym).kind.clone();
-                            if let crate::SymbolKind::TypeParam = sym_kind {
-                                Some(self.ctx.types.intern(SemanticType::GenericParam(sym)))
-                            } else {
-                                let base_ty = self.ctx.tables.symbol_types.get(&sym).copied();
-                                if let Some(base_ty) = base_ty {
-                                    if generic_args.is_empty() {
-                                        Some(base_ty)
-                                    } else {
-                                        Some(self.instantiate_generic_named_type(sym, base_ty, generic_args))
-                                    }
-                                } else {
-                                    None
-                                }
-                            }
-                        } else {
-                            None
+                        while index < prefix_segments.len() {
+                            let Some(self_ty) = resolved else { break };
+                            let assoc = self.get_span_text(prefix_segments[index]).to_string();
+                            resolved = Some(self.lower_associated_type_projection(self_ty, &assoc, span));
+                            index += 1;
                         }
+                        resolved
                     };
 
                     if let Some(self_ty) = prefix_ty {
