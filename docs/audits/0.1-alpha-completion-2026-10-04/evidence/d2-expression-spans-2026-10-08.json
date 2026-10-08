@@ -1,0 +1,37 @@
+{
+  "task": "D2 — expression span precision",
+  "status": "PASS (coverage certification; no counterexample found)",
+  "date": "2026-10-08",
+  "branch": "d2-expression-spans",
+  "base": "39004d69",
+  "class": "COVERAGE — no span propagation change required",
+  "scope": "span precision only, not a second DIAG-1..10 pass",
+  "reducers": {
+    "invalid_deref": { "fixture": "diagnostic_spans/deref_scalar.ln", "code": "E2002", "span": "the deref base expression (`*value` -> `value`)" },
+    "invalid_negation": { "fixture": "diagnostic_spans/neg_bool.ln", "code": "E2012", "span": "the invalid unary `-value` operand (`value`); invalid operand type, not feature support" },
+    "invalid_char_cast": { "fixture": "diagnostic_spans/char_invalid.ln", "code": "E2026", "span": "the cast source token `55296`, not the whole statement" },
+    "invalid_tuple_projection": { "fixture": "diagnostic_spans/tuple_scalar.ln", "code": "E2003", "span": "the projection base `value`" },
+    "invalid_index": { "fixture": "diagnostic_spans/index_scalar.ln", "code": "E2003", "span": "the index base `value`" }
+  },
+  "invariants_verified": [
+    "correct stable code (E2002 / E2012 / E2026 / E2003)",
+    "primary span points at the offending token/expression (file:line:column)",
+    "caret width equals the offending token width (smallest useful primary span, not the whole statement)",
+    "rendered diagnostic block is identical between check and build",
+    "rendered diagnostic block is identical between source and fresh-artifact modes",
+    "no executable is published for the error"
+  ],
+  "harness": "luna-rs/crates/luna-cli/tests/expression_span_precision_cli.rs",
+  "guards": ["expression_diagnostic_spans_cli (E2002/E2012/E2003/E2026 spans) PASS"],
+  "focused": {
+    "command": "cargo test -p luna-cli --test expression_span_precision_cli (plus expression_diagnostic_spans_cli)",
+    "result": "expression_span_precision_cli 1 passed; expression_diagnostic_spans_cli 1 passed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 216 binaries, 1353 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — test-only; no span propagation change",
+  "verdict": "D2: CONFORMANT IN TESTED SCOPE (four targeted expression errors carry precise, stable, smallest-useful spans in source and artifact modes)"
+}
