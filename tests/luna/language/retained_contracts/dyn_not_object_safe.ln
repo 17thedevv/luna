@@ -1,0 +1,3 @@
+trait NotObjectSafe { fn convert<T>(&self, value: T) -> T; }
+fn use_it(value: &dyn NotObjectSafe) -> i32 { return 0; }
+fn main() -> i32 { return 0; }
