@@ -478,6 +478,26 @@ release: still BLOCKED
 next: D2
 ```
 
+### D2 — Expression span precision
+
+Coverage certification (no counterexample). Four targeted expression errors carry
+precise, stable, smallest-useful spans: E2002 invalid deref, E2012 invalid
+negation (`-value` on bool — invalid operand type, not feature support), E2026
+invalid char cast (span on `55296`, not the statement), E2003 invalid tuple
+projection. Harness `expression_span_precision_cli` asserts code, primary span
+line:column, caret width == token width, and identical rendered block between
+check/build and source/artifact. Guard `expression_diagnostic_spans_cli` PASS.
+
+```
+D2
+status: CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: expression_span_precision_cli PASS + expression_diagnostic_spans_cli PASS
+workspace: 216 binaries, 1353 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: D3
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
