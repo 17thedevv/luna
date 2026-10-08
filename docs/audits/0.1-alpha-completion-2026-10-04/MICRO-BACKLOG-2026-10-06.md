@@ -324,6 +324,27 @@ release: still BLOCKED
 next correctness blocker: A6
 ```
 
+### A6 — Unary logical NOT
+
+Implementation fix. `!x` was rejected for every operand with E2012
+(`Unary operator `Not` is not yet supported`). The parser already produced
+`UnaryOp::Not`; the gap was in the typechecker (grouped with the unsupported
+BitNot/PostInc/PostDec) and the MVIR generator (no lowering). Fix: typechecker
+admits `bool -> bool` and rejects a non-bool operand with one E2012 (poisoned);
+generator lowers `!x` to `Eq { x, false }` — no new instruction, no MVIR schema
+change, so **no protocol bump**. Comptime and runtime share semantics.
+Bitwise NOT on integers is deliberately not added.
+
+```
+A6
+status: CLOSED / CONFORMANT IN TESTED SCOPE (implementation fix)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: unary_not_cli PASS + luna-semantic 0 failed + expression_diagnostic_spans_cli PASS
+workspace: 210 binaries, 1342 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: C2
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
