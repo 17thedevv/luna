@@ -1,0 +1,2 @@
+import "c4_direct";
+fn main() -> i32 { return c4_direct::value() - 1; }
