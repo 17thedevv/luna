@@ -81,6 +81,80 @@ pub enum DiagnosticCode {
 }
 
 impl DiagnosticCode {
+    /// Every diagnostic code, in freezing order. `docs/diagnostics/diagnostics-v1.md`
+    /// (DIAG-10) requires exact parity between this list and the specification.
+    pub const ALL: &'static [DiagnosticCode] = &[
+        DiagnosticCode::ExpectedToken,
+        DiagnosticCode::UnexpectedToken,
+        DiagnosticCode::InvalidSyntax,
+        DiagnosticCode::UnclosedDelimiter,
+        DiagnosticCode::InvalidAnnotation,
+        DiagnosticCode::UnresolvedSymbol,
+        DiagnosticCode::DuplicateDefinition,
+        DiagnosticCode::PrivateSymbolAccess,
+        DiagnosticCode::UnresolvedModuleProvider,
+        DiagnosticCode::CyclicModuleDependency,
+        DiagnosticCode::InvalidVisibility,
+        DiagnosticCode::WildcardImportProhibited,
+        DiagnosticCode::AmbiguousSymbol,
+        DiagnosticCode::TypeMismatch,
+        DiagnosticCode::CannotDereference,
+        DiagnosticCode::CannotIndex,
+        DiagnosticCode::CopyDropConflict,
+        DiagnosticCode::ConflictingTraitImpl,
+        DiagnosticCode::OrphanImpl,
+        DiagnosticCode::UnresolvedTraitImpl,
+        DiagnosticCode::AssociatedTypeCycle,
+        DiagnosticCode::InfiniteSizeRecursiveType,
+        DiagnosticCode::NonObjectSafeTrait,
+        DiagnosticCode::InvalidLvalue,
+        DiagnosticCode::InvalidUnaryOp,
+        DiagnosticCode::InvalidBinaryOp,
+        DiagnosticCode::DuplicateField,
+        DiagnosticCode::DuplicateVariant,
+        DiagnosticCode::LifetimeConstraintViolation,
+        DiagnosticCode::MissingField,
+        DiagnosticCode::NoAssociatedType,
+        DiagnosticCode::AmbiguousAssociatedType,
+        DiagnosticCode::CannotCallNonFunction,
+        DiagnosticCode::TraitBoundNotSatisfied,
+        DiagnosticCode::NonExhaustivePattern,
+        DiagnosticCode::CannotMutateImmutable,
+        DiagnosticCode::InvalidMainSignature,
+        DiagnosticCode::UnsafeOperationOutsideUnsafe,
+        DiagnosticCode::InvalidCast,
+        DiagnosticCode::AwaitOutsideAsync,
+        DiagnosticCode::InvalidTryOperator,
+        DiagnosticCode::LoopControlOutsideLoop,
+        DiagnosticCode::NonFfiSafeType,
+        DiagnosticCode::ExplicitDropCall,
+        DiagnosticCode::UseAfterMove,
+        DiagnosticCode::PartialMoveUnderDrop,
+        DiagnosticCode::BorrowConflict,
+        DiagnosticCode::MissingReturnValue,
+        DiagnosticCode::LocalBorrowEscape,
+        DiagnosticCode::UseOfUninitializedValue,
+        DiagnosticCode::UseAfterDrop,
+        DiagnosticCode::RawStorageAnchorMismatch,
+        DiagnosticCode::RawStorageAnchorViolation,
+        DiagnosticCode::AsyncBorrowAcrossAwait,
+        DiagnosticCode::ComptimeStepLimitExceeded,
+        DiagnosticCode::ComptimeUnserializableEscape,
+        DiagnosticCode::ComptimePanic,
+        DiagnosticCode::ComptimeEvaluationFailed,
+        DiagnosticCode::MonomorphizationBarrier,
+        DiagnosticCode::InfiniteMonomorphizationRecursion,
+        DiagnosticCode::BackendInvariantViolation,
+        DiagnosticCode::ObjectEmissionFailure,
+        DiagnosticCode::LinkerFailure,
+        DiagnosticCode::SysrootConfigurationFailure,
+        DiagnosticCode::ProviderReadFailure,
+        DiagnosticCode::OutputWriteFailure,
+        DiagnosticCode::InvalidArtifactOutput,
+        DiagnosticCode::ProviderConfigurationError,
+        DiagnosticCode::ProcessExecutionFailure,
+    ];
+
     pub const fn number(self) -> u16 {
         self as u16
     }
@@ -280,5 +354,56 @@ mod tests {
         let rendered = diagnostic.render(&manager);
         assert!(rendered.contains("emoji.ln:1:6"), "{rendered}");
         assert!(rendered.contains("   |        ^^^^\n"), "{rendered}");
+    }
+}
+
+/// DIAG-10: exact parity between `DiagnosticCode::ALL` and the frozen registry
+/// `docs/diagnostics/diagnostics-v1.md`.
+#[cfg(test)]
+mod registry_parity {
+    use super::DiagnosticCode;
+
+    const DOCS: &str = include_str!("../../../../docs/diagnostics/diagnostics-v1.md");
+
+    #[test]
+    fn every_code_is_documented_unique_and_named() {
+        let mut seen = std::collections::BTreeSet::new();
+        for code in DiagnosticCode::ALL {
+            let number = code.number();
+            assert!(seen.insert(number), "duplicate diagnostic number {number}");
+            let needle = format!("E{number:04}");
+            assert!(
+                DOCS.contains(&format!("| `{needle}` |")),
+                "{needle} is missing from the diagnostics registry table"
+            );
+            assert!(
+                DOCS.contains(&format!("{code:?}")),
+                "{code:?} name is missing from the diagnostics registry"
+            );
+        }
+    }
+
+    #[test]
+    fn documented_codes_all_exist_in_the_enum() {
+        let numbers: std::collections::BTreeSet<u16> =
+            DiagnosticCode::ALL.iter().map(|code| code.number()).collect();
+        for line in DOCS.lines() {
+            let Some(rest) = line.strip_prefix("| `E") else {
+                continue;
+            };
+            let Some((digits, tail)) = rest.split_once('`') else {
+                continue;
+            };
+            // Only exact code rows (`| `E1001` | ...`) count; range rows such as
+            // `| `E1000`–`E1999` | ...` are excluded.
+            if !tail.starts_with(" |") {
+                continue;
+            }
+            let number: u16 = digits.parse().expect("numeric diagnostic id");
+            assert!(
+                numbers.contains(&number),
+                "registry documents E{number:04} but DiagnosticCode has no such code"
+            );
+        }
     }
 }
