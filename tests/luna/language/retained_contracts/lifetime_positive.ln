@@ -1,0 +1,12 @@
+fn main() -> i32 {
+    dec value = 5;
+    {
+        dec shared = &value;
+        if *shared != 5 { return 1; }
+    }
+    dec moved = value;
+    dec rw other = 7;
+    dec rw_ref = &rw other;
+    *rw_ref = 9;
+    return moved - 5 + (other - 9);
+}

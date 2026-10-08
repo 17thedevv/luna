@@ -1,0 +1,6 @@
+fn main() -> i32 {
+    dec scalar = 233 as char;
+    dec code = scalar as u32;
+    if code != 233 as u32 { return 1; }
+    return 0;
+}

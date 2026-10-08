@@ -1,0 +1,8 @@
+trait Shape { fn area(&self) -> i32; }
+struct Square { side: i32 };
+impl Shape for Square { fn area(&self) -> i32 { return self.side * self.side; } }
+fn measure(shape: &dyn Shape) -> i32 { return shape.area(); }
+fn main() -> i32 {
+    dec square = Square { side: 3 };
+    return measure(&square) - 9;
+}
