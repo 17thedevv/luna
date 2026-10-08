@@ -1,0 +1,14 @@
+import "provider";
+fn main() -> i32 {
+    dec alpha = meta::Alpha { value: 5 };
+    dec beta = meta::Beta { value: 5 };
+    if meta::Describe::describe(&alpha) != 5 { return 1; }
+    if meta::Describe::describe(&beta) != 105 { return 2; }
+    dec pair_alpha = meta::Pair<meta::Alpha> { value: meta::Alpha { value: 7 } };
+    if pair_alpha.inner() != 7 { return 3; }
+    dec pair_int = meta::Pair<i32> { value: 10 };
+    if meta::Ranked<i32>::rank(&pair_int, 10) != 11 { return 4; }
+    dec pair_bool = meta::Pair<bool> { value: true };
+    if meta::Ranked<bool>::rank(&pair_bool, true) == false { return 5; }
+    return 0;
+}
