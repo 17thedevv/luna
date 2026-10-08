@@ -1,0 +1,39 @@
+{
+  "task": "C2 — per-impl-header metadata",
+  "status": "PASS (coverage certification; no counterexample found)",
+  "date": "2026-10-08",
+  "branch": "c2-per-impl-header-metadata",
+  "base": "5939105d",
+  "class": "COVERAGE / certification — no implementation change was required",
+  "invariant": "each checked impl header keeps its identity, binders, constraints, trait arguments, associated types and method contracts through .llib serialization, decoding and semantic reconstruction; impls on different concrete self types or different trait arguments are never merged; an ambiguous method call is rejected rather than resolved to the first candidate",
+  "harness": "luna-rs/crates/luna-cli/tests/impl_header_metadata_cli.rs",
+  "reducers": {
+    "multiple_impl_headers": "two concrete Describe impls (Alpha/Beta) survive with distinct identity, self_type and method symbol_id",
+    "generic_impl_binders": "impl<T: Describe> Pair<T>: impl-level constraint survives in the metadata",
+    "trait_impl_args": "Ranked<i32> / Ranked<bool> on the same nominal head Pair are not merged (distinct trait_args and identity)",
+    "method_identity": "no collision between concrete self types",
+    "artifact_reconstruction": "consumer builds and runs from source and from a relocated artifact-only graph",
+    "ambiguity": "a type implementing two traits with the same method name rejects with E1008 (never picks the first candidate); check and build agree",
+    "interface_fingerprint": "covered by interface_constraints_cli (public bound change -> different fingerprint; private-body / alpha-rename / reversed -> same fingerprint)",
+    "stale_dependency": "covered by interface_constraints_cli (dependency interface fingerprint mismatch rejects)"
+  },
+  "guard_suites": [
+    "interface_constraints_cli — 1 passed (10 impl headers, distinct concrete self types, decoder invariants, relocated graph, stale dependency rejection)",
+    "test_artifact_metadata_parity — 9 passed"
+  ],
+  "focused": {
+    "command": "cargo test -p luna-cli --test impl_header_metadata_cli (plus interface_constraints_cli and test_artifact_metadata_parity)",
+    "result": "impl_header_metadata_cli 1 passed; interface_constraints_cli 1 passed; test_artifact_metadata_parity 9 passed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 211 binaries, 1343 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — test-only; serialized semantic metadata unchanged",
+  "unverified_domains": [
+    "impl headers emitted only by third-party providers with exotic generic nesting beyond the reducers",
+    "cross-provider impl ambiguity (two providers contributing the same trait+type) not exercised here"
+  ],
+  "verdict": "C2: CLOSED / CONFORMANT IN TESTED SCOPE (per-impl-header identity + constraints + method contracts + relocated artifact resolution + ambiguity rejection)"
+}
