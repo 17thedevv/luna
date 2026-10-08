@@ -345,6 +345,28 @@ release: still BLOCKED
 next correctness blocker: C2
 ```
 
+### C2 — Per-impl-header metadata
+
+Freeze matrix found **no counterexample**. Each checked impl header keeps its
+identity, binders, constraints, trait arguments, associated types and method
+contracts through `.llib` serialization/decoding/reconstruction; two concrete
+`Describe` impls and `Ranked<i32>`/`Ranked<bool>` on the same nominal head are
+never merged; the graph resolves from a relocated artifact; an ambiguous method
+call rejects with E1008 (never picks the first candidate). Interface-fingerprint
+and stale-dependency semantics remain covered by `interface_constraints_cli`.
+Closes as a coverage certification; no compiler change was required and the
+protocol is unchanged.
+
+```
+C2
+status: CLOSED / CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: impl_header_metadata_cli PASS + interface_constraints_cli PASS + test_artifact_metadata_parity 9 PASS
+workspace: 211 binaries, 1343 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: C3
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
