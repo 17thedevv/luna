@@ -1,0 +1,47 @@
+{
+  "task": "D3 — provider Tier-2 / Tier-3 matrix",
+  "status": "PASS (coverage certification)",
+  "date": "2026-10-08",
+  "branch": "d3-provider-tier23-matrix",
+  "base": "35260b6b",
+  "class": "COVERAGE — no provider-boundary fix required",
+  "boundaries_locked": [
+    "provider public interface",
+    "serialized metadata",
+    "dependency reconstruction",
+    "consumer semantic resolution"
+  ],
+  "tier3_graph": {
+    "shape": "consumer -> a -> b -> c",
+    "modes": ["all-source", "a-artifact + b/c source", "a/b artifact + c source", "all-artifact", "relocated all-artifact"],
+    "result": "each mode builds and runs the consumer to exit 0"
+  },
+  "tier2_features": {
+    "source_and_artifact": true,
+    "features": ["generic fn", "generic type", "trait + impl", "comptime const", "private helper reached from a public fn"],
+    "result": "the exported surface survives serialization and the consumer resolves through the artifact boundary; a private helper is not leaked into metadata yet its body still materializes for execution"
+  },
+  "mixed_graph": "a-artifact/ab-artifact modes interleave source and artifact providers in one graph",
+  "generic_trait_comptime_guards": "covered by generic_typing_cli, interface_constraints_cli, impl_header_metadata_cli, comptime_dependency_precision_cli",
+  "missing_dependency": "consumer importing an absent provider rejects with E1004 (fail-closed); no source fallback and no published executable",
+  "stale_provider": "interface/execution/version mismatch classes are covered by interface_constraints_cli, comptime_dependency_precision_cli and fresh_artifact_classification_cli",
+  "duplicate_provider_identity": "covered by the module/provider surfaces (alpha_modules_cli, provider_module_contract_acceptance_tests)",
+  "async_probe": {
+    "id": "FIND-ASYNC-PROVIDER-01",
+    "probe": "export an async fn with zero parameters from a provider, publish .llib, import the artifact",
+    "observed": "reproduced: the importing build rejects with `Invalid semantic metadata: CorruptedData`",
+    "disposition": "recorded and EXCLUDED from D3; the root cause is a deeper serialization/decode issue, not a Tier-2/3 provider-boundary defect, so it stays a separate open task"
+  },
+  "harness": "luna-rs/crates/luna-cli/tests/provider_tiers_cli.rs",
+  "focused": {
+    "command": "cargo test -p luna-cli --test provider_tiers_cli (plus interface_constraints_cli, artifact_execution_dependencies_cli, alpha_modules_cli)",
+    "result": "provider_tiers_cli 4 passed; interface_constraints_cli 1 passed; artifact_execution_dependencies_cli 1 passed; alpha_modules_cli 1 passed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 217 binaries, 1357 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — test-only; no provider serialization change",
+  "verdict": "D3: CONFORMANT IN TESTED SCOPE (Tier-2/3 graphs, mixed and relocated, generic/trait/comptime/private surface, fail-closed missing dependency) with FIND-ASYNC-PROVIDER-01 explicitly excluded and still open"
+}
