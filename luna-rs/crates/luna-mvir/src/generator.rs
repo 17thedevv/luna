@@ -3580,6 +3580,19 @@ impl<'a> MvirGenerator<'a> {
                         let val = self.push_inst(Instruction::Neg { value: val_op }, ty_id);
                         Operand::Value(val)
                     }
+                    UnaryOp::Not => {
+                        // Logical NOT is a boolean operator; lower it to an
+                        // equality against `false` so no new MVIR instruction
+                        // (and no MVIR format change) is required.
+                        let val_op = self.generate_expr(operand);
+                        let bool_ty = self.ctx.types.bool_id();
+                        let result_ty = if ty_id != luna_semantic::SemanticTypeId(0) { ty_id } else { bool_ty };
+                        let val = self.push_inst(Instruction::Eq {
+                            left: val_op,
+                            right: Operand::Boolean(false),
+                        }, result_ty);
+                        Operand::Value(val)
+                    }
                     _ => self.generate_expr(operand),
                 }
             }
