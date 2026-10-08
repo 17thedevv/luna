@@ -6037,7 +6037,20 @@ impl<'a> TypeChecker<'a> {
                             inner_ty
                         }
                     }
-                    UnaryOp::Not | UnaryOp::BitNot | UnaryOp::PostInc | UnaryOp::PostDec => {
+                    UnaryOp::Not => {
+                        let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                        match self.ctx.types.get(inner_ty) {
+                            SemanticType::Primitive(crate::ty::BuiltinType::Bool) => {
+                                self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool))
+                            }
+                            SemanticType::Error => self.ctx.types.error_id(),
+                            _ => {
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_UNARY_OP: Cannot apply unary operator `!` to type `{:?}`", self.ctx.types.get(inner_ty))).with_code(DiagnosticCode::InvalidUnaryOp).with_span(span));
+                                self.ctx.types.error_id()
+                            }
+                        }
+                    }
+                    UnaryOp::BitNot | UnaryOp::PostInc | UnaryOp::PostDec => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                         self.ctx.diagnostics.push(Diagnostic::error(format!("Unary operator `{:?}` is not yet supported", op)).with_code(DiagnosticCode::InvalidUnaryOp).with_span(span));
                         self.ctx.types.intern(SemanticType::Error)
