@@ -498,6 +498,33 @@ release: still BLOCKED
 next: D3
 ```
 
+### D3 — Provider Tier-2 / Tier-3 matrix
+
+Coverage certification (no provider-boundary counterexample). Locks public
+interface -> serialized metadata -> dependency reconstruction -> consumer
+resolution. Tier-3 `consumer -> a -> b -> c` resolves and runs in all five modes
+(all-source, a-artifact, ab-artifact, all-artifact, relocated). Tier-2 surface
+(generic fn/type, trait+impl, comptime const, private helper reached from a public
+fn) survives the artifact boundary without leaking the private symbol. Missing
+dependency fails closed with E1004 (no source fallback). Stale classes covered by
+`interface_constraints_cli` / `comptime_dependency_precision_cli` /
+`fresh_artifact_classification_cli`.
+
+`FIND-ASYNC-PROVIDER-01` reproduces (zero-parameter exported `async fn` `.llib`
+import -> `CorruptedData`); recorded and **excluded** from D3 (root cause is a
+deeper serialization issue, not a Tier-2/3 boundary defect); still open.
+
+```
+D3
+status: CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: provider_tiers_cli 4 PASS + interface_constraints_cli / artifact_execution_dependencies_cli / alpha_modules_cli PASS
+workspace: 217 binaries, 1357 passed / 0 failed / 1 ignored (exit 0)
+excluded/open: FIND-ASYNC-PROVIDER-01
+release: still BLOCKED
+next: D4
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
