@@ -525,6 +525,34 @@ release: still BLOCKED
 next: D4
 ```
 
+### D4 — Retained contracts
+
+Ledger certification (no mega-test). Nine groups re-certified on the candidate;
+new reducers added only for gaps (FFI, dyn, entry, UTF-8, lifetime) with a
+positive and a negative/fail-closed case in source and artifact modes:
+lifetime (E3001), FFI (`extern fn` + `#[link]`; E2030), dyn (`&dyn` dispatch;
+E2010), closure (`generic_drop_cli`), async (`a2_suspension_cleanup_tests`,
+`async_cleanup_cli`), comptime (`comptime_dependency_precision_cli`,
+`artifact_execution_dependencies_cli`), UTF-8 (E2026), entry (`fn main(args:
+[str])`; E2024), backend (`fresh_artifact_classification_cli`).
+
+Guard batch all green. **FIND-ASYNC-PROVIDER-01 promoted to its own task**
+(decision B) — async runtime contract passes, provider-serialization finding
+stays OPEN. A2-FU1 stays OPEN (before R5). D4-FU1 observation: a file whose first
+item is `#[link(...)]` fails to parse (E0003).
+
+```
+D4
+status: CLOSED / CONFORMANT IN TESTED SCOPE (coverage certification / ledger)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: retained_contracts_cli PASS + guard batch (generic_drop/async_cleanup/a2_suspension/comptime_dependency/artifact_execution/provider_tiers/fresh_artifact) PASS
+workspace: 218 binaries, 1358 passed / 0 failed / 1 ignored (exit 0)
+promoted: FIND-ASYNC-PROVIDER-01 (own task)
+open: A2-FU1 (before R5); C4-FU1, D1-FU1, D1-FU2, D4-FU1
+release: still BLOCKED
+next: FIND-ASYNC-PROVIDER-01
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
