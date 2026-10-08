@@ -1,0 +1,9 @@
+export module features {
+    export struct Box<T> { value: T };
+    export trait Describe { fn describe(&self) -> i32; }
+    impl Describe for Box<i32> { fn describe(&self) -> i32 { return self.value; } }
+    export fn identity<T>(value: T) -> T { return value; }
+    export const STAMP: i32 = comptime { 7 };
+    fn helper() -> i32 { return 3; }
+    export fn use_helper() -> i32 { return helper(); }
+}

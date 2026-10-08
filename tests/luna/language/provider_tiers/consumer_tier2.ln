@@ -1,0 +1,10 @@
+import "feature_provider";
+fn main() -> i32 {
+    dec boxed = features::Box<i32> { value: 5 };
+    if features::Describe::describe(&boxed) != 5 { return 1; }
+    dec echoed = features::identity<i32>(9);
+    if echoed != 9 { return 2; }
+    if features::STAMP != 7 { return 3; }
+    if features::use_helper() != 3 { return 4; }
+    return 0;
+}
