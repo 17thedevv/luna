@@ -1,0 +1,11 @@
+export module amb {
+    export trait A { fn tag(&self) -> i32; }
+    export trait B { fn tag(&self) -> i32; }
+    export struct Both {};
+    impl A for Both { fn tag(&self) -> i32 { return 1; } }
+    impl B for Both { fn tag(&self) -> i32 { return 2; } }
+}
+fn main() -> i32 {
+    dec both = amb::Both {};
+    return both.tag();
+}
