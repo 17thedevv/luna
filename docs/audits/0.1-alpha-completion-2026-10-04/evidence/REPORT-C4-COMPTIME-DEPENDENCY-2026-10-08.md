@@ -7,8 +7,10 @@ Branch `c4-comptime-dependency` (from candidate `bf265798`).
 ## Method
 
 Freeze matrix first (no compiler change). The invariant under test is
-`interface fingerprint != execution fingerprint`, plus: a comptime result depends
-on exactly the providers it executed.
+`interface fingerprint != execution fingerprint`, plus: a comptime result is
+**sound and sufficiently precise in the tested scope** — the global claim that it
+depends on *exactly* the providers executed is **not** made, because
+branch-sensitive selection is C4-FU1 (below).
 
 ## Reducers (`luna-rs/crates/luna-cli/tests/comptime_dependency_precision_cli.rs`)
 
@@ -48,6 +50,7 @@ protocol stays **compiler22 / metadata9 / MVIR5 / format2**.
 
 ## Verdict
 
-**C4: CONFORMANT IN TESTED SCOPE** — direct, transitive and unused-import
-dependency precision, source/artifact parity and typed stale rejection all hold;
-the over-approximation for untaken branches is filed as non-blocking C4-FU1.
+**C4: CONFORMANT IN TESTED SCOPE** — sound and sufficiently precise for the tested
+scope: direct, transitive and unused-import dependency behaviour, source/artifact
+parity and typed stale rejection all hold; branch-sensitive precision is filed as
+non-blocking C4-FU1.

@@ -1,9 +1,10 @@
 //! C4 freeze — comptime execution-dependency precision.
 //!
-//! A comptime result must depend on exactly the providers it actually executed:
-//! a changed execution dependency must invalidate the dependent artifact, while a
+//! In the tested scope the behaviour must be sound and sufficiently precise: a
+//! changed execution dependency must invalidate the dependent artifact, while a
 //! changed provider that was only imported (never executed at comptime) must not.
-//! `interface fingerprint != execution fingerprint` is preserved throughout.
+//! Branch-sensitive selection is not asserted here (see C4-FU1). `interface
+//! fingerprint != execution fingerprint` is preserved throughout.
 #[path = "support/stdlib.rs"]
 mod support;
 
