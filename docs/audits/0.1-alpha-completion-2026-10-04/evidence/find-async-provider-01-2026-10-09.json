@@ -1,0 +1,39 @@
+{
+  "task": "FIND-ASYNC-PROVIDER-01 — exported async provider `.llib` corruption",
+  "status": "FIXED",
+  "date": "2026-10-09",
+  "branch": "fix-async-provider-zero-param-export",
+  "base": "4024abc6",
+  "implementation_commit": "13082834",
+  "class": "IMPLEMENTATION FIX (MVIR decode)",
+  "authority_note": "The fix commit 13082834 was authored directly by the maintainer and is a superset of a parallel local attempt (it also removes the stale opcode-15 HeapFree arm and adds MVIR wire unit tests). The duplicate local commits were discarded in favour of this commit.",
+  "first_mismatch": {
+    "layer": "MVIR instruction opcode table (luna-llib reader/writer)",
+    "detail": "the writer emits `HeapFree` as opcode 17 with a single operand; the reader's opcode-17 arm decoded `Eq` with two operands (a stray duplicate of opcode 8). The reader's `HeapFree` lived at opcode 15, which the writer never emits.",
+    "effect": "each `HeapFree` was misread as `Eq`, consuming one extra operand (4+ bytes); the reader drifted and read a garbage block_count (83886080) -> allocation abort / `CorruptedData`"
+  },
+  "why_only_async": "only async-lowered bodies emit `HeapFree` (the A2 future-environment free). Sync functions and generic async functions (whose bodies are not materialized) never emit it, so they round-tripped fine — which is why the A2-FU2 workaround (generic async) accidentally avoided the bug.",
+  "control_matrix": {
+    "async_zero_i32": "FAILED before -> PASSES now",
+    "async_one_i32 (parameterized)": "FAILED before -> PASSES now",
+    "async_zero_void": "FAILED before -> PASSES now",
+    "async_generic_one": "PASSED before (body not materialized, no HeapFree)",
+    "sync_zero_i32": "PASSED before"
+  },
+  "fix": "reader opcode 17 decodes `MlibInstruction::HeapFree { value }`; the stale opcode-15 HeapFree arm was removed",
+  "unit_tests": [
+    "heap_free_decodes_at_writer_opcode_17",
+    "stale_heap_free_opcode_15_is_not_accepted"
+  ],
+  "non_fixes_avoided": [
+    "no dummy parameter added",
+    "no special-case zero-parameter async on import",
+    "no source fallback",
+    "no re-mapping of CorruptedData to another diagnostic",
+    "no validation removed"
+  ],
+  "harness": "luna-rs/crates/luna-cli/tests/async_provider_export_cli.rs (inline provider sources; source + artifact modes)",
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — the serialized schema and the writer's emitted bytes are unchanged; only the decoder's wrong opcode arm was corrected, so previously-broken artifacts become readable rather than invalidated",
+  "verdict": "FIND-ASYNC-PROVIDER-01: CLOSED / FIXED IN TESTED SCOPE at 13082834 (exported async providers survive the .llib boundary; nonzero-param, void, generic and sync controls all hold)"
+}

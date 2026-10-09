@@ -553,6 +553,35 @@ release: still BLOCKED
 next: FIND-ASYNC-PROVIDER-01
 ```
 
+### FIND-ASYNC-PROVIDER-01 — exported async provider `.llib` corruption (FIXED)
+
+Freeze matrix (controls) showed the trigger is **non-generic exported async**, not
+zero parameters: async zero-param, async parameterized and async void all failed;
+generic async and sync passed (their bodies never materialize, so they never emit
+`HeapFree`).
+
+First mismatch: the MVIR **instruction opcode table**. The writer emits `HeapFree`
+as opcode **17** (single operand); the reader's opcode-17 arm decoded `Eq` (two
+operands, a stray duplicate of opcode 8), while `HeapFree` sat at opcode 15 which
+the writer never emits. Only async-lowered bodies emit `HeapFree` (A2 future-env
+free) → 1-operand drift per occurrence → garbage `block_count` → abort /
+`CorruptedData`.
+
+Fix (`13082834`, authored by the maintainer): the reader decodes opcode 17 as
+`HeapFree { value }`; the stale opcode-15 arm is removed; MVIR wire unit tests
+added. A parallel local attempt was discarded as a duplicate. No protocol bump
+(schema and emitted bytes unchanged; previously-broken artifacts become readable).
+
+```
+FIND-ASYNC-PROVIDER-01
+status: CLOSED / FIXED IN TESTED SCOPE
+implementation_commit: 13082834
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: async_provider_export_cli + mvir_wire_regression_tests
+release: still BLOCKED
+next: A2-FU1
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
