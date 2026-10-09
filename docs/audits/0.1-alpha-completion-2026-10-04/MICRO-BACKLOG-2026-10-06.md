@@ -577,7 +577,9 @@ FIND-ASYNC-PROVIDER-01
 status: CLOSED / FIXED IN TESTED SCOPE
 implementation_commit: 13082834
 protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
-focused: async_provider_export_cli + mvir_wire_regression_tests
+focused: async_provider_export_cli 2 PASS + luna-llib 20 PASS (incl. MVIR wire tests)
+workspace: 219 binaries, 1362 passed / 0 failed / 1 ignored (exit 0)
+note: an earlier full run flagged one luna-driver combinators harness flake (remove_artifacts NotFound); the binary passes 9/9 in isolation and the re-run is green — pre-existing harness race, not a regression
 release: still BLOCKED
 next: A2-FU1
 ```

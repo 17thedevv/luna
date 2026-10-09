@@ -33,6 +33,15 @@
     "no validation removed"
   ],
   "harness": "luna-rs/crates/luna-cli/tests/async_provider_export_cli.rs (inline provider sources; source + artifact modes)",
+  "focused": {
+    "command": "cargo test -p luna-cli --test async_provider_export_cli; cargo test -p luna-llib",
+    "result": "async_provider_export_cli 2 passed; luna-llib 20 passed (incl. mvir_wire_regression_tests)"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 219 binaries, 1362 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "observed_flake": "an earlier full run reported one failure in luna-driver stdlib_phase4b_combinators_tests (`test_option_filter`): its harness helper `remove_artifacts` hit NotFound while removing .llib/.obj from a temp sysroot copy. The binary passes 9/9 in isolation and the full workspace re-run is green, so this is a pre-existing harness race, not a regression from the decode fix.",
   "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
   "bump": "none — the serialized schema and the writer's emitted bytes are unchanged; only the decoder's wrong opcode arm was corrected, so previously-broken artifacts become readable rather than invalidated",
   "verdict": "FIND-ASYNC-PROVIDER-01: CLOSED / FIXED IN TESTED SCOPE at 13082834 (exported async providers survive the .llib boundary; nonzero-param, void, generic and sync controls all hold)"
