@@ -1,4 +1,5 @@
 //! Lower conditional local/subplace cleanup without weakening definite use checks.
+use crate::drop_flag_plan::plan_drop_flag_transitions;
 use crate::{
     dataflow::{DataflowAnalysis, DataflowEngine},
     effect::CallEffectSummary,
@@ -9,7 +10,7 @@ use luna_mvir::{
     BasicBlock, Function, GlobalId, Instruction, LabelId, Operand, Terminator, ValueData, ValueId,
 };
 use luna_semantic::{SemanticContext, SemanticTypeId};
-use std::collections::{BTreeMap, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 fn append(func: &mut Function, inst: Instruction, ty: SemanticTypeId) -> ValueId {
     let id = ValueId(func.values.len() as u32);
@@ -64,30 +65,11 @@ pub(crate) fn elaborate(
         return HashSet::new();
     }
 
-    // Record the same ownership transitions that move analysis uses, at each
-    // runtime operation, rather than deriving initialization from a CFG join.
-    let mut updates: HashMap<ValueId, Vec<(Place, bool)>> = HashMap::new();
-    for block in &func.blocks {
-        let mut state = incoming.get(&block.label.name).cloned().unwrap_or_default();
-        for &id in &block.insts {
-            let before: Vec<_> = locals
-                .keys()
-                .map(|place| (place.clone(), analyzer.get_place_state(place, &state)))
-                .collect();
-            analyzer.transfer_instruction(id, &func.value(id).inst, &mut state);
-            for (place, previous) in before {
-                let current = analyzer.get_place_state(&place, &state);
-                if current != previous || id == place.local {
-                    let initialized = match current {
-                        MoveState::Live => true,
-                        MoveState::Moved | MoveState::Dropped | MoveState::Uninitialized => false,
-                        _ => continue,
-                    };
-                    updates.entry(id).or_default().push((place, initialized));
-                }
-            }
-        }
-    }
+    // Record the shared ownership transitions at each runtime operation, rather
+    // than deriving initialization from a CFG join. The async cleanup consumes
+    // the same planner; only the flag storage differs.
+    let tracked: BTreeSet<Place> = locals.keys().cloned().collect();
+    let updates = plan_drop_flag_transitions(func, Some(ctx), Some(summaries), &tracked);
     drop(analyzer);
     let bool_ty = ctx.types.bool_id();
     let mut flags = BTreeMap::new();
@@ -156,15 +138,17 @@ pub(crate) fn elaborate(
                 current.insts.push(id);
             }
             if let Some(events) = updates.get(&id) {
-                for (place, initialized) in events {
-                    current.insts.push(append(
-                        func,
-                        Instruction::Store {
-                            ptr: Operand::Value(flags[place]),
-                            value: Operand::Boolean(*initialized),
-                        },
-                        bool_ty,
-                    ));
+                for (place, transition) in events {
+                    if let Some(initialized) = transition.flag_value() {
+                        current.insts.push(append(
+                            func,
+                            Instruction::Store {
+                                ptr: Operand::Value(flags[place]),
+                                value: Operand::Boolean(initialized),
+                            },
+                            bool_ty,
+                        ));
+                    }
                 }
             }
         }

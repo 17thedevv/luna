@@ -1,9 +1,10 @@
 ﻿use crate::dataflow::{DataflowAnalysis, DataflowEngine};
+use crate::drop_flag_plan::plan_drop_flag_transitions;
 use crate::move_analysis::{MoveAnalyzer, MoveState, MoveStateData};
 use crate::place::Place;
 use luna_mvir::{Function, Instruction, ValueId};
 use luna_semantic::SemanticContext;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 #[derive(Debug, Clone)]
 pub struct SuspensionState {
@@ -154,30 +155,15 @@ pub fn compute_async_cleanup_plan(
         return AsyncCleanupPlan { conditional_places, transitions: HashMap::new() };
     }
 
-    // Record ownership transitions for the flagged places, mirroring the sync
-    // drop-flag machinery: initialize -> true, move -> false, reinit -> true.
-    let mut analyzer = MoveAnalyzer::new(func, semantic_ctx, None);
-    analyzer.emit_diagnostics = false;
-    let incoming = DataflowEngine::run_forward(func, &mut analyzer);
+    // Record ownership transitions for the flagged places through the shared
+    // planner; only the flag storage (an async environment field) is async
+    // specific.
+    let tracked: BTreeSet<Place> = conditional_places.iter().cloned().collect();
+    let raw = plan_drop_flag_transitions(func, semantic_ctx, None, &tracked);
     let mut transitions: HashMap<ValueId, Vec<(Place, bool)>> = HashMap::new();
-    for block in &func.blocks {
-        let mut state = incoming.get(&block.label.name).cloned().unwrap_or_default();
-        for &id in &block.insts {
-            let before: Vec<_> = conditional_places
-                .iter()
-                .map(|place| (place.clone(), analyzer.get_place_state(place, &state)))
-                .collect();
-            analyzer.transfer_instruction(id, &func.value(id).inst, &mut state);
-            for (place, previous) in before {
-                let current = analyzer.get_place_state(&place, &state);
-                if current == previous && id != place.local {
-                    continue;
-                }
-                let initialized = match current {
-                    MoveState::Live => true,
-                    MoveState::Moved | MoveState::Dropped | MoveState::Uninitialized => false,
-                    _ => continue,
-                };
+    for (id, events) in raw {
+        for (place, transition) in events {
+            if let Some(initialized) = transition.flag_value() {
                 transitions.entry(id).or_default().push((place, initialized));
             }
         }

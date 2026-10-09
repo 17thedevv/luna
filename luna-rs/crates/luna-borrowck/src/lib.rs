@@ -1,6 +1,7 @@
 pub mod borrow_analysis;
 pub mod cfg;
 pub mod cleanup;
+mod drop_flag_plan;
 mod drop_flags;
 mod memory_intrinsic_body;
 pub mod dataflow;
