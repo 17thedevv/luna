@@ -3129,7 +3129,7 @@ impl<'a> TypeChecker<'a> {
             Item::Decl(decl_id) => {
                 let decl = &self.arena.decls[decl_id.0 as usize];
                 match decl {
-                    Decl::Function { name, params, body, is_async, return_type, is_unsafe, .. } => {
+                    Decl::Function { annotations, name, params, body, is_async, return_type, is_unsafe, .. } => {
                         self.comptime_prepared_functions.insert(*decl_id);
                         let prev_scope = self.current_scope;
                         let mut is_main = false;
@@ -3160,6 +3160,17 @@ impl<'a> TypeChecker<'a> {
 
                         let mut is_valid_main = false;
                         if is_main {
+                            // The entry symbol is compiler-owned; a user `#[link]`
+                            // annotation must not rename `main` away from it.
+                            for annot in annotations {
+                                if self.get_span_text(annot.name) == "link" {
+                                    self.ctx.diagnostics.push(
+                                        Diagnostic::error("`#[link]` cannot be applied to the program entry `main`")
+                                            .with_code(DiagnosticCode::InvalidAnnotation)
+                                            .with_span(annot.name),
+                                    );
+                                }
+                            }
                             let mut valid = true;
                             if *is_async {
                                 valid = false;
