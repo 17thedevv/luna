@@ -584,6 +584,30 @@ release: still BLOCKED
 next: A2-FU1
 ```
 
+### A2-FU1 — shared DropFlagPlan / DropFlagTransition (DONE)
+
+Refactor (no semantics change). The sync cleanup (`drop_flags::elaborate`) and the
+async cleanup (`suspension::compute_async_cleanup_plan`) each duplicated the same
+per-instruction ownership-transition loop. New module
+`luna-borrowck/src/drop_flag_plan.rs` owns
+`DropFlagTransition { Initialize, Reinitialize, MoveOut, Destroy, ConditionalMove }`
++ `plan_drop_flag_transitions(...)`; both paths route through it and keep their own
+storage (sync: bool alloca; async: env field). Shared semantics, separate physical
+storage — the abstraction keys on `Place` + transition, not ValueId/env index.
+Unit tests prove the shared model (`transition_mapping_is_the_shared_contract`,
+`both_cleanup_paths_share_the_planner`).
+
+```
+A2-FU1
+status: DONE (anti-drift refactor; no semantics change)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: generic_drop_cli/a2_suspension/async_cleanup/async_provider_export PASS + luna-llib/luna-borrowck 0 failed
+workspace: 219 binaries, 1364 passed / 0 failed / 1 ignored (exit 0)
+note: two earlier parallel runs each flaked one luna-driver acceptance test (different test each time; both pass in isolation) — pre-existing shared-sysroot concurrency fragility, not a regression
+release: still BLOCKED
+next: classify C4-FU1 / D1-FU1 / D1-FU2 / D4-FU1
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
