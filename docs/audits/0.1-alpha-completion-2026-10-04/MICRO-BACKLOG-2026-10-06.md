@@ -608,6 +608,45 @@ release: still BLOCKED
 next: classify C4-FU1 / D1-FU1 / D1-FU2 / D4-FU1
 ```
 
+### Debt classification (2026-10-09)
+
+| Debt | Classification | Before R5? |
+|---|---|---|
+| C4-FU1 branch-sensitive comptime deps | Sound but imprecise (static call-graph over-approximation) | No — DEFERRED to 0.2 |
+| D1-FU1 E3001 renders `%v5.0` | Presentation leak (code/span/ownership all correct) | No — NON_BLOCKING_PRESENTATION |
+| D1-FU2 comptime E1001 + E4005 | Needs verification: legitimate causal pair vs cascade | **Yes — RELEASE_REVIEW_REQUIRED** |
+| D4-FU1 `#[link]` placement | Corrected: `#[link]` on entry `main` → E6001 backend ICE | **Yes — RELEASE_BLOCKER** |
+| Harness parallel flakes | Test infrastructure nondeterminism | **Yes — R5-HARNESS-01 blocker** |
+
+Sequence from `d4d980fb`: D4-FU1 → D1-FU2 → R5-HARNESS-01 → (formally defer C4-FU1,
+D1-FU1) → regression workspace → E1/E2 → R4 → R5.
+
+### D4-FU1 — `#[link]` on the program entry (FIXED)
+
+Original observation (attribute-first → E0003) **RETRACTED as a misdiagnosis**: the
+E0003 came from the invalid `extern "C" fn` spelling, not attribute position.
+Verified: `#[link]` first item + `extern fn`, a leading comment, and a preceding
+item all build and run.
+
+Corrected finding: `#[link] fn main()` → `check` PASSED, `build` → **E6001 backend
+ICE** (`Function not found: __luna_user_main`), because `#[link]` renames the
+compiler-owned entry symbol (generator.rs:1651-1675). Front-end validation gap
+(DIAG-7), release blocker.
+
+Fix: reject `#[link]` on the entry `main` with `InvalidAnnotation` (E0005) at the
+front-end entry-identity site; span on the `#[link]` attribute; generator
+unchanged (no silent ignore).
+
+```
+D4-FU1
+status: CLOSED / FIXED IN TESTED SCOPE
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: ffi_attribute_placement_cli 1 PASS + retained_contracts_cli 1 + diagnostic_conformance_cli 4 + luna-semantic 0 failed
+workspace: 220 binaries, 1365 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: D1-FU2
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·
