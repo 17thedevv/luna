@@ -1,0 +1,2 @@
+extern "C" fn abs(value: i32) -> i32;
+fn main() -> i32 { return abs(-5) - 5; }
