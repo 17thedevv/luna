@@ -1,0 +1,55 @@
+{
+  "task": "D1-FU2 — comptime diagnostic cascade (E1001 + E4005 for one root)",
+  "status": "FIXED",
+  "date": "2026-10-09",
+  "branch": "d1-fu2-comptime-diagnostic-cascade",
+  "base": "5122d3ce",
+  "classification": "REDUNDANT CASCADE — not a legitimate causal pair. E4005 restated a lowering symptom whose cause (an unresolved method) was already reported as E1001; it carried no independent failure.",
+  "reproducer": {
+    "fixture": "tests/luna/language/diagnostic_conformance/comptime_failure.ln",
+    "source": "const BAD: i32 = comptime { dec value = 1; value.not_a_method() };\nfn main() -> i32 { return BAD; }",
+    "before": ["error[E1001]: Method `not_a_method` not found for type `Primitive(I32)`", "error[E4005]: cannot evaluate comptime block: comptime type mismatch: MVIR invariant violated: unresolved method `not_a_method` reached lowering"],
+    "after": ["error[E1001]: Method `not_a_method` not found for type `Primitive(I32)`"]
+  },
+  "root_cause": {
+    "site": "luna-mvir/src/interp.rs:1448-1455 (finish_preparation)",
+    "detail": "The comptime interpreter lowers the target to MVIR. When the generator reports an invariant (`generator.diagnostics` non-empty, e.g. `unresolved method ... reached lowering` at generator.rs:3259), the interpreter flattened those diagnostic MESSAGES into `ComptimeError::TypeMismatch(\"<messages joined>\")`, discarding their code and span. The semantic caller (typechecker.rs `report_comptime_error`) then wrapped that generic error in a fresh `E4005`, i.e. provenance was lost at the comptime evaluation boundary and the failure was re-reported as a second, generic diagnostic.",
+    "first_mismatch_layer": "comptime evaluation boundary (interpreter -> semantic diagnostic), not the formatter"
+  },
+  "fix": {
+    "approach": "preserve provenance at the boundary instead of matching on 'E1001 exists'",
+    "changes": [
+      "luna-semantic::ComptimeError: new variant `AlreadyDiagnosed` (value.rs)",
+      "luna-mvir/src/interp.rs: return `ComptimeError::AlreadyDiagnosed` when generator.diagnostics is non-empty (no stringification)",
+      "luna-semantic typechecker `report_comptime_error`: `AlreadyDiagnosed` emits no diagnostic (the root cause is already in the list)"
+    ],
+    "independent_failures_preserved": "the variant is only produced by the generator-invariant path; every interpreter-level failure (division by zero, unsupported operation, step/recursion limit, operand mismatch, unresolved projection) still returns its own variant and still reports E4005"
+  },
+  "acceptance_matrix": {
+    "semantic error inside comptime": "E1001 only (no E4005)",
+    "semantic error outside comptime": "unchanged (E1001 only)",
+    "independent comptime failure (1/0)": "E4005 still emitted",
+    "independent comptime failure (unsupported operation)": "E4005 still emitted",
+    "check vs build": "same diagnostic identity set",
+    "source vs fresh artifact": "parity"
+  },
+  "harness": "luna-rs/crates/luna-cli/tests/comptime_diagnostic_cascade_cli.rs (+ fixtures tests/luna/language/comptime_diagnostic_cascade/*.ln)",
+  "focused": {
+    "command": "cargo test -p luna-cli --test comptime_diagnostic_cascade_cli; -p luna-cli diagnostic_conformance_cli/comptime_dependency_precision_cli/artifact_execution_dependencies_cli; -p luna-semantic; -p luna-driver adv_comptime_dyn_tests/ui_tests",
+    "result": "comptime_diagnostic_cascade_cli 4 passed; diagnostic_conformance_cli 4 passed; comptime_dependency_precision_cli 1 passed; artifact_execution_dependencies_cli 1 passed; luna-semantic 0 failed; adv_comptime_dyn_tests 16 passed; ui_tests 1 passed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 221 binaries, 1369 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "harness_observation": {
+    "finding": "Two earlier workspace attempts exited 101 with `Os { code: 112, kind: StorageFull }` at `support/stdlib.rs:34`.",
+    "cause": "`ProviderModes::fresh()` builds an isolated sysroot under %TEMP% and never removes it; 3467 abandoned %TEMP%/luna* directories (21.3 GB) had accumulated across runs.",
+    "action": "deleted the abandoned temp dirs; the next run was clean",
+    "relevance": "direct evidence for R5-HARNESS-01 (unbounded temp growth + shared-sysroot concurrency), NOT a regression"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — diagnostic presentation/provenance only; no comptime execution semantics, MVIR, artifact schema or version change",
+  "not_changed": ["comptime execution semantics", "interpreter evaluation rules", "MVIR", "artifact schema", "versioning", "diagnostic formatter"],
+  "verdict": "D1-FU2: CLOSED / FIXED IN TESTED SCOPE (redundant cascade removed by preserving failure provenance at the comptime boundary; independent comptime failures still report E4005)"
+}
