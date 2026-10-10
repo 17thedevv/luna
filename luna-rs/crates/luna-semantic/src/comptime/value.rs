@@ -115,6 +115,10 @@ pub enum ComptimeError {
     IntegerOverflow,
     TypeMismatch(String),
     UnsupportedOperation(String),
+    /// The comptime target could not be lowered because an earlier phase already
+    /// diagnosed the failure. The caller must not re-report it as a comptime
+    /// evaluation failure; the root diagnostic is already in the list.
+    AlreadyDiagnosed,
     StepLimitExceeded(usize),
     RecursionLimitExceeded(usize),
     MemoryLimitExceeded,
@@ -134,6 +138,7 @@ impl std::fmt::Display for ComptimeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ComptimeError::Diagnostics(diagnostics) => write!(f, "comptime admission rejected: {}", diagnostics.iter().map(|diagnostic| diagnostic.message.as_str()).collect::<Vec<_>>().join("; ")),
+            ComptimeError::AlreadyDiagnosed => write!(f, "comptime target already diagnosed by an earlier phase"),
             ComptimeError::DivisionByZero => write!(f, "attempt to divide by zero in comptime evaluation"),
             ComptimeError::IntegerOverflow => write!(f, "integer overflow during comptime evaluation"),
             ComptimeError::TypeMismatch(msg) => write!(f, "comptime type mismatch: {}", msg),
