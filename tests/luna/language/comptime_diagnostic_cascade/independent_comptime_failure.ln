@@ -1,0 +1,2 @@
+const BAD: i32 = comptime { 1 / 0 };
+fn main() -> i32 { return BAD; }

@@ -1,0 +1,2 @@
+const GOOD: i32 = 41;
+fn main() -> i32 { return GOOD.not_a_method(); }

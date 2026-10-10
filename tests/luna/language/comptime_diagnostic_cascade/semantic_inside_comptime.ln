@@ -1,0 +1,2 @@
+const BAD: i32 = comptime { dec value = 1; value.not_a_method() };
+fn main() -> i32 { return BAD; }
