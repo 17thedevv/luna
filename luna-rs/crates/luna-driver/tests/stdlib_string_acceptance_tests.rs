@@ -33,7 +33,7 @@ fn copy_tree(source: &Path, destination: &Path) {
 }
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
-    let mut dir = std::env::temp_dir();
+    let mut dir = luna_test_support::owned_temp_root();
     dir.push(format!("luna_test_{}_{}_{}", prefix, std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).expect("Failed to create temp dir");

@@ -2,7 +2,7 @@ use std::fs;
 use std::process::Command;
 
 fn run_luna_source(name: &str, source: &str) -> i32 {
-    let temp_dir = std::env::temp_dir().join(format!("luna_macro_decouple_{}_{}", name, std::process::id()));
+    let temp_dir = luna_test_support::owned_temp_root().join(format!("luna_macro_decouple_{}_{}", name, std::process::id()));
     let _ = fs::remove_dir_all(&temp_dir);
     fs::create_dir_all(&temp_dir).unwrap();
 

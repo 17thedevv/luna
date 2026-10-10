@@ -42,7 +42,7 @@ fn generic_binders_stay_rigid_in_bodies_and_independent_across_relocated_provide
                 failures.push(format!("{mode}/{name} build: {}", render(&build)));
             } else {
                 let run = Command::new(exe)
-                    .current_dir(std::env::temp_dir())
+                    .current_dir(luna_test_support::owned_temp_root())
                     .output()
                     .unwrap();
                 if !run.status.success() {

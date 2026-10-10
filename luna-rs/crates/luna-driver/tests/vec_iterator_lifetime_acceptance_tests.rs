@@ -5,7 +5,7 @@ use std::fs;
 use std::path::PathBuf;
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
-    let dir = std::env::temp_dir()
+    let dir = luna_test_support::owned_temp_root()
         .join("luna_vec_iterator_tests")
         .join(test_name);
     let _ = fs::remove_dir_all(&dir);

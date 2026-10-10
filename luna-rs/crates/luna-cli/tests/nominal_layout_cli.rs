@@ -25,7 +25,7 @@ fn copy_bundle(from: &Path, to: &Path) {
 fn run(modes: &ProviderModes, root: &Path, main: &Path, label: &str) {
     let (executable, build) = modes.build(root, main, label);
     assert!(build.status.success(), "{label}: {}", render(&build));
-    let result = Command::new(executable).current_dir(std::env::temp_dir()).output().unwrap();
+    let result = Command::new(executable).current_dir(luna_test_support::owned_temp_root()).output().unwrap();
     assert!(result.status.success(), "{label}: {}", render(&result));
     eprintln!("PASS native/{label}: exit0");
 }

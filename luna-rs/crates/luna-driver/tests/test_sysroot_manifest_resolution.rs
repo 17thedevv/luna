@@ -7,7 +7,7 @@ use luna_driver::discovery::ExternalComponentDiscovery;
 use luna_driver::resolution_context::ProviderResolutionContext;
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join("luna_sysroot_manifest_tests").join(name);
+    let dir = luna_test_support::owned_temp_root().join("luna_sysroot_manifest_tests").join(name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir

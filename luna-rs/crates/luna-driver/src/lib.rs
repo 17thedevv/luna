@@ -1033,7 +1033,7 @@ mod publication_tests {
 
     #[test]
     fn test_atomic_publication_successful_replacement() {
-        let temp_dir = std::env::temp_dir().join("luna_pub_test_success");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_pub_test_success");
         let _ = std::fs::remove_dir_all(&temp_dir);
         std::fs::create_dir_all(&temp_dir).unwrap();
 
@@ -1065,7 +1065,7 @@ mod publication_tests {
 
     #[test]
     fn test_atomic_publication_failure_cleans_temp_and_preserves_old() {
-        let temp_dir = std::env::temp_dir().join("luna_pub_test_fail");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_pub_test_fail");
         let _ = std::fs::remove_dir_all(&temp_dir);
         std::fs::create_dir_all(&temp_dir).unwrap();
 
@@ -1094,7 +1094,7 @@ mod publication_tests {
 
     #[test]
     fn test_sibling_temp_discovery_isolation() {
-        let temp_dir = std::env::temp_dir().join("luna_pub_test_isolation");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_pub_test_isolation");
         let _ = std::fs::remove_dir_all(&temp_dir);
         std::fs::create_dir_all(&temp_dir).unwrap();
 

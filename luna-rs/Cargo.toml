@@ -12,4 +12,5 @@ members = [
     "crates/luna-llib",
     "crates/luna-optimizer",
     "crates/luna-cli",
+    "crates/luna-test-support",
 ]

@@ -5,7 +5,7 @@ use std::process::Command;
 use luna_driver::{compile, CompilerOptions};
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
-    let mut dir = std::env::temp_dir();
+    let mut dir = luna_test_support::owned_temp_root();
     dir.push(format!(
         "luna_test_p4b_comb_{}_{}_{}",
         prefix,

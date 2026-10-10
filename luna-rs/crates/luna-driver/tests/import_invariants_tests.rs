@@ -7,7 +7,7 @@ use std::sync::OnceLock;
 static SOURCE_ONLY_ROOT: OnceLock<PathBuf> = OnceLock::new();
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join("luna_import_invariants_tests").join(test_name);
+    let dir = luna_test_support::owned_temp_root().join("luna_import_invariants_tests").join(test_name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).expect("Failed to create test temp dir");
     dir

@@ -17,7 +17,7 @@ fn run_executable(exe_path: &Path) -> (i32, String, String) {
 }
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!(
+    let dir = luna_test_support::owned_temp_root().join(format!(
         "luna_canon_ser_{}_{}",
         name,
         std::time::SystemTime::now()

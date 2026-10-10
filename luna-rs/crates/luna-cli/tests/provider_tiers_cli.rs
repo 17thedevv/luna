@@ -41,7 +41,7 @@ fn run_consumer(
         failures.push(format!("{tag} build: {}", render(&build)));
         return;
     }
-    let run = Command::new(exe).current_dir(std::env::temp_dir()).output().unwrap();
+    let run = Command::new(exe).current_dir(luna_test_support::owned_temp_root()).output().unwrap();
     if run.status.code() != Some(0) {
         failures.push(format!("{tag} run: {}", render(&run)));
     }

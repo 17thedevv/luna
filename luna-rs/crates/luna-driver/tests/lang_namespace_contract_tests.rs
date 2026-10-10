@@ -25,7 +25,7 @@ fn source_only_sysroot_root() -> &'static PathBuf {
 
 fn compile_source(name: &str, source: &str) -> Result<(), String> {
     let root = source_only_sysroot_root();
-    let dir = std::env::temp_dir().join(format!("luna_std_namespace_{name}"));
+    let dir = luna_test_support::owned_temp_root().join(format!("luna_std_namespace_{name}"));
     fs::create_dir_all(&dir).expect("create temporary fixture directory");
     let source_path = dir.join("main.ln");
     fs::write(&source_path, source).expect("write temporary Luna source");
@@ -46,7 +46,7 @@ fn check_source_semantics(name: &str, source: &str) -> Result<(), String> {
 }
 
 fn check_source_semantics_at(name: &str, source: &str, root: &Path) -> Result<(), String> {
-    let dir = std::env::temp_dir().join(format!("luna_std_namespace_{name}"));
+    let dir = luna_test_support::owned_temp_root().join(format!("luna_std_namespace_{name}"));
     fs::create_dir_all(&dir).expect("create temporary fixture directory");
     let source_path = dir.join("main.ln");
     fs::write(&source_path, source).expect("write temporary Luna source");
@@ -60,7 +60,7 @@ fn check_source_semantics_at(name: &str, source: &str, root: &Path) -> Result<()
 }
 
 fn compile_and_run_source_at(name: &str, source: &str, root: &Path) -> Result<i32, String> {
-    let dir = std::env::temp_dir().join(format!("luna_std_namespace_{name}"));
+    let dir = luna_test_support::owned_temp_root().join(format!("luna_std_namespace_{name}"));
     fs::create_dir_all(&dir).expect("create temporary fixture directory");
     let source_path = dir.join("main.ln");
     fs::write(&source_path, source).expect("write temporary Luna source");
@@ -87,7 +87,7 @@ fn compile_and_run_output_at(
     source: &str,
     root: &Path,
 ) -> Result<(i32, String, String), String> {
-    let dir = std::env::temp_dir().join(format!("luna_std_namespace_{name}"));
+    let dir = luna_test_support::owned_temp_root().join(format!("luna_std_namespace_{name}"));
     fs::create_dir_all(&dir).expect("create temporary fixture directory");
     let source_path = dir.join("main.ln");
     fs::write(&source_path, source).expect("write temporary Luna source");
@@ -155,7 +155,7 @@ fn temp_sysroot(name: &str) -> PathBuf {
         .duration_since(std::time::UNIX_EPOCH)
         .expect("system clock after epoch")
         .as_nanos();
-    std::env::temp_dir().join(format!(
+    luna_test_support::owned_temp_root().join(format!(
         "luna_std_namespace_{name}_{}_{}",
         std::process::id(),
         suffix

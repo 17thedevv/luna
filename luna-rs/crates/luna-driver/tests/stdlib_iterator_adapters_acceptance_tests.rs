@@ -6,7 +6,7 @@ use luna_driver::{check, compile, CompilerOptions};
 use luna_driver::sysroot::Sysroot;
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
-    let mut dir = std::env::temp_dir();
+    let mut dir = luna_test_support::owned_temp_root();
     dir.push(format!(
         "luna_test_adapters_{}_{}_{}",
         prefix,
