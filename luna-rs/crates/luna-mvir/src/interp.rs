@@ -1448,7 +1448,10 @@ impl MvirComptimeEngine {
     fn finish_preparation(&self, mut generator: crate::generator::MvirGenerator<'_>, func: Function, ctx: &SemanticContext) -> Result<PreparedComptime, ComptimeError> {
         generator.generate_comptime_dependencies(&func);
         if !generator.diagnostics.is_empty() {
-            return Err(ComptimeError::TypeMismatch(generator.diagnostics.iter().map(|d| d.message.clone()).collect::<Vec<_>>().join("; ")));
+            // The generator reached an unlowerable state that an earlier phase
+            // already diagnosed (e.g. an unresolved method). Preserve that
+            // provenance instead of restating it as a generic comptime failure.
+            return Err(ComptimeError::AlreadyDiagnosed);
         }
         if func.values.iter().any(|v| has_unresolved_projection(ctx, v.ty)) {
             return Err(ComptimeError::TypeMismatch("E_UNRESOLVED_PROJECTION: comptime function contains unresolved associated type projection".to_string()));

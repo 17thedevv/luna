@@ -150,6 +150,9 @@ impl<'a> TypeChecker<'a> {
     fn report_comptime_error(&mut self, error: crate::ComptimeError, span: luna_common::Span, context: &str) {
         match error {
             crate::ComptimeError::Diagnostics(diagnostics) => self.ctx.diagnostics.extend(diagnostics),
+            // The failure is a lowering symptom of a program an earlier phase
+            // already diagnosed; do not emit a duplicate comptime diagnostic.
+            crate::ComptimeError::AlreadyDiagnosed => {}
             other => self.ctx.diagnostics.push(Diagnostic::error(format!("{context}: {other}"))
                 .with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span)),
         }
