@@ -360,7 +360,7 @@ fn sem_extern_03_aggregate_carrying_ref() {
 
     // Control 03-PARITY: Provider .ln declaring safe-reference aggregate FFI compiled to .llib must be rejected
     let sysroot = Sysroot::discover_for_test().expect("discover test sysroot").root().to_string_lossy().to_string();
-    let temp_dir = std::env::temp_dir().join(format!("luna_ext03_parity_{}_{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    let temp_dir = luna_test_support::owned_temp_root().join(format!("luna_ext03_parity_{}_{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
     fs::create_dir_all(&temp_dir).expect("create temp dir");
     let prov_src = r#"
         module bad_prov {
@@ -636,7 +636,7 @@ fn sem_extern_14_extern_return_reference() {
 
     // Control 14-PARITY: Provider .ln declaring safe-reference return compiled to .llib must be rejected
     let sysroot = Sysroot::discover_for_test().expect("discover test sysroot").root().to_string_lossy().to_string();
-    let temp_dir = std::env::temp_dir().join(format!("luna_ext14_parity_{}_{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    let temp_dir = luna_test_support::owned_temp_root().join(format!("luna_ext14_parity_{}_{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
     fs::create_dir_all(&temp_dir).expect("create temp dir");
     let prov_src = r#"
         module bad_ret_prov {
@@ -682,7 +682,7 @@ fn sem_extern_parity_01_sync_noescape_llib_parity() {
         .to_string_lossy()
         .to_string();
 
-    let temp_dir = std::env::temp_dir().join(format!(
+    let temp_dir = luna_test_support::owned_temp_root().join(format!(
         "luna_sync_noescape_parity_{}_{}",
         std::process::id(),
         std::time::SystemTime::now()
@@ -795,7 +795,7 @@ fn sem_extern_parity_02_multi_param_sync_noescape_llib() {
         .to_string_lossy()
         .to_string();
 
-    let temp_dir = std::env::temp_dir().join(format!(
+    let temp_dir = luna_test_support::owned_temp_root().join(format!(
         "luna_multi_param_parity_{}_{}",
         std::process::id(),
         std::time::SystemTime::now()

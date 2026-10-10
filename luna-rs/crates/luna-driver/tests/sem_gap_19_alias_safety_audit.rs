@@ -309,7 +309,7 @@ fn main() -> i32 {
     return 0;
 }
 "#;
-    let temp = std::env::temp_dir().join("sem_gap_19_eval_order");
+    let temp = luna_test_support::owned_temp_root().join("sem_gap_19_eval_order");
     let _ = fs::remove_dir_all(&temp);
     fs::create_dir_all(&temp).unwrap();
     let exe_path = temp.join("test.exe");

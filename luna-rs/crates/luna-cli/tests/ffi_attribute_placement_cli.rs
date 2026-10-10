@@ -62,7 +62,7 @@ fn link_on_entry_is_rejected_and_other_placements_are_accepted() {
                 failures.push(format!("{mode}/{name}: {}", render(&build)));
                 continue;
             }
-            let run = Command::new(exe).current_dir(std::env::temp_dir()).output().unwrap();
+            let run = Command::new(exe).current_dir(luna_test_support::owned_temp_root()).output().unwrap();
             if run.status.code() != Some(0) {
                 failures.push(format!("{mode}/{name} run: {}", render(&run)));
             }

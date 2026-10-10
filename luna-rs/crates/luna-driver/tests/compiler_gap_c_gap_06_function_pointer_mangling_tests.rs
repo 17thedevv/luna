@@ -5,7 +5,7 @@ use luna_driver::sysroot::Sysroot;
 static SOURCE_ONLY_ROOT: OnceLock<PathBuf> = OnceLock::new();
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("luna_c_gap_06_{}", name));
+    let dir = luna_test_support::owned_temp_root().join(format!("luna_c_gap_06_{}", name));
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir

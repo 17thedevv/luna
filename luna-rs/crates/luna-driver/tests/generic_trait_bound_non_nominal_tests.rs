@@ -3,7 +3,7 @@ use std::fs;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 fn check_fixture(name: &str, source: &str) -> Result<(), String> {
-    let work = std::env::temp_dir().join(format!(
+    let work = luna_test_support::owned_temp_root().join(format!(
         "luna_trait_bound_non_nominal_{}_{}_{}",
         name,
         std::process::id(),

@@ -118,7 +118,7 @@ fn per_impl_header_metadata_round_trips_and_resolves_deterministically() {
             failures.push(format!("{mode}/consumer build: {}", render(&build)));
         } else {
             let run = Command::new(executable)
-                .current_dir(std::env::temp_dir())
+                .current_dir(luna_test_support::owned_temp_root())
                 .output()
                 .unwrap();
             if run.status.code() != Some(0) {

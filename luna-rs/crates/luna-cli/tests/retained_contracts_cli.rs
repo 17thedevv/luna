@@ -32,7 +32,7 @@ fn retained_contract_groups_hold_in_source_and_artifact_modes() {
                 failures.push(format!("{mode}/{name}: {}", render(&build)));
                 continue;
             }
-            let run = Command::new(exe).current_dir(std::env::temp_dir()).output().unwrap();
+            let run = Command::new(exe).current_dir(luna_test_support::owned_temp_root()).output().unwrap();
             if run.status.code() != Some(0) {
                 failures.push(format!("{mode}/{name} run: {}", render(&run)));
             }

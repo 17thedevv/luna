@@ -229,10 +229,10 @@ fn alpha_modules_source_and_fresh_artifact_contracts() {
         for name in ["configured", "transitive", "dedup", "old_local"] {
             let input = app.join(format!("{name}.ln"));
             accepted(
-                &cli(root, &std::env::temp_dir(), "check", &input, &[]),
+                &cli(root, &luna_test_support::owned_temp_root(), "check", &input, &[]),
                 name,
             );
-            accepted(&cli(root, &std::env::temp_dir(), "run", &input, &[]), name);
+            accepted(&cli(root, &luna_test_support::owned_temp_root(), "run", &input, &[]), name);
         }
         rejected(
             &cli(root, &work, "check", &app.join("private.ln"), &[]),
@@ -422,7 +422,7 @@ fn alpha_modules_source_and_fresh_artifact_contracts() {
                 &format!("[providers]\ngeo = 'shared/geometry'\nunused = '{forbidden}'\n"),
             );
             for command in ["check", "build", "run"] {
-                let output = cli(root, &std::env::temp_dir(), command, &input, &[]);
+                let output = cli(root, &luna_test_support::owned_temp_root(), command, &input, &[]);
                 rejected(&output, "E6008", forbidden);
                 let rendered = String::from_utf8_lossy(&output.stderr);
                 assert!(
@@ -456,7 +456,7 @@ fn alpha_modules_source_and_fresh_artifact_contracts() {
                     args.extend(["-o", output.to_str().unwrap()]);
                 }
                 accepted(
-                    &cli(root, &std::env::temp_dir(), command, &input, &args),
+                    &cli(root, &luna_test_support::owned_temp_root(), command, &input, &args),
                     "relative parent path and absolute config argument",
                 );
             }
@@ -525,7 +525,7 @@ fn alpha_modules_source_and_fresh_artifact_contracts() {
         accepted(
             &cli(
                 root,
-                &std::env::temp_dir(),
+                &luna_test_support::owned_temp_root(),
                 "run",
                 &moved.join("app/configured.ln"),
                 &[],
@@ -535,7 +535,7 @@ fn alpha_modules_source_and_fresh_artifact_contracts() {
         accepted(
             &cli(
                 root,
-                &std::env::temp_dir(),
+                &luna_test_support::owned_temp_root(),
                 "run",
                 &moved.join("app/transitive.ln"),
                 &[],

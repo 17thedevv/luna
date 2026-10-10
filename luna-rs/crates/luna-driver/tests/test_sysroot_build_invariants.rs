@@ -262,7 +262,7 @@ fn test_sysroot_builder_execution_isolated() {
     let repo_external = repo_sysroot.external_dir();
 
     // Create an isolated temporary sysroot
-    let temp_dir = std::env::temp_dir().join("luna_sysroot_builder_test_isolated");
+    let temp_dir = luna_test_support::owned_temp_root().join("luna_sysroot_builder_test_isolated");
     let _ = fs::remove_dir_all(&temp_dir);
     let temp_ext = temp_dir.join("libs").join("external");
     fs::create_dir_all(temp_ext.join("core")).unwrap();
@@ -324,7 +324,7 @@ lang_contract = "drop"
 /// Test that SysrootBuilder honors existing build lock and does not delete it.
 #[test]
 fn test_sysroot_builder_lock_mutual_exclusion_isolated() {
-    let temp_dir = std::env::temp_dir().join("luna_sysroot_lock_mutex_isolated");
+    let temp_dir = luna_test_support::owned_temp_root().join("luna_sysroot_lock_mutex_isolated");
     let _ = fs::remove_dir_all(&temp_dir);
     let temp_ext = temp_dir.join("libs").join("external");
     fs::create_dir_all(&temp_ext).unwrap();
@@ -358,7 +358,7 @@ fn test_sysroot_builder_lock_mutual_exclusion_isolated() {
 
 #[test]
 fn test_build_json_provider() {
-    let work = std::env::temp_dir().join(format!("luna_json_publish_{}_{}", std::process::id(),
+    let work = luna_test_support::owned_temp_root().join(format!("luna_json_publish_{}_{}", std::process::id(),
         std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
     let pair = provider_parity::ProviderPair::new(&work, "json/json.ln");
     let artifact = pair.artifact.external_dir().join("json/json.llib");

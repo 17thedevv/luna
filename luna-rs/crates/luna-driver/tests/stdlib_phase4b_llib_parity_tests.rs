@@ -35,7 +35,7 @@ fn remove_files_by_ext(dir: &Path, ext: &str) {
 }
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
-    let mut dir = std::env::temp_dir();
+    let mut dir = luna_test_support::owned_temp_root();
     dir.push(format!(
         "luna_p4b_parity_{}_{}_{}",
         prefix,

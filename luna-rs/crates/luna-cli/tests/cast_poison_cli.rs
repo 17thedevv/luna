@@ -64,7 +64,7 @@ fn invalid_static_cast_never_reaches_mvir() {
         .parent()
         .unwrap()
         .join("tests/luna/language/cast_contract/poison_many_uses_invalid.ln");
-    let emitted = std::env::temp_dir().join("a4_poison_invalid.mvir");
+    let emitted = luna_test_support::owned_temp_root().join("a4_poison_invalid.mvir");
     let _ = fs::remove_file(&emitted);
     let output = Command::new(env!("CARGO_BIN_EXE_luna"))
         .arg("build")

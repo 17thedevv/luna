@@ -61,7 +61,7 @@ struct FixtureRoots {
 }
 impl FixtureRoots {
     fn fresh() -> Self {
-        let work = std::env::temp_dir().join(format!(
+        let work = luna_test_support::owned_temp_root().join(format!(
             "luna_literal_parity_{}_{}",
             std::process::id(),
             std::time::SystemTime::now()
@@ -163,7 +163,7 @@ impl FixtureRoots {
 }
 impl Drop for FixtureRoots {
     fn drop(&mut self) {
-        if self.work.parent() == Some(std::env::temp_dir().as_path())
+        if self.work.starts_with(std::env::temp_dir())
             && self
                 .work
                 .file_name()

@@ -2,7 +2,7 @@ use std::fs;
 use std::process::Command;
 
 fn assert_fixture_runs(name: &str, code: &str) {
-    let work = std::env::temp_dir().join(format!(
+    let work = luna_test_support::owned_temp_root().join(format!(
         "luna_compound_assign_{name}_{}_{}",
         std::process::id(),
         std::time::SystemTime::now()

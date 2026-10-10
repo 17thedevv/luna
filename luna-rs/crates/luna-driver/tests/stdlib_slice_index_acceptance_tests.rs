@@ -15,7 +15,7 @@ fn run_binary(exe_path: &Path) -> (i32, String, String) {
 }
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("luna_slice_index_tests_{}", name));
+    let dir = luna_test_support::owned_temp_root().join(format!("luna_slice_index_tests_{}", name));
     if dir.exists() {
         let _ = fs::remove_dir_all(&dir);
     }
