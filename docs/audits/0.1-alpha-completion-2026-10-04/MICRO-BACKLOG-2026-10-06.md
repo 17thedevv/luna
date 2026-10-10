@@ -614,12 +614,12 @@ next: classify C4-FU1 / D1-FU1 / D1-FU2 / D4-FU1
 |---|---|---|
 | C4-FU1 branch-sensitive comptime deps | Sound but imprecise (static call-graph over-approximation) | No — DEFERRED to 0.2 |
 | D1-FU1 E3001 renders `%v5.0` | Presentation leak (code/span/ownership all correct) | No — NON_BLOCKING_PRESENTATION |
-| D1-FU2 comptime E1001 + E4005 | Needs verification: legitimate causal pair vs cascade | **Yes — RELEASE_REVIEW_REQUIRED** |
+| D1-FU2 comptime E1001 + E4005 | **Redundant cascade — FIXED** (provenance preserved at the comptime boundary) | Yes — CLOSED / FIXED IN TESTED SCOPE |
 | D4-FU1 `#[link]` placement | Corrected: `#[link]` on entry `main` → E6001 backend ICE | **Yes — RELEASE_BLOCKER** |
-| Harness parallel flakes | Test infrastructure nondeterminism | **Yes — R5-HARNESS-01 blocker** |
+| Harness parallel flakes | Test infrastructure nondeterminism. Root-cause evidence (D1-FU2): `ProviderModes::fresh()` never removes its `%TEMP%` sysroot — 3467 abandoned `%TEMP%\luna*` dirs / 21.3 GB made runs abort with `StorageFull` | **Yes — R5-HARNESS-01 blocker** |
 
-Sequence from `d4d980fb`: D4-FU1 → D1-FU2 → R5-HARNESS-01 → (formally defer C4-FU1,
-D1-FU1) → regression workspace → E1/E2 → R4 → R5.
+Sequence from `d4d980fb`: D4-FU1 ✅ closed → D1-FU2 ✅ closed → R5-HARNESS-01 →
+(formally defer C4-FU1, D1-FU1) → regression workspace → E1/E2 → R4 → R5.
 
 ### D4-FU1 — `#[link]` on the program entry (FIXED)
 
@@ -646,6 +646,41 @@ workspace: 220 binaries, 1365 passed / 0 failed / 1 ignored (exit 0)
 release: still BLOCKED
 next: D1-FU2
 ```
+
+### D1-FU2 — comptime diagnostic cascade (FIXED)
+
+One semantic error inside a comptime target produced `E1001` **and** a second,
+generic `E4005`. Classification: **redundant cascade**, not a legitimate causal
+pair — E4005's message embedded a lowering symptom (`unresolved method ...
+reached lowering`) caused by the already-diagnosed E1001, so it carried no
+independent failure.
+
+Root cause = provenance loss at the comptime evaluation boundary
+(`luna-mvir/src/interp.rs` `finish_preparation` flattened `generator.diagnostics`
+into a `ComptimeError::TypeMismatch` string, dropping code + span). Fix: a new
+`ComptimeError::AlreadyDiagnosed` variant returned by that generator-invariant
+path; `report_comptime_error` emits nothing for it. The distinction is
+**structural** (did the failure come from an already-diagnosed, unlowerable
+program?) — not the forbidden "if E1001 exists" shortcut — and every independent
+interpreter failure keeps its own variant and still reports E4005.
+
+```
+D1-FU2
+status: CLOSED / FIXED IN TESTED SCOPE
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: comptime_diagnostic_cascade_cli 4 + diagnostic_conformance_cli 4 + comptime_dependency_precision_cli 1 + artifact_execution_dependencies_cli 1 + adv_comptime_dyn_tests 16 + ui_tests 1 + luna-semantic 0 failed
+workspace: 221 binaries, 1369 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: R5-HARNESS-01
+```
+
+Note: two of the three workspace attempts on this branch exited 101 with
+`Os { code: 112, kind: StorageFull }` at `support/stdlib.rs:34` — **not a
+regression**: `ProviderModes::fresh()` builds an isolated sysroot under
+`%TEMP%` and never removes it, so repeated runs had left 3467 abandoned
+`%TEMP%\luna*` directories (21.3 GB). After deleting them the run was clean.
+This is direct evidence for the R5-HARNESS-01 root cause (unbounded temp
+growth + shared-sysroot concurrency, not per-test isolation).
 
 ### A3 — Partial aggregate cleanup
 
