@@ -777,6 +777,31 @@ workspace: 224 binaries, 1384 passed / 0 failed / 1 ignored (exit 0)
 release: still BLOCKED
 ```
 
+### E1 — Checked integer arithmetic (IN PROGRESS)
+
+Contract: ordinary integer arithmetic is checked; debug and release share the
+same semantics; comptime failures stay `E4005` with a primary source span; float
+and pointer behavior unchanged; MVIR opcodes unchanged; **compiler 22 → 23**
+(metadata9 / MVIR5 / format2 unchanged) so pre-E1 artifacts cannot be reused.
+
+**Stage 1 — freeze baseline: DONE.** 34 reducers in
+`tests/luna/language/checked_arithmetic/`, recorded by
+`docs/tools/record_checked_arithmetic.py` into `e1-stage1-baseline.json`:
+0 traps, 30 reducers complete with silent wrapping (including division by zero,
+`MIN / -1` and out-of-range shifts), 4 comptime reducers report `E4005`.
+Classification: no signedness/promotion surprises, so checked lowering only adds
+traps; the one pre-existing defect observed is a duplicated `E4005` per comptime
+root, which Stage 3 must decide (fix or record).
+
+```
+E1
+status: IN PROGRESS — Stage 1 (freeze) DONE; Stage 2 (checked LLVM lowering) NEXT
+base: 6017ba8d
+protocol: compiler22 -> 23 (metadata9 / MVIR5 / format2 unchanged)
+stage1: 34 reducers, 0 traps / 30 silent-wrap / 4 comptime E4005 (duplicated)
+release: still BLOCKED
+```
+
 ### A3 — Partial aggregate cleanup
 
 A3-01 inventory fixtures · 02 nested tuple move · 03 enum-pattern partial move ·

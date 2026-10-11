@@ -1,0 +1,10 @@
+fn main() -> i32 {
+    dec rw a: i32 = 1;
+    dec rw l: i32 = a << 3;
+    dec rw b: i32 = 32;
+    dec rw r: i32 = b >> 2;
+    dec rw c: i32 = 0 - 8;
+    dec rw s: i32 = c >> 1;
+    if l == 8 && r == 8 && s == (0 - 4) { return 0; }
+    return 7;
+}
