@@ -1,0 +1,32 @@
+{
+  "task": "E1 Stage 3 — comptime parity and E4005 de-duplication",
+  "status": "DONE (focused gate green)",
+  "date": "2026-10-11",
+  "branch": "e1-checked-integer-arithmetic",
+  "base": "fbb6f3f5",
+  "comptime_parity": {
+    "already_checked": "eval_binary_op uses checked_add/sub/mul/div/rem and reports DivisionByZero / IntegerOverflow; shift counts are range-checked; unary -MIN reports overflow",
+    "fixed_gap": "left shift previously used wrapping_shl after the count guard, so a value overflow at comptime did not fail. It now truncates to the width and verifies the round trip (result >> n == operand, arithmetic for signed and logical for unsigned), matching the runtime lowering.",
+    "wrapping_intrinsics": "CallIntrinsic wrapping kinds keep modular semantics and produce no diagnostic"
+  },
+  "e4005_dedup": {
+    "finding": "a comptime constant failure was reported twice within ONE CLI invocation (check=2, build=2): populate_signatures (Pass 1.5) and the main declaration pass both called report_comptime_error for the same root cause",
+    "fix": "single diagnostic ownership — Pass 1.5 still populates values on success but no longer reports; the main declaration pass reports exactly once with the primary source span",
+    "not_used": "no global suppression of E4005 and no string matching; D1-FU2 AlreadyDiagnosed and the fail-closed completeness guard are unchanged"
+  },
+  "tests": {
+    "comptime_diagnostic_cascade_cli": "4 passed (D1-FU2 regression)",
+    "comptime_dependency_precision_cli": "1 passed",
+    "wrapping_arithmetic_cli": "6 passed",
+    "adv_comptime_dyn_tests": "16 passed"
+  },
+  "matrix": {
+    "rows": 52,
+    "trap": 28,
+    "no_trap": 20,
+    "compile_error": 4,
+    "unexpected_exit": 0,
+    "comptime_rows": "1 diagnostic each (was 2)"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 }
+}

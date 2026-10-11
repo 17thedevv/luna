@@ -941,8 +941,18 @@ impl<'a> MvirInterpreter<'a> {
                                     Instruction::Shl { .. } | Instruction::Shr { .. } => {
                                         let shift = u32::try_from(right).ok().filter(|&n| n < width.bit_width())
                                             .ok_or_else(|| ComptimeError::Custom("integer shift count out of range".into()))?;
-                                        if matches!(&val_data.inst, Instruction::Shl { .. }) { left.wrapping_shl(shift) }
-                                        else if width.is_signed() { left >> shift }
+                                        if matches!(&val_data.inst, Instruction::Shl { .. }) {
+                                            let shifted = cast_integer_value(left.wrapping_shl(shift), width, width);
+                                            // Parity with the runtime lowering: x * 2^n must stay
+                                            // representable, verified by shifting the result back to
+                                            // the operand (arithmetic for signed, logical for unsigned).
+                                            let back = if width.is_signed() { shifted >> shift }
+                                                else { (((shifted as u128) & integer_mask(width)) >> shift) as i128 };
+                                            if back != left {
+                                                return Err(ComptimeError::IntegerOverflow);
+                                            }
+                                            shifted
+                                        } else if width.is_signed() { left >> shift }
                                         else { (((left as u128) & integer_mask(width)) >> shift) as i128 }
                                     }
                                     _ => unreachable!(),
