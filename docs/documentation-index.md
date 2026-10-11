@@ -1,6 +1,6 @@
 # Luna 0.1 documentation inventory
 
-Updated 2026-10-06. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
+Updated 2026-10-03. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
 
 All repository-authored tracked Markdown and new versioned/archived/audit documents are classified below. Agent guidance is included. Vendor documentation, generated build logs and test-failure dumps are excluded. Website pages are generated from the same baseline.
 
@@ -48,18 +48,40 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/agent-handoff/phase-15-completion-audit.md](agent-handoff/phase-15-completion-audit.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/architecture.md](architecture.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/ast.md](ast.md) | historical | [conformance](spec/0.1/conformance.md) |
-| [docs/audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md](audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md](audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md](audits/0.1-alpha-completion-2026-10-04/CAST-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md](audits/0.1-alpha-completion-2026-10-04/COMPTIME-PREP-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md](audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md](audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md](audits/0.1-alpha-completion-2026-10-04/EXECUTION.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md](audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md) | evidence | [semantics](spec/0.1/semantics.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md](audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md](audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/README.md](audits/0.1-alpha-completion-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
-| [docs/audits/0.1-alpha-completion-2026-10-04/REMAINING-PLAN-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/REMAINING-PLAN-2026-10-06.md) | guidance | [conformance](spec/0.1/conformance.md) |
-| [docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md) | guidance | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/REMAINING-PLAN-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/REMAINING-PLAN-2026-10-06.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A1-CLOSURE-ENV-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A1-CLOSURE-ENV-2026-10-06.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-ASYNC-SUSPENSION-2026-10-07.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-ASYNC-SUSPENSION-2026-10-07.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU1-DROP-FLAG-PLAN-2026-10-09.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU1-DROP-FLAG-PLAN-2026-10-09.md) | evidence | [semantics](spec/0.1/semantics.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU2-CLI-MATRIX-2026-10-07.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU2-CLI-MATRIX-2026-10-07.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A3-PARTIAL-AGGREGATE-CLEANUP-2026-10-07.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A3-PARTIAL-AGGREGATE-CLEANUP-2026-10-07.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A4-CAST-POISON-CONTAINMENT-2026-10-07.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A4-CAST-POISON-CONTAINMENT-2026-10-07.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A5-RAW-SLICE-VIEW-CONTRACT-2026-10-07.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A5-RAW-SLICE-VIEW-CONTRACT-2026-10-07.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A6-UNARY-LOGICAL-NOT-2026-10-07.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A6-UNARY-LOGICAL-NOT-2026-10-07.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C1-RECONCILE-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C1-RECONCILE-2026-10-06.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C2-PER-IMPL-HEADER-METADATA-2026-10-08.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C2-PER-IMPL-HEADER-METADATA-2026-10-08.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C3-PROJECTION-FALLBACK-2026-10-08.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C3-PROJECTION-FALLBACK-2026-10-08.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C4-COMPTIME-DEPENDENCY-2026-10-08.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C4-COMPTIME-DEPENDENCY-2026-10-08.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C5-ARTIFACT-FRESHNESS-CLASSIFICATION-2026-10-08.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C5-ARTIFACT-FRESHNESS-CLASSIFICATION-2026-10-08.md) | evidence | [modules](spec/0.1/modules.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-DIAGNOSTIC-CONFORMANCE-2026-10-08.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-DIAGNOSTIC-CONFORMANCE-2026-10-08.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-FU2-COMPTIME-DIAGNOSTIC-CASCADE-2026-10-09.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-FU2-COMPTIME-DIAGNOSTIC-CASCADE-2026-10-09.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D2-EXPRESSION-SPANS-2026-10-08.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D2-EXPRESSION-SPANS-2026-10-08.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D3-PROVIDER-TIER23-MATRIX-2026-10-08.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D3-PROVIDER-TIER23-MATRIX-2026-10-08.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-FU1-LINK-ENTRY-2026-10-09.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-FU1-LINK-ENTRY-2026-10-09.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-RETAINED-CONTRACTS-2026-10-08.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-RETAINED-CONTRACTS-2026-10-08.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R0-BASELINE-3601d12e-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R0-BASELINE-3601d12e-2026-10-06.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/alpha-modules-2026-10-03/README.md](audits/alpha-modules-2026-10-03/README.md) | evidence | [modules](spec/0.1/modules.md) |
 | [docs/audits/provider-config-relative-2026-10-04/README.md](audits/provider-config-relative-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/repair-0.1/README.md](audits/repair-0.1/README.md) | evidence | [conformance](spec/0.1/conformance.md) |

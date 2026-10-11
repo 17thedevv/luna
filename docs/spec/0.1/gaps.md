@@ -37,18 +37,21 @@ instrumented pipeline evidence, not a claimed full profile of every old suite.
 
 | ID | Contract / correction | Current implementation or documentation |
 |---|---|---|
-| V01-GRAMMAR-01 | Comma-separated struct fields; reject semicolon delimiters | CLI confirms both modes accept and execute semicolon-delimited fields despite the rejection requirement |
-| V01-GRAMMAR-02 | Retained parenthesized foreach head from normative Rule K.4 | CLI confirms both modes reject the contract head and accept the unparenthesized implementation form; reconciliation must retain an explicit decision |
-| V01-GRAMMAR-03 | Receiver shorthand equivalence from Rule K.5 | CLI confirms both modes reject &self shorthand; the complete equivalence contract remains a requirement |
-| V01-DIAG-01 | DIAG-1 requires typed diagnostic codes for every compiler error | The foreach/receiver parser failures render `error:` without a code in both modes; the private-field rejection correctly renders E1003. Code identity/propagation still needs a focused diagnostic audit |
+| V01-GRAMMAR-01 | Comma-separated struct fields; reject semicolon delimiters | **Implemented** — semicolon delimiters reject with typed `E0002` and a primary span in both modes; comma-separated fields accept and run |
+| V01-GRAMMAR-02 | Retained parenthesized foreach head from normative Rule K.4 | **Implemented** — `for (pattern in expression)` accepts and runs in both modes; the unparenthesized head is retained only as LEGACY / CHARACTERIZATION and is not standardized 0.1 syntax |
+| V01-GRAMMAR-03 | Receiver shorthand equivalence from Rule K.5 | **Implemented** — `&self`, `&rw self` and bare `self` receivers build and run in both modes; duplicate/non-first receivers reject with a typed code |
+| V01-DIAG-01 | DIAG-1 requires typed diagnostic codes for every compiler error | **Evidence-backed parts closed in E2** — parser failures (including the foreach/receiver cases) render typed codes with source spans in both modes. Remaining structural invariants are R5 preconditions, not deferred: a mandatory primary span for every source-originated error, structural related labels for multi-position errors, constructor/emission enforcement of DIAG-1/DIAG-2, and no ad-hoc untyped error paths |
 | V01-ARCH-02 | Compiler must not map library macro names, streams, suffixes or callee spellings | Imported D:/fdlang macro_engine.rs contains the eight-name/format_macro interception and print_val/newline lookup. It violates the retained boundary; preservation in Git is not semantic approval |
 | V01-DOC-01 | Visibility-02: fields default public independently of type accessibility | Old grammar skill/reference says private by default; corrected to the approved amendment |
 | V01-DOC-02 | `requires life(...)` is the current relation spelling | Older docs/skills use removed `where outlives`; current guidance is corrected without changing the relation model |
 | V01-DOC-03 | Luna .ln/.llib, 32 providers, six language contract families plus OptionExt contribution | Old overview/bootstrap pages claim Mellis core.ms, 25 providers or four families; current entry points are replaced |
 
-V01-GRAMMAR rows are conformance gaps or unverified contracts, not new parser
-fixes made by this documentation task. Historical plans retain their original
-examples under a historical-role notice.
+V01-GRAMMAR rows record the current conformance state of retained 0.1
+requirements, verified by a CLI run on the exact candidate recorded in
+`evidence/cli-examples.json`. The reconciled behavior does not adopt any syntax
+beyond those requirements: the unparenthesized foreach head stays a legacy
+characterization, and no stdlib program or official documentation may rely on it.
+Historical plans retain their original examples under a historical-role notice.
 
 ## Decisions still required
 
@@ -94,21 +97,27 @@ apply to their recorded baseline, not every newly merged addition.
   they must be corrected as tests, not treated as reasons to alter valid APIs.
 
 
-## Documentation CLI characterization — 2026-10-03
+## Documentation CLI characterization
 
 [evidence/cli-examples.json](evidence/cli-examples.json) records eight standalone
-fixtures in source-only and artifact-only sysroots, 16 attempts total. Eight
-attempts meet their positive/negative requirements; six expose the three grammar
-gaps above; two characterize the accepted unparenthesized implementation form.
-The custom outln macro returns a value and emits no output, demonstrating that
-this name currently uses ordinary expansion. These checks are not a certification
-of every macro, field visibility or language capability.
+fixtures in source-only and artifact-only sysroots, 16 attempts total, re-run on
+the current candidate. Sixteen attempts meet their requirement or are an explicit
+characterization: the three former grammar gaps (`reject_semicolon_fields`,
+`foreach_parenthesized_contract`, `receiver_shorthand_contract`) now meet their
+contract in both modes, and the two unparenthesized-foreach attempts stay
+`characterization` (legacy, contract not asserted). The custom outln macro returns
+a value and emits no output, demonstrating that this name currently uses ordinary
+expansion. These checks are not a certification of every macro, field visibility
+or language capability.
 
-The [integration CLI run](../../integration/evidence/cli-examples.json), after
-rebuilding the merged CLI/runtime and all 49 providers, repeats the same 16
-attempts and outcomes. All three grammar gaps remain reproduced. The custom
-macro case uses an integer argument; it does not exercise or excuse the newly
-imported format-string interception recorded as V01-ARCH-02.
+[historical-2026-10-04/](evidence/historical-2026-10-04/cli-examples.json) preserves
+the pre-fix record, where the same three cases were unmet; history is kept as
+history and is never rewritten to look like a pass.
+
+The [integration CLI run](../../integration/evidence/cli-examples.json) repeats the
+same 16 attempts with the merged CLI/runtime and all providers. The custom macro
+case uses an integer argument; it does not exercise or excuse the imported
+format-string interception recorded as V01-ARCH-02.
 
 
 ## Alpha module additions — implementation update 2026-10-04

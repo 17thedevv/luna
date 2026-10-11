@@ -5,7 +5,8 @@
 <body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
 <main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
 <h1 id="call-arguments-v1--named-arguments-and-per-call-defaults">CALL-ARGUMENTS-v1 — named arguments and per-call defaults</h1>
-<p>Maintainer-authorized 2026-10-04 addition to the 0.1 completion scope: Python-style named arguments and default values. The maintainer chose per-call default evaluation in the function&#x27;s defining scope. Implementation is pending; parser recognition of historical labels is not evidence of correct binding.</p>
+<p>Maintainer-authorized 2026-10-04 addition to the 0.1 completion scope: Python-style named arguments and default values. The maintainer chose per-call default evaluation in the function&#x27;s defining scope. The <a href="../../audits/0.1-alpha-completion-2026-10-04/CALL-ARGUMENTS-GATE.md">implementation gate</a> tracks named binding and default evaluation separately. This adopted contract is not narrowed by implementation gaps.</p>
+<p>The <a href="../../audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md">2026-10-06 omission checkpoint</a> tracks synchronous execution, compact ABI lifetime mapping and independent owner/method binders. Full support remains PARTIAL because async timing and artifact import still fail required positives.</p>
 <h2 id="source-surface-and-binding">Source surface and binding</h2>
 <pre><code>fn make_rect(width: i32, height: i32 = 20) -&gt; i32 {
     return width * height;

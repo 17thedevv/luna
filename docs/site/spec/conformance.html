@@ -33,9 +33,27 @@
 <p>   including user-defined types independent of the original stdlib trigger.</p>
 <p class="list-item">6. Target claims: runtime ABI, linker and executable evidence per advertised</p>
 <p>   target/profile. A Windows pass cannot certify POSIX or freestanding behavior.</p>
+<h2 id="release-01-alpha1-target-matrix">Release 0.1-alpha.1 target matrix</h2>
+<p>Adopted 2026-10-06 (D3). Supported, release-gated targets:</p>
+<table>
+<tr><th>Target</th><th>Status</th><th>Required evidence</th></tr>
+<tr><td><code>x86_64-pc-windows-gnu</code></td><td>SUPPORTED / RELEASE-GATED</td><td>native/full regression</td></tr>
+<tr><td><code>x86_64-unknown-linux-gnu</code> (Ubuntu)</td><td>SUPPORTED / RELEASE-GATED</td><td>normal CI + ASan</td></tr>
+</table>
+<p>NOT ADVERTISED in 0.1-alpha.1: macOS, freestanding and every other target. A target that currently compiles but is not listed here remains experimental/unverified and is not release-supported. The host toolchain triple (for example <code>x86_64-pc-windows-msvc</code>) is not a Luna target and MUST NOT be advertised as one. The maintainer confirms the final advertised matrix before tagging.</p>
 <h2 id="release-01-gate">Release 0.1 gate</h2>
 <p>Before declaring the release conformant, address confirmed compiler/library and architecture gaps; resolve normative disagreements without silent syntax changes; regenerate sysroot artifacts through the official path; run required focused and relevant workspace regressions; verify diagnostics and parity; and publish the exact supported target matrix and any accepted deferrals.</p>
 <p>Current readiness is <strong>BLOCKED</strong> by <a href="gaps.html">gaps.md</a>. The latest audit built all providers and completed substantial checks, but did not complete all compiler tests, sanitizer/fuzzing, all targets or all generic/data domains. Historical green test counts do not supersede a later counterexample.</p>
+<h2 id="retained-01-contract-scope">Retained 0.1 contract scope</h2>
+<p>Adopted 2026-10-06 (D4). The following contracts remain part of 0.1-alpha.1 and are NOT deferred to 0.2:</p>
+<table>
+<tr><th>Contract</th><th>Status</th></tr>
+<tr><td>NAMESPACE-USING-v1</td><td>KEEP</td></tr>
+<tr><td>PROVIDER-CONFIG-v1</td><td>KEEP</td></tr>
+<tr><td>MODULE-CONST-STORAGE-v1</td><td>KEEP</td></tr>
+<tr><td>CALL-ARGUMENTS-v1</td><td>KEEP</td></tr>
+</table>
+<p>Each is a release requirement. If any of them is not yet conformant, the release remains <strong>BLOCKED</strong>; an implementation gap does NOT automatically move a contract out of 0.1. Removing or deferring any of these requires a new explicit maintainer decision.</p>
 <h2 id="documentation-refresh-validation">Documentation refresh validation</h2>
 <p>Local documentation consistency is checked with <code>python docs/tools/validate_v01_docs.py</code>. It validates current links, authority roles, provider/hook inventories and generated pages. <code>python docs/tools/check_v01_examples.py</code> records CLI examples and known grammar failures in both source/artifact modes. These two commands intentionally separate documentation consistency from compiler conformance; known failures are retained in their evidence, not converted into success expectations.</p>
 <p>The CLI recorder defaults to the Windows debug executable and the audited GNU runtime archive. Other build locations can be selected with <code>LUNA_DOCS_CLI</code> and <code>LUNA_RUNTIME_LIB</code>; <code>LUNA_DOCS_TOOLCHAIN_PATH</code> optionally prepends toolchain directories to PATH, and <code>LUNA_DOCS_TEMP</code> selects temporary storage. Rebuild the matching CLI, runtime and sysroot artifacts before collecting new evidence. Use <code>LUNA_DOCS_EVIDENCE_OUT</code> to keep a later run separate from the original audit evidence; the integration run is stored in <code>docs/integration/evidence</code>.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

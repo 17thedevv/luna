@@ -1,4 +1,5 @@
-// Implementation characterization, not adoption of a replacement contract.
+// LEGACY / CHARACTERIZATION: the unparenthesized head is accepted by the parser
+// but is NOT standardized 0.1 syntax. Do not build stdlib or docs on this form.
 import <vec>;
 fn main() -> i32 {
     dec rw values = std::vec_new<i32>();

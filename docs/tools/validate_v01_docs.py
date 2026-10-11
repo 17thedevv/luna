@@ -85,9 +85,21 @@ if results_path.exists():
     for case in ('basic_reference', 'macro_name_independent', 'public_field_default', 'reject_private_field'):
         selected = [row for row in results if row['fixture'] == case]
         assert len(selected) == 2 and all(row['contract_met'] for row in selected)
-    # Known gaps remain failures in the historical evidence; do not rewrite historical expectations.
+    # Reconciled current evidence: the three former grammar gaps now meet their
+    # contract, and the unparenthesized foreach stays an explicit characterization.
     for case in ('reject_semicolon_fields', 'foreach_parenthesized_contract', 'receiver_shorthand_contract'):
-        assert all(not row['contract_met'] for row in results if row['fixture'] == case)
+        selected = [row for row in results if row['fixture'] == case]
+        assert len(selected) == 2 and all(row['contract_met'] for row in selected)
+    legacy = [row for row in results if row['fixture'] == 'foreach_current_parser']
+    assert len(legacy) == 2 and all(row['expectation'] == 'characterization' for row in legacy)
+    # Historical evidence preserves the original gap record; it is never rewritten
+    # into a pass, so the pre-fix failures must still be visible there.
+    historical_path = ROOT / 'docs/spec/0.1/evidence/historical-2026-10-04/cli-examples.json'
+    assert historical_path.exists()
+    historical = json.loads(historical_path.read_text(encoding='utf-8'))
+    for case in ('reject_semicolon_fields', 'foreach_parenthesized_contract', 'receiver_shorthand_contract'):
+        selected = [row for row in historical if row['fixture'] == case]
+        assert len(selected) == 2 and all(not row['contract_met'] for row in selected)
 
 repair_results_path = ROOT / 'docs/audits/repair-0.1/evidence/cli-examples.json'
 if repair_results_path.exists():

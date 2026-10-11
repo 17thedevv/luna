@@ -235,6 +235,11 @@
     "owner": "semantics"
   },
   {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md",
     "role": "evidence",
     "owner": "conformance"
@@ -251,12 +256,117 @@
   },
   {
     "path": "docs/audits/0.1-alpha-completion-2026-10-04/REMAINING-PLAN-2026-10-06.md",
-    "role": "guidance",
+    "role": "evidence",
     "owner": "conformance"
   },
   {
-    "path": "docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md",
-    "role": "guidance",
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A1-CLOSURE-ENV-2026-10-06.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-ASYNC-SUSPENSION-2026-10-07.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU1-DROP-FLAG-PLAN-2026-10-09.md",
+    "role": "evidence",
+    "owner": "semantics"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU2-CLI-MATRIX-2026-10-07.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A3-PARTIAL-AGGREGATE-CLEANUP-2026-10-07.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A4-CAST-POISON-CONTAINMENT-2026-10-07.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A5-RAW-SLICE-VIEW-CONTRACT-2026-10-07.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A6-UNARY-LOGICAL-NOT-2026-10-07.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C1-RECONCILE-2026-10-06.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C2-PER-IMPL-HEADER-METADATA-2026-10-08.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C3-PROJECTION-FALLBACK-2026-10-08.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C4-COMPTIME-DEPENDENCY-2026-10-08.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C5-ARTIFACT-FRESHNESS-CLASSIFICATION-2026-10-08.md",
+    "role": "evidence",
+    "owner": "modules"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-DIAGNOSTIC-CONFORMANCE-2026-10-08.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-FU2-COMPTIME-DIAGNOSTIC-CASCADE-2026-10-09.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D2-EXPRESSION-SPANS-2026-10-08.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D3-PROVIDER-TIER23-MATRIX-2026-10-08.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-FU1-LINK-ENTRY-2026-10-09.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-RETAINED-CONTRACTS-2026-10-08.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R0-BASELINE-3601d12e-2026-10-06.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md",
+    "role": "evidence",
     "owner": "conformance"
   },
   {
