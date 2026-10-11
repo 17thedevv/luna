@@ -793,12 +793,26 @@ Classification: no signedness/promotion surprises, so checked lowering only adds
 traps; the one pre-existing defect observed is a duplicated `E4005` per comptime
 root, which Stage 3 must decide (fix or record).
 
+**Stage 2A — wrapping contract + stdlib audit: DONE.** Option A approved:
+explicit `std::wrapping_add/sub/mul` recognised by compiler-owned language-item
+identity (never by library-name string matching), lowered to unchecked modular
+ops, with comptime parity. The `.llib` writer already carries the kind in the
+compiler-owned `__luna_intrinsic_{kind}` name, so artifact identity can be
+reconstructed without a wire change; if that proves insufficient the task stops
+for a wire-contract review. Stdlib audit: `core/hash.ln` `mix_u64`,
+`alloc/raw_table.ln` `mix_hash` and `alloc/string.ln` FNV are intentional modular
+math → migrate to `wrapping_*`; capacity/allocation-size math stays checked;
+`core/num.ln` `checked_*`/`saturating_*` are already overflow-safe. 12 wrapping
+reducers added; baseline = COMPILE_ERROR (`std::wrapping_*` not yet defined).
+
 ```
 E1
-status: IN PROGRESS — Stage 1 (freeze) DONE; Stage 2 (checked LLVM lowering) NEXT
+status: IN PROGRESS — Stage 1 + 2A DONE; Stage 2B (wrapping APIs + stdlib migration) NEXT
 base: 6017ba8d
 protocol: compiler22 -> 23 (metadata9 / MVIR5 / format2 unchanged)
 stage1: 34 reducers, 0 traps / 30 silent-wrap / 4 comptime E4005 (duplicated)
+stage2a: contract frozen (Option A), stdlib audit done, 12 wrapping reducers (baseline COMPILE_ERROR)
+stages: 2B wrapping APIs + stdlib migration -> 2C checked LLVM lowering -> 3 comptime parity + E4005 dedup -> 4 versioning + regression
 release: still BLOCKED
 ```
 
