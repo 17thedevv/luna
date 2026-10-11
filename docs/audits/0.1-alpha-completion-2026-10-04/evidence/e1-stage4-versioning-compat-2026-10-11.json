@@ -1,0 +1,29 @@
+{
+  "task": "E1 Stage 4 — versioning, artifact compatibility, diagnostic precondition",
+  "status": "DONE",
+  "date": "2026-10-11",
+  "branch": "e1-checked-integer-arithmetic",
+  "base": "12b12f9d",
+  "versioning": {
+    "compiler": "22 -> 23 (LLIB_COMPILER_VERSION)",
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2,
+    "rationale": "ordinary integer arithmetic changed from wrapping to checked; the header compiler version is the only signal that distinguishes an old unchecked artifact from a current one, so it is bumped to prevent silent reuse"
+  },
+  "compatibility": {
+    "real_compiler22_artifact": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat22/num-compiler22.llib — a genuine artifact produced before the bump (header: LLIB, format 2, compiler 22, MVIR 5)",
+    "rejection": "luna-llib/tests/compiler_version_compat_tests.rs loads the real artifact and asserts MlibError::VersionMismatch { component: \"compiler\", found: 22 } — the mismatch is classified on the compiler component and is raised during header validation, before any payload decode",
+    "fresh_compiler23": "the sysroot rebuilt with compiler23 with zero diagnostics; focused acceptance (wrapping, hashmap, hashset, string, phase4b/4c llib parity) exits 0",
+    "relocation": "covered by wrapping_arithmetic_cli (relocated fresh-artifact executable behaves identically)",
+    "not_done": "no header-byte patching was used to simulate compatibility; the archived artifact is real"
+  },
+  "diagnostic_precondition": {
+    "finding": "E1-FU-DIAG-01: attribute validation (including the reserved-intrinsic-namespace guard and the `#[link]`-on-entry check) emits InvalidAnnotation (E0005)",
+    "registry_attribution": "diagnostics-v1.md:112/132 assigns E0001–E0999 to the Parser range and describes it as including attribute grammar, so the code attribution matches the documented contract",
+    "status": "no contract violation introduced by E1; the emitting component is the annotation processor (semantic phase) while the code range is Parser — re-attributing would change the public diagnostic contract, so it is recorded for maintainer review instead of being changed unilaterally",
+    "entry_point_case": "`#[link]` on `main` renders a typed E0005 diagnostic (not a backend ICE)"
+  },
+  "stdlib_regression": "hashmap 14, hashmap-storage 11, hashset 8, string 16, phase4b num/collections/vec-depth/memory and phase4c numerics pass; hash outputs unchanged",
+  "verdict": "Stage 4 done; final qualification (three consecutive full workspace runs) follows"
+}
