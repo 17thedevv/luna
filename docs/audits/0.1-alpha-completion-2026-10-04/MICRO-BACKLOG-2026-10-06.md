@@ -718,6 +718,7 @@ run C: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 1 dir 
 residual: bounded residual cleanup — one 0-byte directory owned by the last test process; the next process's orphan sweep reclaims it. This is a known infrastructure limitation for 0.1-alpha.1; it is NOT a claim that every temp directory is removed the moment a process exits.
 sweep guard: only directories named `luna_test_ws_*`, directly under the process temp dir, carrying our marker file, AND owned by a pid that is no longer alive are removed — a running process's workspace is never touched.
 release: still BLOCKED (next: regression workspace → E-wave)
+regression (candidate 98b55952, post-defer): 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 0 dirs / 0 GB -> 1 dir / 0 GB
 ```
 
 ### Formal defer decisions (0.1-alpha.1)
