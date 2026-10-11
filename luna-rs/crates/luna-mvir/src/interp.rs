@@ -162,6 +162,26 @@ fn integer_mask(width: IntWidth) -> u128 {
     }
 }
 
+/// Modular (2^N) interpretation of an integer at the target width. This is the
+/// comptime counterpart of the wrapping intrinsics' runtime lowering: it never
+/// diagnoses overflow, unlike the checked operator paths.
+fn wrap_to_width(value: i128, width: IntWidth) -> i128 {
+    let bits = width.bit_width();
+    if bits >= 128 {
+        return value;
+    }
+    let truncated = value & ((1i128 << bits) - 1);
+    let signed = matches!(
+        width,
+        IntWidth::I8 | IntWidth::I16 | IntWidth::I32 | IntWidth::I64 | IntWidth::ISize
+    );
+    if signed && (truncated & (1i128 << (bits - 1))) != 0 {
+        truncated - (1i128 << bits)
+    } else {
+        truncated
+    }
+}
+
 fn static_runtime_value(ty: &crate::static_data::StaticType, value: &crate::static_data::StaticValue) -> Result<RuntimeValue, ComptimeError> {
     use crate::static_data::{StaticType as T, StaticValue as V};
     Ok(match (ty, value) {
@@ -938,6 +958,29 @@ impl<'a> MvirInterpreter<'a> {
                                 })
                             }
                             _ => return Err(ComptimeError::TypeMismatch("integer bitwise operand mismatch".into())),
+                        }
+                    }
+                    Instruction::CallIntrinsic { kind, args } => {
+                        use luna_semantic::semantic_tables::IntrinsicKind;
+                        if args.len() != 2 {
+                            return Err(ComptimeError::TypeMismatch(
+                                "wrapping intrinsic expects 2 operands".to_string()));
+                        }
+                        let l = self.eval_operand(&args[0])?;
+                        let r = self.eval_operand(&args[1])?;
+                        match (l, r) {
+                            (RuntimeValue::Int { val: v1, width }, RuntimeValue::Int { val: v2, .. }) => {
+                                let raw = match kind {
+                                    IntrinsicKind::WrappingAdd => v1.wrapping_add(v2),
+                                    IntrinsicKind::WrappingSub => v1.wrapping_sub(v2),
+                                    IntrinsicKind::WrappingMul => v1.wrapping_mul(v2),
+                                    other => return Err(ComptimeError::UnsupportedOperation(
+                                        format!("unsupported intrinsic in comptime: {other:?}"))),
+                                };
+                                RuntimeValue::Int { val: wrap_to_width(raw, width), width }
+                            }
+                            _ => return Err(ComptimeError::TypeMismatch(
+                                "wrapping intrinsics are integer-only".to_string())),
                         }
                     }
                     Instruction::BoundsCheck { index, len } => {

@@ -1720,9 +1720,10 @@ impl<'a> MvirGenerator<'a> {
             let param_types = supplied_ordinals.iter().map(|&ordinal| param_types[ordinal]).collect();
             let is_async = if let Decl::Function { is_async, .. } = decl { *is_async } else { false };
 
-            let memory_intrinsic = sym_id_opt.and_then(|symbol| self.ctx.lang_items.from_symbol(symbol))
-                .filter(|item| item.is_memory_intrinsic());
-            let is_extern = instance.instance.defaults.is_none() && ((body.is_none() && memory_intrinsic.is_none()) || {
+            let lang_intrinsic = sym_id_opt.and_then(|symbol| self.ctx.lang_items.from_symbol(symbol));
+            let memory_intrinsic = lang_intrinsic.filter(|item| item.is_memory_intrinsic());
+            let wrapping_intrinsic = lang_intrinsic.filter(|item| item.is_wrapping_intrinsic());
+            let is_extern = instance.instance.defaults.is_none() && ((body.is_none() && memory_intrinsic.is_none() && wrapping_intrinsic.is_none()) || {
                 instance.instance.subst.is_empty() && !self.is_comptime
                     && sym_id_opt.is_some_and(|symbol| self.ctx.tables.object_backed_functions.contains(&symbol))
             });
@@ -2815,6 +2816,21 @@ impl<'a> MvirGenerator<'a> {
                         }
                         Some(item) if item.is_memory_intrinsic() => {
                             self.diagnostics.push(luna_common::Diagnostic::error("memory intrinsic call has incorrect checked arity")
+                                .with_code(luna_common::DiagnosticCode::BackendInvariantViolation));
+                        }
+                        Some(item) if item.is_wrapping_intrinsic() && arg_ops.len() == 2 => {
+                            let kind = match item {
+                                LangItem::WrappingAdd => luna_semantic::semantic_tables::IntrinsicKind::WrappingAdd,
+                                LangItem::WrappingSub => luna_semantic::semantic_tables::IntrinsicKind::WrappingSub,
+                                LangItem::WrappingMul => luna_semantic::semantic_tables::IntrinsicKind::WrappingMul,
+                                _ => unreachable!("guarded by is_wrapping_intrinsic"),
+                            };
+                            let value = self.push_inst(Instruction::CallIntrinsic { kind, args: arg_ops.clone() }, ty_id);
+                            return Operand::Value(value);
+                        }
+                        Some(item) if item.is_wrapping_intrinsic() => {
+                            self.diagnostics.push(luna_common::Diagnostic::error(
+                                format!("wrapping intrinsic `{}` call has incorrect checked arity", item.name()))
                                 .with_code(luna_common::DiagnosticCode::BackendInvariantViolation));
                         }
                         _ => {}

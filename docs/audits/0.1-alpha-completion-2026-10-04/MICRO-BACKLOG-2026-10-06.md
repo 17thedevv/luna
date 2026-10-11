@@ -807,12 +807,13 @@ reducers added; baseline = COMPILE_ERROR (`std::wrapping_*` not yet defined).
 
 ```
 E1
-status: IN PROGRESS — Stage 1 + 2A DONE; Stage 2B (wrapping APIs + stdlib migration) NEXT
+status: IN PROGRESS — Stage 1 + 2A DONE; Stage 2B implemented (artifact reconstruction guard + full workspace run REMAIN)
 base: 6017ba8d
 protocol: compiler22 -> 23 (metadata9 / MVIR5 / format2 unchanged)
 stage1: 34 reducers, 0 traps / 30 silent-wrap / 4 comptime E4005 (duplicated)
 stage2a: contract frozen (Option A), stdlib audit done, 12 wrapping reducers (baseline COMPILE_ERROR)
-stages: 2B wrapping APIs + stdlib migration -> 2C checked LLVM lowering -> 3 comptime parity + E4005 dedup -> 4 versioning + regression
+stage2b: 3 wrapping lang items (16->19 hooks), identity-based CallIntrinsic, modular LLVM + comptime, stdlib hash/FNV migrated; wrappers 42 no-trap / 4 comptime; hashmap 14 + storage 11 + hashset 8 + string 16 PASS; docs validator 0 errors
+stages: 2B(done: reconstruction guard + workspace run) -> 2C checked LLVM lowering -> 3 comptime parity + E4005 dedup -> 4 versioning + regression
 release: still BLOCKED
 ```
 

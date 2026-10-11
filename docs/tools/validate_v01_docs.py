@@ -76,8 +76,8 @@ for provider in manifest['provider']:
     assert f"`{provider['name']}`" in table
     assert (ROOT / 'luna-rs/libs/external' / (provider['path'] + '.ln')).is_file()
 hooks = (ROOT / 'luna-rs/crates/luna-driver/src/lang_contracts.rs').read_text(encoding='utf-8')
-assert len(re.findall(r'LanguageItemPath \{ lang_item:', hooks)) == 16
-assert '**16** manifest hook identities' in (ROOT / 'docs/core-language-contract.md').read_text(encoding='utf-8')
+assert len(re.findall(r'LanguageItemPath \{ lang_item:', hooks)) == 19
+assert '**19** manifest hook identities' in (ROOT / 'docs/core-language-contract.md').read_text(encoding='utf-8')
 results_path = ROOT / 'docs/spec/0.1/evidence/cli-examples.json'
 if results_path.exists():
     results = json.loads(results_path.read_text(encoding='utf-8'))

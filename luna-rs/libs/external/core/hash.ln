@@ -1,11 +1,13 @@
+import <num>;
+
 export module std {
 export trait Hash {
     fn hash(self: &Self) -> u64;
 }
 
 fn mix_u64(x: u64) -> u64 {
-    dec rw z = (x ^ (x >> 30u64)) * 13787848793156543929u64;
-    z = (z ^ (z >> 27u64)) * 10723151780598845931u64;
+    dec rw z = std::wrapping_mul(x ^ (x >> 30u64), 13787848793156543929u64);
+    z = std::wrapping_mul(z ^ (z >> 27u64), 10723151780598845931u64);
     return z ^ (z >> 31u64);
 }
 

@@ -1866,6 +1866,37 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 // Marker instructions for borrow-checking and cleanup; no runtime effect.
                 Ok(self.context.i32_type().const_zero().into())
             }
+            Instruction::CallIntrinsic { kind, args } => {
+                use luna_semantic::semantic_tables::IntrinsicKind;
+                match kind {
+                    IntrinsicKind::WrappingAdd | IntrinsicKind::WrappingSub | IntrinsicKind::WrappingMul => {
+                        if args.len() != 2 {
+                            return Err(BackendError::InvariantViolation(format!(
+                                "wrapping intrinsic expects 2 operands, got {}", args.len())));
+                        }
+                        let l_val = self.generate_operand(&args[0])?;
+                        let r_val = self.generate_operand(&args[1])?;
+                        if !l_val.is_int_value() || !r_val.is_int_value() {
+                            return Err(BackendError::InvariantViolation(
+                                "wrapping intrinsics are integer-only".into()));
+                        }
+                        let l = l_val.into_int_value();
+                        let r = r_val.into_int_value();
+                        // Plain LLVM add/sub/mul are modular (no nsw/nuw), so this
+                        // is the sanctioned unchecked path and never traps.
+                        let name = format!("v{}", id.0);
+                        let res = match kind {
+                            IntrinsicKind::WrappingAdd => self.builder.build_int_add(l, r, &name),
+                            IntrinsicKind::WrappingSub => self.builder.build_int_sub(l, r, &name),
+                            IntrinsicKind::WrappingMul => self.builder.build_int_mul(l, r, &name),
+                            _ => unreachable!("guarded by the outer match"),
+                        }.unwrap();
+                        Ok(res.into())
+                    }
+                    other => Err(BackendError::InvariantViolation(format!(
+                        "Unhandled intrinsic in LLVM backend: {:?}", other))),
+                }
+            }
             unhandled => {
                 return Err(BackendError::InvariantViolation(format!(
                     "Unhandled MVIR instruction in LLVM backend: {:?}",
