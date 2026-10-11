@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec rw a: u8 = 255;
+    dec rw b: u8 = 1;
+    dec rw r: u8 = a + b;
+    if r == 0 { return 0; }
+    return 7;
+}

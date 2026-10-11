@@ -1,0 +1,6 @@
+fn main() -> i32 {
+    dec rw a: i32 = 5;
+    dec rw r: i32 = 0 - a;
+    if r == (0 - 5) { return 0; }
+    return 7;
+}

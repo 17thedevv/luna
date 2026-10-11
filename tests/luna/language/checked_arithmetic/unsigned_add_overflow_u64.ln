@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec rw a: u64 = 18446744073709551615;
+    dec rw b: u64 = 1;
+    dec rw r: u64 = a + b;
+    if r == 0 { return 0; }
+    return 7;
+}

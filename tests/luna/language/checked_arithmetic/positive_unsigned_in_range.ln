@@ -1,0 +1,9 @@
+fn main() -> i32 {
+    dec rw a: u32 = 100;
+    dec rw b: u32 = 23;
+    dec rw sum: u32 = a + b;
+    dec rw dif: u32 = a - b;
+    dec rw prod: u32 = a * b;
+    if sum == 123 && dif == 77 && prod == 2300 { return 0; }
+    return 7;
+}
