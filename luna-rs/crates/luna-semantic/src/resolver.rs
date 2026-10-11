@@ -563,6 +563,21 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         let name_str =
                             self.get_span_text(*name).to_string();
 
+                        // `__luna_intrinsic_*` is compiler-owned. User declarations may
+                        // not claim the namespace, so a forged wire name cannot be
+                        // produced by ordinary source.
+                        if name_str.starts_with("__luna_intrinsic_")
+                            && !self.ctx.allow_internal_lang_items
+                        {
+                            self.ctx.diagnostics.push(
+                                luna_common::diagnostic::Diagnostic::error(format!(
+                                    "`{name_str}` uses the compiler-owned intrinsic namespace `__luna_intrinsic_`"
+                                ))
+                                .with_code(DiagnosticCode::InvalidAnnotation)
+                                .with_span(*name),
+                            );
+                        }
+
                         let effective_visibility = if let DeclarationContext::TraitMethod(v) = context {
                             v
                         } else {
