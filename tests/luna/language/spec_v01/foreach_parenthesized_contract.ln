@@ -1,4 +1,4 @@
-// Retained Rule K.4 contract; the current parser rejects the head.
+// Canonical 0.1 foreach head (Rule K.4); accepted and executed in both modes.
 import <vec>;
 fn main() -> i32 {
     dec rw values = std::vec_new<i32>();

@@ -28,6 +28,7 @@ DEBUG loading package: cmp
 DEBUG: resolve_collected_imports finished successfully
 DEBUG loading package: clone
 DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: copy
 DEBUG: resolve_collected_imports finished successfully
 DEBUG loading package: ptr
 DEBUG loading package: mem
