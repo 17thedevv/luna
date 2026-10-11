@@ -616,9 +616,9 @@ next: classify C4-FU1 / D1-FU1 / D1-FU2 / D4-FU1
 | D1-FU1 E3001 renders `%v5.0` | Presentation leak (code/span/ownership all correct) | No — NON_BLOCKING_PRESENTATION |
 | D1-FU2 comptime E1001 + E4005 | **Redundant cascade — FIXED** (provenance preserved at the comptime boundary) | Yes — CLOSED / FIXED IN TESTED SCOPE |
 | D4-FU1 `#[link]` placement | Corrected: `#[link]` on entry `main` → E6001 backend ICE | **Yes — RELEASE_BLOCKER** |
-| Harness parallel flakes | Test infrastructure nondeterminism. Root-cause evidence (D1-FU2): `ProviderModes::fresh()` never removes its `%TEMP%` sysroot — 3467 abandoned `%TEMP%\luna*` dirs / 21.3 GB made runs abort with `StorageFull` | **Yes — R5-HARNESS-01 blocker** |
+| Harness parallel flakes | **FIXED** — `TempWorkspace` RAII ownership + orphan sweep; unbounded growth (3467 dirs / 21.3 GB → `StorageFull`) eliminated; per-test isolation preserved | Yes — CLOSED / FIXED IN TESTED SCOPE |
 
-Sequence from `d4d980fb`: D4-FU1 ✅ closed → D1-FU2 ✅ closed → R5-HARNESS-01 →
+Sequence from `d4d980fb`: D4-FU1 ✅ closed → D1-FU2 ✅ closed → R5-HARNESS-01 ✅ closed →
 (formally defer C4-FU1, D1-FU1) → regression workspace → E1/E2 → R4 → R5.
 
 ### D4-FU1 — `#[link]` on the program entry (FIXED)
@@ -681,6 +681,43 @@ regression**: `ProviderModes::fresh()` builds an isolated sysroot under
 `%TEMP%\luna*` directories (21.3 GB). After deleting them the run was clean.
 This is direct evidence for the R5-HARNESS-01 root cause (unbounded temp
 growth + shared-sysroot concurrency, not per-test isolation).
+
+### R5-HARNESS-01 — deterministic test infrastructure (FIXED)
+
+Two distinct problems, kept separate:
+
+1. **Temp sysroot never cleaned up** — 3467 abandoned `%TEMP%\luna*` dirs / 21.3 GB
+   caused `StorageFull` aborts. Root cause: suite-local helpers created unique
+   temp sysroots with no owner (~90 driver suites built paths from
+   `std::env::temp_dir()`; `ProviderModes` had only a heuristic `Drop`).
+2. **Shared mutable output under parallel execution** — **reproduced**: a full
+   workspace run failed `compiler_gap_c_gap_12_safe_loan_effect_tests` with
+   `build fresh canonical sysroot for artifact parity: "Build lock already
+   exists"` while the same binary passed in isolation (4/4, and 1/1 alone).
+   Root cause: suite helpers made paths unique with `pid` + `SystemTime::now()`
+   only, and Windows `SystemTime` granularity is coarse (~15 ms), so two tests
+   running in parallel inside one binary produced the **same** directory — hence
+   the same `.build.lock` and the same artifacts.
+
+Fix: new crate `luna-test-support` with `TempWorkspace` (RAII; guarded removal by
+name prefix + temp-dir containment + marker file), `owned_temp_root()` (one owned
+process root, **a unique child per call** so clock collisions cannot alias two
+tests), and a once-per-process orphan sweep for workspaces whose pid is gone.
+`ProviderModes` owns a `TempWorkspace`; 108 files / 123 call sites route through
+the owned root. No `ignore NotFound` band-aid; no compiler semantics, provider
+protocol or cache-invalidation change.
+
+```
+R5-HARNESS-01
+status: CLOSED / FIXED IN TESTED SCOPE
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+gate: 3 consecutive full workspace runs, parallel mode (no --test-threads=1), temp measured before/after
+run A: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 0 dirs / 0 GB -> 1 dir / 0 GB
+run B: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 1 dir / 0 GB -> 1 dir / 0 GB
+run C: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 1 dir / 0 GB -> 1 dir / 0 GB
+residual: the single leftover directory is the last test process's workspace (0 bytes); the next process's orphan sweep reclaims it
+release: still BLOCKED (next: formally defer C4-FU1/D1-FU1, regression workspace, E-wave)
+```
 
 ### A3 — Partial aggregate cleanup
 
