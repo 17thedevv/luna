@@ -807,15 +807,27 @@ reducers added; baseline = COMPILE_ERROR (`std::wrapping_*` not yet defined).
 
 ```
 E1
-status: IN PROGRESS — Stage 1 + 2A + 2B DONE; Stage 2C (ordinary checked lowering) NEXT
+status: STAGES 1 / 2A / 2B / 2C / 3 / 4 DONE; final qualification (3 consecutive workspace runs) in progress
 base: 6017ba8d
-protocol: compiler22 -> 23 (metadata9 / MVIR5 / format2 unchanged)
+protocol: compiler23 / metadata9 / MVIR5 / format2
 stage1: 34 reducers, 0 traps / 30 silent-wrap / 4 comptime E4005 (duplicated)
 stage2a: contract frozen (Option A), stdlib audit done, 12 wrapping reducers (baseline COMPILE_ERROR)
-stage2b: 3 wrapping lang items (16->19 hooks), identity-based CallIntrinsic, modular LLVM + comptime, stdlib hash/FNV migrated; wrappers 42 no-trap / 4 comptime; hashmap 14 + storage 11 + hashset 8 + string 16 PASS; wrapping_arithmetic_cli 6 PASS (source/artifact/relocation/comptime + forged-name and #[link] guards); workspace 225 binaries / 1390 passed / 0 failed / 1 ignored (exit 0); docs validator 0 errors
-stages: 2C checked LLVM lowering -> 3 comptime parity + E4005 dedup -> 4 versioning + regression
-release: still BLOCKED
+stage2b: 3 wrapping lang items (16->19 hooks), identity-based CallIntrinsic, modular LLVM + comptime, stdlib hash/FNV migrated; wrappers 42 no-trap / 4 comptime; hashmap 14 + storage 11 + hashset 8 + string 16 PASS; wrapping_arithmetic_cli 6 PASS (source/artifact/relocation/comptime + forged-name and #[link] guards); workspace 225 binaries / 1390 passed / 0 failed / 1 ignored (exit 0)
+stage2c: checked LLVM lowering for + - * (overflow intrinsics), / % (zero and signed MIN/-1 guards), << >> (count guard + left-shift round-trip value check), unary -MIN; guards dominate the dangerous op; no nsw/nuw; float/pointer unchanged; compiler-generated arithmetic audited (no wrapping exemption needed)
+stage3: comptime shift value-overflow parity; single E4005 ownership (Pass 1.5 no longer duplicates the main declaration pass); D1-FU2 guard unchanged
+stage4: compiler 22 -> 23 with a real compiler22 artifact rejected as VersionMismatch(component="compiler") before payload decode; fresh compiler23 artifacts accepted; relocation accepted
+matrix: 52 rows -> 28 TRAP / 20 NO_TRAP / 4 COMPILE_ERROR / 0 UNEXPECTED_EXIT (one diagnostic per comptime row)
+release: still BLOCKED pending R4/R5
 ```
+
+E1-FU-DIAG-01 (recorded, not fixed): attribute validation, including the reserved
+intrinsic namespace and the `#[link]`-on-entry check, emits `InvalidAnnotation`
+(E0005). `diagnostics-v1.md` assigns `E0001–E0999` to the Parser range and
+describes it as covering attribute grammar, so the attribution matches the
+documented contract. The residual nuance — the emitting component is the
+annotation processor (semantic phase) while the code range is Parser — would
+require changing the public diagnostic contract to re-attribute, so it is left for
+maintainer review rather than changed unilaterally.
 
 Note (artifact identity): the serialized MVIR stream is not executed — artifact
 execution reconstructs provider bodies from the portable AST, so intrinsic

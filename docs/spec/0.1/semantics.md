@@ -32,7 +32,10 @@ silently. A compile-time/constant expression that reaches one of these condition
 MUST produce a diagnostic instead of emitting a faulty runtime program. Wrapping,
 saturating and checked-result behavior are available only through explicit
 APIs/intrinsics and are never implicit; LLVM's default wrapping is not language
-semantics. This adopts V01-DESIGN-03 and applies to both source and artifact
+semantics. The explicit modular APIs are `std::wrapping_add`, `std::wrapping_sub`
+and `std::wrapping_mul`: integer-only, defined modulo 2^N at the target type's
+width, never trapping, and recognized by the compiler as language items rather
+than by name. This adopts V01-DESIGN-03 and applies to both source and artifact
 modes.
 
 The recovered approved formatting contract defines char as a Unicode scalar,

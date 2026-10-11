@@ -63,8 +63,12 @@ V01-DESIGN-03 was resolved by maintainer adoption on 2026-10-06: ordinary
 integer arithmetic is checked and identical across debug/release; overflow,
 division by zero, `MIN / -1` and out-of-range shifts are deterministic failures,
 and compile-time instances are diagnostics. See [Semantics](semantics.md).
-Implementation and acceptance for the checked-arithmetic behavior remain a
-separate task (E1); this entry records the adopted decision only.
+**Implemented and accepted (E1)**: the runtime lowering uses LLVM overflow
+intrinsics for `+ - *`, dominance-ordered guards for `/ % << >>` and unary
+negation, and the comptime evaluator matches it; explicit modular arithmetic is
+available through `std::wrapping_add/sub/mul`, which are compiler-recognized
+language items and never trap. The compiler version was bumped 22 → 23 so
+pre-E1 artifacts with unchecked arithmetic are rejected.
 
 No new format-macro hook, interpolation syntax, runtime opcode or container
 language item is adopted. These require their own complete generic contract.
