@@ -2,7 +2,7 @@ import "literal_provider";
 fn main() -> i32 {
     dec bytes = literals::bytes();
     if bytes[0] != b'A' || bytes[1] != 0 || bytes[2] != 255 || bytes[3] != b'\n' { return 1; }
-    if literals::maximum() != (0u128 - 1u128) { return 2; }
+    if literals::maximum() != 340282366920938463463374607431768211455u128 { return 2; }
     if literals::minimum() != (-170141183460469231731687303715884105727i128 - 1i128) { return 3; }
     dec inferred: u8 = literals::identity(72);
     if inferred != 72 || literals::byte(71) != 72 { return 4; }
