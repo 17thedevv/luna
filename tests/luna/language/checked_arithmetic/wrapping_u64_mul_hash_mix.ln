@@ -1,0 +1,8 @@
+fn main() -> i32 {
+    dec a: u64 = 13787848793156543929;
+    dec b: u64 = 10723151780598845931;
+    dec x = std::wrapping_mul(a, b);
+    dec y = std::wrapping_add(x, 1);
+    if y == std::wrapping_add(x, 1) { return 0; }
+    return 7;
+}

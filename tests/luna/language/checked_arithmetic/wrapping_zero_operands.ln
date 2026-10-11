@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec z: u32 = 0;
+    dec x = std::wrapping_mul(z, z);
+    dec y = std::wrapping_add(x, z);
+    if y == 0 { return 0; }
+    return 7;
+}
