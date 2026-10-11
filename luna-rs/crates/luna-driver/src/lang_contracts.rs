@@ -119,6 +119,25 @@ impl LangContractManifest {
                     auto_visible_paths: &["std::OptionExt"],
                     language_items: &[],
                 },
+
+                // Explicit modular integer arithmetic. Ordinary `+ - *` stay checked;
+                // these intrinsics are the only sanctioned wrapping forms and are
+                // recognised by resolved language-item identity, never by name.
+                LangContractEntry {
+                    contract_id: "wrapping_arithmetic",
+                    provider_id: "num",
+                    visibility_kind: VisibilityKind::CompilerContract,
+                    auto_visible_paths: &[
+                        "std::wrapping_add",
+                        "std::wrapping_sub",
+                        "std::wrapping_mul",
+                    ],
+                    language_items: &[
+                        LanguageItemPath { lang_item: "wrapping_add", canonical_path: "std::wrapping_add" },
+                        LanguageItemPath { lang_item: "wrapping_sub", canonical_path: "std::wrapping_sub" },
+                        LanguageItemPath { lang_item: "wrapping_mul", canonical_path: "std::wrapping_mul" },
+                    ],
+                },
             ],
         }
     }

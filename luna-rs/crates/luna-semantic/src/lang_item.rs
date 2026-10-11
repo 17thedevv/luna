@@ -88,11 +88,22 @@ lang_item_table! {
     (DropInPlace, "drop_in_place", Function);
     (SliceFromRawParts, "slice_from_raw_parts", Function);
     (SliceFromRawPartsMut, "slice_from_raw_parts_mut", Function);
+    (WrappingAdd, "wrapping_add", Function);
+    (WrappingSub, "wrapping_sub", Function);
+    (WrappingMul, "wrapping_mul", Function);
 }
 
 impl LangItem {
     pub fn is_memory_intrinsic(self) -> bool {
         matches!(self, Self::DropInPlace | Self::SliceFromRawParts | Self::SliceFromRawPartsMut)
+    }
+
+    /// Explicit modular integer arithmetic intrinsics. These are the only
+    /// sanctioned unchecked-arithmetic operations; ordinary operators stay
+    /// checked. Recognition is by resolved lang-item identity, never by callee
+    /// or library symbol names.
+    pub fn is_wrapping_intrinsic(self) -> bool {
+        matches!(self, Self::WrappingAdd | Self::WrappingSub | Self::WrappingMul)
     }
 }
 

@@ -15,7 +15,7 @@ Authority: [Luna 0.1 specification](spec/0.1/README.md). Acquisition uses an exp
 | Copy | copy | copy |
 | Try / FromResidual / ControlFlow | try | try, try_from_output, try_branch, from_residual, from_residual_fn, control_flow, continue, break |
 
-The baseline has six families and **16** manifest hook identities. Exact canonical paths are represented in luna-rs/crates/luna-driver/src/lang_contracts.rs. The result provider adds controlled std::OptionExt visibility with no language hook. std::option_flatten is selected ordinary visibility beside Option. These contributions do not turn Result or a helper into a compiler-native type.
+The baseline has six families and **19** manifest hook identities. Exact canonical paths are represented in luna-rs/crates/luna-driver/src/lang_contracts.rs. The result provider adds controlled std::OptionExt visibility with no language hook. std::option_flatten is selected ordinary visibility beside Option. The wrapping-arithmetic hooks (`std::wrapping_add`, `std::wrapping_sub`, `std::wrapping_mul`) are the only sanctioned unchecked integer arithmetic; ordinary `+ - *` remain checked. These contributions do not turn Result or a helper into a compiler-native type.
 
 ## Identification, policy and identity
 

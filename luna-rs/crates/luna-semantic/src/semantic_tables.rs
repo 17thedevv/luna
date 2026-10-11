@@ -104,6 +104,9 @@ pub enum IntrinsicKind {
     AlignOf,
     TypeOf,
     TypeInfo,
+    WrappingAdd,
+    WrappingSub,
+    WrappingMul,
 }
 
 /// Declaration names belong to callable contracts, never structural function types.
