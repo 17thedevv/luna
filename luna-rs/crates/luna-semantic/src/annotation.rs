@@ -118,6 +118,52 @@ impl<'a> AttributeProcessor<'a> {
         }
     }
 
+    /// `__luna_intrinsic_*` is a compiler-owned namespace. Reject any user
+    /// declaration or `#[link]` rename that claims it, including on the inner
+    /// function of an `extern` declaration.
+    fn check_reserved_intrinsic_namespace(&mut self, decl: &Decl) {
+        let mut offenders: Vec<(String, Span)> = Vec::new();
+        let mut collect = |annotations: &[luna_ast::Annotation], name: Option<Span>, offenders: &mut Vec<(String, Span)>| {
+            if let Some(span) = name {
+                let text = self.get_span_text(span).to_string();
+                if text.starts_with("__luna_intrinsic_") {
+                    offenders.push((text, span));
+                }
+            }
+            for annot in annotations {
+                if self.get_span_text(annot.name) != "link" {
+                    continue;
+                }
+                if let Some(arg) = annot.args.first() {
+                    let raw = self.get_expr_identifier_text(arg.value);
+                    let linked = raw.trim_matches('"').to_string();
+                    if linked.starts_with("__luna_intrinsic_") {
+                        offenders.push((linked, annot.name));
+                    }
+                }
+            }
+        };
+        match decl {
+            Decl::Function { name, annotations, .. } => collect(annotations, Some(*name), &mut offenders),
+            Decl::Extern { func, annotations, .. } => {
+                collect(annotations, None, &mut offenders);
+                if let Decl::Function { name, annotations: inner, .. } = &self.arena.decls[func.0 as usize] {
+                    collect(inner, Some(*name), &mut offenders);
+                }
+            }
+            _ => {}
+        }
+        for (offender, span) in offenders {
+            self.diagnostics.push(
+                Diagnostic::error(format!(
+                    "`{offender}` uses the compiler-owned intrinsic namespace `__luna_intrinsic_`"
+                ))
+                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
+                .with_span(span),
+            );
+        }
+    }
+
     /// Get text from a span.
     fn get_span_text(&self, span: Span) -> &str {
         if (span.end as usize) <= self.source_manager.get_file(span.file_id).unwrap().source.len() && span.start <= span.end {
@@ -130,6 +176,8 @@ impl<'a> AttributeProcessor<'a> {
     /// Process a declaration's annotations.
     fn process_decl(&mut self, decl_id: DeclId, decl: &Decl) -> Vec<Item> {
         let mut generated = Vec::new();
+
+        self.check_reserved_intrinsic_namespace(decl);
 
         // Extract annotations from any decl variant
         let annotations = match decl {
@@ -316,7 +364,23 @@ impl<'a> AttributeProcessor<'a> {
             "link" => {
                 // link can be applied to functions (for FFI) or extern blocks
                 match decl {
-                    Decl::Function { .. } | Decl::Extern { .. } => {}
+                    Decl::Function { .. } | Decl::Extern { .. } => {
+                        // `__luna_intrinsic_*` is a compiler-owned namespace. A user
+                        // declaration may not claim it, including by renaming.
+                        if let Some(arg) = annot.args.first() {
+                            let raw = self.get_expr_identifier_text(arg.value);
+                            let name = raw.trim_matches('"');
+                            if name.starts_with("__luna_intrinsic_") {
+                                self.diagnostics.push(
+                                    Diagnostic::error(format!(
+                                        "`#[link(\"{name}\")]` claims the compiler-owned intrinsic namespace `__luna_intrinsic_`"
+                                    ))
+                                    .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
+                                    .with_span(annot.name),
+                                );
+                            }
+                        }
+                    }
                     _ => {
                         self.diagnostics.push(
                             Diagnostic::error("`#[link]` can only be applied to functions or extern blocks")

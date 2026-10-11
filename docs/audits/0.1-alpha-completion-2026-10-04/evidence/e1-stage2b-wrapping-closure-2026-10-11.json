@@ -1,0 +1,36 @@
+{
+  "task": "E1 Stage 2B — explicit wrapping intrinsics (closure)",
+  "status": "CLOSED / FIXED IN TESTED SCOPE",
+  "date": "2026-10-11",
+  "branch": "e1-checked-integer-arithmetic",
+  "base": "39b4cd6f",
+  "implementation_commit": "080c5099",
+  "contract": "Option A — std::wrapping_add/sub/mul, identity-based, modular, no trap; ordinary + - * stay checked",
+  "artifact_identity": {
+    "finding": "the serialized MVIR stream is not executed: executable definitions come from the portable AST (registry.rs:111/118/124, semantic_tables.rs:117) and MlibInstruction is referenced only inside luna-llib",
+    "consequence": "artifact-mode identity is re-established through the same resolved lang-item path as source mode; no unrecognised __luna_intrinsic_* CallDirect can reach the native linker because that stream is never executed",
+    "security_boundary": "a name in the wire does not prove authenticity of a forged artifact; the guarantee is artifact/namespace consistency, not anti-forgery. Reconstruction with strict validation becomes a precondition only if the serialized stream is ever executed.",
+    "wire_change": "none (no new MVIR opcode, format/MVIR versions unchanged)"
+  },
+  "guards": {
+    "declared_name": "a function declared as __luna_intrinsic_* is rejected (resolver)",
+    "link_rename": "#[link(\"__luna_intrinsic_...\")] is rejected, including on the inner function of an extern declaration",
+    "diagnostic": "typed E0005 / InvalidAnnotation"
+  },
+  "identity_evidence": [
+    "user function named wrapping_add / wrapping_mul keeps ordinary semantics",
+    "a wrapped call site is emitted as CallIntrinsic, lowered to plain modular LLVM ops"
+  ],
+  "tests": {
+    "wrapping_arithmetic_cli": "6 passed (modular source + artifact + relocated; user-name guard; forged name rejected; forged #[link] rejected; comptime modular without E4005)",
+    "freeze_matrix": "46 rows — 42 complete without a trap, 4 comptime diagnostics",
+    "hashmap": "14 passed",
+    "hashmap_storage": "11 passed",
+    "hashset": "8 passed",
+    "string": "16 passed",
+    "docs_validator": "0 errors"
+  },
+  "workspace": "PASS — 225 binaries, 1390 passed / 0 failed / 1 ignored, exit 0",
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none in 2B — compiler 22 -> 23 lands in Stage 4"
+}

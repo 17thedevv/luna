@@ -100,9 +100,11 @@ fn test_unhandled_instruction_fails_closed() {
     assert!(result.is_err(), "Expected compilation to fail closed");
     match result.unwrap_err() {
         BackendError::InvariantViolation(msg) => {
+            // The intrinsic path is now distinct from the generic instruction
+            // path, but both must fail closed with an invariant violation.
             assert!(
-                msg.contains("Unhandled MVIR instruction"),
-                "Error message should mention unhandled instruction: {}",
+                msg.contains("Unhandled intrinsic") || msg.contains("Unhandled MVIR instruction"),
+                "Error message should mention the unhandled instruction/intrinsic: {}",
                 msg
             );
         }
