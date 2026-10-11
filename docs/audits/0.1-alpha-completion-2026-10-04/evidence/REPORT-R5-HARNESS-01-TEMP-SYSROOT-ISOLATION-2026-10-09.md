@@ -63,8 +63,13 @@ New crate `luna-test-support` (dev-dependency of `luna-cli` and `luna-driver`):
 | B | 224 | 1383 | 0 | 1 | 0 | 1 dir / 0 GB | 1 dir / 0 GB |
 | C | 224 | 1383 | 0 | 1 | 0 | 1 dir / 0 GB | 1 dir / 0 GB |
 
-Residual is a single 0-byte directory owned by the last test process, reclaimed by
-the next process's orphan sweep — no unbounded accumulation.
+Residual is **bounded residual cleanup**, not full immediate cleanup: one 0-byte
+directory owned by the last test process remains and is reclaimed by the next
+process's orphan sweep. This is a known infrastructure limitation for
+0.1-alpha.1 — it is not a claim that every temp directory is removed the moment a
+process exits. The sweep only removes directories named `luna_test_ws_*`, directly
+under the process temp dir, carrying our marker file, and owned by a pid that is
+no longer alive, so a running process's workspace is never touched.
 
 `--test-threads=1` is **not** used as evidence that the race is fixed; it is at
 most a release-gate fallback.

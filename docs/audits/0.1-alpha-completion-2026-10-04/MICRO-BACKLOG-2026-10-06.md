@@ -612,14 +612,14 @@ next: classify C4-FU1 / D1-FU1 / D1-FU2 / D4-FU1
 
 | Debt | Classification | Before R5? |
 |---|---|---|
-| C4-FU1 branch-sensitive comptime deps | Sound but imprecise (static call-graph over-approximation) | No — DEFERRED to 0.2 |
-| D1-FU1 E3001 renders `%v5.0` | Presentation leak (code/span/ownership all correct) | No — NON_BLOCKING_PRESENTATION |
+| C4-FU1 branch-sensitive comptime deps | Sound but imprecise (static call-graph over-approximation) | **No — formally DEFERRED to 0.2** |
+| D1-FU1 E3001 renders `%v5.0` | Presentation leak (code/span/ownership all correct) | **No — formally DEFERRED (non-blocking presentation)** |
 | D1-FU2 comptime E1001 + E4005 | **Redundant cascade — FIXED** (provenance preserved at the comptime boundary) | Yes — CLOSED / FIXED IN TESTED SCOPE |
 | D4-FU1 `#[link]` placement | Corrected: `#[link]` on entry `main` → E6001 backend ICE | **Yes — RELEASE_BLOCKER** |
-| Harness parallel flakes | **FIXED** — `TempWorkspace` RAII ownership + orphan sweep; unbounded growth (3467 dirs / 21.3 GB → `StorageFull`) eliminated; per-test isolation preserved | Yes — CLOSED / FIXED IN TESTED SCOPE |
+| Harness parallel flakes | **FIXED** — `TempWorkspace` RAII ownership + orphan sweep; unbounded growth (3467 dirs / 21.3 GB → `StorageFull`) eliminated; bounded residual cleanup (one 0-byte dir reclaimed by the next process); per-test isolation preserved | Yes — CLOSED / FIXED IN TESTED SCOPE |
 
 Sequence from `d4d980fb`: D4-FU1 ✅ closed → D1-FU2 ✅ closed → R5-HARNESS-01 ✅ closed →
-(formally defer C4-FU1, D1-FU1) → regression workspace → E1/E2 → R4 → R5.
+C4-FU1 ✅ deferred → D1-FU1 ✅ deferred → regression workspace → E1/E2 → R4 → R5.
 
 ### D4-FU1 — `#[link]` on the program entry (FIXED)
 
@@ -715,9 +715,37 @@ gate: 3 consecutive full workspace runs, parallel mode (no --test-threads=1), te
 run A: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 0 dirs / 0 GB -> 1 dir / 0 GB
 run B: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 1 dir / 0 GB -> 1 dir / 0 GB
 run C: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 1 dir / 0 GB -> 1 dir / 0 GB
-residual: the single leftover directory is the last test process's workspace (0 bytes); the next process's orphan sweep reclaims it
-release: still BLOCKED (next: formally defer C4-FU1/D1-FU1, regression workspace, E-wave)
+residual: bounded residual cleanup — one 0-byte directory owned by the last test process; the next process's orphan sweep reclaims it. This is a known infrastructure limitation for 0.1-alpha.1; it is NOT a claim that every temp directory is removed the moment a process exits.
+sweep guard: only directories named `luna_test_ws_*`, directly under the process temp dir, carrying our marker file, AND owned by a pid that is no longer alive are removed — a running process's workspace is never touched.
+release: still BLOCKED (next: regression workspace → E-wave)
 ```
+
+### Formal defer decisions (0.1-alpha.1)
+
+Decisions recorded only — **no implementation change** in this pass.
+
+**C4-FU1 — branch-sensitive comptime dependency selection → DEFERRED to 0.2**
+- Decision: not a 0.1-alpha.1 release blocker. The behaviour is **sound but
+  imprecise**: the static call-graph over-approximation can record a provider that
+  is only reachable through an untaken branch. It never drops a real (executed)
+  dependency, so it cannot produce a stale-artifact false negative.
+- Tested scope: C4 freeze matrix C4-1/C4-2/C4-3/C4-5/C4-6/C4-7 with no
+  counterexample; `comptime_dependency_precision_cli` PASS (source + artifact).
+- Reopen when: a case is found where an untaken branch's provider materially
+  affects a release claim, or before claiming exact dependency selection.
+- Target: 0.2 (precision), not a correctness fix.
+
+**D1-FU1 — E3001 renders internal `%v5.0` → DEFERRED, non-blocking presentation**
+- Decision: presentation-only. Diagnostic code, span and phase ownership are all
+  correct; only the rendered message leaks an internal type-id placeholder.
+- Tested scope: D1 matrix DIAG-1..DIAG-10; `diagnostic_conformance_cli` PASS.
+- Reopen when: a user-visible message-quality pass is scheduled, or if a spec/UX
+  requirement forbids internal placeholders in rendered diagnostics.
+- Target: 0.2 (presentation), not a correctness fix.
+
+With C4-FU1 and D1-FU1 deferred, the known release blockers in the A/C/D groups
+and in test infrastructure are closed. This does **not** replace the E-wave (spec
+debt) or the R5 release qualification.
 
 ### A3 — Partial aggregate cleanup
 
