@@ -44,7 +44,8 @@
       { "run": "B", "binaries": 224, "passed": 1383, "failed": 0, "ignored": 1, "exit": 0, "temp_before": "1 dir / 0 GB", "temp_after": "1 dir / 0 GB" },
       { "run": "C", "binaries": 224, "passed": 1383, "failed": 0, "ignored": 1, "exit": 0, "temp_before": "1 dir / 0 GB", "temp_after": "1 dir / 0 GB" }
     ],
-    "residual": "the single leftover directory is the last test process's workspace (0 bytes); the next process's orphan sweep reclaims it",
+    "residual": "bounded residual cleanup: one 0-byte directory owned by the last test process, reclaimed by the next process's orphan sweep. Known infrastructure limitation for 0.1-alpha.1; it is NOT a claim that every temp directory is removed the moment a process exits.",
+    "sweep_guard": "only directories named luna_test_ws_*, directly under the process temp dir, carrying the marker file, AND owned by a pid that is no longer alive are removed; a running process's workspace is never touched",
     "note": "temp is measured as count and total size of %TEMP%\\luna* before and after each full workspace run"
   },
   "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
