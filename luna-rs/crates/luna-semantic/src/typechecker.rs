@@ -151,8 +151,16 @@ impl<'a> TypeChecker<'a> {
         match error {
             crate::ComptimeError::Diagnostics(diagnostics) => self.ctx.diagnostics.extend(diagnostics),
             // The failure is a lowering symptom of a program an earlier phase
-            // already diagnosed; do not emit a duplicate comptime diagnostic.
-            crate::ComptimeError::AlreadyDiagnosed => {}
+            // diagnosed. Suppress the wrapper only while a root diagnostic is
+            // guaranteed to be visible; otherwise fail closed rather than drop
+            // the failure silently.
+            crate::ComptimeError::AlreadyDiagnosed => {
+                if !any_error_emitted(&self.ctx.diagnostics) {
+                    self.ctx.diagnostics.push(Diagnostic::error(format!(
+                        "{context}: comptime lowering failed without a previously reported diagnostic"
+                    )).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
+                }
+            }
             other => self.ctx.diagnostics.push(Diagnostic::error(format!("{context}: {other}"))
                 .with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span)),
         }
@@ -6320,5 +6328,45 @@ impl<'a> TypeChecker<'a> {
         } else {
             true
         }
+    }
+}
+
+/// A comptime failure may only be suppressed as redundant when at least one
+/// error-level diagnostic is already visible to the user; otherwise the
+/// compiler must fail closed rather than drop the failure silently.
+fn any_error_emitted(diagnostics: &[luna_common::Diagnostic]) -> bool {
+    diagnostics
+        .iter()
+        .any(|diagnostic| matches!(diagnostic.level, luna_common::DiagnosticLevel::Error))
+}
+
+#[cfg(test)]
+mod comptime_failure_completeness_tests {
+    use super::any_error_emitted;
+    use luna_common::ids::FileId;
+    use luna_common::{Diagnostic, DiagnosticCode, Span};
+
+    fn span() -> Span {
+        Span::new(FileId(0), 0, 1)
+    }
+
+    #[test]
+    fn suppression_requires_a_visible_error_level_root_diagnostic() {
+        let empty: Vec<Diagnostic> = Vec::new();
+        assert!(!any_error_emitted(&empty), "no failure may be suppressed with an empty list");
+
+        let warnings_only = vec![Diagnostic {
+            level: luna_common::DiagnosticLevel::Warning,
+            code: None,
+            span: None,
+            message: String::from("just a warning"),
+            related: Vec::new(),
+        }];
+        assert!(!any_error_emitted(&warnings_only), "warnings do not justify suppression");
+
+        let with_error = vec![Diagnostic::error("Method `not_a_method` not found")
+            .with_code(DiagnosticCode::UnresolvedSymbol)
+            .with_span(span())];
+        assert!(any_error_emitted(&with_error), "a visible error justifies suppression");
     }
 }
