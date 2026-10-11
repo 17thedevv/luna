@@ -2241,9 +2241,10 @@ impl<'a> TypeChecker<'a> {
                                 self.ctx.const_values.insert(sym_id, val);
                             }
                         }
-                        Err(e) => {
-                            let span = self.get_expr_span_for_diag(&init).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.report_comptime_error(e, span, "cannot evaluate constant in comptime");
+                        Err(_) => {
+                            // Diagnostic ownership: the main declaration pass reports a
+                            // constant-evaluation failure exactly once. Reporting here as
+                            // well would duplicate the same root cause.
                         }
                     }
                     self.current_scope = previous_scope;
