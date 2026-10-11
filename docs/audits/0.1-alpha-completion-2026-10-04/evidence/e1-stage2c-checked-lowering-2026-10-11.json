@@ -1,0 +1,34 @@
+{
+  "task": "E1 Stage 2C — checked LLVM lowering for ordinary integer arithmetic",
+  "status": "DONE (focused gate green; full regression deferred to final qualification)",
+  "date": "2026-10-11",
+  "branch": "e1-checked-integer-arithmetic",
+  "base": "b92600d3",
+  "implementation": {
+    "add_sub_mul": "LLVM overflow intrinsics llvm.{s,u}{add,sub,mul}.with.overflow.iN; the overflow flag branches to __luna_overflow_fail before the value is used",
+    "div_rem": "guards run before the division: divisor == 0 -> __luna_div_zero_fail; signed MIN / -1 and MIN % -1 -> __luna_overflow_fail",
+    "shift": "count guard uses one unsigned comparison (count >= lhs_width), which also catches a negative count whose bit pattern is huge; then left shift verifies x * 2^n stays representable via the round-trip (result >> n) == x (arithmetic for signed, logical for unsigned)",
+    "unary_neg": "signed -MIN traps; unsigned negation keeps its existing modular behavior",
+    "float_pointer": "float arithmetic and pointer arithmetic paths are unchanged",
+    "no_nsw_nuw": "overflow is detected with intrinsics; no nsw/nuw flags are used as the check",
+    "trap_placement": "guards dominate the dangerous operation in the CFG (trap block precedes and branches around it)"
+  },
+  "compiler_generated_audit": {
+    "generator.rs:675": "count - 1 guarded by count != 0 (provably safe) but still checked",
+    "generator.rs:681": "pointer elements + index (pointer arithmetic path, unchanged)",
+    "generator.rs:2249": "C-style for-loop step cur + 1 is user-visible integer arithmetic -> checked",
+    "const_fold": "const_fold uses checked_* and skips folding on overflow, so no wrapped constant can reach codegen",
+    "conclusion": "no internal operation needs wrapping; the only intentional wrapping is stdlib hashing, already migrated to wrapping_mul"
+  },
+  "matrix": {
+    "rows": 52,
+    "trap": 28,
+    "no_trap": 20,
+    "compile_error": 4,
+    "unexpected_exit": 0,
+    "note": "28 traps cover signed/unsigned add/sub/mul overflow, division and remainder by zero, signed MIN / -1 and MIN % -1, invalid shift counts, left-shift value overflow, unary -MIN, plus literal-only, runtime-variable, const-fold-sensitive and narrow-width variants. 20 no-trap rows are the positives and the 12 wrapping reducers."
+  },
+  "debug_release": "identical by construction: no cfg(debug_assertions)-dependent arithmetic lowering and a single lowering path; the shared signature was not weakened.",
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none in 2C — compiler 22 -> 23 lands in Stage 4"
+}

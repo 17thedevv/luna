@@ -1,0 +1,10 @@
+fn add_one(x: i8) -> i8 {
+    return x + 1;
+}
+
+fn main() -> i32 {
+    dec rw v: i8 = 127;
+    dec rw r: i8 = add_one(v);
+    if r == ((0 - 127) - 1) { return 0; }
+    return 7;
+}

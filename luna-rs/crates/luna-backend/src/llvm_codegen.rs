@@ -4,9 +4,9 @@ use std::path::Path;
 use inkwell::context::Context;
 use inkwell::module::Module as InkwellModule;
 use inkwell::builder::Builder;
-use inkwell::values::BasicValueEnum;
+use inkwell::values::{BasicValueEnum, IntValue};
 use inkwell::basic_block::BasicBlock as InkwellBasicBlock;
-use inkwell::types::{BasicTypeEnum, BasicType};
+use inkwell::types::{BasicTypeEnum, BasicType, IntType};
 use inkwell::targets::{Target, TargetMachine, InitializationConfig, FileType};
 use inkwell::OptimizationLevel;
 
@@ -419,6 +419,12 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
         ], false);
         self.llvm_module.add_function("__luna_bounds_fail", bounds_type, None);
 
+        // Declare `__luna_overflow_fail(ptr, i32) -> void` and
+        // `__luna_div_zero_fail(ptr, i32) -> void` (checked arithmetic traps).
+        let arith_trap_type = void_type.fn_type(&[ptr_type.into(), i32_type.into()], false);
+        self.llvm_module.add_function("__luna_overflow_fail", arith_trap_type, None);
+        self.llvm_module.add_function("__luna_div_zero_fail", arith_trap_type, None);
+
         // Declare `__luna_panic(ptr, i64, ptr, i64, i32, i32) -> void`
         let panic_type = void_type.fn_type(&[
             ptr_type.into(), i64_type.into(),
@@ -669,7 +675,15 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let res = self.builder.build_float_neg(val.into_float_value(), &format!("v{}", id.0)).unwrap();
                     Ok(res.into())
                 } else {
-                    let res = self.builder.build_int_neg(val.into_int_value(), &format!("v{}", id.0)).unwrap();
+                    let v = val.into_int_value();
+                    // Signed `-MIN` is not representable and must trap. Unsigned
+                    // negation keeps its existing modular behavior.
+                    if !self.is_unsigned_operand(value, _func) {
+                        let min = self.int_min_value(v.get_type());
+                        let is_min = self.builder.build_int_compare(inkwell::IntPredicate::EQ, v, min, &format!("negmin_{}", id.0)).unwrap();
+                        self.emit_guarded_trap(is_min, "__luna_overflow_fail", id.0)?;
+                    }
+                    let res = self.builder.build_int_neg(v, &format!("v{}", id.0)).unwrap();
                     Ok(res.into())
                 }
             }
@@ -691,7 +705,10 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 } else {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
-                    let res = self.builder.build_int_add(l, r, &format!("v{}", id.0)).unwrap();
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let op = if is_unsigned { "uadd" } else { "sadd" };
+                    let (res, overflow) = self.checked_int_binop(op, l, r, id.0)?;
+                    self.emit_guarded_trap(overflow, "__luna_overflow_fail", id.0)?;
                     Ok(res.into())
                 }
             }
@@ -738,7 +755,10 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 } else {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
-                    let res = self.builder.build_int_sub(l, r, &format!("v{}", id.0)).unwrap();
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let op = if is_unsigned { "usub" } else { "ssub" };
+                    let (res, overflow) = self.checked_int_binop(op, l, r, id.0)?;
+                    self.emit_guarded_trap(overflow, "__luna_overflow_fail", id.0)?;
                     Ok(res.into())
                 }
             }
@@ -751,7 +771,10 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 } else {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
-                    let res = self.builder.build_int_mul(l, r, &format!("v{}", id.0)).unwrap();
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let op = if is_unsigned { "umul" } else { "smul" };
+                    let (res, overflow) = self.checked_int_binop(op, l, r, id.0)?;
+                    self.emit_guarded_trap(overflow, "__luna_overflow_fail", id.0)?;
                     Ok(res.into())
                 }
             }
@@ -765,6 +788,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
                     let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    self.emit_div_guards(l, r, is_unsigned, id.0)?;
                     let res = if is_unsigned {
                         self.builder.build_int_unsigned_div(l, r, &format!("v{}", id.0)).unwrap()
                     } else {
@@ -783,6 +807,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
                     let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    self.emit_div_guards(l, r, is_unsigned, id.0)?;
                     let res = if is_unsigned {
                         self.builder.build_int_unsigned_rem(l, r, &format!("v{}", id.0)).unwrap()
                     } else {
@@ -848,13 +873,25 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::Shl { left, right } => {
                 let l = self.generate_operand(left)?.into_int_value();
                 let r = self.generate_operand(right)?.into_int_value();
+                let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                let lhs_width = self.int_bit_width(l.get_type());
+                self.emit_shift_count_guard(r, lhs_width, id.0)?;
                 let res = self.builder.build_left_shift(l, r, &format!("v{}", id.0)).unwrap();
+                // Value overflow: `x * 2^n` must stay representable, i.e. shifting
+                // the result back must recover the operand exactly. This also holds
+                // for negative operands (arithmetic right shift), and the count was
+                // already validated, so no invalid shift is executed.
+                let back = self.builder.build_right_shift(res, r, !is_unsigned, &format!("shl_back_{}", id.0)).unwrap();
+                let lost = self.builder.build_int_compare(inkwell::IntPredicate::NE, back, l, &format!("shl_lost_{}", id.0)).unwrap();
+                self.emit_guarded_trap(lost, "__luna_overflow_fail", id.0)?;
                 Ok(res.into())
             }
             Instruction::Shr { left, right } => {
                 let l = self.generate_operand(left)?.into_int_value();
                 let r = self.generate_operand(right)?.into_int_value();
                 let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                let lhs_width = self.int_bit_width(l.get_type());
+                self.emit_shift_count_guard(r, lhs_width, id.0)?;
                 let res = self.builder.build_right_shift(l, r, !is_unsigned, &format!("v{}", id.0)).unwrap();
                 Ok(res.into())
             }
@@ -1961,6 +1998,139 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             }
         }
         Ok(())
+    }
+
+    /// Emit `if guard { <trap>(file, line); unreachable }` with the trap in a
+    /// block that dominates the dangerous operation, then continue in the
+    /// fall-through block. Guards must always run before the risky instruction.
+    fn emit_guarded_trap(&self, guard: IntValue<'ctx>, trap_fn: &str, id: u32) -> Result<(), BackendError> {
+        let current_fn = self.builder.get_insert_block().unwrap().get_parent().unwrap();
+        let ok_bb = self.context.append_basic_block(current_fn, &format!("arith_ok_{}", id));
+        let fail_bb = self.context.append_basic_block(current_fn, &format!("arith_fail_{}", id));
+        self.builder.build_conditional_branch(guard, fail_bb, ok_bb).unwrap();
+        self.builder.position_at_end(fail_bb);
+        let trap = self.get_function(trap_fn).ok_or_else(|| {
+            BackendError::InvariantViolation(format!("{trap_fn} declaration missing"))
+        })?;
+        let file_name = self.llvm_module.get_name().to_str().unwrap_or("<unknown>");
+        let file_str = self.builder.build_global_string_ptr(file_name, "arith_file").unwrap();
+        let line = self.context.i32_type().const_zero();
+        self.builder
+            .build_call(trap, &[file_str.as_pointer_value().into(), line.into()], "")
+            .unwrap();
+        self.builder.build_unreachable().unwrap();
+        self.builder.position_at_end(ok_bb);
+        Ok(())
+    }
+
+    fn int_bit_width(&self, ty: IntType<'ctx>) -> u64 {
+        ty.get_bit_width() as u64
+    }
+
+    fn int_min_value(&self, ty: IntType<'ctx>) -> IntValue<'ctx> {
+        let width = self.int_bit_width(ty);
+        if width == 0 || width >= 128 {
+            return ty.const_zero();
+        }
+        ty.const_int(1u64 << (width - 1), false)
+    }
+
+    /// `{result, overflow}` from the LLVM overflow intrinsic for +, -, *.
+    fn checked_int_binop(
+        &self,
+        op: &str,
+        l: IntValue<'ctx>,
+        r: IntValue<'ctx>,
+        id: u32,
+    ) -> Result<(IntValue<'ctx>, IntValue<'ctx>), BackendError> {
+        let ty = l.get_type();
+        let width = self.int_bit_width(ty);
+        let name = format!("llvm.{}.with.overflow.i{}", op, width);
+        let struct_ty = self
+            .context
+            .struct_type(&[ty.into(), self.context.bool_type().into()], false);
+        let fn_ty = struct_ty.fn_type(&[ty.into(), ty.into()], false);
+        let func = match self.llvm_module.get_function(&name) {
+            Some(f) => f,
+            None => self.llvm_module.add_function(&name, fn_ty, None),
+        };
+        let call = self
+            .builder
+            .build_call(func, &[l.into(), r.into()], &format!("ovf_{}", id))
+            .map_err(|e| {
+                BackendError::InvariantViolation(format!("overflow intrinsic call failed: {e}"))
+            })?;
+        let sv = call
+            .try_as_basic_value()
+            .left()
+            .ok_or_else(|| {
+                BackendError::InvariantViolation("overflow intrinsic returned void".into())
+            })?
+            .into_struct_value();
+        let result = self
+            .builder
+            .build_extract_value(sv, 0, &format!("ovf_val_{}", id))
+            .unwrap()
+            .into_int_value();
+        let overflow = self
+            .builder
+            .build_extract_value(sv, 1, &format!("ovf_bit_{}", id))
+            .unwrap()
+            .into_int_value();
+        Ok((result, overflow))
+    }
+
+    /// Guard divisor == 0 (div/rem by zero trap) and, for signed integers,
+    /// MIN / -1 and MIN % -1 (overflow trap) *before* the division executes.
+    fn emit_div_guards(
+        &self,
+        l: IntValue<'ctx>,
+        r: IntValue<'ctx>,
+        is_unsigned: bool,
+        id: u32,
+    ) -> Result<(), BackendError> {
+        let ty = r.get_type();
+        let zero = ty.const_zero();
+        let is_zero = self
+            .builder
+            .build_int_compare(inkwell::IntPredicate::EQ, r, zero, &format!("dz_{}", id))
+            .unwrap();
+        self.emit_guarded_trap(is_zero, "__luna_div_zero_fail", id)?;
+        if !is_unsigned {
+            let min = self.int_min_value(ty);
+            let is_min = self
+                .builder
+                .build_int_compare(inkwell::IntPredicate::EQ, l, min, &format!("dmin_{}", id))
+                .unwrap();
+            let minus_one = ty.const_all_ones();
+            let is_neg_one = self
+                .builder
+                .build_int_compare(inkwell::IntPredicate::EQ, r, minus_one, &format!("dneg1_{}", id))
+                .unwrap();
+            let danger = self
+                .builder
+                .build_and(is_min, is_neg_one, &format!("dovf_{}", id))
+                .unwrap();
+            self.emit_guarded_trap(danger, "__luna_overflow_fail", id)?;
+        }
+        Ok(())
+    }
+
+    /// Guard a shift count: the raw unsigned comparison `count >= lhs_width`
+    /// catches both `count >= width` and a negative count (whose bit pattern is
+    /// huge), so no invalid shift is ever executed.
+    fn emit_shift_count_guard(
+        &self,
+        r: IntValue<'ctx>,
+        lhs_width: u64,
+        id: u32,
+    ) -> Result<(), BackendError> {
+        let width_const = r.get_type().const_int(lhs_width, false);
+        let too_big = self
+            .builder
+            .build_int_compare(inkwell::IntPredicate::UGE, r, width_const, &format!("shcnt_{}", id))
+            .unwrap();
+        self.emit_guarded_trap(too_big, "__luna_overflow_fail", id)
     }
 
     fn is_unsigned_operand(&self, op: &Operand, func: &MvirFunction) -> bool {

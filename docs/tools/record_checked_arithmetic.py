@@ -53,6 +53,7 @@ def main():
                     try:
                         run = subprocess.run([str(exe)], capture_output=True, text=True, timeout=15)
                         row['run_exit'] = run.returncode
+                        row['run_stderr'] = (run.stderr or '')[:400]
                         row['trap'] = run.returncode != 0
                     except subprocess.TimeoutExpired:
                         row.update(run_exit=-1, trap=True, timeout=True)
@@ -60,15 +61,39 @@ def main():
                     row.update(run_exit=None, trap=None)
             except subprocess.TimeoutExpired:
                 row.update(compile_exit=-1, timeout=True)
+            row['outcome'] = classify(row)
             rows.append(row)
             print(f"{name}: compile={row.get('compile_exit')} run={row.get('run_exit')} "
-                  f"trap={row.get('trap')} {row.get('diagnostics')}", flush=True)
+                  f"outcome={row['outcome']} {row.get('diagnostics')}", flush=True)
 
     (OUT / f'e1-{args.label}.json').write_text(json.dumps(rows, indent=2), encoding='utf-8')
     trapped = sum(1 for row in rows if row.get('trap'))
     clean = sum(1 for row in rows if row.get('trap') is False)
     failed = sum(1 for row in rows if row.get('compile_exit') not in (0, None))
     print(f"\nrows={len(rows)} trapped={trapped} completed_without_trap={clean} compile_failed={failed}")
+
+
+def classify(row):
+    """Fine-grained outcome: distinguishes a real trap from an unexpected crash.
+
+    A non-zero exit alone is not evidence of a trap: the runtime signature (a
+    Luna panic mentioning the arithmetic failure) or a known trap status must
+    confirm it.
+    """
+    if row.get('compile_exit') not in (0, None):
+        return 'COMPILE_ERROR'
+    if row.get('timeout'):
+        return 'TIMEOUT'
+    run = row.get('run_exit')
+    if run == 0:
+        return 'NO_TRAP'
+    text = (row.get('run_stderr') or '').lower()
+    if 'overflow' in text or 'division by zero' in text or 'divide by zero' in text or 'shift' in text:
+        return 'TRAP'
+    # Windows status codes: integer divide by zero / illegal instruction.
+    if run in (0xC0000094, 0xC000001D, 0xC0000409) or run < 0:
+        return 'TRAP'
+    return 'UNEXPECTED_EXIT'
 
 
 if __name__ == '__main__':
