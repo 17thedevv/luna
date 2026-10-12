@@ -1,0 +1,17 @@
+{
+  "source_sha": "0fff28d83ba317d1ab6bb6edef6ce1b383a9fd3b",
+  "tracked_diff_sha256": "6de0790758e055c4eb06023e8abddaebc274db40fe589bd42de9d9de735df580",
+  "cli_sha256": "cb62ddfcafd12052863c7780a8c8a76b39ad8175df9915dd0f312a6ad704d842",
+  "cli": "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+  "sysroot": "D:\\fdlang\\luna-rs",
+  "profile": "debug",
+  "provider_mode": "existing",
+  "rows": 55,
+  "outcomes": {
+    "COMPILE_ERROR": 4,
+    "TRAP": 30,
+    "PASS": 9,
+    "WRAP": 12
+  },
+  "contract_met": true
+}

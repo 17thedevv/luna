@@ -245,6 +245,7 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
     let mut items = parser.parse_file().map_err(|_| parser.diagnostics.clone())?;
     if !parser.diagnostics.is_empty() { return Err(parser.diagnostics); }
     let mut semantic_ctx = SemanticContext::new();
+    semantic_ctx.current_file_id = Some(file_id);
 
     let search_paths_buf: Vec<std::path::PathBuf> = options.search_paths.iter().map(std::path::PathBuf::from).collect();
     let sysroot = search_paths_buf
@@ -270,8 +271,7 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
     let registry = std::mem::take(&mut driver_session.registry);
     drop(driver_session);
 
-    let mut attr_processor = luna_semantic::AttributeProcessor::new(&mut arena, &mut session.source_manager, file_id);
-    let items = attr_processor.process_items(items).map_err(|e| e)?;
+    let items = TypeChecker::prepare_attributes(&mut arena, &mut session.source_manager, file_id, items)?;
 
     registry.inject_into_ctx(&mut semantic_ctx);
 
@@ -288,7 +288,7 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
         &semantic_ctx.symbol_table,
         &semantic_ctx.tables,
     );
-    let items = macro_engine.expand_items(items).map_err(|e| e)?;
+    let items = macro_engine.expand_items(items).map_err(Resolver::admit_macro_expansion_failures)?;
 
     Resolver::new(&mut semantic_ctx, &arena, &session.source_manager).resolve_items(&items);
     let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
@@ -336,6 +336,7 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
     let mut items = parser.parse_file().map_err(|_| parser.diagnostics.clone())?;
     if !parser.diagnostics.is_empty() { return Err(parser.diagnostics); }
     let mut semantic_ctx = SemanticContext::new();
+    semantic_ctx.current_file_id = Some(file_id);
     
     let search_paths_buf: Vec<std::path::PathBuf> = options.search_paths.iter().map(std::path::PathBuf::from).collect();
     let sysroot = search_paths_buf
@@ -376,8 +377,7 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
     let registry = std::mem::take(&mut driver_session.registry);
     drop(driver_session);
     
-    let mut attr_processor = luna_semantic::AttributeProcessor::new(&mut arena, &mut session.source_manager, file_id);
-    let items = attr_processor.process_items(items).map_err(|e| e)?;
+    let items = TypeChecker::prepare_attributes(&mut arena, &mut session.source_manager, file_id, items)?;
 
     registry.inject_into_ctx(&mut semantic_ctx);
 
@@ -394,7 +394,7 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
         &semantic_ctx.symbol_table,
         &semantic_ctx.tables,
     );
-    let items = macro_engine.expand_items(items).map_err(|e| e)?;
+    let items = macro_engine.expand_items(items).map_err(Resolver::admit_macro_expansion_failures)?;
 
     Resolver::new(&mut semantic_ctx, &arena, &session.source_manager).resolve_items(&items);
     let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
@@ -498,6 +498,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             }
             // Semantic phase
             let mut semantic_ctx = SemanticContext::new();
+            semantic_ctx.current_file_id = Some(file_id);
             
             let main_expr_end = arena.exprs.len() as u32;
             let main_decl_end = arena.decls.len() as u32;
@@ -558,8 +559,9 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             let registry = std::mem::take(&mut driver_session.registry);
             drop(driver_session);
 
-            let mut attr_processor = luna_semantic::AttributeProcessor::new(&mut arena, &mut session.source_manager, file_id);
-            let items_mut = attr_processor.process_items(items_mut).map_err(|e| e)?;
+            let generated_start = (arena.exprs.len() as u32, arena.decls.len() as u32,
+                arena.pats.len() as u32, arena.types.len() as u32);
+            let items_mut = TypeChecker::prepare_attributes(&mut arena, &mut session.source_manager, file_id, items_mut)?;
 
             registry.inject_into_ctx(&mut semantic_ctx);
 
@@ -576,7 +578,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 &semantic_ctx.symbol_table,
                 &semantic_ctx.tables,
             );
-            let items_mut = macro_engine.expand_items(items_mut).map_err(|e| e)?;
+            let items_mut = macro_engine.expand_items(items_mut).map_err(Resolver::admit_macro_expansion_failures)?;
 
             let mut resolver = Resolver::new(&mut semantic_ctx, &arena, &session.source_manager);
             resolver.resolve_items(&items_mut);
@@ -717,9 +719,10 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     _ => return None,
                 };
                 Some((ty.0, bits, signed))
-            });
+            }).collect::<Vec<_>>();
+            let integer_types = integer_ranges.iter().map(|fact| fact.0).collect::<Vec<_>>();
             pass_manager.add_pass(Box::new(luna_optimizer::ConstantFolding::with_integer_ranges(integer_ranges)));
-            pass_manager.add_pass(Box::new(luna_optimizer::DeadCodeElimination::new()));
+            pass_manager.add_pass(Box::new(luna_optimizer::DeadCodeElimination::with_integer_types(integer_types)));
             pass_manager.run(&mut module);
             if !options.quiet {
                 println!("-----------------");
@@ -888,7 +891,15 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     pats: 0..main_pat_end,
                     types: 0..main_type_end,
                 };
-                let interface = crate::registry::ModuleRegistry::extract_interface_from_ctx(provider_name.clone(), main_provider_id, &semantic_ctx, &ranges);
+                let generated = crate::registry::ArenaRanges {
+                    exprs: generated_start.0..arena.exprs.len() as u32,
+                    decls: generated_start.1..arena.decls.len() as u32,
+                    pats: generated_start.2..arena.pats.len() as u32,
+                    types: generated_start.3..arena.types.len() as u32,
+                };
+                let interface = crate::registry::ModuleRegistry::extract_interface_from_owned_ranges(
+                    provider_name.clone(), main_provider_id, &semantic_ctx, &[ranges, generated],
+                );
                 let builder = crate::metadata_builder::MetadataBuilder::new(&registry, &interface, &summaries);
                 let semantic_metadata = Some(builder.build());
 
@@ -897,7 +908,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                         .with_code(luna_common::DiagnosticCode::ObjectEmissionFailure),
                 ])?;
                 luna_llib::LlibWriter::write_module(
-                    &module, &arena, &items, &input, manifest, semantic_metadata.as_ref(),
+                    &module, &arena, &items_mut, &input, manifest, semantic_metadata.as_ref(),
                     Some(&obj_bytes), &mut llib_buffer,
                 ).map_err(|error| vec![
                     Diagnostic::error(format!("Failed to serialize library artifact '{}': {}", llib_file, error))

@@ -1,0 +1,26 @@
+{
+  "scope": "development only; not the final source SHA gate",
+  "source_identity": "working tree during repairs; no immutable source pin recorded for these executions",
+  "logs": [
+    {
+      "log": ".e1-qualification24-final.log",
+      "sha256": "2b579a4fe8aab3d5e7f558646ba8cac9b9dcbcc560d93acc94986809bd484727",
+      "archive": "e1-development-qualification24-final.txt.gz"
+    },
+    {
+      "log": ".e1-owner24-final3.log",
+      "sha256": "e4b65c7a5bcf7b2496f2494affb38b1fe64ad85406d5bfd92ef031c322d26b53",
+      "archive": "e1-development-owner24-final3.txt.gz"
+    },
+    {
+      "log": ".e1-approved-contract-focused.log",
+      "sha256": "579b7e679f559279a480b64b97875ccf83215e775ba9f2e65cedd035c0a1d91d",
+      "archive": "e1-development-approved-contract-focused.txt.gz"
+    },
+    {
+      "log": ".e1-release-range-probe.log",
+      "sha256": "8849f9ec86052302a06c949d000f2a01eefaa17bfdd984976410e0a34c98ef54",
+      "archive": "e1-development-release-range-probe.txt.gz"
+    }
+  ]
+}

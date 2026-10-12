@@ -1,0 +1,7 @@
+macro value_macro {
+    () => { 1 }
+}
+fn main() -> i32 {
+    dec value = value_macro;
+    return 0;
+}

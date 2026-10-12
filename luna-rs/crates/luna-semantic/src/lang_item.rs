@@ -153,7 +153,7 @@ impl LangItemRegistry {
     pub fn register(&mut self, item: LangItem, sym: SymbolId, actual_target: LangItemTarget, span: Span, diagnostics: &mut Vec<Diagnostic>) {
         let expected_target = item.target();
         if actual_target != expected_target {
-            diagnostics.push(Diagnostic::error(format!("language item `{}` requires target {:?}, but found {:?}", item.name(), expected_target, actual_target)).with_code(DiagnosticCode::InvalidAnnotation).with_span(span));
+            diagnostics.push(Diagnostic::error(format!("language item `{}` requires target {:?}, but found {:?}", item.name(), expected_target, actual_target)).with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver).with_span(span));
             return;
         }
 

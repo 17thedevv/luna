@@ -776,6 +776,12 @@ impl<'a> Parser<'a> {
             } else {
                 self.source[token.span.start as usize..token.span.end as usize].to_string()
             };
+            if let Err(diagnostic) = crate::validate_literal_syntax(token, &text) {
+                self.diagnostics.push(diagnostic);
+                // Keep consuming the enclosing declaration after a malformed
+                // literal. The Parser diagnostic fails admission; aborting item
+                // parsing here would restate its closing brace as another error.
+            }
             return Ok(self.arena.alloc_expr(Expr::Literal(token, text)));
         }
 

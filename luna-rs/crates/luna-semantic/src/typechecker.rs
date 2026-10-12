@@ -10,6 +10,8 @@ mod call_binding;
 mod call_defaults;
 #[path = "trait_bound_proof.rs"]
 mod trait_bound_proof;
+#[path = "attribute_application.rs"]
+mod attribute_application;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssociatedTypeEqObligation {
@@ -47,6 +49,30 @@ pub struct TypeChecker<'a> {
 }
 
 impl<'a> TypeChecker<'a> {
+    /// TypeChecker-owned preparation admission, before name resolution because
+    /// derives materialize declarations. Transformations return structured
+    /// failures; this boundary alone gives application failures their code/span.
+    /// Binding identity is never validated here: Resolver owns that later pass.
+    pub fn prepare_attributes(
+        arena: &mut AstArena,
+        sources: &mut luna_common::source::SourceManager,
+        file: luna_common::ids::FileId,
+        items: Vec<Item>,
+    ) -> Result<Vec<Item>, Vec<Diagnostic>> {
+        crate::AttributeProcessor::new(arena, sources, file).process_items(items)
+            .map_err(Self::admit_attribute_expansion_failures)
+    }
+
+    pub fn admit_attribute_expansion_failures(
+        failures: Vec<crate::derive::AttributeExpansionFailure>,
+    ) -> Vec<Diagnostic> {
+        failures.into_iter().map(|failure| match failure {
+            crate::derive::AttributeExpansionFailure::Parser(diagnostic) => diagnostic,
+            crate::derive::AttributeExpansionFailure::Application { message, span } =>
+                Diagnostic::source_error(DiagnosticCode::InvalidAttributeApplication, span, message),
+        }).collect()
+    }
+
 
     pub fn get_span_text(&self, span: luna_common::ids::Span) -> &'a str {
         &self.source_manager.get_file(span.file_id).unwrap().source[span.start as usize..span.end as usize]
@@ -2170,7 +2196,7 @@ impl<'a> TypeChecker<'a> {
             if !valid {
                 self.ctx.diagnostics.push(Diagnostic::error(format!(
                     "invalid declaration for memory intrinsic `{}`: expected an unsafe, bodyless, non-variadic intrinsic with the canonical generic signature", item.name()))
-                    .with_code(DiagnosticCode::InvalidAnnotation)
+                    .with_code(DiagnosticCode::InvalidAttributeApplication).in_phase(luna_common::diagnostic::DiagnosticPhase::TypeChecker)
                     .with_span(self.ctx.symbol_table.get_symbol(symbol).span));
             }
         }
@@ -3118,7 +3144,7 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             Type::MacroCall { span, .. } => {
-                self.ctx.diagnostics.push(Diagnostic::error("internal compiler error: unexpanded macro call in type position").with_code(DiagnosticCode::InvalidSyntax).with_span(*span));
+                self.ctx.diagnostics.push(Diagnostic::invariant_error("internal compiler error: unexpanded macro call in type position").with_span(*span));
                 self.ctx.types.intern(SemanticType::Error)
             }
             Type::Typeof { expr } => {
@@ -3128,7 +3154,7 @@ impl<'a> TypeChecker<'a> {
                 self.ctx.types.intern(SemanticType::Never)
             }
             other => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("Unsupported or unrecognized type construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax));
+                self.ctx.diagnostics.push(Diagnostic::invariant_error(format!("Unrecognized internal type construct in semantic phase: {:?}", other)));
                 self.ctx.types.intern(SemanticType::Error)
             }
         };
@@ -3140,6 +3166,7 @@ impl<'a> TypeChecker<'a> {
         match item {
             Item::Decl(decl_id) => {
                 let decl = &self.arena.decls[decl_id.0 as usize];
+                self.validate_attribute_application(decl);
                 match decl {
                     Decl::Function { annotations, name, params, body, is_async, return_type, is_unsafe, .. } => {
                         self.comptime_prepared_functions.insert(*decl_id);
@@ -3147,7 +3174,7 @@ impl<'a> TypeChecker<'a> {
                         let mut is_main = false;
                         if let Some(sym_id) = self.ctx.tables.decl_symbols.get(decl_id).copied() {
                             let sym = self.ctx.symbol_table.get_symbol(sym_id);
-                            if sym.name == "main" {
+                            if self.ctx.symbol_table.is_program_entry(sym_id) {
                                 is_main = true;
                             }
                             if let Some(inner) = sym.inner_scope {
@@ -3178,7 +3205,7 @@ impl<'a> TypeChecker<'a> {
                                 if self.get_span_text(annot.name) == "link" {
                                     self.ctx.diagnostics.push(
                                         Diagnostic::error("`#[link]` cannot be applied to the program entry `main`")
-                                            .with_code(DiagnosticCode::InvalidAnnotation)
+                                            .with_code(DiagnosticCode::InvalidAttributeApplication).in_phase(luna_common::diagnostic::DiagnosticPhase::TypeChecker)
                                             .with_span(annot.name),
                                     );
                                 }
@@ -4048,8 +4075,13 @@ impl<'a> TypeChecker<'a> {
                     );
                 }
             }
-            other => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("Unsupported or unrecognized statement construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax));
+            Stmt::Comptime { body } => {
+                let span = self.statement_primary_span(*body).unwrap_or_else(|| {
+                    let file = self.ctx.current_file_id.unwrap_or(luna_common::ids::FileId(0));
+                    let end = self.source_manager.get_file(file).map_or(0, |source| source.source.len() as u32);
+                    luna_common::Span::new(file, 0, end)
+                });
+                self.ctx.diagnostics.push(crate::comptime::reject_statement(span));
             }
         }
     }
@@ -4120,10 +4152,10 @@ impl<'a> TypeChecker<'a> {
     }
 
     fn typecheck_integer_literal_at(&mut self, span: luna_common::Span, text: &str, negative: bool) -> SemanticTypeId {
-        let decoded = match luna_lexer::literal::decode_integer(text) {
+        let decoded = match luna_parser::decode_integer_literal(text, span) {
             Ok(value) => value,
-            Err(message) => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INTEGER_LITERAL: {message}")).with_code(DiagnosticCode::InvalidSyntax).with_span(span));
+            Err(diagnostic) => {
+                self.ctx.diagnostics.push(diagnostic);
                 return self.ctx.types.error_id();
             }
         };
@@ -4162,7 +4194,7 @@ impl<'a> TypeChecker<'a> {
                 let kind = match tok.kind {
                     TokenKind::IntegerLiteral => return self.typecheck_integer_literal(*expr_id, text, false),
                     TokenKind::ByteLiteral | TokenKind::ByteStringLiteral => {
-                        match luna_lexer::literal::decode_bytes(text, tok.kind == TokenKind::ByteLiteral) {
+                        match luna_parser::decode_byte_literal(text, tok.kind == TokenKind::ByteLiteral, tok.span) {
                             Ok(bytes) => {
                                 let byte_ty = self.ctx.types.intern(SemanticType::Primitive(BuiltinType::U8));
                                 let ty = if tok.kind == TokenKind::ByteLiteral { byte_ty } else {
@@ -4171,8 +4203,8 @@ impl<'a> TypeChecker<'a> {
                                 self.ctx.tables.expr_types.insert(*expr_id, ty);
                                 return ty;
                             }
-                            Err(message) => {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_BYTE_LITERAL: {message}")).with_code(DiagnosticCode::InvalidSyntax).with_span(tok.span));
+                            Err(diagnostic) => {
+                                self.ctx.diagnostics.push(diagnostic);
                                 return self.ctx.types.error_id();
                             }
                         }
@@ -4190,7 +4222,7 @@ impl<'a> TypeChecker<'a> {
                     TokenKind::CharLiteral => SemanticType::Primitive(BuiltinType::Char),
                     TokenKind::KwTrue | TokenKind::KwFalse => SemanticType::Primitive(BuiltinType::Bool),
                     _ => {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("Unrecognized literal token '{:?}'", tok.kind)).with_code(DiagnosticCode::InvalidSyntax).with_span(tok.span));
+                        self.ctx.diagnostics.push(Diagnostic::invariant_error(format!("Unrecognized internal literal token '{:?}'", tok.kind)).with_span(tok.span));
                         SemanticType::Error
                     },
                 };
@@ -4198,6 +4230,17 @@ impl<'a> TypeChecker<'a> {
             }
             Expr::Identifier { generic_args, .. } => {
                 if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id).copied() {
+                    let symbol = self.ctx.symbol_table.get_symbol(sym_id);
+                    if matches!(symbol.kind, crate::SymbolKind::Macro) {
+                        let span = self.get_expr_span_for_diag(expr_id).unwrap_or(symbol.span);
+                        self.ctx.diagnostics.push(Diagnostic::source_error(
+                            DiagnosticCode::TypeMismatch, span,
+                            format!("macro '{}' cannot be used as a value", symbol.name))
+                            .in_phase(luna_common::diagnostic::DiagnosticPhase::TypeChecker));
+                        let error = self.ctx.types.error_id();
+                        self.ctx.tables.expr_types.insert(*expr_id, error);
+                        return error;
+                    }
                     let mut base_ty = None;
                     if let Some(ty) = self.ctx.tables.symbol_types.get(&sym_id) {
                         base_ty = Some(*ty);
@@ -6117,7 +6160,7 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             other => {
-                let mut diag = Diagnostic::error(format!("Unsupported or unrecognized expression construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax);
+                let mut diag = Diagnostic::invariant_error(format!("Unrecognized internal expression construct in semantic phase: {:?}", other));
                 if let Some(span) = self.get_expr_span_for_diag(expr_id) {
                     diag.span = Some(span);
                 }
@@ -6193,6 +6236,24 @@ impl<'a> TypeChecker<'a> {
             SemanticType::Primitive(BuiltinType::U64) => Some((0.0, (2.0f64).powi(64))),
             SemanticType::Primitive(BuiltinType::Usize) => Some((0.0, (2.0f64).powi(usize::BITS as i32))),
             _ => None,
+        }
+    }
+
+    fn statement_primary_span(&self, statement: luna_ast::StmtId) -> Option<luna_common::Span> {
+        match &self.arena.stmts[statement.0 as usize] {
+            Stmt::Block { body, tail_expr } => body.iter().find_map(|item| match item {
+                Item::Stmt(statement) => self.statement_primary_span(*statement),
+                Item::Decl(declaration) => self.ctx.tables.decl_symbols.get(declaration)
+                    .map(|symbol| self.ctx.symbol_table.get_symbol(*symbol).span),
+            }).or_else(|| tail_expr.and_then(|expression| self.get_expr_span_for_diag(&expression))),
+            Stmt::Expr { expr, .. } => self.get_expr_span_for_diag(expr),
+            Stmt::Return { value } => value.and_then(|expression| self.get_expr_span_for_diag(&expression)),
+            Stmt::If { condition, .. } | Stmt::While { condition, .. } => self.get_expr_span_for_diag(condition),
+            Stmt::For { iterable, cond, body, .. } => iterable.or(*cond)
+                .and_then(|expression| self.get_expr_span_for_diag(&expression))
+                .or_else(|| self.statement_primary_span(*body)),
+            Stmt::Break { span, .. } | Stmt::Continue { span, .. } => Some(*span),
+            Stmt::Unsafe { body } | Stmt::Comptime { body } => self.statement_primary_span(*body),
         }
     }
 

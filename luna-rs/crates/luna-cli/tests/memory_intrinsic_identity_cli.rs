@@ -120,7 +120,7 @@ fn exercise(modes: &ProviderModes, renamed: bool) {
             }
         }
         for (name, code) in [
-            ("spoof_hook", "E0005"),
+            ("spoof_hook", "E1009"),
             ("missing_intrinsic_argument", "E2001"),
             ("excess_intrinsic_argument", "E2001"),
             ("unsafe_intrinsic_call", "E2025"),

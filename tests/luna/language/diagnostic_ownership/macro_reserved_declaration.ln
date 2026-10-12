@@ -1,0 +1,5 @@
+macro reserve {
+    () => { fn __luna_intrinsic_WrappingMul(a: u32, b: u32) -> u32 { return 1; } }
+}
+reserve!();
+fn main() -> i32 { return 0; }

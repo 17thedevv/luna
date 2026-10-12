@@ -1,0 +1,1 @@
+export module stale { export fn overflow() -> i32 { 2147483647i32 + 1i32; return 0; } }

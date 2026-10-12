@@ -3,7 +3,7 @@ use std::io::{Read, Write};
 pub const LLIB_MAGIC: [u8; 4] = *b"LLIB";
 pub const MLIB_MAGIC: [u8; 4] = *b"MLIB";
 pub const LLIB_FORMAT_VERSION: u16 = 2;
-pub const LLIB_COMPILER_VERSION: u16 = 23; // E1: ordinary integer arithmetic is checked; compiler22 artifacts carry unchecked semantics.
+pub const LLIB_COMPILER_VERSION: u16 = 24; // E1 amendment: compiler23's DCE could erase checked arithmetic; reject old native artifacts.
 pub const LLIB_MVIR_VERSION: u16 = 5; // Portable default-entry lifetime assumptions/obligations in ABI/value slots.
 
 pub const MLIB_FORMAT_VERSION: u16 = LLIB_FORMAT_VERSION;

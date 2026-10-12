@@ -22,6 +22,8 @@ pub enum DiagnosticCode {
     InvalidVisibility = 1006,
     WildcardImportProhibited = 1007,
     AmbiguousSymbol = 1008,
+    InvalidCompilerBinding = 1009,
+    InvalidMacroExpansion = 1010,
     TypeMismatch = 2001,
     CannotDereference = 2002,
     CannotIndex = 2003,
@@ -53,6 +55,7 @@ pub enum DiagnosticCode {
     LoopControlOutsideLoop = 2029,
     NonFfiSafeType = 2030,
     ExplicitDropCall = 2031,
+    InvalidAttributeApplication = 2032,
     UseAfterMove = 3001,
     PartialMoveUnderDrop = 3002,
     BorrowConflict = 3003,
@@ -81,6 +84,17 @@ pub enum DiagnosticCode {
 }
 
 impl DiagnosticCode {
+    pub const fn owner(self) -> DiagnosticPhase {
+        match self.number() / 1000 {
+            0 => DiagnosticPhase::Parser,
+            1 => DiagnosticPhase::Resolver,
+            2 => DiagnosticPhase::TypeChecker,
+            3 => DiagnosticPhase::Borrowck,
+            4 => DiagnosticPhase::AsyncComptime,
+            5 => DiagnosticPhase::Mono,
+            _ => DiagnosticPhase::Infrastructure,
+        }
+    }
     /// Every diagnostic code, in freezing order. `docs/diagnostics/diagnostics-v1.md`
     /// (DIAG-10) requires exact parity between this list and the specification.
     pub const ALL: &'static [DiagnosticCode] = &[
@@ -97,6 +111,8 @@ impl DiagnosticCode {
         DiagnosticCode::InvalidVisibility,
         DiagnosticCode::WildcardImportProhibited,
         DiagnosticCode::AmbiguousSymbol,
+        DiagnosticCode::InvalidCompilerBinding,
+        DiagnosticCode::InvalidMacroExpansion,
         DiagnosticCode::TypeMismatch,
         DiagnosticCode::CannotDereference,
         DiagnosticCode::CannotIndex,
@@ -128,6 +144,7 @@ impl DiagnosticCode {
         DiagnosticCode::LoopControlOutsideLoop,
         DiagnosticCode::NonFfiSafeType,
         DiagnosticCode::ExplicitDropCall,
+        DiagnosticCode::InvalidAttributeApplication,
         DiagnosticCode::UseAfterMove,
         DiagnosticCode::PartialMoveUnderDrop,
         DiagnosticCode::BorrowConflict,
@@ -173,6 +190,19 @@ pub enum DiagnosticLevel {
     Note,
 }
 
+/// Stable phase partitions from DIAG-8. This is compiler admission metadata,
+/// not a change to serialized artifacts or the diagnostic code discriminants.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DiagnosticPhase {
+    Parser,
+    Resolver,
+    TypeChecker,
+    Borrowck,
+    AsyncComptime,
+    Mono,
+    Infrastructure,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Diagnostic {
     pub level: DiagnosticLevel,
@@ -186,6 +216,12 @@ pub struct Diagnostic {
 pub struct DiagnosticLabel { pub span: Span, pub message: String }
 
 impl Diagnostic {
+    /// Infrastructure owns compiler invariant reporting, including failures
+    /// discovered by an earlier stage after source admission.
+    pub fn invariant_error(message: impl Into<String>) -> Self {
+        Self::error(message).with_code(DiagnosticCode::BackendInvariantViolation)
+            .in_phase(DiagnosticPhase::Infrastructure)
+    }
     pub fn error(message: impl Into<String>) -> Self {
         Self {
             level: DiagnosticLevel::Error,
@@ -198,6 +234,18 @@ impl Diagnostic {
 
     pub fn with_code(mut self, code: DiagnosticCode) -> Self {
         self.code = Some(code);
+        self
+    }
+
+    pub fn source_error(code: DiagnosticCode, span: Span, message: impl Into<String>) -> Self {
+        assert!(code.number() < 6000, "source diagnostics require a source owning phase");
+        Self::error(message).with_code(code).with_span(span)
+    }
+
+    /// Fail closed if a phase attempts to construct another phase's code.
+    pub fn in_phase(self, phase: DiagnosticPhase) -> Self {
+        assert_eq!(self.code.expect("phase-owned diagnostics require a code").owner(),
+            phase, "DIAG-8: diagnostic emitted by a non-owning phase");
         self
     }
 
@@ -361,9 +409,28 @@ mod tests {
 /// `docs/diagnostics/diagnostics-v1.md`.
 #[cfg(test)]
 mod registry_parity {
-    use super::DiagnosticCode;
+    use super::{DiagnosticCode, DiagnosticPhase};
 
     const DOCS: &str = include_str!("../../../../docs/diagnostics/diagnostics-v1.md");
+
+    #[test]
+    fn phase_partitions_match_every_registry_owner() {
+        for code in DiagnosticCode::ALL {
+            let needle = format!("| `{code}` |");
+            let row = DOCS.lines().find(|line| line.starts_with(&needle)).unwrap();
+            let fields: Vec<_> = row.split('|').map(str::trim).collect();
+            let expected = match code.owner() {
+                DiagnosticPhase::Parser => "Parser",
+                DiagnosticPhase::Resolver => "Resolver",
+                DiagnosticPhase::TypeChecker => "TypeChecker",
+                DiagnosticPhase::Borrowck => "Borrowck",
+                DiagnosticPhase::AsyncComptime => "Async/Comptime",
+                DiagnosticPhase::Mono => "Mono",
+                DiagnosticPhase::Infrastructure => "Infrastructure",
+            };
+            assert_eq!(fields[4], expected, "{code} registry owner");
+        }
+    }
 
     #[test]
     fn every_code_is_documented_unique_and_named() {

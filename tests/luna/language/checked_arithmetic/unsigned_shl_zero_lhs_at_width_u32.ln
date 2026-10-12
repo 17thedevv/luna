@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec value: u32 = 0;
+    dec count: u32 = 32;
+    dec shifted = value << count;
+    if shifted == 0 { return 0; }
+    return 7;
+}
