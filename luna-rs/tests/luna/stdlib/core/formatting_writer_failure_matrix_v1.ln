@@ -15,7 +15,7 @@ impl std::fmt::Writer for PrefixWriter {
         self.attempts = self.attempts + (1 as usize);
         if self.accepted >= self.limit { return std::Result::Err(std::fmt::FmtError::WriteFailed); }
         self.accepted = self.accepted + (1 as usize);
-        self.checksum = self.checksum * (31 as u64) + (value as u32 as u64);
+        self.checksum = std::wrapping_add(std::wrapping_mul(self.checksum, 31 as u64), value as u32 as u64);
         return std::Result::Ok;
     }
 }
@@ -34,7 +34,7 @@ fn verify<T: std::fmt::Display>(value: &T, expected: &[char]) -> bool {
         if writer.accepted != limit || writer.checksum != checksum { return false; }
         if limit < expected.length {
             if result.is_err() == false || writer.attempts != limit + (1 as usize) { return false; }
-            checksum = checksum * (31 as u64) + (expected[limit] as u32 as u64);
+            checksum = std::wrapping_add(std::wrapping_mul(checksum, 31 as u64), expected[limit] as u32 as u64);
         } else {
             if result.is_err() || writer.attempts != limit { return false; }
         }
@@ -50,10 +50,10 @@ fn main() -> i32 {
     dec value_1 = false;
     dec expected_1: [char; 5] = ['f', 'a', 'l', 's', 'e'];
     if verify(&value_1, &expected_1) == false { return 2; }
-    dec value_2 = -128 as i8;
+    dec value_2 = ((0 as i8) - (127 as i8)) - (1 as i8);
     dec expected_2: [char; 4] = ['-', '1', '2', '8'];
     if verify(&value_2, &expected_2) == false { return 3; }
-    dec value_3 = -32768 as i16;
+    dec value_3 = ((0 as i16) - (32767 as i16)) - (1 as i16);
     dec expected_3: [char; 6] = ['-', '3', '2', '7', '6', '8'];
     if verify(&value_3, &expected_3) == false { return 4; }
     dec value_4 = (0 as i32) - (2147483647 as i32) - (1 as i32);

@@ -1,0 +1,6 @@
+fn main() -> i32 {
+    dec max: i128 = (((1 as i128) << (126 as i128)) - (1 as i128)) + ((1 as i128) << (126 as i128));
+    dec r: i128 = max + (1 as i128);
+    if r == 0 { return 0; }
+    return 7;
+}
