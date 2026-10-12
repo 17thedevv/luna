@@ -54,6 +54,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md](audits/0.1-alpha-completion-2026-10-04/DEFAULT-ARGUMENTS-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md](audits/0.1-alpha-completion-2026-10-04/DEFAULT-OMISSION-GATE.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/EXECUTION.md](audits/0.1-alpha-completion-2026-10-04/EXECUTION.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md](audits/0.1-alpha-completion-2026-10-04/MEMORY-CALLABLES.md) | evidence | [semantics](spec/0.1/semantics.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md](audits/0.1-alpha-completion-2026-10-04/MONO-CALLEE-ROLE.md) | evidence | [conformance](spec/0.1/conformance.md) |

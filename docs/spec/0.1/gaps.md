@@ -63,12 +63,26 @@ V01-DESIGN-03 was resolved by maintainer adoption on 2026-10-06: ordinary
 integer arithmetic is checked and identical across debug/release; overflow,
 division by zero, `MIN / -1` and out-of-range shifts are deterministic failures,
 and compile-time instances are diagnostics. See [Semantics](semantics.md).
-**Implemented and accepted (E1)**: the runtime lowering uses LLVM overflow
+**Implemented; E-wave qualification remains blocked (E1)**: the runtime lowering uses LLVM overflow
 intrinsics for `+ - *`, dominance-ordered guards for `/ % << >>` and unary
 negation, and the comptime evaluator matches it; explicit modular arithmetic is
 available through `std::wrapping_add/sub/mul`, which are compiler-recognized
 language items and never trap. The compiler version was bumped 22 → 23 so
 pre-E1 artifacts with unchecked arithmetic are rejected.
+
+**E1-FU-DIAG-01 — release blocker, confirmed 2026-10-12 at
+`2fcce5a4ea1973100a3d8a99781e1188aeed5d78`.** DIAG-8 in the
+[diagnostic contract](../../diagnostics/diagnostics-v1.md) assigns E0005 to
+Parser alone. Reserved intrinsic declarations/renames are rejected by the
+semantic attribute processor; `#[link]` on entry `main` is rejected by the
+TypeChecker. Both emit E0005, violating phase ownership despite correct typed
+rejection and source spans. Resolver also constructs E0005 for language-item
+validation. The annotation description in the registry does not waive DIAG-8.
+See the [blocker report](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md)
+for reproductions, first divergence and repair alternatives requiring an
+ownership decision. Historical Stage 4 evidence is retained; its DONE claim
+does not discharge this precondition. No final E-wave closure or candidate
+advance is authorized by the current evidence.
 
 No new format-macro hook, interpolation syntax, runtime opcode or container
 language item is adopted. These require their own complete generic contract.

@@ -1,5 +1,23 @@
 # Execution ledger — Luna 0.1 completion
 
+### E-wave diagnostic precondition — 2026-10-12, BLOCKED
+
+Implementation/verified source: `2fcce5a4ea1973100a3d8a99781e1188aeed5d78`.
+Candidate/E2 boundary: `6017ba8d8db40cf0bc16498f639e5d830c0e827c`, unchanged.
+Stage 2C/3 implementations and compiler23 versioning are present; current Stage 4
+readiness is blocked by E1-FU-DIAG-01 (semantic E0005 emission conflicts with
+Parser-only DIAG-8 ownership). The previous Stage 4 DONE claim is historical,
+not current release authority. No ownership/code mapping is changed.
+
+Fresh evidence: CLI build exit0; 14 diagnostic check/build reproductions;
+real compiler22 rejection test 1 passed / 0 failed / 0 ignored / exit0.
+Four comptime cases emit one E4005 per invocation. Full workspace qualification
+and native target acceptance are NOT VERIFIED; candidate is not advanced.
+See the [blocker report](evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md)
+for exact source trace, repair alternatives, historical matrix boundary and
+remaining qualification obligations. This entry records an incomplete E-wave
+checkpoint and does not perform R4 schema reconciliation or release tagging.
+
 Baseline implementation: `c8d0559500e78ef85c96ac842e824e639917cbad`.
 This supplements the dated [plan](README.md); no full release PASS is claimed.
 Current state remains **PARTIAL**. Revision-specific checkpoints are recorded
