@@ -807,7 +807,7 @@ reducers added; baseline = COMPILE_ERROR (`std::wrapping_*` not yet defined).
 
 ```
 E1
-status: STAGES 1 / 2A / 2B / 2C / 3 / 4 DONE; final qualification (3 consecutive workspace runs) in progress
+status: STAGES 1 / 2A / 2B / 2C / 3 implemented; Stage 4 versioning implemented, diagnostic precondition BLOCKED (2026-10-12); final qualification not started in the blocked checkpoint
 base: 6017ba8d
 protocol: compiler23 / metadata9 / MVIR5 / format2
 stage1: 34 reducers, 0 traps / 30 silent-wrap / 4 comptime E4005 (duplicated)
@@ -820,14 +820,21 @@ matrix: 52 rows -> 28 TRAP / 20 NO_TRAP / 4 COMPILE_ERROR / 0 UNEXPECTED_EXIT (o
 release: still BLOCKED pending R4/R5
 ```
 
-E1-FU-DIAG-01 (recorded, not fixed): attribute validation, including the reserved
-intrinsic namespace and the `#[link]`-on-entry check, emits `InvalidAnnotation`
-(E0005). `diagnostics-v1.md` assigns `E0001–E0999` to the Parser range and
-describes it as covering attribute grammar, so the attribution matches the
-documented contract. The residual nuance — the emitting component is the
-annotation processor (semantic phase) while the code range is Parser — would
-require changing the public diagnostic contract to re-attribute, so it is left for
-maintainer review rather than changed unilaterally.
+E1-FU-DIAG-01 is a **confirmed release blocker**, not an attribution nuance.
+DIAG-8 forbids a phase from emitting another phase's code; the registry assigns
+E0005 only to Parser. At `2fcce5a4`, reserved intrinsic declarations/renames emit
+it in the semantic attribute processor, and `#[link]` on entry `main` emits it
+in TypeChecker. Resolver also constructs it for contextual language-item
+validation. Three CLI negatives reproduce exactly one E0005 in each check/build
+invocation. Moving ownership or changing semantic diagnostic identities needs
+an explicit maintainer decision; do not reinterpret the attribute description
+as an exception to DIAG-8. The dated Stage 4 record is preserved as historical
+evidence, but its DONE verdict is superseded for current readiness by the
+[2026-10-12 blocker report](evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md).
+Current fixtures total 55; the original 46-row historical subset records
+22 TRAP / 20 NO_TRAP / 4 COMPILE_ERROR. Four comptime rows are rechecked here;
+the remaining 42 runtime rows and final qualification are NOT VERIFIED at this
+checkpoint. Candidate remains `6017ba8d`; E2 implementation is unchanged.
 
 Note (artifact identity): the serialized MVIR stream is not executed — artifact
 execution reconstructs provider bodies from the portable AST, so intrinsic
