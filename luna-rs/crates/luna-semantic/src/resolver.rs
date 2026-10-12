@@ -161,6 +161,20 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         self.resolve_using_items(items, false);
     }
 
+    /// Resolver-owned admission of macro identity/rule expansion failures.
+    /// Parser diagnostics carried from token re-entry retain their own owner.
+    pub fn admit_macro_expansion_failures(
+        failures: Vec<crate::macro_engine::MacroExpansionFailure>,
+    ) -> Vec<luna_common::Diagnostic> {
+        failures.into_iter().map(|failure| match failure {
+            crate::macro_engine::MacroExpansionFailure::Diagnostic(diagnostic) => diagnostic,
+            crate::macro_engine::MacroExpansionFailure::Rule { message, span } => {
+                luna_common::Diagnostic::source_error(DiagnosticCode::InvalidMacroExpansion, span, message)
+                    .in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
+            }
+        }).collect()
+    }
+
     fn declare_macro_item(&mut self, item: &Item) {
         if let Item::Decl(decl_id) = item {
             let decl = &self.arena.decls[decl_id.0 as usize];
@@ -421,6 +435,32 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         }
     }
 
+    /// Resolver admission of compiler-owned identity. This runs on every
+    /// declared item, including nested, macro-expanded and portable provider AST.
+    fn check_compiler_binding(&mut self, decl: &Decl) {
+        if let Decl::Function { name, .. } = decl {
+            let text = self.get_span_text(*name);
+            if text.starts_with("__luna_intrinsic_") && !self.ctx.allow_internal_lang_items {
+                self.ctx.diagnostics.push(luna_common::Diagnostic::source_error(
+                    DiagnosticCode::InvalidCompilerBinding, *name,
+                    format!("`{text}` uses the compiler-owned intrinsic namespace `__luna_intrinsic_`")));
+            }
+        }
+        for annotation in decl.annotations() {
+            if self.get_span_text(annotation.name) != "link" { continue; }
+            if let Some(argument) = annotation.args.first() {
+                if let Expr::Literal(token, _) = &self.arena.exprs[argument.value.0 as usize] {
+                    let text = self.get_span_text(token.span).trim_matches('"');
+                    if text.starts_with("__luna_intrinsic_") {
+                        self.ctx.diagnostics.push(luna_common::Diagnostic::source_error(
+                            DiagnosticCode::InvalidCompilerBinding, annotation.name,
+                            format!("`#[link(\"{text}\")]` claims the compiler-owned intrinsic namespace `__luna_intrinsic_`")));
+                    }
+                }
+            }
+        }
+    }
+
     fn check_lang_item(
         &mut self,
         annotations: &[luna_ast::Annotation],
@@ -435,7 +475,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute can only be used in trusted compiler/core contexts",
                         )
-                        .with_code(DiagnosticCode::InvalidAnnotation)
+                        .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                         .with_span(annot.name),
                     );
                     continue;
@@ -445,7 +485,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute requires exactly one argument: `#[lang(\"name\")]`",
                         )
-                        .with_code(DiagnosticCode::InvalidAnnotation)
+                        .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                         .with_span(annot.name),
                     );
                     continue;
@@ -458,7 +498,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                 luna_common::diagnostic::Diagnostic::error(
                                     "`#[lang(...)]` argument must be a string literal",
                                 )
-                                .with_code(DiagnosticCode::InvalidAnnotation)
+                                .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                                 .with_span(tok.span),
                             );
                             continue;
@@ -470,7 +510,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             luna_common::diagnostic::Diagnostic::error(
                                 "`#[lang(...)]` argument must be a string literal",
                             )
-                            .with_code(DiagnosticCode::InvalidAnnotation)
+                            .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                             .with_span(annot.name),
                         );
                         continue;
@@ -483,7 +523,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             "unknown language item `{}`",
                             arg_str
                         ))
-                        .with_code(DiagnosticCode::InvalidAnnotation)
+                        .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                         .with_span(tok_span),
                     );
                     continue;
@@ -513,7 +553,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute can only be used in trusted compiler/core contexts",
                         )
-                        .with_code(DiagnosticCode::InvalidAnnotation)
+                        .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                         .with_span(annot.name),
                     );
                     continue;
@@ -523,7 +563,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         "`#[lang]` cannot be applied to {} declarations",
                         decl_kind
                     ))
-                    .with_code(DiagnosticCode::InvalidAnnotation)
+                    .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                     .with_span(annot.name),
                 );
             }
@@ -531,6 +571,16 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     }
 
     pub fn resolve_items(&mut self, items: &[Item]) {
+        // Parser-owned grammar re-admission of materialized AST precedes binding
+        // resolution. This also covers portable provider bodies and macro AST.
+        for expression in &self.arena.exprs {
+            if let Expr::Literal(token, text) = expression {
+                if let Err(diagnostic) = luna_parser::validate_literal_syntax(*token, text) {
+                    self.ctx.diagnostics.push(diagnostic);
+                }
+            }
+        }
+        if !self.ctx.diagnostics.is_empty() { return; }
         for item in items {
             self.declare_item(item, DeclarationContext::Free);
         }
@@ -541,6 +591,26 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     fn declare_item(&mut self, item: &Item, context: DeclarationContext) {
         match item {
             Item::Decl(decl_id) => {
+                let admission_decl = &self.arena.decls[decl_id.0 as usize];
+                // Re-admit materialized AST grammar through its Parser owner;
+                // portable AST and macro output use the same boundary.
+                self.ctx.diagnostics.extend(luna_parser::validate_annotation_names(
+                    admission_decl.annotations(), self.source_manager));
+                if let Decl::Function { params, .. } = admission_decl {
+                    for parameter in params {
+                        let parameter_decl = &self.arena.decls[parameter.0 as usize];
+                        self.ctx.diagnostics.extend(luna_parser::validate_annotation_names(
+                            parameter_decl.annotations(), self.source_manager));
+                        self.check_unsupported_lang_item(parameter_decl.annotations(), "parameter");
+                    }
+                }
+                if let Decl::Enum { variants, .. } = admission_decl {
+                    for variant in variants {
+                        self.ctx.diagnostics.extend(luna_parser::validate_annotation_names(
+                            &variant.annotations, self.source_manager));
+                    }
+                }
+                self.check_compiler_binding(admission_decl);
                 let prev_scope = self.current_scope;
                 if let Some(&sym_id) = self.ctx.tables.decl_symbols.get(decl_id) {
                     if let Some(scope) = self.ctx.symbol_table.get_symbol(sym_id).inner_scope {
@@ -562,21 +632,6 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                     } => {
                         let name_str =
                             self.get_span_text(*name).to_string();
-
-                        // `__luna_intrinsic_*` is compiler-owned. User declarations may
-                        // not claim the namespace, so a forged wire name cannot be
-                        // produced by ordinary source.
-                        if name_str.starts_with("__luna_intrinsic_")
-                            && !self.ctx.allow_internal_lang_items
-                        {
-                            self.ctx.diagnostics.push(
-                                luna_common::diagnostic::Diagnostic::error(format!(
-                                    "`{name_str}` uses the compiler-owned intrinsic namespace `__luna_intrinsic_`"
-                                ))
-                                .with_code(DiagnosticCode::InvalidAnnotation)
-                                .with_span(*name),
-                            );
-                        }
 
                         let effective_visibility = if let DeclarationContext::TraitMethod(v) = context {
                             v
@@ -1273,8 +1328,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                     }
                     Decl::Using { span, .. } | Decl::UsingNamespace { span, .. } => {
                         if !matches!(self.ctx.symbol_table.scopes[self.current_scope.0 as usize].kind, crate::symbol::ScopeKind::Global | crate::symbol::ScopeKind::Module) {
-                            self.ctx.diagnostics.push(luna_common::Diagnostic::error("using is restricted to file/module scope")
-                                .with_code(DiagnosticCode::InvalidSyntax).with_span(*span));
+                            self.ctx.diagnostics.push(luna_parser::invalid_using_scope(*span));
                         }
                     },
                     Decl::Import { name, kind, .. } => {
@@ -1879,28 +1933,8 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             );
                             return;
                         }
-                        if matches!(sym.kind, crate::symbol::SymbolKind::Macro) {
-                            let name_str = segments
-                                .iter()
-                                .map(|seg| self.get_span_text(*seg))
-                                .collect::<Vec<_>>()
-                                .join("::");
-                            let span = Span {
-                                file_id: segments[0].file_id,
-                                start: segments[0].start,
-                                end: segments.last().unwrap().end,
-                                ctxt: segments[0].ctxt,
-                            };
-                            self.ctx.diagnostics.push(
-                                luna_common::Diagnostic::error(format!(
-                                    "macro '{}' cannot be used as a value",
-                                    name_str
-                                ))
-                                .with_code(DiagnosticCode::InvalidSyntax)
-                                .with_span(span),
-                            );
-                            return;
-                        }
+                        // Macro binding identity is resolved here; using it as a
+                        // runtime value is a TypeChecker admission failure.
                         self.ctx.tables.expr_symbols.insert(*expr_id, sym_id);
 
                         if !self.active_lambdas.is_empty() {

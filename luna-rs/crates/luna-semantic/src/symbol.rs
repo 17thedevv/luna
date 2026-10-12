@@ -311,7 +311,19 @@ impl SymbolTable {
         }
     }
 
+    pub fn is_program_entry(&self, symbol: SymbolId) -> bool {
+        let symbol = self.get_symbol(symbol);
+        symbol.name == "main" && symbol.scope == ScopeId(0)
+            && symbol.provider_id.is_none() && self.lookup_provider.is_none()
+    }
+
     pub fn is_accessible_with_ctxt(&self, symbol: SymbolId, scope: ScopeId, provider: Option<ProviderId>, ctxt: SyntaxContext) -> bool {
+        // A binding introduced by this expansion belongs to its generated
+        // lexical scope. Definition-site authority is for uncaptured names
+        // resolved from the macro environment, not expansion-local parameters.
+        if ctxt != SyntaxContext::ROOT && self.get_symbol(symbol).ctxt == ctxt {
+            return self.is_accessible(symbol, scope, provider);
+        }
         let origin = self.macro_origins.borrow().get(&ctxt).copied();
         let (scope, provider) = origin.map(|(scope, provider, _)| (scope, provider)).unwrap_or((scope, provider));
         self.is_accessible(symbol, scope, provider)

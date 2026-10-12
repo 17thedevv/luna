@@ -805,6 +805,15 @@ math → migrate to `wrapping_*`; capacity/allocation-size math stays checked;
 `core/num.ln` `checked_*`/`saturating_*` are already overflow-safe. 12 wrapping
 reducers added; baseline = COMPILE_ERROR (`std::wrapping_*` not yet defined).
 
+Current revision, 2026-10-12: diagnostic ownership repair and its supplemental
+E1010/E4005/E6001 mappings are adopted; ordinary integer DCE effects are fixed.
+Compiler24 is approved after real compiler23 unchecked-object reproduction;
+metadata9/MVIR5/format2 are retained. Alias identity, expanded-provider AST,
+hygienic access and generated metadata ownership are repaired. See the
+[repair report](evidence/REPORT-E1-REPAIR-2026-10-12.md). Final qualification is
+in progress; candidate remains `6017ba8d`. The checkpoint below is historical
+and does not override the adopted amendments or establish current closure.
+
 ```
 E1
 status: STAGES 1 / 2A / 2B / 2C / 3 implemented; Stage 4 versioning implemented, diagnostic precondition BLOCKED (2026-10-12); final qualification not started in the blocked checkpoint

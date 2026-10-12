@@ -1,31 +1,28 @@
 use luna_llib::{LlibReader, MlibError};
 use std::path::Path;
 
-/// Compatibility: a real artifact produced by compiler22 must be rejected by
-/// compiler23 with a typed compiler-version mismatch — not silently reused with
-/// the new checked-arithmetic semantics.
+/// Real compiler22 and pre-DCE compiler23 artifacts must be rejected before any
+/// unchecked native body can be reused. Artifact bytes were never header-patched.
 #[test]
-fn real_compiler22_artifact_is_rejected_by_compiler23() {
-    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(
-        "../../../docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat22/num-compiler22.llib",
-    );
-    let bytes = std::fs::read(&path).expect("archived compiler22 artifact must exist");
-    assert_eq!(&bytes[0..4], b"LLIB", "artifact magic");
-    assert_eq!(u16::from_le_bytes([bytes[4], bytes[5]]), 2, "format version is unchanged");
-    assert_eq!(
-        u16::from_le_bytes([bytes[6], bytes[7]]),
-        22,
-        "the archived artifact really was produced by compiler22"
-    );
-    assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 5, "MVIR wire version is unchanged");
-
-    let mut cursor = std::io::Cursor::new(bytes);
-    let err = LlibReader::read_manifest(&mut cursor).expect_err("compiler22 must be rejected");
-    match err {
-        MlibError::VersionMismatch { component, found, .. } => {
-            assert_eq!(component, "compiler", "mismatch must be classified as the compiler component");
-            assert_eq!(found, 22);
+fn real_older_compiler_artifacts_are_rejected_by_compiler24() {
+    for (version, relative) in [
+        (22, "compat22/num-compiler22.llib"),
+        (23, "compat23/discarded-arithmetic-compiler23.llib"),
+    ] {
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(
+            "../../../docs/audits/0.1-alpha-completion-2026-10-04/evidence").join(relative);
+        let bytes = std::fs::read(&path).expect("genuine archived compiler artifact");
+        assert_eq!(&bytes[0..4], b"LLIB");
+        assert_eq!(u16::from_le_bytes([bytes[4], bytes[5]]), 2);
+        assert_eq!(u16::from_le_bytes([bytes[6], bytes[7]]), version);
+        assert_eq!(u16::from_le_bytes([bytes[8], bytes[9]]), 5);
+        let error = LlibReader::read_manifest(&mut std::io::Cursor::new(bytes)).unwrap_err();
+        match error {
+            MlibError::VersionMismatch { component, found, .. } => {
+                assert_eq!(component, "compiler");
+                assert_eq!(found, version);
+            }
+            other => panic!("expected compiler VersionMismatch, got {other:?}"),
         }
-        other => panic!("expected a compiler VersionMismatch, got {other:?}"),
     }
 }

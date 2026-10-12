@@ -1,0 +1,26 @@
+[
+  {
+    "producer": "pre_dce_compiler23",
+    "producer_sha256": "754c5d86cb09b3553028a06117ebfe34e12434bab5a55673df77c3c0258b8449",
+    "producer_exit": 0,
+    "producer_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "compiler_header": 23,
+    "artifact_sha256": "8e56dbe100107bd3e331c32ec5b4096a3154c324fd0e9accea2b3dd2dcdda939",
+    "consumer_compile_exit": 0,
+    "consumer_compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "run_stderr": ""
+  },
+  {
+    "producer": "current_compiler23",
+    "producer_sha256": "4659f227126f4870b513cc696e496f564b3a17b627a30e9792a8ab0b1cf662e8",
+    "producer_exit": 0,
+    "producer_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "compiler_header": 23,
+    "artifact_sha256": "f613fbc00b5b1975cc71a7bf176ba41d0b96cca1e49915484f1322d9db1a008d",
+    "consumer_compile_exit": 0,
+    "consumer_compile_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 3,
+    "run_stderr": "\nluna: PANIC [L005] integer overflow\n    at C:\\Users\\84387\\AppData\\Local\\Temp\\luna_e1_same_version_probe_s3ijwhw0\\stale_provider.ln:0:0\n"
+  }
+]

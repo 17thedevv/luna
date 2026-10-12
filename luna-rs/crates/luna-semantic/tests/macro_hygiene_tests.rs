@@ -23,7 +23,7 @@ fn check_code(source: &str) -> Result<luna_ast::AstArena, Vec<luna_common::Diagn
     }
 
     let mut engine = MacroEngine::new(&mut arena, &source_manager, file_id, &ctx.symbol_table, &ctx.tables);
-    let expanded = engine.expand_items(items)?;
+    let expanded = engine.expand_items(items).map_err(Resolver::admit_macro_expansion_failures)?;
 
     Resolver::new(&mut ctx, &arena, &source_manager).resolve_items(&expanded);
     TypeChecker::new(&mut ctx, &arena, &source_manager).typecheck_items(&expanded);
@@ -54,6 +54,12 @@ fn test_hygiene_local_variable_no_collision() {
     "#;
     let res = check_code(code);
     assert!(res.is_ok(), "Failed hygiene local variable anti-shadowing: {:?}", res.err());
+}
+
+#[test]
+fn generated_module_parameters_use_their_lexical_access_scope() {
+    let source = "macro arithmetic { () => { export module math { export fn add(a:i8,b:i8)->i8 { return a+b; } } } } arithmetic!();";
+    assert!(check_code(source).is_ok(), "generated private parameters remain accessible inside their own function");
 }
 
 #[test]

@@ -116,7 +116,7 @@ fn main() -> i32 {
     let rendered = render(&check);
     assert!(!check.status.success(), "reserved namespace must be rejected: {rendered}");
     assert!(
-        rendered.contains("__luna_intrinsic_") && rendered.contains("E0003") || rendered.contains("compiler-owned intrinsic namespace"),
+        rendered.contains("error[E1009]") && rendered.contains("compiler-owned intrinsic namespace"),
         "expected a typed rejection for the reserved namespace: {rendered}"
     );
 }
@@ -137,7 +137,7 @@ fn main() -> i32 {
     let rendered = render(&check);
     assert!(!check.status.success(), "#[link] spoof must be rejected: {rendered}");
     assert!(
-        rendered.contains("compiler-owned intrinsic namespace"),
+        rendered.contains("error[E1009]") && rendered.contains("compiler-owned intrinsic namespace"),
         "expected the reserved-namespace rejection message: {rendered}"
     );
 }

@@ -23,7 +23,7 @@ fn expand_code(source: &str) -> Result<luna_ast::AstArena, Vec<luna_common::Diag
     }
 
     let mut engine = MacroEngine::new(&mut arena, &source_manager, file_id, &ctx.symbol_table, &ctx.tables);
-    let expanded = engine.expand_items(items)?;
+    let expanded = engine.expand_items(items).map_err(Resolver::admit_macro_expansion_failures)?;
 
     Resolver::new(&mut ctx, &arena, &source_manager).resolve_items(&expanded);
     TypeChecker::new(&mut ctx, &arena, &source_manager).typecheck_items(&expanded);

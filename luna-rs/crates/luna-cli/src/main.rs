@@ -137,6 +137,20 @@ fn read_source(file: &PathBuf) -> String {
 }
 
 fn main() {
+    // Compiler recursion is bounded by admission limits. The Windows process
+    // main stack is too small to reach the macro limit in debug builds; use
+    // an explicit compiler stack so the limit produces a diagnostic.
+    let worker = std::thread::Builder::new().name("luna-compiler".into())
+        .stack_size(16 * 1024 * 1024).spawn(run_cli).unwrap_or_else(|error| {
+            let diagnostic = luna_common::Diagnostic::error(format!("Cannot start compiler worker: {error}"))
+                .with_code(luna_common::DiagnosticCode::ProcessExecutionFailure);
+            eprintln!("{}", diagnostic.render(&luna_common::source::SourceManager::new()));
+            process::exit(1);
+        });
+    if let Err(panic) = worker.join() { std::panic::resume_unwind(panic); }
+}
+
+fn run_cli() {
     let cli = Cli::parse();
 
     match &cli.command {

@@ -12,6 +12,34 @@
 
 ## 1. Overview & Architectural Principles
 
+Maintainer amendment **E1-DIAG-OWNERSHIP-01**, adopted 2026-10-12: E0005
+remains Parser-only for annotation grammar/names; E1009 belongs to Resolver
+for compiler-owned symbols and trusted language-item binding; E2032 belongs
+to TypeChecker for contextual attribute applications, entry constraints and
+resolved intrinsic signatures. DIAG-8 is unchanged. Attribute transformation
+records contextual failures without codes; TypeChecker's explicit preparation
+admission reports them before resolution when derive generation must stop.
+Binding guards run in Resolver on materialized source/macro/provider AST;
+remaining application/signature checks run in TypeChecker after resolution.
+
+Supplemental maintainer decision, 2026-10-12: invalid integer literal syntax
+is admitted by Parser and keeps E0003. Macro-as-value resolves the macro's
+binding in Resolver, then fails value typing with TypeChecker's E2001. The
+same admission applies to materialized AST. Existing code values/meanings,
+runtime ABI remain unchanged. The separately approved compiler24 boundary
+rejects artifacts with pre-repair checked-arithmetic behavior; metadata9,
+MVIR5 and format2 are unchanged.
+
+The supplemental macro decision adds **E1010 InvalidMacroExpansion**, owned
+by Resolver admission for rule mismatch and expansion recursion limits.
+MacroEngine transports structured failures without assigning that code.
+Diagnostics constructed by Parser during expansion re-entry retain E0003/E0005.
+The final supplemental mapping keeps standalone `comptime` statements
+unsupported: Comptime admission emits E4005 with a primary source span.
+Expression-form comptime remains supported. Unexpanded/unrecognized internal
+AST or literal-token invariants use E6001 through Infrastructure reporting,
+instead of constructing Parser-owned E0003 in TypeChecker.
+
 The Luna Compiler diagnostic subsystem is a first-class compiler boundary responsible for reporting all syntactic, semantic, borrow-checking, capability, monomorphization, and backend errors.
 
 Ad-hoc error strings and unformatted diagnostic messages are strictly forbidden. Every compiler diagnostic is a structured, strongly-typed machine-readable object governed by the invariants defined below.
@@ -130,6 +158,8 @@ The following table lists every stable `DiagnosticCode` recognized by Luna v1.0.
 | `E0003` | 3 | InvalidSyntax | Parser | General syntax violation or malformed statement |
 | `E0004` | 4 | UnclosedDelimiter | Parser | Unclosed parentheses, bracket, or brace |
 | `E0005` | 5 | InvalidAnnotation | Parser | Malformed or unknown compiler attribute (`#[...]`) |
+| `E1009` | 1009 | InvalidCompilerBinding | Resolver | Reserved compiler symbols/namespace and trusted language-item binding; E1-DIAG-OWNERSHIP-01 |
+| `E1010` | 1010 | InvalidMacroExpansion | Resolver | Macro rule matching and expansion recursion admission; E1-DIAG-OWNERSHIP-01 supplemental approval |
 | `E1001` | 1001 | UnresolvedSymbol | Resolver | Identifier not found in local or imported scope |
 | `E1002` | 1002 | DuplicateDefinition | Resolver | Symbol declared multiple times in same scope |
 | `E1003` | 1003 | PrivateSymbolAccess | Resolver | Access to non-exported private item across boundary |
@@ -169,6 +199,7 @@ The following table lists every stable `DiagnosticCode` recognized by Luna v1.0.
 | `E2029` | 2029 | LoopControlOutsideLoop | TypeChecker | `break` or `continue` used outside loop body |
 | `E2030` | 2030 | NonFfiSafeType | TypeChecker | Extern function signature contains non-FFI-safe types |
 | `E2031` | 2031 | ExplicitDropCall | TypeChecker | Explicit call to a compiler-managed destructor is prohibited |
+| `E2032` | 2032 | InvalidAttributeApplication | TypeChecker | Attribute applied in an invalid semantic context, entry constraint or resolved intrinsic signature; E1-DIAG-OWNERSHIP-01 |
 | `E3001` | 3001 | UseAfterMove | Borrowck | Value accessed or borrowed after having been moved |
 | `E3002` | 3002 | PartialMoveUnderDrop | Borrowck | Partial move attempted out of a type implementing Drop |
 | `E3003` | 3003 | BorrowConflict | Borrowck | Aliasing violation (multiple mutable or mut/immut loans) |

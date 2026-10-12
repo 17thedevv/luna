@@ -1,6 +1,6 @@
 //! D4-FU1 — `#[link]` must not rename the compiler-owned program entry.
 //!
-//! `#[link]` on the entry `main` is a typed front-end rejection (E0005) in both
+//! `#[link]` on the entry `main` is a typed front-end rejection (E2032) in both
 //! `check` and `build`, with no backend E6001/ICE and no published executable.
 //! `#[link]` on non-entry functions and the normal `#[link]` + `extern fn` FFI
 //! forms keep working, independent of attribute position in the file.
@@ -34,8 +34,8 @@ fn link_on_entry_is_rejected_and_other_placements_are_accepted() {
                     failures.push(format!("{mode}/{name}/{command}: {}", render(output)));
                     continue;
                 }
-                if !stderr.contains("error[E0005]") {
-                    failures.push(format!("{mode}/{name}/{command}: expected E0005: {}", render(output)));
+                if !stderr.contains("error[E2032]") {
+                    failures.push(format!("{mode}/{name}/{command}: expected E2032: {}", render(output)));
                 }
                 if stderr.contains("E6001") || stderr.contains("invariant violated") {
                     failures.push(format!("{mode}/{name}/{command}: leaked a backend ICE: {}", render(output)));

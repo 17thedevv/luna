@@ -6,6 +6,16 @@ use luna_common::DiagnosticCode;
 
 impl<'a> Parser<'a> {
     pub fn parse_annotations(&mut self) -> Result<Vec<Annotation>, ()> {
+        let diagnostic_start = self.diagnostics.len();
+        let result = self.parse_annotations_impl();
+        // All failures inside attribute grammar belong to Parser's E0005.
+        for diagnostic in &mut self.diagnostics[diagnostic_start..] {
+            diagnostic.code = Some(DiagnosticCode::InvalidAnnotation);
+        }
+        result
+    }
+
+    fn parse_annotations_impl(&mut self) -> Result<Vec<Annotation>, ()> {
         let mut annotations = Vec::new();
         while self.match_token(TokenKind::HashBracket) {
             
@@ -15,6 +25,12 @@ impl<'a> Parser<'a> {
                 return Err(());
             }
             let name = self.previous().span;
+            let text = self.get_token_text(name);
+            if !crate::is_annotation_name(text) {
+                let message = format!("unknown attribute `{text}`");
+                self.error_with_code(DiagnosticCode::InvalidAnnotation, &message, name);
+                return Err(());
+            }
             
             let mut args = Vec::new();
             if self.match_token(TokenKind::LParen) {

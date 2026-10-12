@@ -1,8 +1,7 @@
-"""Record E1-FU-DIAG-01 reproductions without changing diagnostic ownership.
+"""Record focused CLI rejections for the adopted E1 diagnostic amendment.
 
-Successful reproduction of E0005 is evidence of the existing violation, not
-DIAG-8 conformance. Compiler phase attribution is established by the source
-trace in REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md.
+CLI evidence checks identity/parity; the structural phase-ownership suite
+establishes actual compiler ownership. Historical blocker evidence is immutable.
 """
 import argparse
 import hashlib
@@ -21,18 +20,32 @@ def main():
     parser.add_argument('--cli', type=Path,
                         default=ROOT / 'luna-rs/target/debug/luna.exe')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--sysroot', type=Path, default=ROOT / 'luna-rs')
+    parser.add_argument('--baseline', action='store_true',
+                        help='Reproduce the historical E0005 blocker with an old CLI')
     args = parser.parse_args()
+    if args.output.exists():
+        parser.error('Evidence output already exists; choose a new acquisition label')
     cli = args.cli.resolve()
     cases = [
-        ('reserved_declaration', 'tests/luna/language/diagnostic_ownership/reserved_intrinsic_declaration.ln', 'E0005'),
-        ('reserved_link', 'tests/luna/language/diagnostic_ownership/reserved_intrinsic_link.ln', 'E0005'),
-        ('link_on_main', 'tests/luna/language/ffi_attributes/invalid_link_placement.ln', 'E0005'),
+        ('reserved_declaration', 'tests/luna/language/diagnostic_ownership/reserved_intrinsic_declaration.ln', 'E1009'),
+        ('reserved_link', 'tests/luna/language/diagnostic_ownership/reserved_intrinsic_link.ln', 'E1009'),
+        ('link_on_main', 'tests/luna/language/ffi_attributes/invalid_link_placement.ln', 'E2032'),
     ]
+    if args.baseline:
+        cases = [(name, fixture, 'E0005') for name, fixture, _ in cases]
+    else:
+        for name, expected in [('unknown_attribute', 'E0005'), ('malformed_attribute', 'E0005'),
+                               ('invalid_application', 'E2032'), ('macro_as_value', 'E2001'),
+                               ('invalid_integer_syntax', 'E0003'),
+                               ('macro_rule_mismatch', 'E1010'), ('macro_recursion', 'E1010'),
+                               ('unsupported_comptime_statement', 'E4005')]:
+            cases.append((name, f'tests/luna/language/diagnostic_ownership/{name}.ln', expected))
     for name in ('comptime_division_by_zero', 'comptime_shift_out_of_range',
                  'comptime_signed_overflow', 'comptime_unary_neg_min'):
         cases.append((name, f'tests/luna/language/checked_arithmetic/{name}.ln', 'E4005'))
     env = os.environ.copy()
-    env['LUNA_SYSROOT'] = str(ROOT / 'luna-rs')
+    env['LUNA_SYSROOT'] = str(args.sysroot.resolve())
     rows = []
     with tempfile.TemporaryDirectory(prefix='luna_e1_diag_') as temporary:
         work = Path(temporary)
@@ -58,11 +71,13 @@ def main():
     reproduced = all(row['expected_rejection_reproduced'] for row in rows)
     evidence = dict(task='E1 diagnostic precondition audit', source_sha=sha,
                     cli=str(cli), cli_sha256=hashlib.sha256(cli.read_bytes()).hexdigest(),
-                    provider_mode='existing sysroot; not a fresh-artifact parity gate',
+                    provider_mode='selected sysroot; parity separately verified by CLI harness',
+                    sysroot=env['LUNA_SYSROOT'],
                     llvm_runtime_root=env.get('LLVM_SYS_180_PREFIX'),
                     diagnostic_contract='DIAG-8; E0005 is owned by Parser',
-                    verdict=('BLOCKED: E0005 emitted outside Parser; reproduction is not conformance'
-                             if reproduced else 'NOT VERIFIED: reproduction acquisition failed'),
+                    verdict=(('BLOCKED: historical out-of-phase E0005 reproduced' if args.baseline
+                              else 'PASS: adopted diagnostic identities; structural ownership verified separately')
+                             if reproduced else 'NOT VERIFIED: acquisition failed'),
                     rows=rows)
     args.output.write_text(json.dumps(evidence, indent=2), encoding='utf-8')
     return 0 if reproduced else 1

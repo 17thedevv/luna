@@ -67,8 +67,13 @@ and compile-time instances are diagnostics. See [Semantics](semantics.md).
 intrinsics for `+ - *`, dominance-ordered guards for `/ % << >>` and unary
 negation, and the comptime evaluator matches it; explicit modular arithmetic is
 available through `std::wrapping_add/sub/mul`, which are compiler-recognized
-language items and never trap. The compiler version was bumped 22 → 23 so
-pre-E1 artifacts with unchecked arithmetic are rejected.
+language items and never trap. The maintainer approved compiler24 after a
+genuine compiler23 artifact was shown to retain unchecked execution when DCE
+removed unused integer operations. Metadata9/MVIR5/format2 remain unchanged.
+The [2026-10-12 repair record](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-REPAIR-2026-10-12.md)
+documents adopted diagnostic ownership amendments, the DCE repair, and provider
+identity/AST parity repairs. Final qualification remains pending; the historical
+blocker record below describes the pre-repair checkpoint.
 
 **E1-FU-DIAG-01 — release blocker, confirmed 2026-10-12 at
 `2fcce5a4ea1973100a3d8a99781e1188aeed5d78`.** DIAG-8 in the
@@ -86,6 +91,13 @@ advance is authorized by the current evidence.
 
 No new format-macro hook, interpolation syntax, runtime opcode or container
 language item is adopted. These require their own complete generic contract.
+
+**Standalone comptime statements — support gap, confirmed 2026-10-12.**
+`comptime { ... }` in statement position is parsed but currently not admitted
+for execution. The maintainer approved fail-closed E4005 from Comptime admission
+with a source span, replacing the erroneous TypeChecker E0003 fallback.
+Expression-form comptime and const MVIR evaluation remain supported. This
+diagnostic repair does not claim statement execution support.
 
 V01-DESIGN-01 was resolved by maintainer adoption of Option A on 2026-10-04:
 [METHOD-RESOLUTION-v1](method-resolution-v1.md). The resolver's complete

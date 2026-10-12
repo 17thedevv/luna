@@ -112,6 +112,9 @@ pub struct SemanticContext {
     pub external_module_scopes: HashMap<String, ScopeId>,
     pub current_provider: Option<symbol::ProviderId>,
     pub current_provider_name: Option<String>,
+    /// Session-local source identity for diagnostics with no leaf AST span.
+    /// This is semantic context only, never serialized artifact metadata.
+    pub current_file_id: Option<luna_common::ids::FileId>,
     pub is_slice_authorized: bool,
 }
 
@@ -162,6 +165,7 @@ impl SemanticContext {
             external_module_scopes: HashMap::new(),
             current_provider: None,
             current_provider_name: None,
+            current_file_id: None,
             is_slice_authorized: false,
             closure_value_ptr_ty: None,
         };

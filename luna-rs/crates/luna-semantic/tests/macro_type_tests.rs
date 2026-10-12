@@ -23,7 +23,7 @@ fn check_code(source: &str) -> Result<luna_ast::AstArena, Vec<luna_common::Diagn
     }
 
     let mut engine = MacroEngine::new(&mut arena, &source_manager, file_id, &ctx.symbol_table, &ctx.tables);
-    let expanded = engine.expand_items(items)?;
+    let expanded = engine.expand_items(items).map_err(Resolver::admit_macro_expansion_failures)?;
 
     // Verify completion invariant: NO MacroCall node survives anywhere in types or expressions
     for ty in &arena.types {

@@ -1,5 +1,16 @@
 # Execution ledger — Luna 0.1 completion
 
+### E-wave repair — 2026-10-12, qualification in progress
+
+E1-DIAG-OWNERSHIP-01 and supplemental E1010/literal/macro mappings are adopted
+and implemented with actual owning admission. Compiler24 is separately approved
+because real compiler23 artifacts can contain DCE-erased checked arithmetic.
+Metadata9/MVIR5/format2 are unchanged. Provider alias identity, macro expansion
+and statement relocation repairs retain strict artifact validation.
+See the [repair checkpoint](evidence/REPORT-E1-REPAIR-2026-10-12.md).
+The historical E0005 blocker checkpoint below is preserved; candidate remains
+`6017ba8d8db40cf0bc16498f639e5d830c0e827c` until final qualification succeeds.
+
 ### E-wave diagnostic precondition — 2026-10-12, BLOCKED
 
 Implementation/verified source: `2fcce5a4ea1973100a3d8a99781e1188aeed5d78`.

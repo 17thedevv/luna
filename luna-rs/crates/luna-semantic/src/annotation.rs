@@ -2,47 +2,25 @@
 //!
 //! This module handles:
 //! - `#[derive(...)]` - attribute-driven derive macro expansion
-//! - `#[repr(...)]` - compiler-defined representation hints
-//! - `#[test]` - compiler-defined test marker
-//! - `#[inline]`, `#[no_mangle]`, `#[link(...)]` - compiler ABI/codegen hints
-//! - Other attributes are validated and passed through
+//! Contextual application admission is owned by TypeChecker; compiler binding
+//! admission is owned by Resolver. This module only transforms declarations.
 //!
 //! The derive system uses a registry-based approach where derive macros are
 //! registered by name and invoked generically. See `derive.rs` for details.
 
 use std::collections::HashSet;
-use std::sync::Arc;
 use luna_ast::{AstArena, Decl, DeclId, Expr, Item};
-use luna_common::diagnostic::Diagnostic;
 use luna_common::ids::{FileId, Span};
 
-use crate::derive::{DeriveInput, DeriveRegistry, DeriveContext, extract_struct_input, extract_enum_input};
+use crate::derive::{AttributeExpansionFailure, DeriveRegistry, DeriveContext, extract_struct_input, extract_enum_input};
 
-/// Compiler-defined attributes that affect codegen/ABI but don't use the derive system.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum CompilerAttr {
-    Repr,
-    Test,
-    Inline,
-    NoMangle,
-    Link,
-    Lang,
-    SyncNoescape,
-}
-
-/// The set of known compiler-defined attribute names.
-const COMPILER_ATTRS: &[&str] = &["repr", "test", "inline", "no_mangle", "link", "lang", "sync_noescape"];
-
-/// Attribute processor that handles both compiler-defined attributes and derive expansion.
-///
-/// This processor maintains separation between:
-/// - Compiler-defined attributes (repr, test, inline, no_mangle, link) that are validated here
-/// - User-defined derives that are dispatched to the DeriveRegistry
+/// Attribute transformation only. Application failures remain structured data;
+/// TypeChecker's preparation admission emits their diagnostics before resolution.
 pub struct AttributeProcessor<'a> {
     arena: &'a mut AstArena,
     source_manager: &'a mut luna_common::source::SourceManager,
     file_id: FileId,
-    diagnostics: Vec<Diagnostic>,
+    diagnostics: Vec<AttributeExpansionFailure>,
     /// Registry of available derive macros
     derive_registry: DeriveRegistry,
     /// Tracks which traits have been emitted to prevent duplicates
@@ -95,8 +73,8 @@ impl<'a> AttributeProcessor<'a> {
         &self.derive_registry
     }
 
-    /// Process all items, expanding derives and validating compiler attributes.
-    pub fn process_items(&mut self, items: Vec<Item>) -> Result<Vec<Item>, Vec<Diagnostic>> {
+    /// Expand derives, transporting contextual failures without diagnostic codes.
+    pub fn process_items(&mut self, items: Vec<Item>) -> Result<Vec<Item>, Vec<AttributeExpansionFailure>> {
         let mut generated_items = Vec::new();
         let mut out_items = Vec::new();
 
@@ -118,52 +96,6 @@ impl<'a> AttributeProcessor<'a> {
         }
     }
 
-    /// `__luna_intrinsic_*` is a compiler-owned namespace. Reject any user
-    /// declaration or `#[link]` rename that claims it, including on the inner
-    /// function of an `extern` declaration.
-    fn check_reserved_intrinsic_namespace(&mut self, decl: &Decl) {
-        let mut offenders: Vec<(String, Span)> = Vec::new();
-        let mut collect = |annotations: &[luna_ast::Annotation], name: Option<Span>, offenders: &mut Vec<(String, Span)>| {
-            if let Some(span) = name {
-                let text = self.get_span_text(span).to_string();
-                if text.starts_with("__luna_intrinsic_") {
-                    offenders.push((text, span));
-                }
-            }
-            for annot in annotations {
-                if self.get_span_text(annot.name) != "link" {
-                    continue;
-                }
-                if let Some(arg) = annot.args.first() {
-                    let raw = self.get_expr_identifier_text(arg.value);
-                    let linked = raw.trim_matches('"').to_string();
-                    if linked.starts_with("__luna_intrinsic_") {
-                        offenders.push((linked, annot.name));
-                    }
-                }
-            }
-        };
-        match decl {
-            Decl::Function { name, annotations, .. } => collect(annotations, Some(*name), &mut offenders),
-            Decl::Extern { func, annotations, .. } => {
-                collect(annotations, None, &mut offenders);
-                if let Decl::Function { name, annotations: inner, .. } = &self.arena.decls[func.0 as usize] {
-                    collect(inner, Some(*name), &mut offenders);
-                }
-            }
-            _ => {}
-        }
-        for (offender, span) in offenders {
-            self.diagnostics.push(
-                Diagnostic::error(format!(
-                    "`{offender}` uses the compiler-owned intrinsic namespace `__luna_intrinsic_`"
-                ))
-                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                .with_span(span),
-            );
-        }
-    }
-
     /// Get text from a span.
     fn get_span_text(&self, span: Span) -> &str {
         if (span.end as usize) <= self.source_manager.get_file(span.file_id).unwrap().source.len() && span.start <= span.end {
@@ -173,282 +105,16 @@ impl<'a> AttributeProcessor<'a> {
         }
     }
 
-    /// Process a declaration's annotations.
+    /// Expand derives; binding and application validation belongs to Resolver
+    /// and TypeChecker respectively, including AST materialized after this pass.
     fn process_decl(&mut self, decl_id: DeclId, decl: &Decl) -> Vec<Item> {
         let mut generated = Vec::new();
-
-        self.check_reserved_intrinsic_namespace(decl);
-
-        // Extract annotations from any decl variant
-        let annotations = match decl {
-            Decl::Struct { annotations, .. } => annotations,
-            Decl::Enum { annotations, .. } => annotations,
-            Decl::Function { annotations, .. } => annotations,
-            Decl::Var { annotations, .. } => annotations,
-            Decl::Trait { annotations, .. } => annotations,
-            Decl::Impl { annotations, .. } => annotations,
-            Decl::Module { annotations, .. } => annotations,
-            Decl::Extern { annotations, .. } => annotations,
-            Decl::TypeAlias { annotations, .. } => annotations,
-            Decl::Macro { annotations, .. } => annotations,
-            _ => return generated,
-        };
-
-        for annot in annotations {
-            let attr_name = self.get_span_text(annot.name);
-
-            match attr_name {
-                "derive" => {
-                    // Derive is handled by the generic derive system
-                    let extra = self.handle_derive(decl_id, decl, annot);
-                    generated.extend(extra);
-                }
-                "repr" => {
-                    self.handle_repr(decl, annot);
-                }
-                "test" => {
-                    self.handle_test(decl, annot);
-                }
-                "inline" | "no_mangle" | "link" | "lang" | "sync_noescape" => {
-                    // Valid compiler directives - validated but not processed
-                    self.validate_compiler_attr(decl, annot);
-                }
-                _ => {
-                    // Unknown attribute - report error
-                    // Note: In a more extensible system, this could be configurable
-                    // to allow user-defined attributes that are processed elsewhere.
-                    // For now, we report unknown attributes as errors.
-                    self.diagnostics.push(
-                        Diagnostic::error(format!("unknown attribute `{}`", attr_name))
-                            .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                            .with_span(annot.name),
-                    );
-                }
+        for annot in decl.annotations() {
+            if self.get_span_text(annot.name) == "derive" {
+                generated.extend(self.handle_derive(decl_id, decl, annot));
             }
         }
-
-        // If Enum, also validate variant annotations
-        if let Decl::Enum { variants, .. } = decl {
-            for variant in variants {
-                for annot in &variant.annotations {
-                    let attr_name = self.get_span_text(annot.name);
-                    if attr_name == "lang" {
-                        // valid on variant in compiler/core contexts
-                    } else if !COMPILER_ATTRS.contains(&attr_name) && attr_name != "derive" {
-                        self.diagnostics.push(
-                            Diagnostic::error(format!("unknown attribute `{}`", attr_name))
-                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                .with_span(annot.name),
-                        );
-                    } else {
-                        self.diagnostics.push(
-                            Diagnostic::error(format!("`#[{}]` cannot be applied to enum variants", attr_name))
-                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                .with_span(annot.name),
-                        );
-                    }
-                }
-            }
-        }
-
-        // If Function, also validate parameter annotations
-        if let Decl::Function { params, .. } = decl {
-            for param_id in params {
-                if let Decl::Param { annotations, .. } = &self.arena.decls[param_id.0 as usize] {
-                    for annot in annotations {
-                        let attr_name = self.get_span_text(annot.name);
-                        if attr_name == "sync_noescape" {
-                            // valid on parameter
-                        } else if !COMPILER_ATTRS.contains(&attr_name) && attr_name != "derive" {
-                            self.diagnostics.push(
-                                Diagnostic::error(format!("unknown attribute `{}`", attr_name))
-                                    .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                    .with_span(annot.name),
-                            );
-                        } else {
-                            self.diagnostics.push(
-                                Diagnostic::error(format!("`#[{}]` cannot be applied to parameters", attr_name))
-                                    .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                    .with_span(annot.name),
-                            );
-                        }
-                    }
-                }
-            }
-        }
-
-        // If Extern, also validate parameter annotations of extern func
-        if let Decl::Extern { func, .. } = decl {
-            if let Decl::Function { params, .. } = &self.arena.decls[func.0 as usize] {
-                for param_id in params {
-                    if let Decl::Param { annotations, .. } = &self.arena.decls[param_id.0 as usize] {
-                        for annot in annotations {
-                            let attr_name = self.get_span_text(annot.name);
-                            if attr_name == "sync_noescape" {
-                                // valid on parameter
-                            } else if !COMPILER_ATTRS.contains(&attr_name) && attr_name != "derive" {
-                                self.diagnostics.push(
-                                    Diagnostic::error(format!("unknown attribute `{}`", attr_name))
-                                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                        .with_span(annot.name),
-                                );
-                            } else {
-                                self.diagnostics.push(
-                                    Diagnostic::error(format!("`#[{}]` cannot be applied to parameters", attr_name))
-                                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                        .with_span(annot.name),
-                                );
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         generated
-    }
-
-    /// Validate that a compiler attribute is applied to an appropriate declaration.
-    fn validate_compiler_attr(&mut self, decl: &Decl, annot: &luna_ast::Annotation) {
-        let attr_name = self.get_span_text(annot.name);
-
-        match attr_name {
-            "repr" => {
-                match decl {
-                    Decl::Struct { .. } | Decl::Enum { .. } => {}
-                    _ => {
-                        self.diagnostics.push(
-                            Diagnostic::error("`#[repr]` can only be applied to structs or enums")
-                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                .with_span(annot.name),
-                        );
-                    }
-                }
-            }
-            "test" => {
-                match decl {
-                    Decl::Function { .. } => {}
-                    _ => {
-                        self.diagnostics.push(
-                            Diagnostic::error("`#[test]` can only be applied to functions")
-                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                .with_span(annot.name),
-                        );
-                    }
-                }
-            }
-            "inline" => {
-                match decl {
-                    Decl::Function { .. } => {}
-                    _ => {
-                        self.diagnostics.push(
-                            Diagnostic::error("`#[inline]` can only be applied to functions")
-                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                .with_span(annot.name),
-                        );
-                    }
-                }
-            }
-            "no_mangle" => {
-                match decl {
-                    Decl::Function { .. } => {}
-                    _ => {
-                        self.diagnostics.push(
-                            Diagnostic::error("`#[no_mangle]` can only be applied to functions")
-                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                .with_span(annot.name),
-                        );
-                    }
-                }
-            }
-            "link" => {
-                // link can be applied to functions (for FFI) or extern blocks
-                match decl {
-                    Decl::Function { .. } | Decl::Extern { .. } => {
-                        // `__luna_intrinsic_*` is a compiler-owned namespace. A user
-                        // declaration may not claim it, including by renaming.
-                        if let Some(arg) = annot.args.first() {
-                            let raw = self.get_expr_identifier_text(arg.value);
-                            let name = raw.trim_matches('"');
-                            if name.starts_with("__luna_intrinsic_") {
-                                self.diagnostics.push(
-                                    Diagnostic::error(format!(
-                                        "`#[link(\"{name}\")]` claims the compiler-owned intrinsic namespace `__luna_intrinsic_`"
-                                    ))
-                                    .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                    .with_span(annot.name),
-                                );
-                            }
-                        }
-                    }
-                    _ => {
-                        self.diagnostics.push(
-                            Diagnostic::error("`#[link]` can only be applied to functions or extern blocks")
-                                .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                                .with_span(annot.name),
-                        );
-                    }
-                }
-            }
-            "lang" => {
-                // lang can be applied to various items (traits, functions, structs, etc)
-                // in trusted compiler/core contexts. Handled in Resolver.
-            }
-            "sync_noescape" => {
-                self.diagnostics.push(
-                    Diagnostic::error("`#[sync_noescape]` can only be applied to parameters")
-                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                        .with_span(annot.name),
-                );
-            }
-            _ => {}
-        }
-    }
-
-    /// Handle #[repr(...)] attribute - compiler-defined, validation only.
-    fn handle_repr(&mut self, decl: &Decl, annot: &luna_ast::Annotation) {
-        match decl {
-            Decl::Struct { .. } | Decl::Enum { .. } => {}
-            _ => {
-                self.diagnostics.push(
-                    Diagnostic::error("`#[repr]` can only be applied to structs or enums")
-                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                        .with_span(annot.name),
-                );
-                return;
-            }
-        }
-
-        for arg in &annot.args {
-            let arg_text = self.get_expr_identifier_text(arg.value);
-            match arg_text.as_str() {
-                "C" | "transparent" | "u8" | "u16" | "u32" | "u64" | "i8" | "i16" | "i32" | "i64" => {
-                    // Valid repr
-                }
-                _ => {
-                    let span = self.get_expr_span(arg.value).unwrap_or(annot.name);
-                    self.diagnostics.push(
-                        Diagnostic::error(format!("invalid repr argument `{}`", arg_text))
-                            .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                            .with_span(span),
-                    );
-                }
-            }
-        }
-    }
-
-    /// Handle #[test] attribute - compiler-defined, validation only.
-    fn handle_test(&mut self, decl: &Decl, annot: &luna_ast::Annotation) {
-        match decl {
-            Decl::Function { .. } => {}
-            _ => {
-                self.diagnostics.push(
-                    Diagnostic::error("`#[test]` can only be applied to functions")
-                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                        .with_span(annot.name),
-                );
-            }
-        }
     }
 
     /// Handle #[derive(...)] attribute using the generic derive system.
@@ -461,9 +127,7 @@ impl<'a> AttributeProcessor<'a> {
             Decl::Enum { .. } => extract_enum_input(self.arena, &self.source_manager.get_file(self.file_id).unwrap().source, decl),
             _ => {
                 self.diagnostics.push(
-                    Diagnostic::error("`#[derive]` can only be applied to structs or enums")
-                        .with_code(luna_common::DiagnosticCode::InvalidAnnotation)
-                        .with_span(annot.name),
+                    AttributeExpansionFailure::application("`#[derive]` can only be applied to structs or enums", annot.name),
                 );
                 return Vec::new();
             }
@@ -491,7 +155,7 @@ impl<'a> AttributeProcessor<'a> {
                         available.join(", ")
                     )
                 };
-                self.diagnostics.push(Diagnostic::error(msg).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(span));
+                self.diagnostics.push(AttributeExpansionFailure::application(msg, span));
                 continue;
             }
 
