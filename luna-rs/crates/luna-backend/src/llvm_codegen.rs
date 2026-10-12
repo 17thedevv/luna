@@ -2029,10 +2029,17 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
 
     fn int_min_value(&self, ty: IntType<'ctx>) -> IntValue<'ctx> {
         let width = self.int_bit_width(ty);
-        if width == 0 || width >= 128 {
+        if width == 0 {
             return ty.const_zero();
         }
-        ty.const_int(1u64 << (width - 1), false)
+        if width <= 64 {
+            ty.const_int(1u64 << (width - 1), false)
+        } else if width == 128 {
+            // 1 << 127: high word 0x8000_0000_0000_0000, low word 0.
+            ty.const_int_arbitrary_precision(&[0, 1u64 << 63])
+        } else {
+            ty.const_int(1u64 << (width - 1), false)
+        }
     }
 
     /// `{result, overflow}` from the LLVM overflow intrinsic for +, -, *.

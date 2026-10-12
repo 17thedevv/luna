@@ -3,7 +3,6 @@
     "fixture": "comptime_division_by_zero",
     "compile_exit": 1,
     "diagnostics": [
-      "error[E4005]: cannot evaluate constant in comptime: attempt to divide by zero in comptime evaluation",
       "error[E4005]: cannot evaluate constant in comptime: attempt to divide by zero in comptime evaluation"
     ],
     "run_exit": null,
@@ -14,7 +13,6 @@
     "fixture": "comptime_shift_out_of_range",
     "compile_exit": 1,
     "diagnostics": [
-      "error[E4005]: cannot evaluate constant in comptime: comptime error: integer shift count out of range",
       "error[E4005]: cannot evaluate constant in comptime: comptime error: integer shift count out of range"
     ],
     "run_exit": null,
@@ -25,7 +23,6 @@
     "fixture": "comptime_signed_overflow",
     "compile_exit": 1,
     "diagnostics": [
-      "error[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation",
       "error[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation"
     ],
     "run_exit": null,
@@ -36,7 +33,6 @@
     "fixture": "comptime_unary_neg_min",
     "compile_exit": 1,
     "diagnostics": [
-      "error[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation",
       "error[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation"
     ],
     "run_exit": null,
@@ -90,6 +86,15 @@
   },
   {
     "fixture": "positive_float_overflow_no_trap",
+    "compile_exit": 0,
+    "diagnostics": [],
+    "run_exit": 0,
+    "run_stderr": "",
+    "trap": false,
+    "outcome": "NO_TRAP"
+  },
+  {
+    "fixture": "positive_i128_neg_zero",
     "compile_exit": 0,
     "diagnostics": [],
     "run_exit": 0,
@@ -170,6 +175,15 @@
     "outcome": "TRAP"
   },
   {
+    "fixture": "signed_add_overflow_i128",
+    "compile_exit": 0,
+    "diagnostics": [],
+    "run_exit": 3,
+    "run_stderr": "\nluna: PANIC [L005] integer overflow\n    at D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\signed_add_overflow_i128.ln:0:0\n",
+    "trap": true,
+    "outcome": "TRAP"
+  },
+  {
     "fixture": "signed_add_overflow_i32",
     "compile_exit": 0,
     "diagnostics": [],
@@ -202,6 +216,15 @@
     "diagnostics": [],
     "run_exit": 3,
     "run_stderr": "\nluna: PANIC [L003] division by zero\n    at D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\signed_div_zero_i32.ln:0:0\n",
+    "trap": true,
+    "outcome": "TRAP"
+  },
+  {
+    "fixture": "signed_min_div_neg_one_i128",
+    "compile_exit": 0,
+    "diagnostics": [],
+    "run_exit": 3,
+    "run_stderr": "\nluna: PANIC [L005] integer overflow\n    at D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\signed_min_div_neg_one_i128.ln:0:0\n",
     "trap": true,
     "outcome": "TRAP"
   },
