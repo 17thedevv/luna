@@ -1,5 +1,20 @@
 # Execution ledger — Luna 0.1 completion
 
+### E-wave final qualification — 2026-10-13, RangeInclusive decision pending
+
+Production/test pin `939d53e0ad7719c7c4a3eb4b915173fedeb1a129` passes four
+59-row matrices (236 acquisitions), diagnostic ownership/identity, source/fresh
+artifact parity, real22/23 rejection and fresh24 relocation controls. A full
+default-parallel workspace run stops at 138 binaries: 877 passed / 1 failed /
+1 ignored / exit101. RangeInclusive advances after yielding MAX and correctly
+traps L005. Three consecutive workspace passes remain unmet; candidate stays
+`6017ba8d8db40cf0bc16498f639e5d830c0e827c`.
+The [blocker report](evidence/REPORT-E1-RANGE-BLOCKER-2026-10-13.md) records
+the first divergence, public-field compatibility decision, four-mode ordinary
+Luna/non-Copy prototype and pending continuation. A test-generated tracked
+MVIR dump is separately isolated (9 focused tests PASS). No E-wave closure,
+candidate advancement, main merge, or release tag occurs at this checkpoint.
+
 ### E-wave repair — 2026-10-12, qualification in progress
 
 E1-DIAG-OWNERSHIP-01 and supplemental E1010/literal/macro mappings are adopted

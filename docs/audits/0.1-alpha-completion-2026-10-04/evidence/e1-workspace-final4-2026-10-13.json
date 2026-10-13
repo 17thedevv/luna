@@ -1,0 +1,34 @@
+{
+  "source_sha": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+  "command": [
+    "cargo",
+    "test",
+    "--workspace"
+  ],
+  "parallelism": "default; no --test-threads override; RUST_TEST_THREADS absent",
+  "cli_debug_sha256": "7d9630f419726e58140952991e4bb8557983814a2c1cf2fd13f8994d800f6222",
+  "cli_release_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+  "runs": [
+    {
+      "run": 1,
+      "start_utc": "2026-10-13T04:12:06.486180+00:00",
+      "elapsed_seconds": 8600.251,
+      "head_before": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+      "head_after": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+      "exit": 101,
+      "binaries": 138,
+      "doc_test_groups": 0,
+      "passed": 877,
+      "failed": 1,
+      "ignored": 1,
+      "result_groups": 138,
+      "log_sha256": "fe7a60141d49559b0cbcc0114d4ed11ab3a8047880c0aea51e4242379a8b833d",
+      "arithmetic_modes": [],
+      "cli_debug_sha256_after": "bd80e80b7b2a1da65b787e4a28791367797079f20041b8233f8e9cf307153aac",
+      "cli_release_sha256_after": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+      "code_diff_empty_after": false,
+      "log_archive": "e1-workspace-final4-2026-10-13-run1.txt.gz"
+    }
+  ],
+  "three_consecutive_passes": false
+}

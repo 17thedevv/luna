@@ -360,6 +360,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-RANGE-BLOCKER-2026-10-13.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-REPAIR-2026-10-12.md",
     "role": "evidence",
     "owner": "conformance"
@@ -652,6 +657,11 @@
   {
     "path": "docs/project/rename-luna-v1.md",
     "role": "adopted-contract",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/proposals/e1-range-inclusive-terminal-slot-2026-10-13.md",
+    "role": "historical",
     "owner": "conformance"
   },
   {

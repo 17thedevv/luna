@@ -6,6 +6,7 @@ use std::process::Command;
 #[test]
 fn test_place_model_investigation() {
     let sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
+    let work = luna_test_support::TempWorkspace::new("sem_gap_19_model");
     let src = r#"
 fn test_model() -> i32 {
     dec rw x = 1;
@@ -21,9 +22,11 @@ fn main() -> i32 {
         search_paths: vec![sysroot.root().to_string_lossy().to_string()],
         quiet: true,
         emit_mvir: true,
+        output_path: Some(work.join("test_model.exe").to_string_lossy().into_owned()),
         ..Default::default()
     };
-    let res = luna_driver::compile("test_model.ln", src.to_string(), &options);
+    let source_path = work.join("test_model.ln");
+    let res = luna_driver::compile(source_path.to_str().unwrap(), src.to_string(), &options);
     assert!(res.is_ok(), "test_model should compile: {:?}", res.err());
 }
 

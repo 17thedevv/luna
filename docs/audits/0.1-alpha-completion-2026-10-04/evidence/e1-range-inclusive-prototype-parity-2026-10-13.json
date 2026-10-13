@@ -1,0 +1,38 @@
+[
+  {
+    "profile": "debug",
+    "provider_mode": "source",
+    "build_exit": 0,
+    "build_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "run_stderr": "",
+    "cli_sha256": "bd80e80b7b2a1da65b787e4a28791367797079f20041b8233f8e9cf307153aac"
+  },
+  {
+    "profile": "debug",
+    "provider_mode": "artifact",
+    "build_exit": 0,
+    "build_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "run_stderr": "",
+    "cli_sha256": "bd80e80b7b2a1da65b787e4a28791367797079f20041b8233f8e9cf307153aac"
+  },
+  {
+    "profile": "release",
+    "provider_mode": "source",
+    "build_exit": 0,
+    "build_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "run_stderr": "",
+    "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8"
+  },
+  {
+    "profile": "release",
+    "provider_mode": "artifact",
+    "build_exit": 0,
+    "build_stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: iter_adapters\nDEBUG loading package: __lang_option\nDEBUG loading package: __lang_iterator\nDEBUG loading package: __lang_into_iterator\nDEBUG loading package: clone\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG loading package: ptr\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: mem\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\n",
+    "run_exit": 0,
+    "run_stderr": "",
+    "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8"
+  }
+]
