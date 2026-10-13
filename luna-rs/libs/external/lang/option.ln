@@ -27,7 +27,7 @@ impl<T> std::Option<T> {
     export fn as_ref(self: &Self) -> std::Option<&T> life_from(self) {
         if self.is_some() {
             unsafe {
-                return std::Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *T));
+                return std::Option::Some(&*(((self as *Self as u64) + (alignof(Self) as u64)) as *T));
             }
         }
         return std::Option::None;
@@ -36,7 +36,7 @@ impl<T> std::Option<T> {
     export fn as_mut(self: &rw Self) -> std::Option<&rw T> life_from(self) {
         if self.is_some() {
             unsafe {
-                return std::Option::Some(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw T));
+                return std::Option::Some(&rw *(((self as *rw Self as u64) + (alignof(Self) as u64)) as *rw T));
             }
         }
         return std::Option::None;

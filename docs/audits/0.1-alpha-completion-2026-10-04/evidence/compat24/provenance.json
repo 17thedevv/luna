@@ -1,0 +1,25 @@
+{
+  "producer_head": "356b1028e36733e7664e672d56aa761fe5643686",
+  "producer_cli_sha256": "2cd6d626df776615c82d681d19bd1c1bf21bdf2ce06b46d812e30e76f3afedcc",
+  "compiler": 24,
+  "metadata": 9,
+  "mvir": 5,
+  "format": 2,
+  "header_modified": false,
+  "files": {
+    "enum-alignment-compiler24.ll": "d69b214d2dac26748b2afb27ff27d3cc679ba6b5c81ef906d7e4e0cdde3f60cf",
+    "enum-alignment-compiler24.llib": "06ac93594c0bab1baba95c99c25864cb0e2b1976044043b80f713d2178806d22",
+    "enum-alignment-compiler24.ln": "8b14624fd95ccc42759142b6c80692439669b4d162eac9eb819613243b75d0cb",
+    "enum-alignment-compiler24.obj": "c047822a4f3f63dd325a75723a2c976d3479428a74b3b9de46d63b65687323a7",
+    "producer-build.txt.gz": "7b2437293890d8d1a8c921a930e39052026e004a884e31818e889e1a282f4402"
+  },
+  "compiler_tree_unchanged_from": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+  "uncommitted_stdlib_change": "Approved RangeInclusive Option slot; compiler still pre-alignment-repair",
+  "command": [
+    "build",
+    "enum-alignment-compiler24.ln",
+    "--lib",
+    "--emit",
+    "llib,llvm"
+  ]
+}

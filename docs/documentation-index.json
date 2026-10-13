@@ -360,6 +360,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-RANGE-BLOCKER-2026-10-13.md",
     "role": "evidence",
     "owner": "conformance"

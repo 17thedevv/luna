@@ -4,7 +4,7 @@
 
 # E1 decision: RangeInclusive at the terminal value
 
-Status: **PROPOSAL — maintainer decision required; production unchanged**.
+Status: **ADOPTED — maintainer approved decision A on 2026-10-13; implementation qualification in progress**.
 Observed source pin: `939d53e0ad7719c7c4a3eb4b915173fedeb1a129`.
 
 The default-parallel workspace run stops at `test_range_and_inclusive_boundaries`:
@@ -22,7 +22,7 @@ owned slot. Advancing solely to replace the terminal value is unnecessary and
 fails at MAX. A raw read would leave alias/double-drop hazards; adding Copy/Clone
 bounds would lose the existing non-Copy capability.
 
-## Proposed decision A (recommended)
+## Adopted decision A
 
 Change **only `RangeInclusive.current` from `T` to `std::Option<T>`**.
 The constructor puts `Some(start)` in the slot. `next` borrows the current item
@@ -33,7 +33,9 @@ the old owned `Some(T)`. Repeated `next` returns `None`.
 - `Step` signatures and checked integer implementations remain unchanged.
 - `Range<T>` is unchanged; non-Copy/non-Clone steps remain supported.
 - No new intrinsic, compiler branch, runtime ABI, MVIR encoding, or metadata
-  schema is needed. Versions remain compiler24/metadata9/MVIR5/format2.
+  schema is needed for this slot amendment. The later independently approved
+  generic enum alignment repair bumps compiler24 → 25; metadata9/MVIR5/format2
+  remain unchanged. See the [alignment continuation](../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md).
 - Public source compatibility changes for direct struct literals and field
   access: `current: value` becomes `current: Some(value)`; direct readers must
   handle Option. The constructor and Iterator call surface stay unchanged.
@@ -73,7 +75,7 @@ require permission for every representation edit. Permission is required here
 because these fields are public and decision A changes their type, while B
 decides previously unspecified boundary behavior.
 
-After a decision: implement in ordinary Luna, validate all supported integer
+The maintainer selected **A — Option slot, keep Step checked**. Implement in ordinary Luna, validate all supported integer
 limits and non-Copy drops through source/fresh artifacts, rerun the failed range
 suite, pin the final source and restart the three full workspace gates. Candidate
 remains `6017ba8d8db40cf0bc16498f639e5d830c0e827c`. E-wave is not CLOSED.

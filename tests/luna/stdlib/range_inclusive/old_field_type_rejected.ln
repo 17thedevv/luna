@@ -1,0 +1,1 @@
+import <iter_adapters>; fn main() -> i32 { dec value = std::iter::RangeInclusive<i32> { current: 1i32, end: 2i32, exhausted: false }; return 0; }

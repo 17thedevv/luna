@@ -79,7 +79,10 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 14 rejects compiler versions 1–13. This revision requires
+protocol introduced at compiler14 rejects earlier execution identities. The
+current compiler25 boundary additionally rejects versions1–24, including
+pre-repair generic enum ABI artifacts; metadata9/MVIR5/format2 remain unchanged.
+This revision requires
 revalidated raw-to-safe slice promotion and checked memory-hook identities
 and callable safety in addition to
 native integrity envelopes and portable payload checksums, and retains

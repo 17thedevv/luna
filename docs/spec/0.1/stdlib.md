@@ -39,6 +39,24 @@ view cannot escape local backing storage or permit invalidation of a live
 borrow. See the [scoped repair audit](../../audits/0.1-alpha-completion-2026-10-04/RAW-SLICE-VIEWS.md)
 for current verification rather than a blanket release claim.
 
+## Inclusive range terminal ownership (adopted 2026-10-13)
+
+`std::iter::RangeInclusive<T>.current` is `std::Option<T>`; `end: T` and
+`exhausted: bool` remain public. `range_inclusive(start, end)` initializes
+`Some(start)`. `next` yields the terminal item without requiring a successor,
+then leaves `current = None` and `exhausted = true`. Subsequent calls return
+None. Inverted ranges yield no item. The iterator retains its existing Step
+bound and supports non-Copy, non-Clone owned items.
+
+Step signatures and builtin integer arithmetic remain checked. This amendment
+does not define wrapping at MAX. Direct construction uses `current: Some(value)`
+or `None`; field readers handle Option. Constructor/Iterator call signatures
+and exclusive Range are unchanged. The public layout/interface change requires
+rebuilding providers and dependents; stale dependency interfaces are rejected.
+See the [adopted decision](../../proposals/e1-range-inclusive-terminal-slot-2026-10-13.md)
+for authority and the historical failing qualification. This contract is not
+a claim that final workspace qualification has passed.
+
 ## Numeric, text and optimization boundaries
 
 Convert and Display inherit correct generic integer widening; they must not

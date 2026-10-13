@@ -1,6 +1,6 @@
 # Execution ledger — Luna 0.1 completion
 
-### E-wave final qualification — 2026-10-13, RangeInclusive decision pending
+### E-wave final qualification — 2026-10-13, approved RangeInclusive repair
 
 Production/test pin `939d53e0ad7719c7c4a3eb4b915173fedeb1a129` passes four
 59-row matrices (236 acquisitions), diagnostic ownership/identity, source/fresh
@@ -11,7 +11,15 @@ traps L005. Three consecutive workspace passes remain unmet; candidate stays
 `6017ba8d8db40cf0bc16498f639e5d830c0e827c`.
 The [blocker report](evidence/REPORT-E1-RANGE-BLOCKER-2026-10-13.md) records
 the first divergence, public-field compatibility decision, four-mode ordinary
-Luna/non-Copy prototype and pending continuation. A test-generated tracked
+Luna/non-Copy prototype. The maintainer approved Option A: public current
+becomes Option, terminal extraction does not call Step, and Step stays checked.
+Canonical provider qualification passes all four modes, including a wider i128
+non-Copy Probe, after an independently approved generic enum alignment repair.
+Compiler25 rejects genuine24 ABI artifacts; metadata9/MVIR5/format2 remain.
+The [alignment record](evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md) preserves
+the pre-repair crashes and successful focused controls. Final qualification
+remains pending; the failed
+full run above remains FAIL. A test-generated tracked
 MVIR dump is separately isolated (9 focused tests PASS). No E-wave closure,
 candidate advancement, main merge, or release tag occurs at this checkpoint.
 

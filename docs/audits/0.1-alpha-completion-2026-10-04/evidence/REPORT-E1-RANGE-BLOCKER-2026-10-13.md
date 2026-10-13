@@ -66,6 +66,12 @@ qualification follows a decision.
 
 ## Continuation
 
+Maintainer continuation, 2026-10-13: **A approved — Option slot, keep Step
+checked**. The public current field amendment is adopted in the
+[stdlib contract](../../../spec/0.1/stdlib.md). The historical failed run and
+unchanged-production observations above describe the pre-approval checkpoint;
+they do not describe the subsequent implementation or certify its final gates.
+
 Implement the selected policy, run focused native source/artifact checks for
 all supported integer limits, empty/inverted/repeated exhaustion and non-Copy
 drops, regenerate the sysroot and verify stale-interface rejection. Pin the

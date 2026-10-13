@@ -1,5 +1,5 @@
 //! E1 qualification: ordinary and modular reducers through source/fresh artifact
-//! providers, real compiler22/23 rejection, and relocation of actual artifact bundles.
+//! providers, real compiler22/23/24 rejection, and relocation of actual artifact bundles.
 #[path = "support/stdlib.rs"]
 mod support;
 use std::{fs, path::Path, process::{Command, Output}};
@@ -92,7 +92,7 @@ fn macro_arithmetic_provider_survives_relocation_and_rejects_old_compilers() {
         .env("LUNA_SYSROOT", &modes.source).output().unwrap();
     assert!(output.status.success(), "{}", render(&output));
     let bytes = fs::read(&artifact).unwrap();
-    assert_eq!(u16::from_le_bytes([bytes[6], bytes[7]]), 24);
+    assert_eq!(u16::from_le_bytes([bytes[6], bytes[7]]), luna_llib::format::LLIB_COMPILER_VERSION);
     fs::remove_file(&provider).unwrap();
     let relocated_project = work.join("relocated_provider_project");
     fs::rename(&project, &relocated_project).unwrap();
@@ -118,6 +118,7 @@ fn macro_arithmetic_provider_survives_relocation_and_rejects_old_compilers() {
     for (old_version, archived) in [
         (22, "compat22/num-compiler22.llib"),
         (23, "compat23/discarded-arithmetic-compiler23.llib"),
+        (24, "compat24/enum-alignment-compiler24.llib"),
     ] {
     let archived = workspace_root().parent().unwrap().join("docs/audits/0.1-alpha-completion-2026-10-04/evidence").join(archived);
     fs::copy(archived, relocated_project.join("old_provider.llib")).unwrap();
@@ -126,7 +127,7 @@ fn macro_arithmetic_provider_survives_relocation_and_rejects_old_compilers() {
         let output = build(cli, &relocated_sysroot, &old_consumer, &exe);
         assert_eq!(output.status.code(), Some(1), "{}", render(&output));
         let stderr = String::from_utf8_lossy(&output.stderr);
-        assert!(stderr.contains("compiler") && stderr.contains(&old_version.to_string()) && stderr.contains("24"), "{}", render(&output));
+        assert!(stderr.contains("compiler") && stderr.contains(&old_version.to_string()) && stderr.contains("25"), "{}", render(&output));
         assert!(!exe.exists());
     }
     }

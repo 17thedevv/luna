@@ -69,7 +69,11 @@ negation, and the comptime evaluator matches it; explicit modular arithmetic is
 available through `std::wrapping_add/sub/mul`, which are compiler-recognized
 language items and never trap. The maintainer approved compiler24 after a
 genuine compiler23 artifact was shown to retain unchecked execution when DCE
-removed unused integer operations. Metadata9/MVIR5/format2 remain unchanged.
+removed unused integer operations. The later approved terminal Option slot
+exposed a generic enum payload alignment defect for i128-bearing owned items.
+The maintainer approved the generic alignment repair and compiler25 boundary;
+real artifact24 is also rejected. Metadata9/MVIR5/format2 remain unchanged.
+See the [alignment continuation](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md).
 The [2026-10-12 repair record](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-REPAIR-2026-10-12.md)
 documents adopted diagnostic ownership amendments, the DCE repair, and provider
 identity/AST parity repairs. Final qualification remains pending; the historical
