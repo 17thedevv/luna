@@ -1,0 +1,123 @@
+{
+  "head_during_development": "356b1028e36733e7664e672d56aa761fe5643686",
+  "source_state": "Uncommitted approved implementation; source hashes below, final exact-pin qualification is separate",
+  "code_sha256": {
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs": "f2a4ce1bbbd5ee9d818e58acc0cd9231d8feac7833b25b2cc9f44575a5b19acd",
+    "luna-rs/crates/luna-backend/src/static_codegen.rs": "9052ce6bdf3d6c677ee76535e2e80f5037e15cf731d0d38b499461674957edfb",
+    "luna-rs/crates/luna-mvir/src/interp.rs": "b3700848e8c318f79d22ddaf350a443a76d6a69bc1b36d9486cffd7bfd89584a",
+    "luna-rs/crates/luna-llib/src/format.rs": "cef8f9fd2794e17b99f45c5511fc6bf824e1b6066f9c27a2400328425ac1778f",
+    "luna-rs/libs/external/core/iter_adapters.ln": "0deece97bec0a401f91791c23dfffe5500b81c25fee2c89ba037c9f45c699fa4",
+    "luna-rs/libs/external/lang/option.ln": "45f32a97118a95b9646445b3de82a4994d5cc8377313542e9138d436510757d5",
+    "luna-rs/libs/external/core/result.ln": "5576d7057ab55cb5d92d731c12f5cf4852d22ae023cdb6074ccc20be4576b8ab"
+  },
+  "fixture_sha256": {
+    "tests\\luna\\stdlib\\range_inclusive\\boundaries.ln": "e3e7f76a85a77911188462768f49ff6615e6ee822629721f4d466faa5d0324fe",
+    "tests\\luna\\stdlib\\range_inclusive\\iter_adapters_before_option.ln.snapshot": "9498b3def2f8acb083f9632581ed2f6bec99a03b26c4cf4a134120483b569e95",
+    "tests\\luna\\stdlib\\range_inclusive\\noncopy_drop_controls.ln": "10d49d6dca8aa7151baa1fab0c77fecc094c9a92cd2f7fef6a04a0252d89f919",
+    "tests\\luna\\stdlib\\range_inclusive\\noncopy_terminal.ln": "5e3d82a99321ac644f4fb2bc2508c99eb1dc9d5b9e8dc8dbe484d25cc748be68",
+    "tests\\luna\\stdlib\\range_inclusive\\old_field_type_rejected.ln": "7a9862da4f6f239de92d38da5041364477146dfa134f975c09b4ec5822f72e35",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_i16.ln": "ea2b9c10fec59725c02409915c45874f9af402aabccea909063e3aea8d0d31a5",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_i32.ln": "0e3f2adf655fb75c82c2068f832fd5445c47d2736dc94580d061190b5f09af09",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_i64.ln": "5faa17c7c6c707467588bb2a802c808c00fb0fb3b5d413f365258795760ce20f",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_i8.ln": "a3e89b75014c4df391531cff0f8e8fa2c073c6fb71c9506ed7626e359eef3de3",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_isize.ln": "a25e8d7c928c52c56df8e29ba1b2aa472a8d7ff1c2f6f171690054c4cb5899bf",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_u16.ln": "6b141998a031a4763a484a28c60a49f6172ab4c1337197b28a80f643f43a931c",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_u32.ln": "3d76492be4e08852f6543b471421da8654a222485662523a91ebec9337d58386",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_u64.ln": "a2fb409f0fd8bc3d38a183f80e7c529d2b3c40efe2bfbb950aaae76df94ec4a8",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_u8.ln": "327b88e226759357d493eab48b550796027902f8a0ecb2b6fbff28778a22b39c",
+    "tests\\luna\\stdlib\\range_inclusive\\trap_step_usize.ln": "bb7e7238c076b856b40192b1e0ed67d92e9d1d2d000e09da6b0ff35393c1bbcf",
+    "tests\\luna\\language\\enum_alignment_consumer.ln": "afa407f99b28572487015f261dda098606d8568c566990a9054c793a6a10b979",
+    "tests\\luna\\language\\enum_alignment_provider.ln": "dcc93f35618af156e0da41b392c9cfc524f022a809945107111192285ce13c29",
+    "tests\\luna\\language\\enum_payload_alignment_repro.ln": "3966f072e8ca60e5eb090d416785ea43665b36f0954d63a4bed59fe3e03b8a33",
+    "tests\\luna\\language\\enum_payload_reference_alignment_repro.ln": "8df6838ece30b3dfd9e9e3f90dce1e92ce32e92f8c7a742bee5b3eb93950eaa5"
+  },
+  "logs": [
+    {
+      "log": "e1-compiler25-alignment-unit-focused.log.txt.gz",
+      "log_sha256": "47d22ee5366777111475f07ee9299a3a847a928179c046e4e8f3a15dcf8059e9",
+      "passed": 14,
+      "failed": 0,
+      "ignored": 0,
+      "result_groups": 6,
+      "verdict": "PASS"
+    },
+    {
+      "log": "e1-compiler25-alignment-backend-focused2.log.txt.gz",
+      "log_sha256": "b2cab5b6d292211eb92820b469e3dd92c1cf4dc606547a63a511b7940ff59e04",
+      "passed": 5,
+      "failed": 0,
+      "ignored": 0,
+      "result_groups": 2,
+      "verdict": "PASS"
+    },
+    {
+      "log": "e1-compiler25-compiler25-reader-focused.log.txt.gz",
+      "log_sha256": "6e636b3d08681743ca1b340c5e62717578c1dab106071f9ef79aabc20dd2e06b",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "result_groups": 1,
+      "verdict": "PASS"
+    },
+    {
+      "log": "e1-compiler25-range-driver-focused25.log.txt.gz",
+      "log_sha256": "2c7b2aaac2277df6de55577fa903dc809b34889c53008703ae019cfb56cc515a",
+      "passed": 4,
+      "failed": 0,
+      "ignored": 0,
+      "result_groups": 1,
+      "verdict": "PASS"
+    },
+    {
+      "log": "e1-compiler25-range-cli-focused25.log.txt.gz",
+      "log_sha256": "a7e8a9678f93ca2b098b741a82933ebb07fde753504bdf015b3d53f2efb0b03a",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "result_groups": 1,
+      "verdict": "PASS"
+    },
+    {
+      "log": "e1-compiler25-module-const-focused25.log.txt.gz",
+      "log_sha256": "f58b54672fe3e6f25687f7badacda61d4e13aca8d0bbc6825d019d2333774dc7",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "result_groups": 1,
+      "verdict": "PASS"
+    },
+    {
+      "log": "e1-compiler25-compat-cli-focused25.log.txt.gz",
+      "log_sha256": "b198384d9201e9b7efb6f44cffbd205def437d9ce5172600067e765fb6ef581a",
+      "passed": 0,
+      "failed": 1,
+      "ignored": 0,
+      "result_groups": 1,
+      "verdict": "FAIL"
+    },
+    {
+      "log": "e1-compiler25-compat-cli-focused25b.log.txt.gz",
+      "log_sha256": "e7ba9c637c6e7f640a922a2761dc4b5ffe9c331fb0a0541d3659aeecabf76056",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "result_groups": 1,
+      "verdict": "PASS"
+    }
+  ],
+  "range_and_generic_mode_count": 4,
+  "range_and_generic_fixture_acquisitions": 68,
+  "range_native_outcomes": {
+    "arithmetic_traps": 40,
+    "native_success": 24,
+    "typed_rejection": 4
+  },
+  "additional_stale_controls": "Real old-field provider generated through CLI: native baseline; matching new bundle makes relocated dependent reject E6001 check/build with no executable; rebuild yields native success",
+  "compat_failed_acquisition": "First compiler25 CLI compatibility rerun stopped at obsolete hardcoded header24 assertion. Test now uses LLIB_COMPILER_VERSION; rerun passes. No compiler semantic change made for this test expectation.",
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  }
+}

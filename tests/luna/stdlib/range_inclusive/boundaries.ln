@@ -1,0 +1,316 @@
+import <iter_adapters>;
+// Native target: 64-bit usize/isize. All ten existing Step implementations.
+
+fn edges_u8() -> i32 {
+    dec rw upper = std::iter::range_inclusive(254u8, 255u8);
+    match upper.next() { std::Option::Some(v) -> { if v != 254u8 { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 255u8 { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(255u8, 255u8);
+    match singleton.next() { std::Option::Some(v) -> { if v != 255u8 { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(0u8, 1u8);
+    match lower.next() { std::Option::Some(v) -> { if v != 0u8 { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != 1u8 { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2u8, 1u8);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<u8> { current: std::Option::Some(1u8), end: 2u8, exhausted: false };
+    if direct.next().unwrap() != 1u8 { return 19; }
+    if direct.next().unwrap() != 2u8 { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<u8> { current: std::Option::None, end: 2u8, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(254u8, 255u8);
+    if exclusive.next().unwrap() != 254u8 { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_u16() -> i32 {
+    dec rw upper = std::iter::range_inclusive(65534u16, 65535u16);
+    match upper.next() { std::Option::Some(v) -> { if v != 65534u16 { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 65535u16 { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(65535u16, 65535u16);
+    match singleton.next() { std::Option::Some(v) -> { if v != 65535u16 { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(0u16, 1u16);
+    match lower.next() { std::Option::Some(v) -> { if v != 0u16 { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != 1u16 { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2u16, 1u16);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<u16> { current: std::Option::Some(1u16), end: 2u16, exhausted: false };
+    if direct.next().unwrap() != 1u16 { return 19; }
+    if direct.next().unwrap() != 2u16 { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<u16> { current: std::Option::None, end: 2u16, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(65534u16, 65535u16);
+    if exclusive.next().unwrap() != 65534u16 { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_u32() -> i32 {
+    dec rw upper = std::iter::range_inclusive(4294967294u32, 4294967295u32);
+    match upper.next() { std::Option::Some(v) -> { if v != 4294967294u32 { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 4294967295u32 { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(4294967295u32, 4294967295u32);
+    match singleton.next() { std::Option::Some(v) -> { if v != 4294967295u32 { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(0u32, 1u32);
+    match lower.next() { std::Option::Some(v) -> { if v != 0u32 { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != 1u32 { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2u32, 1u32);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<u32> { current: std::Option::Some(1u32), end: 2u32, exhausted: false };
+    if direct.next().unwrap() != 1u32 { return 19; }
+    if direct.next().unwrap() != 2u32 { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<u32> { current: std::Option::None, end: 2u32, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(4294967294u32, 4294967295u32);
+    if exclusive.next().unwrap() != 4294967294u32 { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_u64() -> i32 {
+    dec rw upper = std::iter::range_inclusive(18446744073709551614u64, 18446744073709551615u64);
+    match upper.next() { std::Option::Some(v) -> { if v != 18446744073709551614u64 { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 18446744073709551615u64 { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(18446744073709551615u64, 18446744073709551615u64);
+    match singleton.next() { std::Option::Some(v) -> { if v != 18446744073709551615u64 { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(0u64, 1u64);
+    match lower.next() { std::Option::Some(v) -> { if v != 0u64 { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != 1u64 { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2u64, 1u64);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<u64> { current: std::Option::Some(1u64), end: 2u64, exhausted: false };
+    if direct.next().unwrap() != 1u64 { return 19; }
+    if direct.next().unwrap() != 2u64 { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<u64> { current: std::Option::None, end: 2u64, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(18446744073709551614u64, 18446744073709551615u64);
+    if exclusive.next().unwrap() != 18446744073709551614u64 { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_usize() -> i32 {
+    dec rw upper = std::iter::range_inclusive(18446744073709551614usize, 18446744073709551615usize);
+    match upper.next() { std::Option::Some(v) -> { if v != 18446744073709551614usize { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 18446744073709551615usize { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(18446744073709551615usize, 18446744073709551615usize);
+    match singleton.next() { std::Option::Some(v) -> { if v != 18446744073709551615usize { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(0usize, 1usize);
+    match lower.next() { std::Option::Some(v) -> { if v != 0usize { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != 1usize { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2usize, 1usize);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<usize> { current: std::Option::Some(1usize), end: 2usize, exhausted: false };
+    if direct.next().unwrap() != 1usize { return 19; }
+    if direct.next().unwrap() != 2usize { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<usize> { current: std::Option::None, end: 2usize, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(18446744073709551614usize, 18446744073709551615usize);
+    if exclusive.next().unwrap() != 18446744073709551614usize { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_i8() -> i32 {
+    dec rw upper = std::iter::range_inclusive(126i8, 127i8);
+    match upper.next() { std::Option::Some(v) -> { if v != 126i8 { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 127i8 { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(127i8, 127i8);
+    match singleton.next() { std::Option::Some(v) -> { if v != 127i8 { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(-128i8, -127i8);
+    match lower.next() { std::Option::Some(v) -> { if v != -128i8 { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != -127i8 { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2i8, 1i8);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<i8> { current: std::Option::Some(1i8), end: 2i8, exhausted: false };
+    if direct.next().unwrap() != 1i8 { return 19; }
+    if direct.next().unwrap() != 2i8 { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<i8> { current: std::Option::None, end: 2i8, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(126i8, 127i8);
+    if exclusive.next().unwrap() != 126i8 { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_i16() -> i32 {
+    dec rw upper = std::iter::range_inclusive(32766i16, 32767i16);
+    match upper.next() { std::Option::Some(v) -> { if v != 32766i16 { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 32767i16 { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(32767i16, 32767i16);
+    match singleton.next() { std::Option::Some(v) -> { if v != 32767i16 { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(-32768i16, -32767i16);
+    match lower.next() { std::Option::Some(v) -> { if v != -32768i16 { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != -32767i16 { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2i16, 1i16);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<i16> { current: std::Option::Some(1i16), end: 2i16, exhausted: false };
+    if direct.next().unwrap() != 1i16 { return 19; }
+    if direct.next().unwrap() != 2i16 { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<i16> { current: std::Option::None, end: 2i16, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(32766i16, 32767i16);
+    if exclusive.next().unwrap() != 32766i16 { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_i32() -> i32 {
+    dec rw upper = std::iter::range_inclusive(2147483646i32, 2147483647i32);
+    match upper.next() { std::Option::Some(v) -> { if v != 2147483646i32 { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 2147483647i32 { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(2147483647i32, 2147483647i32);
+    match singleton.next() { std::Option::Some(v) -> { if v != 2147483647i32 { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(-2147483648i32, -2147483647i32);
+    match lower.next() { std::Option::Some(v) -> { if v != -2147483648i32 { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != -2147483647i32 { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2i32, 1i32);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<i32> { current: std::Option::Some(1i32), end: 2i32, exhausted: false };
+    if direct.next().unwrap() != 1i32 { return 19; }
+    if direct.next().unwrap() != 2i32 { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<i32> { current: std::Option::None, end: 2i32, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(2147483646i32, 2147483647i32);
+    if exclusive.next().unwrap() != 2147483646i32 { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_i64() -> i32 {
+    dec rw upper = std::iter::range_inclusive(9223372036854775806i64, 9223372036854775807i64);
+    match upper.next() { std::Option::Some(v) -> { if v != 9223372036854775806i64 { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 9223372036854775807i64 { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(9223372036854775807i64, 9223372036854775807i64);
+    match singleton.next() { std::Option::Some(v) -> { if v != 9223372036854775807i64 { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(-9223372036854775808i64, -9223372036854775807i64);
+    match lower.next() { std::Option::Some(v) -> { if v != -9223372036854775808i64 { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != -9223372036854775807i64 { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2i64, 1i64);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<i64> { current: std::Option::Some(1i64), end: 2i64, exhausted: false };
+    if direct.next().unwrap() != 1i64 { return 19; }
+    if direct.next().unwrap() != 2i64 { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<i64> { current: std::Option::None, end: 2i64, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(9223372036854775806i64, 9223372036854775807i64);
+    if exclusive.next().unwrap() != 9223372036854775806i64 { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn edges_isize() -> i32 {
+    dec rw upper = std::iter::range_inclusive(9223372036854775806isize, 9223372036854775807isize);
+    match upper.next() { std::Option::Some(v) -> { if v != 9223372036854775806isize { return 1; } }, std::Option::None -> { return 2; }, }
+    match upper.next() { std::Option::Some(v) -> { if v != 9223372036854775807isize { return 3; } }, std::Option::None -> { return 4; }, }
+    if upper.next().is_some() { return 5; }
+    if upper.next().is_some() { return 6; }
+    if upper.current.is_some() { return 7; }
+    if upper.exhausted == false { return 8; }
+    dec rw singleton = std::iter::range_inclusive(9223372036854775807isize, 9223372036854775807isize);
+    match singleton.next() { std::Option::Some(v) -> { if v != 9223372036854775807isize { return 9; } }, std::Option::None -> { return 10; }, }
+    if singleton.next().is_some() { return 11; }
+    dec rw lower = std::iter::range_inclusive(-9223372036854775808isize, -9223372036854775807isize);
+    match lower.next() { std::Option::Some(v) -> { if v != -9223372036854775808isize { return 12; } }, std::Option::None -> { return 13; }, }
+    match lower.next() { std::Option::Some(v) -> { if v != -9223372036854775807isize { return 14; } }, std::Option::None -> { return 15; }, }
+    if lower.next().is_some() { return 16; }
+    dec rw inverted = std::iter::range_inclusive(2isize, 1isize);
+    if inverted.next().is_some() { return 17; }
+    if inverted.next().is_some() { return 18; }
+    dec rw direct = std::iter::RangeInclusive<isize> { current: std::Option::Some(1isize), end: 2isize, exhausted: false };
+    if direct.next().unwrap() != 1isize { return 19; }
+    if direct.next().unwrap() != 2isize { return 20; }
+    if direct.next().is_some() { return 21; }
+    dec rw empty_slot = std::iter::RangeInclusive<isize> { current: std::Option::None, end: 2isize, exhausted: false };
+    if empty_slot.next().is_some() { return 22; }
+    dec rw exclusive = std::iter::range(9223372036854775806isize, 9223372036854775807isize);
+    if exclusive.next().unwrap() != 9223372036854775806isize { return 23; }
+    if exclusive.next().is_some() { return 24; }
+    return 0;
+}
+
+fn main() -> i32 {
+    if edges_u8() != 0 { return 1; }
+    if edges_u16() != 0 { return 2; }
+    if edges_u32() != 0 { return 3; }
+    if edges_u64() != 0 { return 4; }
+    if edges_usize() != 0 { return 5; }
+    if edges_i8() != 0 { return 6; }
+    if edges_i16() != 0 { return 7; }
+    if edges_i32() != 0 { return 8; }
+    if edges_i64() != 0 { return 9; }
+    if edges_isize() != 0 { return 10; }
+    return 0;
+}

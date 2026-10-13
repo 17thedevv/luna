@@ -783,16 +783,20 @@ Current qualification, 2026-10-13: four 59-row matrices and diagnostic
 acquisition PASS on `939d53e0ad7719c7c4a3eb4b915173fedeb1a129`. Full workspace
 stops at 138 binaries / 877 PASS / 1 FAIL / 1 ignored / exit101:
 RangeInclusive computes a successor after MAX solely to replace its owned
-terminal slot. The checked overflow trap is correct. A public representation
-decision is pending; [blocker report](evidence/REPORT-E1-RANGE-BLOCKER-2026-10-13.md)
+terminal slot. The checked overflow trap is correct. The maintainer approved
+Option slot representation; canonical-provider qualification passes four modes.
+A wider i128 non-Copy test exposed generic enum alignment, now repaired under
+separate approval with compiler25. See the [alignment record](evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md).
+The historical [blocker report](evidence/REPORT-E1-RANGE-BLOCKER-2026-10-13.md)
 links concrete four-mode/non-Copy feasibility evidence. No three-pass gate or
-candidate advancement is claimed. Compiler24/metadata9/MVIR5/format2 remains
+candidate advancement is claimed. Compiler25/metadata9/MVIR5/format2 is now
 the adopted boundary; E2 stays CLOSED.
 
 Contract: ordinary integer arithmetic is checked; debug and release share the
 same semantics; comptime failures stay `E4005` with a primary source span; float
-and pointer behavior unchanged; MVIR opcodes unchanged; **compiler 22 → 23**
-(metadata9 / MVIR5 / format2 unchanged) so pre-E1 artifacts cannot be reused.
+and pointer behavior unchanged; MVIR opcodes unchanged. The initial compiler
+22 → 23 boundary was subsequently amended to **25**, rejecting real22/23/24
+(metadata9 / MVIR5 / format2 unchanged) so incompatible native artifacts cannot be reused.
 
 **Stage 1 — freeze baseline: DONE.** 34 reducers in
 `tests/luna/language/checked_arithmetic/`, recorded by

@@ -1,0 +1,1 @@
+export module compatibility { export struct Wide { value: i32, marker: i128 }; export enum Envelope<T> { Value(T), Empty } export fn make() -> Envelope<Wide> { return Envelope::Value(Wide { value: 42, marker: 123456789123456789i128 }); } }

@@ -4,10 +4,11 @@ use std::path::Path;
 /// Real compiler22 and pre-DCE compiler23 artifacts must be rejected before any
 /// unchecked native body can be reused. Artifact bytes were never header-patched.
 #[test]
-fn real_older_compiler_artifacts_are_rejected_by_compiler24() {
+fn real_older_compiler_artifacts_are_rejected_by_compiler25() {
     for (version, relative) in [
         (22, "compat22/num-compiler22.llib"),
         (23, "compat23/discarded-arithmetic-compiler23.llib"),
+        (24, "compat24/enum-alignment-compiler24.llib"),
     ] {
         let path = Path::new(env!("CARGO_MANIFEST_DIR")).join(
             "../../../docs/audits/0.1-alpha-completion-2026-10-04/evidence").join(relative);

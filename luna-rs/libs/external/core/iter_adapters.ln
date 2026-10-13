@@ -528,14 +528,14 @@ export fn range<T>(start: T, end: T) -> Range<T> {
 }
 
 export struct RangeInclusive<T> {
-    export current: T,
+    export current: std::Option<T>,
     export end: T,
     export exhausted: bool,
 };
 
 export fn range_inclusive<T>(start: T, end: T) -> RangeInclusive<T> {
     return RangeInclusive<T> {
-        current: start,
+        current: std::Option::Some(start),
         end: end,
         exhausted: false,
     };
@@ -555,16 +555,24 @@ impl<T: Step> std::Iterator<T> for Range<T> {
 impl<T: Step> std::Iterator<T> for RangeInclusive<T> {
     fn next(self: &rw Self) -> std::Option<T> life_from(self) {
         if self.exhausted { return std::Option::None; }
-        if self.current.step_greater(&self.end) { return std::Option::None; }
-        if self.current.step_eq(&self.end) {
-            self.exhausted = true;
-            dec next_val = self.current.step_forward();
-            dec val = std::mem::replace<T>(&rw self.current, next_val);
-            return std::Option::Some(val);
+        dec rw terminal = false;
+        dec rw following: std::Option<T> = std::Option::None;
+        {
+            match self.current.as_ref() {
+                std::Option::Some(current) -> {
+                    if current.step_greater(&self.end) { return std::Option::None; }
+                    if current.step_eq(&self.end) {
+                        terminal = true;
+                    } else {
+                        following = std::Option::Some(current.step_forward());
+                    }
+                },
+                std::Option::None -> { return std::Option::None; },
+            }
         }
-        dec next_val = self.current.step_forward();
-        dec val = std::mem::replace<T>(&rw self.current, next_val);
-        return std::Option::Some(val);
+        if terminal { self.exhausted = true; }
+        // Moving the terminal slot out needs no successor and no Copy bound.
+        return std::mem::replace<std::Option<T>>(&rw self.current, following);
     }
 }
 

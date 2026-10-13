@@ -1005,11 +1005,11 @@ impl<'a> MvirInterpreter<'a> {
                         return Err(ComptimeError::ComptimeAwaitForbidden);
                     }
                     Instruction::SizeOf { ty } => {
-                        let size = self.calculate_size_of(*ty);
+                        let size = self.calculate_layout(*ty)?.0;
                         RuntimeValue::Int { val: size as i128, width: IntWidth::USize }
                     }
                     Instruction::AlignOf { ty } => {
-                        let align = self.calculate_align_of(*ty);
+                        let align = self.calculate_layout(*ty)?.1;
                         RuntimeValue::Int { val: align as i128, width: IntWidth::USize }
                     }
                     Instruction::Variant { enum_ty, variant_idx, args } => {
@@ -1366,68 +1366,63 @@ impl<'a> MvirInterpreter<'a> {
         Ok(RuntimeValue::Unit)
     }
 
-    fn calculate_size_of(&self, ty_id: SemanticTypeId) -> usize {
-        let sem_ty = self.ctx.types.get(ty_id);
-        match sem_ty {
-            SemanticType::Primitive(b) => match b {
-                luna_semantic::ty::BuiltinType::Bool => 1,
-                luna_semantic::ty::BuiltinType::Char => 4,
-                luna_semantic::ty::BuiltinType::I8 | luna_semantic::ty::BuiltinType::U8 => 1,
-                luna_semantic::ty::BuiltinType::I16 | luna_semantic::ty::BuiltinType::U16 => 2,
-                luna_semantic::ty::BuiltinType::I32 | luna_semantic::ty::BuiltinType::U32 | luna_semantic::ty::BuiltinType::F32 => 4,
-                luna_semantic::ty::BuiltinType::I64 | luna_semantic::ty::BuiltinType::U64 | luna_semantic::ty::BuiltinType::F64 => 8,
-                luna_semantic::ty::BuiltinType::I128 | luna_semantic::ty::BuiltinType::U128 => 16,
-                luna_semantic::ty::BuiltinType::Isize | luna_semantic::ty::BuiltinType::Usize => 8, // Assuming 64-bit for now
-                luna_semantic::ty::BuiltinType::String => 16,
-            },
-            SemanticType::Void => 0,
-            SemanticType::Pointer(..) | SemanticType::Reference(..) => 8,
-            SemanticType::Array(elem, len) => self.calculate_size_of(*elem) * (*len as usize),
-            SemanticType::Tuple(elems) => elems.iter().map(|&e| self.calculate_size_of(e)).sum(),
-            SemanticType::Struct(sym_id, _, _) => {
-                if let Some(fields) = self.ctx.tables.struct_fields.get(sym_id) {
-                    fields.iter().map(|f_sym| {
-                        let f_ty = self.ctx.tables.symbol_types.get(f_sym).copied().unwrap_or(SemanticTypeId(0));
-                        self.calculate_size_of(f_ty)
-                    }).sum()
-                } else {
-                    8
-                }
+    /// Layout model for the currently admitted 64-bit GNU targets. The VM has
+    /// no native memory; sizeof/alignof must still include native padding and
+    /// enum payload alignment. Other target conformance remains unverified.
+    fn calculate_layout(&self, ty_id: SemanticTypeId) -> Result<(usize, usize), ComptimeError> {
+        let overflow = || ComptimeError::UnsupportedOperation("type layout overflow".into());
+        let round = |size: usize, align: usize| -> Result<usize, ComptimeError> {
+            size.checked_add(align - 1).and_then(|v| (v / align).checked_mul(align))
+                .ok_or_else(overflow)
+        };
+        let aggregate = |fields: &[SemanticTypeId], minimum: usize| -> Result<(usize, usize), ComptimeError> {
+            let mut offset = 0usize;
+            let mut alignment = minimum;
+            for &field in fields {
+                let (size, align) = self.calculate_layout(field)?;
+                alignment = alignment.max(align);
+                offset = round(offset, align)?.checked_add(size).ok_or_else(overflow)?;
             }
-            _ => 8,
-        }
-    }
-
-    fn calculate_align_of(&self, ty_id: SemanticTypeId) -> usize {
-        let sem_ty = self.ctx.types.get(ty_id);
-        match sem_ty {
+            Ok((round(offset, alignment)?, alignment))
+        };
+        Ok(match self.ctx.types.get(ty_id) {
             SemanticType::Primitive(b) => match b {
-                luna_semantic::ty::BuiltinType::Bool => 1,
-                luna_semantic::ty::BuiltinType::Char => 4,
-                luna_semantic::ty::BuiltinType::I8 | luna_semantic::ty::BuiltinType::U8 => 1,
-                luna_semantic::ty::BuiltinType::I16 | luna_semantic::ty::BuiltinType::U16 => 2,
-                luna_semantic::ty::BuiltinType::I32 | luna_semantic::ty::BuiltinType::U32 | luna_semantic::ty::BuiltinType::F32 => 4,
-                luna_semantic::ty::BuiltinType::I64 | luna_semantic::ty::BuiltinType::U64 | luna_semantic::ty::BuiltinType::F64 => 8,
-                luna_semantic::ty::BuiltinType::I128 | luna_semantic::ty::BuiltinType::U128 => 8,
-                luna_semantic::ty::BuiltinType::Isize | luna_semantic::ty::BuiltinType::Usize => 8,
-                luna_semantic::ty::BuiltinType::String => 8,
+                BuiltinType::Bool | BuiltinType::I8 | BuiltinType::U8 => (1, 1),
+                BuiltinType::I16 | BuiltinType::U16 => (2, 2),
+                BuiltinType::Char | BuiltinType::I32 | BuiltinType::U32 | BuiltinType::F32 => (4, 4),
+                BuiltinType::I64 | BuiltinType::U64 | BuiltinType::F64 | BuiltinType::Isize | BuiltinType::Usize | BuiltinType::String => (8, 8),
+                BuiltinType::I128 | BuiltinType::U128 => (16, 16),
             },
-            SemanticType::Void => 1,
-            SemanticType::Pointer(..) | SemanticType::Reference(..) => 8,
-            SemanticType::Array(elem, _) => self.calculate_align_of(*elem),
-            SemanticType::Tuple(elems) => elems.iter().map(|&e| self.calculate_align_of(e)).max().unwrap_or(1),
-            SemanticType::Struct(sym_id, _, _) => {
-                if let Some(fields) = self.ctx.tables.struct_fields.get(sym_id) {
-                    fields.iter().map(|f_sym| {
-                        let f_ty = self.ctx.tables.symbol_types.get(f_sym).copied().unwrap_or(SemanticTypeId(0));
-                        self.calculate_align_of(f_ty)
-                    }).max().unwrap_or(1)
-                } else {
-                    8
+            SemanticType::Void | SemanticType::Never => (0, 1),
+            SemanticType::Pointer(_, inner) | SemanticType::Reference(_, _, inner) => {
+                if matches!(self.ctx.types.get(*inner), SemanticType::Slice(_) | SemanticType::DynTrait(_)) {
+                    (16, 8)
+                } else { (8, 8) }
+            },
+            SemanticType::Function { .. } => (8, 8),
+            SemanticType::Slice(_) | SemanticType::DynTrait(_) | SemanticType::Closure(..) => (16, 8),
+            SemanticType::Array(elem, len) => {
+                let (size, align) = self.calculate_layout(*elem)?;
+                (size.checked_mul((*len).try_into().map_err(|_| overflow())?).ok_or_else(overflow)?, align)
+            },
+            SemanticType::Tuple(fields) | SemanticType::Struct(_, _, fields) => aggregate(fields, 1)?,
+            SemanticType::Enum(_, _, variants) => {
+                let mut size = 16usize;
+                let mut align = 8usize;
+                for &variant in variants {
+                    let (variant_size, variant_align) = self.calculate_layout(variant)?;
+                    size = size.max(variant_size);
+                    align = align.max(variant_align);
                 }
-            }
-            _ => 8,
-        }
+                (align.checked_add(round(size, align)?).ok_or_else(overflow)?, align)
+            },
+            SemanticType::Future(inner) => {
+                let (size, align) = self.calculate_layout(*inner)?;
+                let alignment = align.max(4);
+                (round(round(4, align)?.checked_add(size).ok_or_else(overflow)?, alignment)?, alignment)
+            },
+            other => return Err(ComptimeError::UnsupportedOperation(format!("unresolved or unsupported layout type: {other:?}"))),
+        })
     }
 
 

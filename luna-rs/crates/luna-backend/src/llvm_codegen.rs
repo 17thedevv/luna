@@ -7,7 +7,7 @@ use inkwell::builder::Builder;
 use inkwell::values::{BasicValueEnum, IntValue};
 use inkwell::basic_block::BasicBlock as InkwellBasicBlock;
 use inkwell::types::{BasicTypeEnum, BasicType, IntType};
-use inkwell::targets::{Target, TargetMachine, InitializationConfig, FileType};
+use inkwell::targets::{Target, TargetMachine, InitializationConfig, FileType, TargetData};
 use inkwell::OptimizationLevel;
 
 use luna_mvir::{Module as MvirModule, Function as MvirFunction, Instruction, Terminator, Operand, ValueId, ValueData, LabelId};
@@ -85,6 +85,7 @@ pub struct LLVMBackend<'a, 'ctx> {
     link_name_map: HashMap<String, String>,
     supports_comdat: bool,
     target_config: TargetConfig,
+    target_data: Option<TargetData>,
 }
 
 impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
@@ -107,6 +108,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             link_name_map: HashMap::new(),
             supports_comdat: target_config.supports_comdat(),
             target_config: target_config.clone(),
+            target_data: None,
         }
     }
     
@@ -132,73 +134,41 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
         self.llvm_module.get_function(actual_name)
     }
 
-    fn layout_size(&self, ty_id: SemanticTypeId) -> u64 {
-        match self.semantic_ctx.types.get(ty_id) {
-            SemanticType::Primitive(BuiltinType::I8 | BuiltinType::U8 | BuiltinType::Bool) => 1,
-            SemanticType::Primitive(BuiltinType::I16 | BuiltinType::U16) => 2,
-            SemanticType::Primitive(BuiltinType::I32 | BuiltinType::U32 | BuiltinType::F32 | BuiltinType::Char) => 4,
-            SemanticType::Primitive(BuiltinType::I64 | BuiltinType::U64 | BuiltinType::Isize | BuiltinType::Usize | BuiltinType::F64 | BuiltinType::String) => 8,
-            SemanticType::Primitive(BuiltinType::I128 | BuiltinType::U128) => 16,
-            SemanticType::Pointer(..) | SemanticType::Reference(..) => 8,
-            SemanticType::Slice(..) => 16,
-            SemanticType::Array(elem, len) => self.layout_size(*elem) * len,
-            SemanticType::Struct(_, _, field_tys) => {
-                let mut offset = 0;
-                for &f in field_tys {
-                    let align = self.layout_align(f);
-                    if align > 0 && offset % align != 0 {
-                        offset += align - (offset % align);
-                    }
-                    offset += self.layout_size(f);
-                }
-                let struct_align = self.layout_align(ty_id);
-                if struct_align > 0 && offset % struct_align != 0 {
-                    offset += struct_align - (offset % struct_align);
-                }
-                offset
-            }
-            SemanticType::Tuple(types) => {
-                let mut offset = 0;
-                for &f in types {
-                    let align = self.layout_align(f);
-                    if align > 0 && offset % align != 0 {
-                        offset += align - (offset % align);
-                    }
-                    offset += self.layout_size(f);
-                }
-                let tuple_align = types.iter().map(|&t| self.layout_align(t)).max().unwrap_or(1);
-                if tuple_align > 0 && offset % tuple_align != 0 {
-                    offset += tuple_align - (offset % tuple_align);
-                }
-                offset
-            }
-            SemanticType::Enum(_, _, variants) => {
-                let max_payload_size = variants.iter().map(|&v| self.layout_size(v)).max().unwrap_or(0);
-                let words = std::cmp::max(2, (max_payload_size + 7) / 8);
-                8 + words * 8
-            }
-            _ => {
-                match self.map_type(ty_id) {
-                    Ok(ty) => ty.size_of().map(|size| size.get_zero_extended_constant().unwrap_or(8)).unwrap_or(8),
-                    Err(_) => 8,
-                }
-            }
-        }
+    fn target_layout(&self) -> Result<&TargetData, BackendError> {
+        self.target_data.as_ref().ok_or_else(|| BackendError::InvariantViolation(
+            "target layout unavailable before lowering".into()))
     }
 
-    fn layout_align(&self, ty_id: SemanticTypeId) -> u64 {
-        match self.semantic_ctx.types.get(ty_id) {
-            SemanticType::Primitive(BuiltinType::I8 | BuiltinType::U8 | BuiltinType::Bool) => 1,
-            SemanticType::Primitive(BuiltinType::I16 | BuiltinType::U16) => 2,
-            SemanticType::Primitive(BuiltinType::I32 | BuiltinType::U32 | BuiltinType::F32 | BuiltinType::Char) => 4,
-            SemanticType::Primitive(BuiltinType::I64 | BuiltinType::U64 | BuiltinType::Isize | BuiltinType::Usize | BuiltinType::F64 | BuiltinType::String) => 8,
-            SemanticType::Primitive(BuiltinType::I128 | BuiltinType::U128) => 16,
-            SemanticType::Pointer(..) | SemanticType::Reference(..) => 8,
-            SemanticType::Struct(_, _, field_tys) => {
-                field_tys.iter().map(|&f| self.layout_align(f)).max().unwrap_or(8)
-            }
-            _ => 8,
-        }
+    fn layout_size(&self, ty_id: SemanticTypeId) -> Result<u64, BackendError> {
+        Ok(self.target_layout()?.get_abi_size(&self.map_type(ty_id)?))
+    }
+
+    fn layout_align(&self, ty_id: SemanticTypeId) -> Result<u64, BackendError> {
+        Ok(u64::from(self.target_layout()?.get_abi_alignment(&self.map_type(ty_id)?)))
+    }
+
+    /// One representation for both runtime and constant enums. A zero-length
+    /// array carries the strongest payload alignment without storing a value.
+    /// The word buffer covers all variants; the outer struct pads the tag before
+    /// the payload. No library name, host layout or session identity participates.
+    fn enum_type(&self, payloads: &[BasicTypeEnum<'ctx>], layout: &TargetData)
+        -> Result<BasicTypeEnum<'ctx>, BackendError>
+    {
+        let word: BasicTypeEnum<'ctx> = self.context.i64_type().into();
+        let anchor = payloads.iter().copied().chain(std::iter::once(word))
+            .max_by_key(|ty| layout.get_abi_alignment(ty)).unwrap();
+        let alignment = u64::from(layout.get_abi_alignment(&anchor));
+        let size = payloads.iter().map(|ty| layout.get_abi_size(ty)).max().unwrap_or(0).max(16);
+        let bytes = size.checked_add(alignment - 1)
+            .and_then(|v| (v / alignment).checked_mul(alignment))
+            .ok_or_else(|| BackendError::InvariantViolation("enum payload layout overflow".into()))?;
+        let words: u32 = bytes.div_ceil(8).try_into()
+            .map_err(|_| BackendError::InvariantViolation("enum payload exceeds LLVM array length".into()))?;
+        let buffer: BasicTypeEnum<'ctx> = self.context.i64_type().array_type(words).into();
+        let storage = if layout.get_abi_alignment(&anchor) > layout.get_abi_alignment(&word) {
+            self.context.struct_type(&[anchor.array_type(0).into(), buffer], false).into()
+        } else { buffer };
+        Ok(self.context.struct_type(&[self.context.i32_type().into(), storage], false).into())
     }
 
     fn map_type(&self, ty_id: SemanticTypeId) -> Result<BasicTypeEnum<'ctx>, BackendError> {
@@ -239,11 +209,9 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 Ok(self.context.struct_type(&field_types, false).into())
             }
             SemanticType::Enum(_, _, variants) => {
-                let i32_ty = self.context.i32_type();
-                let max_payload_size = variants.iter().map(|&v| self.layout_size(v)).max().unwrap_or(0);
-                let words = std::cmp::max(2, (max_payload_size + 7) / 8);
-                let payload_array_ty = self.context.i64_type().array_type(words as u32);
-                Ok(self.context.struct_type(&[i32_ty.into(), payload_array_ty.into()], false).into())
+                let payloads = variants.iter().map(|&v| self.map_type(v))
+                    .collect::<Result<Vec<_>, _>>()?;
+                self.enum_type(&payloads, self.target_layout()?)
             }
             SemanticType::Tuple(elem_tys) => {
                 let mut field_types = Vec::new();
@@ -259,7 +227,9 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
 
             SemanticType::Array(elem_ty, len) => {
                 let elem_type = self.map_type(*elem_ty)?;
-                Ok(elem_type.array_type(*len as u32).into())
+                let len = (*len).try_into().map_err(|_| BackendError::InvariantViolation(
+                    "array layout exceeds LLVM array length".into()))?;
+                Ok(elem_type.array_type(len).into())
             }
             SemanticType::Slice(_) => {
                 let ptr_ty = self.context.ptr_type(inkwell::AddressSpace::default());
@@ -301,6 +271,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
         }
         self.llvm_module.set_triple(&machine.get_triple());
         self.llvm_module.set_data_layout(&machine.get_target_data().get_data_layout());
+        self.target_data = Some(machine.get_target_data());
         self.declare_functions()?;
         let mut user_main_func = None;
         for func in &self.module.functions {
@@ -635,8 +606,8 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::HeapAlloc => {
                 let alloc_fn = self.get_function("__luna_alloc")
                     .ok_or_else(|| BackendError::InvariantViolation("__luna_alloc declaration missing".into()))?;
-                let size = self.context.i64_type().const_int(self.layout_size(data.ty), false);
-                let align = self.context.i64_type().const_int(self.layout_align(data.ty).max(1), false);
+                let size = self.context.i64_type().const_int(self.layout_size(data.ty)?, false);
+                let align = self.context.i64_type().const_int(self.layout_align(data.ty)?.max(1), false);
                 let call = self.builder.build_call(alloc_fn, &[size.into(), align.into()], &format!("v{}", id.0)).unwrap();
                 call.try_as_basic_value().left().ok_or_else(|| BackendError::InvariantViolation("__luna_alloc returned void".into()))
             }
@@ -1279,12 +1250,12 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     // Slot 1: size as pointer
                     let concrete_ty_id = self.semantic_ctx.tables.symbol_types.get(concrete_sym).copied()
                         .unwrap_or(luna_semantic::SemanticTypeId(0));
-                    let size_val = self.context.i64_type().const_int(self.layout_size(concrete_ty_id), false);
+                    let size_val = self.context.i64_type().const_int(self.layout_size(concrete_ty_id)?, false);
                     let size_ptr = size_val.const_to_pointer(ptr_ty);
                     fn_ptrs.push(size_ptr);
 
                     // Slot 2: align as pointer
-                    let align_val = self.context.i64_type().const_int(self.layout_align(concrete_ty_id), false);
+                    let align_val = self.context.i64_type().const_int(self.layout_align(concrete_ty_id)?, false);
                     let align_ptr = align_val.const_to_pointer(ptr_ty);
                     fn_ptrs.push(align_ptr);
 
@@ -1464,7 +1435,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let ptr_val = self.generate_operand(value)?;
                     let (size, align) = if let Operand::Value(val_id) = value {
                         if let Some(val_data) = _func.values.get(val_id.0 as usize) {
-                            (self.layout_size(val_data.ty), self.layout_align(val_data.ty).max(1))
+                            (self.layout_size(val_data.ty)?, self.layout_align(val_data.ty)?.max(1))
                         } else {
                             (8, 8)
                         }
@@ -1489,7 +1460,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     _ => data.ty,
                 };
                 let elem_size = if elem_semantic_ty != SemanticTypeId(0) {
-                    self.layout_size(elem_semantic_ty)
+                    self.layout_size(elem_semantic_ty)?
                 } else {
                     1
                 };
@@ -1892,11 +1863,11 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 }
             }
             Instruction::SizeOf { ty } => {
-                let size = self.layout_size(*ty);
+                let size = self.layout_size(*ty)?;
                 Ok(self.context.i64_type().const_int(size, false).into())
             }
             Instruction::AlignOf { ty } => {
-                let align = self.layout_align(*ty);
+                let align = self.layout_align(*ty)?;
                 Ok(self.context.i64_type().const_int(align, false).into())
             }
             Instruction::MarkInit { .. } | Instruction::Nop => {
@@ -2269,6 +2240,43 @@ mod cast_invariant_tests {
     use super::*;
     use luna_common::ids::SymbolId;
     use luna_semantic::ty::{LifetimeId, Mutability};
+
+    #[test]
+    fn generic_enum_storage_covers_and_aligns_every_variant_on_configured_targets() {
+        for triple in ["x86_64-pc-windows-gnu", "x86_64-unknown-linux-gnu"] {
+            let mut semantic = SemanticContext::new();
+            let byte = semantic.types.intern(SemanticType::Primitive(BuiltinType::U8));
+            let wide = semantic.types.intern(SemanticType::Primitive(BuiltinType::I128));
+            let array = semantic.types.intern(SemanticType::Array(wide, 3));
+            let tuple = semantic.types.intern(SemanticType::Tuple(vec![byte, wide]));
+            let record = semantic.types.intern(SemanticType::Struct(SymbolId(100), vec![], vec![byte, array]));
+            let nested = semantic.types.intern(SemanticType::Enum(SymbolId(101), vec![], vec![byte, tuple]));
+            let envelope = semantic.types.intern(SemanticType::Enum(SymbolId(102), vec![], vec![record, nested]));
+            let too_large = semantic.types.intern(SemanticType::Array(byte, u64::from(u32::MAX) + 1));
+            let context = Context::create();
+            let module = MvirModule::new();
+            let config = TargetConfig { triple: triple.into(), cpu: "generic".into(), features: String::new(), optimization: OptimizationLevel::None };
+            let mut backend = LLVMBackend::new(&context, &module, &semantic, "enum_layout", &config);
+            backend.compile().unwrap();
+            let layout = backend.target_layout().unwrap();
+            assert!(matches!(backend.map_type(too_large), Err(BackendError::InvariantViolation(message))
+                if message.contains("array length")));
+            for (enum_ty, variants) in [(nested, vec![byte, tuple]), (envelope, vec![record, nested])] {
+                let lowered = backend.map_type(enum_ty).unwrap().into_struct_type();
+                let offset = layout.offset_of_element(&lowered, 1).unwrap();
+                let size = backend.layout_size(enum_ty).unwrap();
+                let align = backend.layout_align(enum_ty).unwrap();
+                assert_eq!(size, layout.get_abi_size(&lowered));
+                assert_eq!(size % align, 0);
+                for variant in variants {
+                    let variant_align = backend.layout_align(variant).unwrap();
+                    assert_eq!(offset % variant_align, 0, "{triple}: misaligned payload");
+                    assert!(align >= variant_align);
+                    assert!(size >= offset + backend.layout_size(variant).unwrap());
+                }
+            }
+        }
+    }
 
     #[test]
     fn malformed_typed_casts_reject_before_representation_lowering() {
