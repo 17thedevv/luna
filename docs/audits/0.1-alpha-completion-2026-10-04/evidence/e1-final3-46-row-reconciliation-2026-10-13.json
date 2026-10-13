@@ -1,0 +1,601 @@
+{
+  "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+  "baseline": "e1-stage2b-wrapping.json",
+  "original_rows": 46,
+  "original_final_counts": {
+    "COMPILE_ERROR": 4,
+    "PASS": 8,
+    "TRAP": 22,
+    "WRAP": 12
+  },
+  "all_final_counts": {
+    "COMPILE_ERROR": 4,
+    "TRAP": 34,
+    "PASS": 9,
+    "WRAP": 12
+  },
+  "modes": [
+    "debug/source",
+    "debug/artifact",
+    "release/source",
+    "release/artifact"
+  ],
+  "rows": [
+    {
+      "fixture": "comptime_division_by_zero",
+      "baseline_compile_exit": 1,
+      "baseline_run_exit": null,
+      "baseline_diagnostics": [
+        "error[E4005]: cannot evaluate constant in comptime: attempt to divide by zero in comptime evaluation",
+        "error[E4005]: cannot evaluate constant in comptime: attempt to divide by zero in comptime evaluation"
+      ],
+      "final_outcome": "COMPILE_ERROR",
+      "final_compile_exit": 1,
+      "final_run_exit": null,
+      "final_diagnostic_count": 1,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "comptime_shift_out_of_range",
+      "baseline_compile_exit": 1,
+      "baseline_run_exit": null,
+      "baseline_diagnostics": [
+        "error[E4005]: cannot evaluate constant in comptime: comptime error: integer shift count out of range",
+        "error[E4005]: cannot evaluate constant in comptime: comptime error: integer shift count out of range"
+      ],
+      "final_outcome": "COMPILE_ERROR",
+      "final_compile_exit": 1,
+      "final_run_exit": null,
+      "final_diagnostic_count": 1,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "comptime_signed_overflow",
+      "baseline_compile_exit": 1,
+      "baseline_run_exit": null,
+      "baseline_diagnostics": [
+        "error[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation",
+        "error[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation"
+      ],
+      "final_outcome": "COMPILE_ERROR",
+      "final_compile_exit": 1,
+      "final_run_exit": null,
+      "final_diagnostic_count": 1,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "comptime_unary_neg_min",
+      "baseline_compile_exit": 1,
+      "baseline_run_exit": null,
+      "baseline_diagnostics": [
+        "error[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation",
+        "error[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation"
+      ],
+      "final_outcome": "COMPILE_ERROR",
+      "final_compile_exit": 1,
+      "final_run_exit": null,
+      "final_diagnostic_count": 1,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "positive_division_in_range",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "PASS",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "positive_float_overflow_no_trap",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "PASS",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "positive_negation_in_range",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "PASS",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "positive_shifts_in_range",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "PASS",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "positive_shl_negative_operand_in_range",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "PASS",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "positive_shl_signed_boundary",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "PASS",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "positive_signed_in_range",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "PASS",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "positive_unsigned_in_range",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "PASS",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_add_overflow_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_add_overflow_i64",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_add_overflow_i8",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_div_zero_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_min_div_neg_one_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_min_rem_neg_one_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_mul_overflow_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_neg_min_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_rem_zero_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_shl_count_at_width_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_shl_overflow_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_shr_count_at_width_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "signed_sub_underflow_i32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_add_overflow_u32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_add_overflow_u64",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_add_overflow_u8",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_div_zero_u32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_mul_overflow_u32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_rem_zero_u32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_shl_count_at_width_u32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_shl_loses_bit_u32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "unsigned_sub_underflow_u32",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "TRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 3,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_i32_mul",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_i32_sub",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_i64_add",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_i8_add",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_i8_mul_neg_one",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_u16_mul",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_u32_add",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_u64_mul_hash_mix",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_u8_add",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_u8_mul",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_u8_sub",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    },
+    {
+      "fixture": "wrapping_zero_operands",
+      "baseline_compile_exit": 0,
+      "baseline_run_exit": 0,
+      "baseline_diagnostics": [],
+      "final_outcome": "WRAP",
+      "final_compile_exit": 0,
+      "final_run_exit": 0,
+      "final_diagnostic_count": 0,
+      "all_four_modes_agree": true
+    }
+  ],
+  "additional_rows": [
+    {
+      "fixture": "constfold_signed_add_i8",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "constfold_unsigned_mul_u8",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "discarded_signed_add_overflow_i32",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "discarded_unsigned_div_zero_u32",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "narrow_i16_add_overflow",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "narrow_u16_add_overflow",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "positive_i128_neg_zero",
+      "outcome": "PASS"
+    },
+    {
+      "fixture": "runtime_param_add_overflow_i8",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "runtime_param_div_zero_u32",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "signed_add_overflow_i128",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "signed_min_div_neg_one_i128",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "signed_shl_negative_count_i32",
+      "outcome": "TRAP"
+    },
+    {
+      "fixture": "unsigned_shl_zero_lhs_at_width_u32",
+      "outcome": "TRAP"
+    }
+  ],
+  "diagnostic_gate": {
+    "debug": "PASS: adopted diagnostic identities; structural ownership verified separately",
+    "release": "PASS: adopted diagnostic identities; structural ownership verified separately"
+  }
+}

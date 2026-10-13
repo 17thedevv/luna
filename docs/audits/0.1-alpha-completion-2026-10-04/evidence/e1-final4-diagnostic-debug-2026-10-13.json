@@ -1,0 +1,403 @@
+{
+  "task": "E1 diagnostic precondition audit",
+  "source_sha": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+  "cli": "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+  "cli_sha256": "7d9630f419726e58140952991e4bb8557983814a2c1cf2fd13f8994d800f6222",
+  "provider_mode": "selected sysroot; parity separately verified by CLI harness",
+  "sysroot": "D:\\fdlang\\.e1-fp-b99152562efa448c8ecf6d0573a3feeb\\artifact",
+  "llvm_runtime_root": "D:\\Programs\\LLVM-DEV",
+  "diagnostic_contract": "DIAG-8; E0005 is owned by Parser",
+  "verdict": "PASS: adopted diagnostic identities; structural ownership verified separately",
+  "rows": [
+    {
+      "case": "reserved_declaration",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/reserved_intrinsic_declaration.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E1009"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E1009]: `__luna_intrinsic_WrappingMul` uses the compiler-owned intrinsic namespace `__luna_intrinsic_`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\reserved_intrinsic_declaration.ln:1:4\n   |\n1  | fn __luna_intrinsic_WrappingMul(a: u32, b: u32) -> u32 {\n   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "reserved_declaration",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/reserved_intrinsic_declaration.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E1009"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E1009]: `__luna_intrinsic_WrappingMul` uses the compiler-owned intrinsic namespace `__luna_intrinsic_`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\reserved_intrinsic_declaration.ln:1:4\n   |\n1  | fn __luna_intrinsic_WrappingMul(a: u32, b: u32) -> u32 {\n   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "reserved_link",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/reserved_intrinsic_link.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E1009"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E1009]: `#[link(\"__luna_intrinsic_WrappingAdd\")]` claims the compiler-owned intrinsic namespace `__luna_intrinsic_`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\reserved_intrinsic_link.ln:1:3\n   |\n1  | #[link(\"__luna_intrinsic_WrappingAdd\")]\n   |   ^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "reserved_link",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/reserved_intrinsic_link.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E1009"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E1009]: `#[link(\"__luna_intrinsic_WrappingAdd\")]` claims the compiler-owned intrinsic namespace `__luna_intrinsic_`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\reserved_intrinsic_link.ln:1:3\n   |\n1  | #[link(\"__luna_intrinsic_WrappingAdd\")]\n   |   ^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "link_on_main",
+      "command": "check",
+      "fixture": "tests/luna/language/ffi_attributes/invalid_link_placement.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E2032"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E2032]: `#[link]` cannot be applied to the program entry `main`\n  --> D:\\fdlang\\tests\\luna\\language\\ffi_attributes\\invalid_link_placement.ln:1:3\n   |\n1  | #[link(name = \"abs\")]\n   |   ^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "link_on_main",
+      "command": "build",
+      "fixture": "tests/luna/language/ffi_attributes/invalid_link_placement.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E2032"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E2032]: `#[link]` cannot be applied to the program entry `main`\n  --> D:\\fdlang\\tests\\luna\\language\\ffi_attributes\\invalid_link_placement.ln:1:3\n   |\n1  | #[link(name = \"abs\")]\n   |   ^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "unknown_attribute",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/unknown_attribute.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E0005"
+      ],
+      "stdout": "",
+      "stderr": "error[E0005]: unknown attribute `unknown_attribute`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\unknown_attribute.ln:1:3\n   |\n1  | #[unknown_attribute]\n   |   ^^^^^^^^^^^^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "unknown_attribute",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/unknown_attribute.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E0005"
+      ],
+      "stdout": "",
+      "stderr": "error[E0005]: unknown attribute `unknown_attribute`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\unknown_attribute.ln:1:3\n   |\n1  | #[unknown_attribute]\n   |   ^^^^^^^^^^^^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "malformed_attribute",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/malformed_attribute.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E0005"
+      ],
+      "stdout": "",
+      "stderr": "error[E0005]: Expected expression.\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\malformed_attribute.ln:1:8\n   |\n1  | #[link(]\n   |        ^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "malformed_attribute",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/malformed_attribute.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E0005"
+      ],
+      "stdout": "",
+      "stderr": "error[E0005]: Expected expression.\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\malformed_attribute.ln:1:8\n   |\n1  | #[link(]\n   |        ^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "invalid_application",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/invalid_application.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E2032"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E2032]: `#[inline]` can only be applied to functions\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\invalid_application.ln:1:3\n   |\n1  | #[inline]\n   |   ^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "invalid_application",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/invalid_application.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E2032"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E2032]: `#[inline]` can only be applied to functions\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\invalid_application.ln:1:3\n   |\n1  | #[inline]\n   |   ^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "macro_as_value",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/macro_as_value.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E2001"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E2001]: macro 'value_macro' cannot be used as a value\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\macro_as_value.ln:5:17\n   |\n5  |     dec value = value_macro;\n   |                 ^^^^^^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "macro_as_value",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/macro_as_value.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E2001"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E2001]: macro 'value_macro' cannot be used as a value\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\macro_as_value.ln:5:17\n   |\n5  |     dec value = value_macro;\n   |                 ^^^^^^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "invalid_integer_syntax",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/invalid_integer_syntax.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E0003"
+      ],
+      "stdout": "",
+      "stderr": "error[E0003]: E_INVALID_INTEGER_LITERAL: invalid digit or suffix in integer literal `0b2`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\invalid_integer_syntax.ln:2:22\n   |\n2  |     dec value: i32 = 0b2;\n   |                      ^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "invalid_integer_syntax",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/invalid_integer_syntax.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E0003"
+      ],
+      "stdout": "",
+      "stderr": "error[E0003]: E_INVALID_INTEGER_LITERAL: invalid digit or suffix in integer literal `0b2`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\invalid_integer_syntax.ln:2:22\n   |\n2  |     dec value: i32 = 0b2;\n   |                      ^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "macro_rule_mismatch",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/macro_rule_mismatch.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E1010"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E1010]: macro `only` expected end of macro invocation\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\macro_rule_mismatch.ln:2:33\n   |\n2  | fn main() -> i32 { return only!(1); }\n   |                                 ^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "macro_rule_mismatch",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/macro_rule_mismatch.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E1010"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E1010]: macro `only` expected end of macro invocation\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\macro_rule_mismatch.ln:2:33\n   |\n2  | fn main() -> i32 { return only!(1); }\n   |                                 ^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "macro_recursion",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/macro_recursion.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E1010"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E1010]: recursion limit reached while expanding macro `repeat`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\macro_recursion.ln:1:24\n   |\n1  | macro repeat { () => { repeat!() } }\n   |                        ^^^^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "macro_recursion",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/macro_recursion.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E1010"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E1010]: recursion limit reached while expanding macro `repeat`\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\macro_recursion.ln:1:24\n   |\n1  | macro repeat { () => { repeat!() } }\n   |                        ^^^^^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "unsupported_comptime_statement",
+      "command": "check",
+      "fixture": "tests/luna/language/diagnostic_ownership/unsupported_comptime_statement.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: standalone comptime statements are not supported; use a comptime expression\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\unsupported_comptime_statement.ln:2:16\n   |\n2  |     comptime { 1i32 + 1i32; }\n   |                ^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "unsupported_comptime_statement",
+      "command": "build",
+      "fixture": "tests/luna/language/diagnostic_ownership/unsupported_comptime_statement.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: standalone comptime statements are not supported; use a comptime expression\n  --> D:\\fdlang\\tests\\luna\\language\\diagnostic_ownership\\unsupported_comptime_statement.ln:2:16\n   |\n2  |     comptime { 1i32 + 1i32; }\n   |                ^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "comptime_division_by_zero",
+      "command": "check",
+      "fixture": "tests/luna/language/checked_arithmetic/comptime_division_by_zero.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: cannot evaluate constant in comptime: attempt to divide by zero in comptime evaluation\n  --> D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\comptime_division_by_zero.ln:1:7\n   |\n1  | const VALUE: i32 = 42 / 0;\n   |       ^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "comptime_division_by_zero",
+      "command": "build",
+      "fixture": "tests/luna/language/checked_arithmetic/comptime_division_by_zero.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: cannot evaluate constant in comptime: attempt to divide by zero in comptime evaluation\n  --> D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\comptime_division_by_zero.ln:1:7\n   |\n1  | const VALUE: i32 = 42 / 0;\n   |       ^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "comptime_shift_out_of_range",
+      "command": "check",
+      "fixture": "tests/luna/language/checked_arithmetic/comptime_shift_out_of_range.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: cannot evaluate constant in comptime: comptime error: integer shift count out of range\n  --> D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\comptime_shift_out_of_range.ln:1:7\n   |\n1  | const VALUE: i32 = 1 << 32;\n   |       ^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "comptime_shift_out_of_range",
+      "command": "build",
+      "fixture": "tests/luna/language/checked_arithmetic/comptime_shift_out_of_range.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: cannot evaluate constant in comptime: comptime error: integer shift count out of range\n  --> D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\comptime_shift_out_of_range.ln:1:7\n   |\n1  | const VALUE: i32 = 1 << 32;\n   |       ^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "comptime_signed_overflow",
+      "command": "check",
+      "fixture": "tests/luna/language/checked_arithmetic/comptime_signed_overflow.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation\n  --> D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\comptime_signed_overflow.ln:1:7\n   |\n1  | const VALUE: i32 = 2147483647 + 1;\n   |       ^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "comptime_signed_overflow",
+      "command": "build",
+      "fixture": "tests/luna/language/checked_arithmetic/comptime_signed_overflow.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation\n  --> D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\comptime_signed_overflow.ln:1:7\n   |\n1  | const VALUE: i32 = 2147483647 + 1;\n   |       ^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "comptime_unary_neg_min",
+      "command": "check",
+      "fixture": "tests/luna/language/checked_arithmetic/comptime_unary_neg_min.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation\n  --> D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\comptime_unary_neg_min.ln:1:7\n   |\n1  | const VALUE: i32 = 0 - ((0 - 2147483647) - 1);\n   |       ^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    },
+    {
+      "case": "comptime_unary_neg_min",
+      "command": "build",
+      "fixture": "tests/luna/language/checked_arithmetic/comptime_unary_neg_min.ln",
+      "exit": 1,
+      "diagnostic_codes": [
+        "E4005"
+      ],
+      "stdout": "",
+      "stderr": "DEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG loading package: result\nDEBUG loading package: core/panic\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG loading package: __lang_option\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_collected_imports finished successfully\nDEBUG: resolve_imports returning true\nerror[E4005]: cannot evaluate constant in comptime: integer overflow during comptime evaluation\n  --> D:\\fdlang\\tests\\luna\\language\\checked_arithmetic\\comptime_unary_neg_min.ln:1:7\n   |\n1  | const VALUE: i32 = 0 - ((0 - 2147483647) - 1);\n   |       ^^^^^\n\n",
+      "executable_published": false,
+      "expected_rejection_reproduced": true
+    }
+  ]
+}
