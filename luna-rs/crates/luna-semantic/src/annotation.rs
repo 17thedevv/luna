@@ -220,6 +220,7 @@ impl<'a> AttributeProcessor<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Arc;
 
     #[test]
     fn test_derive_registry_has_std_derives() {
