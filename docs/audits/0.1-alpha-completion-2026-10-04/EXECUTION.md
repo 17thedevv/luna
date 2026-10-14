@@ -1,5 +1,18 @@
 # Execution ledger — Luna 0.1 completion
 
+### E-wave final qualification — 2026-10-13, CLOSED
+
+Tested source: `e4f9fb530d72628c81dfa29d117afeb99cc7664c`. Ordinary checked integer arithmetic, explicit wrapping,
+runtime/comptime and debug/release parity pass all 59 rows in four modes.
+Three consecutive default-parallel workspace runs pass; real22/23/24 reject,
+fresh25 and relocated macro provider pass. E2 remains CLOSED. Compiler25 /
+metadata9 / MVIR5 / format2. See [closure report](evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md)
+for source identity, lossless logs, the 46-row reconciliation and scoped limits.
+Closure integration is a documentation/evidence commit with the same tested
+code tree. Ubuntu GNU normal/ASan and broader DIAG audit remain R5 obligations;
+standalone comptime statement execution remains a documented support gap.
+Stop at preparation for R4; no main merge or release tag.
+
 ### E-wave final qualification — 2026-10-13, approved RangeInclusive repair
 
 Production/test pin `939d53e0ad7719c7c4a3eb4b915173fedeb1a129` passes four

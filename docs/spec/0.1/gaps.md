@@ -63,7 +63,7 @@ V01-DESIGN-03 was resolved by maintainer adoption on 2026-10-06: ordinary
 integer arithmetic is checked and identical across debug/release; overflow,
 division by zero, `MIN / -1` and out-of-range shifts are deterministic failures,
 and compile-time instances are diagnostics. See [Semantics](semantics.md).
-**Implemented; E-wave qualification remains blocked (E1)**: the runtime lowering uses LLVM overflow
+**Implemented and qualified — E-wave CLOSED 2026-10-13 (E1)**: the runtime lowering uses LLVM overflow
 intrinsics for `+ - *`, dominance-ordered guards for `/ % << >>` and unary
 negation, and the comptime evaluator matches it; explicit modular arithmetic is
 available through `std::wrapping_add/sub/mul`, which are compiler-recognized
@@ -73,14 +73,31 @@ removed unused integer operations. The later approved terminal Option slot
 exposed a generic enum payload alignment defect for i128-bearing owned items.
 The maintainer approved the generic alignment repair and compiler25 boundary;
 real artifact24 is also rejected. Metadata9/MVIR5/format2 remain unchanged.
-See the [alignment continuation](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md).
-The [2026-10-12 repair record](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-REPAIR-2026-10-12.md)
-documents adopted diagnostic ownership amendments, the DCE repair, and provider
-identity/AST parity repairs. Final qualification remains pending; the historical
-blocker record below describes the pre-repair checkpoint.
+See the [alignment continuation](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md)
+and the [2026-10-12 repair record](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-REPAIR-2026-10-12.md),
+which documents the adopted diagnostic ownership amendments, the DCE repair and
+the provider identity/AST parity repairs. The
+[E-wave closure report](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md)
+records the current qualification boundary: three consecutive default-parallel
+workspace runs, four-mode 59-row matrices, real compiler22/23/24 rejection and
+the resolved diagnostic-ownership precondition. The historical blocker text
+below is retained unchanged.
 
-**E1-FU-DIAG-01 — release blocker, confirmed 2026-10-12 at
-`2fcce5a4ea1973100a3d8a99781e1188aeed5d78`.** DIAG-8 in the
+**E1-FU-DIAG-01 — RESOLVED 2026-10-13 by phase-owned admission. The paragraph
+below is the retained historical blocker record (confirmed 2026-10-12 at
+`2fcce5a4ea1973100a3d8a99781e1188aeed5d78`); it is preserved unchanged.**
+
+Resolution: diagnostic ownership is now explicit per phase — Parser owns
+E0003/E0005 for annotation grammar and names; Resolver owns E1009 for the
+protected compiler namespace and trusted language-item bindings, plus E1010 for
+structured macro admission failures; TypeChecker owns E2032 for contextual
+attributes, `#[link]` on the program entry and intrinsic signatures; Comptime
+admission stays E4005 with a primary source span, and internal
+invalid/unexpanded fallbacks are Infrastructure E6001. Typed check/build
+ownership evidence is recorded in the
+[E-wave closure report](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md).
+
+**Historical record:** DIAG-8 in the
 [diagnostic contract](../../diagnostics/diagnostics-v1.md) assigns E0005 to
 Parser alone. Reserved intrinsic declarations/renames are rejected by the
 semantic attribute processor; `#[link]` on entry `main` is rejected by the
@@ -90,8 +107,7 @@ validation. The annotation description in the registry does not waive DIAG-8.
 See the [blocker report](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md)
 for reproductions, first divergence and repair alternatives requiring an
 ownership decision. Historical Stage 4 evidence is retained; its DONE claim
-does not discharge this precondition. No final E-wave closure or candidate
-advance is authorized by the current evidence.
+does not discharge this precondition.
 
 No new format-macro hook, interpolation syntax, runtime opcode or container
 language item is adopted. These require their own complete generic contract.

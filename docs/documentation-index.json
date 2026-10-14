@@ -400,6 +400,11 @@
     "owner": "syntax"
   },
   {
+    "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md",
     "role": "evidence",
     "owner": "conformance"

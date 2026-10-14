@@ -1,0 +1,315 @@
+{
+  "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+  "source": "Complete workspace logs; selected relevant suites, not a substitute for workspace totals",
+  "runs": [
+    {
+      "run": 1,
+      "suites": [
+        {
+          "suite": "Running tests\\attribute_ownership_cli.rs (target\\debug\\deps\\attribute_ownership_cli-189d5da985b99af5.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\checked_arithmetic_qualification_cli.rs (target\\debug\\deps\\checked_arithmetic_qualification_cli-463acd38fde75f0a.exe)",
+          "verdict": "ok",
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\comptime_diagnostic_cascade_cli.rs (target\\debug\\deps\\comptime_diagnostic_cascade_cli-24b8ba8cbc3b8ad8.exe)",
+          "verdict": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\diagnostic_conformance_cli.rs (target\\debug\\deps\\diagnostic_conformance_cli-8fcec3fc018f17cc.exe)",
+          "verdict": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\ffi_attribute_placement_cli.rs (target\\debug\\deps\\ffi_attribute_placement_cli-fc2e402349312bd0.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\memory_intrinsic_identity_cli.rs (target\\debug\\deps\\memory_intrinsic_identity_cli-1c9e369142ad0726.exe)",
+          "verdict": "ok",
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\module_const_storage_cli.rs (target\\debug\\deps\\module_const_storage_cli-3b9f75b37e7698b9.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\range_inclusive_cli.rs (target\\debug\\deps\\range_inclusive_cli-3858e4fcecdb1bf1.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\v01_grammar_acceptance_tests.rs (target\\debug\\deps\\v01_grammar_acceptance_tests-daca96899b1efc42.exe)",
+          "verdict": "ok",
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\wrapping_arithmetic_cli.rs (target\\debug\\deps\\wrapping_arithmetic_cli-2c187f5173a1b491.exe)",
+          "verdict": "ok",
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashmap_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashmap_acceptance_tests-c508539c1717a1c4.exe)",
+          "verdict": "ok",
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashmap_storage_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashmap_storage_acceptance_tests-8174c8132d362b19.exe)",
+          "verdict": "ok",
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashset_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashset_acceptance_tests-87596edb70056ddb.exe)",
+          "verdict": "ok",
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_string_acceptance_tests.rs (target\\debug\\deps\\stdlib_string_acceptance_tests-6632396298dcdcb7.exe)",
+          "verdict": "ok",
+          "passed": 16,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "run": 2,
+      "suites": [
+        {
+          "suite": "Running tests\\attribute_ownership_cli.rs (target\\debug\\deps\\attribute_ownership_cli-189d5da985b99af5.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\checked_arithmetic_qualification_cli.rs (target\\debug\\deps\\checked_arithmetic_qualification_cli-463acd38fde75f0a.exe)",
+          "verdict": "ok",
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\comptime_diagnostic_cascade_cli.rs (target\\debug\\deps\\comptime_diagnostic_cascade_cli-24b8ba8cbc3b8ad8.exe)",
+          "verdict": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\diagnostic_conformance_cli.rs (target\\debug\\deps\\diagnostic_conformance_cli-8fcec3fc018f17cc.exe)",
+          "verdict": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\ffi_attribute_placement_cli.rs (target\\debug\\deps\\ffi_attribute_placement_cli-fc2e402349312bd0.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\memory_intrinsic_identity_cli.rs (target\\debug\\deps\\memory_intrinsic_identity_cli-1c9e369142ad0726.exe)",
+          "verdict": "ok",
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\module_const_storage_cli.rs (target\\debug\\deps\\module_const_storage_cli-3b9f75b37e7698b9.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\range_inclusive_cli.rs (target\\debug\\deps\\range_inclusive_cli-3858e4fcecdb1bf1.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\v01_grammar_acceptance_tests.rs (target\\debug\\deps\\v01_grammar_acceptance_tests-daca96899b1efc42.exe)",
+          "verdict": "ok",
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\wrapping_arithmetic_cli.rs (target\\debug\\deps\\wrapping_arithmetic_cli-2c187f5173a1b491.exe)",
+          "verdict": "ok",
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashmap_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashmap_acceptance_tests-c508539c1717a1c4.exe)",
+          "verdict": "ok",
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashmap_storage_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashmap_storage_acceptance_tests-8174c8132d362b19.exe)",
+          "verdict": "ok",
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashset_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashset_acceptance_tests-87596edb70056ddb.exe)",
+          "verdict": "ok",
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_string_acceptance_tests.rs (target\\debug\\deps\\stdlib_string_acceptance_tests-6632396298dcdcb7.exe)",
+          "verdict": "ok",
+          "passed": 16,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    },
+    {
+      "run": 3,
+      "suites": [
+        {
+          "suite": "Running tests\\attribute_ownership_cli.rs (target\\debug\\deps\\attribute_ownership_cli-189d5da985b99af5.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\checked_arithmetic_qualification_cli.rs (target\\debug\\deps\\checked_arithmetic_qualification_cli-463acd38fde75f0a.exe)",
+          "verdict": "ok",
+          "passed": 2,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\comptime_diagnostic_cascade_cli.rs (target\\debug\\deps\\comptime_diagnostic_cascade_cli-24b8ba8cbc3b8ad8.exe)",
+          "verdict": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\diagnostic_conformance_cli.rs (target\\debug\\deps\\diagnostic_conformance_cli-8fcec3fc018f17cc.exe)",
+          "verdict": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\ffi_attribute_placement_cli.rs (target\\debug\\deps\\ffi_attribute_placement_cli-fc2e402349312bd0.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\memory_intrinsic_identity_cli.rs (target\\debug\\deps\\memory_intrinsic_identity_cli-1c9e369142ad0726.exe)",
+          "verdict": "ok",
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\module_const_storage_cli.rs (target\\debug\\deps\\module_const_storage_cli-3b9f75b37e7698b9.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\range_inclusive_cli.rs (target\\debug\\deps\\range_inclusive_cli-3858e4fcecdb1bf1.exe)",
+          "verdict": "ok",
+          "passed": 1,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\v01_grammar_acceptance_tests.rs (target\\debug\\deps\\v01_grammar_acceptance_tests-daca96899b1efc42.exe)",
+          "verdict": "ok",
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\wrapping_arithmetic_cli.rs (target\\debug\\deps\\wrapping_arithmetic_cli-2c187f5173a1b491.exe)",
+          "verdict": "ok",
+          "passed": 6,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashmap_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashmap_acceptance_tests-c508539c1717a1c4.exe)",
+          "verdict": "ok",
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashmap_storage_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashmap_storage_acceptance_tests-8174c8132d362b19.exe)",
+          "verdict": "ok",
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_hashset_acceptance_tests.rs (target\\debug\\deps\\stdlib_hashset_acceptance_tests-87596edb70056ddb.exe)",
+          "verdict": "ok",
+          "passed": 11,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "suite": "Running tests\\stdlib_string_acceptance_tests.rs (target\\debug\\deps\\stdlib_string_acceptance_tests-6632396298dcdcb7.exe)",
+          "verdict": "ok",
+          "passed": 16,
+          "failed": 0,
+          "ignored": 0
+        }
+      ]
+    }
+  ]
+}
