@@ -1,5 +1,14 @@
 # Luna 0.1 — modules, bootstrap and artifacts
 
+Implementation status — 2026-10-14: the
+[R4 ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md) records
+source/fresh-artifact provider and call-contract scopes. Current protocol is
+compiler25 / semantic metadata9 / MVIR5 / format2. E1 preserves genuine
+compiler22/23/24 artifacts and their rejection evidence; fresh25 parity and
+relocation are qualified at `e4f9fb53`. Rebuild through the official path after
+an identity rejection; no automatic compiler repair or publisher-authentication
+claim follows from checksums. Exact candidate and advertised-target gates remain R5.
+
 ## Providers and namespaces
 
 `import` acquires a provider. `module` creates an inline namespace. `::` resolves

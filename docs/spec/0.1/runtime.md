@@ -33,7 +33,9 @@ Startup receives argc/argv. The already defined language entry contract permits
 `main` returning void or i32, with the defined argument-slice bridge when used.
 The baseline retains construction from OS arguments as defined by the detailed
 ABI contract; it does not bless an empty-slice replacement. C-GAP-03 records
-that current backend failure. Runtime argument accessors distinguish user
+the original audited failure; its later repair record is preserved in the
+[R4 migration](../../audits/0.1-alpha-completion-2026-10-04/r4/legacy-status.migrated.json).
+Runtime argument accessors distinguish user
 arguments from the executable path as documented in the process header; a future
 entry-policy revision must reconcile those two views explicitly.
 
@@ -56,3 +58,9 @@ for 0.1-alpha.1; a target that currently compiles is not thereby release-support
 CTest passing is runtime ABI evidence, not proof of language argument lowering,
 every safe stdlib invariant or every target ABI. The contracts retain their
 stated hosted/freestanding intent.
+
+Current qualification at the E-wave tested implementation `e4f9fb53` is Windows
+GNU only in the reported scope. Ubuntu GNU normal and ASan remain NOT VERIFIED;
+see the [R4 target matrix](../../audits/0.1-alpha-completion-2026-10-04/r4/target-matrix.md).
+Historical runtime ABI checks and the Rust host triple cannot certify the
+missing release-target gates.

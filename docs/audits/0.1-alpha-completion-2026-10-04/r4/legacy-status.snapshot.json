@@ -1,0 +1,218 @@
+[
+  {
+    "id": "W1-POSIX-BUILD",
+    "contract": "Runtime C11 portability and complete headers for POSIX/Darwin",
+    "status": "PARTIAL",
+    "first_failing_stage": "runtime_c_compile",
+    "repro": "runtime/src/io/io.c (kill/SIGKILL without signal.h), runtime/src/platform/posix/net.c (addrinfo without netdb.h)",
+    "fix_commit": "a4c83d5",
+    "evidence": "Headers restored in io.c/net.c; RuntimeAbiTests passed on Windows GNU; pending native Ubuntu/macOS CI verification"
+  },
+  {
+    "id": "A1-P0",
+    "contract": "Backend fail-closed without silent dummy value fallback for unhandled instructions",
+    "status": "PASS",
+    "first_failing_stage": "luna-backend/src/llvm_codegen.rs",
+    "repro": "llvm_codegen.rs:1836 wildcard returns Ok(i32 zero) instead of Err(BackendError)",
+    "fix_commit": null,
+    "evidence": "llvm_codegen.rs wildcard fallback removed, fails closed with BackendError::InvariantViolation; crates/luna-driver/tests/backend_fail_closed_tests.rs passes"
+  },
+  {
+    "id": "C-GAP-04",
+    "contract": "Import metadata bound identity deduplication without exponential copies",
+    "status": "PASS",
+    "first_failing_stage": "luna-driver::registry import resolution",
+    "repro": "tests/luna/language/audit_2026_10_02/provider_bounds/",
+    "fix_commit": "19ba384",
+    "evidence": "tests/luna/language/audit_2026_10_02/provider_bounds/ (12 levels dedup verified); crates/luna-driver/tests/compiler_gap_c_gap_04_provider_chain_bounds_tests.rs"
+  },
+  {
+    "id": "C-GAP-01",
+    "contract": "Deterministic inherent/trait method resolution without infinite recursion",
+    "status": "PASS",
+    "first_failing_stage": "luna-semantic method resolver",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/compiler_inherent_trait_dispatch.ln",
+    "fix_commit": "d950f7f",
+    "evidence": "docs/proposals/v01-design-01-method-collision.md; tests/luna/stdlib/audit_2026_10_02/compiler_inherent_trait_dispatch.ln (source/artifact pass)"
+  },
+  {
+    "id": "C-GAP-03",
+    "contract": "Entry argument bridge passing valid argv slices to main(args: [str])",
+    "status": "PASS",
+    "first_failing_stage": "luna-backend entrypoint lowering and runtime argv ABI",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/compiler_main_args.ln",
+    "fix_commit": "d950f7f",
+    "evidence": "docs/proposals/entry-argv-policy.md; tests/luna/stdlib/audit_2026_10_02/compiler_main_args.ln (source/artifact pass); crates/luna-driver/tests/main_entrypoint_tests.rs"
+  },
+  {
+    "id": "C-GAP-02",
+    "contract": "Source-aware unsigned integer widening casts without sign extension",
+    "status": "PASS",
+    "first_failing_stage": "luna-mvir / backend cast lowering",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/compiler_unsigned_cast.ln",
+    "fix_commit": "eb72083",
+    "evidence": "tests/luna/stdlib/audit_2026_10_02/compiler_unsigned_cast.ln; crates/luna-driver/tests/integer_cast_signedness_tests.rs"
+  },
+  {
+    "id": "COMPOUND-ASSIGN",
+    "contract": "Compound assignment lowering preserving LHS operation and lvalue evaluation",
+    "status": "PASS",
+    "first_failing_stage": "luna-mvir generator Expr::Assign",
+    "repro": "luna-rs/tests/luna/compiler/numeric_compound_assignment_diagnostic.ln",
+    "fix_commit": "eb72083",
+    "evidence": "luna-rs/tests/luna/compiler/numeric_compound_assignment_diagnostic.ln; crates/luna-driver/tests/compound_assignment_tests.rs"
+  },
+  {
+    "id": "S-04",
+    "contract": "Unicode scalar char enforcement and safe UTF-8 String invariants",
+    "status": "PASS",
+    "first_failing_stage": "luna-semantic / alloc/string.ln",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/string_invalid_char.ln",
+    "fix_commit": "41484c2",
+    "evidence": "crates/luna-cli/tests/char_scalar_cli_parity.rs; tests/luna/stdlib/audit_2026_10_02/string_invalid_char.ln"
+  },
+  {
+    "id": "LITERAL-TYPING-01",
+    "contract": "Literal typing conformance across integer suffix, context, and byte arrays",
+    "status": "PASS",
+    "first_failing_stage": "luna-semantic typechecker",
+    "repro": "luna-rs/tests/literal_typing_cli_parity.rs",
+    "fix_commit": "6e8d278",
+    "evidence": "crates/luna-cli/tests/literal_typing_cli_parity.rs"
+  },
+  {
+    "id": "S-01",
+    "contract": "Vec checked allocation and reserve arithmetic without overflow",
+    "status": "PASS",
+    "first_failing_stage": "alloc/vec.ln",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/vec_capacity_overflow.ln",
+    "fix_commit": "1ba8518",
+    "evidence": "tests/luna/stdlib/audit_2026_10_02/vec_capacity_overflow.ln; vec_reserve_overflow.ln (safe panic)"
+  },
+  {
+    "id": "S-02",
+    "contract": "RawTable capacity round-up and growth without wrap to zero or infinite loop",
+    "status": "PASS",
+    "first_failing_stage": "alloc/raw_table.ln",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/hashmap_capacity_overflow.ln",
+    "fix_commit": "1ba8518",
+    "evidence": "tests/luna/stdlib/audit_2026_10_02/hashmap_capacity_overflow.ln (safe panic)"
+  },
+  {
+    "id": "S-06",
+    "contract": "Generic Vec.dedup without reinterpreting arbitrary T as i32",
+    "status": "PASS",
+    "first_failing_stage": "alloc/vec.ln dedup_i32",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/vec_dedup_i32_generic.ln",
+    "fix_commit": null,
+    "evidence": "alloc/vec.ln dedup_i32 delegates safely to self.dedup() using Eq without pointer reinterpret or size_of==4 assumption; verified with vec_dedup_4byte_nominal.ln and vec_dedup_i32_generic.ln"
+  },
+  {
+    "id": "V01-ARCH-02",
+    "contract": "Removal of hardcoded stdlib macro names, callee mappings, and fallback in MacroEngine",
+    "status": "PASS",
+    "first_failing_stage": "luna-semantic/src/macro_engine.rs",
+    "repro": "luna-semantic macro expansion inspection",
+    "fix_commit": "d950f7f",
+    "evidence": "crates/luna-cli/tests/v01_arch_02_macro_decoupling_tests.rs"
+  },
+  {
+    "id": "A-01",
+    "contract": "Removal of compiler hardcoded SliceIter/SliceIterMut layout and type knowledge",
+    "status": "PASS",
+    "first_failing_stage": "luna-semantic typechecker.rs",
+    "repro": "luna-semantic typechecker slice iterator lowering",
+    "fix_commit": "6aa260d",
+    "evidence": "SliceIter compiler synthesis removed; SemanticContext.is_slice_authorized capability securely restricts slice inherent impls to authorized sysroot build context; rejects impersonation attempts (e.g. user provider slice.ln); crates/luna-semantic/tests/p1a_tests.rs Cases 19, 20 & 21 pass; crates/luna-cli/tests/v01_grammar_acceptance_tests.rs Case 7 verifies CLI rejection with error[E2006]; 2026-10-03 follow-up: canonical file containment/authentication gates provenance for both .ln and .llib, including -I candidates. Permanent CLI and provider_authority_tests controls; see compiler-integrity-repair-2026-10-03.md."
+  },
+  {
+    "id": "S-03",
+    "contract": "Zero-Sized Type (ZST) slice iteration returning correct element count",
+    "status": "PASS",
+    "first_failing_stage": "core/slice.ln",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/slice_zst.ln",
+    "fix_commit": "1ba8518",
+    "evidence": "tests/luna/stdlib/audit_2026_10_02/slice_zst.ln; slice_zst_mut.ln"
+  },
+  {
+    "id": "S-05",
+    "contract": "Filter/find borrow-checker compliant non-Copy item consumption",
+    "status": "PASS",
+    "first_failing_stage": "core/iter_adapters.ln, core/iter_consumers.ln",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/filter_owned.ln",
+    "fix_commit": "6aa260d",
+    "evidence": "docs/proposals/v01-filter-step-dedup-api.md adopted; borrowed predicate fn(&Item) -> bool implemented; tests/luna/stdlib/audit_2026_10_02/filter_owned.ln and find_owned.ln pass"
+  },
+  {
+    "id": "S-07",
+    "contract": "Range<T: Step> advancing without moving non-Copy current value prematurely",
+    "status": "PASS",
+    "first_failing_stage": "core/iter_adapters.ln",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/range_owned_step.ln",
+    "fix_commit": "1ba8518",
+    "evidence": "tests/luna/stdlib/audit_2026_10_02/range_owned_step.ln (source/artifact pass)"
+  },
+  {
+    "id": "V01-GRAMMAR-01",
+    "contract": "Comma-separated struct fields; semicolon delimiters strictly rejected",
+    "status": "PASS",
+    "first_failing_stage": "luna-parser struct field parsing",
+    "repro": "tests/luna/language/spec_v01/reject_semicolon_fields.ln",
+    "fix_commit": "41484c2",
+    "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+  },
+  {
+    "id": "V01-GRAMMAR-02",
+    "contract": "Parenthesized foreach head support per Rule K.4",
+    "status": "PASS",
+    "first_failing_stage": "luna-parser foreach head parsing",
+    "repro": "tests/luna/language/spec_v01/foreach_parenthesized_contract.ln",
+    "fix_commit": "41484c2",
+    "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+  },
+  {
+    "id": "V01-GRAMMAR-03",
+    "contract": "Receiver shorthand &self, &rw self, self equivalent to canonical form per Rule K.5",
+    "status": "PASS",
+    "first_failing_stage": "luna-parser method receiver parsing",
+    "repro": "tests/luna/language/spec_v01/receiver_shorthand_contract.ln",
+    "fix_commit": "41484c2",
+    "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+  },
+  {
+    "id": "V01-DIAG-01",
+    "contract": "Typed diagnostic codes across compiler phases conforming to DIAG-1..10",
+    "status": "PARTIAL",
+    "first_failing_stage": "luna-parser and diagnostic emission",
+    "repro": "tests/luna/language/spec_v01 parser error rendering",
+    "fix_commit": "41484c2",
+    "evidence": "Typed diagnostic codes E0001..E0003 (parser), E1001 (unresolved symbol/method), E2001 (type mismatch in local/global var decl, call args, binary ops, returns), E2006 (coherence orphan & slice impersonation), E2026 (typechecker invalid cast) verified in crates/luna-cli/tests/v01_grammar_acceptance_tests.rs; 2026-10-03 follow-up repairs previously uncoded production constructors, typed escape identity and Unicode/tab caret rendering. Full DIAG-1..10 remains PARTIAL: optional code/span fields, structural related labels, constructor enforcement and complete registry coverage are not implemented by this repair. See compiler-integrity-repair-2026-10-03.md."
+  },
+  {
+    "id": "W7-COMPTIME",
+    "contract": "Portable comptime artifact without host session leakage across process boundaries",
+    "status": "PASS",
+    "first_failing_stage": "luna-llib and comptime preparation",
+    "repro": "tests/luna/language/literal_comptime_provider_gap.ln",
+    "fix_commit": "6e8d278",
+    "evidence": "crates/luna-cli/tests/literal_typing_cli_parity.rs (comptime_provider_gap)"
+  },
+  {
+    "id": "W8-ALL-PROVIDERS",
+    "contract": "Verification matrix for all 49 providers and adopted language contracts",
+    "status": "PARTIAL",
+    "first_failing_stage": "provider test coverage",
+    "repro": "luna-rs/libs/external/sysroot.toml",
+    "fix_commit": "8fa8429",
+    "evidence": "Inventory & build infrastructure: 49/49 providers build successfully under sysroot DAG and pass test_sysroot_build_invariants (6/6). Tier-1 Core/Alloc containers (Box, Vec, String, RawTable, HashMap, HashSet, Slice, Iterators) achieve CERTIFIED status with positive/negative/ownership/CLI parity. Full API-level fixture matrix for remaining Tier-2/3 providers is mapped in docs/audits/repair-0.1/provider_matrix.md and remains in progress."
+  },
+  {
+    "id": "W9-PERF",
+    "contract": "Evidence-backed optimizations for HashMap clustering, allocations, and clear/overwrite",
+    "status": "PASS",
+    "first_failing_stage": "benchmarks",
+    "repro": "tests/luna/stdlib/audit_2026_10_02/hashmap_collision_pattern.ln",
+    "fix_commit": null,
+    "evidence": "SplitMix64 bit mixer in core/hash.ln and alloc/raw_table.ln; raw_table insert/insert_if_absent/get_or_insert probe first before grow, eliminating redundant rehash/growth on overwrite and hits (verified by test_hashmap_overwrite_no_growth_stress with 10k overwrites); clear() retains capacity; benchmark in docs/audits/repair-0.1/evidence/hashmap-benchmark.json shows 132x speedup on low_bits_collision n=12000 (0.0259s vs 3.4264s)"
+  }
+]

@@ -2,6 +2,15 @@
 
 # Luna 0.1-alpha.1 Sysroot 49 Provider Verification Matrix
 
+**Current reconciliation — 2026-10-14:** the classifications below are the
+historical repair baseline. E1 now preserves all 49 fresh bundle hashes and
+native target/object evidence; D3 closes a bounded Tier-2/3 provider graph
+matrix, with the async-provider finding closed separately. See the
+[R4 exact ledger](../0.1-alpha-completion-2026-10-04/r4/README.md) and
+[target qualification](../0.1-alpha-completion-2026-10-04/r4/target-matrix.md).
+Neither those results nor the word CERTIFIED below imply every API/domain or
+Ubuntu normal/ASan release qualification.
+
 **Assessment Status:**
 - **Inventory & Build Infrastructure:** **PASS** (49/49 providers successfully compiled via DAG in `luna build-sysroot`; 6/6 tests passing in `crates/luna-driver/tests/test_sysroot_build_invariants.rs`).
 - **Comprehensive API & Semantic Behavior:** **PARTIAL** (Tier-1 Core and Alloc primary containers are CERTIFIED with executable positive/negative fixtures, ownership lifecycle proofs, and source/.llib parity; Tier-2 and Tier-3 providers are structurally verified and build-validated in the sysroot DAG, with dedicated standalone CLI fixture test suites currently being expanded).

@@ -4,6 +4,15 @@ Detailed rules A–K in [normative rules](../../normative-rules-p0-p1.md) remain
 requirements. This chapter connects them; it does not weaken them to match a
 compiler bug. Status and evidence are in [conformance](conformance.md).
 
+Implementation status — 2026-10-14: A/C/E closures establish only the cases in
+the [R4 ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md).
+Ordinary checked arithmetic and explicit wrapping are qualified in E1's four
+modes; ownership, call and provider cases retain their named boundaries.
+Standalone comptime statement execution remains unsupported (spanned E4005);
+VM layout is tested only for 64-bit GNU. See
+[known limits](../../audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md).
+These implementation statuses do not change the requirements below.
+
 ## Types, initialization and ownership
 
 Types determine permitted values and operations; LLVM layout is a later

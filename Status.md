@@ -2,7 +2,38 @@
 
 > **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](docs/spec/0.1/README.md).
 
-# Luna 0.1 status — 2026-10-03
+# Luna 0.1 status — 2026-10-14
+
+**Release: BLOCKED / NOT VERIFIED; R5 PENDING.** R4 documentation base is
+`3f8646c654b99b67bae57ee290b7a7e23d717b40`; tested implementation is
+`e4f9fb530d72628c81dfa29d117afeb99cc7664c`. Protocol: **25 / 9 / 5 / 2**
+(compiler / semantic metadata / MVIR / artifact format).
+
+| Area | Current scoped status / evidence |
+| --- | --- |
+| A-wave | CLOSED; closure/async/partial cleanup, cast, view and logical-not scopes |
+| C-wave | CLOSED IN TESTED SCOPE; calls, impl metadata, projections, dependencies and freshness |
+| D-wave | CLOSED with follow-ups classified; complete diagnostic structural audit remains R5 |
+| E2 grammar | CLOSED; adopted grammar behavior reconciled, legacy syntax only characterized |
+| E1 checked arithmetic | CLOSED / QUALIFIED IN TESTED SCOPE; 59 cases x four modes = 236/236 |
+| Full workspace | Three final6 runs at the tested pin: each 1404 passed / 0 failed / 1 ignored / exit0 |
+| Windows GNU | VERIFIED IN TESTED SCOPE; 49 fresh bundles with actual GNU LLIB/COFF object identity |
+| Ubuntu GNU normal / ASan | NOT VERIFIED; required R5 release gates |
+| Cleanup | Accepted CLOSED 2026-10-14; 254 temporary files removed; nine logs and referenced sysroot retained |
+| R4 / R5 | R4 docs/evidence reconciliation; R5 exact candidate qualification pending; no release-ready claim |
+
+The [exact release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)
+maps every wave/follow-up to closure SHA and saved evidence. Its
+[diagnostic inventory](docs/audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md),
+[target matrix](docs/audits/0.1-alpha-completion-2026-10-04/r4/target-matrix.md),
+[limitations](docs/audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md)
+and [R5 checklist](docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md)
+define the remaining qualification. Standalone comptime statement execution
+is unsupported; VM layout is only verified in the 64-bit GNU tested scope.
+C4-FU1 precision and D1-FU1 presentation remain approved non-blocking deferrals;
+they do not waive correctness or DIAG-1..10 requirements.
+
+## Historical audit — 2026-10-03
 
 Contract baseline: [spec/0.1](docs/spec/0.1/README.md). Release conformance:
 **BLOCKED / NOT VERIFIED**. Compiler revision evaluated: `3dac3ac`.

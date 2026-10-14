@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "R4 release ledger, schema 1",
+  "type": "object",
+  "required": ["schema_version", "base_commit", "implementation_tested_commit", "release_status", "records", "evidence", "legacy_migration", "target_qualification"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "base_commit": {"$ref": "#/$defs/commit"},
+    "implementation_tested_commit": {"$ref": "#/$defs/commit"},
+    "release_status": {"const": "BLOCKED_PENDING_R5"},
+    "records": {"type": "array", "minItems": 25, "items": {"$ref": "#/$defs/record"}},
+    "evidence": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence"}},
+    "legacy_migration": {"type": "object"},
+    "target_qualification": {"type": "array", "minItems": 3}
+  },
+  "$defs": {
+    "commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "nullable_commit": {"anyOf": [{"$ref": "#/$defs/commit"}, {"type": "null"}]},
+    "record": {
+      "type": "object",
+      "required": ["id", "closure_commit", "implementation_commit", "implementation_commits", "verified_at_commit", "preexisting_at_baseline", "contract_status", "implementation_status", "verification_scope", "evidence", "remaining_gaps"],
+      "properties": {
+        "id": {"type": "string"},
+        "closure_commit": {"$ref": "#/$defs/commit"},
+        "implementation_commit": {"$ref": "#/$defs/nullable_commit"},
+        "implementation_commits": {"type": "array", "items": {"$ref": "#/$defs/commit"}},
+        "verified_at_commit": {"$ref": "#/$defs/nullable_commit"},
+        "preexisting_at_baseline": {"type": "boolean"},
+        "contract_status": {"type": "string"},
+        "implementation_status": {"type": "string"},
+        "verification_scope": {"type": "string"},
+        "evidence": {"type": "array", "items": {"type": "string"}},
+        "remaining_gaps": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["path", "sha256", "hash_basis", "acquired_workspace_sha256", "kind", "command", "mode", "target", "result", "verified_at_commit"],
+      "properties": {
+        "path": {"type": "string"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "hash_basis": {"const": "git_blob_bytes"},
+        "acquired_workspace_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "command": {"type": ["array", "null"], "items": {"type": "string"}},
+        "mode": {"type": "string"},
+        "target": {"type": "string"},
+        "result": {"type": "string"},
+        "verified_at_commit": {"$ref": "#/$defs/nullable_commit"}
+      }
+    }
+  }
+}

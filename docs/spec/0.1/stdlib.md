@@ -8,6 +8,14 @@ provider is not automatic adoption or verification of every public API it
 contains. The inventory is derived from `luna-rs/libs/external/sysroot.toml`,
 not a second hand-maintained manifest.
 
+Current evidence — 2026-10-14: E1 preserves hashes and target/object identity
+for all 49 fresh bundles at `e4f9fb53`; D3 establishes a bounded Tier-2/3 graph,
+private/generic/comptime and fail-closed matrix. A-wave container/ownership and
+E1 arithmetic/range evidence are listed in the
+[R4 ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md).
+This supersedes a blanket description of every later addition as unverified,
+while retaining the distinction between building providers and certifying all APIs.
+
 ## Required invariants
 
 | Capability | Contract |
