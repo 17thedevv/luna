@@ -27,9 +27,18 @@ struct ProviderConfigArgs {
     no_config: bool,
 }
 
+/// Every user-visible CLI failure carries a typed diagnostic code (DIAG-1).
+/// Infrastructure failures are not source diagnostics, so they carry the code
+/// without a fabricated span.
+fn fail(code: luna_common::DiagnosticCode, message: String) -> ! {
+    let diagnostic = luna_common::Diagnostic::error(message).with_code(code);
+    eprintln!("{}", diagnostic.render(&luna_common::source::SourceManager::new()));
+    process::exit(1);
+}
+
 fn configured_bindings(file: &std::path::Path, args: &ProviderConfigArgs) -> luna_driver::provider_binding::ProviderBindings {
     provider_config::load(file, args.config.as_deref(), args.no_config).unwrap_or_else(|error| {
-        eprintln!("{}", error); process::exit(1);
+        fail(luna_common::DiagnosticCode::ProviderConfigurationError, error.to_string());
     })
 }
 
@@ -120,8 +129,7 @@ fn parse_emit(emit_opt: &Option<String>) -> (bool, bool, bool) {
                 "llvm" => emit_llvm = true,
                 "llib" => emit_llib = true,
                 other => {
-                    eprintln!("Unknown emit type: {}", other);
-                    process::exit(1);
+                    fail(luna_common::DiagnosticCode::InvalidArtifactOutput, format!("Unknown emit type: {other}"));
                 }
             }
         }
@@ -131,8 +139,7 @@ fn parse_emit(emit_opt: &Option<String>) -> (bool, bool, bool) {
 
 fn read_source(file: &PathBuf) -> String {
     fs::read_to_string(file).unwrap_or_else(|err| {
-        eprintln!("Error reading file {}: {}", file.display(), err);
-        process::exit(1);
+        fail(luna_common::DiagnosticCode::ProviderReadFailure, format!("Error reading file {}: {}", file.display(), err));
     })
 }
 
@@ -156,8 +163,7 @@ fn run_cli() {
     match &cli.command {
         Commands::Manifest { file } => {
             let mut f = std::fs::File::open(file).unwrap_or_else(|err| {
-                eprintln!("Error opening {}: {}", file.display(), err);
-                process::exit(1);
+                fail(luna_common::DiagnosticCode::ProviderReadFailure, format!("Error opening {}: {}", file.display(), err));
             });
             match luna_llib::reader::LlibReader::read_manifest(&mut f) {
                 Ok(manifest) => {
@@ -166,20 +172,17 @@ fn run_cli() {
                     process::exit(0);
                 }
                 Err(e) => {
-                    eprintln!("Failed to read manifest: {:?}", e);
-                    process::exit(1);
+                    fail(luna_common::DiagnosticCode::ProviderReadFailure, format!("Failed to read manifest: {e:?}"));
                 }
             }
         }
         Commands::BuildSysroot { quiet } => {
             let sysroot = luna_driver::sysroot::Sysroot::discover(None).unwrap_or_else(|err| {
-                eprintln!("Failed to locate Luna sysroot: {err:?}");
-                process::exit(1);
+                fail(luna_common::DiagnosticCode::SysrootConfigurationFailure, format!("Failed to locate Luna sysroot: {err:?}"));
             });
             let builder = luna_driver::sysroot_builder::SysrootBuilder::new(sysroot);
             if let Err(err) = builder.build_all(*quiet) {
-                eprintln!("Failed to build Luna sysroot: {err}");
-                process::exit(1);
+                fail(luna_common::DiagnosticCode::SysrootConfigurationFailure, format!("Failed to build Luna sysroot: {err}"));
             }
         }
         Commands::Build { file, output, emit, quiet, lib, search_paths, provider_config } => {
@@ -240,7 +243,7 @@ fn run_cli() {
             let bindings = configured_bindings(file, provider_config);
             match run_application(file, source, *quiet, search_paths, bindings, cli.comptime_steps, cli.comptime_depth) {
                 Ok(code) => process::exit(code),
-                Err(error) => { eprintln!("{}", error); process::exit(1); }
+                Err(error) => fail(luna_common::DiagnosticCode::ProcessExecutionFailure, error),
             }
         }
     }

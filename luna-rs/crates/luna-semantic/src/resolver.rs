@@ -461,7 +461,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         }
     }
 
-    fn check_lang_item(
+fn check_lang_item(
         &mut self,
         annotations: &[luna_ast::Annotation],
         sym_id: luna_common::ids::SymbolId,
@@ -2472,4 +2472,25 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         self.ctx.tables.raw_storage_anchor_contracts.insert(struct_sym, canonical);
         self.ctx.tables.resolved_raw_storage_anchor_contracts.insert(struct_sym, resolved);
     }
+}
+
+/// DIAG-8: `E1008` (AmbiguousSymbol) is owned by the Resolver phase. Other
+/// phases that detect ambiguity construct the diagnostic through this
+/// owner-provided constructor instead of building it themselves.
+pub fn ambiguous_method_diagnostic(
+    name: &str,
+    candidates: &[(luna_common::Span, String)],
+    span: luna_common::Span,
+) -> luna_common::diagnostic::Diagnostic {
+    let names = candidates.iter().map(|(_, label)| label.as_str()).collect::<Vec<_>>();
+    let mut diagnostic = luna_common::diagnostic::Diagnostic::error(format!(
+        "Ambiguous method `{name}`: {}",
+        names.join(", ")
+    ))
+    .with_code(luna_common::DiagnosticCode::AmbiguousSymbol)
+    .with_span(span);
+    for (candidate_span, label) in candidates {
+        diagnostic = diagnostic.with_related(*candidate_span, format!("candidate {label}"));
+    }
+    diagnostic
 }
