@@ -777,7 +777,7 @@ workspace: 224 binaries, 1384 passed / 0 failed / 1 ignored (exit 0)
 release: still BLOCKED
 ```
 
-### E1 — Checked integer arithmetic (IN PROGRESS)
+### E1 — Checked integer arithmetic (CLOSED — 2026-10-13)
 
 Current qualification, 2026-10-13: four 59-row matrices and diagnostic
 acquisition PASS on `939d53e0ad7719c7c4a3eb4b915173fedeb1a129`. Full workspace
@@ -818,6 +818,15 @@ for a wire-contract review. Stdlib audit: `core/hash.ln` `mix_u64`,
 math → migrate to `wrapping_*`; capacity/allocation-size math stays checked;
 `core/num.ln` `checked_*`/`saturating_*` are already overflow-safe. 12 wrapping
 reducers added; baseline = COMPILE_ERROR (`std::wrapping_*` not yet defined).
+
+Current closure, 2026-10-13: source `e4f9fb530d72628c81dfa29d117afeb99cc7664c` passes four 59-row
+matrices and three consecutive default-parallel workspace runs. Compiler25
+rejects real22/23/24; source/fresh-artifact/relocation and diagnostic ownership
+gates pass. [E-wave closure](evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md)
+is the current qualification boundary; older entries below remain history.
+E2 remains CLOSED. Next is R4 preparation; Ubuntu GNU/ASan and broader release
+audit remain R5 obligations. Standalone comptime statement execution is a
+separate unsupported surface with typed E4005 admission.
 
 Current revision, 2026-10-12: diagnostic ownership repair and its supplemental
 E1010/E4005/E6001 mappings are adopted; ordinary integer DCE effects are fixed.

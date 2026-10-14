@@ -1,0 +1,18 @@
+{
+  "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "cli_sha256": "e685dbcd6263978a44af0a9d56c227514c76950e5def4c8e94d89f810f213f74",
+  "source_input_sha256": "3c22a04f8bd3e721ebe670848f8d248f7a05e91eb3650abfedac9050b5444e5f",
+  "cli": "D:\\fdlang\\luna-rs\\target\\release\\luna.exe",
+  "sysroot": "D:\\fdlang\\.e1-fp-b99152562efa448c8ecf6d0573a3feeb\\artifact",
+  "profile": "release",
+  "provider_mode": "fresh-artifact",
+  "rows": 59,
+  "outcomes": {
+    "COMPILE_ERROR": 4,
+    "TRAP": 34,
+    "PASS": 9,
+    "WRAP": 12
+  },
+  "contract_met": true
+}
