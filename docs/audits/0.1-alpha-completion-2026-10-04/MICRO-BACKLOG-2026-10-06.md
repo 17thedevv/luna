@@ -6,6 +6,12 @@
 
 # Micro-backlog thực thi — Luna 0.1-alpha.1 (2026-10-06)
 
+R4 reconciliation, 2026-10-14: [exact ledger and R5 handoff](r4/README.md),
+base `3f8646c654b99b67bae57ee290b7a7e23d717b40`. Later closure/decision rows in
+that ledger supersede earlier OPEN wording below only in their tested scopes.
+Original failures and maintainer deferrals stay historical evidence. R5 is
+PENDING / RELEASE BLOCKED; complete DIAG-1..10 and Ubuntu normal/ASan are not PASS.
+
 Tách từ [kế hoạch còn lại](REMAINING-PLAN-2026-10-06.md) và
 [kế hoạch gốc 2026-10-04](README.md). Tham chiếu ledger [EXECUTION](EXECUTION.md),
 contract [CALL-ARGUMENTS-v1](../../spec/0.1/call-arguments-v1.md) và

@@ -1,5 +1,17 @@
 # Execution ledger — Luna 0.1 completion
 
+### R4 documentation reconciliation — 2026-10-14
+
+Branch `r4-release-docs-ledger`, base `3f8646c654b99b67bae57ee290b7a7e23d717b40`.
+The [exact ledger](r4/README.md) records A/C/D/E closure identities, approved
+deferrals, diagnostic structural gaps, target qualification and an executable
+R5 handoff. E-wave remains CLOSED / QUALIFIED IN TESTED SCOPE at implementation
+`e4f9fb530d72628c81dfa29d117afeb99cc7664c`; R5 remains PENDING / RELEASE BLOCKED.
+The 2026-10-14 cleanup checkpoint is accepted CLOSED; no further root cleanup
+is part of R4. Subsequent sections are dated historical checkpoints and preserve
+their failures and earlier pending wording. R4 changes no implementation,
+runtime or tests and does not rerun the three full regressions.
+
 ### E-wave final qualification — 2026-10-13, CLOSED
 
 Tested source: `e4f9fb530d72628c81dfa29d117afeb99cc7664c`. Ordinary checked integer arithmetic, explicit wrapping,

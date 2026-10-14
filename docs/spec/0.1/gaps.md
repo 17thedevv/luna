@@ -11,7 +11,32 @@ otherwise. Some fixes may now be present; each original finding requires a
 fresh check before being marked closed. The merged manifest has 49 providers.
 V01-ARCH-02 is newly observed in the imported source, not the old audit.
 
-## Confirmed audit defects
+## Current reconciliation — 2026-10-14
+
+The [R4 ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md)
+supersedes historical pending/open wording only within the explicitly recorded
+scope: A/C/D/E-wave closures and their follow-ups are reconciled against
+`3f8646c6`, with regression evidence at `e4f9fb53`. Earlier failures below stay
+dated evidence. The old 24-row repair ledger is preserved and migrated losslessly;
+its historical PASS entries are not silently promoted to complete current
+certification or assigned a new introducing fix commit.
+
+| Area | Current implementation/evidence state | Remaining obligation |
+| --- | --- | --- |
+| Closure / async / partial cleanup | A1/A2/A3 and A2-FU1/FU2 closed in tested scope | Exact R5 candidate regression; no universal ownership-domain claim |
+| Casts / raw views / logical NOT | A4/A5/A6 closed in tested scope | Preserve invalid-program and loan controls in R5 |
+| Calls / impl metadata / projections / artifact identity | C1..C5 closed in tested scope; original C1 comparison failure retained | C4-FU1 precision deferred, not missing-dependency correctness |
+| Diagnostics | D1/D2 and D1-FU2/E1 admission controls establish bounded code/span/phase behavior | Complete structural DIAG-1..10 and V01-DIAG-01 remainder mandatory in R5 |
+| Provider graphs / retained contracts | D3/D4 scoped closure; async-provider finding and D4-FU1 closed separately | Full advertised target/exact-candidate qualification; 49 builds are not every API |
+| Grammar / arithmetic | E2 closed; E1 qualified (236/236 and 3/3 full runs) | Standalone comptime statements remain unsupported; complete formal grammar debt stays explicit |
+| Native targets / VM | Windows GNU tested scope; VM layout tested in 64-bit GNU only | Ubuntu GNU normal/ASan and wider layout certification remain absent |
+
+See [diagnostic inventory](../../audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md)
+and [accepted deferrals / known limits](../../audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md).
+Release remains BLOCKED / NOT VERIFIED pending the
+[R5 checklist](../../audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md).
+
+## Historical confirmed audit defects — revision 3dac3ac
 
 | Audit ID | Priority | Requirement violated / observed failure |
 |---|---|---|
@@ -130,7 +155,7 @@ invalid static casts diagnose, invalid dynamic casts trap, and arithmetic/
 bitwise/shift/negation operators on char reject. The approval and acceptance
 apply to their recorded baseline, not every newly merged addition.
 
-## Evidence not completed
+## Evidence not completed by the historical 3dac3ac audit
 
 - All compiler integration tests, exhaustive input/generic domains, sanitizers
   and fuzzing have not been verified by the stdlib audit.

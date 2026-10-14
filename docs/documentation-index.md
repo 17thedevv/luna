@@ -1,6 +1,6 @@
 # Luna 0.1 documentation inventory
 
-Updated 2026-10-03. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
+Updated 2026-10-14. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
 
 All repository-authored tracked Markdown and new versioned/archived/audit documents are classified below. Agent guidance is included. Vendor documentation, generated build logs and test-failure dumps are excluded. Website pages are generated from the same baseline.
 
@@ -92,6 +92,11 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R0-BASELINE-3601d12e-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R0-BASELINE-3601d12e-2026-10-06.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md](audits/0.1-alpha-completion-2026-10-04/r4/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md](audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md](audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md](audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/r4/target-matrix.md](audits/0.1-alpha-completion-2026-10-04/r4/target-matrix.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/alpha-modules-2026-10-03/README.md](audits/alpha-modules-2026-10-03/README.md) | evidence | [modules](spec/0.1/modules.md) |
 | [docs/audits/provider-config-relative-2026-10-04/README.md](audits/provider-config-relative-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/repair-0.1/README.md](audits/repair-0.1/README.md) | evidence | [conformance](spec/0.1/conformance.md) |

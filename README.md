@@ -17,12 +17,22 @@ and [document inventory](docs/documentation-index.md).
 
 The baseline retains defined contracts even where implementation is incomplete.
 **Release conformance is blocked**, not certified by historical FROZEN labels.
-The [2026-10-02 audit](docs/audits/stdlib-2026-10-02/README.md) found compiler and
+Current scoped status is in the [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md):
+A/C/D/E-wave closures are reconciled at candidate input `3f8646c6`, with tested
+implementation `e4f9fb53` and compiler/metadata/MVIR/format **25/9/5/2**.
+E-wave's 236/236 matrix and three workspace passes certify their Windows GNU
+tested scope. Ubuntu GNU normal/ASan and the complete structural diagnostic audit
+remain R5 obligations. See [known limitations](docs/audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md)
+and the [executable R5 checklist](docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md).
+
+The historical [2026-10-02 audit](docs/audits/stdlib-2026-10-02/README.md) found compiler and
 stdlib defects at `3dac3ac`. Later compiler, runtime, stdlib and website work
 has been integrated; prior audit results do not certify the merged implementation.
 
 The merged sysroot contains **49 component providers**: 32 in the original audit
-and 17 later additions requiring their own acceptance evidence. Six language-contract
+and 17 later additions. E1 records fresh bundle/header/object provenance for all
+49; D3's provider graph evidence covers a bounded Tier-2/3 matrix. This does not
+certify every API/domain. Six language-contract
 families and controlled OptionExt visibility are bootstrapped; ordinary library
 APIs require their specified imports. Stdlib is a language consumer: compiler
 macro names, stream prefixes and newline suffixes must not select stdlib callees.
