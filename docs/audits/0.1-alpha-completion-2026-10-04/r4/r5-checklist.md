@@ -54,8 +54,9 @@ function Invoke-R5Gate {
         ConvertTo-Json -Depth 6 | Set-Content (Join-Path $r5Out ($Label + '.json'))
     if ($r5Exit -ne 0) { throw "$Label failed: exit $r5Exit; retain log" }
 }
-Invoke-R5Gate 'clone' 'git' @('clone', $env:R5_REPOSITORY_URL, (Join-Path $r5Out 'checkout'))
+Invoke-R5Gate 'clone' 'git' @('-c','core.longpaths=true','clone', $env:R5_REPOSITORY_URL, (Join-Path $r5Out 'checkout'))
 Set-Location (Join-Path $r5Out 'checkout')
+git config core.longpaths true
 Invoke-R5Gate 'checkout' 'git' @('checkout', '--detach', $env:R5_SHA)
 if ((git rev-parse HEAD) -ne $env:R5_SHA) { throw 'Wrong pin' }
 if (git status --porcelain) { throw 'Checkout is not clean' }
@@ -81,6 +82,10 @@ The runtime path above is for the explicitly selected standalone Ninja/MinGW
 configuration. Verify actual object/LLIB GNU target headers and executable
 behavior; a successful host build alone is not target evidence. Do not run
 Cargo mutations concurrently with CLI sysroot/matrix acquisitions.
+Long evidence paths require Git long-path support when using a deep Windows
+checkout directory. Verify the initial clean status even if checkout reports
+exit0; the R4 docs-only clone check encountered missing long-path files before
+enabling this local setting. No global Git preference change is required.
 
 ## Ubuntu GNU normal and ASan command sequence
 

@@ -93,6 +93,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R0-BASELINE-3601d12e-2026-10-06.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R0-BASELINE-3601d12e-2026-10-06.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md](audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md](audits/0.1-alpha-completion-2026-10-04/r4/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/0.1-alpha-completion-2026-10-04/r4/REPORT-R4-CLOSURE-2026-10-14.md](audits/0.1-alpha-completion-2026-10-04/r4/REPORT-R4-CLOSURE-2026-10-14.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md](audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md](audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md](audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md) | evidence | [conformance](spec/0.1/conformance.md) |

@@ -1,0 +1,102 @@
+{
+  "task": "R4 Release Documentation & Ledger",
+  "base_commit": "3f8646c654b99b67bae57ee290b7a7e23d717b40",
+  "documentation_verified_at_commit": "b03fa63f5027491c90fc9070e3229a583d875669",
+  "implementation_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+  "scope": "Documentation/provenance only; no compiler/runtime/test execution",
+  "documentation_commit_validation": {
+    "ledger": {
+      "task": "R4 documentation provenance validation",
+      "records": 25,
+      "evidence_files": 108,
+      "readable_gz": 33,
+      "arithmetic_acquisitions": 236,
+      "preserved_evidence_files": 1004,
+      "release_status": "BLOCKED_PENDING_R5",
+      "implementation_tree_required": true,
+      "errors": []
+    },
+    "docs": {
+      "documents": 219,
+      "site_pages": 30,
+      "checked_local_links": 1710,
+      "errors": []
+    }
+  },
+  "lf_checkout": {
+    "documentation_commit": "b03fa63f5027491c90fc9070e3229a583d875669",
+    "core_autocrlf": false,
+    "core_longpaths": true,
+    "initial_attempt": "Windows long-path files missing before core.longpaths; restored and clean status verified before validation",
+    "ledger": {
+      "task": "R4 documentation provenance validation",
+      "records": 25,
+      "evidence_files": 108,
+      "readable_gz": 33,
+      "arithmetic_acquisitions": 236,
+      "preserved_evidence_files": 1004,
+      "release_status": "BLOCKED_PENDING_R5",
+      "implementation_tree_required": true,
+      "errors": []
+    },
+    "docs": {
+      "documents": 219,
+      "site_pages": 30,
+      "checked_local_links": 1710,
+      "errors": []
+    }
+  },
+  "release_status": "BLOCKED_PENDING_R5",
+  "full_workspace_regressions_rerun": false,
+  "final_closure_sha_policy": "Reported externally after committing, avoiding self-reference",
+  "closing_document_checks": {
+    "input_parent_commit": "b03fa63f5027491c90fc9070e3229a583d875669",
+    "checks": {
+      "ledger": {
+        "command": [
+          "python",
+          "docs/tools/validate_r4_ledger.py",
+          "--require-unchanged-implementation"
+        ],
+        "exit": 0,
+        "result": {
+          "task": "R4 documentation provenance validation",
+          "records": 25,
+          "evidence_files": 108,
+          "readable_gz": 33,
+          "arithmetic_acquisitions": 236,
+          "preserved_evidence_files": 1004,
+          "release_status": "BLOCKED_PENDING_R5",
+          "implementation_tree_required": true,
+          "errors": []
+        }
+      },
+      "docs": {
+        "command": [
+          "python",
+          "docs/tools/validate_v01_docs.py"
+        ],
+        "exit": 0,
+        "result": {
+          "documents": 220,
+          "site_pages": 30,
+          "checked_local_links": 1721,
+          "errors": []
+        }
+      }
+    },
+    "source_tree_objects": {
+      "luna-rs": "e3cd58fdfcf9f7b996f6f0b6aa15661fe8fba8ca",
+      "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+      "tests": "4cf8d95eb737b5b05d89372f7f44c62f880a4e94"
+    },
+    "protocol_source": "luna-rs/crates/luna-llib/src/format.rs",
+    "protocol": {
+      "compiler": 25,
+      "metadata": 9,
+      "mvir": 5,
+      "format": 2
+    },
+    "scope": "Closing docs worktree; exact closure rerun recorded externally after commit, no self-referential hash"
+  }
+}

@@ -5,6 +5,9 @@ Base/candidate on entry: `3f8646c654b99b67bae57ee290b7a7e23d717b40`.
 Tested implementation: `e4f9fb530d72628c81dfa29d117afeb99cc7664c`.
 Protocol: **compiler25 / metadata9 / MVIR5 / format2**.
 
+R4: **CLOSED / VERIFIED IN DOCUMENTATION AND EVIDENCE SCOPE**; see the
+[closing record](REPORT-R4-CLOSURE-2026-10-14.md) and its saved checks.
+
 **Release: BLOCKED / NOT VERIFIED. R5: PENDING.** R4 reconciles existing
 evidence and current documentation. It grants no new capability or release
 certification and does not run R5. A/C/D/E closures retain their tested scopes.

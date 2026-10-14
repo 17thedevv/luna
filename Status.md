@@ -20,7 +20,7 @@
 | Windows GNU | VERIFIED IN TESTED SCOPE; 49 fresh bundles with actual GNU LLIB/COFF object identity |
 | Ubuntu GNU normal / ASan | NOT VERIFIED; required R5 release gates |
 | Cleanup | Accepted CLOSED 2026-10-14; 254 temporary files removed; nine logs and referenced sysroot retained |
-| R4 / R5 | R4 docs/evidence reconciliation; R5 exact candidate qualification pending; no release-ready claim |
+| R4 / R5 | R4 CLOSED in docs/evidence scope; R5 exact candidate qualification pending; no release-ready claim |
 
 The [exact release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)
 maps every wave/follow-up to closure SHA and saved evidence. Its
