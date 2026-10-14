@@ -1,0 +1,15 @@
+const TRUE_VALUE: i32 = comptime {
+    dec rw value: i32 = 0;
+    if true { value = 11; } else { value = 23; }
+    value
+};
+const FALSE_VALUE: i32 = comptime {
+    dec rw value: i32 = 0;
+    if false { value = 11; } else { value = 23; }
+    value
+};
+fn main() -> i32 {
+    if TRUE_VALUE != 11 { return 1; }
+    if FALSE_VALUE != 23 { return 2; }
+    return 0;
+}

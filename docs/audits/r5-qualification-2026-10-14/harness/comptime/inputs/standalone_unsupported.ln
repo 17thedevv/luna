@@ -1,0 +1,4 @@
+fn main() -> i32 {
+    comptime { 1i32 + 1i32; }
+    return 0;
+}

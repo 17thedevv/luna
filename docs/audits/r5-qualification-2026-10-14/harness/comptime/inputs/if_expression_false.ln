@@ -1,0 +1,5 @@
+// Permanent reducer for withdrawn C4 branch-value probe.
+// Parser represents final if as a statement, not a block tail expression.
+// Observe admission/materialization; do not assume a normative value-producing if.
+const VALUE: i32 = comptime { if false { 11i32 } else { 23i32 } };
+fn main() -> i32 { return VALUE; }

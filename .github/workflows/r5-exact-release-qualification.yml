@@ -18,7 +18,7 @@ env:
 
 jobs:
   ubuntu-normal:
-    name: Ubuntu GNU exact-pin normal qualification
+    name: Ubuntu GNU exact-pin descriptive normal acquisition (target contract enforced)
     runs-on: ubuntu-24.04
     timeout-minutes: 360
     env:
@@ -38,7 +38,7 @@ jobs:
         with:
           cache: false
           rustflags: ""
-      - name: Qualify immutable candidate from fresh detached clone
+      - name: Acquire exact-candidate evidence and retain mandatory target-contract verdict
         run: >-
           python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
           --lane normal --out "$RUNNER_TEMP/r5-normal"
@@ -54,6 +54,8 @@ jobs:
 
   ubuntu-runtime-asan:
     name: Ubuntu GNU C runtime ABI and partial-read cleanup ASan
+    # Original narrow ASan acquisition is preserved; replay only on dispatch.
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
@@ -77,6 +79,41 @@ jobs:
         with:
           name: r5-ubuntu-runtime-asan-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/r5-runtime-asan/evidence/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  ubuntu-comptime-vm:
+    name: Ubuntu GNU64 descriptive comptime and VM boundary acquisition
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
+      LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
+      LLVM_HOME: /usr/lib/llvm-18
+    steps:
+      - name: Acquire qualification harness separately from tested candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Ubuntu GNU and LLVM18 dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build clang-18 llvm-18-dev libclang-18-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire isolated portable boundary probe evidence at exact candidate
+        run: >-
+          python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
+          --lane comptime-vm --out "$RUNNER_TEMP/r5-comptime-vm"
+      - name: Preserve boundary evidence including mandatory target conflict
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-ubuntu-comptime-vm-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/r5-comptime-vm/evidence/
           if-no-files-found: error
           retention-days: 30
           include-hidden-files: true
