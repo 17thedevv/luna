@@ -1,0 +1,76 @@
+[
+  {
+    "invariant": "DIAG-1",
+    "status": "BROKEN",
+    "evidence": [
+      "R5-DIAG-001"
+    ]
+  },
+  {
+    "invariant": "DIAG-2",
+    "status": "PARTIAL",
+    "evidence": [
+      "R5-DIAG-005"
+    ],
+    "notes": "Source-primary universal contract not established; constructor defects and reachability distinguishable."
+  },
+  {
+    "invariant": "DIAG-3",
+    "status": "BROKEN",
+    "evidence": [
+      "R5-DIAG-002"
+    ]
+  },
+  {
+    "invariant": "DIAG-4",
+    "status": "BROKEN",
+    "evidence": [
+      "R5-DIAG-003"
+    ]
+  },
+  {
+    "invariant": "DIAG-5",
+    "status": "PARTIAL",
+    "evidence": [
+      "tests/luna/language/cast_contract/poison_many_uses_invalid.ln",
+      "luna-rs/crates/luna-cli/tests/comptime_diagnostic_cascade_cli.rs"
+    ],
+    "notes": "Existing poison reducers inspected as test definitions, not executed here. All error-value joins/consumers not proven; no global poison-containment claim."
+  },
+  {
+    "invariant": "DIAG-6",
+    "status": "UNVERIFIED",
+    "evidence": [
+      "R5-DIAG-006"
+    ]
+  },
+  {
+    "invariant": "DIAG-7",
+    "status": "PARTIAL",
+    "evidence": [
+      "R5-DIAG-007"
+    ]
+  },
+  {
+    "invariant": "DIAG-8",
+    "status": "BROKEN",
+    "evidence": [
+      "R5-DIAG-004"
+    ]
+  },
+  {
+    "invariant": "DIAG-9",
+    "status": "BROKEN",
+    "evidence": [
+      "R5-DIAG-002"
+    ]
+  },
+  {
+    "invariant": "DIAG-10",
+    "status": "PARTIAL",
+    "evidence": [
+      "registry-parity-static.json"
+    ],
+    "notes": "Exact current 72/72 name/value/code parity and uniqueness statically verified. Automated exact-candidate test execution is parent lane; historical cross-version immutability not certified from one snapshot."
+  }
+]

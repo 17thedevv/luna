@@ -1,0 +1,51 @@
+{
+  "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "triage": {
+    "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+    "label": "workspace-triage",
+    "command": [
+      "C:\\Users\\84387\\.cargo\\bin\\cargo.exe",
+      "test",
+      "--workspace",
+      "--no-fail-fast"
+    ],
+    "cwd": "D:\\r5-9bda6f57\\windows-checkout\\luna-rs",
+    "start_utc": "2026-10-14T08:58:58.132995+00:00",
+    "end_utc": "2026-10-14T13:54:38.678336+00:00",
+    "elapsed_seconds": 17742.733,
+    "exit": 0,
+    "log": "workspace-triage.log",
+    "log_sha256": "9767722cf0dff6e2d274bbc995201c1a744f1ecf189c87797e51ccb333451b10",
+    "result_groups": 231,
+    "passed": 1404,
+    "failed": 0,
+    "ignored": 1,
+    "binaries": 219,
+    "log_archive": "workspace-triage.log.gz",
+    "archive_sha256": "ed3b22e6e57bca853aed4d9fabc79aeaea0828a7c1263082a30914c1d40856dc"
+  },
+  "final": {
+    "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+    "label": "workspace-final",
+    "command": [
+      "C:\\Users\\84387\\.cargo\\bin\\cargo.exe",
+      "test",
+      "--workspace"
+    ],
+    "cwd": "D:\\r5-9bda6f57\\windows-checkout\\luna-rs",
+    "start_utc": "2026-10-14T13:54:38.963722+00:00",
+    "end_utc": "2026-10-14T17:38:38.761760+00:00",
+    "elapsed_seconds": 13439.799,
+    "exit": 0,
+    "log": "workspace-final.log",
+    "log_sha256": "22af1c140c8d11f010dd865518286c5c033c8037aeb0f21223a147cea2770fcd",
+    "result_groups": 231,
+    "passed": 1404,
+    "failed": 0,
+    "ignored": 1,
+    "binaries": 219,
+    "log_archive": "workspace-final.log.gz",
+    "archive_sha256": "56ded851dccece864eac7c56c6643866765d0d5840af780a76ddb744b57cc621"
+  },
+  "status": "PASS"
+}

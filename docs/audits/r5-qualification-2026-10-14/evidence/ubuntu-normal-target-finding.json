@@ -1,0 +1,26 @@
+{
+  "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "harness_commit": "f3989c91c4311659f3deb5b46b3141747fe7dd9f",
+  "run_id": 38524557278,
+  "job_id": 115721728023,
+  "artifact_id": 11875323796,
+  "artifact_zip_sha256": "552fd7b6658aa03ae09762617d1d91d0a905925e39db6c8a37fe6113c9efc724",
+  "file_hashes_verified": 54,
+  "gate_log_content_hashes_verified": 24,
+  "hash_mismatches": 0,
+  "actual_llib_and_manifest_target": "x86_64-pc-linux-gnu",
+  "r4_advertised_target": "x86_64-unknown-linux-gnu",
+  "provider_count": 49,
+  "all_providers_have_protocol_25_9_5_2": true,
+  "all_providers_have_elf64_x86_64_relocatable_objects": true,
+  "all_embedded_objects_equal_sidecars": true,
+  "result": "STRICT TARGET CONTRACT GATE FAIL / RECONCILIATION REQUIRED",
+  "source_trace": [
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs:56 TargetMachine::get_default_triple()",
+    "luna-rs/crates/luna-driver/src/lib.rs:742 TargetConfig::default()",
+    "docs/spec/0.1/conformance.md:66 advertised unknown-linux-gnu; other targets unadvertised"
+  ],
+  "dependent_focused_docs_workspace_not_run": true,
+  "no_candidate_changes": true,
+  "no_vendor_normalization_or_pass_inference": true
+}
