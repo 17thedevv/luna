@@ -1,0 +1,34 @@
+// Scope: x86_64 GNU only. No arbitrary-target layout certification.
+struct Wide { prefix: u8, marker: i128, tail: u64 };
+enum Owned<T> { Empty, Value(T), Pair(u8, T) }
+const I128_SIZE: usize = comptime { sizeof(i128) as usize };
+const I128_ALIGN: usize = comptime { alignof(i128) as usize };
+const STRUCT_SIZE: usize = comptime { sizeof(Wide) as usize };
+const STRUCT_ALIGN: usize = comptime { alignof(Wide) as usize };
+const TUPLE_SIZE: usize = comptime { sizeof((u8, i128, u64)) as usize };
+const TUPLE_ALIGN: usize = comptime { alignof((u8, i128, u64)) as usize };
+const ENUM_SIZE: usize = comptime { sizeof(Owned<Wide>) as usize };
+const ENUM_ALIGN: usize = comptime { alignof(Owned<Wide>) as usize };
+const TUPLE: (u8, i128, u64) = comptime { (7u8, 123456789123456789i128, 11u64) };
+const VALUE: Owned<Wide> = comptime { Owned::Value(Wide { prefix: 7u8, marker: 123456789123456789i128, tail: 11u64 }) };
+fn make(marker: i128) -> Owned<Wide> { return Owned::Value(Wide { prefix: 7u8, marker: marker, tail: 11u64 }); }
+fn main() -> i32 {
+    if I128_SIZE != 16usize || I128_ALIGN != 16usize { return 1; }
+    if I128_SIZE != (sizeof(i128) as usize) || I128_ALIGN != (alignof(i128) as usize) { return 2; }
+    if STRUCT_SIZE != 48usize || STRUCT_ALIGN != 16usize { return 3; }
+    if STRUCT_SIZE != (sizeof(Wide) as usize) || STRUCT_ALIGN != (alignof(Wide) as usize) { return 4; }
+    if TUPLE_SIZE != 48usize || TUPLE_ALIGN != 16usize { return 5; }
+    if TUPLE_SIZE != (sizeof((u8, i128, u64)) as usize) || TUPLE_ALIGN != (alignof((u8, i128, u64)) as usize) { return 6; }
+    if ENUM_SIZE != (sizeof(Owned<Wide>) as usize) || ENUM_ALIGN != (alignof(Owned<Wide>) as usize) { return 7; }
+    if ENUM_ALIGN != 16usize { return 8; }
+    if TUPLE.0 != 7u8 || TUPLE.1 != 123456789123456789i128 || TUPLE.2 != 11u64 { return 9; }
+    match VALUE {
+        Owned::Value(v) -> { if v.prefix != 7u8 || v.marker != 123456789123456789i128 || v.tail != 11u64 { return 10; } },
+        Owned::Empty -> { return 11; }, Owned::Pair(p, v) -> { return 12; },
+    }
+    match make(123456789123456789i128) {
+        Owned::Value(v) -> { if v.marker != 123456789123456789i128 { return 13; } },
+        Owned::Empty -> { return 14; }, Owned::Pair(p, v) -> { return 15; },
+    }
+    return 0;
+}

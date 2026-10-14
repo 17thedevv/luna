@@ -1,0 +1,10 @@
+const ADD: u8 = comptime { std::wrapping_add(255u8, 1u8) };
+const SUB: u8 = comptime { std::wrapping_sub(0u8, 1u8) };
+const MUL: u8 = comptime { std::wrapping_mul(128u8, 2u8) };
+fn main() -> i32 {
+    if ADD != 0u8 || SUB != 255u8 || MUL != 0u8 { return 1; }
+    if std::wrapping_add(255u8, 1u8) != ADD { return 2; }
+    if std::wrapping_sub(0u8, 1u8) != SUB { return 3; }
+    if std::wrapping_mul(128u8, 2u8) != MUL { return 4; }
+    return 0;
+}

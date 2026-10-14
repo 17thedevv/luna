@@ -46,6 +46,7 @@ class Recorder:
         self.checkout = out / "checkout"
         self.rows = []
         self.env = os.environ.copy()
+        self.native_target = None
 
     def run(self, name, args, *, cwd=None, required=True, timeout=21000):
         args = list(map(str, args))
@@ -127,7 +128,7 @@ class Recorder:
         return provenance
 
 
-def providers(rec):
+def providers(rec, llvm_host_target):
     root = rec.checkout / "luna-rs/libs/external"
     manifest = tomllib.loads((root / "sysroot.toml").read_text())
     rows = []
@@ -173,19 +174,31 @@ def providers(rec):
                    library_sha256=digest(library), object_sha256=digest(obj),
                    embedded_object_sha256=hashlib.sha256(embedded).hexdigest(),
                    embedded_equals_sidecar=embedded == native)
-        row["valid"] = (fmt, compiler, mvir, metadata) == (2, 25, 5, 9) and target == TARGET and strings[4] == TARGET and pointer_width == 64 and elf and e_type == 1 and e_machine == 62 and native == embedded
+        row["native_integrity_valid"] = (fmt, compiler, mvir, metadata) == (2, 25, 5, 9) and target == llvm_host_target and strings[4] == target and target in (TARGET, "x86_64-pc-linux-gnu") and pointer_width == 64 and elf and e_type == 1 and e_machine == 62 and native == embedded
+        row["advertised_target_match"] = target == TARGET
+        row["valid"] = row["native_integrity_valid"] and row["advertised_target_match"]
         rows.append(row)
+    native_integrity = len(rows) == 49 and all(x["native_integrity_valid"] for x in rows)
+    rec.native_target = llvm_host_target
     result = dict(tested_commit=PIN, providers=rows, count=len(rows),
+                  actual_native_target=llvm_host_target, advertised_target=TARGET,
+                  native_integrity_valid=native_integrity,
+                  scope="Descriptive actual-target acquisition; strict advertised-target gate remains mandatory",
                   producer_cli_sha256=digest(rec.checkout / "luna-rs/target/debug/luna"),
                   status="PASS" if len(rows) == 49 and all(x["valid"] for x in rows) else "FAIL")
     save(rec.evidence / "sysroot-provenance.json", result)
-    if result["status"] != "PASS":
-        raise RuntimeError("49 provider/header/metadata/native identity gate failed")
+    # A synthetic executable gate preserves FAIL for the exact normative triple.
+    # Continue independent descriptive evidence only after all native checks pass.
+    rec.run("TARGET_CONTRACT", [sys.executable, "-c",
+            "import json,sys; print(json.dumps(dict(actual=sys.argv[1],advertised=sys.argv[2],gate='MANDATORY TARGET_CONTRACT',status='PASS' if sys.argv[1]==sys.argv[2] else 'FAIL / BLOCKED; NO VENDOR NORMALIZATION'))); sys.exit(0 if sys.argv[1]==sys.argv[2] else 1)",
+            llvm_host_target, TARGET], required=False)
+    if not native_integrity:
+        raise RuntimeError("49 provider/header/metadata/native integrity gate failed; dependent acquisitions stopped")
 
 
-def normal(rec, provenance):
+def normal(rec, provenance, *, probe_only=False):
     root = rec.checkout
-    for name, args in [("rustc", ["rustc", "-vV"]), ("llvm", ["llvm-config-18", "--version"]), ("cargo", ["cargo", "--version"])]:
+    for name, args in [("rustc", ["rustc", "-vV"]), ("llvm", ["llvm-config-18", "--version"]), ("llvm-host-target", ["llvm-config-18", "--host-target"]), ("cargo", ["cargo", "--version"])]:
         provenance[name] = rec.text(rec.run(name, args, cwd=root)).strip()
     save(rec.evidence / "provenance.json", provenance)
     build = rec.out / "runtime"
@@ -200,7 +213,18 @@ def normal(rec, provenance):
     rec.env.update(LUNA_E1_RELEASE_CLI=str(release), LUNA_DOCS_CLI=str(debug))
     save(rec.evidence / "compiler-runtime-hashes.json", dict(tested_commit=PIN, debug_cli=digest(debug), release_cli=digest(release), runtime=digest(build / "libluna-runtime.a")))
     rec.run("sysroot", [debug, "build-sysroot", "--quiet"], cwd=root)
-    providers(rec)
+    providers(rec, provenance["llvm-host-target"])
+    if probe_only:
+        # Keep harness inputs and every generated probe artifact outside checkout.
+        inputs = Path(__file__).resolve().parent / "comptime"
+        external = rec.evidence / "comptime"
+        shutil.copytree(inputs, external)
+        rec.run("comptime-vm-boundary", [sys.executable, external / "run_qualification.py",
+                "--checkout", root, "--sysroot", root / "luna-rs", "--debug", debug,
+                "--release", release, "--runtime", build / "libluna-runtime.a",
+                "--label", "ubuntu-acquisition1"], cwd=rec.out, required=False)
+        rec.run("protected-tree-diff", ["git", "diff", "--exit-code", "HEAD", "--", "luna-rs", "runtime", "tests", "CMakeLists.txt"], cwd=root)
+        return
     batches = [
         ("focused-a-ownership", "luna-cli", ["generic_drop_cli", "async_cleanup_cli", "async_provider_export_cli"]),
         ("focused-a-casts", "luna-cli", ["cast_contract_cli", "cast_poison_cli", "raw_slice_view_a5_cli", "raw_slice_provenance_cli"]),
@@ -213,7 +237,7 @@ def normal(rec, provenance):
         ("whole-file-io", "luna-driver", ["whole_file_io_v1_acceptance_tests"]),
     ]
     for name, package, tests in batches:
-        args = ["cargo", "test", "--locked", "--manifest-path", root / "luna-rs/Cargo.toml", "-p", package]
+        args = ["cargo", "test", "--locked", "--no-fail-fast", "--manifest-path", root / "luna-rs/Cargo.toml", "-p", package]
         for target in tests:
             args += ["--test", target]
         rec.run(name, args + ["--", "--nocapture"], cwd=root, required=False)
@@ -257,15 +281,15 @@ def asan(rec):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--lane", choices=["normal", "runtime-asan"], required=True)
+    parser.add_argument("--lane", choices=["normal", "runtime-asan", "comptime-vm"], required=True)
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
     rec = Recorder(args.out.resolve())
     error = None
     try:
         provenance = rec.acquire()
-        if args.lane == "normal":
-            normal(rec, provenance)
+        if args.lane in ("normal", "comptime-vm"):
+            normal(rec, provenance, probe_only=args.lane == "comptime-vm")
         else:
             asan(rec)
     except Exception:
@@ -278,7 +302,7 @@ def main():
         rec.run("disk-final", ["df", "-h"], required=False)
         save(rec.evidence / "gates.json", rec.rows)
         failed = [r["gate"] for r in rec.rows if r["status"] != "PASS"]
-        save(rec.evidence / "summary.json", dict(tested_commit=PIN, harness_commit=os.environ.get("GITHUB_SHA"), lane=args.lane, status="FAIL" if error or failed else "PASS_IN_EXECUTED_LANE_SCOPE", failure=error, failed_gates=failed, r5_verdict="NOT DETERMINED BY THIS LANE", release="BLOCKED PENDING COMPLETE R5 RECONCILIATION", gate_count=len(rec.rows)))
+        save(rec.evidence / "summary.json", dict(tested_commit=PIN, harness_commit=os.environ.get("GITHUB_SHA"), lane=args.lane, actual_native_target=rec.native_target, advertised_target=TARGET, scope="Descriptive execution on actual native target; no advertised-target equivalence or normalization" if rec.native_target and rec.native_target != TARGET else "Executed lane scope only", status="FAIL" if error or failed else "PASS_IN_EXECUTED_LANE_SCOPE", failure=error, failed_gates=failed, r5_verdict="NOT DETERMINED BY THIS LANE", release="BLOCKED PENDING COMPLETE R5 RECONCILIATION", gate_count=len(rec.rows)))
         save(rec.evidence / "evidence-hashes.json", {str(p.relative_to(rec.evidence)): digest(p) for p in sorted(rec.evidence.rglob("*")) if p.is_file() and p.name != "evidence-hashes.json"})
     return 1 if error or failed else 0
 

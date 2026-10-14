@@ -1,0 +1,17 @@
+// C-GAP isolation: ordinary user enum, no iterator, no Option API, no unsafe.
+struct Wide { value: i32, marker: i128 };
+enum Envelope<T> { Value(T), Empty }
+fn make(value: i32) -> Envelope<Wide> {
+    return Envelope::Value(Wide { value: value, marker: 123456789123456789i128 });
+}
+fn main() -> i32 {
+    dec item = make(42);
+    match item {
+        Envelope::Value(v) -> {
+            if v.value != 42 { return 1; }
+            if v.marker != 123456789123456789i128 { return 2; }
+        },
+        Envelope::Empty -> { return 3; },
+    }
+    return 0;
+}
