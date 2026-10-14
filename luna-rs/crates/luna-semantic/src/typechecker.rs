@@ -6396,6 +6396,30 @@ impl<'a> TypeChecker<'a> {
 /// A comptime failure may only be suppressed as redundant when at least one
 /// error-level diagnostic is already visible to the user; otherwise the
 /// compiler must fail closed rather than drop the failure silently.
+/// DIAG-8: `E2001` (TypeMismatch) is owned by the TypeChecker phase. Other
+/// passes that detect a type mismatch construct it through this constructor.
+pub fn type_mismatch_diagnostic(message: String, span: luna_common::Span) -> Diagnostic {
+    Diagnostic::error(message)
+        .with_code(DiagnosticCode::TypeMismatch)
+        .with_span(span)
+}
+
+/// DIAG-8: `E2016` (LifetimeConstraintViolation) is owned by the TypeChecker
+/// phase; the borrow checker routes its structured region failures here rather
+/// than constructing the diagnostic itself. A missing span is left absent rather
+/// than fabricating a placeholder location.
+pub fn lifetime_constraint_violation(
+    message: String,
+    span: Option<luna_common::Span>,
+) -> Diagnostic {
+    let diagnostic = Diagnostic::error(message)
+        .with_code(DiagnosticCode::LifetimeConstraintViolation);
+    match span {
+        Some(span) => diagnostic.with_span(span),
+        None => diagnostic,
+    }
+}
+
 fn any_error_emitted(diagnostics: &[luna_common::Diagnostic]) -> bool {
     diagnostics
         .iter()

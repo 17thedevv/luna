@@ -18,11 +18,14 @@ pub enum MoveState {
 pub struct MoveStateData {
     pub is_unvisited: bool,
     pub places: HashMap<Place, MoveState>,
+    /// DIAG-3/9: the instruction that moved or dropped each place, used as the
+    /// structural origin label of use-after-move / use-after-drop diagnostics.
+    pub sites: HashMap<Place, luna_common::Span>,
 }
 
 impl Default for MoveStateData {
     fn default() -> Self {
-        Self { is_unvisited: true, places: HashMap::new() }
+        Self { is_unvisited: true, places: HashMap::new(), sites: HashMap::new() }
     }
 }
 
@@ -113,42 +116,61 @@ impl<'a> MoveAnalyzer<'a> {
         }
         
         let span = self.func.values[val_id.0 as usize].span.clone();
-        if loc_state == MoveState::Moved {
-            let msg = format!("Use of moved value '{}'", formatted_name);
-            if !self.diagnostics.iter().any(|d| d.message == msg) {
-                let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterMove);
-                diag.span = span.clone();
-                self.diagnostics.push(diag);
+        // DIAG-3/9: the diagnostic identity is the typed code plus the primary
+        // span, and the origin of the move/drop is attached as a structural
+        // related label instead of being restated in the message text.
+        let (code, message, origin_label) = match loc_state {
+            MoveState::Moved => (
+                DiagnosticCode::UseAfterMove,
+                format!("Use of moved value '{}'", formatted_name),
+                Some("value moved here"),
+            ),
+            MoveState::ConditionallyMoved => (
+                DiagnosticCode::UseAfterMove,
+                format!("Use of conditionally moved value '{}'", formatted_name),
+                Some("value moved here"),
+            ),
+            MoveState::Dropped => (
+                DiagnosticCode::UseAfterDrop,
+                format!("Use of dropped value '{}'", formatted_name),
+                Some("value dropped here"),
+            ),
+            MoveState::Uninitialized => (
+                DiagnosticCode::UseOfUninitializedValue,
+                format!("Use of uninitialized value '{}'", formatted_name),
+                None,
+            ),
+            MoveState::PartialMoved => (
+                DiagnosticCode::UseAfterMove,
+                format!("Use of partially moved value '{}'", formatted_name),
+                Some("value partially moved here"),
+            ),
+            MoveState::Live => return,
+        };
+        if !self.has_diagnostic(code, &span) {
+            let mut diag = Diagnostic::error(message).with_code(code);
+            diag.span = span.clone();
+            // The move may have been recorded for an ancestor place (a whole
+            // local moved before a field is read); use the nearest one.
+            let origin = state
+                .sites
+                .iter()
+                .filter(|(candidate, _)| *candidate == place || place.is_descendant_of(candidate))
+                .max_by_key(|(candidate, _)| candidate.projections.len())
+                .map(|(_, site)| site.clone());
+            if let (Some(label), Some(origin)) = (origin_label, origin) {
+                diag = diag.with_related(origin, label.to_string());
             }
-        } else if loc_state == MoveState::ConditionallyMoved {
-            let msg = format!("Use of conditionally moved value '{}'", formatted_name);
-            if !self.diagnostics.iter().any(|d| d.message == msg) {
-                let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterMove);
-                diag.span = span.clone();
-                self.diagnostics.push(diag);
-            }
-        } else if loc_state == MoveState::Dropped {
-            let msg = format!("Use of dropped value '{}'", formatted_name);
-            if !self.diagnostics.iter().any(|d| d.message == msg) {
-                let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterDrop);
-                diag.span = span.clone();
-                self.diagnostics.push(diag);
-            }
-        } else if loc_state == MoveState::Uninitialized {
-            let msg = format!("Use of uninitialized value '{}'", formatted_name);
-            if !self.diagnostics.iter().any(|d| d.message == msg) {
-                let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseOfUninitializedValue);
-                diag.span = span.clone();
-                self.diagnostics.push(diag);
-            }
-        } else if loc_state == MoveState::PartialMoved {
-            let msg = format!("Use of partially moved value '{}'", formatted_name);
-            if !self.diagnostics.iter().any(|d| d.message == msg) {
-                let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterMove);
-                diag.span = span.clone();
-                self.diagnostics.push(diag);
-            }
+            self.diagnostics.push(diag);
         }
+    }
+
+    /// DIAG-4: diagnostic identity is the typed code plus the primary span,
+    /// never the rendered message text.
+    fn has_diagnostic(&self, code: DiagnosticCode, span: &Option<luna_common::Span>) -> bool {
+        self.diagnostics
+            .iter()
+            .any(|d| d.code == Some(code) && &d.span == span)
     }
 
     fn check_operand(&mut self, op: &Operand, state: &MoveStateData, val_id: luna_mvir::ValueId) {
@@ -246,6 +268,7 @@ impl<'a> MoveAnalyzer<'a> {
                 
                 state.places.retain(|k, _| !k.is_descendant_of(&place));
                 state.places.insert(place.clone(), MoveState::Moved);
+                self.record_site(&place, state);
                 self.collapse_fully_moved_ancestors(place, state);
             }
         }
@@ -276,8 +299,29 @@ impl<'a> MoveAnalyzer<'a> {
                 break;
             }
 
+            let inherited = state
+                .sites
+                .iter()
+                .find(|(candidate, _)| candidate.is_descendant_of(&place))
+                .map(|(_, site)| site.clone());
             state.places.retain(|candidate, _| !candidate.is_descendant_of(&place));
             state.places.insert(place.clone(), MoveState::Moved);
+            if let Some(site) = inherited {
+                state.sites.insert(place.clone(), site);
+            }
+        }
+    }
+
+    /// DIAG-3/9: remember where a place was moved or dropped so the later use
+    /// can carry a structural origin label.
+    fn record_site(&self, place: &Place, state: &mut MoveStateData) {
+        let site = self
+            .func
+            .values
+            .get(self.current_instruction.0 as usize)
+            .and_then(|value| value.span.clone());
+        if let Some(site) = site {
+            state.sites.insert(place.clone(), site);
         }
     }
 
@@ -330,7 +374,8 @@ impl<'a> MoveAnalyzer<'a> {
                 let current_state = self.get_place_state(&place, state);
                 if current_state != MoveState::Moved && current_state != MoveState::Uninitialized {
                     state.places.retain(|k, _| !k.is_descendant_of(&place));
-                    state.places.insert(place, MoveState::Dropped);
+                    state.places.insert(place.clone(), MoveState::Dropped);
+                    self.record_site(&place, state);
                 }
             }
         }
@@ -707,7 +752,18 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
             if dest_state.as_ref() != Some(&new_state) {
                 if new_state == MoveState::ConditionallyMoved && k.local.0 == 5 {
                 }
-                dest.places.insert(k, new_state);
+                // DIAG-3/9: keep an origin label only while both paths agree.
+                let merged_site = match (dest.sites.get(&k).cloned(), src.sites.get(&k).cloned()) {
+                    (Some(a), Some(b)) if a == b => Some(a),
+                    (Some(a), None) => Some(a),
+                    (None, Some(b)) => Some(b),
+                    _ => None,
+                };
+                dest.places.insert(k.clone(), new_state);
+                match merged_site {
+                    Some(site) => { dest.sites.insert(k, site); }
+                    None => { dest.sites.remove(&k); }
+                }
                 changed = true;
             }
         }
