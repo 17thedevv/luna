@@ -1,0 +1,52 @@
+{
+  "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "source": "quickstart/program.ln",
+  "source_sha256": "c53554f73fe3910c5ed769d2129f95c5228ab98058d3e771401d562b6b29eac9",
+  "readme_sha256": "38f769102d87b9ba7c3604c4d1fd44cd9a0194159e159b5546bb46806ac465b3",
+  "note": "README leaves program.ln unspecified; supplied minimal canonical native entry point. Official sysroot was freshly built earlier in this acquisition.",
+  "debug_cli_sha256": "d7cc39c0511eeeea62ae33a636d73d52e71aeecca40e3ef02a51802463c5ac46",
+  "release_cli_sha256": "18fbe84c96691b1655b21757d7e3ab87a769ae1f3432501d762d739e409ce2e1",
+  "runtime_sha256": "827ef92231b32b8c4681821e3832339658e961185648033eab6d25ef678e5637",
+  "build": {
+    "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+    "label": "quickstart-build",
+    "command": [
+      "C:\\r5-9bda6f57\\windows-build\\cargo-target\\debug\\luna.exe",
+      "build",
+      "D:\\r5-9bda6f57\\windows\\quickstart\\program.ln",
+      "-o",
+      "D:\\r5-9bda6f57\\windows\\quickstart\\program.exe"
+    ],
+    "cwd": "D:\\r5-9bda6f57\\windows\\quickstart",
+    "start_utc": "2026-10-14T08:58:56.706874+00:00",
+    "end_utc": "2026-10-14T08:58:57.544775+00:00",
+    "elapsed_seconds": 0.838,
+    "exit": 0,
+    "log": "quickstart-build.log",
+    "log_sha256": "30be8d44610c3e84dc16e2a63d47fe0884c785bc71adc584cabd770a83eca33a"
+  },
+  "native": {
+    "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+    "label": "quickstart-native",
+    "command": [
+      "D:\\r5-9bda6f57\\windows\\quickstart\\program.exe"
+    ],
+    "cwd": "D:\\r5-9bda6f57\\windows\\quickstart",
+    "start_utc": "2026-10-14T08:58:57.775480+00:00",
+    "end_utc": "2026-10-14T08:58:57.819134+00:00",
+    "elapsed_seconds": 0.044,
+    "exit": 0,
+    "log": "quickstart-native.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "formats": {
+    "executable_pe64_x86_64": true,
+    "object_coff64_x86_64": true
+  },
+  "artifact_hashes": {
+    "program.exe": "4f19c6c2e47e37cbbf54cc42453cce4339943af91c33d99af5bb441b319eec47",
+    "program.ln": "c53554f73fe3910c5ed769d2129f95c5228ab98058d3e771401d562b6b29eac9",
+    "program.obj": "c371d8e14e2c189362a2aa7a22006d98b9123ae1a80b55f8d327005290d7ef4b"
+  },
+  "status": "PASS"
+}
