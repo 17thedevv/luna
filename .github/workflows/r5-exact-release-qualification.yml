@@ -43,7 +43,15 @@ jobs:
       - name: Acquire exact-candidate evidence and retain mandatory target-contract verdict
         run: >-
           python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
-          --lane normal --out "$RUNNER_TEMP/r5-normal"
+          --lane normal --skip-workspace --out "$RUNNER_TEMP/r5-normal"
+      - name: Surface lane failure reason as an annotation
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP/r5-normal/evidence/failure.txt" "$RUNNER_TEMP/r5-normal/evidence/summary.json"; do
+            if [ -f "$f" ]; then
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
+            fi
+          done
       - name: Preserve normal gate evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
@@ -76,6 +84,14 @@ jobs:
         run: >-
           python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
           --lane runtime-asan --out "$RUNNER_TEMP/r5-runtime-asan"
+      - name: Surface lane failure reason as an annotation
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP/r5-runtime-asan/evidence/failure.txt" "$RUNNER_TEMP/r5-runtime-asan/evidence/summary.json"; do
+            if [ -f "$f" ]; then
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
+            fi
+          done
       - name: Preserve runtime ASan evidence even on failure
         if: always()
         uses: actions/upload-artifact@v4
@@ -111,6 +127,14 @@ jobs:
         run: >-
           python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
           --lane comptime-vm --out "$RUNNER_TEMP/r5-comptime-vm"
+      - name: Surface lane failure reason as an annotation
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP/r5-comptime-vm/evidence/failure.txt" "$RUNNER_TEMP/r5-comptime-vm/evidence/summary.json"; do
+            if [ -f "$f" ]; then
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
+            fi
+          done
       - name: Preserve boundary evidence including mandatory target conflict
         if: always()
         uses: actions/upload-artifact@v4
