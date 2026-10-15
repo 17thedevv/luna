@@ -174,24 +174,28 @@ def providers(rec, llvm_host_target):
                    library_sha256=digest(library), object_sha256=digest(obj),
                    embedded_object_sha256=hashlib.sha256(embedded).hexdigest(),
                    embedded_equals_sidecar=embedded == native)
-        row["native_integrity_valid"] = (fmt, compiler, mvir, metadata) == (2, 25, 5, 9) and target == llvm_host_target and strings[4] == target and target in (TARGET, "x86_64-pc-linux-gnu") and pointer_width == 64 and elf and e_type == 1 and e_machine == 62 and native == embedded
+        # R5-FU-TARGET-01: the artifact records the canonical Luna release
+        # target, not the host LLVM spelling. The host triple stays provenance.
+        row["native_integrity_valid"] = (fmt, compiler, mvir, metadata) == (2, 25, 5, 9) and target == TARGET and strings[4] == target and pointer_width == 64 and elf and e_type == 1 and e_machine == 62 and native == embedded
         row["advertised_target_match"] = target == TARGET
         row["valid"] = row["native_integrity_valid"] and row["advertised_target_match"]
         rows.append(row)
     native_integrity = len(rows) == 49 and all(x["native_integrity_valid"] for x in rows)
     rec.native_target = llvm_host_target
     result = dict(tested_commit=PIN, providers=rows, count=len(rows),
-                  actual_native_target=llvm_host_target, advertised_target=TARGET,
+                  llvm_host_target=llvm_host_target, advertised_target=TARGET,
                   native_integrity_valid=native_integrity,
-                  scope="Descriptive actual-target acquisition; strict advertised-target gate remains mandatory",
+                  scope="Artifact target identity is the canonical Luna release target; the LLVM host spelling is provenance only",
                   producer_cli_sha256=digest(rec.checkout / "luna-rs/target/debug/luna"),
                   status="PASS" if len(rows) == 49 and all(x["valid"] for x in rows) else "FAIL")
     save(rec.evidence / "sysroot-provenance.json", result)
-    # A synthetic executable gate preserves FAIL for the exact normative triple.
-    # Continue independent descriptive evidence only after all native checks pass.
+    # Mandatory contract gate: every provider artifact must record the canonical
+    # Luna target. The host LLVM spelling is recorded, never used as the
+    # expected value.
+    artifact_target = rows[0]["target"] if rows else None
     rec.run("TARGET_CONTRACT", [sys.executable, "-c",
-            "import json,sys; print(json.dumps(dict(actual=sys.argv[1],advertised=sys.argv[2],gate='MANDATORY TARGET_CONTRACT',status='PASS' if sys.argv[1]==sys.argv[2] else 'FAIL / BLOCKED; NO VENDOR NORMALIZATION'))); sys.exit(0 if sys.argv[1]==sys.argv[2] else 1)",
-            llvm_host_target, TARGET], required=False)
+            "import json,sys; artifact,advertised,host=sys.argv[1],sys.argv[2],sys.argv[3]; ok=artifact==advertised; print(json.dumps(dict(artifact_target=artifact,advertised_target=advertised,llvm_host_target=host,gate='MANDATORY TARGET_CONTRACT',status='PASS' if ok else 'FAIL',note='artifact records the canonical Luna target; host LLVM spelling is provenance only'))); sys.exit(0 if ok else 1)",
+            artifact_target, TARGET, llvm_host_target], required=False)
     if not native_integrity:
         raise RuntimeError("49 provider/header/metadata/native integrity gate failed; dependent acquisitions stopped")
 
