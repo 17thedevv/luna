@@ -1,4 +1,4 @@
-﻿"""DIAG-7 structural producer inventory for the Luna diagnostic registry.
+"""DIAG-7 structural producer inventory for the Luna diagnostic registry.
 
 Produces a deterministic, machine-checked inventory of every producer of every
 code in `DiagnosticCode::ALL`:
