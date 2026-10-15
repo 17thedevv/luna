@@ -200,7 +200,7 @@ def providers(rec, llvm_host_target):
         raise RuntimeError("49 provider/header/metadata/native integrity gate failed; dependent acquisitions stopped")
 
 
-def normal(rec, provenance, *, probe_only=False):
+def normal(rec, provenance, *, probe_only=False, skip_workspace=False):
     root = rec.checkout
     for name, args in [("rustc", ["rustc", "-vV"]), ("llvm", ["llvm-config-18", "--version"]), ("llvm-host-target", ["llvm-config-18", "--host-target"]), ("cargo", ["cargo", "--version"])]:
         provenance[name] = rec.text(rec.run(name, args, cwd=root)).strip()
@@ -259,10 +259,11 @@ def normal(rec, provenance, *, probe_only=False):
         rec.run("quickstart-native", [exe], cwd=quick, required=False)
         rec.run("quickstart-object", ["file", exe, quick / "program.obj"], cwd=quick, required=False)
         save(quick / "hashes.json", {p.name: digest(p) for p in quick.iterdir() if p.is_file()})
-    workspace = ["cargo", "test", "--locked", "--manifest-path", root / "luna-rs/Cargo.toml", "--workspace"]
-    rec.run("workspace-triage", workspace + ["--no-fail-fast"], cwd=root, required=False)
-    # This is a default-parallel exact-pin execution, not a full R5 verdict.
-    rec.run("workspace-final", workspace, cwd=root, required=False)
+    if not skip_workspace:
+        workspace = ["cargo", "test", "--locked", "--manifest-path", root / "luna-rs/Cargo.toml", "--workspace"]
+        rec.run("workspace-triage", workspace + ["--no-fail-fast"], cwd=root, required=False)
+        # This is a default-parallel exact-pin execution, not a full R5 verdict.
+        rec.run("workspace-final", workspace, cwd=root, required=False)
     rec.run("protected-tree-diff", ["git", "diff", "--exit-code", "HEAD", "--", "luna-rs", "runtime", "tests", "CMakeLists.txt"], cwd=root)
 
 
@@ -287,13 +288,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--lane", choices=["normal", "runtime-asan", "comptime-vm"], required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--skip-workspace", action="store_true",
+                        help="Skip the workspace suite: the GitHub-hosted 6h job cap cannot cover it; "
+                             "the exact-pin workspace evidence is acquired in the Windows lane at the same commit")
     args = parser.parse_args()
     rec = Recorder(args.out.resolve())
     error = None
     try:
         provenance = rec.acquire()
         if args.lane in ("normal", "comptime-vm"):
-            normal(rec, provenance, probe_only=args.lane == "comptime-vm")
+            normal(rec, provenance, probe_only=args.lane == "comptime-vm", skip_workspace=args.skip_workspace)
         else:
             asan(rec)
     except Exception:
