@@ -135,6 +135,9 @@ jobs:
               echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
             fi
           done
+          for f in $(find "$RUNNER_TEMP/r5-comptime-vm/evidence" -name 'failure.txt' -o -name 'summary.json' 2>/dev/null | head -4); do
+            echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py::$f :: $(head -c 600 "$f" | tr '\n' ' ')"
+          done
       - name: Preserve boundary evidence including mandatory target conflict
         if: always()
         uses: actions/upload-artifact@v4
