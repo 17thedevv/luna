@@ -210,6 +210,11 @@ pub struct Diagnostic {
     pub span: Option<Span>,
     pub message: String,
     pub related: Vec<DiagnosticLabel>,
+    /// DIAG-2: true only for diagnostics whose subject is a provider/manifest
+    /// contract rather than a source construct. Every other diagnostic carrying
+    /// a source-range code must have a primary span; producers must fix the
+    /// span rather than fabricating a location.
+    pub contract_diagnostic: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -229,7 +234,33 @@ impl Diagnostic {
             span: None,
             message: message.into(),
             related: Vec::new(),
+            contract_diagnostic: false,
         }
+    }
+
+    /// A diagnostic about a provider/manifest contract rather than a source
+    /// construct (module identity conflicts, cyclic providers, canonical path
+    /// defects). It is declared explicitly so the DIAG-2 audit can tell a
+    /// deliberate non-source subject from a producer that forgot its span.
+    pub fn contract_error(code: DiagnosticCode, message: impl Into<String>) -> Self {
+        assert!(code.number() < 6000, "contract diagnostics carry a source-range code");
+        Self {
+            level: DiagnosticLevel::Error,
+            code: Some(code),
+            span: None,
+            message: message.into(),
+            related: Vec::new(),
+            contract_diagnostic: true,
+        }
+    }
+
+    /// DIAG-2: a source diagnostic that is neither anchored to a primary span
+    /// nor declared as a provider/manifest contract diagnostic is a defect at
+    /// its producer.
+    pub fn violates_source_anchor_contract(&self) -> bool {
+        matches!(self.code, Some(code) if code.number() < 6000)
+            && self.span.is_none()
+            && !self.contract_diagnostic
     }
 
     pub fn with_code(mut self, code: DiagnosticCode) -> Self {
@@ -305,7 +336,7 @@ impl Diagnostic {
 
         for label in &self.related {
             out.push_str(&Self { level: DiagnosticLevel::Note, code: None, span: Some(label.span),
-                message: label.message.clone(), related: Vec::new() }.render(source_manager));
+                message: label.message.clone(), related: Vec::new(), contract_diagnostic: false }.render(source_manager));
         }
         out
     }
@@ -331,7 +362,80 @@ fn display_text(text: &str, initial_column: usize) -> (String, usize) {
 #[cfg(test)]
 mod tests {
     use super::{Diagnostic, DiagnosticCode};
+    use crate::diagnostic::DiagnosticPhase;
+    use crate::ids::{FileId, Span};
     use crate::source::SourceManager;
+
+    /// DIAG-7: every registered code declares a canonical identity and span
+    /// policy. Source-range codes require a primary span from their producer;
+    /// infrastructure codes are never anchored to a source construct.
+    #[test]
+    fn every_registered_code_declares_its_identity_and_span_policy() {
+        let anchor = Span::new(FileId(0), 0, 1);
+        for code in DiagnosticCode::ALL {
+            let code = *code;
+            let number = code.number();
+            assert_eq!(code.to_string(), format!("E{number:04}"), "diagnostic identity");
+            assert_eq!(
+                DiagnosticCode::ALL
+                    .iter()
+                    .filter(|candidate| candidate.number() == number)
+                    .count(),
+                1,
+                "diagnostic number {number} must be unique"
+            );
+            let source_range = number < 6000;
+            assert_eq!(
+                source_range,
+                !matches!(code.owner(), DiagnosticPhase::Infrastructure),
+                "{code} owner must decide its span policy"
+            );
+            if source_range {
+                assert!(
+                    !Diagnostic::source_error(code, anchor, "policy")
+                        .violates_source_anchor_contract(),
+                    "{code} must be anchorable with a primary span"
+                );
+                assert!(
+                    Diagnostic::error("policy")
+                        .with_code(code)
+                        .violates_source_anchor_contract(),
+                    "{code} producer must supply a primary span"
+                );
+            } else {
+                assert!(
+                    !Diagnostic::error("policy")
+                        .with_code(code)
+                        .violates_source_anchor_contract(),
+                    "{code} infrastructure diagnostics are not source-anchored"
+                );
+            }
+        }
+    }
+
+    /// DIAG-2: a source diagnostic must carry the primary span of the construct
+    /// that produced it, or declare itself a provider/manifest contract
+    /// diagnostic. Anything else is a producer defect, never a fabricated span.
+    #[test]
+    fn source_diagnostics_are_anchored_or_declared_contract_diagnostics() {
+        let anchor = Span::new(FileId(0), 0, 4);
+        assert!(!Diagnostic::source_error(DiagnosticCode::UseAfterMove, anchor, "anchored")
+            .violates_source_anchor_contract());
+        assert!(
+            !Diagnostic::contract_error(DiagnosticCode::UnresolvedSymbol, "manifest defect")
+                .violates_source_anchor_contract()
+        );
+        assert!(
+            Diagnostic::error("producer forgot the span")
+                .with_code(DiagnosticCode::UseAfterMove)
+                .violates_source_anchor_contract()
+        );
+        assert!(
+            !Diagnostic::error("infrastructure failure")
+                .with_code(DiagnosticCode::ProviderReadFailure)
+                .violates_source_anchor_contract()
+        );
+    }
 
     #[test]
     fn candidate_labels_remain_structural_across_rendering() {

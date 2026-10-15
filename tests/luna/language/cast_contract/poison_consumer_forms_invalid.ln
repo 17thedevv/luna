@@ -1,0 +1,13 @@
+struct Record { value: i32, };
+
+fn takes(value: i32) -> i32 { return value; }
+
+fn main() -> i32 {
+    dec record = Record { value: 1 };
+    dec bad = record as i32;
+    dec call = takes(bad);
+    dec field = bad.value;
+    dec negated = -bad;
+    if bad > 0 { return call; }
+    return call + field + negated;
+}

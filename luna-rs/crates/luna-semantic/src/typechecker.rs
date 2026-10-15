@@ -3520,7 +3520,13 @@ impl<'a> TypeChecker<'a> {
                 let resolved_ty = self.ctx.types.get(ty).clone();
                 if let SemanticType::Tuple(elem_tys) = resolved_ty {
                     if elements.len() != elem_tys.len() {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("Tuple pattern has {} elements, but tuple type has {}", elements.len(), elem_tys.len())).with_code(DiagnosticCode::TypeMismatch));
+                        // DIAG-2: anchor the diagnostic at the pattern that
+                        // produced it instead of emitting a span-less error.
+                        let mut diag = Diagnostic::error(format!("Tuple pattern has {} elements, but tuple type has {}", elements.len(), elem_tys.len())).with_code(DiagnosticCode::TypeMismatch);
+                        if let Some(span) = self.pattern_elements_primary_span(elements) {
+                            diag = diag.with_span(span);
+                        }
+                        self.ctx.diagnostics.push(diag);
                     }
                     for (i, elem) in elements.iter().enumerate() {
                         if i < elem_tys.len() {
@@ -3982,7 +3988,9 @@ impl<'a> TypeChecker<'a> {
                 let cond_ty = self.typecheck_expr(condition);
                 let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                 if self.unify(bool_ty, cond_ty).is_err() {
-                    self.ctx.diagnostics.push(Diagnostic::error("if condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
+                    let mut diag = Diagnostic::error("if condition must be a boolean").with_code(DiagnosticCode::TypeMismatch);
+                    if let Some(span) = self.get_expr_span_for_diag(condition) { diag = diag.with_span(span); }
+                    self.ctx.diagnostics.push(diag);
                 }
                 self.typecheck_stmt(then_branch);
                 if let Some(else_br) = else_branch {
@@ -3993,7 +4001,9 @@ impl<'a> TypeChecker<'a> {
                 let cond_ty = self.typecheck_expr(condition);
                 let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                 if self.unify(bool_ty, cond_ty).is_err() {
-                    self.ctx.diagnostics.push(Diagnostic::error("while condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
+                    let mut diag = Diagnostic::error("while condition must be a boolean").with_code(DiagnosticCode::TypeMismatch);
+                    if let Some(span) = self.get_expr_span_for_diag(condition) { diag = diag.with_span(span); }
+                    self.ctx.diagnostics.push(diag);
                 }
                 self.loop_depth += 1;
                 self.typecheck_stmt(body);
@@ -4005,7 +4015,9 @@ impl<'a> TypeChecker<'a> {
                     let cond_ty = self.typecheck_expr(c); 
                     let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                     if self.unify(bool_ty, cond_ty).is_err() {
-                        self.ctx.diagnostics.push(Diagnostic::error("for condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
+                        let mut diag = Diagnostic::error("for condition must be a boolean").with_code(DiagnosticCode::TypeMismatch);
+                        if let Some(span) = self.get_expr_span_for_diag(c) { diag = diag.with_span(span); }
+                        self.ctx.diagnostics.push(diag);
                     }
                 }
                 if let Some(s) = step { self.typecheck_expr(s); }
@@ -4833,6 +4845,15 @@ impl<'a> TypeChecker<'a> {
                 let obj_ty_id = self.ctx.types.resolve_inference(obj_ty_id);
                 let obj_ty = self.ctx.types.get(obj_ty_id).clone();
                 let member_name = self.get_span_text(*member);
+
+                // DIAG-5: an operand whose type is already poisoned by an earlier
+                // failing boundary carries SemanticType::Error. Containment keeps
+                // the root cause as the single report instead of cascading a
+                // second member-access error from the poisoned value.
+                if matches!(obj_ty, SemanticType::Error) {
+                    self.ctx.tables.expr_types.insert(*expr_id, self.ctx.types.error_id());
+                    return self.ctx.types.error_id();
+                }
                 
                 // 1. Check if obj_ty is DynTrait or pointer/ref to DynTrait
                 let dyn_trait_sym = match &obj_ty {
@@ -5277,7 +5298,9 @@ impl<'a> TypeChecker<'a> {
                     if i == 0 {
                         elem_ty = ty;
                     } else if self.unify(elem_ty, ty).is_err() {
-                        self.ctx.diagnostics.push(Diagnostic::error("Array literal elements must have the same type").with_code(DiagnosticCode::TypeMismatch));
+                        let mut diag = Diagnostic::error("Array literal elements must have the same type").with_code(DiagnosticCode::TypeMismatch);
+                        if let Some(span) = self.get_expr_span_for_diag(el) { diag = diag.with_span(span); }
+                        self.ctx.diagnostics.push(diag);
                     }
                 }
                 self.ctx.types.intern(SemanticType::Array(elem_ty, elements.len() as u64))
@@ -6257,6 +6280,25 @@ impl<'a> TypeChecker<'a> {
         }
     }
 
+    /// DIAG-2: the primary span of a pattern so source diagnostics are anchored
+    /// at the construct that produced them rather than being emitted span-less.
+    fn pattern_primary_span(&self, pattern: &luna_ast::Pattern) -> Option<luna_common::Span> {
+        match pattern {
+            luna_ast::Pattern::Wildcard => None,
+            luna_ast::Pattern::Literal(token) => Some(token.span),
+            luna_ast::Pattern::Identifier { segments } => segments.first().copied(),
+            luna_ast::Pattern::Enum { path, .. } => path.first().copied(),
+            luna_ast::Pattern::Struct { path, .. } => path.first().copied(),
+            luna_ast::Pattern::Tuple { elements, .. } => self.pattern_elements_primary_span(elements),
+        }
+    }
+
+    fn pattern_elements_primary_span(&self, elements: &[luna_ast::PatId]) -> Option<luna_common::Span> {
+        elements
+            .iter()
+            .find_map(|element| self.pattern_primary_span(&self.arena.pats[element.0 as usize]))
+    }
+
     fn get_expr_span_for_diag(&self, expr_id: &luna_ast::ExprId) -> Option<luna_common::Span> {
         let expr = self.arena.exprs.get(expr_id.0 as usize)?;
         match expr {
@@ -6447,6 +6489,7 @@ mod comptime_failure_completeness_tests {
             span: None,
             message: String::from("just a warning"),
             related: Vec::new(),
+            contract_diagnostic: false,
         }];
         assert!(!any_error_emitted(&warnings_only), "warnings do not justify suppression");
 

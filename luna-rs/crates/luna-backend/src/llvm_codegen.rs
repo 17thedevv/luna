@@ -53,10 +53,14 @@ pub struct TargetConfig {
 impl Default for TargetConfig {
     fn default() -> Self {
         Target::initialize_all(&InitializationConfig::default());
-        let mut triple = TargetMachine::get_default_triple().as_str().to_str().unwrap_or("x86_64-pc-windows-gnu").to_string();
-        if triple.contains("-msvc") {
-            triple = triple.replace("-msvc", "-gnu");
-        }
+        let host = TargetMachine::get_default_triple().as_str().to_str().unwrap_or("x86_64-pc-windows-gnu").to_string();
+        // R5-FU-TARGET-01: the artifact records the canonical Luna release
+        // triple, not the host LLVM spelling. Hosts outside the release matrix
+        // keep their own spelling instead of being advertised as a Luna target.
+        let triple = match crate::target_matrix::canonical_supported_target(&host) {
+            Some(target) => target.triple().to_string(),
+            None => host,
+        };
         Self {
             triple,
             cpu: TargetMachine::get_host_cpu_name().to_string(),
@@ -2309,6 +2313,35 @@ mod cast_invariant_tests {
             let cast = ValueData::new(Instruction::Cast { value: Operand::Value(ValueId(0)), target_ty: target }, target, None);
             let result = backend.generate_inst(ValueId(1), &cast, &function);
             assert!(matches!(result, Err(BackendError::InvariantViolation(ref message)) if message.contains(reason)), "{result:?}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod target_selection_tests {
+    use super::*;
+
+    /// R5-FU-TARGET-01: on a supported host the artifact target identity is the
+    /// canonical Luna release triple, never the host LLVM spelling.
+    #[test]
+    fn default_target_config_records_the_canonical_luna_triple() {
+        let host = TargetMachine::get_default_triple()
+            .as_str()
+            .to_str()
+            .unwrap_or_default()
+            .to_string();
+        let config = TargetConfig::default();
+        match crate::target_matrix::canonical_supported_target(&host) {
+            Some(target) => {
+                assert_eq!(config.triple, target.triple(), "host {host}");
+                assert!(crate::target_matrix::SUPPORTED_TARGETS
+                    .iter()
+                    .any(|supported| supported.triple() == config.triple));
+            }
+            None => assert_eq!(
+                config.triple, host,
+                "hosts outside the release matrix keep their own spelling"
+            ),
         }
     }
 }

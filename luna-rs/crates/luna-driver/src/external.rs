@@ -167,10 +167,10 @@ impl ExternalComponentLoader {
 
             if driver_session.registry.is_loading(&descriptor.name) {
                 return Err(ExternalComponentError::ImportFailed(vec![
-                    luna_common::Diagnostic::error(format!(
+                    luna_common::Diagnostic::contract_error(luna_common::DiagnosticCode::CyclicModuleDependency, format!(
                         "Cyclic module dependency detected involving external component `{}`",
                         descriptor.name
-                    )).with_code(luna_common::DiagnosticCode::CyclicModuleDependency),
+                    )),
                 ]));
             }
             driver_session.registry.start_loading(&descriptor.name);
@@ -450,9 +450,9 @@ impl ExternalComponentLoader {
             return Ok(id);
         }
         if session.loading_paths.contains(&file) {
-            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::error(
-                format!("Cyclic module dependency through '{}'", descriptor.entry_file.display()))
-                .with_code(luna_common::DiagnosticCode::CyclicModuleDependency)]));
+            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::contract_error(
+                luna_common::DiagnosticCode::CyclicModuleDependency,
+                format!("Cyclic module dependency through '{}'", descriptor.entry_file.display()))]));
         }
         let mut canonical = descriptor.clone();
         if let Some(entry) = session.sysroot.get_canonical_provider(&descriptor.entry_file) {
@@ -472,9 +472,9 @@ impl ExternalComponentLoader {
         // Identical logical identities from distinct physical providers must not
         // silently reuse an earlier provider. Configuration aliases do not rename identity.
         if session.registry.interfaces.values().any(|interface| interface.name == canonical.name) {
-            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::error(
-                format!("Distinct provider '{}' conflicts with loaded identity '{}'", descriptor.entry_file.display(), canonical.name))
-                .with_code(luna_common::DiagnosticCode::DuplicateDefinition)]));
+            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::contract_error(
+                luna_common::DiagnosticCode::DuplicateDefinition,
+                format!("Distinct provider '{}' conflicts with loaded identity '{}'", descriptor.entry_file.display(), canonical.name))]));
         }
         session.loading_paths.insert(file.clone());
         let result = Self::load_uncached(&canonical, arena, session);
@@ -498,10 +498,10 @@ impl ExternalComponentLoader {
 
         if driver_session.registry.is_loading(&descriptor.name) {
             return Err(ExternalComponentError::ImportFailed(vec![
-                luna_common::Diagnostic::error(format!(
+                luna_common::Diagnostic::contract_error(luna_common::DiagnosticCode::CyclicModuleDependency, format!(
                     "Cyclic module dependency detected involving external component `{}`",
                     descriptor.name
-                )).with_code(luna_common::DiagnosticCode::CyclicModuleDependency),
+                )),
             ]));
         }
 
