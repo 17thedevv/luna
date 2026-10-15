@@ -12,7 +12,12 @@ permissions:
   contents: read
 
 env:
-  R5_TESTED_COMMIT: 9bda6f572fa5f9904379c08c625c28122fcd0c56
+  # Final implementation pin: the DIAG repair and canonical target selection are
+  # part of the tested tree (compiler25/metadata9/MVIR5/format2 unchanged).
+  R5_TESTED_COMMIT: db00b9ff1287c7a900d60e3d20c8f8340dd09091
+  # Dispatch-only by default; this pin's replay sets the flag below so the
+  # sanitized C runtime lane is acquired for the final implementation pin too.
+  R5_ASAN_REPLAY_ON_PUSH: '1'
   R5_REPOSITORY_URL: https://github.com/17thedevv/luna.git
   CARGO_TERM_COLOR: never
 
@@ -54,8 +59,9 @@ jobs:
 
   ubuntu-runtime-asan:
     name: Ubuntu GNU C runtime ABI and partial-read cleanup ASan
-    # Original narrow ASan acquisition is preserved; replay only on dispatch.
-    if: github.event_name == 'workflow_dispatch'
+    # Original narrow ASan acquisition is preserved; replays run on dispatch or
+    # when the replay flag is set for a new implementation pin.
+    if: github.event_name == 'workflow_dispatch' || env.R5_ASAN_REPLAY_ON_PUSH == '1'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     env:
