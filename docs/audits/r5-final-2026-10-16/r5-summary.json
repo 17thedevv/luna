@@ -1,0 +1,179 @@
+{
+  "task": "R5 exact release qualification \u2014 final implementation pin",
+  "date": "2026-10-16",
+  "implementation_pin": "db00b9ff1287c7a900d60e3d20c8f8340dd09091",
+  "docs_followup": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+  "candidate_before": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "windows": {
+    "build": "PASS",
+    "cli_debug_sha256": "a62533d52c4632eb3e17927c2f0925671817fce965c6e99746053a7dd580ad81",
+    "cli_release_sha256": "b6ccfc2b58b3e44ab1fced8df772f0768440f488b287a340f9e176deffcbbf98",
+    "runtime_sha256": "d077887af5adb0cb2bdb37f59f345f162ef7002601e42755b29be61c1b9ed785",
+    "provider_count": 49,
+    "artifact_target": "x86_64-pc-windows-gnu",
+    "versions": {
+      "compiler": 25,
+      "metadata": 9,
+      "mvir": 5,
+      "format": 2
+    },
+    "focused_status": "PASS",
+    "focused_batches": [
+      {
+        "label": "focused/ownership",
+        "exit": 0
+      },
+      {
+        "label": "focused/casts-views",
+        "exit": 0
+      },
+      {
+        "label": "focused/calls",
+        "exit": 0
+      },
+      {
+        "label": "focused/traits-comptime",
+        "exit": 0
+      },
+      {
+        "label": "focused/diagnostics",
+        "exit": 0
+      },
+      {
+        "label": "focused/providers",
+        "exit": 0
+      },
+      {
+        "label": "focused/arithmetic",
+        "exit": 0
+      },
+      {
+        "label": "focused/grammar-harness",
+        "exit": 0
+      },
+      {
+        "label": "focused/format-unicode",
+        "exit": 0
+      },
+      {
+        "label": "focused/artifact-target",
+        "exit": 0
+      },
+      {
+        "label": "focused/registry",
+        "exit": 0
+      },
+      {
+        "label": "focused/whole-file-io",
+        "exit": 0
+      }
+    ],
+    "diagnostics_status": "PASS",
+    "diagnostics_gates": [
+      {
+        "label": "diagnostics/registry-parity",
+        "exit": 0
+      },
+      {
+        "label": "diagnostics/code-policy",
+        "exit": 0
+      },
+      {
+        "label": "diagnostics/span-anchor",
+        "exit": 0
+      },
+      {
+        "label": "diagnostics/inventory",
+        "exit": 0
+      }
+    ],
+    "quickstart": "PASS",
+    "comptime": "PASS",
+    "workspace_triage_exit": 0,
+    "workspace_triage_passed": 1409,
+    "workspace_triage_failed": 0,
+    "workspace_triage_ignored": 1,
+    "workspace_final_exit": 0,
+    "workspace_final_passed": 1409,
+    "workspace_final_failed": 0,
+    "workspace_final_ignored": 1
+  },
+  "ubuntu": {
+    "normal": {
+      "run": 10,
+      "url": "https://github.com/17thedevv/luna/actions/runs/38859185307",
+      "tested_commit": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+      "conclusion": "success",
+      "gates": 43,
+      "failed_gates": []
+    },
+    "asan": {
+      "run": 10,
+      "url": "https://github.com/17thedevv/luna/actions/runs/38859185307",
+      "tested_commit": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+      "conclusion": "success",
+      "scope": "sanitized C runtime + RuntimeAbiTests only"
+    },
+    "comptime_vm": {
+      "run": 10,
+      "url": "https://github.com/17thedevv/luna/actions/runs/38859185307",
+      "tested_commit": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+      "conclusion": "failure",
+      "failed_gates": [
+        "comptime-vm-boundary"
+      ],
+      "host_llvm_target": "x86_64-pc-linux-gnu",
+      "advertised_target": "x86_64-unknown-linux-gnu",
+      "note": "platform/target/provider gates all pass; the nested comptime harness invocation fails on the Linux runner. Recorded as tooling debt, not a platform defect and not a PASS claim."
+    },
+    "earlier_failed_attempts": [
+      {
+        "run": 4,
+        "reason": "invalid workflow file: env is not available in jobs.<job_id>.if"
+      },
+      {
+        "run": 6,
+        "reason": "native-integrity gate still expected the host LLVM spelling"
+      },
+      {
+        "run": 7,
+        "reason": "docs-validator only, caused by a byte-order mark in the DIAG-7 inventory tool"
+      }
+    ]
+  },
+  "diag_invariants": {
+    "note": "DIAG-1..DIAG-10 repaired and re-audited at the final pin; see the repair evidence and the producer inventory."
+  },
+  "remaining_gaps": {
+    "blockers": [],
+    "deferred": [
+      {
+        "id": "UBN-CPT-01",
+        "status": "OPEN",
+        "class": "tooling-portability",
+        "must_complete_before": "ubuntu-comptime-lane",
+        "note": "nested comptime harness invocation fails on the Ubuntu runner; the same comptime/layout gate passes on Windows at the pin"
+      },
+      {
+        "id": "DIAG-COMPTIME-CODE-01",
+        "status": "OPEN",
+        "class": "diagnostic-identity",
+        "must_complete_before": "next-diagnostic-amendment",
+        "note": "E4002/E4003/E4004 are registered but no producer emits them; step/recursion limits are reported as E4005 with an E_COMPTIME_*_LIMIT message"
+      },
+      {
+        "id": "DIAG-7-COV-01",
+        "status": "OPEN",
+        "class": "behavioural-coverage",
+        "must_complete_before": "release-gate:per-code behavioural coverage",
+        "note": "17 codes have identity/span-policy coverage but no behavioural fixture reference yet"
+      }
+    ]
+  }
+}
