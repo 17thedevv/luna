@@ -21,7 +21,7 @@ import time
 import tomllib
 import traceback
 
-PIN = "db00b9ff1287c7a900d60e3d20c8f8340dd09091"
+PIN = "c085449b207b5860b1d7a79bee221c2ff3d357c3"
 REPOSITORY = "https://github.com/17thedevv/luna.git"
 TARGET = "x86_64-unknown-linux-gnu"
 
