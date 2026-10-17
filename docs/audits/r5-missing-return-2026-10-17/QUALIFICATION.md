@@ -11,7 +11,7 @@ The candidate remains at `c085449b`; no result is carried from an earlier pin.
 | --- | --- | --- |
 | Windows fresh detached clone and runtime ABI | PASS | `D:/r5-52ef3711/windows/provenance.json`, `runtime-abi.json` |
 | Windows CLI debug/release and 49 providers | PASS | `D:/r5-52ef3711/windows/build-summary.json`, `sysroot-provenance.json` |
-| Windows focused and structural diagnostics | IN PROGRESS | [Ownership](evidence/windows-ownership/ownership.json), [casts/views](evidence/windows-casts-views/casts-views.json) and [calls](evidence/windows-calls/calls.json) PASS; traits/comptime running; remaining batches and structural audit follow |
+| Windows focused and structural diagnostics | IN PROGRESS | [Ownership](evidence/windows-ownership/ownership.json), [casts/views](evidence/windows-casts-views/casts-views.json), [calls](evidence/windows-calls/calls.json) and [traits/comptime](evidence/windows-traits-comptime/traits-comptime.json) PASS; diagnostics batch running; remaining batches and structural audit follow |
 | Windows native CI at the exact pin | IN PROGRESS | [Windows CI run 1](https://github.com/17thedevv/luna/actions/runs/39032926577) |
 | Windows docs, quickstart and comptime/layout | PENDING | Exact-pin runner continues after focused |
 | Strict A5 native bounds-trap replay | PENDING | `verify_bounds_trap.py`, after Cargo completes; require L002 and actual index/length in both profiles and provider modes |
