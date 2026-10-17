@@ -2,12 +2,14 @@
 
 **DRAFT — qualification is still running. Do not publish this as a completed release.**
 
-Selected implementation: `52ef3711813ac0e2ded272f5ebe71897752766bc`.
+Selected implementation: `3a72f9464fa921410b63551f7eac03414cf51e2b`.
+Previous implementation `52ef3711` is not qualified (five Ubuntu native math link failures).
 Current remote candidate: `c085449b207b5860b1d7a79bee221c2ff3d357c3`.
 Current remote main: `401a95a872f0fdfb9840640f41cc4ac629cb17cd`.
-Refs were checked on 2026-10-17; recheck before any maintainer action.
-The [qualification report](QUALIFICATION.md) and
-[live acquisition locators](qualification-state.json) own the current status.
+Refs were checked on 2026-10-18; recheck before any maintainer action.
+The [current qualification report](../r5-linux-native-link-2026-10-18/README.md) and
+[live acquisition locators](../r5-linux-native-link-2026-10-18/qualification-state.json) own the current status.
+The [previous pin report](QUALIFICATION.md) preserves its terminal failures.
 Evidence/report commits identify the harness or recorded results; they do not
 automatically become the tested implementation pin.
 

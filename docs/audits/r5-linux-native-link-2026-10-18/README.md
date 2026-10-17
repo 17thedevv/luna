@@ -59,3 +59,17 @@ Tagging, main merge, PR creation and publication remain maintainer decisions.
 
 Skill impact: no reusable semantic or architecture rule changed; existing
 generic compiler-boundary and public CLI testing guidance covers this fix.
+
+## Active acquisition
+
+Implementation pin: `3a72f9464fa921410b63551f7eac03414cf51e2b`.
+Harness commit: `14a608660cdec0c3bb8884ab893f74acda200dcd`.
+
+- [Ubuntu normal / ASan / comptime](https://github.com/17thedevv/luna/actions/runs/39056178504)
+- [Ubuntu full workspace](https://github.com/17thedevv/luna/actions/runs/39056178775)
+- [Windows normal / full workspace](https://github.com/17thedevv/luna/actions/runs/39056178610)
+
+All three workflows were observed running through the authenticated GitHub
+connector. Final workspace jobs depend on triage success. These are acquisition
+locators, not PASS evidence; verify terminal results and artifact hashes before
+changing the verdict. The [state file](qualification-state.json) records jobs.
