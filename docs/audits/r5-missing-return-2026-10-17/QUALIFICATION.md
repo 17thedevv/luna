@@ -14,6 +14,7 @@ The candidate remains at `c085449b`; no result is carried from an earlier pin.
 | Windows focused and structural diagnostics | IN PROGRESS | Ownership batch PASS; remaining batches and structural audit follow |
 | Windows native CI at the exact pin | IN PROGRESS | [Windows CI run 1](https://github.com/17thedevv/luna/actions/runs/39032926577) |
 | Windows docs, quickstart and comptime/layout | PENDING | Exact-pin runner continues after focused |
+| Strict A5 native bounds-trap replay | PENDING | `verify_bounds_trap.py`, after Cargo completes; require L002 and actual index/length in both profiles and provider modes |
 | Windows workspace triage and default-parallel final | PENDING | Both complete invocations required; no partial run is PASS |
 | Ubuntu GNU normal and target contract | IN PROGRESS | [CI run 19](https://github.com/17thedevv/luna/actions/runs/39031984873) |
 | Ubuntu complete workspace triage and default-parallel final | IN PROGRESS | [Workspace run 1](https://github.com/17thedevv/luna/actions/runs/39032654737); normal's `--skip-workspace` does not satisfy this gate |
