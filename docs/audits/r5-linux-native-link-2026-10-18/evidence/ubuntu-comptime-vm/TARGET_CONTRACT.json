@@ -1,0 +1,20 @@
+{
+  "gate": "TARGET_CONTRACT",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "/usr/bin/python3",
+    "-c",
+    "import json,sys; artifact,advertised,host=sys.argv[1],sys.argv[2],sys.argv[3]; ok=artifact==advertised; print(json.dumps(dict(artifact_target=artifact,advertised_target=advertised,llvm_host_target=host,gate='MANDATORY TARGET_CONTRACT',status='PASS' if ok else 'FAIL',note='artifact records the canonical Luna target; host LLVM spelling is provenance only'))); sys.exit(0 if ok else 1)",
+    "x86_64-unknown-linux-gnu",
+    "x86_64-unknown-linux-gnu",
+    "x86_64-pc-linux-gnu"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-comptime-vm",
+  "started_utc": "2026-10-17T18:03:17Z",
+  "exit": 0,
+  "seconds": 0.031919150000021546,
+  "log_sha256": "2b50653974f99353d50abc8caf1d1ad9c6c227f64b3f67a921539ca1efe70475",
+  "status": "PASS",
+  "log": "TARGET_CONTRACT.log.gz",
+  "compressed_sha256": "3926ba2bb8f5278b92b68746cd5d0dbf1b42460a0ef911b31903861a8e887969"
+}

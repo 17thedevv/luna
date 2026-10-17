@@ -79,3 +79,5 @@ changing the verdict. The [state file](qualification-state.json) records jobs.
 Ubuntu ASan passed its C runtime/RuntimeAbiTests scope. The [verification](evidence/ubuntu-asan-verification.json) checks the GitHub ZIP digest, all 42 manifest files and compressed/raw hashes of all 19 gate logs. Raw logs show libasan linkage, the partial-read-capacity test executing, 100% CTest pass, and no sanitizer report. This does not certify compiler/generated-code/stdlib instrumentation.
 
 The [requirement-by-requirement matrix](REQUIREMENTS.md) keeps all remaining gates pending until their own evidence is verified.
+
+Ubuntu comptime-vm also passed: [verified artifact](evidence/ubuntu-comptime-vm-verification.json), 981 manifest files and 28 compressed/raw gate logs checked. Nested verdicts are **88 PASS / 0 FAIL / 8 CHARACTERIZED**. The eight historical final-if statement cases are not value-producing if-expression conformance. All 49 providers have canonical Linux GNU target and native ELF integrity; the protected source-tree diff is empty. This verifies the named 64-bit GNU boundary scope.
