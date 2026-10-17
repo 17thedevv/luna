@@ -11,7 +11,8 @@ The candidate remains at `c085449b`; no result is carried from an earlier pin.
 | --- | --- | --- |
 | Windows fresh detached clone and runtime ABI | PASS | `D:/r5-52ef3711/windows/provenance.json`, `runtime-abi.json` |
 | Windows CLI debug/release and 49 providers | PASS | `D:/r5-52ef3711/windows/build-summary.json`, `sysroot-provenance.json` |
-| Windows focused and structural diagnostics | IN PROGRESS | Focused ownership batch running; structural audit follows |
+| Windows focused and structural diagnostics | IN PROGRESS | Ownership batch PASS; remaining batches and structural audit follow |
+| Windows native CI at the exact pin | IN PROGRESS | [Windows CI run 1](https://github.com/17thedevv/luna/actions/runs/39032926577) |
 | Windows docs, quickstart and comptime/layout | PENDING | Exact-pin runner continues after focused |
 | Windows workspace triage and default-parallel final | PENDING | Both complete invocations required; no partial run is PASS |
 | Ubuntu GNU normal and target contract | IN PROGRESS | [CI run 19](https://github.com/17thedevv/luna/actions/runs/39031984873) |
@@ -78,3 +79,21 @@ Collect and verify the other exact-pin lane results, resolve failures if any,
 then reconcile the report, public documentation, target matrix and limitations.
 Only advance the candidate when every required gate is proven. Tagging, merging
 main, creating a PR and publication remain maintainer decisions.
+
+## Windows CI acquisition
+
+The checklist also requires Windows native CI identity and job URLs. The local
+fresh-clone lane supplies its own native and full-workspace evidence, but does
+not by itself prove that CI requirement. A dedicated Windows job now repeats
+native build/runtime/sysroot, all focused batches, structural diagnostics,
+documentation examples, quickstart and comptime acquisition at the same pin.
+Complete Windows workspace triage/final remain required from the local lane.
+
+CI harness commit: `23ff7e8aea176fe4ff44d0104fe2e84ffd083a2c`.
+The job acquires the development distribution from the official
+[LLVM 18.1.8 release](https://github.com/llvm/llvm-project/releases/tag/llvmorg-18.1.8),
+records the acquired archive hash and verifies required tools/import library.
+It verifies the actual GNU compiler target and rebuilds the native runtime;
+the [Windows runner image](https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md)
+is only toolchain setup context, not conformance evidence. The Rust compiler's
+MSVC host identity does not advertise a Luna MSVC target.
