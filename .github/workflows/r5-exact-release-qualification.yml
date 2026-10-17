@@ -138,15 +138,16 @@ jobs:
           for f in $(find "$RUNNER_TEMP/r5-comptime-vm/evidence" -name 'failure.txt' -o -name 'summary.json' 2>/dev/null | head -4); do
             echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py::$f :: $(head -c 600 "$f" | tr '\n' ' ')"
           done
-          log="$RUNNER_TEMP/r5-comptime-vm/comptime-vm-boundary.log"
+          log="$RUNNER_TEMP/r5-comptime-vm/evidence/comptime-vm-boundary.log.gz"
           if [ -f "$log" ]; then
-            count=$(grep -Fc '"result": "FAIL"' "$log" || true)
+            count=$(zgrep -Fc '"result": "FAIL"' "$log" || true)
             echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py,line=1::FAIL verdicts=$count"
             n=2
-            grep -F '"result": "FAIL"' "$log" | head -6 | cut -c1-200 | while IFS= read -r line; do
-              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py,line=$n::$(printf '%s' "$line" | tr -d '\n' | tr -d '\r')"
+            zgrep -F '"result": "FAIL"' "$log" | head -6 | cut -c1-200 | while IFS= read -r line; do
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py,line=$n::$(printf '%s' "$line" | tr -d '\r')"
               n=$((n+1))
             done
+            echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py,line=9::tail $(zcat "$log" | tail -c 260 | tr '\n' ' ' | tr -d '\r')"
           fi
       - name: Preserve boundary evidence including mandatory target conflict
         if: always()
