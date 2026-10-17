@@ -15,7 +15,7 @@ P.add_argument("--label", default="acquisition1")
 P.add_argument("--critical-only", action="store_true")
 A = P.parse_args()
 ROOT = pathlib.Path(__file__).resolve().parent
-PIN = "c085449b207b5860b1d7a79bee221c2ff3d357c3"
+PIN = "5d20e57156038a4b43c11734a9b4bd5ce58cd206"
 OUT = ROOT / A.label
 OUT.mkdir(exist_ok=False)
 plan = json.loads((ROOT / "plan.json").read_text(encoding="utf-8"))
