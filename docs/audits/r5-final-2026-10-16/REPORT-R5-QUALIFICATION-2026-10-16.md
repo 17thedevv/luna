@@ -2,7 +2,8 @@
 
 **Ngày**: 2026-10-16
 **Task**: R5 exact release qualification cho pin implementation cuối cùng sau repair wave DIAG.
-**Base (pin R5 gốc)**: `9bda6f572fa5f9904379c08c625c28122fcd0c56` (candidate `luna-0.1-alpha.1-candidate` — **chưa** fast-forward)
+**Base (pin R5 gốc)**: `9bda6f572fa5f9904379c08c625c28122fcd0c56` (candidate `luna-0.1-alpha.1-candidate` trước closure)
+**Candidate sau closure**: `c085449b207b5860b1d7a79bee221c2ff3d357c3` — đã **fast-forward** từ `9bda6f57` (fast-forward, không force)
 **Implementation SHA**: `db00b9ff1287c7a900d60e3d20c8f8340dd09091` (branch `r5-diag-repair`, đã push)
 **Docs follow-up của pin**: `c085449b207b5860b1d7a79bee221c2ff3d357c3` (chỉ sửa BOM trong `docs/tools/diag_producer_inventory.py`)
 **Code tree**: `luna-rs`, `runtime`, `tests` **giống hệt byte-for-byte** giữa `db00b9ff` và `c085449b` (tree objects `0861dcad004e`, `60cb194d21d5`, `ba52039a110e`) ⇒ pin implementation không bị vô hiệu, đây là docs-only follow-up.
@@ -56,8 +57,8 @@ Ghi chú liveness: `workspace-final` lần đầu bị **host session kết thú
 | Lane | Run | Kết quả |
 | --- | --- | --- |
 | **Ubuntu GNU normal** (build + sysroot target contract + focused + docs + quickstart, `--skip-workspace`) | #10 `38859185307` @ `c085449b` | **SUCCESS — 43/43 gate** |
-| **Ubuntu runtime ASan** (sanitized C runtime + RuntimeAbiTests) | #10 `38859185307` | **SUCCESS** |
-| Ubuntu comptime-vm (portable boundary probe) | #10 `38859185307` | **FAIL** — 28 gate khác PASS, chỉ `comptime-vm-boundary` fail |
+| **Ubuntu runtime ASan** (sanitized C runtime + RuntimeAbiTests) | #16 `39009473122` @ `c085449b` | **SUCCESS** |
+| **Ubuntu comptime-vm** (portable boundary probe) | #16 `39009473122` @ `c085449b` | **SUCCESS** (sau khi align pin của harness lồng) |
 
 **Điểm quan trọng (giải quyết blocker R5)**: trên runner Ubuntu host LLVM báo `x86_64-pc-linux-gnu`, nhưng artifact ghi **canonical** `x86_64-unknown-linux-gnu` và **native-integrity + MANDATORY TARGET_CONTRACT đều PASS** ⇒ contract target canonical đã được enforce đúng trên Linux.
 
@@ -66,6 +67,7 @@ Ba lần fail trước đó của lane CI đều là lỗi công cụ, đã sử
 - run #6: harness còn kỳ vọng artifact target bằng spelling host LLVM (giả định pre-repair) → đã align theo contract đã adopt.
 - run #7/#9: chỉ `docs-validator` fail do BOM trong tool DIAG-7 → sửa docs-only, đưa pin tested lên `c085449b`.
 - run #7b (trước đó): job bị **cancel ở đúng 6h00m** do cap 6 giờ của GitHub-hosted runner khi lane còn chạy cả workspace → tách workspace khỏi lane normal (workspace evidence lấy từ lane Windows cùng pin).
+- run #11..#15 (lane comptime-vm): gate `comptime-vm-boundary` fail vì **harness lồng còn hardcode pin `9bda6f57`** nên assert `HEAD == PIN` chết ngay khi khởi động (không sinh verdict nào: `FAIL verdicts=0`). Đã đưa pin harness lồng về đúng pin tested → lane **PASS** ở run #16. Việc đọc được nguyên nhân này là nhờ bổ sung bước đưa failure summary + verdict vào workflow annotation (log CI cần quyền admin nên không tải trực tiếp được).
 
 ---
 
@@ -84,7 +86,7 @@ Ba lần fail trước đó của lane CI đều là lỗi công cụ, đã sử
 | --- | --- |
 | Windows x86_64 GNU (`x86_64-pc-windows-gnu`) | **VERIFIED** (build + 49 provider + focused + diagnostics + comptime + quickstart + workspace 1409/0) |
 | Linux x86_64 GNU (`x86_64-unknown-linux-gnu`) | **VERIFIED** cho platform/ABI/target-contract/focused/docs/quickstart (lane normal 43 gate) + sanitized runtime ASan |
-| Ubuntu comptime-vm (portable boundary probe) | **NOT VERIFIED** — debt công cụ `UBN-CPT-01` |
+| Ubuntu comptime-vm (portable boundary probe) | **VERIFIED** (run #16 sau khi align pin harness lồng) |
 | macOS / 32-bit / freestanding | **không advertised** (ngoài release matrix, không canonicalize) |
 
 ---
@@ -94,7 +96,7 @@ Ba lần fail trước đó của lane CI đều là lỗi công cụ, đã sử
 **Blockers**: không.
 
 **Deferred debt** (đã ghi trong `r5-summary.json`):
-- `UBN-CPT-01` — tooling-portability: lời gọi harness comptime lồng fail trên runner Ubuntu. Coverage comptime/layout tại cùng pin đã PASS ở lane Windows; không claim PASS cho lane này. MUST-COMPLETE-BEFORE: ubuntu-comptime-lane.
+- `UBN-CPT-01` — **RESOLVED**: pin của harness comptime lồng đã align về đúng pin tested; lane `ubuntu comptime-vm` PASS ở run #16.
 - `DIAG-COMPTIME-CODE-01` — diagnostic-identity: E4002/E4003/E4004 đã registered nhưng **không có producer**; step/recursion limit hiện báo **E4005** với message nêu tên `E_COMPTIME_*_LIMIT` (prose code ≠ typed code). Ghi nhận riêng, không tự đổi hành vi. MUST-COMPLETE-BEFORE: next-diagnostic-amendment.
 - `DIAG-7-COV-01` — behavioural-coverage: 17 code có coverage identity + span policy nhưng chưa có fixture/hành vi tham chiếu. MUST-COMPLETE-BEFORE: release-gate:per-code behavioural coverage.
 
@@ -104,16 +106,17 @@ Ba lần fail trước đó của lane CI đều là lỗi công cụ, đã sử
 
 ## 6. VERDICT
 
-**Release gate: SATISFIED trong phạm vi đã test** cho các lane bắt buộc — Windows GNU exact-pin (focused + diagnostics + comptime + quickstart + workspace 1409/0 final), Ubuntu GNU normal (43/43 gate, canonical target contract PASS), Ubuntu runtime ASan PASS.
+**Release gate: SATISFIED trong phạm vi đã test.** Toàn bộ lane bắt buộc PASS tại pin implementation cuối:
+- Windows GNU exact-pin: focused 12 batch + diagnostics + comptime/layout + quickstart + workspace triage/final **1409 passed / 0 failed**;
+- Ubuntu GNU normal: **43/43 gate**, bao gồm canonical target contract;
+- Ubuntu runtime ASan: PASS;
+- Ubuntu comptime-vm: PASS.
 
-**Chưa đủ điều kiện để tự động fast-forward candidate**: còn **01 lane** (`ubuntu comptime-vm`) FAIL vì debt công cụ harness, không phải lỗi platform/target — cần quyết định của maintainer (sửa harness rồi chạy lại lane, hoặc chấp nhận lane này là debt và chốt candidate trên pin này).
-
-Candidate `luna-0.1-alpha.1-candidate` **vẫn giữ** `9bda6f57`; chưa fast-forward.
+**Candidate `luna-0.1-alpha.1-candidate` đã được fast-forward `9bda6f57 → c085449b`** (`c085449b` là docs descendant của `db00b9ff`, tree `luna-rs`/`runtime`/`tests` giống hệt byte-for-byte), đúng điều kiện đã thống nhất: chỉ fast-forward khi final implementation SHA đạt toàn bộ R5 gate.
 
 ---
 
 ## 7. NEXT
 
-1. Quyết định maintainer: sửa portability harness comptime lồng rồi chạy lại lane `ubuntu comptime-vm` tại cùng pin, **hoặc** chốt candidate/closure trên pin này với lane đó là debt.
-2. Nếu chốt: fast-forward `luna-0.1-alpha.1-candidate` → `db00b9ff` (hoặc descendant docs-only của nó), rồi cập nhật ledger/closure docs.
-3. Xử lý debt theo thứ tự đã ghi (`UBN-CPT-01`, `DIAG-COMPTIME-CODE-01`, `DIAG-7-COV-01`).
+1. Xử lý debt còn lại theo thứ tự: `DIAG-COMPTIME-CODE-01` (typed code cho step/recursion limit) rồi `DIAG-7-COV-01` (behavioural coverage per-code).
+2. Không cần chạy lại lane nào cho closure này; mọi thay đổi tiếp theo ngoài docs sẽ tạo pin mới và phải refresh qualification tương ứng.
