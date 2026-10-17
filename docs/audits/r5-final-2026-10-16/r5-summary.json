@@ -1,9 +1,12 @@
 {
   "task": "R5 exact release qualification \u2014 final implementation pin",
-  "date": "2026-10-16",
+  "date": "2026-10-17",
   "implementation_pin": "db00b9ff1287c7a900d60e3d20c8f8340dd09091",
   "docs_followup": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
   "candidate_before": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "candidate_after": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+  "candidate_status": "fast-forwarded from 9bda6f57 to c085449b (docs descendant with identical luna-rs/runtime/tests trees)",
+  "verdict": "R5 release gate SATISFIED in tested scope: Windows GNU exact-pin lane, Ubuntu GNU normal (43 gates), Ubuntu runtime ASan and Ubuntu comptime-vm all PASS",
   "versions": {
     "compiler": 25,
     "metadata": 9,
@@ -114,23 +117,21 @@
       "failed_gates": []
     },
     "asan": {
-      "run": 10,
-      "url": "https://github.com/17thedevv/luna/actions/runs/38859185307",
+      "run": 16,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39009473122",
       "tested_commit": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
       "conclusion": "success",
       "scope": "sanitized C runtime + RuntimeAbiTests only"
     },
     "comptime_vm": {
-      "run": 10,
-      "url": "https://github.com/17thedevv/luna/actions/runs/38859185307",
+      "run": 16,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39009473122",
       "tested_commit": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
-      "conclusion": "failure",
-      "failed_gates": [
-        "comptime-vm-boundary"
-      ],
+      "conclusion": "success",
+      "failed_gates": [],
       "host_llvm_target": "x86_64-pc-linux-gnu",
       "advertised_target": "x86_64-unknown-linux-gnu",
-      "note": "platform/target/provider gates all pass; the nested comptime harness invocation fails on the Linux runner. Recorded as tooling debt, not a platform defect and not a PASS claim."
+      "root_cause": "the nested comptime harness still asserted HEAD == 9bda6f57 and crashed before producing any verdict; its pin now matches the tested commit, like the Ubuntu harness pin"
     },
     "earlier_failed_attempts": [
       {
@@ -144,6 +145,10 @@
       {
         "run": 7,
         "reason": "docs-validator only, caused by a byte-order mark in the DIAG-7 inventory tool"
+      },
+      {
+        "run": "7..15",
+        "reason": "comptime-vm lane: harness log path assumed uncompressed, then the nested harness pin"
       }
     ]
   },
@@ -155,10 +160,9 @@
     "deferred": [
       {
         "id": "UBN-CPT-01",
-        "status": "OPEN",
+        "status": "RESOLVED",
         "class": "tooling-portability",
-        "must_complete_before": "ubuntu-comptime-lane",
-        "note": "nested comptime harness invocation fails on the Ubuntu runner; the same comptime/layout gate passes on Windows at the pin"
+        "note": "nested comptime harness pin aligned with the tested commit; the Ubuntu comptime-vm lane now passes"
       },
       {
         "id": "DIAG-COMPTIME-CODE-01",
