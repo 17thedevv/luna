@@ -15,7 +15,7 @@ The candidate remains at `c085449b`; no result is carried from an earlier pin.
 | Windows docs, quickstart and comptime/layout | PENDING | Exact-pin runner continues after focused |
 | Windows workspace triage and default-parallel final | PENDING | Both complete invocations required; no partial run is PASS |
 | Ubuntu GNU normal and target contract | IN PROGRESS | [CI run 19](https://github.com/17thedevv/luna/actions/runs/39031984873) |
-| Ubuntu complete workspace triage and default-parallel final | PENDING | Separate exact-pin workflow; normal's `--skip-workspace` does not satisfy this gate |
+| Ubuntu complete workspace triage and default-parallel final | IN PROGRESS | [Workspace run 1](https://github.com/17thedevv/luna/actions/runs/39032654737); normal's `--skip-workspace` does not satisfy this gate |
 | Ubuntu comptime-vm | PASS IN EXECUTED SCOPE | [Verification](evidence/ubuntu-comptime-vm-verification.json), [original artifact](evidence/ubuntu-comptime-vm.zip) |
 | Ubuntu runtime ASan | PASS IN EXECUTED SCOPE | [Verification](evidence/ubuntu-asan-verification.json), [original artifact](evidence/ubuntu-asan.zip) |
 
@@ -55,6 +55,22 @@ compiler/runtime/test tree diff is empty.
 
 This is the named 64-bit GNU comptime/layout boundary scope. It does not certify
 other widths, non-GNU layout or standalone statement-position comptime execution.
+
+## Ubuntu workspace acquisition
+
+The original R5 checklist and target matrix require complete workspace evidence
+on Ubuntu as well as Windows. The normal lane deliberately omits workspace to
+fit a hosted job's time budget, so it cannot substitute for that requirement.
+The dedicated workspace workflow uses two separately acquired fresh clones of
+the same implementation pin. The final job waits for triage to pass, then runs
+`cargo test --workspace` with default parallelism. Each job independently builds
+the runtime, both CLI profiles and all 49 providers before running tests.
+
+Harness commit: `185e977328d4c2839b7fbf4903af89ce4cd0a0ae`.
+The recorder requires a nonempty completed test summary, zero failures, the
+E3004 suite in the Cargo log and a clean final checkout; it preserves compressed
+raw logs, command exits, hashes and toolchain/target identities on either result.
+This is additional acquisition for `52ef3711`, not a new implementation pin.
 
 ## Remaining closure work
 
