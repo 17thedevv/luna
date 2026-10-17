@@ -218,7 +218,7 @@ comptime { Expr } ──► [effect containment check] ──► MVIR ──► 
 $$\text{VM Memory} \not\longrightarrow \text{Runtime}$$
 $$\text{VM Value} \longrightarrow \text{Runtime Materialization} \longrightarrow \text{Runtime-Owned Representation}$$
 
-1. **Resource Escape Invariant**: No VM-allocated memory or host-bound resource may escape across the compile-time boundary into runtime code (`E_COMPTIME_RESOURCE_ESCAPE`).
+1. **Resource Escape Invariant**: No VM-allocated memory or host-bound resource may escape across the compile-time boundary into runtime code. Escaping values that cannot be materialized are reported with the registered code `E4003` (`ComptimeUnserializableEscape`).
 2. **Prohibited Escapes**:
    - VM stack pointers (`Address::Stack`, `&T`)
    - Raw VM heap pointers (`Address::Heap`, `*T`)
@@ -234,11 +234,11 @@ $$\text{VM Value} \longrightarrow \text{Runtime Materialization} \longrightarrow
 - Memory slots in the VM maintain affine states: `Uninitialized`, `Initialized`, `Moved`.
 - Reading a moved slot triggers `E_USE_OF_MOVED_VALUE`.
 - Scope exits in the VM invoke drop functions for initialized places implementing `Drop`. Moved places are skipped, preventing double-frees at compile-time.
-- Unfreed VM heap allocations at `comptime` block termination emit `E_COMPTIME_RESOURCE_LEAK`.
+- Unfreed VM heap allocations at `comptime` block termination emit the registered code `E4003` (`ComptimeUnserializableEscape`), because retained compile-time storage means the value could not be materialized on the runtime side.
 
 ### G.6 Configurable Execution Boundaries
 - The compile-time VM enforces an execution step limit (default: 1,000,000 steps) and a call recursion limit (default: 512 frames), configurable via compiler options (`--comptime-steps`, `--comptime-depth`).
-- Exceeding these limits is a fatal diagnostic (`E_COMPTIME_STEP_LIMIT`, `E_COMPTIME_RECURSION_LIMIT`), never a runtime fallback.
+- Exceeding these limits is a fatal diagnostic, never a runtime fallback: the step limit is reported with the registered code `E4002` (`ComptimeStepLimitExceeded`); the call recursion limit has no separate registered code and is reported as the general comptime evaluation failure `E4005` (`ComptimeEvaluationFailed`).
 
 ---
 

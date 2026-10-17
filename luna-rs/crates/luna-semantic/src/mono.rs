@@ -1569,11 +1569,11 @@ impl<'a> MonoCollector<'a> {
             if let Some(message) = op.error_for_type(&self.ctx.types, ty) {
                 let span = self.get_expr_span_for_diag(operand)
                     .unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                self.ctx.diagnostics.push(
-                    luna_common::Diagnostic::error(message)
-                        .with_code(luna_common::DiagnosticCode::TypeMismatch)
-                        .with_span(span)
-                );
+                // DIAG-8: E2001 is owned by the TypeChecker phase; the mono pass
+                // routes through the owner-provided constructor.
+                self.ctx
+                    .diagnostics
+                    .push(crate::typechecker::type_mismatch_diagnostic(message, span));
             }
         }
     }

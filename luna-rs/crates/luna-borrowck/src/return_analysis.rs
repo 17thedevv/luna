@@ -41,7 +41,18 @@ pub fn analyze_returns(func: &Function) -> Vec<Diagnostic> {
                     }
                 }
                 Terminator::MissingReturn => {
-                    let diag = Diagnostic::error("Function expects a return value, but control flow reaches the end without returning.".to_string()).with_code(DiagnosticCode::MissingReturnValue);
+                    // DIAG-2: anchor the diagnostic at the last instruction of
+                    // the block whose control flow falls off the end, never at a
+                    // fabricated location.
+                    let mut diag = Diagnostic::error("Function expects a return value, but control flow reaches the end without returning.".to_string()).with_code(DiagnosticCode::MissingReturnValue);
+                    if let Some(span) = block
+                        .insts
+                        .last()
+                        .and_then(|value| func.values.get(value.0 as usize))
+                        .and_then(|value| value.span.clone())
+                    {
+                        diag = diag.with_span(span);
+                    }
                     diagnostics.push(diag);
                 }
                 Terminator::Ret { .. } | Terminator::Unreachable => {}

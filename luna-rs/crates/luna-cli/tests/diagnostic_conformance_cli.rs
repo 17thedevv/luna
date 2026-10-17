@@ -125,6 +125,20 @@ fn related_spans_and_poison_containment_hold() {
         failures.push(format!("DIAG-4: expected 1 diagnostic, got {errors}: {}", render(&check)));
     }
 
+    // DIAG-5: every consumer form of a poisoned value (call argument, member
+    // access, unary negation, comparison) stays contained: the poisoned value
+    // carries SemanticType::Error, so no consumer may cascade a second error.
+    let consumers = language.join("cast_contract/poison_consumer_forms_invalid.ln");
+    let check = modes.check(&modes.source, &consumers);
+    let stderr = String::from_utf8_lossy(&check.stderr);
+    let errors = count_errors(&stderr);
+    if errors != 1 || !stderr.contains("-->") {
+        failures.push(format!(
+            "DIAG-5: expected one anchored root diagnostic, got {errors}: {}",
+            render(&check)
+        ));
+    }
+
     assert!(failures.is_empty(), "{}", failures.join("\n\n"));
 }
 

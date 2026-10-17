@@ -881,13 +881,22 @@ let val_op = Operand::Value(*val);
                                 let is_carrier_live = entry_live.map_or(false, |live| live.contains(carrier));
                                 if is_carrier_live {
                                     let provenance: Vec<Operand> = loans.iter().map(|l| l.place.clone()).collect();
-                                    let loan_span = loans.iter().next().and_then(|l| {
-                                        if (l.id.0 as usize) < func.values.len() {
-                                            func.values[l.id.0 as usize].span.clone()
-                                        } else {
-                                            None
-                                        }
-                                    });
+                                    // DIAG-6: pick the antecedent deterministically (earliest
+                                    // location, then value id) instead of an arbitrary element.
+                                    let loan_span = loans
+                                        .iter()
+                                        .filter_map(|l| {
+                                            if (l.id.0 as usize) < func.values.len() {
+                                                func.values[l.id.0 as usize]
+                                                    .span
+                                                    .clone()
+                                                    .map(|span| (span, l.id.0))
+                                            } else {
+                                                None
+                                            }
+                                        })
+                                        .min_by_key(|(span, id)| (span.file_id.0, span.start, *id))
+                                        .map(|(span, _)| span);
 
                                     let shadow_verdict = bridge.check_boundary_crossing(*carrier, &provenance, &block.label.name, &succ);
 
@@ -898,7 +907,11 @@ let val_op = Operand::Value(*val);
                                         &succ,
                                         loan_span,
                                     ) {
-                                        if !analyzer.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                                        // DIAG-4: identity is code plus primary span.
+                                        if !analyzer
+                                            .diagnostics
+                                            .iter()
+                                            .any(|d| d.code == diag.code && d.span == diag.span) {
                                             analyzer.diagnostics.push(diag.clone());
                                         }
                                     }
@@ -926,13 +939,22 @@ let val_op = Operand::Value(*val);
                                 let is_carrier_live = entry_live.map_or(false, |live| live.contains(carrier));
                                 if is_carrier_live {
                                     let provenance: Vec<Operand> = loans.iter().map(|l| l.place.clone()).collect();
-                                    let loan_span = loans.iter().next().and_then(|l| {
-                                        if (l.id.0 as usize) < func.values.len() {
-                                            func.values[l.id.0 as usize].span.clone()
-                                        } else {
-                                            None
-                                        }
-                                    });
+                                    // DIAG-6: pick the antecedent deterministically (earliest
+                                    // location, then value id) instead of an arbitrary element.
+                                    let loan_span = loans
+                                        .iter()
+                                        .filter_map(|l| {
+                                            if (l.id.0 as usize) < func.values.len() {
+                                                func.values[l.id.0 as usize]
+                                                    .span
+                                                    .clone()
+                                                    .map(|span| (span, l.id.0))
+                                            } else {
+                                                None
+                                            }
+                                        })
+                                        .min_by_key(|(span, id)| (span.file_id.0, span.start, *id))
+                                        .map(|(span, _)| span);
 
                                     let shadow_verdict = bridge.check_boundary_crossing(*carrier, &provenance, &block.label.name, &succ);
 
@@ -943,7 +965,11 @@ let val_op = Operand::Value(*val);
                                         &succ,
                                         loan_span,
                                     ) {
-                                        if !analyzer.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                                        // DIAG-4: identity is code plus primary span.
+                                        if !analyzer
+                                            .diagnostics
+                                            .iter()
+                                            .any(|d| d.code == diag.code && d.span == diag.span) {
                                             analyzer.diagnostics.push(diag.clone());
                                         }
                                     }
@@ -1575,6 +1601,9 @@ let val_op = Operand::Value(*val);
         let resolved_place = self.resolve_alias(place, state);
         let place_name = print_operand_name(resolved_place);
         let active = self.active_loans(val_id, state);
+        let mut active: Vec<Loan> = active.into_iter().collect();
+        // DIAG-6: report conflicts in a deterministic order.
+        active.sort_by_key(|loan| (loan.id.0, loan.is_rw));
         
         for loan in &active {
             if self.is_external_loan(loan, state) {
@@ -1605,7 +1634,11 @@ let val_op = Operand::Value(*val);
                     ))
                     .with_code(DiagnosticCode::BorrowConflict);
                     diag.span = self.func.values[val_id.0 as usize].span.clone();
-                    if !self.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                    // DIAG-3/9: attach the conflicting loan as a structural origin.
+                    if let Some(loan_span) = self.func.values[loan.id.0 as usize].span.clone() {
+                        diag = diag.with_related(loan_span, "conflicting borrow occurs here".to_string());
+                    }
+                    if !self.has_diagnostic(DiagnosticCode::BorrowConflict, &diag.span) {
                         self.diagnostics.push(diag);
                     }
                 } else if is_write {
@@ -1615,7 +1648,10 @@ let val_op = Operand::Value(*val);
                     ))
                     .with_code(DiagnosticCode::BorrowConflict);
                     diag.span = self.func.values[val_id.0 as usize].span.clone();
-                    if !self.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                    if let Some(loan_span) = self.func.values[loan.id.0 as usize].span.clone() {
+                        diag = diag.with_related(loan_span, "conflicting borrow occurs here".to_string());
+                    }
+                    if !self.has_diagnostic(DiagnosticCode::BorrowConflict, &diag.span) {
                         self.diagnostics.push(diag);
                     }
                 }
@@ -1623,10 +1659,21 @@ let val_op = Operand::Value(*val);
         }
     }
 
+    /// DIAG-4: diagnostic identity is the typed code plus the primary span,
+    /// never the rendered message text.
+    fn has_diagnostic(&self, code: DiagnosticCode, span: &Option<luna_common::Span>) -> bool {
+        self.diagnostics
+            .iter()
+            .any(|d| d.code == Some(code) && &d.span == span)
+    }
+
     fn issue_loan(&mut self, place: &Operand, is_rw: bool, val_id: ValueId, state: &mut BorrowStateData) {
         let resolved_place = self.resolve_alias(place, state);
         let place_name = print_operand_name(resolved_place);
         let active = self.active_loans(val_id, state);
+        let mut active: Vec<Loan> = active.into_iter().collect();
+        // DIAG-6: report conflicts in a deterministic order.
+        active.sort_by_key(|loan| (loan.id.0, loan.is_rw));
         
         if self.emit_diagnostics {
             for loan in &active {
@@ -1642,7 +1689,10 @@ let val_op = Operand::Value(*val);
                         ))
                         .with_code(DiagnosticCode::BorrowConflict);
                         diag.span = self.func.values[val_id.0 as usize].span.clone();
-                        if !self.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                        if let Some(loan_span) = self.func.values[loan.id.0 as usize].span.clone() {
+                            diag = diag.with_related(loan_span, "conflicting borrow occurs here".to_string());
+                        }
+                        if !self.has_diagnostic(DiagnosticCode::BorrowConflict, &diag.span) {
                             self.diagnostics.push(diag);
                         }
                     } else if is_rw {
@@ -1652,7 +1702,10 @@ let val_op = Operand::Value(*val);
                         ))
                         .with_code(DiagnosticCode::BorrowConflict);
                         diag.span = self.func.values[val_id.0 as usize].span.clone();
-                        if !self.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                        if let Some(loan_span) = self.func.values[loan.id.0 as usize].span.clone() {
+                            diag = diag.with_related(loan_span, "conflicting borrow occurs here".to_string());
+                        }
+                        if !self.has_diagnostic(DiagnosticCode::BorrowConflict, &diag.span) {
                             self.diagnostics.push(diag);
                         }
                     }
