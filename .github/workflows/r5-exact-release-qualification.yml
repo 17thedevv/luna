@@ -3,7 +3,7 @@ name: R5 exact-candidate Ubuntu qualification
 on:
   workflow_dispatch:
   push:
-    branches: [r5-exact-release-qualification]
+    branches: [r5-exact-release-qualification, codex/r5-missing-return]
     paths:
       - .github/workflows/r5-exact-release-qualification.yml
       - docs/audits/r5-qualification-2026-10-14/harness/**

@@ -21,7 +21,7 @@ import time
 import tomllib
 import traceback
 
-PIN = "5d20e57156038a4b43c11734a9b4bd5ce58cd206"
+PIN = os.environ.get("R5_TESTED_COMMIT", "5d20e57156038a4b43c11734a9b4bd5ce58cd206")
 REPOSITORY = "https://github.com/17thedevv/luna.git"
 TARGET = "x86_64-unknown-linux-gnu"
 
@@ -234,10 +234,11 @@ def normal(rec, provenance, *, probe_only=False, skip_workspace=False):
         ("focused-a-casts", "luna-cli", ["cast_contract_cli", "cast_poison_cli", "raw_slice_view_a5_cli", "raw_slice_provenance_cli"]),
         ("focused-c-calls", "luna-cli", ["named_arguments_cli", "default_arguments_cli", "default_omission_cli", "call_arity_cli"]),
         ("focused-c-comptime", "luna-cli", ["impl_header_metadata_cli", "projection_fallback_cli", "comptime_dependency_precision_cli", "comptime_loans_cli"]),
-        ("focused-d-diagnostics", "luna-cli", ["diagnostic_conformance_cli", "expression_span_precision_cli", "comptime_diagnostic_cascade_cli", "compiler_trust_diagnostics_cli_parity"]),
+        ("focused-d-diagnostics", "luna-cli", ["diagnostic_conformance_cli", "expression_span_precision_cli", "comptime_diagnostic_cascade_cli", "compiler_trust_diagnostics_cli_parity", "diag_per_code_coverage_cli", "missing_return_cli"]),
         ("focused-d-providers", "luna-cli", ["provider_tiers_cli", "retained_contracts_cli", "alpha_modules_cli", "module_const_storage_cli", "fresh_artifact_classification_cli"]),
         ("arithmetic-grammar-harness", "luna-cli", ["checked_arithmetic_qualification_cli", "wrapping_arithmetic_cli", "v01_grammar_acceptance_tests", "test_temp_workspace_lifecycle_cli"]),
         ("format-unicode", "luna-cli", ["stdlib_format_cli_acceptance", "char_scalar_cli_parity", "char_operator_cli_parity"]),
+        ("artifact-target", "luna-cli", ["artifact_target_contract_cli"]),
         ("whole-file-io", "luna-driver", ["whole_file_io_v1_acceptance_tests"]),
     ]
     for name, package, tests in batches:
@@ -246,6 +247,9 @@ def normal(rec, provenance, *, probe_only=False, skip_workspace=False):
             args += ["--test", target]
         rec.run(name, args + ["--", "--nocapture"], cwd=root, required=False)
     rec.run("registry-parity", ["cargo", "test", "--locked", "--manifest-path", root / "luna-rs/Cargo.toml", "-p", "luna-common", "registry_parity"], cwd=root, required=False)
+    rec.run("diagnostic-code-policy", ["cargo", "test", "--locked", "--manifest-path", root / "luna-rs/Cargo.toml", "-p", "luna-common", "every_registered_code_declares_its_identity_and_span_policy"], cwd=root, required=False)
+    rec.run("diagnostic-span-anchor", ["cargo", "test", "--locked", "--manifest-path", root / "luna-rs/Cargo.toml", "-p", "luna-common", "source_diagnostics_are_anchored_or_declared_contract_diagnostics"], cwd=root, required=False)
+    rec.run("diagnostic-inventory", [sys.executable, "docs/tools/diag_producer_inventory.py", "--check"], cwd=root, required=False)
     rec.run("docs-build", [sys.executable, "docs/tools/build_v01_docs.py"], cwd=root, required=False)
     rec.run("docs-validator", [sys.executable, "docs/tools/validate_v01_docs.py"], cwd=root, required=False)
     rec.run("docs-examples", [sys.executable, "docs/tools/check_v01_examples.py", "--gate", "--cli", debug, "--runtime-lib", build / "libluna-runtime.a", "--out", rec.evidence / "docs-examples"], cwd=root, required=False)

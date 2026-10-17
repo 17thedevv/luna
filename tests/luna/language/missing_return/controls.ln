@@ -1,0 +1,26 @@
+import "provider";
+fn nothing() { }
+async fn async_nothing() { }
+fn tail() -> i32 { 11 }
+fn branches(flag: bool) -> i32 {
+    if flag { return 3; } else { return 5; }
+}
+fn after_loop(flag: bool) -> i32 {
+    while flag { return 13; }
+    return 17;
+}
+fn unsafe_body() -> i32 { unsafe { return 19; } }
+fn main() -> i32 {
+    nothing();
+    dec future = async_nothing();
+    dec callback = || -> i32 { return 23; };
+    if callback() != 23 { return 1; }
+    if tail() != 11 { return 2; }
+    if branches(true) != 3 { return 3; }
+    if branches(false) != 5 { return 4; }
+    if after_loop(false) != 17 { return 5; }
+    if unsafe_body() != 19 { return 6; }
+    if returns::choose(false) != 9 { return 7; }
+    if returns::identity<i32>(29) != 29 { return 8; }
+    return 0;
+}

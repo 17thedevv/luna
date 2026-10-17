@@ -1,0 +1,2 @@
+fn f<T>(value: T) -> i32 { }
+fn main() -> i32 { return f<i32>(1); }
