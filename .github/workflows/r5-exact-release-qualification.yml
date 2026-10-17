@@ -140,7 +140,10 @@ jobs:
           done
           log="$RUNNER_TEMP/r5-comptime-vm/comptime-vm-boundary.log"
           if [ -f "$log" ]; then
-            echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py::nested-harness-tail :: $(tail -c 700 "$log" | tr '\n' ' ')"
+            grep -o '{"label": "[^"]*", "result": "FAIL"[^}]*}' "$log" | head -5 | while read -r line; do
+              echo "::error::comptime-vm FAILED VERDICT $line"
+            done
+            echo "::error::comptime-vm harness tail $(tail -c 400 "$log" | tr '\n' ' ')"
           fi
       - name: Preserve boundary evidence including mandatory target conflict
         if: always()
