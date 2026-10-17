@@ -235,11 +235,12 @@ def normal(rec, provenance, *, probe_only=False, skip_workspace=False):
         ("focused-c-calls", "luna-cli", ["named_arguments_cli", "default_arguments_cli", "default_omission_cli", "call_arity_cli"]),
         ("focused-c-comptime", "luna-cli", ["impl_header_metadata_cli", "projection_fallback_cli", "comptime_dependency_precision_cli", "comptime_loans_cli"]),
         ("focused-d-diagnostics", "luna-cli", ["diagnostic_conformance_cli", "expression_span_precision_cli", "comptime_diagnostic_cascade_cli", "compiler_trust_diagnostics_cli_parity", "diag_per_code_coverage_cli", "missing_return_cli"]),
-        ("focused-d-providers", "luna-cli", ["provider_tiers_cli", "retained_contracts_cli", "alpha_modules_cli", "module_const_storage_cli", "fresh_artifact_classification_cli"]),
+        ("focused-d-providers", "luna-cli", ["provider_tiers_cli", "retained_contracts_cli", "alpha_modules_cli", "module_const_storage_cli", "fresh_artifact_classification_cli", "native_math_link_cli"]),
         ("arithmetic-grammar-harness", "luna-cli", ["checked_arithmetic_qualification_cli", "wrapping_arithmetic_cli", "v01_grammar_acceptance_tests", "test_temp_workspace_lifecycle_cli"]),
         ("format-unicode", "luna-cli", ["stdlib_format_cli_acceptance", "char_scalar_cli_parity", "char_operator_cli_parity"]),
         ("artifact-target", "luna-cli", ["artifact_target_contract_cli"]),
         ("whole-file-io", "luna-driver", ["whole_file_io_v1_acceptance_tests"]),
+        ("native-math-link-regressions", "luna-driver", ["lang_namespace_contract_tests", "stdlib_phase4c_llib_parity_tests", "stdlib_phase4c_numerics"]),
     ]
     for name, package, tests in batches:
         args = ["cargo", "test", "--locked", "--no-fail-fast", "--manifest-path", root / "luna-rs/Cargo.toml", "-p", package]

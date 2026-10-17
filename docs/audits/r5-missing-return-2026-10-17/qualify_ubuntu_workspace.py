@@ -57,9 +57,10 @@ def main():
         groups = re.findall(r"test result: (?:ok|FAILED)\. (\d+) passed; (\d+) failed; (\d+) ignored;", text)
         totals = dict(groups=len(groups), passed=sum(int(x[0]) for x in groups),
                       failed=sum(int(x[1]) for x in groups), ignored=sum(int(x[2]) for x in groups),
-                      missing_return_suite_observed="Running tests/missing_return_cli.rs" in text)
-        if result["status"] != "PASS" or not groups or totals["passed"] == 0 or totals["failed"] or not totals["missing_return_suite_observed"]:
-            raise RuntimeError("Workspace did not complete with zero failures and the E3004 suite: " + json.dumps(totals))
+                      missing_return_suite_observed="Running tests/missing_return_cli.rs" in text,
+                      native_math_suite_observed="Running tests/native_math_link_cli.rs" in text)
+        if result["status"] != "PASS" or not groups or totals["passed"] == 0 or totals["failed"] or not totals["missing_return_suite_observed"] or not totals["native_math_suite_observed"]:
+            raise RuntimeError("Workspace did not complete with zero failures and both compiler regression suites: " + json.dumps(totals))
         rec.run("protected-tree-diff", ["git", "diff", "--exit-code", "HEAD", "--"], cwd=root)
     except BaseException:
         error = traceback.format_exc()

@@ -12,9 +12,9 @@ permissions:
   contents: read
 
 env:
-  # Final implementation pin: the DIAG repair and canonical target selection are
-  # part of the tested tree (compiler25/metadata9/MVIR5/format2 unchanged).
-  R5_TESTED_COMMIT: 52ef3711813ac0e2ded272f5ebe71897752766bc
+  # Implementation pin includes DIAG/E3004 repairs and generic Linux math linkage.
+  # compiler25/metadata9/MVIR5/format2 unchanged; every lane reacquires this SHA.
+  R5_TESTED_COMMIT: 3a72f9464fa921410b63551f7eac03414cf51e2b
   R5_REPOSITORY_URL: https://github.com/17thedevv/luna.git
   CARGO_TERM_COLOR: never
 
