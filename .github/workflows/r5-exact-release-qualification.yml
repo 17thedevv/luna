@@ -140,9 +140,10 @@ jobs:
           done
           log="$RUNNER_TEMP/r5-comptime-vm/comptime-vm-boundary.log"
           if [ -f "$log" ]; then
-            echo "::error::comptime-vm FAIL verdict count $(grep -Fc '"result": "FAIL"' "$log" || true)"
-            grep -F '"result": "FAIL"' "$log" | head -5 | cut -c1-320 | while IFS= read -r line; do
-              echo "::error::comptime-vm FAIL $line"
+            count=$(grep -Fc '"result": "FAIL"' "$log" || true)
+            echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py::FAIL verdicts=$count"
+            grep -F '"result": "FAIL"' "$log" | head -6 | cut -c1-200 | while IFS= read -r line; do
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py::$(printf '%s' "$line" | tr -d '\n' | tr -d '\r')"
             done
           fi
       - name: Preserve boundary evidence including mandatory target conflict
