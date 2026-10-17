@@ -11,7 +11,16 @@ otherwise. Some fixes may now be present; each original finding requires a
 fresh check before being marked closed. The merged manifest has 49 providers.
 V01-ARCH-02 is newly observed in the imported source, not the old audit.
 
-## Current reconciliation — 2026-10-14
+## Current qualification - 2026-10-18
+
+[selected-pin report](../../audits/r5-linux-native-link-2026-10-18/README.md)
+and [completion requirements](../../audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md).
+Pin `3a72f946` is qualifying after E3004 and generic Linux native math linkage
+repairs. Its C runtime ASan scope is verified; other release lanes remain in
+progress. Candidate remains `c085449b`. Release is **BLOCKED / NOT VERIFIED**;
+historical passes are not transferred to the selected pin.
+
+## Prior reconciliation — 2026-10-14
 
 The [R4 ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md)
 supersedes historical pending/open wording only within the explicitly recorded
