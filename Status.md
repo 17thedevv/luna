@@ -2,7 +2,34 @@
 
 > **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](docs/spec/0.1/README.md).
 
-# Luna 0.1 status — 2026-10-14
+# Luna 0.1 status — 2026-10-18
+
+**Release: BLOCKED / NOT VERIFIED; replacement-pin qualification IN PROGRESS.**
+Selected implementation: `3a72f9464fa921410b63551f7eac03414cf51e2b`.
+Candidate: `c085449b207b5860b1d7a79bee221c2ff3d357c3`.
+Protocol: compiler / metadata / MVIR / format **25 / 9 / 5 / 2**.
+
+The [current report](docs/audits/r5-linux-native-link-2026-10-18/README.md) and
+[completion matrix](docs/audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md)
+record the exact jobs, evidence and remaining work. Ubuntu ASan passed at the
+selected pin and its artifact/log hashes are verified. Native normal, comptime,
+and complete workspace triage/final on Windows and Ubuntu remain pending.
+
+Diagnostic E4002/E4003 debt and E3004 reachable fallthrough have implementation
+repairs and permanent regressions. The previous pin `52ef3711` failed five
+Ubuntu workspace tests due to unresolved C math symbols; its final job was
+skipped. The replacement adds generic Linux `-lm` linkage. Windows source/fresh
+artifact preflight passes, while Linux and all release gates require their own
+selected-pin results. The previous local Windows arithmetic attempt stopped
+without a completed batch and is preserved as interrupted evidence.
+
+Tagging, main merge, PR creation and publication remain maintainer decisions.
+The [draft handoff](docs/audits/r5-missing-return-2026-10-17/RELEASE-HANDOFF.md)
+records the known limitations and completion prerequisites.
+
+## Prior reconciliation - 2026-10-14
+
+The following snapshot describes its dated evidence, not the selected pin.
 
 **Release: BLOCKED / NOT VERIFIED; R5 PENDING.** R4 documentation base is
 `3f8646c654b99b67bae57ee290b7a7e23d717b40`; tested implementation is

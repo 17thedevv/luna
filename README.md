@@ -17,12 +17,18 @@ and [document inventory](docs/documentation-index.md).
 
 The baseline retains defined contracts even where implementation is incomplete.
 **Release conformance is blocked**, not certified by historical FROZEN labels.
-Current scoped status is in the [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md):
-A/C/D/E-wave closures are reconciled at candidate input `3f8646c6`, with tested
-implementation `e4f9fb53` and compiler/metadata/MVIR/format **25/9/5/2**.
-E-wave's 236/236 matrix and three workspace passes certify their Windows GNU
-tested scope. Ubuntu GNU normal/ASan and the complete structural diagnostic audit
-remain R5 obligations. See [known limitations](docs/audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md)
+Current qualification is tracked in the [2026-10-18 report](docs/audits/r5-linux-native-link-2026-10-18/README.md)
+and its [requirement matrix](docs/audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md).
+Implementation pin `3a72f946` includes the diagnostic debt closure, reachable
+missing-return rejection and Linux native math linkage repair. Its Ubuntu
+runtime ASan evidence is verified; native normal, comptime and complete workspace
+gates remain in progress. Candidate stays at `c085449b` until all gates pass.
+Protocol remains compiler/metadata/MVIR/format **25/9/5/2**.
+
+The [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)
+and later [R5 historical qualification](docs/audits/r5-final-2026-10-16/REPORT-R5-QUALIFICATION-2026-10-16.md)
+retain their exact tested scopes. Historical passes cannot certify a newer pin.
+See [current limitations](docs/audits/r5-missing-return-2026-10-17/RELEASE-HANDOFF.md)
 and the [executable R5 checklist](docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md).
 
 The historical [2026-10-02 audit](docs/audits/stdlib-2026-10-02/README.md) found compiler and

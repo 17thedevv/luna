@@ -3,7 +3,14 @@
 Contract baseline: **0.1**. Release conformance: **BLOCKED / NOT VERIFIED**.
 Consolidated 2026-10-03 at compiler revision `3dac3ac`.
 
-Implementation status reconciliation — 2026-10-14: the
+Current qualification - 2026-10-18: [selected-pin report](../../audits/r5-linux-native-link-2026-10-18/README.md)
+and [completion requirements](../../audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md).
+Pin `3a72f946` is qualifying after E3004 and generic Linux native math linkage
+repairs. Its C runtime ASan scope is verified; other release lanes remain in
+progress. Candidate remains `c085449b`. Release is **BLOCKED / NOT VERIFIED**;
+historical passes are not transferred to the selected pin.
+
+Prior implementation status reconciliation — 2026-10-14: the
 [R4 exact release ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md)
 records A/C/D/E-wave closures, candidate input `3f8646c6`, tested implementation
 `e4f9fb53` and protocol 25/9/5/2. E-wave is qualified in its Windows GNU tested
