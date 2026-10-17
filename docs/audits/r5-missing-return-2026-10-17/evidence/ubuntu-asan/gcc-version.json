@@ -1,0 +1,16 @@
+{
+  "gate": "gcc-version",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "gcc",
+    "--version"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan/checkout",
+  "started_utc": "2026-10-17T12:18:33Z",
+  "exit": 0,
+  "seconds": 0.003636524999997448,
+  "log_sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048",
+  "status": "PASS",
+  "log": "gcc-version.log.gz",
+  "compressed_sha256": "64d434179361e9470365a73cabd8e91e9fc12c1a89c0da349de18bf3e74b85d7"
+}
