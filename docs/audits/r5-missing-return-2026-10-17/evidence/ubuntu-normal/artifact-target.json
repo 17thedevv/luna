@@ -1,0 +1,26 @@
+{
+  "gate": "artifact-target",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--no-fail-fast",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "artifact_target_contract_cli",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T13:46:18Z",
+  "exit": 0,
+  "seconds": 100.22424139400027,
+  "log_sha256": "8db41c856c106ac17e0a9cccbc2f3e5f21746e0a75956b254b867e4030b4b945",
+  "status": "PASS",
+  "log": "artifact-target.log.gz",
+  "compressed_sha256": "bc31f82ee53c039a04f4a9fdec7a2abb9d46b93da4ba29acf4d44f6147987fbb"
+}

@@ -1,0 +1,8 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "artifact_sha256": "addfed4b12389ea28e5ca1e466f4a4112cb3162a7a615b099b7f615c6c17e0be",
+  "manifest_files_verified": 0,
+  "gate_logs_verified": 34,
+  "original_archive": "windows-ci.zip",
+  "status": "HASHES_VERIFIED; lane verdict is retained in summary, not overridden"
+}

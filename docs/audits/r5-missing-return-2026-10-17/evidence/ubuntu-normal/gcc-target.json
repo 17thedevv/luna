@@ -1,0 +1,16 @@
+{
+  "gate": "gcc-target",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "gcc",
+    "-dumpmachine"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T12:18:44Z",
+  "exit": 0,
+  "seconds": 0.008177615999997556,
+  "log_sha256": "08cababdf891ccbf96eb376f1e84f279f70302fb13d84e5f98637becdfc6d989",
+  "status": "PASS",
+  "log": "gcc-target.log.gz",
+  "compressed_sha256": "e8e5e9f6618ebad0031d4c14ee37483ba1239620667c0cb6cec14a55d6d22793"
+}

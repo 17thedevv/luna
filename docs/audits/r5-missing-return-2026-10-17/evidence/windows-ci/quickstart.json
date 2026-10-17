@@ -1,0 +1,13 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "status": "PASS",
+  "source_sha256": "9255fa719896a093eb9babf793b836451204444a198a63f155a9b6393de604d3",
+  "executable_sha256": "06abdc950c500f854279519c7cd00d07809865a4c6d3b5a981982e38dc0bd296",
+  "object_sha256": "e79ef45ee41b6ee630143af1313cec7eb21b5079f5a1e7c3aa82e794966173aa",
+  "formats": {
+    "executable_pe64_x86_64": true,
+    "object_coff64_x86_64": true
+  },
+  "cli_release_sha256": "5dac4627f00ff4216478e0db4e3c2dc11f9f70f0b81a18daba2254fb58d73a62",
+  "time": "2026-10-17T14:25:06.993765+00:00"
+}
