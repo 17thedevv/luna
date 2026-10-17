@@ -1,0 +1,24 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "workflow_run": 39031984873,
+  "workflow_url": "https://github.com/17thedevv/luna/actions/runs/39031984873",
+  "artifact_id": 12100218616,
+  "archive_sha256": "86608bf37a32bdd940b19e25aa377841f407fbccaa1449605a9b7ff794ab1d40",
+  "archive_matches_github_digest": true,
+  "manifest_files_verified": 981,
+  "gate_logs_verified": 28,
+  "expected_nonzero_gate": "detached: git symbolic-ref -q HEAD exits 1",
+  "raw_and_compressed_hashes_verified": true,
+  "comptime": {
+    "pass_count": 88,
+    "fail_count": 0,
+    "characterization_count": 8,
+    "characterizations_are_not_passes": true
+  },
+  "target_contract": "49 native provider bundles with canonical x86_64-unknown-linux-gnu; host LLVM spelling recorded separately",
+  "protected_tree_diff_empty": true,
+  "scope": "64-bit GNU comptime/layout boundary and named fixtures only",
+  "archive_contains_complete_manifest": true,
+  "extracted_summary_files_are_subset": true,
+  "status": "PASS_IN_EXECUTED_SCOPE"
+}

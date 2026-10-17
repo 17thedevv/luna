@@ -1,5 +1,5 @@
 {
-  "observed_at_utc": "2026-10-17T12:22:32.652406+00:00",
+  "observed_at_utc": "2026-10-17T12:24:35.055780+00:00",
   "status": "QUALIFICATION_IN_PROGRESS",
   "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
   "harness_commit": "0301ff9e824299f95b06a63e297fe08bae40a6a6",
@@ -38,6 +38,11 @@
       "status": "PASS_IN_EXECUTED_SCOPE",
       "artifact_id": 12100293080,
       "verification": "evidence/ubuntu-asan-verification.json"
+    },
+    "comptime_vm": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "artifact_id": 12100218616,
+      "verification": "evidence/ubuntu-comptime-vm-verification.json"
     }
   },
   "previous_pin": {

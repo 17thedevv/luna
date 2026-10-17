@@ -10,12 +10,12 @@ The candidate remains at `c085449b`; no result is carried from an earlier pin.
 | Required evidence | Current result | Evidence |
 | --- | --- | --- |
 | Windows fresh detached clone and runtime ABI | PASS | `D:/r5-52ef3711/windows/provenance.json`, `runtime-abi.json` |
-| Windows CLI debug/release and 49 providers | IN PROGRESS | Same lane; debug build passed, release build running |
-| Windows focused and structural diagnostics | PENDING | Exact-pin runner continues after build |
+| Windows CLI debug/release and 49 providers | PASS | `D:/r5-52ef3711/windows/build-summary.json`, `sysroot-provenance.json` |
+| Windows focused and structural diagnostics | IN PROGRESS | Focused ownership batch running; structural audit follows |
 | Windows docs, quickstart and comptime/layout | PENDING | Exact-pin runner continues after focused |
 | Windows workspace triage and default-parallel final | PENDING | Both complete invocations required; no partial run is PASS |
 | Ubuntu GNU normal and target contract | IN PROGRESS | [CI run 19](https://github.com/17thedevv/luna/actions/runs/39031984873) |
-| Ubuntu comptime-vm | IN PROGRESS | Same CI run |
+| Ubuntu comptime-vm | PASS IN EXECUTED SCOPE | [Verification](evidence/ubuntu-comptime-vm-verification.json), [original artifact](evidence/ubuntu-comptime-vm.zip) |
 | Ubuntu runtime ASan | PASS IN EXECUTED SCOPE | [Verification](evidence/ubuntu-asan-verification.json), [original artifact](evidence/ubuntu-asan.zip) |
 
 ## Ubuntu ASan verification
@@ -35,6 +35,25 @@ check and scope record confirm libasan linkage and
 
 This verifies the sanitized C runtime and RuntimeAbiTests only. Generated Luna
 executables, compiler and stdlib are not claimed to be fully instrumented.
+
+## Ubuntu comptime-vm verification
+
+The original artifact's SHA-256 matches GitHub's published digest:
+`86608bf37a32bdd940b19e25aa377841f407fbccaa1449605a9b7ff794ab1d40`.
+All 981 manifest files and the compressed/raw hashes of all 28 gate logs were
+checked at acquisition. The archive preserves the full downloaded evidence;
+the extracted directory contains the summaries and key target/identity logs.
+
+The nested comptime harness reports **88 PASS, 0 FAIL, 8 CHARACTERIZED** at the
+same exact pin. The eight characterizations concern historical final-if
+statement spelling; they grant no value-producing if-expression conformance
+claim and are not counted as passes. The target gate verifies canonical
+`x86_64-unknown-linux-gnu` artifacts independently of LLVM host spelling
+`x86_64-pc-linux-gnu`, with 49 valid native provider bundles. The protected
+compiler/runtime/test tree diff is empty.
+
+This is the named 64-bit GNU comptime/layout boundary scope. It does not certify
+other widths, non-GNU layout or standalone statement-position comptime execution.
 
 ## Remaining closure work
 
