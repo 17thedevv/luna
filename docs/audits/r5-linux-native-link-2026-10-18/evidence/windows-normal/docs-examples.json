@@ -1,0 +1,22 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "docs-examples",
+  "command": [
+    "python",
+    "D:\\r5-39056178610\\windows-checkout\\docs\\tools\\check_v01_examples.py",
+    "--gate",
+    "--cli",
+    "C:\\r5b-39056178610\\cargo-target\\debug\\luna.exe",
+    "--runtime-lib",
+    "C:\\r5b-39056178610\\runtime\\libluna-runtime.a",
+    "--out",
+    "D:\\r5-39056178610\\windows\\docs-examples"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T19:53:05.546567+00:00",
+  "end_utc": "2026-10-17T19:53:28.310412+00:00",
+  "elapsed_seconds": 22.766,
+  "exit": 0,
+  "log": "docs-examples.log",
+  "log_sha256": "ee1d234d64e2dd1e550dbeefb4a663b74467900f700e6378f9291a7aa4cfed18"
+}
