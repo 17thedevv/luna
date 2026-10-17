@@ -1,5 +1,5 @@
 {
-  "observed_at_utc": "2026-10-17T12:29:18.822426+00:00",
+  "observed_at_utc": "2026-10-17T12:33:28.138508+00:00",
   "status": "QUALIFICATION_IN_PROGRESS",
   "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
   "harness_commit": "0301ff9e824299f95b06a63e297fe08bae40a6a6",
@@ -23,7 +23,19 @@
       "comptime",
       "workspace"
     ],
-    "liveness_note": "PID and session are locators, not proof of liveness. Revalidate process command line or session before waiting. Labels are immutable; never restart all into this evidence directory."
+    "liveness_note": "PID and session are locators, not proof of liveness. Revalidate process command line or session before waiting. Labels are immutable; never restart all into this evidence directory.",
+    "ci": {
+      "workflow_run": 39032926577,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39032926577",
+      "harness_commit": "23ff7e8aea176fe4ff44d0104fe2e84ffd083a2c",
+      "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+      "required_job": "windows-gnu",
+      "scope": "native build/runtime/sysroot/focused/diagnostics/docs/quickstart/comptime; local full workspace remains independently required"
+    },
+    "ownership": {
+      "status": "PASS",
+      "evidence": "evidence/windows-ownership/ownership.json"
+    }
   },
   "ubuntu": {
     "run": 19,
@@ -67,6 +79,7 @@
   "remaining": [
     "Complete exact-pin Windows gates, including workspace triage and default-parallel final",
     "Complete and verify Ubuntu full workspace triage then final from the dedicated exact-pin workflow",
+    "Complete and verify exact-pin hosted Windows native CI, including the full focused matrix",
     "Inspect all Ubuntu job results and preserve exact-pin artifacts/provenance",
     "Resolve any failures without weakening contracts or test oracles; compiler changes require a new pin",
     "Reconcile final closure report, ledger and public documentation",
