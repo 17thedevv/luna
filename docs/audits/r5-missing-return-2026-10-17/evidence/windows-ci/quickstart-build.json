@@ -1,0 +1,18 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "label": "quickstart-build",
+  "command": [
+    "C:\\r5b-39032926577\\cargo-target\\debug\\luna.exe",
+    "build",
+    "D:\\r5-39032926577\\windows\\quickstart\\program.ln",
+    "-o",
+    "D:\\r5-39032926577\\windows\\quickstart\\program.exe"
+  ],
+  "cwd": "D:\\r5-39032926577\\windows\\quickstart",
+  "start_utc": "2026-10-17T14:25:05.696899+00:00",
+  "end_utc": "2026-10-17T14:25:06.665560+00:00",
+  "elapsed_seconds": 0.969,
+  "exit": 0,
+  "log": "quickstart-build.log",
+  "log_sha256": "910a9c024194540198ccb7614ddafed80c16543fe5aa1be7ba542337aafbb18d"
+}

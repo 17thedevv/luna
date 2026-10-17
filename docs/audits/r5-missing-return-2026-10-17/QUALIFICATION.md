@@ -11,13 +11,13 @@ The candidate remains at `c085449b`; no result is carried from an earlier pin.
 | --- | --- | --- |
 | Windows fresh detached clone and runtime ABI | PASS | `D:/r5-52ef3711/windows/provenance.json`, `runtime-abi.json` |
 | Windows CLI debug/release and 49 providers | PASS | `D:/r5-52ef3711/windows/build-summary.json`, `sysroot-provenance.json` |
-| Windows focused and structural diagnostics | IN PROGRESS | [Ownership](evidence/windows-ownership/ownership.json), [casts/views](evidence/windows-casts-views/casts-views.json), [calls](evidence/windows-calls/calls.json), [traits/comptime](evidence/windows-traits-comptime/traits-comptime.json), [diagnostics including E3004](evidence/windows-diagnostics/diagnostics.json) and [providers](evidence/windows-providers/providers.json) PASS; arithmetic running; remaining batches and structural audit follow |
-| Windows native CI at the exact pin | IN PROGRESS | [Windows CI run 1](https://github.com/17thedevv/luna/actions/runs/39032926577) |
-| Windows docs, quickstart and comptime/layout | PENDING | Exact-pin runner continues after focused |
+| Windows focused and structural diagnostics | INTERRUPTED LOCALLY | [Ownership](evidence/windows-ownership/ownership.json), [casts/views](evidence/windows-casts-views/casts-views.json), [calls](evidence/windows-calls/calls.json), [traits/comptime](evidence/windows-traits-comptime/traits-comptime.json), [diagnostics including E3004](evidence/windows-diagnostics/diagnostics.json) and [providers](evidence/windows-providers/providers.json) PASS; local runner stopped during arithmetic; six completed batches remain historical evidence |
+| Windows native CI at the exact pin | PASS IN EXECUTED SCOPE | [Windows CI run 1](https://github.com/17thedevv/luna/actions/runs/39032926577) |
+| Windows docs, quickstart and comptime/layout | PASS IN HOSTED CI SCOPE | [Archived CI summary](evidence/windows-ci/ci-summary.json) |
 | Strict A5 native bounds-trap replay | PENDING | `verify_bounds_trap.py`, after Cargo completes; require L002 and actual index/length in both profiles and provider modes |
 | Windows workspace triage and default-parallel final | PENDING | Both complete invocations required; no partial run is PASS |
-| Ubuntu GNU normal and target contract | IN PROGRESS | [CI run 19](https://github.com/17thedevv/luna/actions/runs/39031984873) |
-| Ubuntu complete workspace triage and default-parallel final | IN PROGRESS | [Workspace run 1](https://github.com/17thedevv/luna/actions/runs/39032654737); normal's `--skip-workspace` does not satisfy this gate |
+| Ubuntu GNU normal and target contract | PASS: 47 GATES | [CI run 19](https://github.com/17thedevv/luna/actions/runs/39031984873) |
+| Ubuntu complete workspace triage and default-parallel final | FAIL: 1408 PASS / 5 FAIL / 1 IGNORED; FINAL SKIPPED | [Workspace run 1](https://github.com/17thedevv/luna/actions/runs/39032654737); normal's `--skip-workspace` does not satisfy this gate |
 | Ubuntu comptime-vm | PASS IN EXECUTED SCOPE | [Verification](evidence/ubuntu-comptime-vm-verification.json), [original artifact](evidence/ubuntu-comptime-vm.zip) |
 | Ubuntu runtime ASan | PASS IN EXECUTED SCOPE | [Verification](evidence/ubuntu-asan-verification.json), [original artifact](evidence/ubuntu-asan.zip) |
 
@@ -98,3 +98,9 @@ It verifies the actual GNU compiler target and rebuilds the native runtime;
 the [Windows runner image](https://github.com/actions/runner-images/blob/main/images/windows/Windows2022-Readme.md)
 is only toolchain setup context, not conformance evidence. The Rust compiler's
 MSVC host identity does not advertise a Luna MSVC target.
+
+## Terminal observation on 2026-10-18
+
+All hosted jobs have completed. Normal Ubuntu passed 47 gates; Windows CI passed its declared scope. The Ubuntu triage failed five unchanged tests due to unresolved C math symbols (`sin`, `sqrt`, `ceilf`, and others); final was skipped. See the [preserved failure analysis](evidence/ubuntu-workspace-triage/failure-analysis.json). The complete original archives, manifest hashes and compressed/raw gate-log hashes were verified for [normal](evidence/ubuntu-normal-verification.json), [workspace triage](evidence/ubuntu-workspace-triage-verification.json) and [Windows CI](evidence/windows-ci-verification.json).
+
+The local Windows runner has stopped with no terminal arithmetic result and no workspace acquisition. Its partial log is not a completed batch. The generic Linux native linker omits `-lm`; repairing that requires a new implementation pin and fresh qualification. No 52ef3711 PASS is carried to that pin. Candidate remains c085449b.

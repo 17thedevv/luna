@@ -1,6 +1,6 @@
 {
-  "observed_at_utc": "2026-10-17T13:35:51.467442+00:00",
-  "status": "QUALIFICATION_IN_PROGRESS",
+  "observed_at_utc": "2026-10-17T17:56:00.398250+00:00",
+  "status": "NOT_QUALIFIED_NEW_LINKER_FIX_REQUIRED",
   "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
   "harness_commit": "0301ff9e824299f95b06a63e297fe08bae40a6a6",
   "branch": "codex/r5-missing-return",
@@ -9,8 +9,8 @@
     "top": "D:/r5-52ef3711",
     "checkout": "D:/r5-52ef3711/windows-checkout",
     "build": "C:/r5-52ef3711/windows-build",
-    "runner_pid": 24632,
-    "exec_session_id": 42022,
+    "runner_pid": null,
+    "exec_session_id": null,
     "instrument": "D:\\r5-52ef3711\\instrument\\windows_qualification.py",
     "instrument_sha256": "5711986352d22fc5dea6b886e4826995d23c09971d8c56475a159f7698f322ac",
     "stage_order": [
@@ -30,7 +30,9 @@
       "harness_commit": "23ff7e8aea176fe4ff44d0104fe2e84ffd083a2c",
       "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
       "required_job": "windows-gnu",
-      "scope": "native build/runtime/sysroot/focused/diagnostics/docs/quickstart/comptime; local full workspace remains independently required"
+      "scope": "native build/runtime/sysroot/focused/diagnostics/docs/quickstart/comptime; local full workspace remains independently required",
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "verification": "evidence/windows-ci-verification.json"
     },
     "ownership": {
       "status": "PASS",
@@ -66,7 +68,8 @@
       "evidence": "evidence/windows-providers/providers.json",
       "passed": 8,
       "failed": 0
-    }
+    },
+    "local_status": "INTERRUPTED_DURING_FOCUSED_ARITHMETIC; no completed batch result or workspace pass"
   },
   "ubuntu": {
     "run": 19,
@@ -88,7 +91,7 @@
       "verification": "evidence/ubuntu-comptime-vm-verification.json"
     },
     "workspace": {
-      "status": "IN_PROGRESS",
+      "status": "FAIL",
       "workflow_run": 39032654737,
       "url": "https://github.com/17thedevv/luna/actions/runs/39032654737",
       "harness_commit": "185e977328d4c2839b7fbf4903af89ce4cd0a0ae",
@@ -98,7 +101,21 @@
         "ubuntu-workspace-final"
       ],
       "instrument": "qualify_ubuntu_workspace.py",
-      "note": "Do not substitute Windows workspace or the normal lane with --skip-workspace for these complete Ubuntu invocations."
+      "note": "Do not substitute Windows workspace or the normal lane with --skip-workspace for these complete Ubuntu invocations.",
+      "triage": {
+        "groups": 233,
+        "passed": 1408,
+        "failed": 5,
+        "ignored": 1
+      },
+      "final": "SKIPPED",
+      "verification": "evidence/ubuntu-workspace-triage-verification.json",
+      "failure_analysis": "evidence/ubuntu-workspace-triage/failure-analysis.json"
+    },
+    "normal": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "gates": 47,
+      "verification": "evidence/ubuntu-normal-verification.json"
     }
   },
   "previous_pin": {
@@ -108,6 +125,7 @@
     "status": "SUPERSEDED_NO_CARRY"
   },
   "remaining": [
+    "Fix generic Linux native libm linkage, select a new implementation pin and reacquire all gates; 52ef3711 results are historical only",
     "Complete exact-pin Windows gates, including workspace triage and default-parallel final",
     "Complete and verify Ubuntu full workspace triage then final from the dedicated exact-pin workflow",
     "Complete and verify exact-pin hosted Windows native CI, including the full focused matrix",

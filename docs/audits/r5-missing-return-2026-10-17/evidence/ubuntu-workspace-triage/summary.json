@@ -1,0 +1,21 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "harness_commit": "185e977328d4c2839b7fbf4903af89ce4cd0a0ae",
+  "lane": "workspace-triage",
+  "workflow_run": "39032654737",
+  "totals": {
+    "groups": 233,
+    "passed": 1408,
+    "failed": 5,
+    "ignored": 1,
+    "missing_return_suite_observed": true
+  },
+  "status": "FAIL",
+  "failure": "Traceback (most recent call last):\n  File \"/home/runner/work/luna/luna/docs/audits/r5-missing-return-2026-10-17/qualify_ubuntu_workspace.py\", line 62, in main\n    raise RuntimeError(\"Workspace did not complete with zero failures and the E3004 suite: \" + json.dumps(totals))\nRuntimeError: Workspace did not complete with zero failures and the E3004 suite: {\"groups\": 233, \"passed\": 1408, \"failed\": 5, \"ignored\": 1, \"missing_return_suite_observed\": true}\n",
+  "failed_gates": [
+    "workspace-triage"
+  ],
+  "gate_count": 27,
+  "scope": "Complete cargo test --workspace; final uses default parallelism",
+  "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION"
+}
