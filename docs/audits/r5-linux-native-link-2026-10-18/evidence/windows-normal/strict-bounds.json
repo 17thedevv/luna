@@ -1,0 +1,27 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "strict-bounds",
+  "command": [
+    "python",
+    "D:\\a\\luna\\luna\\docs\\audits\\r5-missing-return-2026-10-17\\verify_bounds_trap.py",
+    "--checkout",
+    "D:\\r5-39056178610\\windows-checkout",
+    "--debug",
+    "C:\\r5b-39056178610\\cargo-target\\debug\\luna.exe",
+    "--release",
+    "C:\\r5b-39056178610\\cargo-target\\release\\luna.exe",
+    "--runtime",
+    "C:\\r5b-39056178610\\runtime\\libluna-runtime.a",
+    "--out",
+    "D:\\r5-39056178610\\windows\\strict-bounds",
+    "--pin",
+    "3a72f9464fa921410b63551f7eac03414cf51e2b"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T19:54:48.158948+00:00",
+  "end_utc": "2026-10-17T19:54:51.552077+00:00",
+  "elapsed_seconds": 3.39,
+  "exit": 0,
+  "log": "strict-bounds.log",
+  "log_sha256": "232d8a93e286ec376324c12d8b9f3e09d9f05b6aa47f06cd0528e7150e23e2ce"
+}

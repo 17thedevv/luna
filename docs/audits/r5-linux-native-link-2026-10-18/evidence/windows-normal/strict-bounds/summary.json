@@ -1,0 +1,83 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "fixture": "D:\\r5-39056178610\\windows-checkout\\tests\\luna\\language\\raw_slice_contract\\a5_slice_index_oob_trap.ln",
+  "fixture_sha256": "351fe67354b5914a3307cb966cb5374ef68a87cce7583ee4e484ed53404d3c4e",
+  "runtime_sha256": "d054a71172b7e57915c29ff743bd37364625f01d904834291073b7710367f923",
+  "debug_sha256": "4d8cfedc3c29c9b0c653af8a44b942679ec1703c26ce10697b69c345dd3a02c5",
+  "release_sha256": "ce338f41e4e1e69f3ed090db69f4487a1e48409a954f4ce9cd89ffe882929d01",
+  "rows": [
+    {
+      "profile": "debug",
+      "mode": "source",
+      "command": [
+        "C:\\r5b-39056178610\\cargo-target\\debug\\luna.exe",
+        "build",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\debug-source\\program.ln",
+        "--quiet",
+        "-I",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\debug-source\\sysroot",
+        "-o",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\debug-source\\program.exe"
+      ],
+      "build_exit": 0,
+      "native_exit": 3221226505,
+      "expected": "L002: index 3, length 2",
+      "status": "PASS"
+    },
+    {
+      "profile": "debug",
+      "mode": "artifact",
+      "command": [
+        "C:\\r5b-39056178610\\cargo-target\\debug\\luna.exe",
+        "build",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\debug-artifact\\program.ln",
+        "--quiet",
+        "-I",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\debug-artifact\\sysroot",
+        "-o",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\debug-artifact\\program.exe"
+      ],
+      "build_exit": 0,
+      "native_exit": 3221226505,
+      "expected": "L002: index 3, length 2",
+      "status": "PASS"
+    },
+    {
+      "profile": "release",
+      "mode": "source",
+      "command": [
+        "C:\\r5b-39056178610\\cargo-target\\release\\luna.exe",
+        "build",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\release-source\\program.ln",
+        "--quiet",
+        "-I",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\release-source\\sysroot",
+        "-o",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\release-source\\program.exe"
+      ],
+      "build_exit": 0,
+      "native_exit": 3221226505,
+      "expected": "L002: index 3, length 2",
+      "status": "PASS"
+    },
+    {
+      "profile": "release",
+      "mode": "artifact",
+      "command": [
+        "C:\\r5b-39056178610\\cargo-target\\release\\luna.exe",
+        "build",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\release-artifact\\program.ln",
+        "--quiet",
+        "-I",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\release-artifact\\sysroot",
+        "-o",
+        "D:\\r5-39056178610\\windows\\strict-bounds\\release-artifact\\program.exe"
+      ],
+      "build_exit": 0,
+      "native_exit": 3221226505,
+      "expected": "L002: index 3, length 2",
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS"
+}

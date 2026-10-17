@@ -1,0 +1,3 @@
+
+luna: PANIC [L002] index out of bounds: index 3, length 2
+    at D:\r5-39056178610\windows\strict-bounds\release-artifact\program.ln:0:0

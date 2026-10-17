@@ -1,0 +1,76 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "status": "PASS",
+  "results": [
+    {
+      "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+      "label": "diagnostics/registry-parity",
+      "command": [
+        "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "luna-common",
+        "registry_parity"
+      ],
+      "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+      "start_utc": "2026-10-17T19:52:59.965615+00:00",
+      "end_utc": "2026-10-17T19:53:00.059804+00:00",
+      "elapsed_seconds": 0.094,
+      "exit": 0,
+      "log": "diagnostics/registry-parity.log",
+      "log_sha256": "d81c2f83b7bddd465371c28b52c34a874fffb66708f687758e23a42217747816"
+    },
+    {
+      "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+      "label": "diagnostics/code-policy",
+      "command": [
+        "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "luna-common",
+        "every_registered_code_declares_its_identity_and_span_policy"
+      ],
+      "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+      "start_utc": "2026-10-17T19:53:00.247313+00:00",
+      "end_utc": "2026-10-17T19:53:00.325433+00:00",
+      "elapsed_seconds": 0.079,
+      "exit": 0,
+      "log": "diagnostics/code-policy.log",
+      "log_sha256": "ca4836827bb9885c5191954e2f98d1f5e6a7e242cae45c5e33d4d15fc15d5894"
+    },
+    {
+      "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+      "label": "diagnostics/span-anchor",
+      "command": [
+        "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+        "test",
+        "-p",
+        "luna-common",
+        "source_diagnostics_are_anchored_or_declared_contract_diagnostics"
+      ],
+      "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+      "start_utc": "2026-10-17T19:53:00.512937+00:00",
+      "end_utc": "2026-10-17T19:53:00.606686+00:00",
+      "elapsed_seconds": 0.094,
+      "exit": 0,
+      "log": "diagnostics/span-anchor.log",
+      "log_sha256": "d3caabe4b86d139af601dc09f7a4f43121ff94455e1c9006d8767d3e0abe020e"
+    },
+    {
+      "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+      "label": "diagnostics/inventory",
+      "command": [
+        "python",
+        "D:\\r5-39056178610\\windows-checkout\\docs\\tools\\diag_producer_inventory.py",
+        "--check"
+      ],
+      "cwd": "D:\\r5-39056178610\\windows-checkout",
+      "start_utc": "2026-10-17T19:53:00.794667+00:00",
+      "end_utc": "2026-10-17T19:53:05.327815+00:00",
+      "elapsed_seconds": 4.532,
+      "exit": 0,
+      "log": "diagnostics/inventory.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

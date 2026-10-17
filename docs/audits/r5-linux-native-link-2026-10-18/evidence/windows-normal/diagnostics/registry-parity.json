@@ -1,0 +1,18 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "diagnostics/registry-parity",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "-p",
+    "luna-common",
+    "registry_parity"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T19:52:59.965615+00:00",
+  "end_utc": "2026-10-17T19:53:00.059804+00:00",
+  "elapsed_seconds": 0.094,
+  "exit": 0,
+  "log": "diagnostics/registry-parity.log",
+  "log_sha256": "d81c2f83b7bddd465371c28b52c34a874fffb66708f687758e23a42217747816"
+}
