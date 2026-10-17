@@ -1,5 +1,5 @@
 {
-  "observed_at_utc": "2026-10-17T12:47:17.376569+00:00",
+  "observed_at_utc": "2026-10-17T12:49:17.693064+00:00",
   "status": "QUALIFICATION_IN_PROGRESS",
   "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
   "harness_commit": "0301ff9e824299f95b06a63e297fe08bae40a6a6",
@@ -35,6 +35,12 @@
     "ownership": {
       "status": "PASS",
       "evidence": "evidence/windows-ownership/ownership.json"
+    },
+    "casts_views": {
+      "status": "PASS",
+      "evidence": "evidence/windows-casts-views/casts-views.json",
+      "passed": 8,
+      "failed": 0
     }
   },
   "ubuntu": {
