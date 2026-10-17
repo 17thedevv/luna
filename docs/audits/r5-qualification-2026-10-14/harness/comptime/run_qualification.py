@@ -15,7 +15,7 @@ P.add_argument("--label", default="acquisition1")
 P.add_argument("--critical-only", action="store_true")
 A = P.parse_args()
 ROOT = pathlib.Path(__file__).resolve().parent
-PIN = "5d20e57156038a4b43c11734a9b4bd5ce58cd206"
+PIN = os.environ.get("R5_TESTED_COMMIT", "5d20e57156038a4b43c11734a9b4bd5ce58cd206")
 OUT = ROOT / A.label
 OUT.mkdir(exist_ok=False)
 plan = json.loads((ROOT / "plan.json").read_text(encoding="utf-8"))

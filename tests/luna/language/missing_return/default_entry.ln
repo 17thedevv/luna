@@ -1,0 +1,2 @@
+fn f(value: i32 = 1) -> i32 { }
+fn main() -> i32 { return f(); }

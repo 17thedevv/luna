@@ -2671,12 +2671,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
-      "declared_unreachable_in_test": "no producer fires: a non-void body that can fall through is accepted today (recorded as a separate correctness finding)",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/missing_return_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -3195,42 +3197,42 @@
         },
         {
           "file": "luna-rs/crates/luna-mvir/src/generator.rs",
-          "line": 2277,
+          "line": 2300,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-mvir/src/generator.rs",
-          "line": 2289,
+          "line": 2312,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-mvir/src/generator.rs",
-          "line": 2298,
+          "line": 2321,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-mvir/src/generator.rs",
-          "line": 2594,
+          "line": 2617,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-mvir/src/generator.rs",
-          "line": 2815,
+          "line": 2838,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-mvir/src/generator.rs",
-          "line": 2819,
+          "line": 2842,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-mvir/src/generator.rs",
-          "line": 2834,
+          "line": 2857,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-mvir/src/generator.rs",
-          "line": 3278,
+          "line": 3301,
           "span_policy": "infrastructure"
         },
         {
@@ -3255,6 +3257,7 @@
         "luna-rs/crates/luna-cli/tests/comptime_loans_cli.rs",
         "luna-rs/crates/luna-cli/tests/default_arguments_cli.rs",
         "luna-rs/crates/luna-cli/tests/ffi_attribute_placement_cli.rs",
+        "luna-rs/crates/luna-cli/tests/missing_return_cli.rs",
         "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
         "luna-rs/crates/luna-cli/tests/nominal_layout_cli.rs",
         "luna-rs/crates/luna-cli/tests/range_inclusive_cli.rs",
