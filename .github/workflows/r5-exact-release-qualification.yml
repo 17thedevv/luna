@@ -140,10 +140,10 @@ jobs:
           done
           log="$RUNNER_TEMP/r5-comptime-vm/comptime-vm-boundary.log"
           if [ -f "$log" ]; then
-            grep -o '{"label": "[^"]*", "result": "FAIL"[^}]*}' "$log" | head -5 | while read -r line; do
-              echo "::error::comptime-vm FAILED VERDICT $line"
+            echo "::error::comptime-vm FAIL verdict count $(grep -Fc '"result": "FAIL"' "$log" || true)"
+            grep -F '"result": "FAIL"' "$log" | head -5 | cut -c1-320 | while IFS= read -r line; do
+              echo "::error::comptime-vm FAIL $line"
             done
-            echo "::error::comptime-vm harness tail $(tail -c 400 "$log" | tr '\n' ' ')"
           fi
       - name: Preserve boundary evidence including mandatory target conflict
         if: always()
