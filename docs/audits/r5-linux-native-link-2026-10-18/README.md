@@ -73,3 +73,9 @@ All three workflows were observed running through the authenticated GitHub
 connector. Final workspace jobs depend on triage success. These are acquisition
 locators, not PASS evidence; verify terminal results and artifact hashes before
 changing the verdict. The [state file](qualification-state.json) records jobs.
+
+## Verified selected-pin results
+
+Ubuntu ASan passed its C runtime/RuntimeAbiTests scope. The [verification](evidence/ubuntu-asan-verification.json) checks the GitHub ZIP digest, all 42 manifest files and compressed/raw hashes of all 19 gate logs. Raw logs show libasan linkage, the partial-read-capacity test executing, 100% CTest pass, and no sanitizer report. This does not certify compiler/generated-code/stdlib instrumentation.
+
+The [requirement-by-requirement matrix](REQUIREMENTS.md) keeps all remaining gates pending until their own evidence is verified.

@@ -1,0 +1,22 @@
+{
+  "gate": "asan-abi",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/runner/work/_temp/r5-runtime-asan/runtime-asan",
+    "-R",
+    "^RuntimeAbiTests$",
+    "--output-on-failure",
+    "--no-tests=error",
+    "-V"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan",
+  "started_utc": "2026-10-17T18:00:44Z",
+  "exit": 0,
+  "seconds": 1.735047385999998,
+  "log_sha256": "d7da1ec57a75c34ff433c577c2ef1bbdbc7de856f96e00efdf449ba462fe7135",
+  "status": "PASS",
+  "log": "asan-abi.log.gz",
+  "compressed_sha256": "b9b890b93fa5803634d8728cfc66e54ff318eece27556ba085476c330a84a7b4"
+}

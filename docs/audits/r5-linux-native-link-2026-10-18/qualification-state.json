@@ -1,5 +1,5 @@
 {
-  "observed_at_utc": "2026-10-17T18:00:43.073082+00:00",
+  "observed_at_utc": "2026-10-17T18:02:46.015511+00:00",
   "implementation_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
   "status": "QUALIFICATION_IN_PROGRESS",
   "previous_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
@@ -37,7 +37,13 @@
         117464496174,
         117464496183
       ],
-      "status": "IN_PROGRESS"
+      "status": "IN_PROGRESS",
+      "asan": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "job": 117464496174,
+        "artifact_id": 12109448075,
+        "verification": "evidence/ubuntu-asan-verification.json"
+      }
     },
     "ubuntu_workspace": {
       "id": 39056178775,
@@ -53,5 +59,6 @@
       "status": "NORMAL_AND_TRIAGE_IN_PROGRESS_FINAL_DEPENDENT"
     }
   },
-  "local_preflight": "evidence/windows-cli-preflight.json"
+  "local_preflight": "evidence/windows-cli-preflight.json",
+  "completion_matrix": "REQUIREMENTS.md"
 }
