@@ -187,8 +187,13 @@ impl<'a> TypeChecker<'a> {
                     )).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
                 }
             }
-            other => self.ctx.diagnostics.push(Diagnostic::error(format!("{context}: {other}"))
-                .with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span)),
+            other => {
+                // The registry code for the condition, not the general wrapper
+                // when a specific code is registered for it.
+                let code = other.diagnostic_code();
+                self.ctx.diagnostics.push(Diagnostic::error(format!("{context}: {other}"))
+                    .with_code(code).with_span(span))
+            }
         }
     }
     

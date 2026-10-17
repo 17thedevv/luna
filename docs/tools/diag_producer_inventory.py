@@ -45,13 +45,10 @@ RESERVED_NO_PRODUCER = {
     "E2014": "DuplicateField: struct-init field duplication is reported as E2001 today",
     "E2015": "DuplicateVariant: no producer path in 0.1",
     "E2020": "CannotCallNonFunction: call misuse is reported as E2001 today",
-    # FINDING (separate task): these three conditions currently emit E4005 with a
-    # message that names E_COMPTIME_*_LIMIT. The registered typed code is not
-    # used, so the prose code and the typed code disagree. The mismatch is
-    # recorded rather than silently changed here.
-    "E4002": "ComptimeStepLimitExceeded: produced as E4005 with an E_COMPTIME_STEP_LIMIT message today",
-    "E4003": "ComptimeUnserializableEscape: no producer path in 0.1",
-    "E4004": "ComptimePanic: no producer path in 0.1",
+    # No comptime panic/assert admission exists: the interpreter has no panic path
+    # and the semantic comptime engine has no assert builtin, so E4004 has no
+    # reachable condition in 0.1.
+    "E4004": "ComptimePanic: no comptime panic/assert condition is reachable in 0.1",
     "E5002": "InfiniteMonomorphizationRecursion: mono recursion is rejected through backend admission today",
 }
 
@@ -207,6 +204,10 @@ def validate(inventory: dict) -> list[str]:
         if not record["produced"] and not record["reserved_no_producer"]:
             problems.append(
                 f"{code} ({record['name']}): registered but no producer site, and not declared as reserved"
+            )
+        if record["produced"] and record["reserved_no_producer"]:
+            problems.append(
+                f"{code} ({record['name']}): declared as reserved but producers exist; drop the stale declaration"
             )
         for site in record["producers"]:
             if site["span_policy"] == "unanchored":

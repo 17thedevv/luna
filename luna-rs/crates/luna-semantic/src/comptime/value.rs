@@ -134,6 +134,31 @@ pub enum ComptimeError {
     Custom(String),
 }
 
+impl ComptimeError {
+    /// The typed diagnostic code registered for this failure.
+    ///
+    /// `docs/diagnostics/diagnostics-v1.md` is the authority: a condition with a
+    /// registered code must be reported with that code instead of the general
+    /// `ComptimeEvaluationFailed` wrapper, so the prose message never has to
+    /// carry a code-like name that disagrees with the typed identity.
+    pub fn diagnostic_code(&self) -> luna_common::DiagnosticCode {
+        use luna_common::DiagnosticCode;
+        match self {
+            // A compile-time value whose runtime-side materialization cannot be
+            // serialized: escaping pointers, escaping resources, and values whose
+            // compile-time storage is retained at the boundary.
+            ComptimeError::PointerEscape(_)
+            | ComptimeError::ResourceEscape(_)
+            | ComptimeError::ResourceLeak(_) => DiagnosticCode::ComptimeUnserializableEscape,
+            // Comptime execution exceeded the instruction step limit.
+            ComptimeError::StepLimitExceeded(_) => DiagnosticCode::ComptimeStepLimitExceeded,
+            // No registered code covers the call-recursion limit; the general
+            // evaluation failure stays typed as such.
+            _ => DiagnosticCode::ComptimeEvaluationFailed,
+        }
+    }
+}
+
 impl std::fmt::Display for ComptimeError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -143,15 +168,15 @@ impl std::fmt::Display for ComptimeError {
             ComptimeError::IntegerOverflow => write!(f, "integer overflow during comptime evaluation"),
             ComptimeError::TypeMismatch(msg) => write!(f, "comptime type mismatch: {}", msg),
             ComptimeError::UnsupportedOperation(msg) => write!(f, "unsupported comptime operation: {}", msg),
-            ComptimeError::StepLimitExceeded(limit) => write!(f, "E_COMPTIME_STEP_LIMIT: comptime execution step limit exceeded (limit: {})", limit),
-            ComptimeError::RecursionLimitExceeded(limit) => write!(f, "E_COMPTIME_RECURSION_LIMIT: comptime call recursion limit exceeded (limit: {})", limit),
+            ComptimeError::StepLimitExceeded(limit) => write!(f, "comptime execution step limit exceeded (limit: {})", limit),
+            ComptimeError::RecursionLimitExceeded(limit) => write!(f, "comptime call recursion limit exceeded (limit: {})", limit),
             ComptimeError::MemoryLimitExceeded => write!(f, "comptime memory allocation limit exceeded"),
-            ComptimeError::ResourceLeak(msg) => write!(f, "E_COMPTIME_RESOURCE_LEAK: {}", msg),
+            ComptimeError::ResourceLeak(msg) => write!(f, "comptime evaluation retained compile-time storage at the runtime boundary: {}", msg),
             ComptimeError::ForbiddenSideEffect(msg) => write!(f, "forbidden side-effect in comptime: {}", msg),
             ComptimeError::SymbolNotFound(name) => write!(f, "symbol '{}' not found in comptime context", name),
             ComptimeError::UseOfUninitializedOrMoved(msg) => write!(f, "E_USE_OF_MOVED_VALUE: {}", msg),
-            ComptimeError::PointerEscape(msg) => write!(f, "E_COMPTIME_POINTER_ESCAPE: pointer escape error in comptime: {}", msg),
-            ComptimeError::ResourceEscape(msg) => write!(f, "E_COMPTIME_RESOURCE_ESCAPE: resource escape error in comptime: {}", msg),
+            ComptimeError::PointerEscape(msg) => write!(f, "pointer escape error in comptime: {}", msg),
+            ComptimeError::ResourceEscape(msg) => write!(f, "resource escape error in comptime: {}", msg),
             ComptimeError::ComptimeAwaitForbidden => write!(f, "comptime await is not allowed: compile-time domain has no async runtime"),
             ComptimeError::NullPointerDereference => write!(f, "E_NULL_POINTER_DEREFERENCE: attempt to dereference null pointer in comptime evaluation"),
             ComptimeError::UseAfterFree => write!(f, "E_USE_AFTER_FREE: use-after-free in compile-time memory"),
