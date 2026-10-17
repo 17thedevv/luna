@@ -1,0 +1,23 @@
+{
+  "gate": "docs-examples",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "/usr/bin/python3",
+    "docs/tools/check_v01_examples.py",
+    "--gate",
+    "--cli",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/target/debug/luna",
+    "--runtime-lib",
+    "/home/runner/work/_temp/r5-normal/runtime/libluna-runtime.a",
+    "--out",
+    "/home/runner/work/_temp/r5-normal/evidence/docs-examples"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T19:44:15Z",
+  "exit": 0,
+  "seconds": 19.457325588999993,
+  "log_sha256": "53813f58d349c9e4c4d0df93b427d7249550c9c7e21bdd1cd62fd2302c1262ca",
+  "status": "PASS",
+  "log": "docs-examples.log.gz",
+  "compressed_sha256": "6c475be4f5bacd4a452d0163ed6e22b7f58676a67cfd345864c3e68e88f2b7a4"
+}

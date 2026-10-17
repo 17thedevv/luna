@@ -1,0 +1,22 @@
+{
+  "gate": "diagnostic-span-anchor",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-common",
+    "source_diagnostics_are_anchored_or_declared_contract_diagnostics"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T19:44:11Z",
+  "exit": 0,
+  "seconds": 0.06408842599921627,
+  "log_sha256": "7e1fd5d63af492f2dc5377e41d0b612eeea5ce603ce3edbb587c39e1347f04b4",
+  "status": "PASS",
+  "log": "diagnostic-span-anchor.log.gz",
+  "compressed_sha256": "29f97c12e6940befb9db36a53efeb4b0f644fb98fb3fd0d783ccec4163ac5b9f"
+}

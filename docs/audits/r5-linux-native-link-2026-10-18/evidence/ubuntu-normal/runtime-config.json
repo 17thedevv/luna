@@ -1,0 +1,24 @@
+{
+  "gate": "runtime-config",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cmake",
+    "-S",
+    "/home/runner/work/_temp/r5-normal/checkout/runtime",
+    "-B",
+    "/home/runner/work/_temp/r5-normal/runtime",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DCMAKE_C_COMPILER=gcc",
+    "-DCMAKE_CXX_COMPILER=g++"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal",
+  "started_utc": "2026-10-17T18:00:39Z",
+  "exit": 0,
+  "seconds": 1.1162367479999489,
+  "log_sha256": "9f5bc28720689205b6a5e94e0d61d431e1574343e6113dfa13b28684516b19d0",
+  "status": "PASS",
+  "log": "runtime-config.log.gz",
+  "compressed_sha256": "0063f3cd92debdc0d77ac7cf1e3bb6b058739527f23bc4bc5f084e8249d44506"
+}

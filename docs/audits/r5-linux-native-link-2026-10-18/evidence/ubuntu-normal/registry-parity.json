@@ -1,0 +1,22 @@
+{
+  "gate": "registry-parity",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-common",
+    "registry_parity"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T19:44:08Z",
+  "exit": 0,
+  "seconds": 3.374852226999792,
+  "log_sha256": "1cbf522f39968fe4cef0e7ea5862859fc8abd59952ac949eb815ef496ab64b3c",
+  "status": "PASS",
+  "log": "registry-parity.log.gz",
+  "compressed_sha256": "411014175d1ad1b9efd03c3844f7aba8131b0faf4b4cb51924ebc7edb4a6e067"
+}
