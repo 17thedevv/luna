@@ -1,5 +1,5 @@
 {
-  "observed_at_utc": "2026-10-17T18:07:18.782644+00:00",
+  "observed_at_utc": "2026-10-17T19:49:19.005091+00:00",
   "implementation_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
   "status": "QUALIFICATION_IN_PROGRESS",
   "previous_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
@@ -37,7 +37,7 @@
         117464496174,
         117464496183
       ],
-      "status": "IN_PROGRESS",
+      "status": "ALL_THREE_JOBS_SUCCESS_ARTIFACTS_VERIFIED",
       "asan": {
         "status": "PASS_IN_EXECUTED_SCOPE",
         "job": 117464496174,
@@ -49,6 +49,14 @@
         "job": 117464495961,
         "artifact_id": 12109342794,
         "verification": "evidence/ubuntu-comptime-vm-verification.json"
+      },
+      "normal": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "job": 117464496183,
+        "artifact_id": 12112417848,
+        "gates": 48,
+        "verification": "evidence/ubuntu-normal-verification.json",
+        "final_status_note": "Generated documentation indexes changed; protected implementation trees unchanged"
       }
     },
     "ubuntu_workspace": {

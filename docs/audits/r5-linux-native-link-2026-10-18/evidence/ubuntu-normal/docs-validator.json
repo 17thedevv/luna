@@ -1,0 +1,16 @@
+{
+  "gate": "docs-validator",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "/usr/bin/python3",
+    "docs/tools/validate_v01_docs.py"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T19:44:15Z",
+  "exit": 0,
+  "seconds": 0.2644406090003031,
+  "log_sha256": "31bee4977fde3ff53d6a4570f04349b820d13bb088a5bf3886bbd6a3a791016d",
+  "status": "PASS",
+  "log": "docs-validator.log.gz",
+  "compressed_sha256": "8067319746d9416770120bf1ae5d71f81cc5cb4ca5e13f3aa2d9bbf56a47cebb"
+}
