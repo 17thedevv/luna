@@ -23,7 +23,7 @@ fn missing_return_rejects_reachable_paths_and_preserves_valid_returns_in_both_mo
             assert!(output.status.success(), "{}", render(&output));
             fs::remove_file(&provider).unwrap();
         }
-        for name in ["empty", "one_branch", "loop_exit", "generic", "method", "closure", "async", "default_entry", "imported_generic"] {
+        for name in ["empty", "one_branch", "loop_exit", "break_exit", "generic", "method", "closure", "async", "default_entry", "imported_generic"] {
             let source = project.join(format!("{name}.ln"));
             fs::copy(fixtures.join(format!("{name}.ln")), &source).unwrap();
             let check = modes.check(root, &source);

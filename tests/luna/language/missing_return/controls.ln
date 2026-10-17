@@ -2,6 +2,9 @@ import "provider";
 fn nothing() { }
 async fn async_nothing() { }
 fn tail() -> i32 { 11 }
+fn forever() -> i32 { while true { continue; } }
+fn for_forever() -> i32 { for (;;) { continue; } }
+fn constant_branch() -> i32 { if true { return 31; } }
 fn branches(flag: bool) -> i32 {
     if flag { return 3; } else { return 5; }
 }
@@ -22,5 +25,6 @@ fn main() -> i32 {
     if unsafe_body() != 19 { return 6; }
     if returns::choose(false) != 9 { return 7; }
     if returns::identity<i32>(29) != 29 { return 8; }
+    if constant_branch() != 31 { return 9; }
     return 0;
 }

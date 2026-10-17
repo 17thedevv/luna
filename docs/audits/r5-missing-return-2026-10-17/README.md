@@ -14,7 +14,9 @@ no syntax, ABI, artifact layout or language policy change.
   methods, closures, defaults and async bodies under the versioned syntax.
 - Invariant: a reachable fallthrough cannot manufacture an initialized result.
   Void fallthrough and explicit/tail returns remain valid. Unreachable joins
-  after returning branches must not create a false E3004.
+  after returning branches must not create a false E3004. Literal/materialized
+  boolean branches have only their executable successor: an endless loop has
+  no fallthrough, while a reachable `break` makes its exit subject to E3004.
 - Owning path: AST/semantic checking → monomorphized MVIR generation → reachable
   CFG return analysis in Borrowck → diagnostic rendering. Invalid paths stop
   before native emission. Imported generic bodies follow this same path.
@@ -47,6 +49,20 @@ checks and both modes' valid check/build/native execution; Cargo reports
 E3004 now has behavioural coverage and is no longer declared unreachable.
 The MVIR/Borrowck internal regression also passes: 73 passed, 0 failed;
 raw logs and SHA-256 hashes are preserved in `evidence/`.
+
+The [expanded focused run](evidence/missing-return-cli2.log.gz) also passes:
+40 negative command checks, plus source/artifact native controls containing
+endless `while true`, conditionless `for`, and a constant-true return branch.
+The endless functions are compiled but not invoked. A reachable `break` is a
+separate E3004 negative. MVIR/Borrowck regression was rerun after the
+reachability change: again 73 passed, 0 failed.
+
+The initial implementation pin `e5f234a9` was superseded after an additional
+control exposed a false E3004 for `while true { continue; }`. Windows acquisition
+at `D:/r5-e5f234a9/windows` was explicitly cancelled during CLI build, after
+runtime ABI passed; incomplete build evidence is preserved, not reused.
+[CI run 18](https://github.com/17thedevv/luna/actions/runs/39031641783) tests that
+superseded pin and cannot qualify the subsequent reachability repair.
 
 Focused regression and a new immutable implementation pin's complete Windows
 and Ubuntu qualification are still required. Earlier pin evidence is historical
