@@ -15,6 +15,7 @@ The candidate remains at `c085449b`; no result is carried from an earlier pin.
 | Windows docs, quickstart and comptime/layout | PENDING | Exact-pin runner continues after focused |
 | Windows workspace triage and default-parallel final | PENDING | Both complete invocations required; no partial run is PASS |
 | Ubuntu GNU normal and target contract | IN PROGRESS | [CI run 19](https://github.com/17thedevv/luna/actions/runs/39031984873) |
+| Ubuntu complete workspace triage and default-parallel final | PENDING | Separate exact-pin workflow; normal's `--skip-workspace` does not satisfy this gate |
 | Ubuntu comptime-vm | PASS IN EXECUTED SCOPE | [Verification](evidence/ubuntu-comptime-vm-verification.json), [original artifact](evidence/ubuntu-comptime-vm.zip) |
 | Ubuntu runtime ASan | PASS IN EXECUTED SCOPE | [Verification](evidence/ubuntu-asan-verification.json), [original artifact](evidence/ubuntu-asan.zip) |
 
