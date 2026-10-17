@@ -243,7 +243,11 @@ fn run_cli() {
             let bindings = configured_bindings(file, provider_config);
             match run_application(file, source, *quiet, search_paths, bindings, cli.comptime_steps, cli.comptime_depth) {
                 Ok(code) => process::exit(code),
-                Err(error) => fail(luna_common::DiagnosticCode::ProcessExecutionFailure, error),
+                // The error is already rendered typed diagnostics: compiler
+                // diagnostics carry their own codes, and a process failure is
+                // rendered as E6009 at its own boundary. Wrapping it here would
+                // misclassify every compile failure under `run` as E6009.
+                Err(rendered) => { eprintln!("{rendered}"); process::exit(1); }
             }
         }
     }

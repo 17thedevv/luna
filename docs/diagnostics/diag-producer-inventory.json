@@ -29,6 +29,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -58,6 +59,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -122,6 +124,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -143,6 +146,7 @@
       "producers": [],
       "produced": false,
       "reserved_no_producer": "UnclosedDelimiter: the lexer reports delimiter errors without this code in 0.1",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "generic"
       ],
@@ -183,6 +187,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -322,6 +327,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -332,6 +338,7 @@
         "luna-rs/crates/luna-cli/tests/compiler_trust_diagnostics_cli_parity.rs",
         "luna-rs/crates/luna-cli/tests/comptime_diagnostic_cascade_cli.rs",
         "luna-rs/crates/luna-cli/tests/default_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs",
         "luna-rs/crates/luna-cli/tests/diagnostic_conformance_cli.rs",
         "luna-rs/crates/luna-cli/tests/module_const_storage_cli.rs",
         "luna-rs/crates/luna-cli/tests/namespace_alias_export_cli.rs",
@@ -392,6 +399,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -502,6 +510,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -539,6 +548,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "contract"
@@ -583,6 +593,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "contract",
@@ -601,6 +612,7 @@
       "producers": [],
       "produced": false,
       "reserved_no_producer": "InvalidVisibility: visibility syntax is admitted by Parser grammar (E0003)",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "generic"
       ],
@@ -615,6 +627,7 @@
       "producers": [],
       "produced": false,
       "reserved_no_producer": "WildcardImportProhibited: wildcard imports are rejected as unresolved (E1001)",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "generic"
       ],
@@ -640,6 +653,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -715,6 +729,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -747,6 +762,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -1146,6 +1162,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -1182,6 +1199,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1225,6 +1243,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1253,6 +1272,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1280,6 +1300,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1307,6 +1328,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1350,11 +1372,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -1370,6 +1395,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1392,11 +1418,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -1457,6 +1486,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1479,11 +1509,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -1509,6 +1542,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1533,11 +1567,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -1547,6 +1584,7 @@
       "producers": [],
       "produced": false,
       "reserved_no_producer": "DuplicateField: struct-init field duplication is reported as E2001 today",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "generic"
       ],
@@ -1561,6 +1599,7 @@
       "producers": [],
       "produced": false,
       "reserved_no_producer": "DuplicateVariant: no producer path in 0.1",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "generic"
       ],
@@ -1771,6 +1810,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -1809,11 +1849,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -1834,11 +1877,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -1864,6 +1910,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1880,6 +1927,7 @@
       "producers": [],
       "produced": false,
       "reserved_no_producer": "CannotCallNonFunction: call misuse is reported as E2001 today",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "generic"
       ],
@@ -1960,6 +2008,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -1995,11 +2044,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -2065,6 +2117,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -2090,6 +2143,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -2137,6 +2191,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -2179,6 +2234,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -2208,11 +2264,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -2238,11 +2297,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -2263,6 +2325,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -2285,6 +2348,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -2313,6 +2377,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -2373,6 +2438,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -2413,7 +2479,7 @@
         },
         {
           "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
-          "line": 437,
+          "line": 441,
           "span_policy": "dynamic"
         },
         {
@@ -2424,6 +2490,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -2476,6 +2543,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -2567,6 +2635,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -2602,6 +2671,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": "no producer fires: a non-void body that can fall through is accepted today (recorded as a separate correctness finding)",
       "span_policies": [
         "anchored"
       ],
@@ -2707,6 +2777,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -2748,6 +2819,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "dynamic"
       ],
@@ -2770,6 +2842,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": "explicit destructor calls are rejected (E2001/E2031), so a dropped place cannot be read afterwards",
       "span_policies": [
         "dynamic"
       ],
@@ -2795,6 +2868,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -2843,6 +2917,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -2869,11 +2944,14 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -2888,12 +2966,13 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
-          "line": 153,
+          "line": 154,
           "span_policy": "dynamic"
         }
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "dynamic"
       ],
@@ -2910,17 +2989,23 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
-          "line": 408,
+          "line": 409,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 500,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
-          "line": 150,
+          "line": 152,
           "span_policy": "dynamic"
         }
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "dynamic"
       ],
@@ -2937,6 +3022,7 @@
       "producers": [],
       "produced": false,
       "reserved_no_producer": "ComptimePanic: no comptime panic/assert condition is reachable in 0.1",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "generic"
       ],
@@ -2961,7 +3047,7 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
-          "line": 156,
+          "line": 157,
           "span_policy": "dynamic"
         },
         {
@@ -2987,6 +3073,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored",
         "dynamic"
@@ -3033,6 +3120,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "anchored"
       ],
@@ -3052,6 +3140,7 @@
       "producers": [],
       "produced": false,
       "reserved_no_producer": "InfiniteMonomorphizationRecursion: mono recursion is rejected through backend admission today",
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "generic"
       ],
@@ -3152,6 +3241,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "dynamic",
         "infrastructure"
@@ -3195,6 +3285,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": "requires an LLVM object-write failure",
       "span_policies": [
         "infrastructure"
       ],
@@ -3215,6 +3306,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": "requires a linker failure environment that is not reproducible portably",
       "span_policies": [
         "infrastructure"
       ],
@@ -3245,12 +3337,15 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "dynamic",
         "infrastructure"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -3281,6 +3376,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "dynamic",
         "infrastructure"
@@ -3298,7 +3394,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-cli/src/main.rs",
-          "line": 266,
+          "line": 270,
           "span_policy": "infrastructure"
         },
         {
@@ -3314,6 +3410,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "infrastructure"
       ],
@@ -3346,12 +3443,15 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "dynamic",
         "infrastructure"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -3377,6 +3477,7 @@
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
       "span_policies": [
         "dynamic",
         "infrastructure"
@@ -3399,145 +3500,22 @@
         },
         {
           "file": "luna-rs/crates/luna-cli/src/main.rs",
-          "line": 246,
-          "span_policy": "dynamic"
-        },
-        {
-          "file": "luna-rs/crates/luna-cli/src/main.rs",
-          "line": 276,
+          "line": 280,
           "span_policy": "infrastructure"
         }
       ],
       "produced": true,
       "reserved_no_producer": null,
+      "declared_unreachable_in_test": "requires a process-spawn failure; the run path no longer reclassifies compile diagnostics",
       "span_policies": [
-        "dynamic",
         "infrastructure"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
       "structural_coverage": null
     }
   ],
-  "coverage_debt": [
-    {
-      "code": "E2007",
-      "name": "UnresolvedTraitImpl",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E2009",
-      "name": "InfiniteSizeRecursiveType",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E2011",
-      "name": "InvalidLvalue",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E2013",
-      "name": "InvalidBinaryOp",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E2017",
-      "name": "MissingField",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E2018",
-      "name": "NoAssociatedType",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E2022",
-      "name": "NonExhaustivePattern",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E2027",
-      "name": "AwaitOutsideAsync",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E2028",
-      "name": "InvalidTryOperator",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E3004",
-      "name": "MissingReturnValue",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E3007",
-      "name": "UseAfterDrop",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E4001",
-      "name": "AsyncBorrowAcrossAwait",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E6002",
-      "name": "ObjectEmissionFailure",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E6003",
-      "name": "LinkerFailure",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E6004",
-      "name": "SysrootConfigurationFailure",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E6007",
-      "name": "InvalidArtifactOutput",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    },
-    {
-      "code": "E6009",
-      "name": "ProcessExecutionFailure",
-      "status": "OPEN",
-      "class": "behavioral-coverage",
-      "must_complete_before": "release-gate:per-code behavioral coverage"
-    }
-  ]
+  "coverage_debt": []
 }
