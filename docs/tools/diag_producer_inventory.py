@@ -52,6 +52,18 @@ RESERVED_NO_PRODUCER = {
     "E5002": "InfiniteMonomorphizationRecursion: mono recursion is rejected through backend admission today",
 }
 
+# Registered codes whose condition cannot be reproduced in a test scope. The
+# reason is recorded instead of claiming behavioural coverage that does not
+# exist, and these codes are excluded from the coverage-debt list because the
+# limitation is declared rather than pending.
+UNREACHABLE_IN_TEST = {
+    "E3004": "no producer fires: a non-void body that can fall through is accepted today (recorded as a separate correctness finding)",
+    "E3007": "explicit destructor calls are rejected (E2001/E2031), so a dropped place cannot be read afterwards",
+    "E6002": "requires an LLVM object-write failure",
+    "E6003": "requires a linker failure environment that is not reproducible portably",
+    "E6009": "requires a process-spawn failure; the run path no longer reclassifies compile diagnostics",
+}
+
 # Helpers that forward a caller-supplied code instead of naming one. They are the
 # declared generic emitters; a code reached only through them is still counted as
 # produced, with a `generic` span policy.
@@ -189,6 +201,7 @@ def scan() -> dict:
             "producers": sites,
             "produced": bool(sites),
             "reserved_no_producer": reserved,
+            "declared_unreachable_in_test": UNREACHABLE_IN_TEST.get(code),
             "span_policies": policy,
             "generic_emitter": generic.get(name),
             "automated_coverage": coverage,
@@ -225,6 +238,8 @@ def coverage_debt(inventory: dict) -> list[dict]:
     debt = []
     for record in inventory["records"]:
         if record["automated_coverage"] or record["structural_coverage"] or record["reserved_no_producer"]:
+            continue
+        if record.get("declared_unreachable_in_test"):
             continue
         debt.append({
             "code": record["code"],
