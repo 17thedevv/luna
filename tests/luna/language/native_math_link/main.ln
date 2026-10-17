@@ -1,0 +1,6 @@
+import "provider";
+
+fn main() -> i32 {
+    dec sample = measurement::Sample { value: 9.0 };
+    return measurement::evaluate(sample, 0.0, 1.25 as f32);
+}
