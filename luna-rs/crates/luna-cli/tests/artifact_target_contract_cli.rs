@@ -55,6 +55,12 @@ fn actual_objects_match_target_contract_and_mismatches_reject_before_use() {
         &header.target_triple[..manifest.target.target_triple.len()],
         manifest.target.target_triple.as_bytes()
     );
+    // R5-FU-TARGET-01: the artifact records the canonical Luna release triple,
+    // never the host's LLVM spelling.
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    assert_eq!(manifest.target.target_triple, "x86_64-pc-windows-gnu");
+    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+    assert_eq!(manifest.target.target_triple, "x86_64-unknown-linux-gnu");
     let object = &baseline[section(&baseline, SectionType::ObjectCode)];
     assert!(!manifest.target.abi.is_empty());
     assert_eq!(manifest.target.pointer_width, usize::BITS as u8);

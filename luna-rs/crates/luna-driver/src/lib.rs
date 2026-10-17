@@ -444,11 +444,35 @@ pub fn compile(file_name: &str, input: String, options: &CompilerOptions) -> Res
     compile_with_session(&mut session, file_name, input, options)
 }
 
+/// DIAG-2/DIAG-7: the user-visible boundary enforces the primary-span policy.
+/// A source diagnostic (code below the infrastructure range) that is neither
+/// anchored to a primary span nor declared as a provider/manifest contract
+/// diagnostic is a compiler invariant failure, reported fail-closed instead of
+/// being rendered as a location-less source error.
+pub fn enforce_source_anchor_policy(diagnostics: &mut Vec<Diagnostic>) {
+    let offenders: Vec<String> = diagnostics
+        .iter()
+        .filter(|diagnostic| diagnostic.violates_source_anchor_contract())
+        .map(|diagnostic| match diagnostic.code {
+            Some(code) => format!("{code}: {}", diagnostic.message),
+            None => diagnostic.message.clone(),
+        })
+        .collect();
+    for offender in offenders {
+        diagnostics.push(Diagnostic::invariant_error(format!(
+            "source diagnostic is missing its primary span: {offender}"
+        )));
+    }
+}
+
 pub fn check_and_render(file_name: &str, input: String, options: &CompilerOptions) -> Result<(), String> {
     let mut session = CompilerSession::new();
     match check_with_session(&mut session, file_name, input, options) {
         Ok(()) => Ok(()),
-        Err(diags) => Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n")),
+        Err(mut diags) => {
+            enforce_source_anchor_policy(&mut diags);
+            Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n"))
+        }
     }
 }
 
@@ -456,7 +480,10 @@ pub fn compile_and_render(file_name: &str, input: String, options: &CompilerOpti
     let mut session = CompilerSession::new();
     match compile_with_session(&mut session, file_name, input, options) {
         Ok(()) => Ok(()),
-        Err(diags) => Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n")),
+        Err(mut diags) => {
+            enforce_source_anchor_policy(&mut diags);
+            Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n"))
+        }
     }
 }
 
