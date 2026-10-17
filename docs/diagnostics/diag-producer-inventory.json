@@ -2665,7 +2665,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/return_analysis.rs",
-          "line": 47,
+          "line": 54,
           "span_policy": "anchored"
         }
       ],
