@@ -266,57 +266,57 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1352,
+          "line": 1357,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1675,
+          "line": 1680,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3029,
+          "line": 3034,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3040,
+          "line": 3045,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3137,
+          "line": 3142,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3584,
+          "line": 3589,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4883,
+          "line": 4888,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5037,
+          "line": 5042,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5198,
+          "line": 5203,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5267,
+          "line": 5272,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5550,
+          "line": 5555,
           "span_policy": "anchored"
         }
       ],
@@ -381,12 +381,12 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1479,
+          "line": 1484,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1581,
+          "line": 1586,
           "span_policy": "anchored"
         }
       ],
@@ -461,42 +461,42 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1362,
+          "line": 1367,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2854,
+          "line": 2859,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2876,
+          "line": 2881,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4979,
+          "line": 4984,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5024,
+          "line": 5029,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5179,
+          "line": 5184,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5203,
+          "line": 5208,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6428,
+          "line": 6433,
           "span_policy": "anchored"
         }
       ],
@@ -875,267 +875,267 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1346,
+          "line": 1351,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1357,
+          "line": 1362,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1367,
+          "line": 1372,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1489,
+          "line": 1494,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2254,
+          "line": 2259,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2598,
+          "line": 2603,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3264,
+          "line": 3269,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3285,
+          "line": 3290,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3331,
+          "line": 3336,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3339,
+          "line": 3344,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3357,
+          "line": 3362,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3516,
+          "line": 3521,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3525,
+          "line": 3530,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3626,
+          "line": 3631,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3651,
+          "line": 3656,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3885,
+          "line": 3890,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3919,
+          "line": 3924,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3964,
+          "line": 3969,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3991,
+          "line": 3996,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4004,
+          "line": 4009,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4018,
+          "line": 4023,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4056,
+          "line": 4061,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4062,
+          "line": 4067,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4195,
+          "line": 4200,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4249,
+          "line": 4254,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4428,
+          "line": 4433,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4445,
+          "line": 4450,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4462,
+          "line": 4467,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4469,
+          "line": 4474,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4512,
+          "line": 4517,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4548,
+          "line": 4553,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4653,
+          "line": 4658,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4694,
+          "line": 4699,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4745,
+          "line": 4750,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4755,
+          "line": 4760,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4832,
+          "line": 4837,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4838,
+          "line": 4843,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5151,
+          "line": 5156,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5209,
+          "line": 5214,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5263,
+          "line": 5268,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5301,
+          "line": 5306,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5424,
+          "line": 5429,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5462,
+          "line": 5467,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5478,
+          "line": 5483,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5504,
+          "line": 5509,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5513,
+          "line": 5518,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5584,
+          "line": 5589,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5723,
+          "line": 5728,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5796,
+          "line": 5801,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6049,
+          "line": 6054,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6067,
+          "line": 6072,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6097,
+          "line": 6102,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6445,
+          "line": 6450,
           "span_policy": "anchored"
         },
         {
@@ -1176,7 +1176,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6132,
+          "line": 6137,
           "span_policy": "anchored"
         }
       ],
@@ -1199,27 +1199,27 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5327,
+          "line": 5332,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5335,
+          "line": 5340,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5355,
+          "line": 5360,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5364,
+          "line": 5369,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5384,
+          "line": 5389,
           "span_policy": "anchored"
         }
       ],
@@ -1242,12 +1242,12 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1147,
+          "line": 1152,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1181,
+          "line": 1186,
           "span_policy": "anchored"
         }
       ],
@@ -1274,7 +1274,7 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3733,
+          "line": 3738,
           "span_policy": "anchored"
         }
       ],
@@ -1324,27 +1324,27 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 662,
+          "line": 667,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 720,
+          "line": 725,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1009,
+          "line": 1014,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1684,
+          "line": 1689,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3809,
+          "line": 3814,
           "span_policy": "anchored"
         }
       ],
@@ -1364,7 +1364,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 628,
+          "line": 633,
           "span_policy": "anchored"
         }
       ],
@@ -1386,7 +1386,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1248,
+          "line": 1253,
           "span_policy": "anchored"
         }
       ],
@@ -1406,52 +1406,52 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2616,
+          "line": 2621,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2634,
+          "line": 2639,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2645,
+          "line": 2650,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2662,
+          "line": 2667,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2674,
+          "line": 2679,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2686,
+          "line": 2691,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2698,
+          "line": 2703,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2716,
+          "line": 2721,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2738,
+          "line": 2743,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3092,
+          "line": 3097,
           "span_policy": "anchored"
         }
       ],
@@ -1473,7 +1473,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4798,
+          "line": 4803,
           "span_policy": "anchored"
         }
       ],
@@ -1493,17 +1493,17 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6144,
+          "line": 6149,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6158,
+          "line": 6163,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6165,
+          "line": 6170,
           "span_policy": "anchored"
         }
       ],
@@ -1527,7 +1527,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4480,
+          "line": 4485,
           "span_policy": "anchored"
         }
       ],
@@ -1735,37 +1735,37 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1516,
+          "line": 1521,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2452,
+          "line": 2457,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2466,
+          "line": 2471,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2481,
+          "line": 2486,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2493,
+          "line": 2498,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2513,
+          "line": 2518,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6458,
+          "line": 6463,
           "span_policy": "anchored"
         }
       ],
@@ -1798,12 +1798,12 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3559,
+          "line": 3564,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5278,
+          "line": 5283,
           "span_policy": "anchored"
         }
       ],
@@ -1823,12 +1823,12 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 759,
+          "line": 764,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1378,
+          "line": 1383,
           "span_policy": "anchored"
         }
       ],
@@ -1848,17 +1848,17 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 693,
+          "line": 698,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 735,
+          "line": 740,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 997,
+          "line": 1002,
           "span_policy": "anchored"
         }
       ],
@@ -1894,67 +1894,67 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 924,
+          "line": 929,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2583,
+          "line": 2588,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3720,
+          "line": 3725,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3757,
+          "line": 3762,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3827,
+          "line": 3832,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3835,
+          "line": 3840,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3843,
+          "line": 3848,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3857,
+          "line": 3862,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3878,
+          "line": 3883,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3896,
+          "line": 3901,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3910,
+          "line": 3915,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3926,
+          "line": 3931,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4675,
+          "line": 4680,
           "span_policy": "anchored"
         }
       ],
@@ -1979,17 +1979,17 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5734,
+          "line": 5739,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5746,
+          "line": 5751,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5757,
+          "line": 5762,
           "span_policy": "anchored"
         }
       ],
@@ -2014,52 +2014,52 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4818,
+          "line": 4823,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5449,
+          "line": 5454,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5843,
+          "line": 5848,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6118,
+          "line": 6123,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6125,
+          "line": 6130,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6342,
+          "line": 6347,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6356,
+          "line": 6361,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6374,
-          "span_policy": "anchored"
-        },
-        {
-          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6388,
+          "line": 6379,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
           "line": 6393,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6398,
           "span_policy": "anchored"
         }
       ],
@@ -2084,7 +2084,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3252,
+          "line": 3257,
           "span_policy": "anchored"
         }
       ],
@@ -2111,27 +2111,27 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4436,
+          "line": 4441,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4613,
+          "line": 4618,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5430,
+          "line": 5435,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5594,
+          "line": 5599,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6114,
+          "line": 6119,
           "span_policy": "anchored"
         }
       ],
@@ -2158,22 +2158,22 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5586,
+          "line": 5591,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5624,
+          "line": 5629,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5635,
+          "line": 5640,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5651,
+          "line": 5656,
           "span_policy": "anchored"
         }
       ],
@@ -2202,7 +2202,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6037,
+          "line": 6042,
           "span_policy": "anchored"
         }
       ],
@@ -2222,17 +2222,17 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5881,
+          "line": 5886,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 5954,
+          "line": 5959,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 6028,
+          "line": 6033,
           "span_policy": "anchored"
         }
       ],
@@ -2252,12 +2252,12 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4076,
+          "line": 4081,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 4085,
+          "line": 4090,
           "span_policy": "anchored"
         }
       ],
@@ -2279,7 +2279,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3471,
+          "line": 3476,
           "span_policy": "anchored"
         }
       ],
@@ -2352,12 +2352,12 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2199,
+          "line": 2204,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3208,
+          "line": 3213,
           "span_policy": "anchored"
         },
         {
@@ -2413,7 +2413,7 @@
         },
         {
           "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
-          "line": 425,
+          "line": 437,
           "span_policy": "dynamic"
         },
         {
@@ -2696,7 +2696,7 @@
         },
         {
           "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
-          "line": 337,
+          "line": 345,
           "span_policy": "dynamic"
         },
         {
@@ -2832,12 +2832,12 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1127,
+          "line": 1132,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 1545,
+          "line": 1550,
           "span_policy": "anchored"
         }
       ],
@@ -2880,28 +2880,54 @@
       "code": "E4002",
       "name": "ComptimeStepLimitExceeded",
       "number": 4002,
-      "producers": [],
-      "produced": false,
-      "reserved_no_producer": "ComptimeStepLimitExceeded: produced as E4005 with an E_COMPTIME_STEP_LIMIT message today",
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 289,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
+          "line": 153,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
       "span_policies": [
-        "generic"
+        "dynamic"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-driver/tests/p2a_tests.rs"
+      ],
       "structural_coverage": null
     },
     {
       "code": "E4003",
       "name": "ComptimeUnserializableEscape",
       "number": 4003,
-      "producers": [],
-      "produced": false,
-      "reserved_no_producer": "ComptimeUnserializableEscape: no producer path in 0.1",
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 408,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
+          "line": 150,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
       "span_policies": [
-        "generic"
+        "dynamic"
       ],
       "generic_emitter": null,
-      "automated_coverage": [],
+      "automated_coverage": [
+        "luna-rs/crates/luna-driver/tests/p2a_tests.rs"
+      ],
       "structural_coverage": null
     },
     {
@@ -2910,7 +2936,7 @@
       "number": 4004,
       "producers": [],
       "produced": false,
-      "reserved_no_producer": "ComptimePanic: no producer path in 0.1",
+      "reserved_no_producer": "ComptimePanic: no comptime panic/assert condition is reachable in 0.1",
       "span_policies": [
         "generic"
       ],
@@ -2924,9 +2950,19 @@
       "number": 4005,
       "producers": [
         {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 322,
+          "span_policy": "dynamic"
+        },
+        {
           "file": "luna-rs/crates/luna-semantic/src/comptime/mod.rs",
           "line": 8,
           "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
+          "line": 156,
+          "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
@@ -2935,29 +2971,25 @@
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 191,
+          "line": 2224,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2219,
+          "line": 2288,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 2283,
-          "span_policy": "anchored"
-        },
-        {
-          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
-          "line": 3366,
+          "line": 3371,
           "span_policy": "anchored"
         }
       ],
       "produced": true,
       "reserved_no_producer": null,
       "span_policies": [
-        "anchored"
+        "anchored",
+        "dynamic"
       ],
       "generic_emitter": null,
       "automated_coverage": [
@@ -2968,6 +3000,7 @@
         "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
         "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
         "luna-rs/crates/luna-cli/tests/wrapping_arithmetic_cli.rs",
+        "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
         "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs"
       ],
       "structural_coverage": null
