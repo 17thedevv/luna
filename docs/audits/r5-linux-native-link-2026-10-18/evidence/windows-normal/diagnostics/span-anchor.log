@@ -1,0 +1,13 @@
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2024 which implies `resolver = "3"`
+  |
+  = note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+  = note: to use the edition 2024 resolver, specify `workspace.resolver = "3"` in the workspace root's manifest
+  = note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+    Finished `test` profile [unoptimized] target(s) in 0.05s
+     Running unittests src\lib.rs (C:\r5b-39056178610\cargo-target\debug\deps\luna_common-70b554409fa25d75.exe)
+
+running 1 test
+test diagnostic::tests::source_diagnostics_are_anchored_or_declared_contract_diagnostics ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+

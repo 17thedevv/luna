@@ -1,0 +1,18 @@
+{'mode': 'source', 'fixture': 'basic_reference', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 0.9406615999996575, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'source', 'fixture': 'foreach_current_parser', 'expectation': 'characterization', 'compile_exit': 0, 'compile_seconds': 3.186163299999862, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': None}
+{'mode': 'source', 'fixture': 'foreach_parenthesized_contract', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 3.18255390000013, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'source', 'fixture': 'macro_name_independent', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 0.9317229999996925, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'source', 'fixture': 'public_field_default', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 0.94346940000014, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'source', 'fixture': 'receiver_shorthand_contract', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 0.9359334000000672, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'source', 'fixture': 'reject_private_field', 'expectation': 'reject', 'compile_exit': 1, 'compile_seconds': 0.8772370999995474, 'contract_met': True}
+{'mode': 'source', 'fixture': 'reject_semicolon_fields', 'expectation': 'reject', 'compile_exit': 1, 'compile_seconds': 0.012345799999820883, 'contract_met': True}
+{'mode': 'artifact', 'fixture': 'basic_reference', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 0.9520549999997456, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'artifact', 'fixture': 'foreach_current_parser', 'expectation': 'characterization', 'compile_exit': 0, 'compile_seconds': 3.2439664000003177, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': None}
+{'mode': 'artifact', 'fixture': 'foreach_parenthesized_contract', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 3.240156200000456, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'artifact', 'fixture': 'macro_name_independent', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 0.9461363000000347, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'artifact', 'fixture': 'public_field_default', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 0.9540643000000273, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'artifact', 'fixture': 'receiver_shorthand_contract', 'expectation': 'accept', 'compile_exit': 0, 'compile_seconds': 0.9547794000000067, 'run_exit': 0, 'stdout': '', 'stderr': '', 'contract_met': True}
+{'mode': 'artifact', 'fixture': 'reject_private_field', 'expectation': 'reject', 'compile_exit': 1, 'compile_seconds': 0.8832284999998592, 'contract_met': True}
+{'mode': 'artifact', 'fixture': 'reject_semicolon_fields', 'expectation': 'reject', 'compile_exit': 1, 'compile_seconds': 0.0117552000001524, 'contract_met': True}
+
+[GATE PASSED] All conformance contracts satisfied.
