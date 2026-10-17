@@ -1,0 +1,27 @@
+{
+  "status": "PASS_LOCAL_PREFLIGHT_ONLY",
+  "source_implementation_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "fresh_remote_checkout": false,
+  "runtime_reused_from": "C:/r5-52ef3711/windows-build/runtime/libluna-runtime.a",
+  "runtime_sha256": "d9f1e021822ff3439d009cadfade5599c6b8462e8168fb1ce7db1e3bcd85cf7f",
+  "cli_sha256": "0195173e7ac4b4ac0fac6c1d42d5a65d3dad05690e3be51e4c06977ef7ceebec",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "native_math_link_cli",
+    "--",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "passed": 1,
+  "failed": 0,
+  "scope": "Fresh sysroot, source and freshly built .llib user provider; CLI check/build and native exit0 in both modes on Windows. Does not validate Linux libm or replace any exact-pin lane.",
+  "log_sha256": "88c20cc06b77849261b667e9fff29456068d9a9ac397582aaed62953b5fdb0a3",
+  "compressed_sha256": "d26bedb90b562080da3154d2e431f64fb3f9924ee9a1d087f4cdbc5de0c16ed2"
+}

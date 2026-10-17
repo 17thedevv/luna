@@ -1,0 +1,61 @@
+# R5 generic Linux native math linkage
+
+Status: implementation under validation; no release qualification claim.
+
+## Contract and observed gap
+
+The advertised Ubuntu GNU target must link executable code that calls ordinary
+C math functions through `#[link(name = "...")] extern fn` declarations.
+Both source and freshly emitted `.llib` providers must preserve that behavior.
+The native linker owns platform system dependencies; library names, namespaces
+and concrete Luna types must not influence linker selection.
+
+At implementation pin `52ef3711813ac0e2ded272f5ebe71897752766bc`, the complete
+Ubuntu workspace triage reported **1408 passed, 5 failed, 1 ignored**. All five
+failures are unresolved C math symbols at native executable link. The final
+workspace job was skipped. The unchanged tests and their raw log are preserved
+in the [previous pin's evidence](../r5-missing-return-2026-10-17/evidence/ubuntu-workspace-triage/failure-analysis.json).
+
+## Implementation plan and boundary
+
+1. Share platform system-library suffix selection between the two native
+   executable linker entrypoints. Add Linux `-lm` after input objects/runtime.
+2. Exercise ordinary user FFI through the public CLI with a user-defined
+   `Sample`, f64 `sqrt`/`sin`, and f32 `ceilf`, in source and fresh artifact modes.
+3. Run the five unchanged failing tests through their three original suites,
+   then all exact-pin gates on Windows and Ubuntu at a new immutable pin.
+
+Compiler Change
+
+    Capability: Native Linux executable linkage of ordinary C math FFI.
+    Why stdlib exposed it: core float providers call host C math symbols.
+    Why it is generic: System-library selection depends only on host platform;
+        no provider, symbol, namespace or concrete type matching is added.
+    User-defined type benefiting: measurement::Sample in native_math_link.
+    Tests: native_math_link_cli; unchanged lang_namespace_contract_tests,
+        stdlib_phase4c_llib_parity_tests and stdlib_phase4c_numerics;
+        complete exact-pin qualification remains required.
+    New intrinsic/lang_item?: NO. No serialized format or ABI changes.
+    Stdlib-specific branch?: NO.
+
+The first local fixture attempt had a missing struct terminator and an f32/f64
+comparison mismatch. Both fixture errors were corrected to canonical syntax;
+the direct CLI source build and native execution then exited 0 on Windows.
+The [fresh source/artifact CLI preflight](evidence/windows-cli-preflight.json)
+then passed on Windows (1 test, 0 failures; both modes check/build/native exit0).
+The runtime was reused locally, so this is preflight evidence only. Linux
+execution and every exact-pin release gate remain separately required.
+
+## Qualification policy
+
+The previous pin is not qualified. Historical passes remain scoped to that SHA.
+All required lanes must be reacquired at the new implementation pin, including
+Windows and Ubuntu full workspace triage and final. Hosted Windows workspace
+passes use separate fresh jobs; final depends on successful triage. No test
+oracle or failure policy is weakened.
+
+The candidate stays at `c085449b` until the selected pin satisfies all gates.
+Tagging, main merge, PR creation and publication remain maintainer decisions.
+
+Skill impact: no reusable semantic or architecture rule changed; existing
+generic compiler-boundary and public CLI testing guidance covers this fix.
