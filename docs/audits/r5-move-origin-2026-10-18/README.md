@@ -120,3 +120,12 @@ SKILL IMPACT: REFINEMENT to `luna-language-capability-validation`: identity and
 order claims now require identical-wording distinct events and multi-function
 errors across independent processes. Related skills were checked for overlap;
 the update adds regression guidance, with no semantic or freeze authority.
+
+## Selected identity/order replacement
+
+Implementation pin: `d3d0ffe8d6495aee1f56257a1db817ce4107e992`. All 90 local preflight tests pass;
+documentation generation is idempotent and validation checks 1815 local links
+without errors. This is not release qualification. The three workflows now
+select this immutable SHA for all eight mandatory lanes, including separate
+workspace triage and dependent final passes on both hosts. Candidate remains
+`c085449b`; no prior-pin result carries forward.
