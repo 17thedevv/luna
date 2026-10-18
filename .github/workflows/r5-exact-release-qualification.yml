@@ -12,9 +12,9 @@ permissions:
   contents: read
 
 env:
-  # Implementation pin includes typed diagnostics, E3004, Linux math and move-origin repairs.
+  # Implementation pin includes typed diagnostics, E3004, Linux math and diagnostic origin/identity/order repairs.
   # compiler25/metadata9/MVIR5/format2 unchanged; every lane reacquires this SHA.
-  R5_TESTED_COMMIT: 67146195fb025951ca51d54365fd3a47ef9544e6
+  R5_TESTED_COMMIT: d3d0ffe8d6495aee1f56257a1db817ce4107e992
   R5_REPOSITORY_URL: https://github.com/17thedevv/luna.git
   CARGO_TERM_COLOR: never
 

@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 env:
-  R5_TESTED_COMMIT: 67146195fb025951ca51d54365fd3a47ef9544e6
+  R5_TESTED_COMMIT: d3d0ffe8d6495aee1f56257a1db817ce4107e992
   R5_REPOSITORY_URL: https://github.com/17thedevv/luna.git
   CARGO_TERM_COLOR: never
   LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
