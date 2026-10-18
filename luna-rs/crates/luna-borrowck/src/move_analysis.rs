@@ -37,6 +37,13 @@ impl MoveStateData {
     fn forget_origin_subtree(&mut self, place: &Place) {
         self.sites.retain(|candidate, _| candidate != place && !candidate.is_descendant_of(place));
     }
+
+    fn origin_for(&self, place: &Place) -> Option<luna_common::Span> {
+        self.sites.iter()
+            .filter(|(candidate, _)| *candidate == place || place.is_descendant_of(candidate))
+            .max_by_key(|(candidate, _)| candidate.projections.len())
+            .map(|(_, site)| *site)
+    }
 }
 
 pub struct MoveAnalyzer<'a> {
@@ -156,12 +163,7 @@ impl<'a> MoveAnalyzer<'a> {
             diag.span = span.clone();
             // The move may have been recorded for an ancestor place (a whole
             // local moved before a field is read); use the nearest one.
-            let origin = state
-                .sites
-                .iter()
-                .filter(|(candidate, _)| *candidate == place || place.is_descendant_of(candidate))
-                .max_by_key(|(candidate, _)| candidate.projections.len())
-                .map(|(_, site)| site.clone());
+            let origin = state.origin_for(place);
             if let (Some(label), Some(origin)) = (origin_label, origin) {
                 diag = diag.with_related(origin, label.to_string());
             }
@@ -257,10 +259,11 @@ impl<'a> MoveAnalyzer<'a> {
                                 };
                                 if has_drop {
                                     let msg = "Cannot move out of a subplace of a type that implements Drop".to_string();
-                                    if !self.diagnostics.iter().any(|d| d.message == msg) {
+                                    let span = self.func.values[val.0 as usize].span.clone();
+                                    if !self.has_diagnostic(DiagnosticCode::PartialMoveUnderDrop, &span) {
                                         let mut diag = Diagnostic::error(msg)
                                             .with_code(DiagnosticCode::PartialMoveUnderDrop);
-                                        diag.span = self.func.values[val.0 as usize].span.clone();
+                                        diag.span = span;
                                         self.diagnostics.push(diag);
                                     }
                                     break;
@@ -646,10 +649,11 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                                         };
                                         if has_drop {
                                             let msg = "Cannot move out of a subplace of a type that implements Drop".to_string();
-                                            if !self.diagnostics.iter().any(|d| d.message == msg) {
+                                            let span = self.func.values[val_id.0 as usize].span.clone();
+                                            if !self.has_diagnostic(DiagnosticCode::PartialMoveUnderDrop, &span) {
                                                 let mut diag = Diagnostic::error(msg)
                                                     .with_code(DiagnosticCode::PartialMoveUnderDrop);
-                                                diag.span = self.func.values[val_id.0 as usize].span.clone();
+                                                diag.span = span;
                                                 self.diagnostics.push(diag);
                                             }
                                             break;
@@ -683,9 +687,13 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                                 let loc_state = self.get_place_state(&place, state);
                                 if loc_state == MoveState::ConditionallyMoved && !self.guarded_drops.contains(&val_id) {
                                     let msg = format!("Cannot drop conditionally moved value");
-                                    if !self.diagnostics.iter().any(|d| d.message == msg) {
+                                    let span = self.func.values[val.0 as usize].span.clone();
+                                    if !self.has_diagnostic(DiagnosticCode::UseAfterMove, &span) {
                                         let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterMove);
-                                        diag.span = self.func.values[val.0 as usize].span.clone();
+                                        diag.span = span;
+                                        if let Some(origin) = state.origin_for(&place) {
+                                            diag = diag.with_related(origin, "value moved here".to_string());
+                                        }
                                         self.diagnostics.push(diag);
                                     }
                                 }

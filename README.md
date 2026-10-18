@@ -22,8 +22,9 @@ and its [replacement requirements](docs/audits/r5-move-origin-2026-10-18/REQUIRE
 Implementation `3a72f946` completed all eight release lanes, including full
 Windows/Ubuntu workspace triage/final (each 1414 passed, 0 failed, 1 ignored).
 Final review then found missing or obsolete antecedent spans in E3001 diagnostics
-across joins and reinitialization. The generic provenance repair needs a new pin
-and fresh qualification. Candidate remains `c085449b`.
+across joins and reinitialization. Follow-up review also found message-based
+dedup and unstable multi-function diagnostic order. The generic repairs need a
+new pin and fresh qualification. Candidate remains `c085449b`.
 Protocol remains compiler/metadata/MVIR/format **25/9/5/2**.
 
 The [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)

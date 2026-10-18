@@ -1186,7 +1186,7 @@ impl<'a> TypeChecker<'a> {
                         .with_code(DiagnosticCode::CopyDropConflict)
                         .with_span(span);
                         
-                        if !self.ctx.diagnostics.contains(&diag) {
+                        if !self.ctx.diagnostics.iter().any(|existing| existing.same_identity(&diag)) {
                             self.ctx.diagnostics.push(diag);
                         }
                     }

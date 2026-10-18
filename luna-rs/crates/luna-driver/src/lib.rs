@@ -238,6 +238,11 @@ fn verify_items_lifetime(
 /// or `Ok(())` if the program would have passed the semantic gate.
 pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     let mut session = CompilerSession::new();
+    let result = check_semantic_only_unordered(&mut session, file_name, input, options);
+    ordered_diagnostic_result(result, &session.source_manager)
+}
+
+fn check_semantic_only_unordered(mut session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     let file_id = session.source_manager.add_file(file_name.to_string(), input.clone());
     let lexer = Lexer::new(&input, file_id);
     let mut arena = AstArena::new();
@@ -329,6 +334,18 @@ pub fn check(file_name: &str, input: String, options: &CompilerOptions) -> Resul
 /// Runs `check` against a caller-owned session so rendered diagnostics can
 /// resolve their source spans through the same `SourceManager`.
 pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
+    let result = check_with_session_unordered(session, file_name, input, options);
+    ordered_diagnostic_result(result, &session.source_manager)
+}
+
+fn ordered_diagnostic_result<T>(result: Result<T, Vec<Diagnostic>>, sources: &luna_common::source::SourceManager) -> Result<T, Vec<Diagnostic>> {
+    result.map_err(|mut diagnostics| {
+        luna_common::diagnostic::normalize_diagnostics(&mut diagnostics, sources);
+        diagnostics
+    })
+}
+
+fn check_with_session_unordered(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     let file_id = session.source_manager.add_file(file_name.to_string(), input.clone());
     let lexer = Lexer::new(&input, file_id);
     let mut arena = AstArena::new();
@@ -488,6 +505,11 @@ pub fn compile_and_render(file_name: &str, input: String, options: &CompilerOpti
 }
 
 pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
+    let result = compile_with_session_unordered(session, file_name, input, options);
+    ordered_diagnostic_result(result, &session.source_manager)
+}
+
+fn compile_with_session_unordered(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     if (options.emit_llib || options.emit_mlib)
         && options.output_path.as_ref().is_some_and(|path| path.ends_with(".mlib"))
     {
@@ -628,7 +650,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             semantic_ctx.drop_glue_instances = drop_glues;
             
             for diag in semantic_ctx.diagnostics.clone() {
-                if !all_diagnostics.contains(&diag) {
+                if !all_diagnostics.iter().any(|existing| existing.same_identity(&diag)) {
                     all_diagnostics.push(diag);
                 }
             }

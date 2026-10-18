@@ -2,7 +2,8 @@
 
 **DRAFT — qualification is still running. Do not publish this as a completed release.**
 
-Selected implementation: `67146195fb025951ca51d54365fd3a47ef9544e6`.
+Replacement implementation: pending final local preflight for DIAG-4/6.
+Pin `67146195` is superseded; its ongoing jobs are historical only.
 Previous `3a72f946` completed all eight lanes (workspace 1414/0/1 on both targets) but exposed a nested/stale move-origin gap at final review.
 Previous implementation `52ef3711` is not qualified (five Ubuntu native math link failures).
 Current remote candidate: `c085449b207b5860b1d7a79bee221c2ff3d357c3`.
@@ -40,7 +41,9 @@ The selected follow-up preserves move antecedents across nested/equal-state join
 reinitialization and compacted aggregate fields. Public CLI reducers verify E3001
 primary and related source lines in source/fresh artifact modes, including
 portable generic bodies. The provenance change does not alter ownership-state
-transitions or introduce library-specific compiler branches.
+transitions or introduce library-specific compiler branches. The next repair
+uses typed source-event identity and source ordering for public diagnostics;
+identical wording no longer collapses distinct events.
 
 Protocol identities remain **compiler25 / metadata9 / MVIR5 / format2**.
 This does not waive artifact freshness or dependency-interface validation.
