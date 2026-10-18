@@ -74,3 +74,13 @@ reinitialization and preservation of valid field causes during compaction.
 Implementation pin: `67146195fb025951ca51d54365fd3a47ef9544e6`. The [local preflight](evidence/local-preflight.json) passes: seven negatives in two provider modes, each checked twice and built (42 negative commands), correct primary/antecedent lines, no executable, and valid native controls in both modes. All 65 affected borrowck tests pass, including predecessor permutations and fixed-point/field metadata invariants. This preflight reuses the existing Windows runtime and is not exact-pin release qualification.
 
 Documentation regeneration is idempotent at the selected implementation (230 documents, 30 pages, 1807 checked local links). The next Ubuntu normal harness explicitly rejects a dirty final checkout and preserves final identity; hosted Windows now also saves its final identity. New full-workspace gates require the move-origin CLI suite in addition to the E3004 and native-math suites. All eight lanes must complete again.
+
+## Active exact-pin acquisition
+
+Harness: `6eab700e5fe211a407b6a7f9aebb16a150a4cbf3`. Authenticated GitHub job observations confirm native acquisition has started:
+
+- [Ubuntu normal / ASan / comptime](https://github.com/17thedevv/luna/actions/runs/39099784852)
+- [Ubuntu workspace triage then final](https://github.com/17thedevv/luna/actions/runs/39099784909)
+- [Windows normal / workspace triage then final](https://github.com/17thedevv/luna/actions/runs/39099784890)
+
+These links identify running jobs, not passing evidence. [State and job IDs](qualification-state.json) and [remaining requirements](REQUIREMENTS.md) retain the full release scope.
