@@ -1,0 +1,8 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "status": "INTERRUPTED_NO_COMPLETED_BATCH_RESULT",
+  "source": "D:\\r5-52ef3711\\windows\\focused\\arithmetic.log",
+  "raw_sha256": "20e87cdacc5ada73f4a32c2fe16ffa52e2e66b1b242437aa662441765ca94447",
+  "compressed_sha256": "d32494e1049d1f447dd1ef58969e2cbb00165560d85147549d54ff28a893f635",
+  "note": "OS process validation found no runner/Cargo/Luna process; arithmetic.json and focused-summary.json absent; partial summaries are not a completed gate"
+}

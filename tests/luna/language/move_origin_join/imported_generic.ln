@@ -1,0 +1,7 @@
+import "provider";
+struct Record { value: i32, };
+fn main() -> i32 {
+    dec value = Record { value: 1 };
+    dec result = origins::invalid<Record>(true, false, value);
+    return result.value;
+}

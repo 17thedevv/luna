@@ -1,0 +1,2 @@
+# Preserve the separately hashed qualification inputs across host checkouts.
+* -text

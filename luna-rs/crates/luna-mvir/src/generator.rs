@@ -1973,6 +1973,31 @@ impl<'a> MvirGenerator<'a> {
                 self.current_block = Some(block);
                 self.emit_drops_up_to(0, None);
 
+                // Falling off a value-returning body is not an implicit zero.
+                // Preserve the missing-return edge for reachable-CFG analysis,
+                // including async bodies whose ABI return wraps the output.
+                let output_ty = match self.ctx.types.get(ret_ty_id) {
+                    luna_semantic::SemanticType::Future(output) if self.current_async_future.is_some() => *output,
+                    _ => ret_ty_id,
+                };
+                if !matches!(self.ctx.types.get(output_ty), luna_semantic::SemanticType::Void) {
+                    // A join or an empty body may have no source-bearing
+                    // instructions. Carry the enclosing declaration's real
+                    // anchor in existing MVIR debug data, also for closures
+                    // and generated default entries without a global symbol.
+                    let span = self.current_instance.and_then(|instance| {
+                        let instance = unsafe { &*instance };
+                        match self.arena.decls.get(instance.instance.decl_id.0 as usize) {
+                            Some(Decl::Function { name, .. }) => Some(*name),
+                            _ => None,
+                        }
+                    }).or(self.current_span);
+                    self.push_inst_span(Instruction::Nop, luna_semantic::SemanticTypeId(0), span);
+                    block = self.current_block.take().unwrap();
+                    block.terminator = Some(Terminator::MissingReturn);
+                    self.current_function.as_mut().unwrap().blocks.push(block);
+                    return;
+                }
                 let ret_val = if let Some(fut_alloca) = self.current_async_future {
                     let i32_ty = luna_semantic::SemanticTypeId(3);
                     let state_ptr = self.push_inst(Instruction::FieldPtr {
@@ -1988,10 +2013,8 @@ impl<'a> MvirGenerator<'a> {
                         ptr: Operand::Value(fut_alloca),
                     }, ret_ty_id);
                     Some(Operand::Value(load_fut))
-                } else if ret_ty_id == luna_semantic::SemanticTypeId(0) {
-                    None
                 } else {
-                    Some(Operand::Number("0".to_string()))
+                    None
                 };
                 block = self.current_block.take().unwrap();
                 block.terminator = Some(Terminator::Ret { value: ret_val });

@@ -1,0 +1,139 @@
+name: R5 exact-pin Windows GNU qualification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/r5-missing-return]
+    paths:
+      - .github/workflows/r5-exact-windows-qualification.yml
+      - docs/audits/r5-missing-return-2026-10-17/prepare_windows_llvm.py
+      - docs/audits/r5-missing-return-2026-10-17/qualify_windows_ci.py
+
+permissions:
+  contents: read
+
+env:
+  R5_TESTED_COMMIT: d3d0ffe8d6495aee1f56257a1db817ce4107e992
+  R5_LLVM_HOME: C:/r5-llvm18
+  R5_WINDOWS_OUT: D:/r5-${{ github.run_id }}
+  R5_WINDOWS_BUILD: C:/r5b-${{ github.run_id }}
+  CARGO_TERM_COLOR: never
+
+jobs:
+  windows-gnu:
+    name: Windows GNU exact-pin native qualification
+    runs-on: windows-2022
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Acquire LLVM18 development distribution
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $archive = Join-Path $env:RUNNER_TEMP 'llvm18.tar.xz'
+          Invoke-WebRequest -Uri 'https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang%2Bllvm-18.1.8-x86_64-pc-windows-msvc.tar.xz' -OutFile $archive
+          python docs/audits/r5-missing-return-2026-10-17/prepare_windows_llvm.py --archive $archive --out $env:R5_LLVM_HOME
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $gcc = (Get-Command gcc.exe -ErrorAction Stop).Source
+          $target = & $gcc -dumpmachine
+          if ($LASTEXITCODE -ne 0 -or $target -notmatch '^x86_64.*mingw') { throw "Expected native x86_64 GNU compiler, got $target" }
+          $env:R5_LLVM_HOME + '/bin' | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+          & ($env:R5_LLVM_HOME + '/bin/llvm-config.exe') --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire exact-pin Windows GNU evidence
+        shell: pwsh
+        run: python docs/audits/r5-missing-return-2026-10-17/qualify_windows_ci.py
+      - name: Preserve native Windows evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-windows-gnu-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.R5_WINDOWS_OUT }}/windows/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  windows-workspace-triage:
+    name: Windows GNU full workspace triage
+    runs-on: windows-2022
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Acquire LLVM18 development distribution
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $archive = Join-Path $env:RUNNER_TEMP 'llvm18.tar.xz'
+          Invoke-WebRequest -Uri 'https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang%2Bllvm-18.1.8-x86_64-pc-windows-msvc.tar.xz' -OutFile $archive
+          python docs/audits/r5-missing-return-2026-10-17/prepare_windows_llvm.py --archive $archive --out $env:R5_LLVM_HOME
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $gcc = (Get-Command gcc.exe -ErrorAction Stop).Source
+          $target = & $gcc -dumpmachine
+          if ($LASTEXITCODE -ne 0 -or $target -notmatch '^x86_64.*mingw') { throw "Expected native x86_64 GNU compiler, got $target" }
+          $env:R5_LLVM_HOME + '/bin' | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+          & ($env:R5_LLVM_HOME + '/bin/llvm-config.exe') --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire exact-pin Windows GNU evidence
+        shell: pwsh
+        run: python docs/audits/r5-missing-return-2026-10-17/qualify_windows_ci.py --pass triage
+      - name: Preserve native Windows evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-windows-workspace-triage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.R5_WINDOWS_OUT }}/windows/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  windows-workspace-final:
+    name: Windows GNU full workspace final
+    needs: windows-workspace-triage
+    runs-on: windows-2022
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Acquire LLVM18 development distribution
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $archive = Join-Path $env:RUNNER_TEMP 'llvm18.tar.xz'
+          Invoke-WebRequest -Uri 'https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang%2Bllvm-18.1.8-x86_64-pc-windows-msvc.tar.xz' -OutFile $archive
+          python docs/audits/r5-missing-return-2026-10-17/prepare_windows_llvm.py --archive $archive --out $env:R5_LLVM_HOME
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $gcc = (Get-Command gcc.exe -ErrorAction Stop).Source
+          $target = & $gcc -dumpmachine
+          if ($LASTEXITCODE -ne 0 -or $target -notmatch '^x86_64.*mingw') { throw "Expected native x86_64 GNU compiler, got $target" }
+          $env:R5_LLVM_HOME + '/bin' | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+          & ($env:R5_LLVM_HOME + '/bin/llvm-config.exe') --version
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire exact-pin Windows GNU evidence
+        shell: pwsh
+        run: python docs/audits/r5-missing-return-2026-10-17/qualify_windows_ci.py --pass final
+      - name: Preserve native Windows evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-windows-workspace-final-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ env.R5_WINDOWS_OUT }}/windows/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true

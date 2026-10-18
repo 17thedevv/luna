@@ -1,0 +1,3 @@
+import "candidates_provider";
+fn takes<T: choices::First + choices::Second>(value: T::Item) -> i32 { return 0; } // invalid definition
+fn main() -> i32 { return 0; }

@@ -45,6 +45,16 @@ fn native_compiler() -> OsString {
     })
 }
 
+fn append_native_system_libraries(command: &mut Command) {
+    // Keep system libraries after all objects and the static runtime so that
+    // linkers using --as-needed can resolve their undefined references.
+    if cfg!(windows) {
+        command.args(["-lws2_32", "-lbcrypt"]);
+    } else if cfg!(target_os = "linux") {
+        command.arg("-lm");
+    }
+}
+
 fn tool(name: &str) -> PathBuf {
     env::var_os("LLVM_HOME")
         .map(PathBuf::from)
@@ -181,10 +191,7 @@ pub fn compile_ll_to_exe(ll_file: &str, obj_file: &str, exe_file: &str) -> Resul
     let runtime = runtime_library()?;
     let mut link_cmd = Command::new(native_compiler());
     link_cmd.arg(obj_file).arg(runtime);
-    if cfg!(windows) {
-        link_cmd.arg("-lws2_32");
-        link_cmd.arg("-lbcrypt");
-    }
+    append_native_system_libraries(&mut link_cmd);
     link_cmd.arg("-o").arg(exe_file);
 
     let link_status = link_cmd
@@ -212,10 +219,7 @@ pub fn link_objs_to_exe<P: AsRef<std::path::Path>, Q: AsRef<std::path::Path>>(
         cmd.arg(obj.as_ref());
     }
     cmd.arg(runtime);
-    if cfg!(windows) {
-        cmd.arg("-lws2_32");
-        cmd.arg("-lbcrypt");
-    }
+    append_native_system_libraries(&mut cmd);
     cmd.arg("-o").arg(exe_file.as_ref());
 
     let output = cmd

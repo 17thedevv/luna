@@ -52,14 +52,14 @@ impl SemanticContext {
                 let self_name = nominal_head
                     .map(|s| self.symbol_table.get_symbol(s).name.clone())
                     .unwrap_or_else(|| format!("{:?}", self.types.get(self_ty_res)));
-                self.diagnostics.push(
-                    Diagnostic::error(format!(
+                let mut diagnostic = Diagnostic::source_error(DiagnosticCode::OrphanImpl, span, format!(
                         "E_ORPHAN_IMPL: Cannot implement foreign trait `{}` for foreign type `{}`. Either the trait or the target type nominal head must be defined in the current module.",
                         trait_name, self_name
-                    ))
-                    .with_code(DiagnosticCode::OrphanImpl)
-                    .with_span(span)
-                );
+                    )).with_related(self.symbol_table.get_symbol(trait_sym).span, "foreign trait declared here");
+                if let Some(head) = nominal_head {
+                    diagnostic = diagnostic.with_related(self.symbol_table.get_symbol(head).span, "foreign type declared here");
+                }
+                self.diagnostics.push(diagnostic);
                 return Err(());
             }
         } else {
@@ -71,14 +71,14 @@ impl SemanticContext {
                 let self_name = nominal_head
                     .map(|s| self.symbol_table.get_symbol(s).name.clone())
                     .unwrap_or_else(|| format!("{:?}", self.types.get(self_ty_res)));
-                self.diagnostics.push(
-                    Diagnostic::error(format!(
+                let mut diagnostic = Diagnostic::source_error(DiagnosticCode::OrphanImpl, span, format!(
                         "E_ORPHAN_IMPL: Cannot define inherent methods for foreign type `{}`. The target type must be defined in the current module.",
                         self_name
-                    ))
-                    .with_code(DiagnosticCode::OrphanImpl)
-                    .with_span(span)
-                );
+                    ));
+                if let Some(head) = nominal_head {
+                    diagnostic = diagnostic.with_related(self.symbol_table.get_symbol(head).span, "foreign type declared here");
+                }
+                self.diagnostics.push(diagnostic);
                 return Err(());
             }
         }
@@ -92,6 +92,17 @@ impl SemanticContext {
         generic_params: &[SymbolId],
         trait_args: &[SemanticTypeId],
         span: Span,
+    ) -> Result<(), ()> {
+        self.check_impl_coherence_with_origin(trait_sym, self_ty, generic_params, trait_args, Some(span))
+    }
+
+    pub fn check_impl_coherence_with_origin(
+        &mut self,
+        trait_sym: SymbolId,
+        self_ty: SemanticTypeId,
+        generic_params: &[SymbolId],
+        trait_args: &[SemanticTypeId],
+        span: Option<Span>,
     ) -> Result<(), ()> {
         for entry in &self.tables.trait_impl_entries {
             if entry.trait_id == trait_sym {
@@ -113,14 +124,18 @@ impl SemanticContext {
                             SemanticType::Enum(e, _, _) => self.symbol_table.get_symbol(*e).name.clone(),
                             _ => format!("{:?}", self.types.get(self_ty_res)),
                         };
-                        self.diagnostics.push(
-                            Diagnostic::error(format!(
+                        let message = format!(
                                 "E_CONFLICTING_TRAIT_IMPL: conflicting implementations for trait `{}` for `{}`",
                                 trait_name, self_type_str
-                            ))
-                            .with_code(DiagnosticCode::ConflictingTraitImpl)
-                            .with_span(span)
-                        );
+                            );
+                        let mut diagnostic = match span {
+                            Some(span) => Diagnostic::source_error(DiagnosticCode::ConflictingTraitImpl, span, message),
+                            None => Diagnostic::contract_error(DiagnosticCode::ConflictingTraitImpl, message),
+                        };
+                        if let Some(previous) = entry.definition_span {
+                            diagnostic = diagnostic.with_related(previous, "previous implementation");
+                        }
+                        self.diagnostics.push(diagnostic);
                         return Err(());
                     }
                 }

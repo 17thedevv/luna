@@ -1,0 +1,24 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "workflow_run": 39056178504,
+  "artifact_id": 12109448075,
+  "artifact_sha256": "ba439723f90f4a6d289979bd7aa7aabc8591722b3b5ea1abb034a22cf0d26b22",
+  "manifest_files_verified": 42,
+  "gate_logs_verified": 19,
+  "status": "PASS_IN_EXECUTED_SCOPE",
+  "scope": "Sanitized C runtime + RuntimeAbiTests; generated code/compiler/stdlib not certified as instrumented",
+  "summary": {
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "harness_commit": "14a608660cdec0c3bb8884ab893f74acda200dcd",
+    "lane": "runtime-asan",
+    "actual_native_target": null,
+    "advertised_target": "x86_64-unknown-linux-gnu",
+    "scope": "Executed lane scope only",
+    "status": "PASS_IN_EXECUTED_LANE_SCOPE",
+    "failure": null,
+    "failed_gates": [],
+    "r5_verdict": "NOT DETERMINED BY THIS LANE",
+    "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION",
+    "gate_count": 19
+  }
+}

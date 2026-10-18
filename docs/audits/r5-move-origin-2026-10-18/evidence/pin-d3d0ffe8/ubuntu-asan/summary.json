@@ -1,0 +1,14 @@
+{
+  "tested_commit": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+  "harness_commit": "bf35297b7797215eabf01572b0531a78ab62511c",
+  "lane": "runtime-asan",
+  "actual_native_target": null,
+  "advertised_target": "x86_64-unknown-linux-gnu",
+  "scope": "Executed lane scope only",
+  "status": "PASS_IN_EXECUTED_LANE_SCOPE",
+  "failure": null,
+  "failed_gates": [],
+  "r5_verdict": "NOT DETERMINED BY THIS LANE",
+  "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION",
+  "gate_count": 19
+}

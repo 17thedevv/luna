@@ -1,0 +1,32 @@
+{
+  "gate": "arithmetic-grammar-harness",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--no-fail-fast",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "checked_arithmetic_qualification_cli",
+    "--test",
+    "wrapping_arithmetic_cli",
+    "--test",
+    "v01_grammar_acceptance_tests",
+    "--test",
+    "test_temp_workspace_lifecycle_cli",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T19:02:55Z",
+  "exit": 0,
+  "seconds": 1051.4336541409998,
+  "log_sha256": "2c30003d4588eb99b01ab2ffba073b7470730bf6573eeb279596923e973d27ca",
+  "status": "PASS",
+  "log": "arithmetic-grammar-harness.log.gz",
+  "compressed_sha256": "1e5c7095a33d10deecccf0b7b97e65bd7e04f77eb76be6a8e12e368006624c61"
+}

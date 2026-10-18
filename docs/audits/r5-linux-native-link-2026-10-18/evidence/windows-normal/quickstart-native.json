@@ -1,0 +1,14 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "quickstart-native",
+  "command": [
+    "D:\\r5-39056178610\\windows\\quickstart\\program.exe"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows\\quickstart",
+  "start_utc": "2026-10-17T19:53:30.375255+00:00",
+  "end_utc": "2026-10-17T19:53:30.390853+00:00",
+  "elapsed_seconds": 0.016,
+  "exit": 0,
+  "log": "quickstart-native.log",
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

@@ -1,0 +1,52 @@
+{
+  "status": "PASS_LOCAL_PREFLIGHT_ONLY",
+  "source_implementation_pin": "67146195fb025951ca51d54365fd3a47ef9544e6",
+  "fresh_remote_checkout": false,
+  "runtime_reused_from": "C:/r5-52ef3711/windows-build/runtime/libluna-runtime.a",
+  "cli_sha256": "b4bcae61dd4913108a92f224ec17cf92c8c2969a65845a658fe8d7b39092a0f6",
+  "public_cli": {
+    "passed": 1,
+    "failed": 0,
+    "negative_cases": 7,
+    "provider_modes": 2,
+    "negative_check_repeat_and_build_commands": 42,
+    "native_valid_control_runs": 2,
+    "primary_and_related_lines_verified": true
+  },
+  "borrowck": {
+    "groups": 12,
+    "passed": 65,
+    "failed": 0,
+    "ignored": 0
+  },
+  "logs": {
+    "fixed-cli-test.log.gz": {
+      "raw_sha256": "583ad350bb791dd395fa1011eac4c11707d4c971c0669b96fdd8b3dad75d4a4a",
+      "compressed_sha256": "3754bda7b7d72e494ca201874fb9428a8d7dfd4aa9a1da7b58a7b7da014a2c2b"
+    },
+    "fixed-cli-test2.log.gz": {
+      "raw_sha256": "00abbd1d92ce9a96baf7797308b7ed98cebf7158dedfa1cadcbf5e0723ab2570",
+      "compressed_sha256": "89936aae98c9ec0a2d6cbb3824c125296f9c6cc094188ed8485a1ca133357fef"
+    },
+    "fixed-cli-test3.log.gz": {
+      "raw_sha256": "493d8116b95329d12b6b45f0a262feccf62d7fb6c7fcf7790874b976b40ead5a",
+      "compressed_sha256": "0dc74e2dc31173851a9bd515133c169890b2501ab79d59048520d28a3951e4d6"
+    },
+    "final-cli-preflight.log.gz": {
+      "raw_sha256": "885a2fff95cda3ab3a068546ce4a4c87773bf9cf0d92b22eb850e89e6892998d",
+      "compressed_sha256": "3529975c8231cbe99a8df82e6d579aed7ad6f3a4b7125cb6dc90ebe2c3cc92af"
+    },
+    "final-borrowck-preflight.log.gz": {
+      "raw_sha256": "10678f577e8c0d8aaa11ac7a1fce3764c490c81df218775332bfc3badf4942fd",
+      "compressed_sha256": "851f3a55c69131a930e99b2826228fac8e4dc753bcc8d4c7d3215aedcd7f25d0"
+    }
+  },
+  "attempt_history": {
+    "fixed-cli-test.log.gz": "FAIL: imported-generic path assertion expected .ln instead of the valid source-free .llib path; source/line requirements unchanged",
+    "fixed-cli-test2.log.gz": "PASS initial join reducers",
+    "fixed-cli-test3.log.gz": "PASS expanded stale-field/compacted-field reducers",
+    "final-cli-preflight.log.gz": "PASS final independent provenance merge",
+    "final-borrowck-preflight.log.gz": "PASS all affected borrowck tests"
+  },
+  "release_gate": "NOT CLAIMED; all eight fresh lanes required"
+}

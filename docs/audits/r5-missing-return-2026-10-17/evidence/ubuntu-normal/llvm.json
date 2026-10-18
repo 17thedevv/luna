@@ -1,0 +1,16 @@
+{
+  "gate": "llvm",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "llvm-config-18",
+    "--version"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T12:18:44Z",
+  "exit": 0,
+  "seconds": 0.08826807399999836,
+  "log_sha256": "b700ddf2ab6060f4dacc4ec19f8440b81e92e303fac663fa177b0154bbf9b844",
+  "status": "PASS",
+  "log": "llvm.log.gz",
+  "compressed_sha256": "28e5a116b761b3497e82bb6b676799b20b68db1441740360c5706ad15cb314f5"
+}

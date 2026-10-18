@@ -1,0 +1,4 @@
+fn f() -> i32 {
+    while true { break; }
+}
+fn main() -> i32 { return f(); }

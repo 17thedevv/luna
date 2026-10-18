@@ -1,0 +1,3 @@
+import "foreign_provider";
+impl Foreign for ForeignRecord {} // invalid definition
+fn main() -> i32 { return 0; }

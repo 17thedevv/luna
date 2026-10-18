@@ -1,0 +1,4 @@
+export module choices {
+    export trait First { type Item; } // first candidate
+    export trait Second { type Item; } // second candidate
+}

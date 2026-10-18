@@ -1,0 +1,160 @@
+name: R5 exact-candidate Ubuntu qualification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [r5-exact-release-qualification, codex/r5-missing-return]
+    paths:
+      - .github/workflows/r5-exact-release-qualification.yml
+      - docs/audits/r5-qualification-2026-10-14/harness/**
+
+permissions:
+  contents: read
+
+env:
+  # Implementation pin includes typed diagnostics, E3004, Linux math and diagnostic origin/identity/order repairs.
+  # compiler25/metadata9/MVIR5/format2 unchanged; every lane reacquires this SHA.
+  R5_TESTED_COMMIT: d3d0ffe8d6495aee1f56257a1db817ce4107e992
+  R5_REPOSITORY_URL: https://github.com/17thedevv/luna.git
+  CARGO_TERM_COLOR: never
+
+jobs:
+  ubuntu-normal:
+    name: Ubuntu GNU exact-pin descriptive normal acquisition (target contract enforced)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
+      LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
+      LLVM_HOME: /usr/lib/llvm-18
+    steps:
+      - name: Acquire qualification harness (separate from tested clone)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install advertised Ubuntu GNU toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build clang-18 llvm-18-dev libclang-18-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire exact-candidate evidence and retain mandatory target-contract verdict
+        run: >-
+          python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
+          --lane normal --skip-workspace --out "$RUNNER_TEMP/r5-normal"
+      - name: Surface lane failure reason as an annotation
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP/r5-normal/evidence/failure.txt" "$RUNNER_TEMP/r5-normal/evidence/summary.json"; do
+            if [ -f "$f" ]; then
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
+            fi
+          done
+      - name: Preserve normal gate evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-ubuntu-normal-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/r5-normal/evidence/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  ubuntu-runtime-asan:
+    name: Ubuntu GNU C runtime ABI and partial-read cleanup ASan
+    # The original narrow acquisition stays in history; a new implementation pin
+    # requires a fresh sanitized-runtime acquisition, so this lane runs for the
+    # final pin as well (dispatch and pin-push).
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+    steps:
+      - name: Acquire qualification harness (separate from tested clone)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install runtime GNU tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build
+      - name: Qualify only the sanitized C runtime at immutable candidate
+        run: >-
+          python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
+          --lane runtime-asan --out "$RUNNER_TEMP/r5-runtime-asan"
+      - name: Surface lane failure reason as an annotation
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP/r5-runtime-asan/evidence/failure.txt" "$RUNNER_TEMP/r5-runtime-asan/evidence/summary.json"; do
+            if [ -f "$f" ]; then
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
+            fi
+          done
+      - name: Preserve runtime ASan evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-ubuntu-runtime-asan-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/r5-runtime-asan/evidence/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  ubuntu-comptime-vm:
+    name: Ubuntu GNU64 descriptive comptime and VM boundary acquisition
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    env:
+      LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
+      LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
+      LLVM_HOME: /usr/lib/llvm-18
+    steps:
+      - name: Acquire qualification harness separately from tested candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Ubuntu GNU and LLVM18 dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build clang-18 llvm-18-dev libclang-18-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire isolated portable boundary probe evidence at exact candidate
+        run: >-
+          python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
+          --lane comptime-vm --out "$RUNNER_TEMP/r5-comptime-vm"
+      - name: Surface lane failure reason as an annotation
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP/r5-comptime-vm/evidence/failure.txt" "$RUNNER_TEMP/r5-comptime-vm/evidence/summary.json"; do
+            if [ -f "$f" ]; then
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
+            fi
+          done
+          for f in $(find "$RUNNER_TEMP/r5-comptime-vm/evidence" -name 'failure.txt' -o -name 'summary.json' 2>/dev/null | head -4); do
+            echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py::$f :: $(head -c 600 "$f" | tr '\n' ' ')"
+          done
+          log="$RUNNER_TEMP/r5-comptime-vm/evidence/comptime-vm-boundary.log.gz"
+          if [ -f "$log" ]; then
+            count=$(zgrep -Fc '"result": "FAIL"' "$log" || true)
+            echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py,line=1::FAIL verdicts=$count"
+            n=2
+            zgrep -F '"result": "FAIL"' "$log" | head -6 | cut -c1-200 | while IFS= read -r line; do
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py,line=$n::$(printf '%s' "$line" | tr -d '\r')"
+              n=$((n+1))
+            done
+            echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/comptime/run_qualification.py,line=9::tail $(zcat "$log" | tail -c 260 | tr '\n' ' ' | tr -d '\r')"
+          fi
+      - name: Preserve boundary evidence including mandatory target conflict
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-ubuntu-comptime-vm-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/r5-comptime-vm/evidence/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true

@@ -2,7 +2,31 @@
 
 > **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](docs/spec/0.1/README.md).
 
-# Luna 0.1 status — 2026-10-14
+# Luna 0.1 status — 2026-10-18
+
+**Release: BLOCKED / NOT VERIFIED; diagnostic origin/identity/order repairs under validation.**
+Candidate: `c085449b207b5860b1d7a79bee221c2ff3d357c3`.
+Protocol: compiler / metadata / MVIR / format **25 / 9 / 5 / 2**.
+
+The [current report](docs/audits/r5-move-origin-2026-10-18/README.md) and
+[replacement matrix](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md)
+record the findings and remaining work. Previous pin `3a72f946` completed normal,
+ASan and comptime lanes plus Windows/Ubuntu full workspace triage/final (each
+1414 passed, 0 failed, 1 ignored). Its final audit found E3001 origins lost at
+nested joins or retained after field reinitialization. Correct rejection alone
+does not satisfy DIAG-3/9. Follow-up review found distinct E3002 events collapsed
+by message-based dedup and unstable multi-function diagnostic order (DIAG-4/6).
+The generic repairs are being validated before selecting a replacement pin and
+reacquiring every lane.
+
+Earlier diagnostic E4002/E4003, E3004 and Linux native math linkage repairs stay
+in the implementation. Their previous passes remain scoped to their own SHA.
+Tagging, main merge, PR creation and publication remain maintainer decisions;
+no release-ready or freeze claim is made.
+
+## Prior reconciliation - 2026-10-14
+
+The following snapshot describes its dated evidence, not the selected pin.
 
 **Release: BLOCKED / NOT VERIFIED; R5 PENDING.** R4 documentation base is
 `3f8646c654b99b67bae57ee290b7a7e23d717b40`; tested implementation is

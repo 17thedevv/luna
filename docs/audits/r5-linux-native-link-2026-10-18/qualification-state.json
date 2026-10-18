@@ -1,0 +1,126 @@
+{
+  "observed_at_utc": "2026-10-18T04:55:21.179787+00:00",
+  "implementation_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "status": "ALL_EIGHT_LANES_PASS_FINAL_AUDIT_FOUND_DIAG_ORIGIN_GAP",
+  "previous_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "previous_pin_result": "NOT_QUALIFIED_UBUNTU_WORKSPACE_5_FAILURES",
+  "candidate": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+  "required_lanes": [
+    "Ubuntu normal including unchanged math regressions",
+    "Ubuntu runtime ASan",
+    "Ubuntu comptime VM",
+    "Ubuntu full workspace triage",
+    "Ubuntu full workspace final",
+    "Windows native normal including strict L002 replay",
+    "Windows full workspace triage",
+    "Windows full workspace final"
+  ],
+  "no_carry": true,
+  "remaining": [
+    "Fix confirmed nested move-origin loss (DIAG-3/9), add public CLI regression, select a new pin and requalify all lanes",
+    "Complete final producer/phase/related-span audit and reconcile closure/public docs",
+    "Advance candidate only after every final requirement passes"
+  ],
+  "maintainer_actions_not_performed": [
+    "tag",
+    "main merge",
+    "PR",
+    "release publication"
+  ],
+  "harness_commit": "14a608660cdec0c3bb8884ab893f74acda200dcd",
+  "runs": {
+    "ubuntu": {
+      "id": 39056178504,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39056178504",
+      "jobs": [
+        117464495961,
+        117464496174,
+        117464496183
+      ],
+      "status": "ALL_THREE_JOBS_SUCCESS_ARTIFACTS_VERIFIED",
+      "asan": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "job": 117464496174,
+        "artifact_id": 12109448075,
+        "verification": "evidence/ubuntu-asan-verification.json"
+      },
+      "comptime_vm": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "job": 117464495961,
+        "artifact_id": 12109342794,
+        "verification": "evidence/ubuntu-comptime-vm-verification.json"
+      },
+      "normal": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "job": 117464496183,
+        "artifact_id": 12112417848,
+        "gates": 48,
+        "verification": "evidence/ubuntu-normal-verification.json",
+        "final_status_note": "Generated documentation indexes changed; protected implementation trees unchanged"
+      }
+    },
+    "ubuntu_workspace": {
+      "id": 39056178775,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39056178775",
+      "triage_job": 117464497144,
+      "status": "TRIAGE_IN_PROGRESS_FINAL_DEPENDENT",
+      "triage": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/ubuntu-workspace-triage-verification.json",
+        "totals": {
+          "groups": 234,
+          "passed": 1414,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "final": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/ubuntu-workspace-final-verification.json",
+        "totals": {
+          "groups": 234,
+          "passed": 1414,
+          "failed": 0,
+          "ignored": 1
+        }
+      }
+    },
+    "windows": {
+      "id": 39056178610,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39056178610",
+      "triage_job": 117464496785,
+      "normal_job": 117464496955,
+      "status": "NORMAL_SUCCESS_VERIFIED_TRIAGE_IN_PROGRESS_FINAL_DEPENDENT",
+      "normal": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "artifact_id": 12113055351,
+        "verification": "evidence/windows-normal-verification.json",
+        "focused_batches": 12,
+        "strict_L002_replay": "4/4 PASS"
+      },
+      "triage": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/windows-workspace-triage-verification.json",
+        "totals": {
+          "groups": 234,
+          "passed": 1414,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "final": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/windows-workspace-final-verification.json",
+        "totals": {
+          "groups": 234,
+          "passed": 1414,
+          "failed": 0,
+          "ignored": 1
+        }
+      }
+    }
+  },
+  "local_preflight": "evidence/windows-cli-preflight.json",
+  "completion_matrix": "REQUIREMENTS.md",
+  "final_audit_finding": "../r5-move-origin-2026-10-18/evidence/finding.json"
+}

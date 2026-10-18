@@ -1,0 +1,16 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "diagnostics/inventory",
+  "command": [
+    "python",
+    "D:\\r5-39056178610\\windows-checkout\\docs\\tools\\diag_producer_inventory.py",
+    "--check"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T19:53:00.794667+00:00",
+  "end_utc": "2026-10-17T19:53:05.327815+00:00",
+  "elapsed_seconds": 4.532,
+  "exit": 0,
+  "log": "diagnostics/inventory.log",
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

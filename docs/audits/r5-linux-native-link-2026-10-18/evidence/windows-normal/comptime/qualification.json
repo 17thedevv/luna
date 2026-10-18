@@ -1,0 +1,27 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "comptime/qualification",
+  "command": [
+    "python",
+    "D:\\r5-39056178610\\windows\\harness-comptime\\run_qualification.py",
+    "--checkout",
+    "D:\\r5-39056178610\\windows-checkout",
+    "--sysroot",
+    "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+    "--debug",
+    "C:\\r5b-39056178610\\cargo-target\\debug\\luna.exe",
+    "--release",
+    "C:\\r5b-39056178610\\cargo-target\\release\\luna.exe",
+    "--runtime",
+    "C:\\r5b-39056178610\\runtime\\libluna-runtime.a",
+    "--label",
+    "final1"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows\\harness-comptime",
+  "start_utc": "2026-10-17T19:53:30.609624+00:00",
+  "end_utc": "2026-10-17T19:54:47.968210+00:00",
+  "elapsed_seconds": 77.359,
+  "exit": 0,
+  "log": "comptime/qualification.log",
+  "log_sha256": "869a7cdb04ba7cc9792a047efa74313ec8bee7aa25f7b7f4540e6ea59e791a36"
+}

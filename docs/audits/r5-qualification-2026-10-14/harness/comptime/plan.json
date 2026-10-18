@@ -1,0 +1,308 @@
+{
+  "task": "R5-3 comptime and GNU64 layout qualification",
+  "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "execution_status": "NOT RUN; awaiting parent-exclusive CLI window",
+  "output_root": "D:\\r5-9bda6f57\\comptime",
+  "source_repository_read_only": "D:\\fdlang",
+  "preflight": {
+    "feature": "pure expression-form comptime, branch values, arithmetic, effect containment and GNU64 layout",
+    "syntax": "canonical dec/const, comma struct fields, match ->, generic calls <T>, extensionless imports",
+    "semantic_rule": "Luna 0.1 const/comptime shared MVIR evaluation, checked arithmetic and explicit wrapping; no extern fallbacks",
+    "enforcing_phase": "semantic/admission then checked MVIR/VM then backend materialization",
+    "ABI_runtime": "GNU64 i128 alignment 16 and matching layout/value observations only",
+    "canonical_examples": "exact-pin copied E1 enum alignment and checked arithmetic reducers",
+    "foreign_assumptions": "no Rust syntax/lifetime assumptions; no cross-target layout inference"
+  },
+  "authorities": [
+    "docs/spec/0.1/semantics.md",
+    "docs/spec/0.1/syntax.md",
+    "docs/spec/0.1/gaps.md",
+    "docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md",
+    "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C4-COMPTIME-DEPENDENCY-2026-10-08.md"
+  ],
+  "dependency_protocol": [
+    "publish taken/untaken/branch through real CLI, then remove provider .ln from artifact-only execution directory",
+    "fresh consumer builds/runs exit0; retain both .llib and native object bundles and hashes",
+    "replace only taken provider body return23->return29 by official publication; old branch dependent check/build must reject E6001 execution fingerprint mismatch",
+    "new isolated baseline; replace only untaken provider return11->return17; report stale rejection as accepted static over-approximation or acceptance as precision, never infer execution",
+    "never overwrite canonical sysroot or input evidence; variants and artifact directories outside checkouts"
+  ],
+  "scope_limits": [
+    "No release-ready assertion",
+    "Standalone statement remains unsupported",
+    "GNU64 only",
+    "C4 withdrawn spelling is characterization: parser models if as statement and final if is not block tail_expr; no normative if-expression support claim",
+    "Valid canonical branch-value reducers (function returns, explicit local plus tail, match expressions) retain strict expectations; no weakening after execution",
+    "No compiler/runtime/test-tree edits; no CLI/Cargo until parent grants exclusive window"
+  ],
+  "rows": [
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\expression_basic.ln",
+      "relative_path": "inputs/expression_basic.ln",
+      "sha256": "602a57157eb1aeee7c42e5d04cbf25e50dcf62bf0adb44852184a8bf90589c5a",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "expression comptime admits pure local imperative computation and materializes 42",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\if_expression_true.ln",
+      "relative_path": "inputs/if_expression_true.ln",
+      "sha256": "48cd75e8ce5ab1cfea5086780312f450e28c8af302cdb07711af0e82331e8914",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "characterize historical C4 spelling on true; selected inner expression=11, outer block has no tail_expr; never infer advertised if-value semantics from parser acceptance",
+      "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\if_expression_false.ln",
+      "relative_path": "inputs/if_expression_false.ln",
+      "sha256": "3f7b0b3c91fe5664c16194a4119c925903c83c62363b080dea70a88ae7439679",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "characterize historical C4 spelling on false; selected inner expression=23, outer block has no tail_expr; never infer advertised if-value semantics from parser acceptance",
+      "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\branch_function_values.ln",
+      "relative_path": "inputs/branch_function_values.ln",
+      "sha256": "56984653904c032563ebfc39e7205f069bd5242bd3171da9e85a7a76e1efb23b",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "canonical branch-dependent function returns materialize and execute selected 11/23 values",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\match_expression_values.ln",
+      "relative_path": "inputs/match_expression_values.ln",
+      "sha256": "91b84819dbd43ce542b4a5b2da037322ae8c61fce2d7388ae356e003b6ef5a5d",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "canonical value-producing match expression selects true/false values in comptime",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\if_statement_control.ln",
+      "relative_path": "inputs/if_statement_control.ln",
+      "sha256": "cf89dcc51cb164c2cd8b1e287892656c90f24a87787f4f132478952bbbcf0a39",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "imperative branch control independently materializes correct selected values",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\wrapping_comptime.ln",
+      "relative_path": "inputs/wrapping_comptime.ln",
+      "sha256": "80ee2a4576177b92e4a8a4f957f00ec06a14e04816305224e0eec7efd33c95ee",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "explicit wrapping add/sub/mul agree between VM constants and runtime modulo 256",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\effect_rejected.ln",
+      "relative_path": "inputs/effect_rejected.ln",
+      "sha256": "7b4f58421009773ec9f427534a984ba4595c1c71739670e69145cc904ae06ac1",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "extern call cannot execute or fall back to runtime inside comptime",
+      "expected": "check_and_build_exit1_E4005_primary_span_no_executable"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\comptime_signed_overflow.ln",
+      "relative_path": "inputs/comptime_signed_overflow.ln",
+      "sha256": "98cd567ef25b6847c9b75862e682da63ea82a68d7dbdf0a612e3e5d91c4a8cb9",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/checked_arithmetic/comptime_signed_overflow.ln",
+        "git_blob": "35b8d035f1f40d6be27a5e5a912b18ed2676db21"
+      },
+      "invariant": "invalid checked arithmetic is rejected during constant evaluation with one E4005, not wrapped or deferred",
+      "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\comptime_division_by_zero.ln",
+      "relative_path": "inputs/comptime_division_by_zero.ln",
+      "sha256": "784057969961a87649bc67bc8404eac7bd1bdaa979e8f6f604af1f4eb5eeed92",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/checked_arithmetic/comptime_division_by_zero.ln",
+        "git_blob": "9020fc71eed69d9eda1cf0141b09273886e4ea8b"
+      },
+      "invariant": "invalid checked arithmetic is rejected during constant evaluation with one E4005, not wrapped or deferred",
+      "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\comptime_shift_out_of_range.ln",
+      "relative_path": "inputs/comptime_shift_out_of_range.ln",
+      "sha256": "5e1c8c8daabd7f0279e19050918aa282e4aeaa69c8eb4da59edbd38857b33a01",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/checked_arithmetic/comptime_shift_out_of_range.ln",
+        "git_blob": "a19737f18375129b32f1835b45196f4fc64dc472"
+      },
+      "invariant": "invalid checked arithmetic is rejected during constant evaluation with one E4005, not wrapped or deferred",
+      "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\comptime_unary_neg_min.ln",
+      "relative_path": "inputs/comptime_unary_neg_min.ln",
+      "sha256": "65bcbbb369a59f8726c07250cf61f1ef823d49f53e4558708e0a1d9e6656dee2",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/checked_arithmetic/comptime_unary_neg_min.ln",
+        "git_blob": "6425d6e5247d935244c70082cf76d31475fbff73"
+      },
+      "invariant": "invalid checked arithmetic is rejected during constant evaluation with one E4005, not wrapped or deferred",
+      "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\standalone_unsupported.ln",
+      "relative_path": "inputs/standalone_unsupported.ln",
+      "sha256": "de47d06c37e38b1b905438fa248bfffb066efeb3d7cbf94d0cd41c6d289cc093",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/diagnostic_ownership/unsupported_comptime_statement.ln",
+        "git_blob": "1641418db5f4253c28301c97923b84f2d9153b95"
+      },
+      "invariant": "statement-position comptime remains unsupported and fails closed; not a request to implement it",
+      "expected": "check_and_build_exit1_E4005_primary_span_no_executable"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\gnu64_layout_tuple_struct_enum.ln",
+      "relative_path": "inputs/gnu64_layout_tuple_struct_enum.ln",
+      "sha256": "c41adb76473b82d0cc9edd529e53a4b4a23f1ca6a3644509a32ebed511eb3881",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "GNU64 i128/tuple/struct/owned generic enum static layout, VM materialization and native value agreement; owned means by-value payload, not certified resource-owning Drop behavior",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\layout\\enum_alignment_provider.ln",
+      "relative_path": "inputs/layout/enum_alignment_provider.ln",
+      "sha256": "dcc93f35618af156e0da41b392c9cfc524f022a809945107111192285ce13c29",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/enum_alignment_provider.ln",
+        "git_blob": "3d81cc08c28d56402d1946a47af4a392f6e24d4b"
+      },
+      "invariant": "existing E1 GNU64 enum padded payload/static/VM/native and aligned Option/Result projections; provider source/artifact parity required",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\layout\\enum_alignment_consumer.ln",
+      "relative_path": "inputs/layout/enum_alignment_consumer.ln",
+      "sha256": "afa407f99b28572487015f261dda098606d8568c566990a9054c793a6a10b979",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/enum_alignment_consumer.ln",
+        "git_blob": "97486ef4b910ce7d9419c6eb47a83f321d7cf09b"
+      },
+      "invariant": "existing E1 GNU64 enum padded payload/static/VM/native and aligned Option/Result projections; provider source/artifact parity required",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\layout\\enum_payload_alignment_repro.ln",
+      "relative_path": "inputs/layout/enum_payload_alignment_repro.ln",
+      "sha256": "3966f072e8ca60e5eb090d416785ea43665b36f0954d63a4bed59fe3e03b8a33",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/enum_payload_alignment_repro.ln",
+        "git_blob": "bb19da6fc2e4df4912a7bf4d4983d5fd61bb4aa4"
+      },
+      "invariant": "existing E1 GNU64 enum padded payload/static/VM/native and aligned Option/Result projections; provider source/artifact parity required",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\layout\\enum_payload_reference_alignment_repro.ln",
+      "relative_path": "inputs/layout/enum_payload_reference_alignment_repro.ln",
+      "sha256": "8df6838ece30b3dfd9e9e3f90dce1e92ce32e92f8c7a742bee5b3eb93950eaa5",
+      "origin": {
+        "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+        "path": "tests/luna/language/enum_payload_reference_alignment_repro.ln",
+        "git_blob": "34a335785f3af0ec79beffc185b7d1ced6d06da9"
+      },
+      "invariant": "existing E1 GNU64 enum padded payload/static/VM/native and aligned Option/Result projections; provider source/artifact parity required",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\dependency\\r5_taken.ln",
+      "relative_path": "inputs/dependency/r5_taken.ln",
+      "sha256": "f6163366e5665d45a3fd336906f1265f496aab18b160cfcae68083e2972da75f",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "executed branch provider: changing only body must invalidate materialized dependent artifact",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\dependency\\r5_untaken.ln",
+      "relative_path": "inputs/dependency/r5_untaken.ln",
+      "sha256": "bafec23bd4ed0ee03e0ea047c28d506297299dab240a69ad66ea954dbcda6986",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "untaken provider may remain a static execution dependency under accepted C4-FU1",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\dependency\\r5_branch.ln",
+      "relative_path": "inputs/dependency/r5_branch.ln",
+      "sha256": "ef4d59df015bc27bbbc2b68b3220b518324222ce535b14bd66b7445483bc08a5",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "actual selected value=23; branch dependency precision characterized separately from correctness",
+      "expected": "build_and_run_exit0"
+    },
+    {
+      "path": "D:\\r5-9bda6f57\\comptime\\inputs\\dependency\\consumer.ln",
+      "relative_path": "inputs/dependency/consumer.ln",
+      "sha256": "8e845b6f44804b529a5749aae9a0ddacf70f0422439bdfb685c3e6893ba75ee6",
+      "origin": "new durable qualification reducer; not a repository test edit",
+      "invariant": "source and fresh relocated artifact consumers execute selected value 23; taken provider stale replacement rejected",
+      "expected": "build_and_run_exit0"
+    }
+  ],
+  "source_provenance": [
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "docs/spec/0.1/semantics.md",
+      "sha256": "82111ae02357ce522d558e403ea6d262a770c3e478142ab5284a6676c91b697a",
+      "git_blob": "6b07663a1c198006239962d5f9211b1a695f0838"
+    },
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "docs/spec/0.1/syntax.md",
+      "sha256": "ec6e9afe6ab166a56b824d49a707c10ef560d7f91bef6398fb1fbbfba95b4d5f",
+      "git_blob": "19b2ac7a4dda399afd5334a9c12e4fb11da915a0"
+    },
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "docs/spec/0.1/gaps.md",
+      "sha256": "a165477d436363756366a98b5723357fe4dbc28259c2afe6c116cb46aea87f7d",
+      "git_blob": "e798cf3891432af56b9295fc040d7411910dc1c3"
+    },
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md",
+      "sha256": "a5ec848cc04a73bf4839ed6734b89bf4cd417731e98f8fde6d6991246eb6ddc6",
+      "git_blob": "3894f9d52b1c11a9610915ae992a69553ab1bca3"
+    },
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C4-COMPTIME-DEPENDENCY-2026-10-08.md",
+      "sha256": "daf4ab42ccb5ee130634d0451c4f8e7824988f0cdc50c333866b48b6f41aa0c2",
+      "git_blob": "bdb3abdee1f8e014779f611318625a4ec172c38b"
+    },
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "luna-rs/crates/luna-parser/src/stmt.rs",
+      "sha256": "849b10b2d8116c3e533364fae4d6fd9eaee2175f44d3fefd4782f5e3f64cf79d",
+      "git_blob": "382f36f40a0d34e6aa2524a564b786a7af989bb2"
+    },
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "luna-rs/crates/luna-ast/src/expr.rs",
+      "sha256": "25189f3170dee6d9536de909fd604096027e8ddd11ed8db900111c3fcb80b116",
+      "git_blob": "881bed3fb933107da0747b1014a51526fa2af75f"
+    },
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "sha256": "e3dd4ec5c2b0f80e3680b77ad430cf89c9adb8ac6cd717e9b44df030ac936351",
+      "git_blob": "69050bb03ea1a4ac497287c1f8b6fda13316d25c"
+    },
+    {
+      "commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+      "path": "luna-rs/crates/luna-cli/tests/support/stdlib.rs",
+      "sha256": "c7b3ace8dd4371b278e8119767910c3e7bfa957ba868bd671b158d01b80b8c1a",
+      "git_blob": "97f0b99c2124a4ca50328eb69d2082b5e2aa7bcb"
+    }
+  ]
+}

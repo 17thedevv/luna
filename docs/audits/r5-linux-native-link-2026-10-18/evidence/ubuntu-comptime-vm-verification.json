@@ -1,0 +1,32 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "workflow_run": 39056178504,
+  "artifact_id": 12109342794,
+  "artifact_sha256": "fe2b82f56e9b8ffc09139344ebe0470a01a88fab092a13ed65191e813154250e",
+  "manifest_files_verified": 981,
+  "gate_logs_verified": 28,
+  "status": "PASS_IN_EXECUTED_SCOPE",
+  "summary": {
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "harness_commit": "14a608660cdec0c3bb8884ab893f74acda200dcd",
+    "lane": "comptime-vm",
+    "actual_native_target": "x86_64-pc-linux-gnu",
+    "advertised_target": "x86_64-unknown-linux-gnu",
+    "scope": "Descriptive execution on actual native target; no advertised-target equivalence or normalization",
+    "status": "PASS_IN_EXECUTED_LANE_SCOPE",
+    "failure": null,
+    "failed_gates": [],
+    "r5_verdict": "NOT DETERMINED BY THIS LANE",
+    "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION",
+    "gate_count": 28
+  },
+  "nested_verdicts": {
+    "PASS": 88,
+    "FAIL": 0,
+    "CHARACTERIZED": 8
+  },
+  "providers": 49,
+  "target_contract": "PASS_CANONICAL_x86_64-unknown-linux-gnu",
+  "scope": "64-bit GNU named comptime/VM/layout probes; historical final-if statements are characterizations, not value-producing if-expression conformance",
+  "protected_tree_diff": "EMPTY"
+}

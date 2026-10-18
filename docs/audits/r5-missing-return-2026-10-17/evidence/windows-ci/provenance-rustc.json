@@ -1,0 +1,15 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "label": "provenance-rustc",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\rustc.exe",
+    "-vV"
+  ],
+  "cwd": "D:\\r5-39032926577\\windows-checkout",
+  "start_utc": "2026-10-17T12:34:45.793696+00:00",
+  "end_utc": "2026-10-17T12:34:45.903077+00:00",
+  "elapsed_seconds": 0.109,
+  "exit": 0,
+  "log": "provenance-rustc.log",
+  "log_sha256": "341fed434cf52bd9ba5ab2f3507dbd943a2062212028574e529fc3e7e5ecd7a8"
+}

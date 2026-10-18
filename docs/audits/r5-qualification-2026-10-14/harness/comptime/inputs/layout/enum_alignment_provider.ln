@@ -1,0 +1,20 @@
+import <result>;
+export module aligned {
+    export struct Wide { prefix: u8, marker: i128, tail: u64 };
+    export enum Envelope<T> { Empty, Value(T), Pair(u8, T) }
+    export enum Addressed { Empty, Data(str, Wide) }
+    export struct Nested { prefix: u8, values: [Envelope<Wide>; 2], tail: i128 };
+    const VALUE: Envelope<Wide> = comptime { aligned::Envelope::Value(aligned::Wide { prefix: 7u8, marker: 123456789123456789i128, tail: 11u64 }) };
+    const PAIR: Envelope<Wide> = comptime { aligned::Envelope::Pair(3u8, aligned::Wide { prefix: 7u8, marker: 123456789123456789i128, tail: 11u64 }) };
+    const NESTED: Nested = comptime { aligned::Nested { prefix: 1u8, values: [aligned::Envelope::Value(aligned::Wide { prefix: 7u8, marker: 123456789123456789i128, tail: 11u64 }), aligned::Envelope::Empty], tail: 22i128 } };
+    const ADDRESSED: Addressed = comptime { aligned::Addressed::Data("aligned", aligned::Wide { prefix: 7u8, marker: 123456789123456789i128, tail: 11u64 }) };
+    export fn value() -> &Envelope<Wide> { return &VALUE; }
+    export fn pair() -> &Envelope<Wide> { return &PAIR; }
+    export fn nested() -> &Nested { return &NESTED; }
+    export fn addressed() -> &Addressed { return &ADDRESSED; }
+    export fn make(marker: i128) -> Envelope<Wide> {
+        return Envelope::Value(Wide { prefix: 7u8, marker: marker, tail: 11u64 });
+    }
+    export fn footprint<T>() -> usize { return sizeof(Envelope<T>) as usize; }
+    export fn alignment<T>() -> usize { return alignof(Envelope<T>) as usize; }
+}

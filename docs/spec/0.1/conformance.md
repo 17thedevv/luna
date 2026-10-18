@@ -4,7 +4,15 @@ Contract status and implementation status are separate. An adopted rule remains
 a requirement while its implementation can be partial, broken or unverified.
 This specification refresh is not a compiler repair or a release certification.
 
-Current evidence reconciliation — 2026-10-14: see the
+Current qualification - 2026-10-18: [move-origin repair report](../../audits/r5-move-origin-2026-10-18/README.md)
+and [replacement requirements](../../audits/r5-move-origin-2026-10-18/REQUIREMENTS.md).
+Previous pin `3a72f946` completed all eight lanes, including full workspace
+triage/final on Windows and Ubuntu (each 1414/0/1). Final review found a DIAG-3/9
+origin-span gap; follow-up review also found message-dependent dedup and unstable
+multi-function diagnostic order. Generic repairs require a new pin and fresh qualification.
+Candidate stays `c085449b`; release remains **BLOCKED / NOT VERIFIED**.
+
+Prior evidence reconciliation — 2026-10-14: see the
 [R4 release ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md).
 The E-wave qualification at `e4f9fb53`, stored by closure `3f8646c6`, is scoped
 Windows GNU evidence. R5 exact-candidate qualification is still PENDING;

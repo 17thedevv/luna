@@ -1,0 +1,163 @@
+{
+  "observed_at_utc": "2026-10-17T17:56:00.398250+00:00",
+  "status": "NOT_QUALIFIED_NEW_LINKER_FIX_REQUIRED",
+  "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "harness_commit": "0301ff9e824299f95b06a63e297fe08bae40a6a6",
+  "branch": "codex/r5-missing-return",
+  "candidate": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+  "windows": {
+    "top": "D:/r5-52ef3711",
+    "checkout": "D:/r5-52ef3711/windows-checkout",
+    "build": "C:/r5-52ef3711/windows-build",
+    "runner_pid": null,
+    "exec_session_id": null,
+    "instrument": "D:\\r5-52ef3711\\instrument\\windows_qualification.py",
+    "instrument_sha256": "5711986352d22fc5dea6b886e4826995d23c09971d8c56475a159f7698f322ac",
+    "stage_order": [
+      "acquire",
+      "build",
+      "focused",
+      "diagnostics",
+      "examples",
+      "quickstart",
+      "comptime",
+      "workspace"
+    ],
+    "liveness_note": "PID and session are locators, not proof of liveness. Revalidate process command line or session before waiting. Labels are immutable; never restart all into this evidence directory.",
+    "ci": {
+      "workflow_run": 39032926577,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39032926577",
+      "harness_commit": "23ff7e8aea176fe4ff44d0104fe2e84ffd083a2c",
+      "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+      "required_job": "windows-gnu",
+      "scope": "native build/runtime/sysroot/focused/diagnostics/docs/quickstart/comptime; local full workspace remains independently required",
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "verification": "evidence/windows-ci-verification.json"
+    },
+    "ownership": {
+      "status": "PASS",
+      "evidence": "evidence/windows-ownership/ownership.json"
+    },
+    "casts_views": {
+      "status": "PASS",
+      "evidence": "evidence/windows-casts-views/casts-views.json",
+      "passed": 8,
+      "failed": 0
+    },
+    "calls": {
+      "status": "PASS",
+      "evidence": "evidence/windows-calls/calls.json",
+      "passed": 4,
+      "failed": 0
+    },
+    "traits_comptime": {
+      "status": "PASS",
+      "evidence": "evidence/windows-traits-comptime/traits-comptime.json",
+      "passed": 4,
+      "failed": 0
+    },
+    "diagnostics_focused": {
+      "status": "PASS",
+      "evidence": "evidence/windows-diagnostics/diagnostics.json",
+      "passed": 14,
+      "failed": 0,
+      "missing_return_regression": "PASS"
+    },
+    "providers": {
+      "status": "PASS",
+      "evidence": "evidence/windows-providers/providers.json",
+      "passed": 8,
+      "failed": 0
+    },
+    "local_status": "INTERRUPTED_DURING_FOCUSED_ARITHMETIC; no completed batch result or workspace pass"
+  },
+  "ubuntu": {
+    "run": 19,
+    "id": 39031984873,
+    "url": "https://github.com/17thedevv/luna/actions/runs/39031984873",
+    "required_jobs": [
+      "ubuntu-normal",
+      "ubuntu-runtime-asan",
+      "ubuntu-comptime-vm"
+    ],
+    "asan": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "artifact_id": 12100293080,
+      "verification": "evidence/ubuntu-asan-verification.json"
+    },
+    "comptime_vm": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "artifact_id": 12100218616,
+      "verification": "evidence/ubuntu-comptime-vm-verification.json"
+    },
+    "workspace": {
+      "status": "FAIL",
+      "workflow_run": 39032654737,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39032654737",
+      "harness_commit": "185e977328d4c2839b7fbf4903af89ce4cd0a0ae",
+      "implementation_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+      "required_jobs": [
+        "ubuntu-workspace-triage",
+        "ubuntu-workspace-final"
+      ],
+      "instrument": "qualify_ubuntu_workspace.py",
+      "note": "Do not substitute Windows workspace or the normal lane with --skip-workspace for these complete Ubuntu invocations.",
+      "triage": {
+        "groups": 233,
+        "passed": 1408,
+        "failed": 5,
+        "ignored": 1
+      },
+      "final": "SKIPPED",
+      "verification": "evidence/ubuntu-workspace-triage-verification.json",
+      "failure_analysis": "evidence/ubuntu-workspace-triage/failure-analysis.json"
+    },
+    "normal": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "gates": 47,
+      "verification": "evidence/ubuntu-normal-verification.json"
+    }
+  },
+  "previous_pin": {
+    "pin": "e5f234a9647b6fefa454d090f71a14e914678d43",
+    "windows": "Explicitly cancelled during CLI build after finding a false E3004 on endless while; preserve all evidence",
+    "ubuntu_run": 18,
+    "status": "SUPERSEDED_NO_CARRY"
+  },
+  "remaining": [
+    "Fix generic Linux native libm linkage, select a new implementation pin and reacquire all gates; 52ef3711 results are historical only",
+    "Complete exact-pin Windows gates, including workspace triage and default-parallel final",
+    "Complete and verify Ubuntu full workspace triage then final from the dedicated exact-pin workflow",
+    "Complete and verify exact-pin hosted Windows native CI, including the full focused matrix",
+    "Execute and preserve strict L002 A5 replay after the local Cargo lane completes",
+    "Inspect all Ubuntu job results and preserve exact-pin artifacts/provenance",
+    "Resolve any failures without weakening contracts or test oracles; compiler changes require a new pin",
+    "Reconcile final closure report, ledger and public documentation",
+    "Only fast-forward candidate after the selected immutable pin satisfies all required gates",
+    "Tag, main merge, PR and release publication remain maintainer decisions"
+  ],
+  "github_observation": {
+    "tool": "mcp__codex_apps__github_fetch_workflow_run_jobs",
+    "note": "Anonymous REST quota was exhausted; authenticated connector successfully revalidated all active jobs. A failed observation is not a terminal job result."
+  },
+  "post_lane_checks": [
+    {
+      "script": "verify_bounds_trap.py",
+      "status": "PENDING",
+      "prerequisite": "Wait until the local Cargo qualification process and descendants complete; do not interleave a CLI replay with Cargo mutations.",
+      "arguments": {
+        "checkout": "D:/r5-52ef3711/windows-checkout",
+        "debug": "C:/r5-52ef3711/windows-build/cargo-target/debug/luna.exe",
+        "release": "C:/r5-52ef3711/windows-build/cargo-target/release/luna.exe",
+        "runtime": "C:/r5-52ef3711/windows-build/runtime/libluna-runtime.a",
+        "out": "D:/r5-52ef3711/strict-bounds-final1",
+        "pin": "52ef3711813ac0e2ded272f5ebe71897752766bc"
+      },
+      "toolchain_path_prefix": [
+        "D:/Programs/LLVM-DEV/bin",
+        "C:/mingw64/bin"
+      ],
+      "expected": "Four profile/provider-mode rows, each native nonzero with luna: PANIC [L002] and index 3, length 2; no arbitrary crash accepted."
+    }
+  ]
+}

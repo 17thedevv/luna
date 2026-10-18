@@ -1,0 +1,17 @@
+{
+  "gate": "sysroot",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/target/debug/luna",
+    "build-sysroot",
+    "--quiet"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T12:20:16Z",
+  "exit": 0,
+  "seconds": 80.697761318,
+  "log_sha256": "8fa38d8b6e5f4eeb1b109c3bb957cc90909c631f82080634c9285ac9f7668116",
+  "status": "PASS",
+  "log": "sysroot.log.gz",
+  "compressed_sha256": "3ec3a8d65c0cb1752f2a634338b2ec853c1663493e977c3f7558d88a0b31d435"
+}

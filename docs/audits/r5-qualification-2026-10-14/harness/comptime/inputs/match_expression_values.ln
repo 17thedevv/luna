@@ -1,0 +1,3 @@
+const TRUE_VALUE: i32 = comptime { match true { true -> 11i32, false -> 23i32, } };
+const FALSE_VALUE: i32 = comptime { match false { true -> 11i32, false -> 23i32, } };
+fn main() -> i32 { if TRUE_VALUE != 11 || FALSE_VALUE != 23 { return 1; } return 0; }

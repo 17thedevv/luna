@@ -1,0 +1,15 @@
+struct Record { value: i32, };
+fn take(record: Record) { }
+fn f(flag: bool, other: bool) -> i32 {
+    dec record = Record { value: 1 };
+    while flag {
+        if other {
+            take(record); // origin
+        } else {
+            if flag { take(record); }
+        }
+        break;
+    }
+    return record.value; // invalid
+}
+fn main() -> i32 { return f(false, true); }

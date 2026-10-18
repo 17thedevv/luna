@@ -1,0 +1,10 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "harness_commit": "14a608660cdec0c3bb8884ab893f74acda200dcd",
+  "workflow_run": "39056178610",
+  "status": "PASS_IN_EXECUTED_SCOPE",
+  "failure": null,
+  "lane": "triage",
+  "scope": "Complete Windows workspace triage; fresh clone/build/sysroot; default parallelism",
+  "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION"
+}

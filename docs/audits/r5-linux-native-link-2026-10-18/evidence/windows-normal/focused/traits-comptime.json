@@ -1,0 +1,26 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "focused/traits-comptime",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--test",
+    "impl_header_metadata_cli",
+    "--test",
+    "projection_fallback_cli",
+    "--test",
+    "comptime_dependency_precision_cli",
+    "--test",
+    "comptime_loans_cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T18:39:35.582238+00:00",
+  "end_utc": "2026-10-17T18:46:45.483322+00:00",
+  "elapsed_seconds": 429.906,
+  "exit": 0,
+  "log": "focused/traits-comptime.log",
+  "log_sha256": "ff14e7c03d5a2b10b25db5d4feb2b7a7243a1c07c78d89f4e55f5160db9accc7"
+}

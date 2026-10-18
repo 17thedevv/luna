@@ -1,0 +1,16 @@
+{
+  "gate": "disk-final",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "df",
+    "-h"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal",
+  "started_utc": "2026-10-17T13:51:01Z",
+  "exit": 0,
+  "seconds": 0.0037868720000915346,
+  "log_sha256": "5a4757d8403f23d88735e8e1b89ce0d548d24d3988715deb4e3e2710dfa6ac4a",
+  "status": "PASS",
+  "log": "disk-final.log.gz",
+  "compressed_sha256": "272923944943e9b2de87a7a2cc99e4a5b962288523acd28a04294359a3f3a658"
+}

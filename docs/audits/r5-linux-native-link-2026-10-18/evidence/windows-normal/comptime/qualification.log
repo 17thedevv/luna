@@ -1,0 +1,97 @@
+{"label": "debug-source-branch_function_values", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-source-if_expression_false", "result": "CHARACTERIZED", "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim", "build_exit": 0, "observed_exit": 0, "claim": "historical final-if statement spelling has no block tail expression; this is not a value-producing if conformance claim"}
+{"label": "debug-source-if_expression_true", "result": "CHARACTERIZED", "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim", "build_exit": 0, "observed_exit": 0, "claim": "historical final-if statement spelling has no block tail expression; this is not a value-producing if conformance claim"}
+{"label": "debug-source-if_statement_control", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-source-match_expression_values", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-source-comptime_division_by_zero", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-source-comptime_shift_out_of_range", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-source-comptime_signed_overflow", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-source-comptime_unary_neg_min", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-source-effect_rejected", "result": "PASS", "expected": "check_and_build_exit1_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-source-enum_alignment_consumer", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-source-enum_payload_alignment_repro", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-source-enum_payload_reference_alignment_repro", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-source-expression_basic", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-source-gnu64_layout_tuple_struct_enum", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-source-standalone_unsupported", "result": "PASS", "expected": "check_and_build_exit1_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-source-wrapping_comptime", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-layout-provider", "result": "PASS"}
+{"label": "debug-artifact-branch_function_values", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-if_expression_false", "result": "CHARACTERIZED", "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim", "build_exit": 0, "observed_exit": 0, "claim": "historical final-if statement spelling has no block tail expression; this is not a value-producing if conformance claim"}
+{"label": "debug-artifact-if_expression_true", "result": "CHARACTERIZED", "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim", "build_exit": 0, "observed_exit": 0, "claim": "historical final-if statement spelling has no block tail expression; this is not a value-producing if conformance claim"}
+{"label": "debug-artifact-if_statement_control", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-match_expression_values", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-comptime_division_by_zero", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-artifact-comptime_shift_out_of_range", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-artifact-comptime_signed_overflow", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-artifact-comptime_unary_neg_min", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-artifact-effect_rejected", "result": "PASS", "expected": "check_and_build_exit1_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-artifact-enum_alignment_consumer", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-enum_payload_alignment_repro", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-enum_payload_reference_alignment_repro", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-expression_basic", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-gnu64_layout_tuple_struct_enum", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "debug-artifact-standalone_unsupported", "result": "PASS", "expected": "check_and_build_exit1_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "debug-artifact-wrapping_comptime", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-branch_function_values", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-if_expression_false", "result": "CHARACTERIZED", "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim", "build_exit": 0, "observed_exit": 0, "claim": "historical final-if statement spelling has no block tail expression; this is not a value-producing if conformance claim"}
+{"label": "release-source-if_expression_true", "result": "CHARACTERIZED", "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim", "build_exit": 0, "observed_exit": 0, "claim": "historical final-if statement spelling has no block tail expression; this is not a value-producing if conformance claim"}
+{"label": "release-source-if_statement_control", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-match_expression_values", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-comptime_division_by_zero", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-source-comptime_shift_out_of_range", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-source-comptime_signed_overflow", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-source-comptime_unary_neg_min", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-source-effect_rejected", "result": "PASS", "expected": "check_and_build_exit1_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-source-enum_alignment_consumer", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-enum_payload_alignment_repro", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-enum_payload_reference_alignment_repro", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-expression_basic", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-gnu64_layout_tuple_struct_enum", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-source-standalone_unsupported", "result": "PASS", "expected": "check_and_build_exit1_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-source-wrapping_comptime", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-layout-provider", "result": "PASS"}
+{"label": "release-artifact-branch_function_values", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-if_expression_false", "result": "CHARACTERIZED", "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim", "build_exit": 0, "observed_exit": 0, "claim": "historical final-if statement spelling has no block tail expression; this is not a value-producing if conformance claim"}
+{"label": "release-artifact-if_expression_true", "result": "CHARACTERIZED", "expected": "characterization_only_report_admission_and_observed_exit_no_PASS_claim", "build_exit": 0, "observed_exit": 0, "claim": "historical final-if statement spelling has no block tail expression; this is not a value-producing if conformance claim"}
+{"label": "release-artifact-if_statement_control", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-match_expression_values", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-comptime_division_by_zero", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-artifact-comptime_shift_out_of_range", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-artifact-comptime_signed_overflow", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-artifact-comptime_unary_neg_min", "result": "PASS", "expected": "check_and_build_exit1_one_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-artifact-effect_rejected", "result": "PASS", "expected": "check_and_build_exit1_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-artifact-enum_alignment_consumer", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-enum_payload_alignment_repro", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-enum_payload_reference_alignment_repro", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-expression_basic", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-gnu64_layout_tuple_struct_enum", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "release-artifact-standalone_unsupported", "result": "PASS", "expected": "check_and_build_exit1_E4005_primary_span_no_executable", "observations": [{"command": "check", "exit": 1, "e4005": 1, "span": true}, {"command": "build", "exit": 1, "e4005": 1, "span": true}], "executable_exists": false}
+{"label": "release-artifact-wrapping_comptime", "result": "PASS", "expected": "build_and_run_exit0", "build_exit": 0, "run_exit": 0}
+{"label": "dependency-debug-source_baseline-baseline", "result": "PASS", "build_exit": 0}
+{"label": "dependency-debug-taken_replacement-publish-r5_taken", "result": "PASS"}
+{"label": "dependency-debug-taken_replacement-publish-r5_untaken", "result": "PASS"}
+{"label": "dependency-debug-taken_replacement-publish-r5_branch", "result": "PASS"}
+{"label": "dependency-debug-taken_replacement-baseline", "result": "PASS", "build_exit": 0}
+{"label": "dependency-debug-taken_replacement-replacement-publish", "result": "PASS"}
+{"label": "dependency-debug-taken_replacement-stale-rejection", "result": "PASS", "check_exit": 1, "build_exit": 1, "executable_exists": false, "expected": "executed dependency body change MUST invalidate the materialized dependent"}
+{"label": "dependency-debug-untaken_replacement-publish-r5_taken", "result": "PASS"}
+{"label": "dependency-debug-untaken_replacement-publish-r5_untaken", "result": "PASS"}
+{"label": "dependency-debug-untaken_replacement-publish-r5_branch", "result": "PASS"}
+{"label": "dependency-debug-untaken_replacement-baseline", "result": "PASS", "build_exit": 0}
+{"label": "dependency-debug-untaken_replacement-replacement-publish", "result": "PASS"}
+{"label": "dependency-debug-untaken_replacement-precision", "result": "PASS", "classification": "SOUND_STATIC_OVER_APPROXIMATION_C4_FU1", "check_exit": 1, "build_exit": 1}
+{"label": "dependency-release-source_baseline-baseline", "result": "PASS", "build_exit": 0}
+{"label": "dependency-release-taken_replacement-publish-r5_taken", "result": "PASS"}
+{"label": "dependency-release-taken_replacement-publish-r5_untaken", "result": "PASS"}
+{"label": "dependency-release-taken_replacement-publish-r5_branch", "result": "PASS"}
+{"label": "dependency-release-taken_replacement-baseline", "result": "PASS", "build_exit": 0}
+{"label": "dependency-release-taken_replacement-replacement-publish", "result": "PASS"}
+{"label": "dependency-release-taken_replacement-stale-rejection", "result": "PASS", "check_exit": 1, "build_exit": 1, "executable_exists": false, "expected": "executed dependency body change MUST invalidate the materialized dependent"}
+{"label": "dependency-release-untaken_replacement-publish-r5_taken", "result": "PASS"}
+{"label": "dependency-release-untaken_replacement-publish-r5_untaken", "result": "PASS"}
+{"label": "dependency-release-untaken_replacement-publish-r5_branch", "result": "PASS"}
+{"label": "dependency-release-untaken_replacement-baseline", "result": "PASS", "build_exit": 0}
+{"label": "dependency-release-untaken_replacement-replacement-publish", "result": "PASS"}
+{"label": "dependency-release-untaken_replacement-precision", "result": "PASS", "classification": "SOUND_STATIC_OVER_APPROXIMATION_C4_FU1", "check_exit": 1, "build_exit": 1}
+D:\r5-39056178610\windows\harness-comptime\final1\summary.json

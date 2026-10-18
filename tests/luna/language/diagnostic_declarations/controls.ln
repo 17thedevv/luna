@@ -1,0 +1,10 @@
+import "first";
+import "foreign_provider";
+trait Local {}
+impl Local for ForeignRecord {}
+module one { fn same() -> i32 { return 1; } }
+module two { fn same() -> i32 { return 2; } }
+struct Record { first: i32, second: i32 };
+enum Choice { First, Second }
+fn nothing() { return; }
+fn main() -> i32 { nothing(); return collision(); }

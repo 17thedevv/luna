@@ -1,0 +1,2 @@
+# Preserve acquisition bytes and their recorded hashes across host checkouts.
+* -text

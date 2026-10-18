@@ -1,0 +1,30 @@
+{
+  "gate": "native-math-link-regressions",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--no-fail-fast",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-driver",
+    "--test",
+    "lang_namespace_contract_tests",
+    "--test",
+    "stdlib_phase4c_llib_parity_tests",
+    "--test",
+    "stdlib_phase4c_numerics",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T19:33:13Z",
+  "exit": 0,
+  "seconds": 655.0058003519998,
+  "log_sha256": "cf3925e8ac8d4702caaa9e9a43de2d427542c6bd82a0e18d66b3e06e04792b87",
+  "status": "PASS",
+  "log": "native-math-link-regressions.log.gz",
+  "compressed_sha256": "dfe9225fa6934a2d8b30dfc00f184e801e64629c8a0406eca758c8cac8efa8cd"
+}

@@ -1,0 +1,11 @@
+module origins {
+    fn take<T>(value: T) { }
+    export fn invalid<T>(flag: bool, other: bool, value: T) -> T {
+        if flag {
+            take<T>(value); // origin
+        } else {
+            if other { take<T>(value); }
+        }
+        return value; // invalid
+    }
+}

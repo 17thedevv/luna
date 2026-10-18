@@ -1,0 +1,30 @@
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+error[E3001]: Use of moved value '%v16.0.0'
+  --> D:\r5-3a72f946\diag-review\field_reinitialized.ln:9:22
+   |
+9  |     return pair.left.value;
+   |                      ^^^^^
+note: value moved here
+  --> D:\r5-3a72f946\diag-review\field_reinitialized.ln:6:23
+   |
+6  |     take<Record>(pair.left);
+   |                       ^^^^
+

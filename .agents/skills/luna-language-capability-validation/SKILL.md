@@ -93,6 +93,20 @@ Negative cases must reject for the right semantic reason where observable.
 Do not suppress diagnostics or weaken safety checks to make positive cases
 pass.
 
+For diagnostic origin claims, include nested control-flow joins with both
+equal and differing ownership states. Verify the structural antecedent label
+as well as the error code and primary span. Diagnostic provenance must join
+and reach a fixed point even when the ownership state itself does not change;
+exercise predecessor ordering and a portable generic provider where relevant.
+Reinitialization must discard obsolete origins, while ownership-state compaction
+must preserve valid field-specific causes for later diagnostic tracing.
+
+For diagnostic identity/order claims, include distinct events with identical
+wording and errors in multiple functions across independent CLI processes.
+Check code and source locations, source/artifact and check/build parity; one
+function or one process cannot expose traversal-order instability. Verify that
+deduplication preserves structural causes without merging distinct events.
+
 For callable identity/safety, compare safe and unsafe functions with identical
 parameter/return shapes. Exercise local values, returned/generic callbacks,
 known immutable targets, mutable reassignment and genuinely opaque indirect

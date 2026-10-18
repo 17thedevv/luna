@@ -1,0 +1,24 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "focused/ownership",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--test",
+    "generic_drop_cli",
+    "--test",
+    "async_cleanup_cli",
+    "--test",
+    "async_provider_export_cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T18:06:57.234236+00:00",
+  "end_utc": "2026-10-17T18:13:47.989557+00:00",
+  "elapsed_seconds": 410.75,
+  "exit": 0,
+  "log": "focused/ownership.log",
+  "log_sha256": "e4215929eef4aea8c49cc2fc3f63282a5b1a865dabebcabcce5fd19987c2d69e"
+}

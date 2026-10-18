@@ -1,0 +1,289 @@
+[
+  {
+    "id": "R5-DIAG-001",
+    "invariants": [
+      "DIAG-1"
+    ],
+    "status": "BROKEN",
+    "severity": "release-blocker",
+    "title": "Official CLI emits untyped infrastructure errors",
+    "trace": [
+      {
+        "file": "luna-rs/crates/luna-cli/src/main.rs",
+        "line": 133,
+        "end_line": 136
+      },
+      {
+        "file": "luna-rs/crates/luna-cli/src/main.rs",
+        "line": 213,
+        "end_line": 214
+      }
+    ],
+    "observation": "read_source uses fs::read_to_string then raw eprintln!(Error reading file...) and exit(1), without constructing Diagnostic. The check/build/run entry paths call it directly. The error is infrastructure I/O, so DIAG-2 source-span rule is not being applied to it; DIAG-1 still covers every user-visible compiler error.",
+    "reachability": "CONFIRMED official CLI debug/release check/build: 4 missing-source replays exit1, raw I/O error with no typed diagnostic header.",
+    "reducer": "luna check --no-config <nonexistent-path.ln>",
+    "other_paths": [
+      {
+        "file": "luna-rs/crates/luna-cli/src/main.rs",
+        "line": 123
+      },
+      {
+        "file": "luna-rs/crates/luna-cli/src/main.rs",
+        "line": 159
+      },
+      {
+        "file": "luna-rs/crates/luna-cli/src/main.rs",
+        "line": 169
+      },
+      {
+        "file": "luna-rs/crates/luna-cli/src/main.rs",
+        "line": 176,
+        "end_line": 181
+      }
+    ],
+    "notes": "manifest directly formats MlibError; build-sysroot returns raw Result<(), String> including parse/dependency/lock errors (sysroot_builder.rs:20,53,73,112,121,182). Ordinary compiler failures eventually use typed diagnostics; string transport itself is not automatically a violation.",
+    "exact_pin_replay_summary": "D:\\r5-9bda6f57\\diagnostics\\replay\\runs\\exact-pin-20261014\\summary.json",
+    "replay_limits": "Execution establishes selected ordinary paths are reached; structural label storage/phase ownership remains traced in pinned source, not inferred from arrow counts."
+  },
+  {
+    "id": "R5-DIAG-002",
+    "invariants": [
+      "DIAG-3",
+      "DIAG-9"
+    ],
+    "status": "BROKEN",
+    "severity": "release-blocker",
+    "title": "Move and loan failures omit structural antecedent origins",
+    "trace": [
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+        "line": 115,
+        "end_line": 151
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+        "line": 1596,
+        "end_line": 1657
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/lib.rs",
+        "line": 86
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/lib.rs",
+        "line": 108
+      },
+      {
+        "file": "luna-rs/crates/luna-driver/src/lib.rs",
+        "line": 437
+      },
+      {
+        "file": "luna-rs/crates/luna-driver/src/lib.rs",
+        "line": 679
+      }
+    ],
+    "codes": [
+      "E3001",
+      "E3003",
+      "E3007"
+    ],
+    "observation": "MoveAnalyzer check_place stores only current optional span; it tracks MoveState, not a source move label. BorrowAnalyzer check_access/issue_loan has loan.id available but only assigns current span. Neither module calls with_related or mutates related. Borrowck and driver append these diagnostics unchanged; renderer can only render labels already present.",
+    "reachability": "CONFIRMED existing E3001/E3003 reducers: debug/release, source/fresh-artifact, check/build, 16 total expected exit1 replays. Missing structural cause labels proven from pinned producers; one-arrow/no-note outputs are separately recorded observations.",
+    "existing_reducers": [
+      "tests/luna/language/diagnostic_conformance/use_after_move.ln",
+      "tests/luna/language/comptime_loans/returned_loan_conflict.ln",
+      "tests/luna/language/named_arguments/borrow_conflict.ln"
+    ],
+    "test_gap": "diagnostic_conformance_cli.rs:24–79 asserts code and primary location, not antecedent move related labels. Its function named origin_traceability_and_source_artifact_identity checks source/artifact identity rather than DIAG-9 cause labels.",
+    "exact_pin_replay_summary": "D:\\r5-9bda6f57\\diagnostics\\replay\\runs\\exact-pin-20261014\\summary.json",
+    "replay_limits": "Execution establishes selected ordinary paths are reached; structural label storage/phase ownership remains traced in pinned source, not inferred from arrow counts."
+  },
+  {
+    "id": "R5-DIAG-003",
+    "invariants": [
+      "DIAG-4"
+    ],
+    "status": "BROKEN",
+    "severity": "release-blocker",
+    "title": "Rendered wording determines diagnostic deduplication and test identity",
+    "trace": [
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+        "line": 118,
+        "end_line": 147
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+        "line": 1608,
+        "end_line": 1655
+      },
+      {
+        "file": "luna-rs/crates/luna-semantic/tests/macro_symbol_tests.rs",
+        "line": 109,
+        "end_line": 138
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+        "line": 337,
+        "end_line": 344
+      }
+    ],
+    "observation": "The analyzers select duplicate diagnostics using d.message == msg or d.message == diag.message plus span. macro duplicate test asserts message.contains rather than typed code/span. region_cutover_tests accepts matching code OR wording and locates order with that same fallback.",
+    "reachability": "Direct analysis implementation and existing automated test definitions; no execution needed to observe their identity predicate.",
+    "notes": "Not every presentation assertion violates DIAG-4. Here wording selects identity/dedup or substitutes for typed identity, not merely renderer appearance."
+  },
+  {
+    "id": "R5-DIAG-004",
+    "invariants": [
+      "DIAG-8"
+    ],
+    "status": "BROKEN",
+    "severity": "release-blocker",
+    "title": "Ordinary TypeChecker/Borrowck emission uses another registered owner",
+    "trace": [
+      {
+        "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+        "line": 247,
+        "end_line": 258
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/region_bridge.rs",
+        "line": 141,
+        "end_line": 197
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/region_bridge.rs",
+        "line": 1196,
+        "end_line": 1213
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+        "line": 500
+      },
+      {
+        "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+        "line": 1479
+      },
+      {
+        "file": "luna-rs/crates/luna-semantic/src/mono.rs",
+        "line": 1573,
+        "end_line": 1575
+      }
+    ],
+    "codes": [
+      "E1008",
+      "E2016",
+      "E1002",
+      "E2001"
+    ],
+    "observation": "impl TypeChecker method ambiguity constructs Resolver-owned E1008; Borrowck RegionFailure adapter and call-outlives diagnostics construct TypeChecker-owned E2016; TypeChecker duplicate-field check constructs Resolver-owned E1002 (registry defines E2014 DuplicateField); Mono validate_instantiated_operator constructs TypeChecker-owned E2001. These are construction sites, not merely transporting an earlier phase Diagnostic. Optional in_phase checks are absent on these paths.",
+    "reachability": "CONFIRMED E1008 ambiguity and E2016 call-outlives reducers: debug/release, source/fresh-artifact, check/build, 16 expected exit1 replays. Mono E2001 path and duplicate-field E1002 path remain static trace without independent runtime replay.",
+    "existing_reducers": [
+      "tests/luna/language/impl_header_metadata/ambiguous.ln",
+      "tests/luna/language/default_arguments/omission_precondition_inverted.ln"
+    ],
+    "notes": "No code reassignment or contract reinterpretation proposed. An approved owner/admission redesign would require a later candidate; this audit retains frozen DIAG-8.",
+    "exact_pin_replay_summary": "D:\\r5-9bda6f57\\diagnostics\\replay\\runs\\exact-pin-20261014\\summary.json",
+    "replay_limits": "Execution establishes selected ordinary paths are reached; structural label storage/phase ownership remains traced in pinned source, not inferred from arrow counts."
+  },
+  {
+    "id": "R5-DIAG-005",
+    "invariants": [
+      "DIAG-2"
+    ],
+    "status": "PARTIAL",
+    "severity": "coverage-and-structure-gap",
+    "title": "Source-category constructors permit absent or fabricated primary spans",
+    "trace": [
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/return_analysis.rs",
+        "line": 43,
+        "end_line": 45
+      },
+      {
+        "file": "luna-rs/crates/luna-semantic/src/lifetime.rs",
+        "line": 464,
+        "end_line": 485
+      },
+      {
+        "file": "luna-rs/crates/luna-semantic/src/mono.rs",
+        "line": 1506,
+        "end_line": 1509
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/region_bridge.rs",
+        "line": 1209,
+        "end_line": 1213
+      },
+      {
+        "file": "luna-rs/crates/luna-common/src/diagnostic.rs",
+        "line": 207,
+        "end_line": 246
+      }
+    ],
+    "codes": [
+      "E3004",
+      "E2016",
+      "E5001"
+    ],
+    "observation": "MissingReturnValue is constructed with no span at all; LifetimeError UnsatisfiableConstraint/AnalysisTimeout conversions omit span; Mono barrier falls back to FileId(0),0..0; default-outlives can return unspanned E2016. Diagnostic public fields permit code/span None and source_error is not universal admission.",
+    "reachability": "Constructor/call-graph evidence only. No current generator construction of Terminator::MissingReturn was found, so do not claim an executed CLI missing-return failure. Optional adapters need producer-path admission proof; synthetic fallback is not proof of correct source event.",
+    "notes": "DIAG-2 universal release proof cannot be granted. Actual reachable span absence remains separately UNVERIFIED until replay or stronger producer proof."
+  },
+  {
+    "id": "R5-DIAG-006",
+    "invariants": [
+      "DIAG-6"
+    ],
+    "status": "UNVERIFIED",
+    "severity": "coverage-gap",
+    "title": "Unordered collection iteration can select diagnostic order and primary cause",
+    "trace": [
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+        "line": 1374,
+        "end_line": 1408
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+        "line": 1579
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+        "line": 883,
+        "end_line": 889
+      },
+      {
+        "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+        "line": 931,
+        "end_line": 937
+      }
+    ],
+    "observation": "active_loans returns HashSet and check_access/issue_loan iterate it. Boundary diagnostic loan_span is loans.iter().next() over a HashSet, and carrier maps iterate HashMap. No sorting was found before these emissions. Multiple distinct active origins need repeated-process controls.",
+    "reachability": "Static risk demonstrated; no nondeterministic output pair executed here. Not labeled BROKEN solely from collection type."
+  },
+  {
+    "id": "R5-DIAG-007",
+    "invariants": [
+      "DIAG-7"
+    ],
+    "status": "PARTIAL",
+    "severity": "release-evidence-blocker",
+    "title": "No complete behavioral code-to-identity-and-span test map",
+    "trace": [
+      {
+        "file": "luna-rs/crates/luna-common/src/diagnostic.rs",
+        "line": 411,
+        "end_line": 479
+      },
+      {
+        "file": "luna-rs/crates/luna-cli/tests/diagnostic_conformance_cli.rs",
+        "line": 31,
+        "end_line": 35
+      }
+    ],
+    "observation": "Registry parity iterates all codes but tests membership/owner, not real producer identity/primary span. CLI diagnostics matrix has three codes. Scan found 10 registry codes without a direct production reference, 54 without an explicit typed-code test reference, and 28 without either typed or rendered numeric code reference in Rust test sources. These are discovery gaps, not a proof that no data-driven external test exists.",
+    "reachability": "Per-code map is supplied in per-code-inventory.json, all unproven modes explicitly UNVERIFIED.",
+    "notes": "E0004/E1006/E1007/E2014/E2015/E2020/E4002/E4003/E4004/E5002 have no direct production reference outside common registry. ComptimeError step/resource/panic-like variants are mapped generally to E4005 by typechecker.rs:176–192; no specialized E4002/E4003/E4004 producer found."
+  }
+]

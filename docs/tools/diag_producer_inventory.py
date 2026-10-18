@@ -57,7 +57,6 @@ RESERVED_NO_PRODUCER = {
 # exist, and these codes are excluded from the coverage-debt list because the
 # limitation is declared rather than pending.
 UNREACHABLE_IN_TEST = {
-    "E3004": "no producer fires: a non-void body that can fall through is accepted today (recorded as a separate correctness finding)",
     "E3007": "explicit destructor calls are rejected (E2001/E2031), so a dropped place cannot be read afterwards",
     "E6002": "requires an LLVM object-write failure",
     "E6003": "requires a linker failure environment that is not reproducible portably",
