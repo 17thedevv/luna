@@ -17,12 +17,13 @@ and [document inventory](docs/documentation-index.md).
 
 The baseline retains defined contracts even where implementation is incomplete.
 **Release conformance is blocked**, not certified by historical FROZEN labels.
-Current qualification is tracked in the [2026-10-18 report](docs/audits/r5-linux-native-link-2026-10-18/README.md)
-and its [requirement matrix](docs/audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md).
-Implementation pin `3a72f946` includes the diagnostic debt closure, reachable
-missing-return rejection and Linux native math linkage repair. Its Ubuntu
-runtime ASan evidence is verified; native normal, comptime and complete workspace
-gates remain in progress. Candidate stays at `c085449b` until all gates pass.
+Current qualification is tracked in the [move-origin repair report](docs/audits/r5-move-origin-2026-10-18/README.md)
+and its [replacement requirements](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md).
+Implementation `3a72f946` completed all eight release lanes, including full
+Windows/Ubuntu workspace triage/final (each 1414 passed, 0 failed, 1 ignored).
+Final review then found missing or obsolete antecedent spans in E3001 diagnostics
+across joins and reinitialization. The generic provenance repair needs a new pin
+and fresh qualification. Candidate remains `c085449b`.
 Protocol remains compiler/metadata/MVIR/format **25/9/5/2**.
 
 The [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)

@@ -106,6 +106,8 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/r5-missing-return-2026-10-17/QUALIFICATION.md](audits/r5-missing-return-2026-10-17/QUALIFICATION.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-missing-return-2026-10-17/README.md](audits/r5-missing-return-2026-10-17/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-missing-return-2026-10-17/RELEASE-HANDOFF.md](audits/r5-missing-return-2026-10-17/RELEASE-HANDOFF.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/r5-move-origin-2026-10-18/README.md](audits/r5-move-origin-2026-10-18/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md](audits/r5-move-origin-2026-10-18/REQUIREMENTS.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-qualification-2026-10-14/REPORT-R5-QUALIFICATION-2026-10-14.md](audits/r5-qualification-2026-10-14/REPORT-R5-QUALIFICATION-2026-10-14.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-qualification-2026-10-14/harness/comptime/historical-c4-characterization.md](audits/r5-qualification-2026-10-14/harness/comptime/historical-c4-characterization.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/repair-0.1/README.md](audits/repair-0.1/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
