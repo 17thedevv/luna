@@ -21,7 +21,7 @@ import time
 import tomllib
 import traceback
 
-PIN = os.environ.get("R5_TESTED_COMMIT", "5d20e57156038a4b43c11734a9b4bd5ce58cd206")
+PIN = os.environ.get("R5_TESTED_COMMIT", "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5")
 REPOSITORY = "https://github.com/17thedevv/luna.git"
 TARGET = "x86_64-unknown-linux-gnu"
 
@@ -272,6 +272,37 @@ def normal(rec, provenance, *, probe_only=False, skip_workspace=False):
     rec.run("protected-tree-diff", ["git", "diff", "--exit-code", "HEAD", "--", "luna-rs", "runtime", "tests", "CMakeLists.txt"], cwd=root)
 
 
+def workspace_lane(rec, provenance, *, triage):
+    """Exact-pin workspace lane: acquire, build runtime and CLI, build the
+    sysroot, then run the full workspace suite once (triage with --no-fail-fast,
+    or the default-parallel final pass)."""
+    root = rec.checkout
+    for name, args in [("rustc", ["rustc", "-vV"]), ("llvm", ["llvm-config-18", "--version"]),
+                       ("llvm-host-target", ["llvm-config-18", "--host-target"]), ("cargo", ["cargo", "--version"]),
+                       ("code-tree-identity", ["git", "ls-tree", "HEAD", "luna-rs", "runtime", "tests", "CMakeLists.txt"])]:
+        provenance[name] = rec.text(rec.run(name, args, cwd=root)).strip()
+    save(rec.evidence / "provenance.json", provenance)
+    build = rec.out / "runtime"
+    rec.run("runtime-config", ["cmake", "-S", root / "runtime", "-B", build, "-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release",
+                               "-DCMAKE_C_COMPILER=gcc", "-DCMAKE_CXX_COMPILER=g++"])
+    rec.run("runtime-build", ["cmake", "--build", build, "--parallel"])
+    rec.run("runtime-abi", ["ctest", "--test-dir", build, "-R", "^RuntimeAbiTests$", "--output-on-failure", "--no-tests=error"])
+    rec.env.update(LUNA_RUNTIME_LIB=str(build / "libluna-runtime.a"), LUNA_SYSROOT=str(root / "luna-rs"))
+    cargo = ["cargo", "build", "--locked", "--manifest-path", root / "luna-rs/Cargo.toml", "-p", "luna-cli"]
+    rec.run("cli-debug", cargo, cwd=root)
+    rec.run("cli-release", cargo + ["--release"], cwd=root)
+    debug, release = root / "luna-rs/target/debug/luna", root / "luna-rs/target/release/luna"
+    rec.env.update(LUNA_E1_RELEASE_CLI=str(release), LUNA_DOCS_CLI=str(debug))
+    rec.run("sysroot", [debug, "build-sysroot", "--quiet"], cwd=root)
+    providers(rec, provenance["llvm-host-target"])
+    workspace = ["cargo", "test", "--locked", "--manifest-path", root / "luna-rs/Cargo.toml", "--workspace"]
+    if triage:
+        rec.run("workspace-triage", workspace + ["--no-fail-fast"], cwd=root)
+    else:
+        rec.run("workspace-final", workspace, cwd=root)
+    rec.run("protected-tree-diff", ["git", "diff", "--exit-code", "HEAD", "--", "luna-rs", "runtime", "tests", "CMakeLists.txt"], cwd=root)
+
+
 def asan(rec):
     root, build = rec.checkout, rec.out / "runtime-asan"
     rec.env["ASAN_OPTIONS"] = "detect_leaks=1:halt_on_error=1"
@@ -291,7 +322,7 @@ def asan(rec):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--lane", choices=["normal", "runtime-asan", "comptime-vm"], required=True)
+    parser.add_argument("--lane", choices=["normal", "runtime-asan", "comptime-vm", "workspace-triage", "workspace-final"], required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--skip-workspace", action="store_true",
                         help="Skip the workspace suite: the GitHub-hosted 6h job cap cannot cover it; "
@@ -303,6 +334,8 @@ def main():
         provenance = rec.acquire()
         if args.lane in ("normal", "comptime-vm"):
             normal(rec, provenance, probe_only=args.lane == "comptime-vm", skip_workspace=args.skip_workspace)
+        elif args.lane in ("workspace-triage", "workspace-final"):
+            workspace_lane(rec, provenance, triage=args.lane == "workspace-triage")
         else:
             asan(rec)
     except Exception:

@@ -3,7 +3,7 @@ name: R5 exact-candidate Ubuntu qualification
 on:
   workflow_dispatch:
   push:
-    branches: [r5-exact-release-qualification, codex/r5-missing-return]
+    branches: [r5-diag-repair, r5-exact-release-qualification]
     paths:
       - .github/workflows/r5-exact-release-qualification.yml
       - docs/audits/r5-qualification-2026-10-14/harness/**
@@ -12,9 +12,11 @@ permissions:
   contents: read
 
 env:
-  # Implementation pin includes typed diagnostics, E3004, Linux math and diagnostic origin/identity/order repairs.
-  # compiler25/metadata9/MVIR5/format2 unchanged; every lane reacquires this SHA.
-  R5_TESTED_COMMIT: d3d0ffe8d6495aee1f56257a1db817ce4107e992
+  # Integrated implementation pin: DIAG-1..10 repair wave, canonical target
+  # selection, typed comptime E4002/E4003, per-code coverage, plus the
+  # declaration/identity/ordering repairs. compiler25/metadata9/MVIR5/format2
+  # unchanged; every lane reacquires this SHA.
+  R5_TESTED_COMMIT: 8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5
   R5_REPOSITORY_URL: https://github.com/17thedevv/luna.git
   CARGO_TERM_COLOR: never
 
@@ -155,6 +157,93 @@ jobs:
         with:
           name: r5-ubuntu-comptime-vm-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/r5-comptime-vm/evidence/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  ubuntu-workspace-triage:
+    name: Ubuntu GNU exact-pin workspace triage (--no-fail-fast)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
+      LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
+      LLVM_HOME: /usr/lib/llvm-18
+    steps:
+      - name: Acquire qualification harness (separate from tested clone)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install advertised Ubuntu GNU toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build clang-18 llvm-18-dev libclang-18-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire exact-pin workspace triage evidence
+        run: >-
+          python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
+          --lane workspace-triage --out "$RUNNER_TEMP/r5-ws-triage"
+      - name: Surface lane failure reason as an annotation
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP/r5-ws-triage/evidence/failure.txt" "$RUNNER_TEMP/r5-ws-triage/evidence/summary.json"; do
+            if [ -f "$f" ]; then
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
+            fi
+          done
+      - name: Preserve workspace triage evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-ubuntu-workspace-triage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/r5-ws-triage/evidence/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  ubuntu-workspace-final:
+    name: Ubuntu GNU exact-pin workspace final (default parallelism)
+    needs: ubuntu-workspace-triage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    env:
+      LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
+      LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
+      LLVM_HOME: /usr/lib/llvm-18
+    steps:
+      - name: Acquire qualification harness (separate from tested clone)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install advertised Ubuntu GNU toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build clang-18 llvm-18-dev libclang-18-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire exact-pin workspace final evidence
+        run: >-
+          python3 docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py
+          --lane workspace-final --out "$RUNNER_TEMP/r5-ws-final"
+      - name: Surface lane failure reason as an annotation
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP/r5-ws-final/evidence/failure.txt" "$RUNNER_TEMP/r5-ws-final/evidence/summary.json"; do
+            if [ -f "$f" ]; then
+              echo "::error file=docs/audits/r5-qualification-2026-10-14/harness/ubuntu_qualification.py::$(head -c 800 "$f" | tr '\n' ' ')"
+            fi
+          done
+      - name: Preserve workspace final evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-ubuntu-workspace-final-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/r5-ws-final/evidence/
           if-no-files-found: error
           retention-days: 30
           include-hidden-files: true
