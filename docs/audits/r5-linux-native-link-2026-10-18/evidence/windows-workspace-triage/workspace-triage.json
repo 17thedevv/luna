@@ -1,0 +1,25 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "workspace-triage",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "--workspace",
+    "--no-fail-fast"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T18:06:56.591289+00:00",
+  "end_utc": "2026-10-17T20:51:42.489405+00:00",
+  "elapsed_seconds": 9885.969,
+  "exit": 0,
+  "log": "workspace-triage.log",
+  "log_sha256": "702e7104520b9f0c8c90ebda9e06cfd4775323dff859df9624764c51e627ab74",
+  "result_groups": 234,
+  "passed": 1414,
+  "failed": 0,
+  "ignored": 1,
+  "binaries": 222,
+  "log_archive": "workspace-triage.log.gz",
+  "archive_sha256": "3c95cdab2b214a3b6147b310e62aef4cd70ade133a9248ffd6507e27dec4f069"
+}

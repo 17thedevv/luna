@@ -1,0 +1,23 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "label": "runtime-config",
+  "command": [
+    "cmake",
+    "-S",
+    "D:\\r5-39032926577\\windows-checkout\\runtime",
+    "-B",
+    "C:\\r5b-39032926577\\runtime",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DCMAKE_C_COMPILER=gcc",
+    "-DCMAKE_CXX_COMPILER=g++"
+  ],
+  "cwd": "D:\\r5-39032926577\\windows-checkout",
+  "start_utc": "2026-10-17T12:34:48.576969+00:00",
+  "end_utc": "2026-10-17T12:35:00.167559+00:00",
+  "elapsed_seconds": 11.594,
+  "exit": 0,
+  "log": "runtime-config.log",
+  "log_sha256": "ba49ab88781cfa9fadd9bd03b5fb54dface051fda13b3eb31c5321d4faddb250"
+}

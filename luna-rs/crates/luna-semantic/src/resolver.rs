@@ -418,16 +418,19 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                     self.current_scope,
                 ) {
                     crate::symbol::ImportSymbolResult::Success
-                    | crate::symbol::ImportSymbolResult::AlreadyImported => {}
-                    crate::symbol::ImportSymbolResult::Conflict { .. } => {
+                    | crate::symbol::ImportSymbolResult::AlreadyImported => {
+                        self.ctx.symbol_table.import_binding_spans.entry((self.current_scope, sym_id)).or_insert(*name);
+                    }
+                    crate::symbol::ImportSymbolResult::Conflict { existing } => {
+                        let previous = self.ctx.symbol_table.import_binding_spans
+                            .get(&(self.current_scope, existing)).copied()
+                            .unwrap_or(self.ctx.symbol_table.get_symbol(existing).span);
                         // IMPORT-5: Conflicting imported root bindings are diagnosed deterministically
                         self.ctx.diagnostics.push(
-                            luna_common::diagnostic::Diagnostic::error(format!(
+                            crate::symbol::duplicate_definition_diagnostic(*name, previous, format!(
                                 "E1002: conflicting imported symbol `{}`: symbol already defined or imported from another provider",
                                 sym_name
-                            ))
-                            .with_code(DiagnosticCode::DuplicateDefinition)
-                            .with_span(*name),
+                            )),
                         );
                     }
                 }

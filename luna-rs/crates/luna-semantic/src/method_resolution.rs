@@ -307,6 +307,7 @@ impl<'a> TypeChecker<'a> {
             current_async_fn: self.current_async_fn,
             comptime_engine: self.comptime_engine,
             current_return_type: self.current_return_type.clone(),
+            declaration_anchor: self.declaration_anchor,
             expected_expr_type: Vec::new(),
             comptime_prepared_functions: self.comptime_prepared_functions.clone(),
             populating_nominal_types: self.populating_nominal_types.clone(),

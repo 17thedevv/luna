@@ -1,0 +1,8 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "artifact_sha256": "809b26f0414208ad54ce89859a8803916cf68e6ffd248f300028d4d10e0cc290",
+  "manifest_files_verified": 60,
+  "gate_logs_verified": 27,
+  "original_archive": "ubuntu-workspace-triage.zip",
+  "status": "HASHES_VERIFIED; lane verdict is retained in summary, not overridden"
+}

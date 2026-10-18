@@ -1,0 +1,46 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "artifact_id": 12119980033,
+  "workflow_run": 39056178775,
+  "artifact_sha256": "b76a0fcd780b856317f27629f1bd99f63a537dc95135cc3967d7c4d0d98b3d88",
+  "status": "PASS_IN_EXECUTED_SCOPE",
+  "manifest_files_verified": 61,
+  "gate_logs_verified": 28,
+  "totals": {
+    "groups": 234,
+    "passed": 1414,
+    "failed": 0,
+    "ignored": 1
+  },
+  "ignored_tests": [
+    [
+      "mutable_references::sem_mutref_06_invalid_fixture",
+      ""
+    ]
+  ],
+  "regression_suites_observed": [
+    "missing_return_cli",
+    "native_math_link_cli"
+  ],
+  "scope": "Complete cargo test --workspace with default parallelism",
+  "summary": {
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "harness_commit": "14a608660cdec0c3bb8884ab893f74acda200dcd",
+    "lane": "workspace-final",
+    "workflow_run": "39056178775",
+    "totals": {
+      "groups": 234,
+      "passed": 1414,
+      "failed": 0,
+      "ignored": 1,
+      "missing_return_suite_observed": true,
+      "native_math_suite_observed": true
+    },
+    "status": "PASS_IN_EXECUTED_LANE_SCOPE",
+    "failure": null,
+    "failed_gates": [],
+    "gate_count": 28,
+    "scope": "Complete cargo test --workspace; final uses default parallelism",
+    "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION"
+  }
+}

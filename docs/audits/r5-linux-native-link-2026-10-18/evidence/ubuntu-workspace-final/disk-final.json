@@ -1,0 +1,16 @@
+{
+  "gate": "disk-final",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "df",
+    "-h"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-final",
+  "started_utc": "2026-10-18T00:19:06Z",
+  "exit": 0,
+  "seconds": 0.0037896400008321507,
+  "log_sha256": "982fbd07177189fb2dd70115d364cd3c3b19b3f860311900271bb9f3b44b91b3",
+  "status": "PASS",
+  "log": "disk-final.log.gz",
+  "compressed_sha256": "b29bde8622d177cb0b14397153b31a6aed3059a9d8979106b640f1afced7480c"
+}

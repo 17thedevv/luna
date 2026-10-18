@@ -11,7 +11,17 @@ otherwise. Some fixes may now be present; each original finding requires a
 fresh check before being marked closed. The merged manifest has 49 providers.
 V01-ARCH-02 is newly observed in the imported source, not the old audit.
 
-## Current reconciliation — 2026-10-14
+## Current qualification - 2026-10-18
+
+[move-origin repair report](../../audits/r5-move-origin-2026-10-18/README.md)
+and [replacement requirements](../../audits/r5-move-origin-2026-10-18/REQUIREMENTS.md).
+Previous pin `3a72f946` completed all eight lanes, including full workspace
+triage/final on Windows and Ubuntu (each 1414/0/1). Final review found a DIAG-3/9
+origin-span gap; follow-up review also found message-dependent dedup and unstable
+multi-function diagnostic order. Generic repairs require a new pin and fresh qualification.
+Candidate stays `c085449b`; release remains **BLOCKED / NOT VERIFIED**.
+
+## Prior reconciliation — 2026-10-14
 
 The [R4 ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md)
 supersedes historical pending/open wording only within the explicitly recorded
@@ -66,10 +76,10 @@ instrumented pipeline evidence, not a claimed full profile of every old suite.
 | V01-GRAMMAR-02 | Retained parenthesized foreach head from normative Rule K.4 | **Implemented** — `for (pattern in expression)` accepts and runs in both modes; the unparenthesized head is retained only as LEGACY / CHARACTERIZATION and is not standardized 0.1 syntax |
 | V01-GRAMMAR-03 | Receiver shorthand equivalence from Rule K.5 | **Implemented** — `&self`, `&rw self` and bare `self` receivers build and run in both modes; duplicate/non-first receivers reject with a typed code |
 | V01-DIAG-01 | DIAG-1 requires typed diagnostic codes for every compiler error | **Evidence-backed parts closed in E2** — parser failures (including the foreach/receiver cases) render typed codes with source spans in both modes. Remaining structural invariants are R5 preconditions, not deferred: a mandatory primary span for every source-originated error, structural related labels for multi-position errors, constructor/emission enforcement of DIAG-1/DIAG-2, and no ad-hoc untyped error paths |
-| V01-ARCH-02 | Compiler must not map library macro names, streams, suffixes or callee spellings | Imported D:/fdlang macro_engine.rs contains the eight-name/format_macro interception and print_val/newline lookup. It violates the retained boundary; preservation in Git is not semantic approval |
+| V01-ARCH-02 | Compiler must not map library macro names, streams, suffixes or callee spellings | The historical eight-name/format_macro interception is absent from the selected pin's MacroEngine. [Permanent CLI controls](../../../luna-rs/crates/luna-cli/tests/v01_arch_02_macro_decoupling_tests.rs) exercise eight user-defined macro names and namespaced shadowing. Exact-pin workspace results remain pending; source inspection alone is not full behavioral certification |
 | V01-DOC-01 | Visibility-02: fields default public independently of type accessibility | Old grammar skill/reference says private by default; corrected to the approved amendment |
 | V01-DOC-02 | `requires life(...)` is the current relation spelling | Older docs/skills use removed `where outlives`; current guidance is corrected without changing the relation model |
-| V01-DOC-03 | Luna .ln/.llib, 32 providers, six language contract families plus OptionExt contribution | Old overview/bootstrap pages claim Mellis core.ms, 25 providers or four families; current entry points are replaced |
+| V01-DOC-03 | Luna .ln/.llib, 49 current component providers, six language contract families plus OptionExt contribution | The original 32-provider audit and earlier Mellis/core.ms counts are historical. The current [sysroot manifest](../../../luna-rs/libs/external/sysroot.toml) declares 49 providers; exact-pin rebuild/header/object verification is a separate release gate |
 
 V01-GRAMMAR rows record the current conformance state of retained 0.1
 requirements, verified by a CLI run on the exact candidate recorded in

@@ -1,0 +1,30 @@
+{
+  "gate": "format-unicode",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--no-fail-fast",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "stdlib_format_cli_acceptance",
+    "--test",
+    "char_scalar_cli_parity",
+    "--test",
+    "char_operator_cli_parity",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T13:37:37Z",
+  "exit": 0,
+  "seconds": 521.5523435109999,
+  "log_sha256": "7b7197d975068bf5fe6d8a782af09f19448a22771c2cf479270866fe2fc188b4",
+  "status": "PASS",
+  "log": "format-unicode.log.gz",
+  "compressed_sha256": "a616931a704453f20b349e6e9b638ea2bc829facb47dc4966f5e4aeeb2d04933"
+}

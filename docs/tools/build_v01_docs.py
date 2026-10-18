@@ -15,7 +15,7 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / 'docs/spec/0.1'
 SITE = ROOT / 'docs/site'
-STATUS_DATE = '2026-10-14'
+STATUS_DATE = '2026-10-18'
 ADOPTED = {
     'docs/normative-rules-p0-p1.md', 'docs/runtime/abi-v1.md',
     'docs/diagnostics/diagnostics-v1.md', 'docs/project/rename-luna-v1.md',

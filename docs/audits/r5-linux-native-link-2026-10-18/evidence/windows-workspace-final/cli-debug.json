@@ -1,0 +1,18 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "cli-debug",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "build",
+    "--locked",
+    "-p",
+    "luna-cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T20:54:24.940916+00:00",
+  "end_utc": "2026-10-17T20:55:05.796221+00:00",
+  "elapsed_seconds": 40.859,
+  "exit": 0,
+  "log": "cli-debug.log",
+  "log_sha256": "0f517328d76dc93da5bd63c89b18ec482479aa2f6e6a63a4a774192f1c1c3cd5"
+}

@@ -33,6 +33,17 @@ impl MoveStateData {
     pub fn new() -> Self {
         Self::default()
     }
+
+    fn forget_origin_subtree(&mut self, place: &Place) {
+        self.sites.retain(|candidate, _| candidate != place && !candidate.is_descendant_of(place));
+    }
+
+    fn origin_for(&self, place: &Place) -> Option<luna_common::Span> {
+        self.sites.iter()
+            .filter(|(candidate, _)| *candidate == place || place.is_descendant_of(candidate))
+            .max_by_key(|(candidate, _)| candidate.projections.len())
+            .map(|(_, site)| *site)
+    }
 }
 
 pub struct MoveAnalyzer<'a> {
@@ -152,12 +163,7 @@ impl<'a> MoveAnalyzer<'a> {
             diag.span = span.clone();
             // The move may have been recorded for an ancestor place (a whole
             // local moved before a field is read); use the nearest one.
-            let origin = state
-                .sites
-                .iter()
-                .filter(|(candidate, _)| *candidate == place || place.is_descendant_of(candidate))
-                .max_by_key(|(candidate, _)| candidate.projections.len())
-                .map(|(_, site)| site.clone());
+            let origin = state.origin_for(place);
             if let (Some(label), Some(origin)) = (origin_label, origin) {
                 diag = diag.with_related(origin, label.to_string());
             }
@@ -253,10 +259,11 @@ impl<'a> MoveAnalyzer<'a> {
                                 };
                                 if has_drop {
                                     let msg = "Cannot move out of a subplace of a type that implements Drop".to_string();
-                                    if !self.diagnostics.iter().any(|d| d.message == msg) {
+                                    let span = self.func.values[val.0 as usize].span.clone();
+                                    if !self.has_diagnostic(DiagnosticCode::PartialMoveUnderDrop, &span) {
                                         let mut diag = Diagnostic::error(msg)
                                             .with_code(DiagnosticCode::PartialMoveUnderDrop);
-                                        diag.span = self.func.values[val.0 as usize].span.clone();
+                                        diag.span = span;
                                         self.diagnostics.push(diag);
                                     }
                                     break;
@@ -267,6 +274,7 @@ impl<'a> MoveAnalyzer<'a> {
                 }
                 
                 state.places.retain(|k, _| !k.is_descendant_of(&place));
+                state.forget_origin_subtree(&place);
                 state.places.insert(place.clone(), MoveState::Moved);
                 self.record_site(&place, state);
                 self.collapse_fully_moved_ancestors(place, state);
@@ -302,9 +310,12 @@ impl<'a> MoveAnalyzer<'a> {
             let inherited = state
                 .sites
                 .iter()
-                .find(|(candidate, _)| candidate.is_descendant_of(&place))
-                .map(|(_, site)| site.clone());
+                .filter(|(candidate, _)| candidate.is_descendant_of(&place))
+                .map(|(_, site)| *site)
+                .min_by_key(|site| (site.file_id.0, site.start, site.end, site.ctxt.0));
             state.places.retain(|candidate, _| !candidate.is_descendant_of(&place));
+            // State compaction is not a new move: retain each field's valid
+            // origin so a later field access can still identify its own cause.
             state.places.insert(place.clone(), MoveState::Moved);
             if let Some(site) = inherited {
                 state.sites.insert(place.clone(), site);
@@ -374,6 +385,7 @@ impl<'a> MoveAnalyzer<'a> {
                 let current_state = self.get_place_state(&place, state);
                 if current_state != MoveState::Moved && current_state != MoveState::Uninitialized {
                     state.places.retain(|k, _| !k.is_descendant_of(&place));
+                    state.forget_origin_subtree(&place);
                     state.places.insert(place.clone(), MoveState::Dropped);
                     self.record_site(&place, state);
                 }
@@ -385,6 +397,7 @@ impl<'a> MoveAnalyzer<'a> {
         if let Operand::Value(val) = op {
             if let Some(place) = self.values_to_places.get(val).cloned() {
                 state.places.retain(|k, _| !k.is_descendant_of(&place));
+                state.forget_origin_subtree(&place);
                 state.places.insert(place.clone(), MoveState::Live);
 
                 if !place.projections.is_empty() {
@@ -636,10 +649,11 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                                         };
                                         if has_drop {
                                             let msg = "Cannot move out of a subplace of a type that implements Drop".to_string();
-                                            if !self.diagnostics.iter().any(|d| d.message == msg) {
+                                            let span = self.func.values[val_id.0 as usize].span.clone();
+                                            if !self.has_diagnostic(DiagnosticCode::PartialMoveUnderDrop, &span) {
                                                 let mut diag = Diagnostic::error(msg)
                                                     .with_code(DiagnosticCode::PartialMoveUnderDrop);
-                                                diag.span = self.func.values[val_id.0 as usize].span.clone();
+                                                diag.span = span;
                                                 self.diagnostics.push(diag);
                                             }
                                             break;
@@ -673,9 +687,13 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                                 let loc_state = self.get_place_state(&place, state);
                                 if loc_state == MoveState::ConditionallyMoved && !self.guarded_drops.contains(&val_id) {
                                     let msg = format!("Cannot drop conditionally moved value");
-                                    if !self.diagnostics.iter().any(|d| d.message == msg) {
+                                    let span = self.func.values[val.0 as usize].span.clone();
+                                    if !self.has_diagnostic(DiagnosticCode::UseAfterMove, &span) {
                                         let mut diag = Diagnostic::error(msg).with_code(DiagnosticCode::UseAfterMove);
-                                        diag.span = self.func.values[val.0 as usize].span.clone();
+                                        diag.span = span;
+                                        if let Some(origin) = state.origin_for(&place) {
+                                            diag = diag.with_related(origin, "value moved here".to_string());
+                                        }
                                         self.diagnostics.push(diag);
                                     }
                                 }
@@ -717,10 +735,31 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
         
         let mut changed = false;
         
+        let mut site_keys = HashSet::new();
+        for k in dest.sites.keys() { site_keys.insert(k.clone()); }
+        for k in src.sites.keys() { site_keys.insert(k.clone()); }
+        for k in site_keys {
+            // Origin information is part of the dataflow state too. Different
+            // incoming moves are all valid antecedents; retain the earliest
+            // source site instead of erasing it at a conditional join. Merge
+            // even when the ownership states agree so predecessor order cannot
+            // choose the reported origin or stop its propagation prematurely.
+            let old_site = dest.sites.get(&k).copied();
+            let merged_site = [old_site, src.sites.get(&k).copied()]
+                .into_iter()
+                .flatten()
+                .min_by_key(|site| (site.file_id.0, site.start, site.end, site.ctxt.0));
+            if old_site != merged_site {
+                if let Some(site) = merged_site {
+                    dest.sites.insert(k.clone(), site);
+                }
+                changed = true;
+            }
+        }
+
         let mut all_keys = HashSet::new();
         for k in dest.places.keys() { all_keys.insert(k.clone()); }
         for k in src.places.keys() { all_keys.insert(k.clone()); }
-        
         for k in all_keys {
             let dest_state = dest.places.get(&k).cloned();
             let src_state = src.places.get(&k).cloned();
@@ -750,20 +789,7 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
             // Actually, if we just insert the merged state, we might be inserting redundant entries.
             // But that's safe.
             if dest_state.as_ref() != Some(&new_state) {
-                if new_state == MoveState::ConditionallyMoved && k.local.0 == 5 {
-                }
-                // DIAG-3/9: keep an origin label only while both paths agree.
-                let merged_site = match (dest.sites.get(&k).cloned(), src.sites.get(&k).cloned()) {
-                    (Some(a), Some(b)) if a == b => Some(a),
-                    (Some(a), None) => Some(a),
-                    (None, Some(b)) => Some(b),
-                    _ => None,
-                };
                 dest.places.insert(k.clone(), new_state);
-                match merged_site {
-                    Some(site) => { dest.sites.insert(k, site); }
-                    None => { dest.sites.remove(&k); }
-                }
                 changed = true;
             }
         }
@@ -788,5 +814,65 @@ impl<'a> DataflowAnalysis<MoveStateData> for MoveAnalyzer<'a> {
                 alloca_count += 1;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod origin_join_tests {
+    use super::*;
+    use luna_common::{FileId, Span, SyntaxContext};
+    use luna_mvir::{GlobalId, ValueId};
+    use luna_semantic::SemanticTypeId;
+
+    #[test]
+    fn origin_join_is_order_independent_and_reaches_a_fixed_point() {
+        let function = Function {
+            name: GlobalId { name: "origin_join".into(), symbol_id: None },
+            is_extern: false, is_async: false, arg_count: 0, link_name: None,
+            param_types: Vec::new(), ret_ty: SemanticTypeId(0),
+            lifetime_info: Default::default(), blocks: Vec::new(), values: Vec::new(),
+        };
+        let mut analysis = MoveAnalyzer::new(&function, None, None);
+        let place = Place::new(ValueId(0));
+        let early = Span { file_id: FileId(1), start: 10, end: 12, ctxt: SyntaxContext(1) };
+        let same_location = Span { ctxt: SyntaxContext(2), ..early };
+        let later = Span { start: 20, end: 22, ..early };
+        let incoming: Vec<_> = [(MoveState::Moved, later), (MoveState::Moved, same_location),
+                                (MoveState::ConditionallyMoved, early)].into_iter().map(|(state, site)| {
+            let mut data = MoveStateData::new();
+            data.is_unvisited = false;
+            data.places.insert(place.clone(), state);
+            data.sites.insert(place.clone(), site);
+            data
+        }).collect();
+        for order in [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]] {
+            let mut joined = MoveStateData::new();
+            for index in order { analysis.merge(&mut joined, &incoming[index]); }
+            assert_eq!(joined.places.get(&place), Some(&MoveState::ConditionallyMoved));
+            assert_eq!(joined.sites.get(&place), Some(&early));
+            for state in &incoming { assert!(!analysis.merge(&mut joined, state)); }
+        }
+        let mut equal_state = incoming[0].clone();
+        assert!(analysis.merge(&mut equal_state, &incoming[1]), "an origin-only change must propagate");
+        assert_eq!(equal_state.places.get(&place), Some(&MoveState::Moved));
+        assert_eq!(equal_state.sites.get(&place), Some(&same_location));
+        assert!(!analysis.merge(&mut equal_state, &incoming[1]));
+
+        // Compacted ownership states may still carry field-specific origins.
+        let child = place.clone().projected(crate::place::Projection::Field(0));
+        let sibling = place.clone().projected(crate::place::Projection::Field(1));
+        let mut compacted = incoming[0].clone();
+        let mut fields = incoming[0].clone();
+        fields.sites.insert(child.clone(), early);
+        fields.sites.insert(sibling.clone(), later);
+        assert!(analysis.merge(&mut compacted, &fields));
+        assert_eq!(compacted.sites.get(&child), Some(&early));
+        assert!(!compacted.places.contains_key(&child));
+        assert!(!analysis.merge(&mut compacted, &fields));
+        compacted.forget_origin_subtree(&child);
+        assert!(!compacted.sites.contains_key(&child));
+        assert_eq!(compacted.sites.get(&sibling), Some(&later));
+        compacted.forget_origin_subtree(&place);
+        assert!(compacted.sites.is_empty());
     }
 }

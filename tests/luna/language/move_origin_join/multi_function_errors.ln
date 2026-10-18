@@ -1,0 +1,12 @@
+struct Record { value: i32, };
+fn first() -> i32 {
+    dec record = Record { value: 1 };
+    dec taken = record; // first origin
+    return record.value; // first invalid
+}
+fn second() -> i32 {
+    dec record = Record { value: 2 };
+    dec taken = record; // second origin
+    return record.value; // second invalid
+}
+fn main() -> i32 { return first() + second(); }

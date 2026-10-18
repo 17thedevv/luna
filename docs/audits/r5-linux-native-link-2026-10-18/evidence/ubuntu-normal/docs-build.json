@@ -1,0 +1,16 @@
+{
+  "gate": "docs-build",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "/usr/bin/python3",
+    "docs/tools/build_v01_docs.py"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T19:44:15Z",
+  "exit": 0,
+  "seconds": 0.16439709399946878,
+  "log_sha256": "ba18ff396ef6ac508ac98f0b95f9233bb9c2612538bedb3d4fd314ad4ed98141",
+  "status": "PASS",
+  "log": "docs-build.log.gz",
+  "compressed_sha256": "d0e99e34e5337729854178d2082b1a7508f3fa02008b9f8536f7aaa70dcdfaca"
+}

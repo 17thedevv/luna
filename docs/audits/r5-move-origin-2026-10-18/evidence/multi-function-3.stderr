@@ -1,0 +1,41 @@
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG loading package: result
+DEBUG loading package: core/panic
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG loading package: __lang_option
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_collected_imports finished successfully
+DEBUG: resolve_imports returning true
+error[E3001]: Use of moved value '%v5.0'
+  --> D:\r5-67146195\review\multi_function_errors.ln:5:19
+   |
+5  |     return record.value;
+   |                   ^^^^^
+note: value moved here
+  --> D:\r5-67146195\review\multi_function_errors.ln:4:9
+   |
+4  |     dec taken = record;
+   |         ^^^^^
+
+error[E3001]: Use of moved value '%v5.0'
+  --> D:\r5-67146195\review\multi_function_errors.ln:10:19
+   |
+10 |     return record.value;
+   |                   ^^^^^
+note: value moved here
+  --> D:\r5-67146195\review\multi_function_errors.ln:9:9
+   |
+9  |     dec taken = record;
+   |         ^^^^^
+

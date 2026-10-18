@@ -1,0 +1,16 @@
+{
+  "gate": "disk-initial",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "df",
+    "-h"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan/checkout",
+  "started_utc": "2026-10-17T18:00:32Z",
+  "exit": 0,
+  "seconds": 0.016194241000000886,
+  "log_sha256": "b854187e44c2e245c4d647f55238f353599234d4b72b1413cf0d7d870f2c2d76",
+  "status": "PASS",
+  "log": "disk-initial.log.gz",
+  "compressed_sha256": "5ff3254d0587eae478d8c69450f57897379fcfc601bd68622682ad1a722e1a2c"
+}

@@ -1,0 +1,10 @@
+struct Record { value: i32, };
+struct Pair { left: Record, right: Record, };
+fn take<T>(value: T) { }
+fn main() -> i32 {
+    dec rw pair = Pair { left: Record { value: 1 }, right: Record { value: 2 } };
+    take<Record>(pair.left);
+    pair.left = Record { value: 3 };
+    take<Pair>(pair);
+    return pair.left.value;
+}

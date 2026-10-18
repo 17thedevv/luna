@@ -1,0 +1,8 @@
+// Distinct invalid contracts must not collapse into one synthetic source event.
+fn first() -> i32 { // first invalid contract
+    return;
+}
+fn second() -> i32 { // second invalid contract
+    return;
+}
+fn main() -> i32 { return 0; }

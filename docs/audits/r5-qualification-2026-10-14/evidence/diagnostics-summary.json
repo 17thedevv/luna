@@ -1,0 +1,97 @@
+{
+  "candidate": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "status": "BROKEN",
+  "release_gate": "NOT SATISFIED",
+  "method": "Read-only structural audit followed by parent-authorized exclusive exact-pin CLI replay; no Cargo or compiler/runtime/test modifications.",
+  "static_scan_scope": "all tracked Rust files, official CLI and inactive/legacy surfaces retained as discovery only",
+  "invariants": [
+    {
+      "invariant": "DIAG-1",
+      "status": "BROKEN",
+      "evidence": [
+        "R5-DIAG-001"
+      ]
+    },
+    {
+      "invariant": "DIAG-2",
+      "status": "PARTIAL",
+      "evidence": [
+        "R5-DIAG-005"
+      ],
+      "notes": "Source-primary universal contract not established; constructor defects and reachability distinguishable."
+    },
+    {
+      "invariant": "DIAG-3",
+      "status": "BROKEN",
+      "evidence": [
+        "R5-DIAG-002"
+      ]
+    },
+    {
+      "invariant": "DIAG-4",
+      "status": "BROKEN",
+      "evidence": [
+        "R5-DIAG-003"
+      ]
+    },
+    {
+      "invariant": "DIAG-5",
+      "status": "PARTIAL",
+      "evidence": [
+        "tests/luna/language/cast_contract/poison_many_uses_invalid.ln",
+        "luna-rs/crates/luna-cli/tests/comptime_diagnostic_cascade_cli.rs"
+      ],
+      "notes": "Existing poison reducers inspected as test definitions, not executed here. All error-value joins/consumers not proven; no global poison-containment claim."
+    },
+    {
+      "invariant": "DIAG-6",
+      "status": "UNVERIFIED",
+      "evidence": [
+        "R5-DIAG-006"
+      ]
+    },
+    {
+      "invariant": "DIAG-7",
+      "status": "PARTIAL",
+      "evidence": [
+        "R5-DIAG-007"
+      ]
+    },
+    {
+      "invariant": "DIAG-8",
+      "status": "BROKEN",
+      "evidence": [
+        "R5-DIAG-004"
+      ]
+    },
+    {
+      "invariant": "DIAG-9",
+      "status": "BROKEN",
+      "evidence": [
+        "R5-DIAG-002"
+      ]
+    },
+    {
+      "invariant": "DIAG-10",
+      "status": "PARTIAL",
+      "evidence": [
+        "registry-parity-static.json"
+      ],
+      "notes": "Exact current 72/72 name/value/code parity and uniqueness statically verified. Automated exact-candidate test execution is parent lane; historical cross-version immutability not certified from one snapshot."
+    }
+  ],
+  "findings": 7,
+  "candidate_unchanged": true,
+  "checkout_final_status": "",
+  "source_artifact_execution": "Selected E3001/E3003/E2016/E1008 replayed in source/fresh-artifact modes, debug/release, check/build. Not exhaustive producer conformance.",
+  "inventory_complete_as_registry_listing": true,
+  "exhaustive_per_producer_conformance": "NOT CLAIMED; concrete structural failures already invalidate universal PASS",
+  "replay": {
+    "path": "D:\\r5-9bda6f57\\diagnostics\\replay\\runs\\exact-pin-20261014\\summary.json",
+    "sha256": "fd039b10b68611df05762e4059aeea192117a789e8c6216305fa51548195664b",
+    "commands": 40,
+    "expected_results": 40,
+    "raw_uncoded_missing_source_cases": 4,
+    "overall_verdict": "BROKEN"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "observed_implementation": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "scope": "Local original-binary preflight; move-analysis source blob is identical at 3a72f946, recorded as source-equivalence evidence rather than another exact-pin run",
+  "move_analysis_blobs": {
+    "52ef3711813ac0e2ded272f5ebe71897752766bc": "6bcb5964326303548ed851ee12c41571d644fe32",
+    "3a72f9464fa921410b63551f7eac03414cf51e2b": "6bcb5964326303548ed851ee12c41571d644fe32"
+  },
+  "cli_sha256": "8647ce3df034a6d8a91c663f2b380b4ead81db5cab5d1340cac9f678a2bdf65d",
+  "command": [
+    "C:\\r5-52ef3711\\windows-build\\cargo-target\\debug\\luna.exe",
+    "check",
+    "D:\\r5-3a72f946\\diag-review\\field_reinitialized.ln",
+    "--quiet"
+  ],
+  "exit": 1,
+  "status": "CONFIRMED_STALE_FIELD_ORIGIN",
+  "actual_antecedent_line": 6,
+  "expected_current_move_line": 8,
+  "invalid_use_line": 9
+}

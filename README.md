@@ -17,12 +17,20 @@ and [document inventory](docs/documentation-index.md).
 
 The baseline retains defined contracts even where implementation is incomplete.
 **Release conformance is blocked**, not certified by historical FROZEN labels.
-Current scoped status is in the [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md):
-A/C/D/E-wave closures are reconciled at candidate input `3f8646c6`, with tested
-implementation `e4f9fb53` and compiler/metadata/MVIR/format **25/9/5/2**.
-E-wave's 236/236 matrix and three workspace passes certify their Windows GNU
-tested scope. Ubuntu GNU normal/ASan and the complete structural diagnostic audit
-remain R5 obligations. See [known limitations](docs/audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md)
+Current qualification is tracked in the [move-origin repair report](docs/audits/r5-move-origin-2026-10-18/README.md)
+and its [replacement requirements](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md).
+Implementation `3a72f946` completed all eight release lanes, including full
+Windows/Ubuntu workspace triage/final (each 1414 passed, 0 failed, 1 ignored).
+Final review then found missing or obsolete antecedent spans in E3001 diagnostics
+across joins and reinitialization. Follow-up review also found message-based
+dedup and unstable multi-function diagnostic order. The generic repairs need a
+new pin and fresh qualification. Candidate remains `c085449b`.
+Protocol remains compiler/metadata/MVIR/format **25/9/5/2**.
+
+The [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)
+and later [R5 historical qualification](docs/audits/r5-final-2026-10-16/REPORT-R5-QUALIFICATION-2026-10-16.md)
+retain their exact tested scopes. Historical passes cannot certify a newer pin.
+See [current limitations](docs/audits/r5-missing-return-2026-10-17/RELEASE-HANDOFF.md)
 and the [executable R5 checklist](docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md).
 
 The historical [2026-10-02 audit](docs/audits/stdlib-2026-10-02/README.md) found compiler and

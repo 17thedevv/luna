@@ -1,0 +1,18 @@
+// C-GAP: ordinary user FFI must resolve host math symbols without stdlib names.
+module measurement {
+    #[link(name = "sqrt")]
+    extern fn root(value: f64) -> f64;
+    #[link(name = "sin")]
+    extern fn sine(value: f64) -> f64;
+    #[link(name = "ceilf")]
+    extern fn ceiling(value: f32) -> f32;
+
+    export struct Sample { value: f64 };
+
+    export fn evaluate(sample: Sample, angle: f64, fraction: f32) -> i32 {
+        if root(sample.value) != 3.0 { return 1; }
+        if sine(angle) != 0.0 { return 2; }
+        if ceiling(fraction) != (2.0 as f32) { return 3; }
+        return 0;
+    }
+}

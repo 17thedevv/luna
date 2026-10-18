@@ -1,5 +1,5 @@
 use luna_common::{Diagnostic, DiagnosticCode};
-use luna_mvir::{Function, Terminator};
+use luna_mvir::{Function, Operand, Terminator};
 use std::collections::{HashMap, HashSet};
 
 pub fn analyze_returns(func: &Function) -> Vec<Diagnostic> {
@@ -32,12 +32,19 @@ pub fn analyze_returns(func: &Function) -> Vec<Diagnostic> {
                         stack.push(idx);
                     }
                 }
-                Terminator::CondBr { true_target, false_target, .. } => {
-                    if let Some(&idx) = label_to_idx.get(&true_target.name) {
-                        stack.push(idx);
+                Terminator::CondBr { condition, true_target, false_target } => {
+                    // Literal/materialized boolean conditions have only one
+                    // executable successor. In particular, an endless loop's
+                    // synthetic exit is not a reachable missing return.
+                    if !matches!(condition, Operand::Boolean(false)) {
+                        if let Some(&idx) = label_to_idx.get(&true_target.name) {
+                            stack.push(idx);
+                        }
                     }
-                    if let Some(&idx) = label_to_idx.get(&false_target.name) {
-                        stack.push(idx);
+                    if !matches!(condition, Operand::Boolean(true)) {
+                        if let Some(&idx) = label_to_idx.get(&false_target.name) {
+                            stack.push(idx);
+                        }
                     }
                 }
                 Terminator::MissingReturn => {

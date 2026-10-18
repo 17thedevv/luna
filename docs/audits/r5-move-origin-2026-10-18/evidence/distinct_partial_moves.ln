@@ -1,0 +1,10 @@
+struct Record { value: i32, };
+struct Pair { left: Record, right: Record, };
+impl std::Drop for Pair { fn drop(&rw self) { } }
+fn take<T>(value: T) { }
+fn main() -> i32 {
+    dec pair = Pair { left: Record { value: 1 }, right: Record { value: 2 } };
+    take<Record>(pair.left);
+    take<Record>(pair.right);
+    return 0;
+}

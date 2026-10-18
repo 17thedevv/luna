@@ -1,0 +1,5 @@
+trait Pick {}
+struct Record { value: i32 };
+impl Pick for Record {}
+impl Pick for Record {}
+fn main() -> i32 { return 0; }

@@ -1,0 +1,48 @@
+{
+  "baseline_pin": "5d20e57156038a4b43c11734a9b4bd5ce58cd206",
+  "baseline_check_exit": 0,
+  "focused_cli_exit": 0,
+  "valid_modes": [
+    "source",
+    "artifact"
+  ],
+  "internal_exit": 0,
+  "internal_passed": 73,
+  "internal_failed": 0,
+  "logs": {
+    "baseline-check.log": {
+      "sha256": "7b83205135640db5fd34f10c82e83a894e90e3a01abac458773343ecd11be5a4",
+      "archive": "baseline-check.log.gz",
+      "archive_sha256": "426ba6295902f51d5087e7c05f5e161556a216bb9d919f6973dcc3fe98e5d58a"
+    },
+    "missing-return-cli.log": {
+      "sha256": "81edafc68f5d58f4bc800b99849837fb92939b9d0493c4a3db6318ebc35208ed",
+      "archive": "missing-return-cli.log.gz",
+      "archive_sha256": "ac46ff427a55ee2197b21f22113b956a338baa3fb376a0ef54c76bdb30608a67"
+    },
+    "mvir-borrowck.log": {
+      "sha256": "c9b5a14a44627d01554513e55a8f135337de21a3deb1ea5cbc07a2f2555e1cbd",
+      "archive": "mvir-borrowck.log.gz",
+      "archive_sha256": "cd1da6cd23ec11fda0ce22f0fa4e542a737a1883146c9306104069585324ac40"
+    },
+    "missing-return-cli2.log": {
+      "sha256": "7b410822204f4c99cca7b017557f8055f90d8b4064937bf23d911f2378b7be7f",
+      "archive": "missing-return-cli2.log.gz",
+      "archive_sha256": "7dc76f6f17665c58f03fd7b6878016e2f1b7450fed88270074c53e4192609a22"
+    },
+    "mvir-borrowck2.log": {
+      "sha256": "cf3c43dff664a26aa14e5cce07614f4ef3b5db1dfa6c053631bfa9c149dd8ea0",
+      "archive": "mvir-borrowck2.log.gz",
+      "archive_sha256": "1eae027771918c2a348fae442892f52b0c635d2ffd0d4442146cbae15dc86c67"
+    }
+  },
+  "qualification": "PENDING at a new immutable implementation pin",
+  "first_focused_negative_commands": 36,
+  "focused_negative_commands": 40,
+  "reachability_controls": [
+    "endless while true",
+    "endless for without condition",
+    "constant true return",
+    "reachable break rejects E3004"
+  ]
+}

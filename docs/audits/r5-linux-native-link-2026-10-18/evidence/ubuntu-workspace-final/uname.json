@@ -1,0 +1,16 @@
+{
+  "gate": "uname",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "uname",
+    "-a"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-final/checkout",
+  "started_utc": "2026-10-17T21:03:40Z",
+  "exit": 0,
+  "seconds": 0.0015301290000024892,
+  "log_sha256": "cd8e31ad3f05d597238a1403bb5c2d25c975d53959c3d48af034216515712dc5",
+  "status": "PASS",
+  "log": "uname.log.gz",
+  "compressed_sha256": "2de7cf89ae868bee64884828c9b4cab31700f642393ae7db754d4b6bc320b3b9"
+}

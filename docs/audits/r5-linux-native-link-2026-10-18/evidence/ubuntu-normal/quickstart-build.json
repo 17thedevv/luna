@@ -1,0 +1,19 @@
+{
+  "gate": "quickstart-build",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/target/debug/luna",
+    "build",
+    "/home/runner/work/_temp/r5-normal/evidence/quickstart/program.ln",
+    "-o",
+    "/home/runner/work/_temp/r5-normal/evidence/quickstart/program"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/evidence/quickstart",
+  "started_utc": "2026-10-17T19:44:35Z",
+  "exit": 0,
+  "seconds": 0.8659419859995978,
+  "log_sha256": "82e54fbe977835d5218e619418825c35af2bcb26bb70d71364db9e515572e31e",
+  "status": "PASS",
+  "log": "quickstart-build.log.gz",
+  "compressed_sha256": "f13ef78b6463071d879deeb5a20602e1a083f7e6d90b070e1058b636368c030a"
+}

@@ -1,0 +1,17 @@
+{
+  "gate": "quickstart-object",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "file",
+    "/home/runner/work/_temp/r5-normal/evidence/quickstart/program",
+    "/home/runner/work/_temp/r5-normal/evidence/quickstart/program.obj"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/evidence/quickstart",
+  "started_utc": "2026-10-17T13:51:01Z",
+  "exit": 0,
+  "seconds": 0.07341081900085555,
+  "log_sha256": "98c1ec5cf952b36de9621db0f3569cd79abd21db8a338d68c86eb93f329ec390",
+  "status": "PASS",
+  "log": "quickstart-object.log.gz",
+  "compressed_sha256": "77dbec52e17a3de87c8713d644ce252545e46a9d0ae4d7afbadb0289af90f406"
+}

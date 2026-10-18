@@ -1,0 +1,20 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "checkout": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+  "sysroot": "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs",
+  "binaries": {
+    "debug": {
+      "path": "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs/target/debug/luna",
+      "sha256": "7d368c14fc07cf579d7a61943d24c77bf83599dc5d56e06a575154ea949b0c79"
+    },
+    "release": {
+      "path": "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs/target/release/luna",
+      "sha256": "960f03fff072aefdccf139c468a0ced1cc4214568e085cf2bcfaf60ae24d316b"
+    },
+    "runtime": {
+      "path": "/home/runner/work/_temp/r5-comptime-vm/runtime/libluna-runtime.a",
+      "sha256": "7aab7fe718fdd27b79fc4555ec8db7a47b27bf5f392959d4817aa532d4a1780b"
+    }
+  },
+  "plan_sha256": "7f5626a49df815e3fadd9274c1d7f0007a3f5bb9fe483eb8bb5c16117b9cb998"
+}

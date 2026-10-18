@@ -1,0 +1,22 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "focused/grammar-harness",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--test",
+    "v01_grammar_acceptance_tests",
+    "--test",
+    "test_temp_workspace_lifecycle_cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T19:26:53.926107+00:00",
+  "end_utc": "2026-10-17T19:38:03.715324+00:00",
+  "elapsed_seconds": 669.781,
+  "exit": 0,
+  "log": "focused/grammar-harness.log",
+  "log_sha256": "148c85eba3df034339899665e4f87402a3e537616069356c904bf4fc7c8e9929"
+}

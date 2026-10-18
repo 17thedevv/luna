@@ -1,0 +1,7 @@
+module returns {
+    export fn choose(flag: bool) -> i32 {
+        if flag { return 7; } else { return 9; }
+    }
+    export fn identity<T>(value: T) -> T { value }
+    export fn missing<T>(value: T) -> i32 { }
+}
