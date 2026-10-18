@@ -1,0 +1,10 @@
+struct Leaf { value: i32, };
+impl std::Drop for Leaf { fn drop(&rw self) { } }
+struct Pair { left: Leaf, right: Leaf, };
+fn take<T>(value: T) { }
+fn main() -> i32 {
+    dec pair = Pair { left: Leaf { value: 1 }, right: Leaf { value: 2 } };
+    take<Leaf>(pair.right);
+    take<Leaf>(pair.left); // origin
+    return pair.left.value; // invalid
+}
