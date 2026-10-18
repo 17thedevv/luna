@@ -1,0 +1,5 @@
+// This comment is not the invalid initializer
+fn main() -> i32 {
+    dec value: i32 = (1, 2);
+    return 0;
+}

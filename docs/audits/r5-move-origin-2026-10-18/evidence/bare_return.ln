@@ -1,0 +1,5 @@
+// diagnostic must refer to the function contract, not this comment
+fn f() -> i32 {
+    return;
+}
+fn main() -> i32 { return 0; }

@@ -1,0 +1,24 @@
+{
+  "status": "CONFIRMED_DIAG_3_PREVIOUS_DECLARATION_MISSING",
+  "observed_source_pin": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+  "scope": "Local CLI reducer, existing workspace sysroot; not clean exact-pin release qualification",
+  "command": [
+    "D:/fdlang/luna-rs/target/debug/luna.exe",
+    "check",
+    "D:/r5-d3d0ffe8/review/duplicate_definition.ln",
+    "--quiet"
+  ],
+  "exit": 1,
+  "expected_primary_line": 2,
+  "expected_related_line": 1,
+  "actual_E1002_count": 1,
+  "actual_location_count": 1,
+  "cli_hash_remeasured_at_reproduction": false,
+  "prior_preflight_identity": "identity-order-preflight.json",
+  "source_blob": "228100e706c18ec25ae34c66c9988ec36e65c0ed",
+  "evidence_sha256": {
+    "duplicate_definition.ln": "b9dbea25404d40f2f84c0c8da3e97185923e5f738e4879edf626856a9451ca0b",
+    "duplicate_definition.stderr": "030b703731d0c13ccecd58af9cfd291a3ee786e87b6db34772675affa5cd4cdb"
+  },
+  "attempt_note": "First launch without LLVM DLL directory on PATH exited 0xc0000135 with no diagnostic; configured PATH and reproduced exit 1 E1002. Initial environment failure is not compiler evidence."
+}

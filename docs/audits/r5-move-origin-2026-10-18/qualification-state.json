@@ -1,6 +1,6 @@
 {
-  "observed_at_utc": "2026-10-18T05:47:50.230626+00:00",
-  "status": "EXACT_PIN_QUALIFICATION_RUNNING",
+  "observed_at_utc": "2026-10-18T10:40:39.088400+00:00",
+  "status": "SUPERSEDED_DURING_QUALIFICATION_DIAG_3_DECLARATION_FINDING",
   "implementation_pin": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
   "previous_pin": "67146195fb025951ca51d54365fd3a47ef9544e6",
   "previous_result": "SUPERSEDED_DURING_QUALIFICATION_DIAG_4_6_FINDINGS",
@@ -23,7 +23,7 @@
     "windows-workspace-final"
   ],
   "remaining": [
-    "Acquire and verify all eight exact-pin release lanes",
+    "Finish declaration/implementation/candidate and source-anchor audit, repair preflight, then select replacement pin and reacquire all eight lanes",
     "Verify all terminal evidence and final requirement audit",
     "Reconcile closure/public documentation and advance candidate only after qualification"
   ],
@@ -73,21 +73,31 @@
       "normal_job": 117599279820,
       "asan_job": 117599279909,
       "comptime_vm_job": 117599279876,
-      "status": "JOBS_IN_PROGRESS_TOOLCHAIN_PREPARATION"
+      "status": "ALL_THREE_JOBS_SUCCESS_SUPERSEDED_PIN"
     },
     "ubuntu_workspace": {
       "id": 39101753252,
       "url": "https://github.com/17thedevv/luna/actions/runs/39101753252",
       "triage_job": 117599279870,
-      "status": "TRIAGE_QUEUED_FINAL_DEPENDENT"
+      "status": "TRIAGE_AND_FINAL_SUCCESS_SUPERSEDED_PIN",
+      "final_job": 117621419161
     },
     "windows": {
       "id": 39101753210,
       "url": "https://github.com/17thedevv/luna/actions/runs/39101753210",
       "normal_job": 117599279674,
       "triage_job": 117599279777,
-      "status": "NORMAL_AND_TRIAGE_IN_PROGRESS_SETUP_FINAL_DEPENDENT"
+      "status": "NORMAL_TRIAGE_FINAL_SUCCESS_SUPERSEDED_PIN",
+      "final_job": 117619646590
     }
   },
-  "harness_commit": "bf35297b7797215eabf01572b0531a78ab62511c"
+  "harness_commit": "bf35297b7797215eabf01572b0531a78ab62511c",
+  "superseded_reason": "DIAG-3 previous declaration/impl locations missing and DIAG-2 bare-return primary fabricated",
+  "d3d0ffe8_asan": {
+    "status": "PASS_IN_EXECUTED_SCOPE",
+    "verification": "evidence/pin-d3d0ffe8/ubuntu-asan-verification.json"
+  },
+  "local_repair_preflight": "evidence/declaration-preflight.json",
+  "replacement_pin": null,
+  "job_success_does_not_equal_artifact_verification": true
 }

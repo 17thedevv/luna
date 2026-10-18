@@ -1,0 +1,5 @@
+trait Pick {}
+struct Record { value: i32 };
+impl Pick for Record {} // previous definition
+impl Pick for Record {} // invalid definition
+fn main() -> i32 { return 0; }

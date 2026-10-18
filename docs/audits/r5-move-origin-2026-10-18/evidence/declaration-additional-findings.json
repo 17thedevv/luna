@@ -1,0 +1,39 @@
+{
+  "status": "CONFIRMED_ADDITIONAL_DIAG_2_3_FINDINGS",
+  "observed_at_utc": "2026-10-18T06:04:17.504092+00:00",
+  "scope": "Local CLI reproducers during repair; not exact-pin release qualification. Coherence and bare-return decision paths are unchanged in the selected d3d0ffe8 source, but the invoked binary also includes ongoing diagnostic repairs.",
+  "findings": [
+    {
+      "contract": "DIAG-3",
+      "code": "E2005",
+      "fixture": "overlapping_impls.ln",
+      "exit": 1,
+      "expected_primary_line": 4,
+      "expected_related_line": 3,
+      "actual_locations": [
+        4
+      ],
+      "baseline_source_blob": "a20e675fbab70423ee5ad4303eec65998e662d4e"
+    },
+    {
+      "contract": "DIAG-2",
+      "code": "E2001",
+      "fixture": "bare_return.ln",
+      "exit": 1,
+      "actual_locations": [
+        [
+          1,
+          1
+        ]
+      ],
+      "problem": "Bare return mismatch fabricates FileId(0),0..0 and highlights a comment rather than the owning return contract",
+      "baseline_source": "d3d0ffe8:luna-rs/crates/luna-semantic/src/typechecker.rs Stmt::Return value=None"
+    }
+  ],
+  "evidence_sha256": {
+    "overlapping_impls.ln": "2a331fb5cf01b54ac6956c65007c698b5285bcf4026b06d3709f61d1714dca06",
+    "overlapping_impls.stderr": "735bde4a484b1f9d0bd5aa548fcd98096e3b94ebc655a04e94fa7995a10bc4f2",
+    "bare_return.ln": "a50bec015f31c279b9c806ce61b071f3715a0572faf84970983991565d690e9e",
+    "bare_return.stderr": "7a829158e86c345089044c21ecf6b5709298b46b981d72e9d0675954e5c09a3b"
+  }
+}

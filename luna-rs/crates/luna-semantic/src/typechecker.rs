@@ -37,6 +37,8 @@ pub struct TypeChecker<'a> {
     current_async_fn: Option<luna_ast::DeclId>,
     comptime_engine: Option<&'a dyn crate::ComptimeEngine>,
     current_return_type: Vec<SemanticTypeId>,
+    /// Existing declaration source identity for errors with no expression token.
+    declaration_anchor: Option<luna_common::Span>,
     expected_expr_type: Vec<SemanticTypeId>,
     comptime_prepared_functions: std::collections::HashSet<luna_ast::DeclId>,
     populating_nominal_types: std::collections::HashSet<luna_ast::DeclId>,
@@ -90,6 +92,7 @@ impl<'a> TypeChecker<'a> {
             current_async_fn: None,
             comptime_engine: None,
             current_return_type: Vec::new(),
+            declaration_anchor: None,
             expected_expr_type: Vec::new(),
             comptime_prepared_functions: std::collections::HashSet::new(),
             populating_nominal_types: std::collections::HashSet::new(),
@@ -114,6 +117,7 @@ impl<'a> TypeChecker<'a> {
             current_async_fn: None,
             comptime_engine: Some(comptime_engine),
             current_return_type: Vec::new(),
+            declaration_anchor: None,
             expected_expr_type: Vec::new(),
             comptime_prepared_functions: std::collections::HashSet::new(),
             populating_nominal_types: std::collections::HashSet::new(),
@@ -690,14 +694,16 @@ impl<'a> TypeChecker<'a> {
         if matched_entries.len() > 1 {
             let trait_name = self.ctx.symbol_table.get_symbol(trait_id).name.clone();
             let assoc_name = self.ctx.symbol_table.get_symbol(assoc_type).name.clone();
-            self.ctx.diagnostics.push(
-                Diagnostic::error(format!(
+            let mut diagnostic = Diagnostic::source_error(DiagnosticCode::AmbiguousAssociatedType, span, format!(
                     "E_AMBIGUOUS_ASSOCIATED_TYPE: Multiple conflicting implementations found for associated type projection `<_ as {}>::{}`",
                     trait_name, assoc_name
-                ))
-                .with_code(DiagnosticCode::AmbiguousAssociatedType)
-                .with_span(span)
-            );
+                ));
+            for (entry, _) in &matched_entries {
+                if let Some(candidate) = entry.definition_span {
+                    diagnostic = diagnostic.with_related(candidate, "candidate implementation");
+                }
+            }
+            self.ctx.diagnostics.push(diagnostic);
             return self.ctx.types.intern(SemanticType::Error);
         }
 
@@ -732,14 +738,18 @@ impl<'a> TypeChecker<'a> {
             if decl_ids.len() > 1 {
                 let trait_name = self.ctx.symbol_table.get_symbol(trait_id).name.clone();
                 let assoc_name = self.ctx.symbol_table.get_symbol(assoc_type).name.clone();
-                self.ctx.diagnostics.push(
-                    Diagnostic::error(format!(
+                let mut diagnostic = Diagnostic::source_error(DiagnosticCode::AmbiguousAssociatedType, span, format!(
                         "E_AMBIGUOUS_ASSOCIATED_TYPE: Multiple conflicting implementations found for associated type projection `<_ as {}>::{}`",
                         trait_name, assoc_name
-                    ))
-                    .with_code(DiagnosticCode::AmbiguousAssociatedType)
-                    .with_span(span)
-                );
+                    ));
+                for entry in &self.ctx.tables.trait_impl_entries {
+                    if entry.decl_id.is_some_and(|decl| decl_ids.contains(&decl)) {
+                        if let Some(candidate) = entry.definition_span {
+                            diagnostic = diagnostic.with_related(candidate, "candidate implementation");
+                        }
+                    }
+                }
+                self.ctx.diagnostics.push(diagnostic);
                 return self.ctx.types.intern(SemanticType::Error);
             }
 
@@ -994,14 +1004,14 @@ impl<'a> TypeChecker<'a> {
         }
 
         if candidate_traits.len() > 1 {
-            self.ctx.diagnostics.push(
-                Diagnostic::error(format!(
+            let mut diagnostic = Diagnostic::source_error(DiagnosticCode::AmbiguousAssociatedType, span, format!(
                     "E_AMBIGUOUS_ASSOCIATED_TYPE: Associated type `{}` is ambiguous between multiple candidate traits",
                     assoc_name
-                ))
-                .with_code(DiagnosticCode::AmbiguousAssociatedType)
-                .with_span(span)
-            );
+                ));
+            for candidate in &candidate_traits {
+                diagnostic = diagnostic.with_related(self.ctx.symbol_table.get_symbol(*candidate).span, "candidate trait");
+            }
+            self.ctx.diagnostics.push(diagnostic);
             return self.ctx.types.intern(SemanticType::Error);
         }
 
@@ -1477,11 +1487,13 @@ impl<'a> TypeChecker<'a> {
                             self.ctx.tables.symbol_types.insert(sym_id, dummy_ty);
                         }
                         let mut field_tys = Vec::new();
-                        let mut seen_fields = std::collections::HashSet::new();
+                        let mut seen_fields = std::collections::HashMap::new();
                         for field in fields {
                             let field_name = self.get_span_text(field.name);
-                            if !seen_fields.insert(field_name) {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("Duplicate field `{}` in struct", field_name)).with_code(DiagnosticCode::DuplicateDefinition).with_span(field.name));
+                            if let Some(&previous) = seen_fields.get(field_name) {
+                                self.ctx.diagnostics.push(crate::symbol::duplicate_definition_diagnostic(field.name, previous, format!("Duplicate field `{}` in struct", field_name)));
+                            } else {
+                                seen_fields.insert(field_name, field.name);
                             }
                             let f_ty = self.lower_type(field.ty);
                             if self.ctx.types.is_unsized(f_ty) {
@@ -1579,11 +1591,13 @@ impl<'a> TypeChecker<'a> {
                             self.ctx.tables.symbol_types.insert(sym_id, dummy_ty);
                         }
                         let mut variant_tys = Vec::new();
-                        let mut seen_variants = std::collections::HashSet::new();
+                        let mut seen_variants = std::collections::HashMap::new();
                         for variant in variants {
                             let variant_name = self.get_span_text(variant.name);
-                            if !seen_variants.insert(variant_name) {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("Duplicate variant `{}` in enum", variant_name)).with_code(DiagnosticCode::DuplicateDefinition).with_span(variant.name));
+                            if let Some(&previous) = seen_variants.get(variant_name) {
+                                self.ctx.diagnostics.push(crate::symbol::duplicate_definition_diagnostic(variant.name, previous, format!("Duplicate variant `{}` in enum", variant_name)));
+                            } else {
+                                seen_variants.insert(variant_name, variant.name);
                             }
                             // Each variant's type is based on its fields
                             let mut field_tys = Vec::new();
@@ -1858,6 +1872,7 @@ impl<'a> TypeChecker<'a> {
                             if coherence_res.is_ok() {
                                 self.ctx.tables.trait_impl_entries.push(crate::semantic_tables::TraitImplEntry {
                                     decl_id: Some(*decl_id),
+                                    definition_span: Some(span),
                                     trait_id: trait_sym,
                                     self_type: self_sem_ty,
                                     generic_params: gp_syms.clone(),
@@ -3171,6 +3186,10 @@ impl<'a> TypeChecker<'a> {
         match item {
             Item::Decl(decl_id) => {
                 let decl = &self.arena.decls[decl_id.0 as usize];
+                let previous_anchor = self.declaration_anchor;
+                if let Some(symbol) = self.ctx.tables.decl_symbols.get(decl_id) {
+                    self.declaration_anchor = Some(self.ctx.symbol_table.get_symbol(*symbol).span);
+                }
                 self.validate_attribute_application(decl);
                 match decl {
                     Decl::Function { annotations, name, params, body, is_async, return_type, is_unsafe, .. } => {
@@ -3424,7 +3443,9 @@ impl<'a> TypeChecker<'a> {
                         self.current_self_type = Some(self_sem_ty);
                         for method_id in methods {
                             let method_decl = &self.arena.decls[method_id.0 as usize];
-                            if let Decl::Function { body: Some(body_stmt), is_async, return_type, is_unsafe, .. } = method_decl {
+                            if let Decl::Function { name, body: Some(body_stmt), is_async, return_type, is_unsafe, .. } = method_decl {
+                                let previous_method_anchor = self.declaration_anchor;
+                                self.declaration_anchor = Some(*name);
                                 let prev_method_scope = self.current_scope;
                                 // Enter method scope
                                 if let Some(sym_id) = self.ctx.tables.decl_symbols.get(method_id).copied() {
@@ -3454,6 +3475,7 @@ impl<'a> TypeChecker<'a> {
                                 self.is_unsafe_context = prev_unsafe;
                                 self.current_async_fn = prev_async;
                                 self.current_scope = prev_method_scope;
+                                self.declaration_anchor = previous_method_anchor;
                             }
                         }
                         self.current_self_type = prev_self;
@@ -3494,6 +3516,7 @@ impl<'a> TypeChecker<'a> {
                     }
                     _ => {}
                 }
+                self.declaration_anchor = previous_anchor;
             }
             Item::Stmt(stmt_id) => {
                 self.typecheck_stmt(stmt_id);
@@ -3729,15 +3752,17 @@ impl<'a> TypeChecker<'a> {
             }
             _ => {
                 let trait_name = self.ctx.symbol_table.get_symbol(trait_id).name.clone();
-                self.ctx.diagnostics.push(
-                    Diagnostic::error(format!(
+                let mut diagnostic = Diagnostic::source_error(DiagnosticCode::ConflictingTraitImpl, span, format!(
                         "Multiple implementations of language protocol `{}` match `{:?}`",
                         trait_name,
                         self.ctx.types.get(self_ty),
-                    ))
-                    .with_code(DiagnosticCode::ConflictingTraitImpl)
-                    .with_span(span),
-                );
+                    ));
+                for (entry, _) in &matches {
+                    if let Some(candidate) = entry.definition_span {
+                        diagnostic = diagnostic.with_related(candidate, "candidate implementation");
+                    }
+                }
+                self.ctx.diagnostics.push(diagnostic);
                 None
             }
         }
@@ -4064,7 +4089,13 @@ impl<'a> TypeChecker<'a> {
                 } else {
                     let void_ty = self.ctx.types.intern(SemanticType::Void);
                     if let Err(e) = self.unify(expected_ty, void_ty) {
-                        self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
+                        // The error is the declaration's non-void return contract;
+                        // a bare return has no expression span in the canonical AST.
+                        let diagnostic = match self.declaration_anchor {
+                            Some(span) => Diagnostic::source_error(DiagnosticCode::TypeMismatch, span, e),
+                            None => Diagnostic::invariant_error("bare-return mismatch has no enclosing declaration source identity"),
+                        };
+                        self.ctx.diagnostics.push(diagnostic);
                     }
                 }
             }
@@ -6318,12 +6349,26 @@ impl<'a> TypeChecker<'a> {
             Expr::Member { member, .. } => Some(*member),
             Expr::Binary { left, .. } => self.get_expr_span_for_diag(left),
             Expr::Assign { lvalue, .. } => self.get_expr_span_for_diag(lvalue),
+            Expr::ArrayLiteral { elements } | Expr::TupleLiteral { elements } =>
+                elements.iter().find_map(|element| self.get_expr_span_for_diag(element)),
+            Expr::Lambda { params, body, .. } => params.iter().find_map(|parameter| {
+                match &self.arena.decls[parameter.0 as usize] {
+                    Decl::Param { name, .. } => Some(*name),
+                    _ => None,
+                }
+            }).or_else(|| self.statement_primary_span(*body)),
+            Expr::Comptime { body } => self.statement_primary_span(*body),
+            Expr::Sizeof { target_type } | Expr::Alignof { target_type } => {
+                match &self.arena.types[target_type.0 as usize] {
+                    luna_ast::Type::Named { segments, .. } => segments.first().copied(),
+                    _ => None,
+                }
+            }
             Expr::StructInit { path, .. } => path.first().copied(),
             Expr::Match { match_span, .. } => Some(*match_span),
             Expr::MacroCall { span, .. } => Some(*span),
             Expr::Try { try_span, .. } => Some(*try_span),
-            _ => None,
-        }
+        }.or(self.declaration_anchor)
     }
 
     pub fn is_place(expr: &Expr) -> bool {

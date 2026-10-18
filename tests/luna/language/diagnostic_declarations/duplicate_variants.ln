@@ -1,0 +1,5 @@
+enum Choice {
+    First, // previous definition
+    First, // invalid definition
+}
+fn main() -> i32 { return 0; }

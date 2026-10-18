@@ -1,0 +1,21 @@
+{
+  "gate": "code-tree-identity",
+  "tested_commit": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+  "command": [
+    "git",
+    "ls-tree",
+    "HEAD",
+    "luna-rs",
+    "runtime",
+    "tests",
+    "CMakeLists.txt"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan/checkout",
+  "started_utc": "2026-10-18T05:47:43Z",
+  "exit": 0,
+  "seconds": 0.0037949659999867436,
+  "log_sha256": "d2c17e1c98116ada638773e5ef56e1683855ff87c1456ef2b918de893a1b14b2",
+  "status": "PASS",
+  "log": "code-tree-identity.log.gz",
+  "compressed_sha256": "b41efb0e21835ef949998ade33948a0373dd72b4e2c5e0b878ab6cd703ad1a8a"
+}

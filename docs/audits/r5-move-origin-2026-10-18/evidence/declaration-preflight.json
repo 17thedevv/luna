@@ -1,0 +1,497 @@
+{
+  "status": "PASS_LOCAL_PREFLIGHT_ONLY",
+  "observed_at_utc": "2026-10-18T10:40:39.084349+00:00",
+  "source_base": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+  "source_state": "uncommitted declaration/candidate/primary-span repair; no replacement qualification pin selected",
+  "fresh_remote_checkout": false,
+  "runtime_reused_from": "C:/r5-52ef3711/windows-build/runtime/libluna-runtime.a",
+  "final_semantic_passed": 206,
+  "final_cli_matrix_passed": 1,
+  "final_existing_regressions_passed": 7,
+  "final_total_passed": 214,
+  "matrix": {
+    "negative_cases": 19,
+    "provider_modes": 2,
+    "negative_commands": 114,
+    "native_valid_control_runs": 2,
+    "custom_artifact_only_providers": 5
+  },
+  "logs": {
+    "declaration-preflight": {
+      "raw_sha256": "2d653b8370a5986a0e22c40421968b9560b4449352d0193813fceb98bcb9d0cb",
+      "compressed_sha256": "58534cf0fa1bedbcc41a532180866429175d015adf37a42ee87571700adeac23",
+      "test_results": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-coherence": {
+      "raw_sha256": "649a47f35658fd9d7a2f088f74ce036c6459f9b9d91f7b1f5bb1f2b74592cad7",
+      "compressed_sha256": "fc3b7a7aa233f6081e8de2f755af15c8fdc94864fc76da4257acc7afa2446ab9",
+      "test_results": [
+        [
+          "ok",
+          "22",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-registry": {
+      "raw_sha256": "6ac1327c60f0cb55b3654394862150d8d0319e3e240f7d7b5c5b0242c47e09ee",
+      "compressed_sha256": "10a1c3e550527710077a725280d46552b5d072537388d2ab7ff53c58ed586c18",
+      "test_results": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-preflight2": {
+      "raw_sha256": "972f9361fe85620d38dd3f2a099c1df44642b8c8a8341169068b2219e83798fc",
+      "compressed_sha256": "6464f838b283aa701eb00a3aaeea42d284241274f28cc04e10fcf41c82a8bffd",
+      "test_results": [
+        [
+          "FAILED",
+          "0",
+          "1",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-preflight3": {
+      "raw_sha256": "0688f0094d01bcf61888a2b8c2b16cccf85fb419b33299d618b2d5634c449550",
+      "compressed_sha256": "8bcf6dd0bfaf9d3996404edbee01e099e611d5839b0841574b1bd1cda677bfa6",
+      "test_results": [],
+      "compilation_failed": true
+    },
+    "declaration-preflight4": {
+      "raw_sha256": "5bce7b2b8264354a59fb09a920628291a294a31ae5e71e5414f35d23630d754f",
+      "compressed_sha256": "a5dc5968b6bbf817b3b645cf779c4438271558af7bb760f372eaa61249ae94c8",
+      "test_results": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-semantic": {
+      "raw_sha256": "78d8ef39a8c694e2994e0a4fda91f82d3a21e554a76fdac32226582d8ddd5a50",
+      "compressed_sha256": "e6c4df8428e284e4804b8dee1545a9454e420afaedb55d12d138e5856d9a8ad9",
+      "test_results": [
+        [
+          "ok",
+          "27",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "4",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "2",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "4",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "7",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "4",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "10",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "22",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "7",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "19",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "11",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "15",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "18",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "20",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "8",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-preflight5": {
+      "raw_sha256": "ef828aabb83ee807ebe1f2ee09d026a4b22798c04409917941e2595629ea791e",
+      "compressed_sha256": "f4b7936380306d09c35269d5dc2a2ae00396d7b027264dabe4ec30c7e78c75b6",
+      "test_results": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-semantic-final": {
+      "raw_sha256": "50b2ebce64c67145d9cac7eb3a0849d616fff8bd93039514434192fd73924860",
+      "compressed_sha256": "e1deded5d73a72d17966bcc7b4c5ad88267c3dce27571c731100a63c4ab43abb",
+      "test_results": [
+        [
+          "ok",
+          "27",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "4",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "2",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "4",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "7",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "5",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "3",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "4",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "10",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "22",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "7",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "19",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "11",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "15",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "18",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "20",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "8",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-preflight6": {
+      "raw_sha256": "99ea2e17d763691567792b2cc387a1960accd57e52286a12390a0b6c4198e5a1",
+      "compressed_sha256": "4224cdfee3b3ed0c6c1a7c5594748edb96ab3363ce9dc2d9e48a2f42db3f7de9",
+      "test_results": [
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    },
+    "declaration-regressions": {
+      "raw_sha256": "b30494eb048d0f1b58853dfbc0e3dca3310a4644a0a763e2fd601fd3f1b827a7",
+      "compressed_sha256": "aef20415098b280f76143d0087b5b0433150225d19169c7f3c9f64454663d122",
+      "test_results": [
+        [
+          "ok",
+          "4",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ],
+        [
+          "ok",
+          "1",
+          "0",
+          "0"
+        ]
+      ],
+      "compilation_failed": false
+    }
+  },
+  "file_sha256": {
+    "luna-rs/crates/luna-driver/src/metadata_decoder.rs": "df217f2bb516c0b81f1c9e0adb0df6c4d0e8b7cfd8b686eb4829100cc56221c1",
+    "luna-rs/crates/luna-driver/src/registry.rs": "43469bb46b478f27ad4a8e9c75ffb6a49338b110974346ae29c8937682bc9b61",
+    "luna-rs/crates/luna-semantic/src/coherence.rs": "8f1fce61ce6594e0a5d58485aa99bcb9ebabe8d63e224a41b69970ec08953440",
+    "luna-rs/crates/luna-semantic/src/lang_item.rs": "23e405283f620dcfe1f32284e17fc4cac2c56f49bf8a9b3c1326978c75ed1abf",
+    "luna-rs/crates/luna-semantic/src/method_resolution.rs": "2470afdee1251847d9aab08722e976ba86eb70d32a96fd41e59571570c1f8d80",
+    "luna-rs/crates/luna-semantic/src/resolver.rs": "35bf9c9f486a77237ff33ea98cd5f4686055e978a82f2e320d99913ff64dac46",
+    "luna-rs/crates/luna-semantic/src/semantic_tables.rs": "a9a4584d0d4b3796caa4a321e3f58574629404c7c5f25e172affa8958aa5ae2f",
+    "luna-rs/crates/luna-semantic/src/symbol.rs": "f77458e9dc02d6f7810a78f569b7ff8679c2fec27299295633d973ea54486266",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "f61744ad5fc417fe7ffcb751e03d110cded1b30015ca305d672c3f9424463ea9",
+    "luna-rs/crates/luna-semantic/tests/p1a_tests.rs": "24423c84d97a29751ce5e28253ba7a92479dcbc0146913bb65b358a0eb1be548",
+    "luna-rs/crates/luna-cli/tests/diagnostic_declaration_locations_cli.rs": "2e1faeced2d1f63e504142b552dd8eba6ff4aeb6568b3183daefcab2cdbf094c"
+  },
+  "remaining": "Full source/requirement audit, inventory/docs refresh, immutable replacement pin, all eight qualification lanes, verified evidence and release closure",
+  "attempt_history": {
+    "declaration-preflight": "PASS initial five-case E1002 matrix",
+    "declaration-preflight2": "FAIL fixture: imported trait and type both foreign, correctly E2006 before intended E2005; corrected to blanket impl plus local type",
+    "declaration-preflight3": "FAIL compilation: speculative TypeChecker initializer missing declaration_anchor; corrected",
+    "declaration-preflight4": "PASS overlap, E1002 and bare-return matrix",
+    "declaration-preflight5": "PASS expanded candidates/orphans matrix",
+    "declaration-preflight6": "PASS final 19-case matrix including tuple/array source spans"
+  }
+}

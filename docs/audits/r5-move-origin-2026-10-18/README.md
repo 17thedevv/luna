@@ -1,5 +1,13 @@
 # R5 move-origin joins
 
+Current checkpoint — 2026-10-18: all eight d3d0ffe8 CI jobs have completed
+successfully, but that pin is superseded by confirmed DIAG-2/3 findings.
+Current uncommitted repairs pass 214 local preflight tests, with
+[archived logs and hashes](evidence/declaration-preflight.json). No replacement
+qualification pin is selected. The
+[remaining completion plan](REMAINING-PLAN.md) defines the ordered work and
+acceptance criteria through maintainer release and clean-package smoke.
+
 Status: compiler repair under validation; candidate remains `c085449b`.
 
 All eight release lanes passed at implementation `3a72f946`, including full
@@ -121,7 +129,7 @@ order claims now require identical-wording distinct events and multi-function
 errors across independent processes. Related skills were checked for overlap;
 the update adds regression guidance, with no semantic or freeze authority.
 
-## Selected identity/order replacement
+## Superseded identity/order pin
 
 Implementation pin: `d3d0ffe8d6495aee1f56257a1db817ce4107e992`. All 90 local preflight tests pass;
 documentation generation is idempotent and validation checks 1815 local links
@@ -137,3 +145,58 @@ and [Windows normal/workspace](https://github.com/17thedevv/luna/actions/runs/39
 [Ubuntu workspace](https://github.com/17thedevv/luna/actions/runs/39101753252)
 is queued. Final workspace passes depend on their triage jobs. These are run
 locators, not passing evidence.
+
+## Declaration-location audit and repair in progress
+
+Implementation d3d0ffe8 is superseded during qualification. The new
+[E1002 reducer](evidence/duplicate-declaration-finding.json) reports a duplicate
+function without the previous definition's structural location. The
+[additional reducers](evidence/declaration-additional-findings.json) expose the
+same missing antecedent in E2005 and a fabricated 0..0 primary span for an E2001
+bare-return mismatch. These findings remain release blockers; successful jobs
+for that SHA are historical only. Its
+[ASan archive verification](evidence/pin-d3d0ffe8/ubuntu-asan-verification.json)
+checks 43 files and 19 gate logs, clean detached identity, libasan linkage,
+RuntimeAbiTests and partial-read cleanup, without extending sanitizer scope.
+
+The repair retains the first declaration for ordinary symbols, fields,
+variants, namespace/import bindings and language-item registration. Import
+origins name actual consumer binding sites, including artifact-only routes.
+Declaration diagnostics use a Resolver-owned typed constructor. Impl origins
+are retained through session-local semantic/interface tables reconstructed
+from canonical source/AST; coherence and candidate diagnostics attach their
+real implementation/trait locations. Legacy metadata-only provider conflicts
+are declared provider-contract diagnostics instead of inventing a source span.
+A bare-return mismatch anchors the enclosing declaration's return contract;
+that existing source identity is saved/restored across nested declarations,
+methods and speculative method checking. No serialized AST/metadata field is
+added, and protocol versions remain 25/9/5/2.
+
+Compiler Change
+
+    Capability: Declaration and implementation conflicts retain structural
+        previous/candidate locations; bare-return errors use a real contract
+        declaration anchor instead of fabricated file-start coordinates.
+    Why stdlib exposed it: The release diagnostic audit used ordinary user
+        functions, Record/Choice declarations, bindings and trait impls.
+    Why it is generic: Symbol/impl provenance and declaration context apply
+        to arbitrary names/types/providers without a library-specific rule.
+    User-defined type benefiting: Record and Choice in diagnostic_declarations.
+    Tests: Repeated public check/build negatives and native valid controls,
+        source/fresh-artifact providers; coherence/registration invariants.
+    New intrinsic/lang_item?: NO. Versions remain 25/9/5/2.
+    Stdlib-specific branch?: NO.
+
+Preflight history is preserved, including an imported-impl fixture that first
+rejected with E2006 because both trait and type were foreign. The corrected
+fixture uses an imported blanket impl and a local nominal type, so locality
+passes and the intended E2005 coherence path is reached. Another intermediate
+attempt failed Rust compilation because a speculative TypeChecker constructor
+needed the new declaration context; that constructor now inherits the context.
+The initial five-case E1002 CLI matrix passed both modes, 22 coherence tests and
+one registration-origin invariant passed. The final expanded preflight passes 206 semantic tests, the 19-case CLI
+matrix in both modes (114 negative commands, two native controls), and seven
+existing diagnostic/span/missing-return/projection regressions. Composite
+tuple/array source-span cases are included. Complete source/requirement review
+is still required before selecting another pin. No replacement pin is selected before this audit
+and repair preflight finish; no old PASS carries forward.

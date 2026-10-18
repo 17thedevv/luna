@@ -203,6 +203,7 @@ impl InterfaceDecoder {
             if let Some(t_id) = trait_id {
                 trait_impl_entries.push(ExternalTraitImplEntry {
                     decl_id: Some(declaration),
+                    definition_span: None, // Legacy .mlib has no canonical source AST.
                     trait_id: t_id,
                     self_type,
                     generic_params: canon_gps.clone(),
