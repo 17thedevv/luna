@@ -2,7 +2,8 @@
 
 **DRAFT — qualification is still running. Do not publish this as a completed release.**
 
-Selected implementation: `d3d0ffe8d6495aee1f56257a1db817ce4107e992`.
+Superseded implementation: `d3d0ffe8d6495aee1f56257a1db817ce4107e992`.
+Further DIAG-2/3 declaration-location repairs and preflight are in progress; no qualified replacement is selected.
 Local preflight: 90 passed / 0 failed; all eight exact-pin lanes must rerun.
 Pin `67146195` is superseded; its ongoing jobs are historical only.
 Previous `3a72f946` completed all eight lanes (workspace 1414/0/1 on both targets) but exposed a nested/stale move-origin gap at final review.

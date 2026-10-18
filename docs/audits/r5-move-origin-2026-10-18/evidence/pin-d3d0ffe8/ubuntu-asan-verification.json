@@ -1,0 +1,29 @@
+{
+  "tested_commit": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+  "harness_commit": "bf35297b7797215eabf01572b0531a78ab62511c",
+  "observed_at_utc": "2026-10-18T05:49:05.531945+00:00",
+  "workflow_run": 39101753234,
+  "job_id": 117599279909,
+  "artifact_id": 12127010672,
+  "artifact_sha256": "7683ad6b783006b41ebb1f85aa33af7d2dade22f60e922cae3b77d54a9b20303",
+  "status": "PASS_IN_EXECUTED_SCOPE",
+  "manifest_files_verified": 43,
+  "gate_logs_verified": 19,
+  "expected_nonzero_gate": "detached: git symbolic-ref -q HEAD exits 1 with empty output; every executable gate exits 0",
+  "final_checkout": "CLEAN",
+  "scope": "Sanitized C runtime and RuntimeAbiTests including partial-read cleanup; compiler/generated code/stdlib instrumentation not certified",
+  "summary": {
+    "tested_commit": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+    "harness_commit": "bf35297b7797215eabf01572b0531a78ab62511c",
+    "lane": "runtime-asan",
+    "actual_native_target": null,
+    "advertised_target": "x86_64-unknown-linux-gnu",
+    "scope": "Executed lane scope only",
+    "status": "PASS_IN_EXECUTED_LANE_SCOPE",
+    "failure": null,
+    "failed_gates": [],
+    "r5_verdict": "NOT DETERMINED BY THIS LANE",
+    "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION",
+    "gate_count": 19
+  }
+}

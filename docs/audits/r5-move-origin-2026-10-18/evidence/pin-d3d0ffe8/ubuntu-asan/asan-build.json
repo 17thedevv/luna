@@ -1,0 +1,18 @@
+{
+  "gate": "asan-build",
+  "tested_commit": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+  "command": [
+    "cmake",
+    "--build",
+    "/home/runner/work/_temp/r5-runtime-asan/runtime-asan",
+    "--parallel"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan",
+  "started_utc": "2026-10-18T05:47:44Z",
+  "exit": 0,
+  "seconds": 1.0685296790000223,
+  "log_sha256": "670235cad0b7d9a1d6e96ccf7a4a215cac842426442476db8f1f8fc160cb32e6",
+  "status": "PASS",
+  "log": "asan-build.log.gz",
+  "compressed_sha256": "f55e5af0727110c5407a23a0b2aaa7da603821080aa1453fb981b460ab293c44"
+}

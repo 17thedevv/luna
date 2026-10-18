@@ -1,0 +1,8 @@
+// This comment must never be selected as a diagnostic source location.
+struct Record { value: i32 };
+impl Record {
+    fn missing(self: &Self) -> i32 { // invalid return contract
+        return;
+    }
+}
+fn main() -> i32 { return 0; }

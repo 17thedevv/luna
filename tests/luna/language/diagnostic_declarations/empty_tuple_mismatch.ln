@@ -1,0 +1,5 @@
+// This comment must never be selected as a diagnostic source location.
+fn main() -> i32 {
+    dec value: i32 = (); // invalid expression
+    return 0;
+}

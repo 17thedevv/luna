@@ -63,6 +63,7 @@ pub struct ExternalImplKey {
 #[derive(Debug, Clone)]
 pub struct ExternalTraitImplEntry {
     pub decl_id: Option<luna_ast::DeclId>,
+    pub definition_span: Option<luna_common::Span>,
     pub trait_id: CanonicalSymbolId,
     pub self_type: luna_semantic::ty::SemanticTypeId,
     pub generic_params: Vec<CanonicalSymbolId>,
@@ -617,9 +618,8 @@ impl ModuleRegistry {
                         .iter()
                         .map(|&a| ctx.types.clone_type_from(a, &interface.types, &lookup_sym))
                         .collect();
-                    let dummy_span = luna_common::Span::default();
                     if ctx
-                        .check_impl_coherence(trait_sym, new_self_ty, &new_gps, &new_trait_args, dummy_span)
+                        .check_impl_coherence_with_origin(trait_sym, new_self_ty, &new_gps, &new_trait_args, entry.definition_span)
                         .is_err()
                     {
                         continue;
@@ -628,6 +628,7 @@ impl ModuleRegistry {
                         .trait_impl_entries
                         .push(luna_semantic::semantic_tables::TraitImplEntry {
                             decl_id: entry.decl_id,
+                            definition_span: entry.definition_span,
                             trait_id: trait_sym,
                             self_type: new_self_ty,
                             generic_params: new_gps,
@@ -985,7 +986,8 @@ impl ModuleRegistry {
                     ));
                     continue;
                 };
-                ctx.lang_items.inject_raw(item, symbol_id);
+                let span = ctx.symbol_table.get_symbol(symbol_id).span;
+                ctx.lang_items.inject_raw_with_span(item, symbol_id, span);
             }
         }
     }
@@ -1406,6 +1408,7 @@ impl ModuleRegistry {
                     .collect();
                 trait_impl_entries.push(ExternalTraitImplEntry {
                     decl_id: entry.decl_id,
+                    definition_span: entry.definition_span,
                     trait_id: canon_trait,
                     self_type: entry.self_type,
                     generic_params: canon_gps,

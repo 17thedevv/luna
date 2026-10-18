@@ -57,6 +57,8 @@ pub struct TraitBound {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TraitImplEntry {
     pub decl_id: Option<DeclId>,
+    /// Diagnostic provenance only; rebuilt from canonical source/portable AST.
+    pub definition_span: Option<luna_common::Span>,
     pub trait_id: SymbolId,
     pub self_type: SemanticTypeId,
     pub generic_params: Vec<SymbolId>,

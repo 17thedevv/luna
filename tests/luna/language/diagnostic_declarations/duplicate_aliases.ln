@@ -1,0 +1,4 @@
+module place {}
+using place as alias; // previous definition
+using place as alias; // invalid definition
+fn main() -> i32 { return 0; }
