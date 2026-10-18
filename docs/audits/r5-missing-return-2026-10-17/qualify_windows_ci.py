@@ -39,15 +39,17 @@ def main():
             result = lane.run("workspace-" + args.lane_pass, command, cwd=lane.SRC / "luna-rs",
                               extra_env=dict(LUNA_E1_RELEASE_CLI=str(lane.RELEASE)))
             raw = (lane.OUT / result["log"]).read_text(encoding="utf-8", errors="replace")
-            if not result["result_groups"] or result["failed"] or "missing_return_cli" not in raw or "native_math_link_cli" not in raw:
-                raise RuntimeError("Complete workspace summaries and both compiler regression suites are required")
+            if not result["result_groups"] or result["failed"] or any(name not in raw for name in ("missing_return_cli", "native_math_link_cli", "move_origin_join_cli")):
+                raise RuntimeError("Complete workspace summaries and all three compiler regression suites are required")
         else:
             lane.run("strict-bounds", ["python", Path(__file__).with_name("verify_bounds_trap.py"),
                      "--checkout", lane.SRC, "--debug", lane.CLI, "--release", lane.RELEASE,
                      "--runtime", lane.BUILD / "runtime/libluna-runtime.a", "--out", lane.OUT / "strict-bounds",
                      "--pin", lane.PIN])
-        lane.identity()
         status = lane.git("status", "--porcelain")
+        lane.save(lane.OUT / "final-identity.json", dict(tested_commit=lane.PIN,
+                  head=lane.git("rev-parse", "HEAD"), status=status, clean=not status))
+        lane.identity()
         if status:
             raise RuntimeError("Final exact-pin checkout is not clean: " + status)
     except BaseException:

@@ -1,7 +1,7 @@
 {
-  "observed_at_utc": "2026-10-18T05:09:53.179966+00:00",
-  "status": "REPAIR_PREFLIGHT_IN_PROGRESS_PIN_NOT_YET_SELECTED",
-  "implementation_pin": null,
+  "observed_at_utc": "2026-10-18T05:12:54.096403+00:00",
+  "status": "AWAITING_FRESH_CI_START",
+  "implementation_pin": "67146195fb025951ca51d54365fd3a47ef9544e6",
   "previous_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
   "previous_result": "ALL_EIGHT_LANES_PASS_BUT_FINAL_DIAG_3_9_AUDIT_GAP",
   "candidate": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
@@ -23,7 +23,7 @@
     "windows-workspace-final"
   ],
   "remaining": [
-    "Complete repair preflight, select implementation pin and dispatch all lanes",
+    "Acquire and verify all eight fresh exact-pin lanes",
     "Verify all terminal evidence and final requirement audit",
     "Reconcile closure/public documentation and advance candidate only after qualification"
   ],
@@ -32,5 +32,6 @@
     "main merge",
     "PR",
     "release publication"
-  ]
+  ],
+  "local_preflight": "evidence/local-preflight.json"
 }

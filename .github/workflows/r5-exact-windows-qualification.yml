@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 env:
-  R5_TESTED_COMMIT: 3a72f9464fa921410b63551f7eac03414cf51e2b
+  R5_TESTED_COMMIT: 67146195fb025951ca51d54365fd3a47ef9544e6
   R5_LLVM_HOME: C:/r5-llvm18
   R5_WINDOWS_OUT: D:/r5-${{ github.run_id }}
   R5_WINDOWS_BUILD: C:/r5b-${{ github.run_id }}

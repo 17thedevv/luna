@@ -68,3 +68,9 @@ each mode; the source and origin requirements are unchanged.
 SKILL IMPACT: REFINEMENT to `luna-language-capability-validation`: diagnostic
 origin claims now explicitly require nested/equal-state joins, convergence,
 reinitialization and preservation of valid field causes during compaction.
+
+## Selected replacement
+
+Implementation pin: `67146195fb025951ca51d54365fd3a47ef9544e6`. The [local preflight](evidence/local-preflight.json) passes: seven negatives in two provider modes, each checked twice and built (42 negative commands), correct primary/antecedent lines, no executable, and valid native controls in both modes. All 65 affected borrowck tests pass, including predecessor permutations and fixed-point/field metadata invariants. This preflight reuses the existing Windows runtime and is not exact-pin release qualification.
+
+Documentation regeneration is idempotent at the selected implementation (230 documents, 30 pages, 1807 checked local links). The next Ubuntu normal harness explicitly rejects a dirty final checkout and preserves final identity; hosted Windows now also saves its final identity. New full-workspace gates require the move-origin CLI suite in addition to the E3004 and native-math suites. All eight lanes must complete again.

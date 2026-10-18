@@ -120,7 +120,7 @@ def focused():
         'casts-views':['cast_contract_cli','cast_poison_cli','raw_slice_view_a5_cli','raw_slice_provenance_cli'],
         'calls':['named_arguments_cli','default_arguments_cli','default_omission_cli','call_arity_cli'],
         'traits-comptime':['impl_header_metadata_cli','projection_fallback_cli','comptime_dependency_precision_cli','comptime_loans_cli'],
-        'diagnostics':['diagnostic_conformance_cli','expression_span_precision_cli','comptime_diagnostic_cascade_cli','compiler_trust_diagnostics_cli_parity','diag_per_code_coverage_cli','missing_return_cli'],
+        'diagnostics':['diagnostic_conformance_cli','expression_span_precision_cli','comptime_diagnostic_cascade_cli','compiler_trust_diagnostics_cli_parity','diag_per_code_coverage_cli','missing_return_cli','move_origin_join_cli'],
         'providers':['provider_tiers_cli','retained_contracts_cli','alpha_modules_cli','module_const_storage_cli','fresh_artifact_classification_cli','native_math_link_cli'],
         'arithmetic':['checked_arithmetic_qualification_cli','wrapping_arithmetic_cli','range_inclusive_cli'],
         'grammar-harness':['v01_grammar_acceptance_tests','test_temp_workspace_lifecycle_cli'],
