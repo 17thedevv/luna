@@ -2459,22 +2459,27 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 128,
+          "line": 135,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 133,
+          "line": 140,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 148,
+          "line": 155,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 687,
+          "line": 691,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 692,
           "span_policy": "anchored"
         },
         {
@@ -2518,12 +2523,22 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 262,
+          "line": 263,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 265,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 651,
+          "line": 653,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 655,
           "span_policy": "anchored"
         },
         {
@@ -2553,6 +2568,7 @@
       "automated_coverage": [
         "luna-rs/crates/luna-borrowck/tests/partial_move_tests.rs",
         "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs",
+        "luna-rs/crates/luna-cli/tests/move_origin_join_cli.rs",
         "luna-rs/crates/luna-cli/tests/semantic_maturity_phase0.rs",
         "luna-rs/crates/luna-driver/tests/p0b_drop_subplace_tests.rs"
       ],
@@ -2816,7 +2832,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 143,
+          "line": 150,
           "span_policy": "dynamic"
         }
       ],
@@ -2839,7 +2855,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 138,
+          "line": 145,
           "span_policy": "dynamic"
         }
       ],
@@ -3178,7 +3194,7 @@
         },
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 775,
+          "line": 797,
           "span_policy": "infrastructure"
         },
         {
@@ -3273,17 +3289,17 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 829,
+          "line": 851,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 897,
+          "line": 919,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 935,
+          "line": 957,
           "span_policy": "infrastructure"
         }
       ],
@@ -3304,7 +3320,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 970,
+          "line": 992,
           "span_policy": "infrastructure"
         }
       ],
@@ -3403,12 +3419,12 @@
         },
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 682,
+          "line": 704,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 946,
+          "line": 968,
           "span_policy": "infrastructure"
         }
       ],
@@ -3436,12 +3452,12 @@
         },
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 496,
+          "line": 518,
           "span_policy": "infrastructure"
         },
         {
           "file": "luna-rs/crates/luna-driver/src/lib.rs",
-          "line": 942,
+          "line": 964,
           "span_policy": "infrastructure"
         }
       ],

@@ -3,7 +3,7 @@
 The original [R5 checklist](../0.1-alpha-completion-2026-10-04/r4/r5-checklist.md)
 and [full completion matrix](../r5-linux-native-link-2026-10-18/REQUIREMENTS.md)
 retain their scope. This replacement must reacquire all eight lanes after the
-move-origin repair; no historical PASS substitutes for a new-pin result.
+move-origin and diagnostic identity/order repairs; no historical PASS substitutes for a new-pin result.
 
 | Required evidence | Current status |
 | --- | --- |
@@ -16,6 +16,7 @@ move-origin repair; no historical PASS substitutes for a new-pin result.
 | Windows full workspace no-fail-fast triage | PENDING NEW PIN |
 | Windows full workspace default-parallel final after triage | PENDING NEW PIN |
 | Diagnostic provenance | New CLI reducers for nested/equal-state/loop joins, field reinitialization, compacted fields and imported generic artifacts; exact primary/related lines, repeated checks, build parity and native valid controls |
+| Diagnostic identity/order | Distinct identical-wording E3002 events; source order across multiple functions and independent check processes; check/build and source/artifact parity; structural-cause union and idempotence |
 | Internal dataflow | Predecessor permutations, origin-only convergence, compacted field provenance and subtree invalidation; affected borrowck regressions |
 | DIAG-1..10 final review | Preserve typed identities, primary/structural related spans, poison, deterministic identity, phase admission and the 72-code inventory; eight reserved and four non-portable fixture limits stay explicit |
 | Final closure | Verify every archive/hash/exit/target/mode, reconcile public docs and ledger, then fast-forward candidate only after all requirements pass |

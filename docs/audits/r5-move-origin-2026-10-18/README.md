@@ -69,13 +69,13 @@ SKILL IMPACT: REFINEMENT to `luna-language-capability-validation`: diagnostic
 origin claims now explicitly require nested/equal-state joins, convergence,
 reinitialization and preservation of valid field causes during compaction.
 
-## Selected replacement
+## Superseded origin-repair pin
 
 Implementation pin: `67146195fb025951ca51d54365fd3a47ef9544e6`. The [local preflight](evidence/local-preflight.json) passes: seven negatives in two provider modes, each checked twice and built (42 negative commands), correct primary/antecedent lines, no executable, and valid native controls in both modes. All 65 affected borrowck tests pass, including predecessor permutations and fixed-point/field metadata invariants. This preflight reuses the existing Windows runtime and is not exact-pin release qualification.
 
 Documentation regeneration is idempotent at the selected implementation (230 documents, 30 pages, 1807 checked local links). The next Ubuntu normal harness explicitly rejects a dirty final checkout and preserves final identity; hosted Windows now also saves its final identity. New full-workspace gates require the move-origin CLI suite in addition to the E3004 and native-math suites. All eight lanes must complete again.
 
-## Active exact-pin acquisition
+## Historical acquisition for 67146195
 
 Harness: `6eab700e5fe211a407b6a7f9aebb16a150a4cbf3`. Authenticated GitHub job observations confirm native acquisition has started:
 
@@ -83,4 +83,40 @@ Harness: `6eab700e5fe211a407b6a7f9aebb16a150a4cbf3`. Authenticated GitHub job ob
 - [Ubuntu workspace triage then final](https://github.com/17thedevv/luna/actions/runs/39099784909)
 - [Windows normal / workspace triage then final](https://github.com/17thedevv/luna/actions/runs/39099784890)
 
-These links identify running jobs, not passing evidence. [State and job IDs](qualification-state.json) and [remaining requirements](REQUIREMENTS.md) retain the full release scope.
+These links identify acquisition for the superseded pin. [State and job IDs](qualification-state.json) and [remaining requirements](REQUIREMENTS.md) retain the full release scope.
+
+## Additional identity/order audit before final closure
+
+Pin 67146195 is superseded during qualification. Its [verified runtime ASan result](evidence/pin-67146195/ubuntu-asan-verification.json) remains historical. The [DIAG-4 reducer](evidence/dedup-finding.json) demonstrates two distinct forbidden partial moves collapsed by message-based dedup. The [DIAG-6 reducer](evidence/ordering-finding.json) demonstrates multi-function error order changing across six processes.
+
+The complete follow-up uses a shared typed source-event identity, replaces message/full-object equality in Borrowck, TypeChecker and Driver dedup, and normalizes diagnostics at public Driver boundaries by source location and code. Duplicate source events retain the union of structural cause spans. Global/unanchored and uncoded diagnostics are preserved. Internal ordering uses source identity rather than message text or function/hash traversal. Regression checks distinct identical-wording E3002 events and multi-process E3001 ordering in both provider modes, in addition to origin joins and reinitialization.
+
+Compiler Change
+
+    Capability: Distinct source events survive dedup; public diagnostic results
+        follow source-path/range/code order, retaining structural cause spans.
+    Why stdlib exposed it: Final release review used ordinary user-defined
+        aggregates and functions, without relying on a standard-library type.
+    Why it is generic: Common identity and Driver result normalization apply
+        to arbitrary source diagnostics; analyzer dedup uses typed identities.
+    User-defined type benefiting: Record with Drop in distinct_partial_moves.
+    Tests: Common identity/order/related-union/idempotence invariants; repeated
+        source/artifact CLI checks and build; existing diagnostic regressions.
+    New intrinsic/lang_item?: NO. Versions remain 25/9/5/2.
+    Stdlib-specific branch?: NO.
+
+The old workflows could not be cancelled with available tooling: the connector
+has no cancellation operation and the isolated browser is signed out. They may
+finish as historical evidence; their results cannot qualify the replacement.
+
+The [repair source review](evidence/identity-order-source-review.json) records
+the inspected boundaries and file hashes. Local preflight passes 15 common and
+65 borrowck tests, plus the expanded CLI matrix in both provider modes. All nine existing diagnostic regression tests also pass. The
+[complete local preflight](evidence/identity-order-preflight.json) preserves
+compressed logs and hashes; it reuses the Windows runtime and is not exact-pin
+release qualification.
+
+SKILL IMPACT: REFINEMENT to `luna-language-capability-validation`: identity and
+order claims now require identical-wording distinct events and multi-function
+errors across independent processes. Related skills were checked for overlap;
+the update adds regression guidance, with no semantic or freeze authority.

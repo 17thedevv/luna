@@ -4,7 +4,7 @@
 
 # Luna 0.1 status — 2026-10-18
 
-**Release: BLOCKED / NOT VERIFIED; diagnostic-origin replacement under validation.**
+**Release: BLOCKED / NOT VERIFIED; diagnostic origin/identity/order repairs under validation.**
 Candidate: `c085449b207b5860b1d7a79bee221c2ff3d357c3`.
 Protocol: compiler / metadata / MVIR / format **25 / 9 / 5 / 2**.
 
@@ -14,8 +14,10 @@ record the findings and remaining work. Previous pin `3a72f946` completed normal
 ASan and comptime lanes plus Windows/Ubuntu full workspace triage/final (each
 1414 passed, 0 failed, 1 ignored). Its final audit found E3001 origins lost at
 nested joins or retained after field reinitialization. Correct rejection alone
-does not satisfy DIAG-3/9. The generic move-provenance repair is being validated
-before selecting a replacement pin and reacquiring every lane.
+does not satisfy DIAG-3/9. Follow-up review found distinct E3002 events collapsed
+by message-based dedup and unstable multi-function diagnostic order (DIAG-4/6).
+The generic repairs are being validated before selecting a replacement pin and
+reacquiring every lane.
 
 Earlier diagnostic E4002/E4003, E3004 and Linux native math linkage repairs stay
 in the implementation. Their previous passes remain scoped to their own SHA.

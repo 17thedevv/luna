@@ -1,6 +1,6 @@
 {
-  "observed_at_utc": "2026-10-18T05:14:40.318009+00:00",
-  "status": "QUALIFICATION_IN_PROGRESS",
+  "observed_at_utc": "2026-10-18T05:35:58.567522+00:00",
+  "status": "SUPERSEDED_DURING_QUALIFICATION_DIAG_4_6_FINDINGS",
   "implementation_pin": "67146195fb025951ca51d54365fd3a47ef9544e6",
   "previous_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
   "previous_result": "ALL_EIGHT_LANES_PASS_BUT_FINAL_DIAG_3_9_AUDIT_GAP",
@@ -23,7 +23,7 @@
     "windows-workspace-final"
   ],
   "remaining": [
-    "Acquire and verify all eight fresh exact-pin lanes",
+    "Complete DIAG-4/6 repair preflight, select replacement pin and reacquire all eight lanes",
     "Verify all terminal evidence and final requirement audit",
     "Reconcile closure/public documentation and advance candidate only after qualification"
   ],
@@ -57,5 +57,10 @@
       "triage_job": 117593507889,
       "status": "NORMAL_AND_TRIAGE_IN_PROGRESS_FINAL_DEPENDENT"
     }
+  },
+  "superseded_reason": "Remaining message-dependent dedup and nondeterministic multi-function diagnostic emission",
+  "67146195_asan": {
+    "status": "PASS_IN_EXECUTED_SCOPE",
+    "verification": "evidence/pin-67146195/ubuntu-asan-verification.json"
   }
 }

@@ -8,7 +8,8 @@ Current qualification - 2026-10-18: [move-origin repair report](../../audits/r5-
 and [replacement requirements](../../audits/r5-move-origin-2026-10-18/REQUIREMENTS.md).
 Previous pin `3a72f946` completed all eight lanes, including full workspace
 triage/final on Windows and Ubuntu (each 1414/0/1). Final review found a DIAG-3/9
-origin-span gap; a generic repair requires a new pin and fresh qualification.
+origin-span gap; follow-up review also found message-dependent dedup and unstable
+multi-function diagnostic order. Generic repairs require a new pin and fresh qualification.
 Candidate stays `c085449b`; release remains **BLOCKED / NOT VERIFIED**.
 
 Prior evidence reconciliation — 2026-10-14: see the

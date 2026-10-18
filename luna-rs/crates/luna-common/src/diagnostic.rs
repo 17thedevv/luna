@@ -221,6 +221,13 @@ pub struct Diagnostic {
 pub struct DiagnosticLabel { pub span: Span, pub message: String }
 
 impl Diagnostic {
+    /// DIAG-4: only coded, anchored source events have a deduplication identity.
+    /// Preserve global diagnostics and uncoded events rather than merging them.
+    pub fn same_identity(&self, other: &Self) -> bool {
+        self.code.is_some() && self.span.is_some()
+            && self.code == other.code && self.span == other.span
+    }
+
     /// Infrastructure owns compiler invariant reporting, including failures
     /// discovered by an earlier stage after source admission.
     pub fn invariant_error(message: impl Into<String>) -> Self {
@@ -359,6 +366,40 @@ fn display_text(text: &str, initial_column: usize) -> (String, usize) {
     (rendered, column)
 }
 
+/// Canonical source order and identity, independent of rendered wording or
+/// function/hash-map traversal order. Duplicate events retain every cause span.
+pub fn normalize_diagnostics(diagnostics: &mut Vec<Diagnostic>, sources: &SourceManager) {
+    fn location(span: Span, sources: &SourceManager) -> (String, u32, u32, u32) {
+        let file = sources.get_file(span.file_id)
+            .map(|file| file.name.clone()).unwrap_or_else(|| format!("#{}", span.file_id.0));
+        (file, span.start, span.end, span.ctxt.0)
+    }
+    diagnostics.sort_by_cached_key(|diagnostic| {
+        let point = diagnostic.span.map(|span| location(span, sources)).unwrap_or_default();
+        (diagnostic.span.is_none(), point, diagnostic.code.map(|code| code.number()).unwrap_or(65535))
+    });
+    let mut seen = std::collections::HashMap::new();
+    let mut normalized: Vec<Diagnostic> = Vec::with_capacity(diagnostics.len());
+    for diagnostic in std::mem::take(diagnostics) {
+        if let (Some(code), Some(span)) = (diagnostic.code, diagnostic.span) {
+            if let Some(&index) = seen.get(&(code, span)) {
+                let existing: &mut Diagnostic = &mut normalized[index];
+                if diagnostic.level == DiagnosticLevel::Error { existing.level = DiagnosticLevel::Error; }
+                existing.contract_diagnostic &= diagnostic.contract_diagnostic;
+                existing.related.extend(diagnostic.related);
+                continue;
+            }
+            seen.insert((code, span), normalized.len());
+        }
+        normalized.push(diagnostic);
+    }
+    for diagnostic in &mut normalized {
+        diagnostic.related.sort_by_cached_key(|label| location(label.span, sources));
+        diagnostic.related.dedup_by(|left, right| left.span == right.span);
+    }
+    *diagnostics = normalized;
+}
+
 #[cfg(test)]
 mod tests {
     use super::{Diagnostic, DiagnosticCode};
@@ -467,6 +508,52 @@ mod tests {
             diagnostic.render(&SourceManager::new()),
             "error[E3001]: Use of moved value `value`\n"
         );
+    }
+
+    #[test]
+    fn diagnostic_identity_uses_code_and_primary_span_instead_of_wording() {
+        let span = Span::new(FileId(0), 1, 2);
+        let first = Diagnostic::source_error(DiagnosticCode::PartialMoveUnderDrop, span, "first wording");
+        let rewritten = Diagnostic::source_error(DiagnosticCode::PartialMoveUnderDrop, span, "different wording")
+            .with_related(Span::new(FileId(0), 5, 6), "another explanation");
+        assert!(first.same_identity(&rewritten));
+        let next_event = Diagnostic::source_error(DiagnosticCode::PartialMoveUnderDrop,
+            Span::new(FileId(0), 3, 4), "first wording");
+        assert!(!first.same_identity(&next_event));
+        let next_kind = Diagnostic::source_error(DiagnosticCode::UseAfterMove, span, "first wording");
+        assert!(!first.same_identity(&next_kind));
+        assert!(!Diagnostic::error("uncoded error").same_identity(&Diagnostic::error("uncoded error")));
+        let global = Diagnostic::invariant_error("independent global faults");
+        assert!(!global.same_identity(&global));
+    }
+
+    #[test]
+    fn normalization_orders_source_paths_and_preserves_all_structural_causes() {
+        let mut sources = SourceManager::new();
+        let b = sources.add_file("b.ln".to_string(), "one two".to_string());
+        let a = sources.add_file("a.ln".to_string(), "one two".to_string());
+        let primary_a = Span::new(a, 0, 3);
+        let primary_b = Span::new(b, 0, 3);
+        let cause_a = Span::new(a, 4, 7);
+        let cause_b = Span::new(b, 4, 7);
+        let first = Diagnostic::source_error(DiagnosticCode::UseAfterMove, primary_a, "first wording")
+            .with_related(cause_b, "cause b");
+        let second = Diagnostic::source_error(DiagnosticCode::UseAfterMove, primary_a, "other wording")
+            .with_related(cause_a, "cause a");
+        let later = Diagnostic::source_error(DiagnosticCode::UseAfterMove, primary_b, "first wording");
+        for input in [vec![later.clone(), first.clone(), second.clone()], vec![second, later, first]] {
+            let mut diagnostics = input;
+            diagnostics.push(Diagnostic::invariant_error("global one"));
+            diagnostics.push(Diagnostic::invariant_error("global two"));
+            super::normalize_diagnostics(&mut diagnostics, &sources);
+            assert_eq!(diagnostics.len(), 4);
+            assert_eq!(diagnostics[0].span, Some(primary_a));
+            assert_eq!(diagnostics[1].span, Some(primary_b));
+            assert_eq!(diagnostics[0].related.iter().map(|label| label.span).collect::<Vec<_>>(), vec![cause_a, cause_b]);
+            let once = diagnostics.clone();
+            super::normalize_diagnostics(&mut diagnostics, &sources);
+            assert_eq!(diagnostics, once);
+        }
     }
 
     #[test]

@@ -442,7 +442,7 @@ impl<'a> BorrowAnalyzer<'a> {
                             &check.longer_subject.to_subject(), &check.longer,
                             &check.shorter_subject.to_subject(), &check.shorter,
                             &current_state, val_data.span) {
-                            if !analyzer.diagnostics.iter().any(|d| d.message == diagnostic.message && d.span == diagnostic.span) {
+                            if !analyzer.diagnostics.iter().any(|d| d.same_identity(&diagnostic)) {
                                 analyzer.diagnostics.push(diagnostic);
                             }
                         }
@@ -505,7 +505,7 @@ impl<'a> BorrowAnalyzer<'a> {
                                                     &current_state,
                                                     val_data.span.clone(),
                                                 ) {
-                                                    if !analyzer.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                                                    if !analyzer.diagnostics.iter().any(|d| d.same_identity(&diag)) {
                                                         analyzer.diagnostics.push(diag);
                                                     }
                                                 }
@@ -572,7 +572,7 @@ impl<'a> BorrowAnalyzer<'a> {
                                                     &current_state,
                                                     val_data.span.clone(),
                                                 ) {
-                                                    if !analyzer.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                                                    if !analyzer.diagnostics.iter().any(|d| d.same_identity(&diag)) {
                                                         analyzer.diagnostics.push(diag);
                                                     }
                                                 }
@@ -666,7 +666,7 @@ impl<'a> BorrowAnalyzer<'a> {
                                             &current_state,
                                             effective_span.clone(),
                                         ) {
-                                            if !analyzer.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                                            if !analyzer.diagnostics.iter().any(|d| d.same_identity(&diag)) {
                                                 analyzer.diagnostics.push(diag);
                                             }
                                         }
@@ -716,7 +716,7 @@ impl<'a> BorrowAnalyzer<'a> {
                                         &current_state,
                                         effective_span.clone(),
                                     ) {
-                                        if !analyzer.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                                        if !analyzer.diagnostics.iter().any(|d| d.same_identity(&diag)) {
                                             analyzer.diagnostics.push(diag);
                                         }
                                     }
@@ -755,7 +755,7 @@ impl<'a> BorrowAnalyzer<'a> {
                                     &current_state,
                                     val_data.span.clone(),
                                 ) {
-                                    if !analyzer.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                                    if !analyzer.diagnostics.iter().any(|d| d.same_identity(&diag)) {
                                         analyzer.diagnostics.push(diag);
                                     }
                                 }
@@ -845,7 +845,7 @@ let val_op = Operand::Value(*val);
                             is_ref_ret,
                             is_direct_ref_ret,
                         ) {
-                            if !analyzer.diagnostics.iter().any(|d| d.message == diag.message && d.span == diag.span) {
+                            if !analyzer.diagnostics.iter().any(|d| d.same_identity(&diag)) {
                                 analyzer.diagnostics.push(diag);
                             }
                         }
@@ -1166,7 +1166,7 @@ let val_op = Operand::Value(*val);
                 let mut diagnostic = Diagnostic::error("Raw pointer access conflicts with a live safe loan of the same UnsafeRawRoot")
                     .with_code(DiagnosticCode::BorrowConflict);
                 diagnostic.span = self.func.values[value.0 as usize].span;
-                if !self.diagnostics.iter().any(|old| old.message == diagnostic.message && old.span == diagnostic.span) {
+                if !self.diagnostics.iter().any(|old| old.same_identity(&diagnostic)) {
                     self.diagnostics.push(diagnostic);
                 }
             }
@@ -1732,7 +1732,7 @@ let val_op = Operand::Value(*val);
                     "Cannot create {requested} from this raw pointer while its UnsafeRawRoot is already borrowed as {existing}"
                 )).with_code(DiagnosticCode::BorrowConflict);
                 diag.span = self.func.values[val_id.0 as usize].span.clone();
-                if !self.diagnostics.iter().any(|old| old.message == diag.message && old.span == diag.span) {
+                if !self.diagnostics.iter().any(|old| old.same_identity(&diag)) {
                     self.diagnostics.push(diag);
                 }
             }
@@ -1744,7 +1744,7 @@ let val_op = Operand::Value(*val);
         let mut diag = Diagnostic::error(format!("UnsafeRawRoot loan cannot escape: {message}"))
             .with_code(DiagnosticCode::LocalBorrowEscape);
         diag.span = self.func.values.get(val_id.0 as usize).and_then(|value| value.span.clone());
-        if !self.diagnostics.iter().any(|old| old.message == diag.message && old.span == diag.span) {
+        if !self.diagnostics.iter().any(|old| old.same_identity(&diag)) {
             self.diagnostics.push(diag);
         }
     }
@@ -3366,7 +3366,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                     "RawStorageAnchorViolation: raw-to-safe reference conversion requires one valid declared anchor and compatible mutability",
                                 ).with_code(DiagnosticCode::RawStorageAnchorViolation);
                                 diag.span = self.func.values[val_id.0 as usize].span.clone();
-                                if !self.diagnostics.iter().any(|existing| existing.message == diag.message && existing.span == diag.span) {
+                                if !self.diagnostics.iter().any(|existing| existing.same_identity(&diag)) {
                                     self.diagnostics.push(diag);
                                 }
                             }
@@ -3640,7 +3640,7 @@ impl<'a> DataflowAnalysis<BorrowStateData> for BorrowAnalyzer<'a> {
                                 place_name
                             )).with_code(DiagnosticCode::AsyncBorrowAcrossAwait);
                             diag.span = self.func.values[val_id.0 as usize].span.clone();
-                            if !self.diagnostics.iter().any(|d| d.message == diag.message) {
+                            if !self.diagnostics.iter().any(|d| d.same_identity(&diag)) {
                                 self.diagnostics.push(diag);
                             }
                         }

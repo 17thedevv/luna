@@ -101,6 +101,12 @@ exercise predecessor ordering and a portable generic provider where relevant.
 Reinitialization must discard obsolete origins, while ownership-state compaction
 must preserve valid field-specific causes for later diagnostic tracing.
 
+For diagnostic identity/order claims, include distinct events with identical
+wording and errors in multiple functions across independent CLI processes.
+Check code and source locations, source/artifact and check/build parity; one
+function or one process cannot expose traversal-order instability. Verify that
+deduplication preserves structural causes without merging distinct events.
+
 For callable identity/safety, compare safe and unsafe functions with identical
 parameter/return shapes. Exercise local values, returned/generic callbacks,
 known immutable targets, mutable reassignment and genuinely opaque indirect
