@@ -2,13 +2,14 @@
 
 **DRAFT — qualification is still running. Do not publish this as a completed release.**
 
-Selected implementation: `3a72f9464fa921410b63551f7eac03414cf51e2b`.
+Selected implementation: `67146195fb025951ca51d54365fd3a47ef9544e6`.
+Previous `3a72f946` completed all eight lanes (workspace 1414/0/1 on both targets) but exposed a nested/stale move-origin gap at final review.
 Previous implementation `52ef3711` is not qualified (five Ubuntu native math link failures).
 Current remote candidate: `c085449b207b5860b1d7a79bee221c2ff3d357c3`.
 Current remote main: `401a95a872f0fdfb9840640f41cc4ac629cb17cd`.
 Refs were checked on 2026-10-18; recheck before any maintainer action.
-The [current qualification report](../r5-linux-native-link-2026-10-18/README.md) and
-[live acquisition locators](../r5-linux-native-link-2026-10-18/qualification-state.json) own the current status.
+The [current qualification report](../r5-move-origin-2026-10-18/README.md) and
+[live acquisition locators](../r5-move-origin-2026-10-18/qualification-state.json) own the current status.
 The [previous pin report](QUALIFICATION.md) preserves its terminal failures.
 Evidence/report commits identify the harness or recorded results; they do not
 automatically become the tested implementation pin.
@@ -34,6 +35,12 @@ Void functions, valid explicit/tail returns and proven endless loops remain
 accepted. The permanent public CLI matrix checks both source and fresh
 artifact-only provider routes, failure before executable publication and
 native execution of valid controls.
+
+The selected follow-up preserves move antecedents across nested/equal-state joins,
+reinitialization and compacted aggregate fields. Public CLI reducers verify E3001
+primary and related source lines in source/fresh artifact modes, including
+portable generic bodies. The provenance change does not alter ownership-state
+transitions or introduce library-specific compiler branches.
 
 Protocol identities remain **compiler25 / metadata9 / MVIR5 / format2**.
 This does not waive artifact freshness or dependency-interface validation.
