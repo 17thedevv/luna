@@ -1,0 +1,3 @@
+
+luna: PANIC [L002] index out of bounds: index 3, length 2
+    at D:\fdlang\docs\audits\r5-move-origin-2026-10-18\evidence\pin-8525067f\strict-bounds\release-artifact\program.ln:0:0
