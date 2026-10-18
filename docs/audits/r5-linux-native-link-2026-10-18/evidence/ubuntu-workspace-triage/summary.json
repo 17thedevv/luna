@@ -1,0 +1,20 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "harness_commit": "14a608660cdec0c3bb8884ab893f74acda200dcd",
+  "lane": "workspace-triage",
+  "workflow_run": "39056178775",
+  "totals": {
+    "groups": 234,
+    "passed": 1414,
+    "failed": 0,
+    "ignored": 1,
+    "missing_return_suite_observed": true,
+    "native_math_suite_observed": true
+  },
+  "status": "PASS_IN_EXECUTED_LANE_SCOPE",
+  "failure": null,
+  "failed_gates": [],
+  "gate_count": 28,
+  "scope": "Complete cargo test --workspace; final uses default parallelism",
+  "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION"
+}

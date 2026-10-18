@@ -1,0 +1,15 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "provenance-llvm",
+  "command": [
+    "C:\\r5-llvm18\\bin\\llvm-config.exe",
+    "--version"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T20:54:09.419070+00:00",
+  "end_utc": "2026-10-17T20:54:09.434693+00:00",
+  "elapsed_seconds": 0.016,
+  "exit": 0,
+  "log": "provenance-llvm.log",
+  "log_sha256": "be9dc5ce956678e5c2ceb953961e75881785713e3bb2a2666aa7b03bf4bf599f"
+}

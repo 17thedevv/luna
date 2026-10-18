@@ -1,0 +1,16 @@
+{
+  "gate": "os-release",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cat",
+    "/etc/os-release"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-final/checkout",
+  "started_utc": "2026-10-17T21:03:40Z",
+  "exit": 0,
+  "seconds": 0.0015404450000175984,
+  "log_sha256": "87458b3b1f1ca0e5c693ade771de7007c3783bdc692fa6b39eb6414bf2af2763",
+  "status": "PASS",
+  "log": "os-release.log.gz",
+  "compressed_sha256": "d87c87220e5e9a326a87d8cd34927c774042daa4298372cf4c21b04168731fd1"
+}

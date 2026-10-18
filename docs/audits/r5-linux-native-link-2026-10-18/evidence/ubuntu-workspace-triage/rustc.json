@@ -1,0 +1,16 @@
+{
+  "gate": "rustc",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "rustc",
+    "-vV"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage/checkout",
+  "started_utc": "2026-10-17T18:00:47Z",
+  "exit": 0,
+  "seconds": 0.0157518500000009,
+  "log_sha256": "f22d5e4e9ced367e774ce5bc140d9e6b1235c1882fec80d011044851f3ae6369",
+  "status": "PASS",
+  "log": "rustc.log.gz",
+  "compressed_sha256": "3bbc73e917112825daa074175c423dc871551bdad39c10b9031e615604bac2f8"
+}

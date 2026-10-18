@@ -1,0 +1,17 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "runtime-build",
+  "command": [
+    "cmake",
+    "--build",
+    "C:\\r5b-39056178610\\runtime",
+    "--parallel"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T20:54:19.397502+00:00",
+  "end_utc": "2026-10-17T20:54:23.455557+00:00",
+  "elapsed_seconds": 4.062,
+  "exit": 0,
+  "log": "runtime-build.log",
+  "log_sha256": "3e14f54e7e7f9662113fd88f5065b99f7898721227f769482f99e38b0d421d1e"
+}

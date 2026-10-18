@@ -89,3 +89,9 @@ The normal checkout was initially clean. Its final status lists only generated `
 Windows native normal also passed. The [verified original archive](evidence/windows-normal-verification.json) matches GitHub digest; all 35 recorded gate-log hashes were checked. All 12 focused batches, diagnostics, native runtime ABI, both CLI profiles, 49 canonical Windows GNU/COFF providers, docs examples and native quickstart pass. Comptime reports **88 PASS / 0 FAIL / 8 CHARACTERIZED**. The hosted wrapper enforces an exact clean checkout after the final replay before writing its successful summary.
 
 The strict A5 replay passes all four profile/provider-mode rows with actual `luna: PANIC [L002]` and `index 3, length 2` in preserved native stderr. It is not inferred from a nonzero exit alone. The original archive preserves all acquired data; selected metadata and raw logs are extracted alongside it. Complete Windows and Ubuntu workspace triage/final remain required and pending.
+
+## Terminal workspace results and final audit finding
+
+All four full workspace passes completed: Windows and Ubuntu each report **1414 passed / 0 failed / 1 ignored**, in both no-fail-fast triage and default-parallel final. The sole ignored test is `mutable_references::sem_mutref_06_invalid_fixture`. All four ZIP digests and raw/compressed gate logs were verified. Ubuntu initial/final status and protected-tree diff are empty; Windows wrapper clean-final checks completed successfully.
+
+**This pin is not final release-qualified.** Final source review exposed a real nested-branch E3001 reducer that loses its structural antecedent move span. [The preserved finding](../r5-move-origin-2026-10-18/evidence/finding.json) shows the invalid program still rejects, but DIAG-3/9 remains incomplete. Candidate stays c085449b. A compiler repair requires a new pin and qualification; these eight green lanes remain historical evidence for 3a72f946.

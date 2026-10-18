@@ -1,0 +1,7 @@
+{
+  "source": "https://github.com/llvm/llvm-project/releases/tag/llvmorg-18.1.8",
+  "asset": "clang+llvm-18.1.8-x86_64-pc-windows-msvc.tar.xz",
+  "archive_sha256": "22c5907db053026cc2a8ff96d21c0f642a90d24d66c23c6d28ee7b1d572b82e8",
+  "digest_scope": "Observed acquisition digest; upstream asset has no published API digest",
+  "extraction": "bin, include and lib/LLVM-C.lib"
+}
