@@ -13,12 +13,12 @@ V01-ARCH-02 is newly observed in the imported source, not the old audit.
 
 ## Current qualification - 2026-10-18
 
-[selected-pin report](../../audits/r5-linux-native-link-2026-10-18/README.md)
-and [completion requirements](../../audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md).
-Pin `3a72f946` is qualifying after E3004 and generic Linux native math linkage
-repairs. Its C runtime ASan scope is verified; other release lanes remain in
-progress. Candidate remains `c085449b`. Release is **BLOCKED / NOT VERIFIED**;
-historical passes are not transferred to the selected pin.
+[move-origin repair report](../../audits/r5-move-origin-2026-10-18/README.md)
+and [replacement requirements](../../audits/r5-move-origin-2026-10-18/REQUIREMENTS.md).
+Previous pin `3a72f946` completed all eight lanes, including full workspace
+triage/final on Windows and Ubuntu (each 1414/0/1). Final review found a DIAG-3/9
+origin-span gap; a generic repair requires a new pin and fresh qualification.
+Candidate stays `c085449b`; release remains **BLOCKED / NOT VERIFIED**.
 
 ## Prior reconciliation — 2026-10-14
 

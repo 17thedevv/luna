@@ -4,28 +4,23 @@
 
 # Luna 0.1 status — 2026-10-18
 
-**Release: BLOCKED / NOT VERIFIED; replacement-pin qualification IN PROGRESS.**
-Selected implementation: `3a72f9464fa921410b63551f7eac03414cf51e2b`.
+**Release: BLOCKED / NOT VERIFIED; diagnostic-origin replacement under validation.**
 Candidate: `c085449b207b5860b1d7a79bee221c2ff3d357c3`.
 Protocol: compiler / metadata / MVIR / format **25 / 9 / 5 / 2**.
 
-The [current report](docs/audits/r5-linux-native-link-2026-10-18/README.md) and
-[completion matrix](docs/audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md)
-record the exact jobs, evidence and remaining work. Ubuntu ASan passed at the
-selected pin and its artifact/log hashes are verified. Native normal, comptime,
-and complete workspace triage/final on Windows and Ubuntu remain pending.
+The [current report](docs/audits/r5-move-origin-2026-10-18/README.md) and
+[replacement matrix](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md)
+record the findings and remaining work. Previous pin `3a72f946` completed normal,
+ASan and comptime lanes plus Windows/Ubuntu full workspace triage/final (each
+1414 passed, 0 failed, 1 ignored). Its final audit found E3001 origins lost at
+nested joins or retained after field reinitialization. Correct rejection alone
+does not satisfy DIAG-3/9. The generic move-provenance repair is being validated
+before selecting a replacement pin and reacquiring every lane.
 
-Diagnostic E4002/E4003 debt and E3004 reachable fallthrough have implementation
-repairs and permanent regressions. The previous pin `52ef3711` failed five
-Ubuntu workspace tests due to unresolved C math symbols; its final job was
-skipped. The replacement adds generic Linux `-lm` linkage. Windows source/fresh
-artifact preflight passes, while Linux and all release gates require their own
-selected-pin results. The previous local Windows arithmetic attempt stopped
-without a completed batch and is preserved as interrupted evidence.
-
-Tagging, main merge, PR creation and publication remain maintainer decisions.
-The [draft handoff](docs/audits/r5-missing-return-2026-10-17/RELEASE-HANDOFF.md)
-records the known limitations and completion prerequisites.
+Earlier diagnostic E4002/E4003, E3004 and Linux native math linkage repairs stay
+in the implementation. Their previous passes remain scoped to their own SHA.
+Tagging, main merge, PR creation and publication remain maintainer decisions;
+no release-ready or freeze claim is made.
 
 ## Prior reconciliation - 2026-10-14
 
