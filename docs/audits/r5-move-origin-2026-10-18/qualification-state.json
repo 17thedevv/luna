@@ -1,6 +1,6 @@
 {
-  "observed_at_utc": "2026-10-18T05:47:12.993157+00:00",
-  "status": "NEW_PIN_SELECTED_ACQUISITION_DISPATCH_PENDING",
+  "observed_at_utc": "2026-10-18T05:47:50.230626+00:00",
+  "status": "EXACT_PIN_QUALIFICATION_RUNNING",
   "implementation_pin": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
   "previous_pin": "67146195fb025951ca51d54365fd3a47ef9544e6",
   "previous_result": "SUPERSEDED_DURING_QUALIFICATION_DIAG_4_6_FINDINGS",
@@ -66,5 +66,28 @@
       "verification": "evidence/pin-67146195/ubuntu-asan-verification.json"
     }
   },
-  "runs": {}
+  "runs": {
+    "ubuntu": {
+      "id": 39101753234,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39101753234",
+      "normal_job": 117599279820,
+      "asan_job": 117599279909,
+      "comptime_vm_job": 117599279876,
+      "status": "JOBS_IN_PROGRESS_TOOLCHAIN_PREPARATION"
+    },
+    "ubuntu_workspace": {
+      "id": 39101753252,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39101753252",
+      "triage_job": 117599279870,
+      "status": "TRIAGE_QUEUED_FINAL_DEPENDENT"
+    },
+    "windows": {
+      "id": 39101753210,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39101753210",
+      "normal_job": 117599279674,
+      "triage_job": 117599279777,
+      "status": "NORMAL_AND_TRIAGE_IN_PROGRESS_SETUP_FINAL_DEPENDENT"
+    }
+  },
+  "harness_commit": "bf35297b7797215eabf01572b0531a78ab62511c"
 }
