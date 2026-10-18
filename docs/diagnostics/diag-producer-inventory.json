@@ -2459,22 +2459,22 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 124,
+          "line": 128,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 129,
+          "line": 133,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 144,
+          "line": 148,
           "span_policy": "dynamic"
         },
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 677,
+          "line": 687,
           "span_policy": "anchored"
         },
         {
@@ -2501,6 +2501,7 @@
         "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
         "luna-rs/crates/luna-cli/tests/diagnostic_conformance_cli.rs",
         "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs",
+        "luna-rs/crates/luna-cli/tests/move_origin_join_cli.rs",
         "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
         "luna-rs/crates/luna-cli/tests/retained_contracts_cli.rs",
         "luna-rs/crates/luna-cli/tests/semantic_maturity_phase0.rs",
@@ -2517,12 +2518,12 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 258,
+          "line": 262,
           "span_policy": "anchored"
         },
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 641,
+          "line": 651,
           "span_policy": "anchored"
         },
         {
@@ -2815,7 +2816,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 139,
+          "line": 143,
           "span_policy": "dynamic"
         }
       ],
@@ -2838,7 +2839,7 @@
       "producers": [
         {
           "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
-          "line": 134,
+          "line": 138,
           "span_policy": "dynamic"
         }
       ],

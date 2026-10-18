@@ -1,0 +1,19 @@
+struct Record { value: i32, };
+fn take(record: Record) { }
+fn consumed(flag: bool, other: bool) {
+    dec record = Record { value: 1 };
+    if flag { take(record); } else { if other { take(record); } }
+}
+fn reinitialized(flag: bool, other: bool) -> i32 {
+    dec rw record = Record { value: 1 };
+    if flag { take(record); } else { if other { take(record); } }
+    record = Record { value: 7 };
+    return record.value;
+}
+fn main() -> i32 {
+    consumed(true, false);
+    consumed(false, true);
+    if reinitialized(true, false) != 7 { return 1; }
+    if reinitialized(false, true) != 7 { return 2; }
+    return 0;
+}
