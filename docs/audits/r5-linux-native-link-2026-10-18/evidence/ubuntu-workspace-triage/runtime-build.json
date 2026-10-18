@@ -1,0 +1,18 @@
+{
+  "gate": "runtime-build",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cmake",
+    "--build",
+    "/home/runner/work/_temp/r5-workspace-triage/runtime",
+    "--parallel"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage",
+  "started_utc": "2026-10-17T18:00:50Z",
+  "exit": 0,
+  "seconds": 8.83503695799999,
+  "log_sha256": "310fec7f84e4f9b3f8af926fe5408546090f1f71914988622d0d72c22499b6f6",
+  "status": "PASS",
+  "log": "runtime-build.log.gz",
+  "compressed_sha256": "4a686c5b1be232e15982ca83f751bfa0e4860109ae3a095615abac9692d1f382"
+}

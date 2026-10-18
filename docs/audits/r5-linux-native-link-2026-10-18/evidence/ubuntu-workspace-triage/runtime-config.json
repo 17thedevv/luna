@@ -1,0 +1,24 @@
+{
+  "gate": "runtime-config",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cmake",
+    "-S",
+    "/home/runner/work/_temp/r5-workspace-triage/checkout/runtime",
+    "-B",
+    "/home/runner/work/_temp/r5-workspace-triage/runtime",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DCMAKE_C_COMPILER=gcc",
+    "-DCMAKE_CXX_COMPILER=g++"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage",
+  "started_utc": "2026-10-17T18:00:47Z",
+  "exit": 0,
+  "seconds": 3.021087125000008,
+  "log_sha256": "fef77228c303736f72e87d2d5ec4380199662039d02002e695e9a62d87847ddf",
+  "status": "PASS",
+  "log": "runtime-config.log.gz",
+  "compressed_sha256": "c5f4cf3b753504578726bcfede52a1ad2c341e8df4c1d7a22ecf986ee59e5896"
+}

@@ -1,0 +1,18 @@
+{
+  "gate": "clone",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "git",
+    "clone",
+    "https://github.com/17thedevv/luna.git",
+    "/home/runner/work/_temp/r5-workspace-triage/checkout"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage",
+  "started_utc": "2026-10-17T18:00:39Z",
+  "exit": 0,
+  "seconds": 5.4248191669999954,
+  "log_sha256": "25c3dbd1764d2fa1cc0a9c8a28d8eab4c1306260b0bd1b21381b01956247c657",
+  "status": "PASS",
+  "log": "clone.log.gz",
+  "compressed_sha256": "36fcddf64cc779f10d25864a13c38987198979f31ae5eb8887fd7c76cb3cb3de"
+}

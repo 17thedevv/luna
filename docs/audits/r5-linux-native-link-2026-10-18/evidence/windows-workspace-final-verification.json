@@ -1,0 +1,36 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "artifact_id": 12119167038,
+  "workflow_run": 39056178610,
+  "artifact_sha256": "d8aa71605ae3690df7831b2a297bf40ddb2f5f393e917873948a584912501cfa",
+  "status": "PASS_IN_EXECUTED_SCOPE",
+  "manifest_files_verified": 0,
+  "gate_logs_verified": 14,
+  "totals": {
+    "groups": 234,
+    "passed": 1414,
+    "failed": 0,
+    "ignored": 1
+  },
+  "ignored_tests": [
+    [
+      "mutable_references::sem_mutref_06_invalid_fixture",
+      ""
+    ]
+  ],
+  "regression_suites_observed": [
+    "missing_return_cli",
+    "native_math_link_cli"
+  ],
+  "scope": "Complete cargo test --workspace with default parallelism",
+  "summary": {
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "harness_commit": "14a608660cdec0c3bb8884ab893f74acda200dcd",
+    "workflow_run": "39056178610",
+    "status": "PASS_IN_EXECUTED_SCOPE",
+    "failure": null,
+    "lane": "final",
+    "scope": "Complete Windows workspace final; fresh clone/build/sysroot; default parallelism",
+    "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION"
+  }
+}

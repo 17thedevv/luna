@@ -1,0 +1,20 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "runtime-abi",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "C:\\r5b-39056178610\\runtime",
+    "-R",
+    "^RuntimeAbiTests$",
+    "--output-on-failure",
+    "--no-tests=error"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T20:54:23.643060+00:00",
+  "end_utc": "2026-10-17T20:54:24.753409+00:00",
+  "elapsed_seconds": 1.109,
+  "exit": 0,
+  "log": "runtime-abi.log",
+  "log_sha256": "f708d1fd0fb170bff4b8fa1f2f2af2a395211259d2ea4a7b488030a4c67a9af7"
+}

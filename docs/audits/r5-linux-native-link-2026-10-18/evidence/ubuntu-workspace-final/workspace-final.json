@@ -1,0 +1,20 @@
+{
+  "gate": "workspace-final",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-workspace-final/checkout/luna-rs/Cargo.toml",
+    "--workspace"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-final/checkout",
+  "started_utc": "2026-10-17T21:06:40Z",
+  "exit": 0,
+  "seconds": 11545.368060476,
+  "log_sha256": "55950309e751251dc649e25fa984fd75ab2f31ce0e295c1bcf5ebf8ff726ec58",
+  "status": "PASS",
+  "log": "workspace-final.log.gz",
+  "compressed_sha256": "f6eddc89cfbadc28268454e2bc3d4457b12b2e6f8bc902613c6dd17db4cfca40"
+}

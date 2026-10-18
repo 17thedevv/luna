@@ -1,7 +1,7 @@
 {
-  "observed_at_utc": "2026-10-17T20:02:02.263475+00:00",
+  "observed_at_utc": "2026-10-18T04:55:21.179787+00:00",
   "implementation_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
-  "status": "QUALIFICATION_IN_PROGRESS",
+  "status": "ALL_EIGHT_LANES_PASS_FINAL_AUDIT_FOUND_DIAG_ORIGIN_GAP",
   "previous_pin": "52ef3711813ac0e2ded272f5ebe71897752766bc",
   "previous_pin_result": "NOT_QUALIFIED_UBUNTU_WORKSPACE_5_FAILURES",
   "candidate": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
@@ -17,9 +17,9 @@
   ],
   "no_carry": true,
   "remaining": [
-    "Verify and archive all fresh lane outcomes; repair failures if any at a new pin",
-    "Reconcile release closure, ledger and public documentation",
-    "Advance candidate only after all requirements pass"
+    "Fix confirmed nested move-origin loss (DIAG-3/9), add public CLI regression, select a new pin and requalify all lanes",
+    "Complete final producer/phase/related-span audit and reconcile closure/public docs",
+    "Advance candidate only after every final requirement passes"
   ],
   "maintainer_actions_not_performed": [
     "tag",
@@ -63,7 +63,27 @@
       "id": 39056178775,
       "url": "https://github.com/17thedevv/luna/actions/runs/39056178775",
       "triage_job": 117464497144,
-      "status": "TRIAGE_IN_PROGRESS_FINAL_DEPENDENT"
+      "status": "TRIAGE_IN_PROGRESS_FINAL_DEPENDENT",
+      "triage": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/ubuntu-workspace-triage-verification.json",
+        "totals": {
+          "groups": 234,
+          "passed": 1414,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "final": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/ubuntu-workspace-final-verification.json",
+        "totals": {
+          "groups": 234,
+          "passed": 1414,
+          "failed": 0,
+          "ignored": 1
+        }
+      }
     },
     "windows": {
       "id": 39056178610,
@@ -77,9 +97,30 @@
         "verification": "evidence/windows-normal-verification.json",
         "focused_batches": 12,
         "strict_L002_replay": "4/4 PASS"
+      },
+      "triage": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/windows-workspace-triage-verification.json",
+        "totals": {
+          "groups": 234,
+          "passed": 1414,
+          "failed": 0,
+          "ignored": 1
+        }
+      },
+      "final": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/windows-workspace-final-verification.json",
+        "totals": {
+          "groups": 234,
+          "passed": 1414,
+          "failed": 0,
+          "ignored": 1
+        }
       }
     }
   },
   "local_preflight": "evidence/windows-cli-preflight.json",
-  "completion_matrix": "REQUIREMENTS.md"
+  "completion_matrix": "REQUIREMENTS.md",
+  "final_audit_finding": "../r5-move-origin-2026-10-18/evidence/finding.json"
 }
