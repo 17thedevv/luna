@@ -1,0 +1,10 @@
+import <mem>;
+fn runtime_len() -> u64 { return 2 as u64; }
+fn main() -> i32 {
+    dec data = [1, 2, 3, 4];
+    dec base = &data[0] as *i32;
+    unsafe {
+        dec slice = std::mem::slice_from_raw_parts<i32>(base, runtime_len());
+        return slice[3];
+    }
+}
