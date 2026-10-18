@@ -129,3 +129,11 @@ without errors. This is not release qualification. The three workflows now
 select this immutable SHA for all eight mandatory lanes, including separate
 workspace triage and dependent final passes on both hosts. Candidate remains
 `c085449b`; no prior-pin result carries forward.
+
+Qualification harness: `bf35297b7797215eabf01572b0531a78ab62511c`.
+Authenticated job observations confirm setup has started for
+[Ubuntu normal/ASan/comptime](https://github.com/17thedevv/luna/actions/runs/39101753234)
+and [Windows normal/workspace](https://github.com/17thedevv/luna/actions/runs/39101753210);
+[Ubuntu workspace](https://github.com/17thedevv/luna/actions/runs/39101753252)
+is queued. Final workspace passes depend on their triage jobs. These are run
+locators, not passing evidence.
