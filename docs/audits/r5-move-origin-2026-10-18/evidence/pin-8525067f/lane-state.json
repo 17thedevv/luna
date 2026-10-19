@@ -13,8 +13,8 @@
   "lanes": [
     {
       "lane": "Windows native normal",
-      "where": "local exact-pin runner D:/r5-8525067f/windows",
-      "status": "PASS_IN_EXECUTED_SCOPE",
+      "where": "local exact-pin runner D:/r5-8525067f/windows (evidence kept) and hosted CI run 39276394971 job 118141683149 (authoritative acquisition)",
+      "status": "PASS_IN_EXECUTED_SCOPE (local) + CI_REACQUIRING",
       "evidence": {
         "build": "build-summary.json status PASS (runtime ABI, debug+release CLI, 49 providers, target x86_64-pc-windows-gnu)",
         "focused": "focused-summary.json status PASS, 12/12 batches exit 0 (includes diagnostics batch with declaration-location, missing-return and per-code coverage suites)",
@@ -26,13 +26,13 @@
     },
     {
       "lane": "Windows workspace triage",
-      "where": "local exact-pin runner",
-      "status": "RE_RUNNING",
-      "note": "the first attempt was interrupted by the host session ending (log stale 578 minutes, no processes, zero recorded result groups) and is preserved under interrupted/ as a partial attempt, not evidence; re-run started at the same pinned SHA with canonical labels"
+      "where": "hosted CI run 39276394971 job 118141682645",
+      "status": "CI_RUNNING",
+      "note": "three local attempts were interrupted by host-session ends (preserved under interrupted/ with records, never counted as evidence); a stale PDB set then caused LNK1207 and was cleared. The lane now runs on the hosted runner so it is independent of the agent session."
     },
     {
       "lane": "Windows workspace final",
-      "where": "local exact-pin runner",
+      "where": "hosted CI run 39276394971 (needs triage)",
       "status": "SCHEDULED_AFTER_TRIAGE"
     },
     {
