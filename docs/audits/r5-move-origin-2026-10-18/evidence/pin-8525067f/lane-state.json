@@ -1,0 +1,86 @@
+{
+  "task": "Luna 0.1 completion — exact-pin lane ledger",
+  "tested_implementation_pin": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "implementation_branch": "r5-diag-repair",
+  "harness_commit": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
+  "versions": { "compiler": 25, "metadata": 9, "mvir": 5, "format": 2 },
+  "candidate": {
+    "ref": "luna-0.1-alpha.1-candidate",
+    "sha": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+    "note": "not advanced; fast-forward happens only after all eight lanes pass at the tested pin"
+  },
+  "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
+  "lanes": [
+    {
+      "lane": "Windows native normal",
+      "where": "local exact-pin runner D:/r5-8525067f/windows",
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "evidence": {
+        "build": "build-summary.json status PASS (runtime ABI, debug+release CLI, 49 providers, target x86_64-pc-windows-gnu)",
+        "focused": "focused-summary.json status PASS, 12/12 batches exit 0 (includes diagnostics batch with declaration-location, missing-return and per-code coverage suites)",
+        "diagnostics": "diagnostics-summary.json status PASS",
+        "quickstart": "quickstart.json status PASS",
+        "comptime": "comptime/qualification2.json exit 0 (first attempt failed on a stale nested-harness pin and is preserved as a tooling attempt)",
+        "strict_l002_replay": "docs/audits/r5-move-origin-2026-10-18/evidence/pin-8525067f/strict-bounds/summary.json 4/4 PASS (debug/release x source/artifact, trap signature L002 index 3 length 2, native exit 3)"
+      }
+    },
+    {
+      "lane": "Windows workspace triage",
+      "where": "local exact-pin runner",
+      "status": "RE_RUNNING",
+      "note": "the first attempt was interrupted by the host session ending (log stale 578 minutes, no processes, zero recorded result groups) and is preserved under interrupted/ as a partial attempt, not evidence; re-run started at the same pinned SHA with canonical labels"
+    },
+    {
+      "lane": "Windows workspace final",
+      "where": "local exact-pin runner",
+      "status": "SCHEDULED_AFTER_TRIAGE"
+    },
+    {
+      "lane": "Ubuntu normal",
+      "where": "CI run 23 job 117679870941",
+      "status": "PASS",
+      "evidence": { "conclusion": "success", "started": "2026-10-18T12:49:55Z", "completed": "2026-10-18T14:38:08Z" }
+    },
+    {
+      "lane": "Ubuntu runtime ASan",
+      "where": "CI run 23 job 117679870857",
+      "status": "PASS",
+      "evidence": { "conclusion": "success", "started": "2026-10-18T12:49:54Z", "completed": "2026-10-18T12:50:41Z" }
+    },
+    {
+      "lane": "Ubuntu comptime/VM",
+      "where": "CI run 23 job 117679870976",
+      "status": "PASS",
+      "evidence": { "conclusion": "success", "started": "2026-10-18T12:49:55Z", "completed": "2026-10-18T12:54:39Z" }
+    },
+    {
+      "lane": "Ubuntu workspace triage",
+      "where": "CI run 23 job 117679870999",
+      "status": "PASS",
+      "evidence": { "conclusion": "success" }
+    },
+    {
+      "lane": "Ubuntu workspace final",
+      "where": "CI run 23 job 117720597415 (needs triage)",
+      "status": "PASS",
+      "evidence": { "conclusion": "success", "started": "2026-10-18T15:57:58Z", "completed": "2026-10-18T19:05:54Z" }
+    }
+  ],
+  "additional_repo_workflows_at_pin": {
+    "Full workspace regression (Ubuntu)": "success",
+    "Whole-File I/O parity (macos-15-intel)": "success",
+    "RuntimeAbiTests (ubuntu-24.04)": "success",
+    "RuntimeAbiTests (macos-15-intel)": "success",
+    "Runtime partial-read cleanup (Ubuntu + ASan)": "success"
+  },
+  "artifact_verification": {
+    "local_lane_digests": "docs/tools/verify_lane_evidence.py: 19 digests recomputed, 0 mismatched, 0 missing",
+    "ci_artifacts": "PENDING: CI artifact ZIP digests require an authenticated download"
+  },
+  "open_items": [
+    "Windows workspace triage + final re-run at the tested pin",
+    "CI artifact ZIP digest verification (needs authenticated download)",
+    "candidate fast-forward after the lanes close",
+    "maintainer release actions (tag, main merge, PR, package smoke) remain reserved"
+  ]
+}
