@@ -3,7 +3,7 @@ name: R5 exact-pin Windows GNU qualification
 on:
   workflow_dispatch:
   push:
-    branches: [codex/r5-missing-return]
+    branches: [r5-diag-repair]
     paths:
       - .github/workflows/r5-exact-windows-qualification.yml
       - docs/audits/r5-missing-return-2026-10-17/prepare_windows_llvm.py
@@ -13,7 +13,9 @@ permissions:
   contents: read
 
 env:
-  R5_TESTED_COMMIT: d3d0ffe8d6495aee1f56257a1db817ce4107e992
+  # Integrated implementation pin (DIAG repair wave + declaration/identity/order
+  # repairs); every Windows lane reacquires this SHA.
+  R5_TESTED_COMMIT: 8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5
   R5_LLVM_HOME: C:/r5-llvm18
   R5_WINDOWS_OUT: D:/r5-${{ github.run_id }}
   R5_WINDOWS_BUILD: C:/r5b-${{ github.run_id }}
