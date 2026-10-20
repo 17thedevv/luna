@@ -1,5 +1,11 @@
 # R5 qualification closure — integrated pin 8525067f
 
+**Historical qualification scope; release verdict superseded.** Clean Windows
+package smoke later failed on host CPU identity drift. The
+[replacement CPU-baseline qualification](../r5-cpu-baseline-2026-10-20/README.md)
+at `b5cb77c3` owns current release readiness. The original results below remain
+valid only for their executed pin and scope.
+
 Date: 2026-10-20. **READY FOR RELEASE REVIEW — qualification COMPLETE in the tested adopted scope.**
 Full release publication and clean release-package smoke remain pending.
 

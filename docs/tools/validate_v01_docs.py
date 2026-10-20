@@ -85,6 +85,7 @@ for page in pages:
         ledger = json.loads((evidence_root / 'lane-state.json').read_text(encoding='utf-8'))
         if not (ledger['tested_implementation_pin'] == qualification['implementation_pin']
                 and verification['status'] == 'PASS' and len(verification['artifacts']) == 8
+                and verification['required_cpu_baseline'] == 'generic;features='
                 and len(ledger['lanes']) == 8
                 and all(lane['status'] == 'PASS_IN_EXECUTED_SCOPE' for lane in ledger['lanes'])
                 and all(artifact['tested_commit'] == ledger['tested_implementation_pin']

@@ -1,5 +1,9 @@
 # Luna 0.1-alpha.1 qualification target matrix
 
+**Historical pin only; current release qualification is pending at `b5cb77c3`.**
+The clean Windows package failure superseded this release verdict; see the
+[replacement qualification](../r5-cpu-baseline-2026-10-20/README.md).
+
 Date: 2026-10-20. Implementation/candidate: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
 **READY FOR RELEASE REVIEW**, publication pending.
 

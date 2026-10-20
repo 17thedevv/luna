@@ -1,10 +1,14 @@
 # Kế hoạch hoàn tất Luna 0.1
 
-Cập nhật 2026-10-20: **READY FOR RELEASE REVIEW tại `8525067f`**.
-Bước 1–4 đã đóng trong adopted tested scope: tám lane và tám ZIP được xác minh.
-Candidate đã fast-forward đến pin; bước 5 theo [closure report](REPORT-R5-QUALIFICATION-8525067f.md).
-Bước 6 còn pending: maintainer PR/main/tag/publication, build gói từ release commit
-đã xác minh, clean Windows/Ubuntu package smoke và closing record cuối.
+Cập nhật 2026-10-20: **qualification tại pin sửa CPU `b5cb77c3` đang chạy lại**.
+Tám lane tại `8525067f` giữ nguyên scope lịch sử; clean Windows package smoke
+đã phát hiện CPU identity phụ thuộc máy, nên verdict release cũ bị thay thế.
+[Trạng thái hiện tại](../r5-cpu-baseline-2026-10-20/qualification-state.json):
+2/8 lane mới đã xác minh độc lập; còn sáu lane. Hai package Windows/Ubuntu từ
+source `cd9cd188` đã build và clean hosted smoke PASS, đủ sáu ZIP đã xác minh.
+Candidate vẫn `8525067f`; PR #7 draft; main/tag/publication còn pending.
+Bước 3–5 phải đóng tại pin mới trước khi tiến hành merge và phát hành đã được
+maintainer cho phép. [Hồ sơ sửa và bằng chứng](../r5-cpu-baseline-2026-10-20/README.md).
 Goal đầy đủ vẫn active. Phần dưới giữ kế hoạch và baseline ngày 2026-10-18.
 
 Kế hoạch này tiếp nối [kế hoạch hoàn tất gốc](../0.1-alpha-completion-2026-10-04/README.md),

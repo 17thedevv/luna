@@ -1,0 +1,131 @@
+{
+  "task": "Luna 0.1 CPU-baseline replacement qualification",
+  "tested_implementation_pin": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "implementation_branch": "r5-diag-repair",
+  "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "candidate": {
+    "ref": "luna-0.1-alpha.1-candidate",
+    "sha": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+    "note": "Retained historical candidate until all replacement lanes and archives close"
+  },
+  "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
+  "status": "ACQUIRING_REPLACEMENT_QUALIFICATION",
+  "observed_utc": "2026-10-20 07:36:14 UTC",
+  "lanes": [
+    {
+      "key": "windows-normal",
+      "lane": "Windows native normal",
+      "run_id": 39385567963,
+      "job_id": 118504461023,
+      "status": "ACQUIRING",
+      "dependency": null,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567963/job/118504461023"
+    },
+    {
+      "key": "windows-workspace-triage",
+      "lane": "Windows workspace triage",
+      "run_id": 39385567963,
+      "job_id": 118504461236,
+      "status": "ACQUIRING",
+      "dependency": null,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567963/job/118504461236"
+    },
+    {
+      "key": "windows-workspace-final",
+      "lane": "Windows workspace final",
+      "run_id": 39385567963,
+      "job_id": null,
+      "status": "PENDING_DEPENDENCY",
+      "dependency": "windows-workspace-triage",
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567963"
+    },
+    {
+      "key": "ubuntu-normal",
+      "lane": "Ubuntu normal",
+      "run_id": 39385567905,
+      "job_id": 118504460936,
+      "status": "ACQUIRING",
+      "dependency": null,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567905/job/118504460936"
+    },
+    {
+      "key": "ubuntu-runtime-asan",
+      "lane": "Ubuntu runtime ASan",
+      "run_id": 39385567905,
+      "job_id": 118504460874,
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "dependency": null,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567905/job/118504460874",
+      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_id": 12247791206,
+      "evidence": {
+        "checks": {
+          "file_hashes": 43,
+          "compressed_log_hashes": 19,
+          "raw_log_hashes": 19
+        },
+        "gates": 19,
+        "workspace": null
+      }
+    },
+    {
+      "key": "ubuntu-comptime-vm",
+      "lane": "Ubuntu comptime/VM",
+      "run_id": 39385567905,
+      "job_id": 118504460970,
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "dependency": null,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567905/job/118504460970",
+      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_id": 12248270213,
+      "evidence": {
+        "checks": {
+          "file_hashes": 982,
+          "compressed_log_hashes": 28,
+          "raw_log_hashes": 28
+        },
+        "gates": 28,
+        "workspace": null
+      }
+    },
+    {
+      "key": "ubuntu-workspace-triage",
+      "lane": "Ubuntu workspace triage",
+      "run_id": 39385567905,
+      "job_id": 118504460603,
+      "status": "ACQUIRING",
+      "dependency": null,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567905/job/118504460603"
+    },
+    {
+      "key": "ubuntu-workspace-final",
+      "lane": "Ubuntu workspace final",
+      "run_id": 39385567905,
+      "job_id": null,
+      "status": "PENDING_DEPENDENCY",
+      "dependency": "ubuntu-workspace-triage",
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567905"
+    }
+  ],
+  "package_smoke": {
+    "status": "PASS",
+    "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+    "targets": [
+      "x86_64-pc-windows-gnu",
+      "x86_64-unknown-linux-gnu"
+    ],
+    "artifact_verification": "evidence/package-cd9cd188/release-package-verification.json",
+    "original_ci_archives": 6,
+    "provider_count_per_package": 49,
+    "payload_files_per_package": 105,
+    "consumer_steps_per_target": 7,
+    "verifier_rejection_controls": 4
+  },
+  "no_prior_pin_pass_transfer": true
+}

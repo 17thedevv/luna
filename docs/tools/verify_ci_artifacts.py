@@ -31,7 +31,12 @@ def workspace_totals(log):
                 ignored_lines=[line for line in text.splitlines() if '... ignored' in line])
 
 
-def verify_windows(z, artifact, pin, expected):
+def require_cpu_baseline(rows, required):
+    if required:
+        assert all(r.get('cpu') == 'generic' and r.get('features') == '' for r in rows), 'Provider CPU baseline mismatch'
+
+
+def verify_windows(z, artifact, pin, expected, generic_cpu=False):
     load = lambda name: json.loads(z.read(name))
     summary = load('ci-summary.json')
     provenance = load('provenance.json')
@@ -129,6 +134,7 @@ def verify_windows(z, artifact, pin, expected):
     assert sysroot['tested_commit'] == pin and sysroot['provider_count'] == len(sysroot['providers']) == 49
     assert len({r['path'] for r in sysroot['providers']}) == 49
     assert tuple(sysroot[k] for k in ('compiler', 'metadata', 'mvir', 'format')) == (25, 9, 5, 2)
+    require_cpu_baseline(sysroot['providers'], generic_cpu)
     for row in sysroot['providers']:
         assert row['target'] == 'x86_64-pc-windows-gnu' and row['coff_machine'] == '0x8664'
         if summary['lane'] == 'normal':
@@ -151,7 +157,7 @@ def verify_windows(z, artifact, pin, expected):
                 code_tree_identity=provenance['source_tree_objects'])
 
 
-def verify(artifact, pin):
+def verify(artifact, pin, generic_cpu=False):
     archive = Path(artifact['local_path'])
     raw = archive.read_bytes()
     expected = artifact['digest'].removeprefix('sha256:')
@@ -165,7 +171,7 @@ def verify(artifact, pin):
                    and '\\' not in n for n in names), 'Unsafe ZIP member'
         assert z.testzip() is None, 'ZIP CRC failure'
         if 'ci-summary.json' in names:
-            return verify_windows(z, artifact, pin, expected)
+            return verify_windows(z, artifact, pin, expected, generic_cpu)
         load = lambda name: json.loads(z.read(name))
         inventory = load('evidence-hashes.json')
         assert set(inventory) == set(names) - {'evidence-hashes.json'}, 'Incomplete file inventory'
@@ -217,6 +223,7 @@ def verify(artifact, pin):
             assert sysroot['tested_commit'] == pin
             rows = sysroot['providers']
             assert len(rows) == 49 and len({r['path'] for r in rows}) == 49
+            require_cpu_baseline(rows, generic_cpu)
             for r in rows:
                 assert (r['compiler'], r['metadata'], r['mvir'], r['format']) == (25, 9, 5, 2)
                 assert r['target'] == r['manifest_target'] == 'x86_64-unknown-linux-gnu'
@@ -237,6 +244,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--pin', required=True)
+    parser.add_argument('--require-generic-cpu', action='store_true',
+                        help='Require generic CPU and empty optional features on every recorded provider')
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     artifacts = json.loads(args.manifest.read_text(encoding='utf-8'))
@@ -246,7 +255,7 @@ def main():
     errors = []
     for artifact in artifacts:
         try:
-            results.append(verify(artifact, args.pin))
+            results.append(verify(artifact, args.pin, args.require_generic_cpu))
         except Exception as exc:
             errors.append(dict(name=artifact['name'], error=str(exc)))
     repo = Path(__file__).resolve().parents[2]
@@ -262,6 +271,7 @@ def main():
             if identity != {k: objects[k] for k in ('luna-rs', 'runtime', 'tests')}:
                 errors.append(dict(name=result['name'], error='Wrong acquired source tree'))
     report = dict(tested_commit=args.pin, status='FAIL' if errors else 'PASS', artifacts=results, errors=errors,
+                  required_cpu_baseline='generic;features=' if args.require_generic_cpu else None,
                   scope='ZIP SHA-256/size/CRC; inventory; clean exact pin; gate exits; compressed and raw log digests; workspace totals; recorded provider identities',
                   release='PENDING COMPLETE EIGHT-LANE RECONCILIATION')
     args.out.parent.mkdir(parents=True, exist_ok=True)
