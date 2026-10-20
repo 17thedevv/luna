@@ -1,0 +1,143 @@
+name: Luna alpha package build and clean smoke
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [r5-diag-repair]
+    paths:
+      - .github/workflows/luna-alpha-package-smoke.yml
+      - docs/tools/package_luna_release.py
+      - docs/tools/smoke_luna_package.py
+
+permissions:
+  contents: read
+
+env:
+  LUNA_QUALIFIED_PIN: 8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5
+  CARGO_TERM_COLOR: never
+
+jobs:
+  build:
+    name: Build package (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            target: x86_64-pc-windows-gnu
+            root: D:/luna-pkg-${{ github.run_id }}
+            llvm: C:/r5-llvm18
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            root: /tmp/luna-pkg-${{ github.run_id }}
+            llvm: /usr/lib/llvm-18
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    env:
+      LLVM_HOME: ${{ matrix.llvm }}
+      LLVM_SYS_180_PREFIX: ${{ matrix.llvm }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Ubuntu GNU and LLVM18 prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build clang-18 llvm-18-dev libclang-18-dev
+          echo "LLVM_CONFIG_PATH=/usr/lib/llvm-18/bin/llvm-config" >> "$GITHUB_ENV"
+          echo "/usr/lib/llvm-18/bin" >> "$GITHUB_PATH"
+      - name: Acquire Windows LLVM18 prerequisites
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $archive = Join-Path $env:RUNNER_TEMP 'llvm18.tar.xz'
+          Invoke-WebRequest -Uri 'https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang%2Bllvm-18.1.8-x86_64-pc-windows-msvc.tar.xz' -OutFile $archive
+          python docs/audits/r5-missing-return-2026-10-17/prepare_windows_llvm.py --archive $archive --out $env:LLVM_HOME
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "LLVM_CONFIG_PATH=$env:LLVM_HOME/bin/llvm-config.exe" | Out-File $env:GITHUB_ENV -Append -Encoding utf8
+          "$env:LLVM_HOME/bin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Build immutable release source and artifact-only package
+        shell: pwsh
+        run: >-
+          python docs/tools/package_luna_release.py
+          --source $env:GITHUB_SHA --qualified $env:LUNA_QUALIFIED_PIN
+          --target '${{ matrix.target }}' --out '${{ matrix.root }}'
+      - name: Preserve build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-package-build-evidence-${{ matrix.target }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ matrix.root }}/evidence/
+          if-no-files-found: error
+          retention-days: 30
+      - name: Upload package for the independent consumer job
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-package-${{ matrix.target }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ matrix.root }}/dist/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  smoke:
+    name: Clean package smoke (${{ matrix.target }})
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            target: x86_64-pc-windows-gnu
+            root: D:/luna-smoke-${{ github.run_id }}
+            llvm: C:/r5-llvm18
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            root: /tmp/luna-smoke-${{ github.run_id }}
+            llvm: /usr/lib/llvm-18
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    env:
+      LLVM_HOME: ${{ matrix.llvm }}
+    steps:
+      # Deliberately no checkout: only the uploaded distribution and tools are present.
+      - uses: actions/download-artifact@v4
+        with:
+          name: luna-package-${{ matrix.target }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: payload
+      - name: Install Ubuntu consumer prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential llvm-18
+          echo "/usr/lib/llvm-18/bin" >> "$GITHUB_PATH"
+      - name: Acquire Windows consumer prerequisites
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $archive = Join-Path $env:RUNNER_TEMP 'llvm18.tar.xz'
+          Invoke-WebRequest -Uri 'https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang%2Bllvm-18.1.8-x86_64-pc-windows-msvc.tar.xz' -OutFile $archive
+          python payload/prepare_windows_llvm.py --archive $archive --out $env:LLVM_HOME
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "$env:LLVM_HOME/bin" | Out-File $env:GITHUB_PATH -Append -Encoding utf8
+      - name: Verify relocated package and run public native consumers
+        shell: pwsh
+        run: >-
+          python payload/smoke_luna_package.py
+          --archive 'payload/luna-0.1.0-alpha.1-${{ matrix.target }}.zip'
+          --expected-source $env:GITHUB_SHA --expected-pin $env:LUNA_QUALIFIED_PIN
+          --target '${{ matrix.target }}' --out '${{ matrix.root }}'
+      - name: Preserve independent package smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-package-smoke-${{ matrix.target }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ matrix.root }}/evidence/
+          if-no-files-found: error
+          retention-days: 30

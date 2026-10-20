@@ -29,7 +29,8 @@ E3004 is produced and covered; the contrary finding was retracted. The earlier
 `2/25/5/2` tuple wording was incorrect; metadata is 9.
 Local interrupted/PDB attempts are historical, never passing evidence.
 
-Remaining full-goal work: maintainer PR/main/tag/publication decision, packages
+Maintainer authorized PR/main/tag/publication after package smoke PASS on 2026-10-20.
+PR #7 is draft. Remaining full-goal work: packages
 built from the selected verified release commit, clean Windows/Ubuntu package
 smoke and final asset/checksum/tag reconciliation. The concrete
 [handoff](docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md) is ready.

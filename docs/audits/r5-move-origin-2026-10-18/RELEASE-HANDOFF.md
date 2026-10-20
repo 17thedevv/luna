@@ -38,10 +38,10 @@ bounded comptime/VM and runtime ASan. Exact pins, jobs and limits are in the rep
 
 ## Proposed release and package checks
 
-Proposed tag for review: `v0.1.0-alpha.1`; maintainer chooses final identity.
+Authorized tag: `v0.1.0-alpha.1` (human approval received 2026-10-20).
 Two packages use the canonical target names. Each contains compiler CLI,
-native runtime,49 canonical LLIB/object bundles, protocol/target/source/build
-manifest, checksums, license and usage instructions. Document LLVM18 and GNU
+native runtime, 49 canonical LLIB/object bundles, protocol/target/source/build
+manifest, checksums, license notice and usage instructions. Document LLVM18 and GNU
 toolchain prerequisites explicitly.
 
 Build from the selected verified release commit. Smoke each downloaded package
@@ -55,7 +55,14 @@ assets/checksums and release notes, then write the final closing record.
 
 ## Remaining authority and work
 
-The inherited plan reserves PR/main merge, tag and publication to the maintainer
-after this concrete handoff. None has been performed. Package acquisition and
-clean-package smoke still need execution; qualification artifacts are evidence,
-not distribution packages.
+Human authorization received 2026-10-20: create PR, merge and publish
+`v0.1.0-alpha.1` after Windows/Ubuntu package smoke PASS. [PR #7](https://github.com/17thedevv/luna/pull/7)
+is open as a draft. No merge/tag/publication has happened. The new package workflow
+builds an immutable source commit with the same qualified implementation trees;
+separate jobs verify the downloaded packages without a source checkout.
+The tag will identify the exact packaged source commit, with main integration
+recorded separately. [Authorization record](evidence/pin-8525067f/release-authorization.json).
+
+No project LICENSE file exists in the source snapshot. Packaging preserves that
+state with a license notice rather than inventing a license grant. CLI output
+remains `luna 0.1.0`; package manifests identify distribution `0.1.0-alpha.1`.
