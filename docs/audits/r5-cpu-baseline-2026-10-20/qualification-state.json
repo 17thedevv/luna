@@ -30,5 +30,43 @@
   "preflight": "evidence/preflight.json",
   "maintainer_authorization": "../r5-move-origin-2026-10-18/evidence/pin-8525067f/release-authorization.json",
   "pr": "https://github.com/17thedevv/luna/pull/7",
-  "runs": "Recorded after workflow dispatch; no passing acquisition claim yet"
+  "runs": {
+    "ubuntu": {
+      "id": 39385567905,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567905",
+      "normal_job": 118504460936,
+      "asan_job": 118504460874,
+      "comptime_job": 118504460970,
+      "triage_job": 118504460603,
+      "status": "QUEUED_AT_INITIAL_OBSERVATION",
+      "final": "dependent on triage"
+    },
+    "windows": {
+      "id": 39385567963,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567963",
+      "normal_job": 118504461023,
+      "triage_job": 118504461236,
+      "status": "NORMAL_SETUP_ACTIVE_TRIAGE_QUEUED_AT_INITIAL_OBSERVATION",
+      "final": "dependent on triage"
+    },
+    "packages": {
+      "id": 39385567878,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567878",
+      "ubuntu_build_job": 118504460445,
+      "windows_build_job": 118504460774,
+      "status": "UBUNTU_BUILD_ACTIVE_WINDOWS_QUEUED_AT_INITIAL_OBSERVATION",
+      "smoke": "separate dependent consumer jobs"
+    }
+  },
+  "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+  "verified_lanes": {
+    "ubuntu-runtime-asan": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "file_hashes": 43,
+      "compressed_log_hashes": 19,
+      "raw_log_hashes": 19
+    }
+  },
+  "remaining": "Seven qualification lanes, both package smokes and archive reconciliation; no candidate advancement or release action yet"
 }
