@@ -270,10 +270,35 @@ def main():
         else:
             if identity != {k: objects[k] for k in ('luna-rs', 'runtime', 'tests')}:
                 errors.append(dict(name=result['name'], error='Wrong acquired source tree'))
+    lane_prefixes = {
+        'windows-normal': 'r5-windows-gnu-',
+        'windows-workspace-triage': 'r5-windows-workspace-triage-',
+        'windows-workspace-final': 'r5-windows-workspace-final-',
+        'ubuntu-normal': 'r5-ubuntu-normal-',
+        'ubuntu-runtime-asan': 'r5-ubuntu-runtime-asan-',
+        'ubuntu-comptime-vm': 'r5-ubuntu-comptime-vm-',
+        'ubuntu-workspace-triage': 'r5-ubuntu-workspace-triage-',
+        'ubuntu-workspace-final': 'r5-ubuntu-workspace-final-',
+    }
+    lane_for_name = {prefix: lane for lane, prefix in lane_prefixes.items()}
+    observed_lanes = []
+    for result in results:
+        lane = next((lane for prefix, lane in lane_for_name.items()
+                     if result['name'].startswith(prefix)), None)
+        if lane is None:
+            errors.append(dict(name=result['name'], error='Unexpected qualification artifact name'))
+        else:
+            observed_lanes.append(lane)
+    if len(observed_lanes) != len(lane_prefixes) or set(observed_lanes) != set(lane_prefixes):
+        errors.append(dict(name='manifest', error='Expected exactly one verified artifact for each of eight qualification lanes'))
+    reconciliation = (not errors and len(results) == len(lane_prefixes)
+                      and len(observed_lanes) == len(lane_prefixes)
+                      and set(observed_lanes) == set(lane_prefixes))
     report = dict(tested_commit=args.pin, status='FAIL' if errors else 'PASS', artifacts=results, errors=errors,
                   required_cpu_baseline='generic;features=' if args.require_generic_cpu else None,
                   scope='ZIP SHA-256/size/CRC; inventory; clean exact pin; gate exits; compressed and raw log digests; workspace totals; recorded provider identities',
-                  release='PENDING COMPLETE EIGHT-LANE RECONCILIATION')
+                  release=('EIGHT-LANE ARCHIVE RECONCILIATION VERIFIED; RELEASE PUBLICATION PENDING'
+                           if reconciliation else 'PENDING COMPLETE EIGHT-LANE RECONCILIATION'))
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8', newline='\n')
     for r in results:

@@ -15,8 +15,8 @@
     "note": "Retained historical candidate until all replacement lanes and archives close"
   },
   "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
-  "status": "ACQUIRING_REPLACEMENT_QUALIFICATION",
-  "observed_utc": "2026-10-20 12:23:14 UTC",
+  "status": "QUALIFICATION_COMPLETE_PENDING_RELEASE",
+  "observed_utc": "2026-10-20 14:37:26 UTC",
   "lanes": [
     {
       "key": "windows-normal",
@@ -26,7 +26,7 @@
       "status": "PASS_IN_EXECUTED_SCOPE",
       "dependency": null,
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567963/job/118504461023",
-      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_verification": "all-artifact-verification.json",
       "artifact_id": 12252351370,
       "evidence": {
         "checks": {
@@ -58,7 +58,9 @@
             3221226505
           ]
         }
-      }
+      },
+      "archive_sha256": "db9e467293a107a38d42c96edab5375be5587d892b8ba95ca32ee014605ef0c4",
+      "archive_size_in_bytes": 43178775
     },
     {
       "key": "windows-workspace-triage",
@@ -68,7 +70,7 @@
       "status": "PASS_IN_EXECUTED_SCOPE",
       "dependency": null,
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567963/job/118504461236",
-      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_verification": "all-artifact-verification.json",
       "artifact_id": 12258834785,
       "evidence": {
         "checks": {
@@ -97,16 +99,55 @@
           },
           "archived_bundles_checked": 0
         }
-      }
+      },
+      "archive_sha256": "9846fee031c2a0ffd1ab522504c67195e206992c3404e221ac041ba78889f565",
+      "archive_size_in_bytes": 104143
     },
     {
       "key": "windows-workspace-final",
       "lane": "Windows workspace final",
       "run_id": 39385567963,
       "job_id": 118589976770,
-      "status": "ACQUIRING",
+      "status": "PASS_IN_EXECUTED_SCOPE",
       "dependency": "windows-workspace-triage",
-      "url": "https://github.com/17thedevv/luna/actions/runs/39385567963/job/118589976770"
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385567963/job/118589976770",
+      "artifact_verification": "all-artifact-verification.json",
+      "artifact_id": 12273890402,
+      "archive_sha256": "bdb7843564c7a8d28ea1633988033f20b4e9967eb8c2fb5acd3b8aab56b1d113",
+      "archive_size_in_bytes": 104154,
+      "evidence": {
+        "checks": {
+          "recorded_log_hashes": 15,
+          "acquisition_gates": 14
+        },
+        "gates": 14,
+        "workspace": {
+          "result_groups": 236,
+          "passed": 1422,
+          "failed": 0,
+          "ignored": 1,
+          "ignored_lines": [
+            "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+          ]
+        },
+        "providers": {
+          "count": 49,
+          "target": "x86_64-pc-windows-gnu",
+          "object": "COFF 0x8664",
+          "versions": {
+            "compiler": 25,
+            "metadata": 9,
+            "mvir": 5,
+            "format": 2
+          },
+          "archived_bundles_checked": 0
+        },
+        "code_tree_identity": {
+          "luna-rs": "a738989a3869ebe054024a8ac6dd49a96c485d7b",
+          "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+          "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4"
+        }
+      }
     },
     {
       "key": "ubuntu-normal",
@@ -116,7 +157,7 @@
       "status": "PASS_IN_EXECUTED_SCOPE",
       "dependency": null,
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567905/job/118504460936",
-      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_verification": "all-artifact-verification.json",
       "artifact_id": 12252234586,
       "evidence": {
         "checks": {
@@ -138,7 +179,9 @@
           "basis": "Recorded provider headers and object identities in hash-verified acquisition"
         },
         "repeated_identical_log_records": []
-      }
+      },
+      "archive_sha256": "248166572662c8031a6ceaca683c2bf8175dc61c0a75f7398cf67a3315bc5344",
+      "archive_size_in_bytes": 191992
     },
     {
       "key": "ubuntu-runtime-asan",
@@ -148,7 +191,7 @@
       "status": "PASS_IN_EXECUTED_SCOPE",
       "dependency": null,
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567905/job/118504460874",
-      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_verification": "all-artifact-verification.json",
       "artifact_id": 12247791206,
       "evidence": {
         "checks": {
@@ -158,7 +201,9 @@
         },
         "gates": 19,
         "repeated_identical_log_records": []
-      }
+      },
+      "archive_sha256": "861787dadd580a9341960ce29684d4fde08d52febb22bb4ab7a472e731395100",
+      "archive_size_in_bytes": 22028
     },
     {
       "key": "ubuntu-comptime-vm",
@@ -168,7 +213,7 @@
       "status": "PASS_IN_EXECUTED_SCOPE",
       "dependency": null,
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567905/job/118504460970",
-      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_verification": "all-artifact-verification.json",
       "artifact_id": 12248270213,
       "evidence": {
         "checks": {
@@ -190,7 +235,9 @@
           "basis": "Recorded provider headers and object identities in hash-verified acquisition"
         },
         "repeated_identical_log_records": []
-      }
+      },
+      "archive_sha256": "74847f9e590ffc48d82104600b9c7eccf751235a3413c7df35a02cd056047f4b",
+      "archive_size_in_bytes": 16170404
     },
     {
       "key": "ubuntu-workspace-triage",
@@ -200,7 +247,7 @@
       "status": "PASS_IN_EXECUTED_SCOPE",
       "dependency": null,
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567905/job/118504460603",
-      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_verification": "all-artifact-verification.json",
       "artifact_id": 12253391317,
       "evidence": {
         "checks": {
@@ -233,7 +280,9 @@
         "repeated_identical_log_records": [
           "code-tree-identity"
         ]
-      }
+      },
+      "archive_sha256": "5defbfcc9d931f7b406d390774a4b21cc9282a7ceb5089ef081774a67299a1cf",
+      "archive_size_in_bytes": 83420
     },
     {
       "key": "ubuntu-workspace-final",
@@ -243,7 +292,7 @@
       "status": "PASS_IN_EXECUTED_SCOPE",
       "dependency": "ubuntu-workspace-triage",
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567905",
-      "artifact_verification": "partial-artifact-verification.json",
+      "artifact_verification": "all-artifact-verification.json",
       "artifact_id": 12263624610,
       "evidence": {
         "checks": {
@@ -276,7 +325,9 @@
         "repeated_identical_log_records": [
           "code-tree-identity"
         ]
-      }
+      },
+      "archive_sha256": "e7602838f5c83e27d821e03fc14beafba165fe29aed8cc7e5c7192384214711b",
+      "archive_size_in_bytes": 83695
     }
   ],
   "package_smoke": {
@@ -294,6 +345,8 @@
     "verifier_rejection_controls": 4
   },
   "no_prior_pin_pass_transfer": true,
-  "verified_lane_count": 7,
-  "supplemental_pr_merge_preview": "pr-merge-preview-replay.json"
+  "verified_lane_count": 8,
+  "supplemental_pr_merge_preview": "pr-merge-preview-replay.json",
+  "artifact_manifest": "ci-artifact-manifest.json",
+  "artifact_verification": "all-artifact-verification.json"
 }
