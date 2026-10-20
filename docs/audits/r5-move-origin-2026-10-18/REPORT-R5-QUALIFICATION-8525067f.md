@@ -1,77 +1,88 @@
-# R5 qualification report — integrated implementation pin
+# R5 qualification closure — integrated pin 8525067f
 
-**Pin (tested implementation)**: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5` (branch `r5-diag-repair`)
-**Harness / gate commit**: `aa3ed8abc2f9001e35530ca3ed473191c40a80ac`
-**Docs reconciliation commit**: `eb2b37a9`
-**Candidate**: `c085449b207b5860b1d7a79bee221c2ff3d357c3` (not advanced yet) · **main**: `401a95a8` (untouched)
-**Versions**: compiler 25 · semantic metadata 9 · MVIR 5 · format 2 (unchanged across the wave)
-**Status**: WIN 8/8 lanes green? — see the lane table; two Windows workspace lanes and CI artifact digests remain open.
+Date: 2026-10-20. **READY FOR RELEASE REVIEW — qualification COMPLETE in the tested adopted scope.**
+Full release publication and clean release-package smoke remain pending.
 
-## Integration
+Tested implementation and remote candidate: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
+Candidate fast-forwarded from `c085449b` without force; remote checked 2026-10-20.
+Main remains `401a95a872f0fdfb9840640f41cc4ac629cb17cd`.
+Versions: **compiler 25 / semantic metadata 9 / MVIR 5 / format 2**.
 
-Two divergent repair lines were integrated onto one implementation SHA before
-qualification (no PASS was carried from any earlier pin):
+Introducing fixes: `67146195` (move origins), `d3d0ffe8` (identity/order),
+`ce886d09` (declaration/implementation anchors), integrated by `8525067f`.
+Earlier DIAG/comptime/return/Linux-link repairs remain included.
+Harnesses: Ubuntu `aa3ed8abc2f9001e35530ca3ed473191c40a80ac`;
+Windows `896876d8694a4010d4f050187afe0af774b2b4a7`.
+Report/evidence descendants are separate from the tested implementation.
 
-| Line | Content |
-| --- | --- |
-| `r5-diag-repair` base `5d20e571` | DIAG-1..10 wave, canonical target selection, typed comptime `E4002`/`E4003`, `run` keeps compiler diagnostics (no `E6009` reclassification), per-code coverage suite |
-| `r5-missing-return` `ce886d09` | duplicate-definition/candidate handling, language-item and coherence ownership, symbol/registry identity, semantic-table and metadata anchors, declaration location suite + fixtures |
+## Eight exact-pin lanes
 
-Merge commit `8525067f` (clean, no conflicts). Verified on the merged tree:
-`cargo check` clean; `diagnostic_declaration_locations_cli` 3/3; per-code
-coverage suite; `luna-common` 15 (registry parity + per-code identity/span
-policy); `luna-semantic` 27; docs validator 0 errors; inventory drift check 0.
+| Lane | Authoritative CI job | Verified result |
+| --- | --- | --- |
+| Windows native normal | [118141683149](https://github.com/17thedevv/luna/actions/runs/39276394971/job/118141683149) | Fresh clean clone; runtime ABI; debug/release CLI; 49 GNU providers; 12 focused batches; diagnostics; docs/examples; native quickstart; comptime 88 PASS/0 FAIL/8 characterized; strict L002 4/4 |
+| Windows workspace triage | [118141682645](https://github.com/17thedevv/luna/actions/runs/39276394971/job/118141682645) | Exit0; 236 groups; 1421 passed/0 failed/1 ignored |
+| Windows workspace final | [118243423793](https://github.com/17thedevv/luna/actions/runs/39276394971/job/118243423793) | After triage, default parallelism; exit 0; 236 groups; 1421/0/1 |
+| Ubuntu native normal | [117679870941](https://github.com/17thedevv/luna/actions/runs/39128925234/job/117679870941) | 48 gate records PASS; runtime/CLI/49 providers; focused/parity/diagnostics; docs/examples and native quickstart |
+| Ubuntu runtime ASan | [117679870857](https://github.com/17thedevv/luna/actions/runs/39128925234/job/117679870857) | 19 records PASS; libasan.so.8; partial-read cleanup executes; RuntimeAbiTests 100%; no sanitizer/leak report |
+| Ubuntu comptime/VM | [117679870976](https://github.com/17thedevv/luna/actions/runs/39128925234/job/117679870976) | 28 records PASS; nested 88 PASS/0 FAIL/8 characterized |
+| Ubuntu workspace triage | [117679870999](https://github.com/17thedevv/luna/actions/runs/39128925234/job/117679870999) | Exit0; 236 groups; 1421/0/1 |
+| Ubuntu workspace final | [117720597415](https://github.com/17thedevv/luna/actions/runs/39128925234/job/117720597415) | After triage, default parallelism; exit 0; 236 groups; 1421/0/1 |
 
-**Retraction**: the earlier claim that `E3004` had no producer was an artifact of
-the divergent base. At the integrated tree a probe reports `E3004` for both
-`fn f() -> i32 { }` and a declaration-only body, `missing_return_cli.rs` covers
-it, and the inventory records it as produced with an anchored producer plus
-automated coverage.
+All four workspace runs ignore only `mutable_references::sem_mutref_06_invalid_fixture`.
+These are the pin's actual counts; no historical PASS is transferred.
 
-**Producer inventory**: 72 codes — produced 64 / reserved-without-producer 8
-(`E0004`, `E1006`, `E1007`, `E2014`, `E2015`, `E2020`, `E4004`, `E5002`) /
-declared-unreachable-in-test 4 (`E3007`, `E6002`, `E6003`, `E6009`) / coverage
-debt 0. Each entry carries its reason; nothing is silently dropped.
+## Evidence acceptance
 
-## Lanes at the pin
+All eight original ZIP byte streams are retained in
+[archives](evidence/pin-8525067f/archives/), with
+[original GitHub metadata](evidence/pin-8525067f/ci-artifact-manifest.json).
+Every ZIP SHA-256, size and CRC matches. Signed URLs are excluded.
 
-| Lane | Where | Verdict | Evidence |
-| --- | --- | --- | --- |
-| Windows native normal | local runner `D:/r5-8525067f/windows` | PASS | build PASS; focused 12/12 exit 0; diagnostics PASS; quickstart PASS; comptime exit 0; strict L002 replay 4/4 (`evidence/pin-8525067f/strict-bounds/`) |
-| Windows workspace triage | local runner | re-running | attempt 1 interrupted by the host session (preserved); attempt 2 hit `LNK1207` on stale PDBs (preserved); attempt 3 clean so far |
-| Windows workspace final | local runner | scheduled after triage | — |
-| Ubuntu normal | CI run 23 job 117679870941 | PASS | success 12:49:55Z → 14:38:08Z |
-| Ubuntu runtime ASan | CI run 23 job 117679870857 | PASS | success 12:49:54Z → 12:50:41Z |
-| Ubuntu comptime/VM | CI run 23 job 117679870976 | PASS | success 12:49:55Z → 12:54:39Z |
-| Ubuntu workspace triage | CI run 23 job 117679870999 | PASS | success |
-| Ubuntu workspace final | CI run 23 job 117720597415 | PASS | success 15:57:58Z → 19:05:54Z |
+The [independent verifier](../../tools/verify_ci_artifacts.py) checks pins,
+clean initial/final state, detached acquisition, source trees, gate exits and
+log digests. Ubuntu: 1270 file hashes plus 153 compressed and153 raw log hashes.
+Windows: 413 distinct recorded log/archive/stream hashes. Windows normal also
+checks 98 archived provider bundle copies against library/object hashes, LLIB
+headers and COFF 0x8664. Canonical Linux provider records are ELF64 x86_64 with
+target `x86_64-unknown-linux-gnu`; LLVM's host spelling is provenance.
 
-Additional repo workflows at the same pin: Full workspace regression (Ubuntu),
-Whole-File I/O parity (macos-15-intel), RuntimeAbiTests (ubuntu-24.04 and
-macos-15-intel) and Runtime partial-read cleanup (Ubuntu + ASan) all SUCCESS.
+Ubuntu workspace records code-tree identity twice with identical command,
+exit and content hashes; only elapsed seconds differ. The verifier records
+this acquisition detail. Six rejection controls covered ZIP tampering, wrong
+pins, inventory tampering, raw-log mismatch and falsified workspace totals.
 
-## Evidence verification
+Hosted bounds replay exits with Windows status 3221226505 in all four cases,
+each accompanied by **luna: PANIC [L002], index 3, length 2**. The earlier local
+exit 3 replay is separate evidence; an arbitrary crash cannot pass.
 
-- Local lane digests: `docs/tools/verify_lane_evidence.py` recomputes every
-  recorded log/archive digest — 19 digests, 0 mismatched, 0 missing.
-- CI artifacts: **pending** — ZIP digest verification needs an authenticated
-  download; lane verdicts were read from the check-run API, which is not a
-  substitute for verifying the archives.
+The [final review](evidence/pin-8525067f/closure-review.json) maps DIAG-1..10,
+source hashes and regressions. Declaration-location coverage passes all four
+workspaces and the local focused matrix. Hosted focused diagnostics includes
+move-origin, per-code and missing-return suites. Both native example gates
+have 14 satisfied contract rows and two legacy characterizations.
+Local integrity verification checks 38 log/archive digests, zero mismatch or
+missing, excluding five interrupted records; failed tooling attempts remain visible.
 
-## Known limitations carried into the release
+Reproduce from the repository root:
 
-- Comptime/layout: eight probes stay explicit characterizations (historical
-  final-if statement spelling), not conformance claims.
-- ASan certifies the sanitized C runtime and RuntimeAbiTests only; generated
-  Luna/compiler/stdlib code is not claimed sanitized.
-- Four registered codes have no reproducible test trigger yet (`E3007`,
-  `E6002`, `E6003`, `E6009`) and eight have no producer in 0.1; both sets are
-  declared with reasons in the inventory.
-- Ubuntu CI artifact archives still need digest verification before closure.
+```text
+python docs/tools/verify_ci_artifacts.py --manifest docs/audits/r5-move-origin-2026-10-18/evidence/pin-8525067f/ci-artifact-manifest.json --pin 8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5 --out OUTPUT.json
+```
 
-## Remaining before closure
+## Scope and remaining full-goal work
 
-1. Windows workspace triage and final at this pin.
-2. CI artifact archive digest verification (needs an authenticated download).
-3. Then: fast-forward the candidate to this pin, sync public docs/status, and
-   hand off; tag, main merge, PR and publication stay with the maintainer.
+[Requirements](REQUIREMENTS.md) · [Targets](TARGET-MATRIX.md) ·
+[Limits](LIMITATIONS.md) · [Lane ledger](evidence/pin-8525067f/lane-state.json) ·
+[Full archive verification](evidence/pin-8525067f/all-artifact-verification.json).
+
+Inventory: 72 codes, 64 produced, eight reserved without producers, four produced
+conditions without portable behavioral fixture triggers, undeclared coverage debt 0.
+**Retraction:** E3004 is produced and tested at this pin; the earlier
+no-producer claim came from a divergent base.
+
+Superseded pins and local interrupted/PDB attempts remain historical.
+No new semantic freeze, target expansion or blanket API certification is declared.
+Qualification is complete. Remaining: maintainer PR/main/tag/publication decision,
+packages from the chosen verified release commit, clean Windows/Ubuntu package
+smoke, final tag/assets/checksum/release-note reconciliation.
+See the concrete [handoff](RELEASE-HANDOFF.md).

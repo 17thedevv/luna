@@ -1,43 +1,39 @@
 <!-- luna-doc-role: guidance -->
 
-> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](docs/spec/0.1/README.md).
+> **Luna 0.1 — guidance.** The [versioned specification](docs/spec/0.1/README.md) and adopted contracts govern; implementation evidence does not create semantic authority.
 
-# Luna 0.1 status — 2026-10-19
+# Luna 0.1 status — 2026-10-20
 
-**Release: PENDING FINAL LANES; integrated implementation pin `8525067f` being qualified.**
-Candidate: `c085449b207b5860b1d7a79bee221c2ff3d357c3` (not advanced).
-Implementation pin: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5` (branch `r5-diag-repair`).
-Protocol: compiler / metadata / MVIR / format **25 / 9 / 5 / 2**.
+**READY FOR RELEASE REVIEW at exact implementation/candidate `8525067f`.**
+Qualification is complete in the adopted tested scope. Full release remains pending.
 
-The diagnostic origin/identity/order repairs and the DIAG-1..10 wave now live on
-one integrated pin (merge `8525067f`, harness commit `aa3ed8ab`). Six of the
-eight required lanes are green at that pin: Windows native normal (build, focused
-12/12, diagnostics, quickstart, comptime and the strict L002 replay 4/4) and all
-five Ubuntu lanes in CI run 23 (normal, runtime ASan, comptime/VM, workspace
-triage, workspace final). The two Windows workspace lanes are re-running after
-host-session interruptions (preserved as partial attempts; a stale PDB set
-caused an immediate `LNK1207` and was cleared).
+Candidate/tested pin: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`, fast-forwarded
+from `c085449b` without force. Main remains `401a95a8`.
+Protocol: compiler / semantic metadata / MVIR / format **25 / 9 / 5 / 2**.
 
-Verified independently at the pin: format/compiler/MVIR/metadata constants
-2/25/5/2, 49 provider bundles with a single canonical `x86_64-pc-windows-gnu`
-target and COFF `0x8664`, and 19 recomputed lane log digests with no mismatch.
-The producer inventory lists 72 codes: 64 produced, 8 reserved without a
-producer, 4 declared unreachable in test scope, and no undeclared coverage debt.
+All eight hosted Windows/Ubuntu lanes PASS. All eight original artifact ZIPs
+are retained and independently verified. Four full workspace runs each have
+**1421 passed / 0 failed / 1 ignored**. Both normal lanes build 49 canonical
+providers. Windows strict L002 replay passes 4/4; comptime per host reports
+88 PASS / 0 FAIL / 8 characterizations. Ubuntu ASan certifies the C runtime only.
 
-An earlier claim that `E3004` had no producer was retracted: it was an artifact
-of a divergent base; `E3004` is produced and covered at the integrated pin.
+[Final report](docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md) ·
+[Requirement matrix](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md) ·
+[Ledger](docs/audits/r5-move-origin-2026-10-18/evidence/pin-8525067f/lane-state.json) ·
+[Target matrix](docs/audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md) ·
+[Limits](docs/audits/r5-move-origin-2026-10-18/LIMITATIONS.md).
 
-[Report](docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md) ·
-[replacement matrix](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md) ·
-[lane ledger](docs/audits/r5-move-origin-2026-10-18/evidence/pin-8525067f/lane-state.json).
+Inventory: 72 codes, 64 produced, eight reserved without producers, four declared
+conditions without portable fixture triggers, undeclared coverage debt zero.
+E3004 is produced and covered; the contrary finding was retracted. The earlier
+`2/25/5/2` tuple wording was incorrect; metadata is 9.
+Local interrupted/PDB attempts are historical, never passing evidence.
 
-Remaining before closure: the two Windows workspace lanes at this pin and
-digit-verification of the Ubuntu CI artifact archives (needs an authenticated
-download). Tagging, main merge, PR creation and publication remain maintainer
-decisions; no release-ready or freeze claim is made.
-
-Earlier diagnostic E4002/E4003 and Linux native math linkage repairs stay in the
-implementation; their previous passes remain scoped to their own SHA.
+Remaining full-goal work: maintainer PR/main/tag/publication decision, packages
+built from the selected verified release commit, clean Windows/Ubuntu package
+smoke and final asset/checksum/tag reconciliation. The concrete
+[handoff](docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md) is ready.
+No release publication or new semantic freeze is claimed.
 
 ## Prior reconciliation - 2026-10-14
 

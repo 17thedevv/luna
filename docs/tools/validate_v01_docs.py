@@ -59,11 +59,27 @@ for row in inventory:
             errors.append(f'Invalid skill front matter: {row["path"]}')
 
 pages = list((ROOT / 'docs/site').rglob('*.html'))
+review_boundary = 'Qualification: READY FOR RELEASE REVIEW IN TESTED SCOPE; publication pending'
+review_evidence_checked = False
 for page in pages:
     text = page.read_text(encoding='utf-8')
     PageLinks(page).feed(text)
-    if 'BLOCKED / NOT VERIFIED' not in text:
+    boundary = re.search(r'<p class="version-note">(.*?)</p>', text, re.S)
+    if boundary is None or not any(state in boundary.group(1) for state in (
+            'BLOCKED / NOT VERIFIED', review_boundary)):
         errors.append(f'Missing readiness boundary: {page.relative_to(ROOT)}')
+    if boundary is not None and review_boundary in boundary.group(1) and not review_evidence_checked:
+        review_evidence_checked = True
+        evidence_root = ROOT / 'docs/audits/r5-move-origin-2026-10-18/evidence/pin-8525067f'
+        verification = json.loads((evidence_root / 'all-artifact-verification.json').read_text(encoding='utf-8'))
+        ledger = json.loads((evidence_root / 'lane-state.json').read_text(encoding='utf-8'))
+        if not (verification['status'] == 'PASS' and len(verification['artifacts']) == 8
+                and len(ledger['lanes']) == 8
+                and all(lane['status'] == 'PASS_IN_EXECUTED_SCOPE' for lane in ledger['lanes'])
+                and all(artifact['tested_commit'] == ledger['tested_implementation_pin']
+                        for artifact in verification['artifacts'])
+                and ledger['candidate']['sha'] == ledger['tested_implementation_pin']):
+            errors.append('Release-review boundary requires eight verified exact-pin lanes and qualified candidate')
 
 for source in (ROOT / 'docs/tools').glob('*.py'):
     ast.parse(source.read_text(encoding='utf-8'), filename=str(source))

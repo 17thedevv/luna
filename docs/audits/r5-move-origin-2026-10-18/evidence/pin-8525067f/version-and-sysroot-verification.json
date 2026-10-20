@@ -1,5 +1,5 @@
 {
-  "task": "Step 4 verification — version tuple and provider/target identity at the integrated pin",
+  "task": "Step 4 verification \u00e2\u20ac\u201d version tuple and provider/target identity at the integrated pin",
   "tested_implementation_pin": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
   "checked_at_source": {
     "file": "luna-rs/crates/luna-llib/src/format.rs",
@@ -12,15 +12,22 @@
   "checked_in_lane_evidence": {
     "file": "D:/r5-8525067f/windows/sysroot-provenance.json",
     "provider_count": 49,
-    "distinct_targets": ["x86_64-pc-windows-gnu"],
-    "coff_machines": ["0x8664"],
-    "versions": { "compiler": 25, "metadata": 9, "mvir": 5, "format": 2 },
+    "distinct_targets": [
+      "x86_64-pc-windows-gnu"
+    ],
+    "coff_machines": [
+      "0x8664"
+    ],
+    "versions": {
+      "compiler": 25,
+      "metadata": 9,
+      "mvir": 5,
+      "format": 2
+    },
     "provider_bundles_on_disk": 49,
     "verdict": "single canonical Windows GNU target; no host-triple leakage; provider count matches the matrix requirement"
   },
   "method": "read the version constants at the pin, read the lane's sysroot provenance, and count the provider bundles in the lane checkout independently",
-  "open": [
-    "Linux GNU canonical target at the tested pin is asserted by the Ubuntu normal lane (43-gate run) and is re-checked when its archive digests are verified",
-    "CI artifact ZIP digests still require an authenticated download"
-  ]
+  "open": [],
+  "ubuntu_confirmation": "all-artifact-verification.json: 49 canonical x86_64-unknown-linux-gnu providers in each normal/comptime/workspace build; LLVM host spelling is provenance only; all CI ZIP digests verified"
 }

@@ -15,7 +15,7 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / 'docs/spec/0.1'
 SITE = ROOT / 'docs/site'
-STATUS_DATE = '2026-10-18'
+STATUS_DATE = '2026-10-20'
 ADOPTED = {
     'docs/normative-rules-p0-p1.md', 'docs/runtime/abi-v1.md',
     'docs/diagnostics/diagnostics-v1.md', 'docs/project/rename-luna-v1.md',
@@ -231,7 +231,7 @@ def page(target, body, language='en', title='Luna 0.1'):
 <title>{html.escape(title)}</title><link rel="stylesheet" href="{relative(SITE / 'assets/styles.css')}">
 <style>main{{max-width:960px;margin:auto;padding:2rem}}table{{width:100%;border-collapse:collapse}}td,th{{padding:.6rem;border:1px solid #777;text-align:left}}pre{{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}}code{{font-family:monospace}}nav a{{margin-right:1rem}}.version-note{{padding:1rem;border:1px solid #777}}</style></head>
 <body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav>{navigation}</nav></div></header>
-<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated {STATUS_DATE}</p>
+<main><p class="version-note">Contract baseline 0.1 · Qualification: READY FOR RELEASE REVIEW IN TESTED SCOPE; publication pending · Updated {STATUS_DATE}</p>
 {body}</main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>
 '''
     target.write_text(text, encoding='utf-8')
@@ -249,7 +249,7 @@ def site_pages():
         body = f'<h1>{title}</h1>'
         body += ('<p>Giữ các contract đã định nghĩa; implementation còn thiếu được ghi riêng trong danh sách khoảng hở. Spec và release conformance là hai trạng thái khác nhau.</p>' if vietnamese else '<p>Defined contracts are retained. Implementation failures and missing evidence are tracked separately; the baseline is not release certification.</p>')
         ledger_url = Path(os.path.relpath(ROOT / 'docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md', target.parent)).as_posix()
-        body += f'<p><a href="{ledger_url}">R4 release ledger / R5 handoff</a>: E-wave qualified in tested scope; Ubuntu normal/ASan and complete diagnostic structure remain unverified.</p>'
+        body += f'<p><a href="{ledger_url}">R4 release ledger / R5 handoff</a>: Current R5 at 8525067f: eight lanes and original ZIPs verified; release review and package smoke/publication remain pending.</p>'
         for chapter in ('syntax', 'semantics', 'macros', 'modules', 'stdlib', 'runtime', 'conformance', 'gaps'):
             rel = Path(os.path.relpath(SITE / f'spec/{chapter}.html', target.parent)).as_posix()
             body += f'<p><a href="{rel}">{chapter.title()}</a></p>'

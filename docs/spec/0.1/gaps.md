@@ -11,15 +11,20 @@ otherwise. Some fixes may now be present; each original finding requires a
 fresh check before being marked closed. The merged manifest has 49 providers.
 V01-ARCH-02 is newly observed in the imported source, not the old audit.
 
-## Current qualification - 2026-10-18
+## Current qualification — 2026-10-20
 
-[move-origin repair report](../../audits/r5-move-origin-2026-10-18/README.md)
-and [replacement requirements](../../audits/r5-move-origin-2026-10-18/REQUIREMENTS.md).
-Previous pin `3a72f946` completed all eight lanes, including full workspace
-triage/final on Windows and Ubuntu (each 1414/0/1). Final review found a DIAG-3/9
-origin-span gap; follow-up review also found message-dependent dedup and unstable
-multi-function diagnostic order. Generic repairs require a new pin and fresh qualification.
-Candidate stays `c085449b`; release remains **BLOCKED / NOT VERIFIED**.
+Current qualification — 2026-10-20: **READY FOR RELEASE REVIEW** at
+`8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5` (tested implementation and candidate).
+All eight hosted Windows/Ubuntu lanes and original ZIPs are independently
+verified. Four full workspaces each report 1421/0/1. Diagnostic-origin,
+identity/order and declaration-location follow-ups are included at this pin.
+[Final report](../../audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md) ·
+[Requirements](../../audits/r5-move-origin-2026-10-18/REQUIREMENTS.md) ·
+[Targets](../../audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md) ·
+[Limits](../../audits/r5-move-origin-2026-10-18/LIMITATIONS.md).
+Publication and clean release-package smoke remain pending. This changes no
+normative contract, deferral authority or target scope. Earlier snapshots below
+remain dated evidence and do not describe the current qualification status.
 
 ## Prior reconciliation — 2026-10-14
 

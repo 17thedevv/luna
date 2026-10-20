@@ -1,6 +1,6 @@
 # Luna 0.1-alpha.1 — draft maintainer handoff
 
-**DRAFT — qualification is still running. Do not publish this as a completed release.**
+**Historical draft, superseded 2026-10-20.** The [current handoff](../r5-move-origin-2026-10-18/RELEASE-HANDOFF.md) records eight verified lanes at `8525067f`; publication remains pending. Original dated draft follows.
 
 Superseded implementation: `d3d0ffe8d6495aee1f56257a1db817ce4107e992`.
 Further DIAG-2/3 declaration-location repairs and preflight are in progress; no qualified replacement is selected.

@@ -1,7 +1,8 @@
 """Independent verification of a local exact-pin lane's recorded evidence.
 
-Recomputes every reported log / archive digest and re-checks the recorded exit
-codes, so a lane result is verifiable without trusting the recorder.
+Recomputes recorded log/archive digests and lists recorded exits. This is an
+integrity check, not a lane PASS verdict. Interrupted attempts are preserved
+but excluded: their renamed records no longer resolve against the active root.
 """
 import hashlib, json, pathlib, sys
 
@@ -13,7 +14,12 @@ def sha(path):
 
 checked = mismatched = missing = 0
 rows = []
+excluded = []
+nonzero_exits = []
 for path in sorted(LANE.rglob("*.json")):
+    if "interrupted" in path.relative_to(LANE).parts:
+        excluded.append(path.relative_to(LANE).as_posix())
+        continue
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except Exception:
@@ -23,6 +29,8 @@ for path in sorted(LANE.rglob("*.json")):
     label = data.get("label")
     if not label:
         continue
+    if data.get("exit", 0) != 0 and data.get("log_sha256"):
+        nonzero_exits.append((path.relative_to(LANE).as_posix(), data["exit"]))
     if data.get("tested_commit") and data["tested_commit"] != PIN:
         rows.append((label, "WRONG PIN", data["tested_commit"][:12]))
         mismatched += 1
@@ -44,6 +52,9 @@ for path in sorted(LANE.rglob("*.json")):
 
 print(f"lane={LANE}")
 print(f"digests_checked={checked} mismatched={mismatched} missing={missing}")
+print(f"interrupted_records_excluded={len(excluded)} (never counted as qualification evidence)")
+for path, code in nonzero_exits:
+    print(f"  recorded nonzero exit={code}: {path} (integrity does not establish PASS)")
 for label, kind, detail in rows[:30]:
     print(f"  {kind}: {label} {detail}")
 
@@ -54,4 +65,9 @@ for path in summary_files:
     status = data.get("status")
     if status is None and "exit" in data:
         status = f"exit={data['exit']}"
+    if status is None and isinstance(data.get("gates"), list):
+        from collections import Counter
+        status = dict(Counter(g.get("result", "UNKNOWN") for g in data["gates"]))
     print(f"  stage {path.name}: {status}")
+
+sys.exit(1 if mismatched or missing or checked == 0 else 0)
