@@ -1,0 +1,17 @@
+{
+  "gate": "head",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "git",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan/checkout",
+  "started_utc": "2026-10-17T12:18:33Z",
+  "exit": 0,
+  "seconds": 0.003825237000000925,
+  "log_sha256": "1e21a8c3b4dc497013cda91919760940633a4c0bbe0144130708f2311e928d51",
+  "status": "PASS",
+  "log": "head.log.gz",
+  "compressed_sha256": "bb8a05db9afd8d3601e2fc9c038564111bc100a7822729b9b8cb2442a1223e23"
+}

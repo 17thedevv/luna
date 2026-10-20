@@ -47,7 +47,7 @@ fn module_constants_preserve_storage_across_native_portable_and_relocated_provid
                 continue;
             }
             let run = Command::new(exe)
-                .current_dir(std::env::temp_dir())
+                .current_dir(luna_test_support::owned_temp_root())
                 .output()
                 .unwrap();
             if !run.status.success() {

@@ -1,0 +1,5 @@
+// This comment must never be selected as a diagnostic source location.
+fn missing() -> i32 { // invalid return contract
+    return;
+}
+fn main() -> i32 { return 0; }

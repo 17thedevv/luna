@@ -6,6 +6,18 @@ export module std {
 // Safe arithmetic with pre-operation overflow/trap detection
 // =========================================================================
 
+// --- Explicit modular integer arithmetic ---
+// Ordinary `+ - *` are checked and trap on overflow. These three intrinsics are
+// the only sanctioned wrapping forms: they operate modulo 2^N at the target
+// type's width, for signed and unsigned, and never trap. The compiler recognizes
+// them by language-item identity, not by name.
+#[lang("wrapping_add")]
+export intrinsic fn wrapping_add<T>(a: T, b: T) -> T;
+#[lang("wrapping_sub")]
+export intrinsic fn wrapping_sub<T>(a: T, b: T) -> T;
+#[lang("wrapping_mul")]
+export intrinsic fn wrapping_mul<T>(a: T, b: T) -> T;
+
 // --- u8 ---
 export fn checked_add_u8(a: u8, b: u8) -> std::Option<u8> {
     dec max_val: u8 = 255 as u8;

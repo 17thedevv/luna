@@ -1,0 +1,4 @@
+import "overlap_provider";
+struct Record { value: i32 };
+impl Pick for Record {} // invalid definition
+fn main() -> i32 { return 0; }

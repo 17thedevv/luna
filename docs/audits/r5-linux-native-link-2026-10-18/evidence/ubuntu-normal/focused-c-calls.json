@@ -1,0 +1,32 @@
+{
+  "gate": "focused-c-calls",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--no-fail-fast",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "named_arguments_cli",
+    "--test",
+    "default_arguments_cli",
+    "--test",
+    "default_omission_cli",
+    "--test",
+    "call_arity_cli",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T18:21:53Z",
+  "exit": 0,
+  "seconds": 626.546899189,
+  "log_sha256": "d8d89b5581b942c429bc402c5de5ec1d7e98b28a65127b30c2d81c8791f1649c",
+  "status": "PASS",
+  "log": "focused-c-calls.log.gz",
+  "compressed_sha256": "5677d6b73c8e84422c446c22957547c0fe0ba0ee233e9728e17eb888cb6a771b"
+}

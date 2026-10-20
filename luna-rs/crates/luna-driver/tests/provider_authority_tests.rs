@@ -6,7 +6,7 @@ use std::fs;
 
 #[test]
 fn discovery_never_grants_authority_and_sysroot_authenticates_actual_files() {
-    let work = std::env::temp_dir().join(format!(
+    let work = luna_test_support::owned_temp_root().join(format!(
         "luna_authority_{}_{}",
         std::process::id(),
         std::time::SystemTime::now()
@@ -79,6 +79,14 @@ fn discovery_never_grants_authority_and_sysroot_authenticates_actual_files() {
         assert_eq!(descriptor.provenance, ComponentProvenance::LocalProject);
     }
     // Delete only the unique test directory allocated above.
-    assert_eq!(work.parent(), Some(std::env::temp_dir().as_path()));
+    let parent = work.parent().expect("unique test directory has a parent");
+    assert!(
+        parent.starts_with(std::env::temp_dir())
+            && parent.ancestors().any(|ancestor| ancestor
+                .file_name()
+                .is_some_and(|name| name.to_string_lossy().starts_with("luna_test_ws_"))),
+        "refusing to delete outside the owned temp workspace: {}",
+        work.display()
+    );
     fs::remove_dir_all(work).unwrap();
 }

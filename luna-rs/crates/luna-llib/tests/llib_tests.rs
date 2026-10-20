@@ -78,7 +78,7 @@ fn test_version_mismatch() {
     
     let mut cursor = Cursor::new(buffer);
     let result = MlibReader::read_module(&mut cursor).map(|(m, _, _, _)| m);
-    assert!(matches!(result, Err(luna_llib::MlibError::VersionMismatch(999))));
+    assert!(matches!(result, Err(luna_llib::MlibError::VersionMismatch { component: "format", found: 999, .. })));
 }
 
 #[test]
@@ -90,7 +90,7 @@ fn test_mvir_version_mismatch() {
 
     let mut cursor = Cursor::new(buffer);
     let result = MlibReader::read_module(&mut cursor);
-    assert!(matches!(result, Err(luna_llib::MlibError::VersionMismatch(999))));
+    assert!(matches!(result, Err(luna_llib::MlibError::VersionMismatch { component: "mvir", found: 999, .. })));
 }
 
 #[test]

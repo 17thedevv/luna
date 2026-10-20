@@ -10,6 +10,8 @@ mod call_binding;
 mod call_defaults;
 #[path = "trait_bound_proof.rs"]
 mod trait_bound_proof;
+#[path = "attribute_application.rs"]
+mod attribute_application;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssociatedTypeEqObligation {
@@ -35,6 +37,8 @@ pub struct TypeChecker<'a> {
     current_async_fn: Option<luna_ast::DeclId>,
     comptime_engine: Option<&'a dyn crate::ComptimeEngine>,
     current_return_type: Vec<SemanticTypeId>,
+    /// Existing declaration source identity for errors with no expression token.
+    declaration_anchor: Option<luna_common::Span>,
     expected_expr_type: Vec<SemanticTypeId>,
     comptime_prepared_functions: std::collections::HashSet<luna_ast::DeclId>,
     populating_nominal_types: std::collections::HashSet<luna_ast::DeclId>,
@@ -47,6 +51,30 @@ pub struct TypeChecker<'a> {
 }
 
 impl<'a> TypeChecker<'a> {
+    /// TypeChecker-owned preparation admission, before name resolution because
+    /// derives materialize declarations. Transformations return structured
+    /// failures; this boundary alone gives application failures their code/span.
+    /// Binding identity is never validated here: Resolver owns that later pass.
+    pub fn prepare_attributes(
+        arena: &mut AstArena,
+        sources: &mut luna_common::source::SourceManager,
+        file: luna_common::ids::FileId,
+        items: Vec<Item>,
+    ) -> Result<Vec<Item>, Vec<Diagnostic>> {
+        crate::AttributeProcessor::new(arena, sources, file).process_items(items)
+            .map_err(Self::admit_attribute_expansion_failures)
+    }
+
+    pub fn admit_attribute_expansion_failures(
+        failures: Vec<crate::derive::AttributeExpansionFailure>,
+    ) -> Vec<Diagnostic> {
+        failures.into_iter().map(|failure| match failure {
+            crate::derive::AttributeExpansionFailure::Parser(diagnostic) => diagnostic,
+            crate::derive::AttributeExpansionFailure::Application { message, span } =>
+                Diagnostic::source_error(DiagnosticCode::InvalidAttributeApplication, span, message),
+        }).collect()
+    }
+
 
     pub fn get_span_text(&self, span: luna_common::ids::Span) -> &'a str {
         &self.source_manager.get_file(span.file_id).unwrap().source[span.start as usize..span.end as usize]
@@ -64,6 +92,7 @@ impl<'a> TypeChecker<'a> {
             current_async_fn: None,
             comptime_engine: None,
             current_return_type: Vec::new(),
+            declaration_anchor: None,
             expected_expr_type: Vec::new(),
             comptime_prepared_functions: std::collections::HashSet::new(),
             populating_nominal_types: std::collections::HashSet::new(),
@@ -88,6 +117,7 @@ impl<'a> TypeChecker<'a> {
             current_async_fn: None,
             comptime_engine: Some(comptime_engine),
             current_return_type: Vec::new(),
+            declaration_anchor: None,
             expected_expr_type: Vec::new(),
             comptime_prepared_functions: std::collections::HashSet::new(),
             populating_nominal_types: std::collections::HashSet::new(),
@@ -150,8 +180,24 @@ impl<'a> TypeChecker<'a> {
     fn report_comptime_error(&mut self, error: crate::ComptimeError, span: luna_common::Span, context: &str) {
         match error {
             crate::ComptimeError::Diagnostics(diagnostics) => self.ctx.diagnostics.extend(diagnostics),
-            other => self.ctx.diagnostics.push(Diagnostic::error(format!("{context}: {other}"))
-                .with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span)),
+            // The failure is a lowering symptom of a program an earlier phase
+            // diagnosed. Suppress the wrapper only while a root diagnostic is
+            // guaranteed to be visible; otherwise fail closed rather than drop
+            // the failure silently.
+            crate::ComptimeError::AlreadyDiagnosed => {
+                if !any_error_emitted(&self.ctx.diagnostics) {
+                    self.ctx.diagnostics.push(Diagnostic::error(format!(
+                        "{context}: comptime lowering failed without a previously reported diagnostic"
+                    )).with_code(DiagnosticCode::ComptimeEvaluationFailed).with_span(span));
+                }
+            }
+            other => {
+                // The registry code for the condition, not the general wrapper
+                // when a specific code is registered for it.
+                let code = other.diagnostic_code();
+                self.ctx.diagnostics.push(Diagnostic::error(format!("{context}: {other}"))
+                    .with_code(code).with_span(span))
+            }
         }
     }
     
@@ -648,14 +694,16 @@ impl<'a> TypeChecker<'a> {
         if matched_entries.len() > 1 {
             let trait_name = self.ctx.symbol_table.get_symbol(trait_id).name.clone();
             let assoc_name = self.ctx.symbol_table.get_symbol(assoc_type).name.clone();
-            self.ctx.diagnostics.push(
-                Diagnostic::error(format!(
+            let mut diagnostic = Diagnostic::source_error(DiagnosticCode::AmbiguousAssociatedType, span, format!(
                     "E_AMBIGUOUS_ASSOCIATED_TYPE: Multiple conflicting implementations found for associated type projection `<_ as {}>::{}`",
                     trait_name, assoc_name
-                ))
-                .with_code(DiagnosticCode::AmbiguousAssociatedType)
-                .with_span(span)
-            );
+                ));
+            for (entry, _) in &matched_entries {
+                if let Some(candidate) = entry.definition_span {
+                    diagnostic = diagnostic.with_related(candidate, "candidate implementation");
+                }
+            }
+            self.ctx.diagnostics.push(diagnostic);
             return self.ctx.types.intern(SemanticType::Error);
         }
 
@@ -690,14 +738,18 @@ impl<'a> TypeChecker<'a> {
             if decl_ids.len() > 1 {
                 let trait_name = self.ctx.symbol_table.get_symbol(trait_id).name.clone();
                 let assoc_name = self.ctx.symbol_table.get_symbol(assoc_type).name.clone();
-                self.ctx.diagnostics.push(
-                    Diagnostic::error(format!(
+                let mut diagnostic = Diagnostic::source_error(DiagnosticCode::AmbiguousAssociatedType, span, format!(
                         "E_AMBIGUOUS_ASSOCIATED_TYPE: Multiple conflicting implementations found for associated type projection `<_ as {}>::{}`",
                         trait_name, assoc_name
-                    ))
-                    .with_code(DiagnosticCode::AmbiguousAssociatedType)
-                    .with_span(span)
-                );
+                    ));
+                for entry in &self.ctx.tables.trait_impl_entries {
+                    if entry.decl_id.is_some_and(|decl| decl_ids.contains(&decl)) {
+                        if let Some(candidate) = entry.definition_span {
+                            diagnostic = diagnostic.with_related(candidate, "candidate implementation");
+                        }
+                    }
+                }
+                self.ctx.diagnostics.push(diagnostic);
                 return self.ctx.types.intern(SemanticType::Error);
             }
 
@@ -952,14 +1004,14 @@ impl<'a> TypeChecker<'a> {
         }
 
         if candidate_traits.len() > 1 {
-            self.ctx.diagnostics.push(
-                Diagnostic::error(format!(
+            let mut diagnostic = Diagnostic::source_error(DiagnosticCode::AmbiguousAssociatedType, span, format!(
                     "E_AMBIGUOUS_ASSOCIATED_TYPE: Associated type `{}` is ambiguous between multiple candidate traits",
                     assoc_name
-                ))
-                .with_code(DiagnosticCode::AmbiguousAssociatedType)
-                .with_span(span)
-            );
+                ));
+            for candidate in &candidate_traits {
+                diagnostic = diagnostic.with_related(self.ctx.symbol_table.get_symbol(*candidate).span, "candidate trait");
+            }
+            self.ctx.diagnostics.push(diagnostic);
             return self.ctx.types.intern(SemanticType::Error);
         }
 
@@ -1144,7 +1196,7 @@ impl<'a> TypeChecker<'a> {
                         .with_code(DiagnosticCode::CopyDropConflict)
                         .with_span(span);
                         
-                        if !self.ctx.diagnostics.contains(&diag) {
+                        if !self.ctx.diagnostics.iter().any(|existing| existing.same_identity(&diag)) {
                             self.ctx.diagnostics.push(diag);
                         }
                     }
@@ -1435,11 +1487,13 @@ impl<'a> TypeChecker<'a> {
                             self.ctx.tables.symbol_types.insert(sym_id, dummy_ty);
                         }
                         let mut field_tys = Vec::new();
-                        let mut seen_fields = std::collections::HashSet::new();
+                        let mut seen_fields = std::collections::HashMap::new();
                         for field in fields {
                             let field_name = self.get_span_text(field.name);
-                            if !seen_fields.insert(field_name) {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("Duplicate field `{}` in struct", field_name)).with_code(DiagnosticCode::DuplicateDefinition).with_span(field.name));
+                            if let Some(&previous) = seen_fields.get(field_name) {
+                                self.ctx.diagnostics.push(crate::symbol::duplicate_definition_diagnostic(field.name, previous, format!("Duplicate field `{}` in struct", field_name)));
+                            } else {
+                                seen_fields.insert(field_name, field.name);
                             }
                             let f_ty = self.lower_type(field.ty);
                             if self.ctx.types.is_unsized(f_ty) {
@@ -1537,11 +1591,13 @@ impl<'a> TypeChecker<'a> {
                             self.ctx.tables.symbol_types.insert(sym_id, dummy_ty);
                         }
                         let mut variant_tys = Vec::new();
-                        let mut seen_variants = std::collections::HashSet::new();
+                        let mut seen_variants = std::collections::HashMap::new();
                         for variant in variants {
                             let variant_name = self.get_span_text(variant.name);
-                            if !seen_variants.insert(variant_name) {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("Duplicate variant `{}` in enum", variant_name)).with_code(DiagnosticCode::DuplicateDefinition).with_span(variant.name));
+                            if let Some(&previous) = seen_variants.get(variant_name) {
+                                self.ctx.diagnostics.push(crate::symbol::duplicate_definition_diagnostic(variant.name, previous, format!("Duplicate variant `{}` in enum", variant_name)));
+                            } else {
+                                seen_variants.insert(variant_name, variant.name);
                             }
                             // Each variant's type is based on its fields
                             let mut field_tys = Vec::new();
@@ -1816,6 +1872,7 @@ impl<'a> TypeChecker<'a> {
                             if coherence_res.is_ok() {
                                 self.ctx.tables.trait_impl_entries.push(crate::semantic_tables::TraitImplEntry {
                                     decl_id: Some(*decl_id),
+                                    definition_span: Some(span),
                                     trait_id: trait_sym,
                                     self_type: self_sem_ty,
                                     generic_params: gp_syms.clone(),
@@ -2159,7 +2216,7 @@ impl<'a> TypeChecker<'a> {
             if !valid {
                 self.ctx.diagnostics.push(Diagnostic::error(format!(
                     "invalid declaration for memory intrinsic `{}`: expected an unsafe, bodyless, non-variadic intrinsic with the canonical generic signature", item.name()))
-                    .with_code(DiagnosticCode::InvalidAnnotation)
+                    .with_code(DiagnosticCode::InvalidAttributeApplication).in_phase(luna_common::diagnostic::DiagnosticPhase::TypeChecker)
                     .with_span(self.ctx.symbol_table.get_symbol(symbol).span));
             }
         }
@@ -2230,9 +2287,10 @@ impl<'a> TypeChecker<'a> {
                                 self.ctx.const_values.insert(sym_id, val);
                             }
                         }
-                        Err(e) => {
-                            let span = self.get_expr_span_for_diag(&init).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                            self.report_comptime_error(e, span, "cannot evaluate constant in comptime");
+                        Err(_) => {
+                            // Diagnostic ownership: the main declaration pass reports a
+                            // constant-evaluation failure exactly once. Reporting here as
+                            // well would duplicate the same root cause.
                         }
                     }
                     self.current_scope = previous_scope;
@@ -2915,52 +2973,73 @@ impl<'a> TypeChecker<'a> {
                         ctxt: segments[0].ctxt,
                     };
 
-                    let prefix_ty: Option<SemanticTypeId> = if prefix_segments.len() == 1 && (self.get_span_text(prefix_segments[0]) == "Self" || self.get_span_text(prefix_segments[0]) == "self") {
-                        self.current_self_type
-                    } else {
+                    let prefix_ty: Option<SemanticTypeId> = {
+                        // Resolve the prefix left to right: consume leading
+                        // segments as symbols (module path or type), then project
+                        // any remaining segments as associated types. This keeps
+                        // single-segment and module-qualified paths unchanged
+                        // while allowing chained projections such as
+                        // `Module::Type::Assoc::Nested`.
                         let mut scope = self.current_scope;
-                        let mut prefix_sym = None;
-                        for (i, seg) in prefix_segments.iter().enumerate() {
-                            let seg_name = self.get_span_text(*seg);
-                            let sym_id = if i == 0 {
-                                self.ctx.symbol_table.lookup_with_ctxt(seg_name, seg.ctxt, scope)
-                                    .or_else(|| self.ctx.symbol_table.lookup_with_ctxt(seg_name, seg.ctxt, crate::ScopeId(0)))
+                        let mut resolved: Option<SemanticTypeId> = None;
+                        let mut index = 0usize;
+                        while index < prefix_segments.len() {
+                            let seg_name = self.get_span_text(prefix_segments[index]).to_string();
+                            if index == 0 && (seg_name == "Self" || seg_name == "self") {
+                                resolved = self.current_self_type;
+                                index += 1;
+                                continue;
+                            }
+                            let sym_id = if index == 0 {
+                                self.ctx.symbol_table.lookup_with_ctxt(&seg_name, prefix_segments[index].ctxt, scope)
+                                    .or_else(|| self.ctx.symbol_table.lookup_with_ctxt(&seg_name, prefix_segments[index].ctxt, crate::ScopeId(0)))
                             } else {
-                                self.ctx.symbol_table.lookup_exact_with_ctxt(seg_name, seg.ctxt, scope)
+                                self.ctx.symbol_table.lookup_exact_with_ctxt(&seg_name, prefix_segments[index].ctxt, scope)
                             };
-                            if let Some(id) = sym_id {
-                                prefix_sym = Some(id);
-                                if let Some(inner) = self.ctx.symbol_table.symbols[id.0 as usize].inner_scope {
-                                    scope = inner;
-                                } else if i < prefix_segments.len() - 1 {
-                                    prefix_sym = None;
-                                    break;
+                            let Some(id) = sym_id else { break };
+                            let is_last = index + 1 == prefix_segments.len();
+                            let inner_scope = self.ctx.symbol_table.symbols[id.0 as usize].inner_scope;
+                            if is_last {
+                                let is_type_param = matches!(self.ctx.symbol_table.get_symbol(id).kind, crate::SymbolKind::TypeParam);
+                                if is_type_param {
+                                    resolved = Some(self.ctx.types.intern(SemanticType::GenericParam(id)));
+                                } else if let Some(base_ty) = self.ctx.tables.symbol_types.get(&id).copied() {
+                                    resolved = Some(if generic_args.is_empty() {
+                                        base_ty
+                                    } else {
+                                        self.instantiate_generic_named_type(id, base_ty, generic_args)
+                                    });
                                 }
+                                index += 1;
                             } else {
-                                prefix_sym = None;
+                                // A non-final segment is only a path component
+                                // when it names a module; a type (or type
+                                // parameter) ends the symbol walk and the
+                                // remaining segments become projections.
+                                let kind = self.ctx.symbol_table.get_symbol(id).kind.clone();
+                                if matches!(kind, crate::SymbolKind::Module) {
+                                    if let Some(inner) = inner_scope {
+                                        scope = inner;
+                                        index += 1;
+                                        continue;
+                                    }
+                                }
+                                resolved = if let crate::SymbolKind::TypeParam = kind {
+                                    Some(self.ctx.types.intern(SemanticType::GenericParam(id)))
+                                } else {
+                                    self.ctx.tables.symbol_types.get(&id).copied()
+                                };
+                                index += 1;
                                 break;
                             }
                         }
-
-                        if let Some(sym) = prefix_sym {
-                            let sym_kind = self.ctx.symbol_table.get_symbol(sym).kind.clone();
-                            if let crate::SymbolKind::TypeParam = sym_kind {
-                                Some(self.ctx.types.intern(SemanticType::GenericParam(sym)))
-                            } else {
-                                let base_ty = self.ctx.tables.symbol_types.get(&sym).copied();
-                                if let Some(base_ty) = base_ty {
-                                    if generic_args.is_empty() {
-                                        Some(base_ty)
-                                    } else {
-                                        Some(self.instantiate_generic_named_type(sym, base_ty, generic_args))
-                                    }
-                                } else {
-                                    None
-                                }
-                            }
-                        } else {
-                            None
+                        while index < prefix_segments.len() {
+                            let Some(self_ty) = resolved else { break };
+                            let assoc = self.get_span_text(prefix_segments[index]).to_string();
+                            resolved = Some(self.lower_associated_type_projection(self_ty, &assoc, span));
+                            index += 1;
                         }
+                        resolved
                     };
 
                     if let Some(self_ty) = prefix_ty {
@@ -3085,7 +3164,7 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             Type::MacroCall { span, .. } => {
-                self.ctx.diagnostics.push(Diagnostic::error("internal compiler error: unexpanded macro call in type position").with_code(DiagnosticCode::InvalidSyntax).with_span(*span));
+                self.ctx.diagnostics.push(Diagnostic::invariant_error("internal compiler error: unexpanded macro call in type position").with_span(*span));
                 self.ctx.types.intern(SemanticType::Error)
             }
             Type::Typeof { expr } => {
@@ -3095,7 +3174,7 @@ impl<'a> TypeChecker<'a> {
                 self.ctx.types.intern(SemanticType::Never)
             }
             other => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("Unsupported or unrecognized type construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax));
+                self.ctx.diagnostics.push(Diagnostic::invariant_error(format!("Unrecognized internal type construct in semantic phase: {:?}", other)));
                 self.ctx.types.intern(SemanticType::Error)
             }
         };
@@ -3107,14 +3186,19 @@ impl<'a> TypeChecker<'a> {
         match item {
             Item::Decl(decl_id) => {
                 let decl = &self.arena.decls[decl_id.0 as usize];
+                let previous_anchor = self.declaration_anchor;
+                if let Some(symbol) = self.ctx.tables.decl_symbols.get(decl_id) {
+                    self.declaration_anchor = Some(self.ctx.symbol_table.get_symbol(*symbol).span);
+                }
+                self.validate_attribute_application(decl);
                 match decl {
-                    Decl::Function { name, params, body, is_async, return_type, is_unsafe, .. } => {
+                    Decl::Function { annotations, name, params, body, is_async, return_type, is_unsafe, .. } => {
                         self.comptime_prepared_functions.insert(*decl_id);
                         let prev_scope = self.current_scope;
                         let mut is_main = false;
                         if let Some(sym_id) = self.ctx.tables.decl_symbols.get(decl_id).copied() {
                             let sym = self.ctx.symbol_table.get_symbol(sym_id);
-                            if sym.name == "main" {
+                            if self.ctx.symbol_table.is_program_entry(sym_id) {
                                 is_main = true;
                             }
                             if let Some(inner) = sym.inner_scope {
@@ -3139,6 +3223,17 @@ impl<'a> TypeChecker<'a> {
 
                         let mut is_valid_main = false;
                         if is_main {
+                            // The entry symbol is compiler-owned; a user `#[link]`
+                            // annotation must not rename `main` away from it.
+                            for annot in annotations {
+                                if self.get_span_text(annot.name) == "link" {
+                                    self.ctx.diagnostics.push(
+                                        Diagnostic::error("`#[link]` cannot be applied to the program entry `main`")
+                                            .with_code(DiagnosticCode::InvalidAttributeApplication).in_phase(luna_common::diagnostic::DiagnosticPhase::TypeChecker)
+                                            .with_span(annot.name),
+                                    );
+                                }
+                            }
                             let mut valid = true;
                             if *is_async {
                                 valid = false;
@@ -3348,7 +3443,9 @@ impl<'a> TypeChecker<'a> {
                         self.current_self_type = Some(self_sem_ty);
                         for method_id in methods {
                             let method_decl = &self.arena.decls[method_id.0 as usize];
-                            if let Decl::Function { body: Some(body_stmt), is_async, return_type, is_unsafe, .. } = method_decl {
+                            if let Decl::Function { name, body: Some(body_stmt), is_async, return_type, is_unsafe, .. } = method_decl {
+                                let previous_method_anchor = self.declaration_anchor;
+                                self.declaration_anchor = Some(*name);
                                 let prev_method_scope = self.current_scope;
                                 // Enter method scope
                                 if let Some(sym_id) = self.ctx.tables.decl_symbols.get(method_id).copied() {
@@ -3378,6 +3475,7 @@ impl<'a> TypeChecker<'a> {
                                 self.is_unsafe_context = prev_unsafe;
                                 self.current_async_fn = prev_async;
                                 self.current_scope = prev_method_scope;
+                                self.declaration_anchor = previous_method_anchor;
                             }
                         }
                         self.current_self_type = prev_self;
@@ -3418,6 +3516,7 @@ impl<'a> TypeChecker<'a> {
                     }
                     _ => {}
                 }
+                self.declaration_anchor = previous_anchor;
             }
             Item::Stmt(stmt_id) => {
                 self.typecheck_stmt(stmt_id);
@@ -3449,7 +3548,13 @@ impl<'a> TypeChecker<'a> {
                 let resolved_ty = self.ctx.types.get(ty).clone();
                 if let SemanticType::Tuple(elem_tys) = resolved_ty {
                     if elements.len() != elem_tys.len() {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("Tuple pattern has {} elements, but tuple type has {}", elements.len(), elem_tys.len())).with_code(DiagnosticCode::TypeMismatch));
+                        // DIAG-2: anchor the diagnostic at the pattern that
+                        // produced it instead of emitting a span-less error.
+                        let mut diag = Diagnostic::error(format!("Tuple pattern has {} elements, but tuple type has {}", elements.len(), elem_tys.len())).with_code(DiagnosticCode::TypeMismatch);
+                        if let Some(span) = self.pattern_elements_primary_span(elements) {
+                            diag = diag.with_span(span);
+                        }
+                        self.ctx.diagnostics.push(diag);
                     }
                     for (i, elem) in elements.iter().enumerate() {
                         if i < elem_tys.len() {
@@ -3647,15 +3752,17 @@ impl<'a> TypeChecker<'a> {
             }
             _ => {
                 let trait_name = self.ctx.symbol_table.get_symbol(trait_id).name.clone();
-                self.ctx.diagnostics.push(
-                    Diagnostic::error(format!(
+                let mut diagnostic = Diagnostic::source_error(DiagnosticCode::ConflictingTraitImpl, span, format!(
                         "Multiple implementations of language protocol `{}` match `{:?}`",
                         trait_name,
                         self.ctx.types.get(self_ty),
-                    ))
-                    .with_code(DiagnosticCode::ConflictingTraitImpl)
-                    .with_span(span),
-                );
+                    ));
+                for (entry, _) in &matches {
+                    if let Some(candidate) = entry.definition_span {
+                        diagnostic = diagnostic.with_related(candidate, "candidate implementation");
+                    }
+                }
+                self.ctx.diagnostics.push(diagnostic);
                 None
             }
         }
@@ -3911,7 +4018,9 @@ impl<'a> TypeChecker<'a> {
                 let cond_ty = self.typecheck_expr(condition);
                 let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                 if self.unify(bool_ty, cond_ty).is_err() {
-                    self.ctx.diagnostics.push(Diagnostic::error("if condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
+                    let mut diag = Diagnostic::error("if condition must be a boolean").with_code(DiagnosticCode::TypeMismatch);
+                    if let Some(span) = self.get_expr_span_for_diag(condition) { diag = diag.with_span(span); }
+                    self.ctx.diagnostics.push(diag);
                 }
                 self.typecheck_stmt(then_branch);
                 if let Some(else_br) = else_branch {
@@ -3922,7 +4031,9 @@ impl<'a> TypeChecker<'a> {
                 let cond_ty = self.typecheck_expr(condition);
                 let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                 if self.unify(bool_ty, cond_ty).is_err() {
-                    self.ctx.diagnostics.push(Diagnostic::error("while condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
+                    let mut diag = Diagnostic::error("while condition must be a boolean").with_code(DiagnosticCode::TypeMismatch);
+                    if let Some(span) = self.get_expr_span_for_diag(condition) { diag = diag.with_span(span); }
+                    self.ctx.diagnostics.push(diag);
                 }
                 self.loop_depth += 1;
                 self.typecheck_stmt(body);
@@ -3934,7 +4045,9 @@ impl<'a> TypeChecker<'a> {
                     let cond_ty = self.typecheck_expr(c); 
                     let bool_ty = self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool));
                     if self.unify(bool_ty, cond_ty).is_err() {
-                        self.ctx.diagnostics.push(Diagnostic::error("for condition must be a boolean").with_code(DiagnosticCode::TypeMismatch));
+                        let mut diag = Diagnostic::error("for condition must be a boolean").with_code(DiagnosticCode::TypeMismatch);
+                        if let Some(span) = self.get_expr_span_for_diag(c) { diag = diag.with_span(span); }
+                        self.ctx.diagnostics.push(diag);
                     }
                 }
                 if let Some(s) = step { self.typecheck_expr(s); }
@@ -3976,7 +4089,13 @@ impl<'a> TypeChecker<'a> {
                 } else {
                     let void_ty = self.ctx.types.intern(SemanticType::Void);
                     if let Err(e) = self.unify(expected_ty, void_ty) {
-                        self.ctx.diagnostics.push(Diagnostic::error(e).with_code(DiagnosticCode::TypeMismatch).with_span(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0)));
+                        // The error is the declaration's non-void return contract;
+                        // a bare return has no expression span in the canonical AST.
+                        let diagnostic = match self.declaration_anchor {
+                            Some(span) => Diagnostic::source_error(DiagnosticCode::TypeMismatch, span, e),
+                            None => Diagnostic::invariant_error("bare-return mismatch has no enclosing declaration source identity"),
+                        };
+                        self.ctx.diagnostics.push(diagnostic);
                     }
                 }
             }
@@ -4004,8 +4123,13 @@ impl<'a> TypeChecker<'a> {
                     );
                 }
             }
-            other => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("Unsupported or unrecognized statement construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax));
+            Stmt::Comptime { body } => {
+                let span = self.statement_primary_span(*body).unwrap_or_else(|| {
+                    let file = self.ctx.current_file_id.unwrap_or(luna_common::ids::FileId(0));
+                    let end = self.source_manager.get_file(file).map_or(0, |source| source.source.len() as u32);
+                    luna_common::Span::new(file, 0, end)
+                });
+                self.ctx.diagnostics.push(crate::comptime::reject_statement(span));
             }
         }
     }
@@ -4076,10 +4200,10 @@ impl<'a> TypeChecker<'a> {
     }
 
     fn typecheck_integer_literal_at(&mut self, span: luna_common::Span, text: &str, negative: bool) -> SemanticTypeId {
-        let decoded = match luna_lexer::literal::decode_integer(text) {
+        let decoded = match luna_parser::decode_integer_literal(text, span) {
             Ok(value) => value,
-            Err(message) => {
-                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_INTEGER_LITERAL: {message}")).with_code(DiagnosticCode::InvalidSyntax).with_span(span));
+            Err(diagnostic) => {
+                self.ctx.diagnostics.push(diagnostic);
                 return self.ctx.types.error_id();
             }
         };
@@ -4118,7 +4242,7 @@ impl<'a> TypeChecker<'a> {
                 let kind = match tok.kind {
                     TokenKind::IntegerLiteral => return self.typecheck_integer_literal(*expr_id, text, false),
                     TokenKind::ByteLiteral | TokenKind::ByteStringLiteral => {
-                        match luna_lexer::literal::decode_bytes(text, tok.kind == TokenKind::ByteLiteral) {
+                        match luna_parser::decode_byte_literal(text, tok.kind == TokenKind::ByteLiteral, tok.span) {
                             Ok(bytes) => {
                                 let byte_ty = self.ctx.types.intern(SemanticType::Primitive(BuiltinType::U8));
                                 let ty = if tok.kind == TokenKind::ByteLiteral { byte_ty } else {
@@ -4127,8 +4251,8 @@ impl<'a> TypeChecker<'a> {
                                 self.ctx.tables.expr_types.insert(*expr_id, ty);
                                 return ty;
                             }
-                            Err(message) => {
-                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_BYTE_LITERAL: {message}")).with_code(DiagnosticCode::InvalidSyntax).with_span(tok.span));
+                            Err(diagnostic) => {
+                                self.ctx.diagnostics.push(diagnostic);
                                 return self.ctx.types.error_id();
                             }
                         }
@@ -4146,7 +4270,7 @@ impl<'a> TypeChecker<'a> {
                     TokenKind::CharLiteral => SemanticType::Primitive(BuiltinType::Char),
                     TokenKind::KwTrue | TokenKind::KwFalse => SemanticType::Primitive(BuiltinType::Bool),
                     _ => {
-                        self.ctx.diagnostics.push(Diagnostic::error(format!("Unrecognized literal token '{:?}'", tok.kind)).with_code(DiagnosticCode::InvalidSyntax).with_span(tok.span));
+                        self.ctx.diagnostics.push(Diagnostic::invariant_error(format!("Unrecognized internal literal token '{:?}'", tok.kind)).with_span(tok.span));
                         SemanticType::Error
                     },
                 };
@@ -4154,6 +4278,17 @@ impl<'a> TypeChecker<'a> {
             }
             Expr::Identifier { generic_args, .. } => {
                 if let Some(sym_id) = self.ctx.tables.expr_symbols.get(expr_id).copied() {
+                    let symbol = self.ctx.symbol_table.get_symbol(sym_id);
+                    if matches!(symbol.kind, crate::SymbolKind::Macro) {
+                        let span = self.get_expr_span_for_diag(expr_id).unwrap_or(symbol.span);
+                        self.ctx.diagnostics.push(Diagnostic::source_error(
+                            DiagnosticCode::TypeMismatch, span,
+                            format!("macro '{}' cannot be used as a value", symbol.name))
+                            .in_phase(luna_common::diagnostic::DiagnosticPhase::TypeChecker));
+                        let error = self.ctx.types.error_id();
+                        self.ctx.tables.expr_types.insert(*expr_id, error);
+                        return error;
+                    }
                     let mut base_ty = None;
                     if let Some(ty) = self.ctx.tables.symbol_types.get(&sym_id) {
                         base_ty = Some(*ty);
@@ -4746,6 +4881,15 @@ impl<'a> TypeChecker<'a> {
                 let obj_ty_id = self.ctx.types.resolve_inference(obj_ty_id);
                 let obj_ty = self.ctx.types.get(obj_ty_id).clone();
                 let member_name = self.get_span_text(*member);
+
+                // DIAG-5: an operand whose type is already poisoned by an earlier
+                // failing boundary carries SemanticType::Error. Containment keeps
+                // the root cause as the single report instead of cascading a
+                // second member-access error from the poisoned value.
+                if matches!(obj_ty, SemanticType::Error) {
+                    self.ctx.tables.expr_types.insert(*expr_id, self.ctx.types.error_id());
+                    return self.ctx.types.error_id();
+                }
                 
                 // 1. Check if obj_ty is DynTrait or pointer/ref to DynTrait
                 let dyn_trait_sym = match &obj_ty {
@@ -5190,7 +5334,9 @@ impl<'a> TypeChecker<'a> {
                     if i == 0 {
                         elem_ty = ty;
                     } else if self.unify(elem_ty, ty).is_err() {
-                        self.ctx.diagnostics.push(Diagnostic::error("Array literal elements must have the same type").with_code(DiagnosticCode::TypeMismatch));
+                        let mut diag = Diagnostic::error("Array literal elements must have the same type").with_code(DiagnosticCode::TypeMismatch);
+                        if let Some(span) = self.get_expr_span_for_diag(el) { diag = diag.with_span(span); }
+                        self.ctx.diagnostics.push(diag);
                     }
                 }
                 self.ctx.types.intern(SemanticType::Array(elem_ty, elements.len() as u64))
@@ -6037,7 +6183,20 @@ impl<'a> TypeChecker<'a> {
                             inner_ty
                         }
                     }
-                    UnaryOp::Not | UnaryOp::BitNot | UnaryOp::PostInc | UnaryOp::PostDec => {
+                    UnaryOp::Not => {
+                        let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
+                        match self.ctx.types.get(inner_ty) {
+                            SemanticType::Primitive(crate::ty::BuiltinType::Bool) => {
+                                self.ctx.types.intern(SemanticType::Primitive(crate::ty::BuiltinType::Bool))
+                            }
+                            SemanticType::Error => self.ctx.types.error_id(),
+                            _ => {
+                                self.ctx.diagnostics.push(Diagnostic::error(format!("E_INVALID_UNARY_OP: Cannot apply unary operator `!` to type `{:?}`", self.ctx.types.get(inner_ty))).with_code(DiagnosticCode::InvalidUnaryOp).with_span(span));
+                                self.ctx.types.error_id()
+                            }
+                        }
+                    }
+                    UnaryOp::BitNot | UnaryOp::PostInc | UnaryOp::PostDec => {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                         self.ctx.diagnostics.push(Diagnostic::error(format!("Unary operator `{:?}` is not yet supported", op)).with_code(DiagnosticCode::InvalidUnaryOp).with_span(span));
                         self.ctx.types.intern(SemanticType::Error)
@@ -6060,7 +6219,7 @@ impl<'a> TypeChecker<'a> {
                 }
             }
             other => {
-                let mut diag = Diagnostic::error(format!("Unsupported or unrecognized expression construct in semantic phase: {:?}", other)).with_code(DiagnosticCode::InvalidSyntax);
+                let mut diag = Diagnostic::invariant_error(format!("Unrecognized internal expression construct in semantic phase: {:?}", other));
                 if let Some(span) = self.get_expr_span_for_diag(expr_id) {
                     diag.span = Some(span);
                 }
@@ -6139,6 +6298,43 @@ impl<'a> TypeChecker<'a> {
         }
     }
 
+    fn statement_primary_span(&self, statement: luna_ast::StmtId) -> Option<luna_common::Span> {
+        match &self.arena.stmts[statement.0 as usize] {
+            Stmt::Block { body, tail_expr } => body.iter().find_map(|item| match item {
+                Item::Stmt(statement) => self.statement_primary_span(*statement),
+                Item::Decl(declaration) => self.ctx.tables.decl_symbols.get(declaration)
+                    .map(|symbol| self.ctx.symbol_table.get_symbol(*symbol).span),
+            }).or_else(|| tail_expr.and_then(|expression| self.get_expr_span_for_diag(&expression))),
+            Stmt::Expr { expr, .. } => self.get_expr_span_for_diag(expr),
+            Stmt::Return { value } => value.and_then(|expression| self.get_expr_span_for_diag(&expression)),
+            Stmt::If { condition, .. } | Stmt::While { condition, .. } => self.get_expr_span_for_diag(condition),
+            Stmt::For { iterable, cond, body, .. } => iterable.or(*cond)
+                .and_then(|expression| self.get_expr_span_for_diag(&expression))
+                .or_else(|| self.statement_primary_span(*body)),
+            Stmt::Break { span, .. } | Stmt::Continue { span, .. } => Some(*span),
+            Stmt::Unsafe { body } | Stmt::Comptime { body } => self.statement_primary_span(*body),
+        }
+    }
+
+    /// DIAG-2: the primary span of a pattern so source diagnostics are anchored
+    /// at the construct that produced them rather than being emitted span-less.
+    fn pattern_primary_span(&self, pattern: &luna_ast::Pattern) -> Option<luna_common::Span> {
+        match pattern {
+            luna_ast::Pattern::Wildcard => None,
+            luna_ast::Pattern::Literal(token) => Some(token.span),
+            luna_ast::Pattern::Identifier { segments } => segments.first().copied(),
+            luna_ast::Pattern::Enum { path, .. } => path.first().copied(),
+            luna_ast::Pattern::Struct { path, .. } => path.first().copied(),
+            luna_ast::Pattern::Tuple { elements, .. } => self.pattern_elements_primary_span(elements),
+        }
+    }
+
+    fn pattern_elements_primary_span(&self, elements: &[luna_ast::PatId]) -> Option<luna_common::Span> {
+        elements
+            .iter()
+            .find_map(|element| self.pattern_primary_span(&self.arena.pats[element.0 as usize]))
+    }
+
     fn get_expr_span_for_diag(&self, expr_id: &luna_ast::ExprId) -> Option<luna_common::Span> {
         let expr = self.arena.exprs.get(expr_id.0 as usize)?;
         match expr {
@@ -6153,12 +6349,26 @@ impl<'a> TypeChecker<'a> {
             Expr::Member { member, .. } => Some(*member),
             Expr::Binary { left, .. } => self.get_expr_span_for_diag(left),
             Expr::Assign { lvalue, .. } => self.get_expr_span_for_diag(lvalue),
+            Expr::ArrayLiteral { elements } | Expr::TupleLiteral { elements } =>
+                elements.iter().find_map(|element| self.get_expr_span_for_diag(element)),
+            Expr::Lambda { params, body, .. } => params.iter().find_map(|parameter| {
+                match &self.arena.decls[parameter.0 as usize] {
+                    Decl::Param { name, .. } => Some(*name),
+                    _ => None,
+                }
+            }).or_else(|| self.statement_primary_span(*body)),
+            Expr::Comptime { body } => self.statement_primary_span(*body),
+            Expr::Sizeof { target_type } | Expr::Alignof { target_type } => {
+                match &self.arena.types[target_type.0 as usize] {
+                    luna_ast::Type::Named { segments, .. } => segments.first().copied(),
+                    _ => None,
+                }
+            }
             Expr::StructInit { path, .. } => path.first().copied(),
             Expr::Match { match_span, .. } => Some(*match_span),
             Expr::MacroCall { span, .. } => Some(*span),
             Expr::Try { try_span, .. } => Some(*try_span),
-            _ => None,
-        }
+        }.or(self.declaration_anchor)
     }
 
     pub fn is_place(expr: &Expr) -> bool {
@@ -6272,5 +6482,70 @@ impl<'a> TypeChecker<'a> {
         } else {
             true
         }
+    }
+}
+
+/// A comptime failure may only be suppressed as redundant when at least one
+/// error-level diagnostic is already visible to the user; otherwise the
+/// compiler must fail closed rather than drop the failure silently.
+/// DIAG-8: `E2001` (TypeMismatch) is owned by the TypeChecker phase. Other
+/// passes that detect a type mismatch construct it through this constructor.
+pub fn type_mismatch_diagnostic(message: String, span: luna_common::Span) -> Diagnostic {
+    Diagnostic::error(message)
+        .with_code(DiagnosticCode::TypeMismatch)
+        .with_span(span)
+}
+
+/// DIAG-8: `E2016` (LifetimeConstraintViolation) is owned by the TypeChecker
+/// phase; the borrow checker routes its structured region failures here rather
+/// than constructing the diagnostic itself. A missing span is left absent rather
+/// than fabricating a placeholder location.
+pub fn lifetime_constraint_violation(
+    message: String,
+    span: Option<luna_common::Span>,
+) -> Diagnostic {
+    let diagnostic = Diagnostic::error(message)
+        .with_code(DiagnosticCode::LifetimeConstraintViolation);
+    match span {
+        Some(span) => diagnostic.with_span(span),
+        None => diagnostic,
+    }
+}
+
+fn any_error_emitted(diagnostics: &[luna_common::Diagnostic]) -> bool {
+    diagnostics
+        .iter()
+        .any(|diagnostic| matches!(diagnostic.level, luna_common::DiagnosticLevel::Error))
+}
+
+#[cfg(test)]
+mod comptime_failure_completeness_tests {
+    use super::any_error_emitted;
+    use luna_common::ids::FileId;
+    use luna_common::{Diagnostic, DiagnosticCode, Span};
+
+    fn span() -> Span {
+        Span::new(FileId(0), 0, 1)
+    }
+
+    #[test]
+    fn suppression_requires_a_visible_error_level_root_diagnostic() {
+        let empty: Vec<Diagnostic> = Vec::new();
+        assert!(!any_error_emitted(&empty), "no failure may be suppressed with an empty list");
+
+        let warnings_only = vec![Diagnostic {
+            level: luna_common::DiagnosticLevel::Warning,
+            code: None,
+            span: None,
+            message: String::from("just a warning"),
+            related: Vec::new(),
+            contract_diagnostic: false,
+        }];
+        assert!(!any_error_emitted(&warnings_only), "warnings do not justify suppression");
+
+        let with_error = vec![Diagnostic::error("Method `not_a_method` not found")
+            .with_code(DiagnosticCode::UnresolvedSymbol)
+            .with_span(span())];
+        assert!(any_error_emitted(&with_error), "a visible error justifies suppression");
     }
 }

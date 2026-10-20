@@ -55,6 +55,17 @@ fn actual_objects_match_target_contract_and_mismatches_reject_before_use() {
         &header.target_triple[..manifest.target.target_triple.len()],
         manifest.target.target_triple.as_bytes()
     );
+    // R5-FU-TARGET-01: the artifact records the canonical Luna release triple,
+    // never the host's LLVM spelling.
+    #[cfg(all(windows, target_arch = "x86_64"))]
+    assert_eq!(manifest.target.target_triple, "x86_64-pc-windows-gnu");
+    #[cfg(all(target_os = "linux", target_arch = "x86_64"))]
+    assert_eq!(manifest.target.target_triple, "x86_64-unknown-linux-gnu");
+    if matches!(manifest.target.target_triple.as_str(),
+        "x86_64-pc-windows-gnu" | "x86_64-unknown-linux-gnu") {
+        assert_eq!(manifest.target.cpu, "generic");
+        assert!(manifest.target.features.is_empty());
+    }
     let object = &baseline[section(&baseline, SectionType::ObjectCode)];
     assert!(!manifest.target.abi.is_empty());
     assert_eq!(manifest.target.pointer_width, usize::BITS as u8);
@@ -151,6 +162,13 @@ fn actual_objects_match_target_contract_and_mismatches_reject_before_use() {
             fs::write(destination.with_extension("obj"), stale).unwrap();
         } else if case == "header" {
             invalid[10] = b'X';
+        } else if case == "features" {
+            // The release baseline has no optional host features. Change the
+            // serialized field structurally; searching for an empty byte
+            // needle cannot identify the field or test strict target identity.
+            invalid = payload::change_manifest(&baseline, |manifest| {
+                manifest.target.features.push_str("+avx");
+            });
         } else if case == "object" || case == "invalid_object" {
             let range = section(&baseline, SectionType::ObjectCode);
             if case == "object" {

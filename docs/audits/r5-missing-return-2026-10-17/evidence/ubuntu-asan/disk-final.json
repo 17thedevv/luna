@@ -1,0 +1,16 @@
+{
+  "gate": "disk-final",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "df",
+    "-h"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan",
+  "started_utc": "2026-10-17T12:18:37Z",
+  "exit": 0,
+  "seconds": 0.003731131000002108,
+  "log_sha256": "453feedf6aa8af31a63cf35d176f5f6b650ff60020e83231ad4cc50e4c5ea31f",
+  "status": "PASS",
+  "log": "disk-final.log.gz",
+  "compressed_sha256": "705f90a251484e5f8617babb571c4f8571108f5e05a545074404aa4d8ec9b90b"
+}

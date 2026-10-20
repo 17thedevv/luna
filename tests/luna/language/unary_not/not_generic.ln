@@ -1,0 +1,5 @@
+fn invert<T>(flag: bool, tag: T) -> bool { return !flag; }
+fn main() -> i32 {
+    if invert<i32>(false, 7) { return 0; }
+    return 1;
+}

@@ -4,7 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join("luna_p2a_tests").join(name);
+    let dir = luna_test_support::owned_temp_root().join("luna_p2a_tests").join(name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir
@@ -259,7 +259,7 @@ fn test_case_12_comptime_div_by_zero_fails_without_fallback() {
     assert!(div_err.is_some(), "Expected division by zero error, got: {:?}", diags);
 }
 
-// 13. Step limit exhaustion triggers E_COMPTIME_STEP_LIMIT with zero runtime fallback
+// 13. Step limit exhaustion triggers the registered E4002 with zero runtime fallback
 #[test]
 fn test_case_13_comptime_step_limit_exceeded() {
     let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
@@ -284,11 +284,14 @@ fn test_case_13_comptime_step_limit_exceeded() {
     };
     let (success, diags) = run_compiler_with_options("test_13", src, options);
     assert!(!success, "Expected step limit failure");
-    let limit_err = diags.iter().find(|d| d.message.contains("E_COMPTIME_STEP_LIMIT"));
-    assert!(limit_err.is_some(), "Expected E_COMPTIME_STEP_LIMIT error, got: {:?}", diags);
+    // The registered code for this condition is E4002; the message carries the
+    // condition, never a code-like name of its own.
+    let limit_err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::ComptimeStepLimitExceeded));
+    assert!(limit_err.is_some(), "Expected E4002 step limit error, got: {:?}", diags);
+    assert!(limit_err.unwrap().message.contains("step limit exceeded"), "{:?}", limit_err.unwrap().message);
 }
 
-// 14. Call recursion depth limit triggers E_COMPTIME_RECURSION_LIMIT
+// 14. Call recursion depth limit is reported as the general comptime evaluation failure
 #[test]
 fn test_case_14_comptime_recursion_limit_exceeded() {
     let test_sysroot = Sysroot::discover_for_test().expect("Failed to locate test sysroot");
@@ -313,8 +316,13 @@ fn test_case_14_comptime_recursion_limit_exceeded() {
     };
     let (success, diags) = run_compiler_with_options("test_14", src, options);
     assert!(!success, "Expected recursion limit failure");
-    let depth_err = diags.iter().find(|d| d.message.contains("E_COMPTIME_RECURSION_LIMIT"));
-    assert!(depth_err.is_some(), "Expected E_COMPTIME_RECURSION_LIMIT error, got: {:?}", diags);
+    // No registered code covers the call-recursion limit, so the condition stays
+    // typed as the general comptime evaluation failure with its own message.
+    let depth_err = diags.iter().find(|d| {
+        d.code == Some(luna_common::DiagnosticCode::ComptimeEvaluationFailed)
+            && d.message.contains("recursion limit exceeded")
+    });
+    assert!(depth_err.is_some(), "Expected recursion limit error, got: {:?}", diags);
 }
 
 // 15. Pointer escape from comptime is rejected with the canonical LocalBorrowEscape code
@@ -381,7 +389,7 @@ fn test_case_17_comptime_await_forbidden() {
     assert!(await_err.is_some(), "Expected await forbidden error, got: {:?}", diags);
 }
 
-// 18. Closure escape from comptime is rejected with E_COMPTIME_RESOURCE_ESCAPE
+// 18. Closure escape from comptime is rejected with the registered E4003
 #[test]
 fn test_case_18_comptime_closure_escape_rejected() {
     let src = r#"
@@ -395,8 +403,16 @@ fn test_case_18_comptime_closure_escape_rejected() {
     "#;
     let (success, diags) = run_compiler("test_18", src);
     assert!(!success, "Expected closure escape to be rejected");
-    let esc_err = diags.iter().find(|d| d.message.contains("E_COMPTIME_RESOURCE_ESCAPE") || d.message.contains("E_COMPTIME_RESOURCE_LEAK") || d.message.contains("cannot export closure") || d.message.contains("closures and lambdas cannot be evaluated"));
-    assert!(esc_err.is_some(), "Expected resource escape error, got: {:?}", diags);
+    // An escaping compile-time value that cannot be materialized on the runtime
+    // side is typed E4003, whether it is reported as an escape or as retained
+    // compile-time storage at the boundary.
+    let esc_err = diags.iter().find(|d| d.code == Some(luna_common::DiagnosticCode::ComptimeUnserializableEscape));
+    assert!(esc_err.is_some(), "Expected E4003 escape error, got: {:?}", diags);
+    let message = &esc_err.unwrap().message;
+    assert!(
+        message.contains("leaked heap memory") || message.contains("escape") || message.contains("cannot export closure"),
+        "{message}"
+    );
 }
 
 // 19. Reading a moved value in compile-time evaluation is rejected with the canonical UseAfterMove code
@@ -426,7 +442,7 @@ fn test_case_19_comptime_use_of_moved_value() {
     assert!(move_err.is_some(), "Expected UseAfterMove error, got: {:?}", diags);
 }
 
-// 20. Resource leak: unfreed compile-time heap memory is rejected with E_COMPTIME_RESOURCE_LEAK
+// 20. Resource leak: compile-time storage retained at the boundary is typed E4003
 #[test]
 fn test_case_20_comptime_resource_leak() {
     use luna_mvir::interp::MvirInterpreter;
@@ -473,8 +489,17 @@ fn test_case_20_comptime_resource_leak() {
         Ok(())
     };
     assert!(leak_check.is_err(), "Expected resource leak error");
-    let err_str = format!("{}", leak_check.unwrap_err());
-    assert!(err_str.contains("E_COMPTIME_RESOURCE_LEAK"), "Expected E_COMPTIME_RESOURCE_LEAK in: {}", err_str);
+    let err = leak_check.unwrap_err();
+    let err_str = format!("{}", err);
+    assert!(
+        err_str.contains("unfreed heap allocation") || err_str.contains("retained compile-time storage"),
+        "{err_str}"
+    );
+    assert_eq!(
+        err.diagnostic_code(),
+        luna_common::DiagnosticCode::ComptimeUnserializableEscape,
+        "compile-time storage retained at the runtime boundary is typed E4003"
+    );
 }
 
 

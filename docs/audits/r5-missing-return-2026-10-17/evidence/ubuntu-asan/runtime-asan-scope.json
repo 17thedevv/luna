@@ -1,0 +1,11 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "scope": "C runtime and RuntimeAbiTests only; generated Luna/compiler/stdlib are not certified sanitized",
+  "asan_options": "detect_leaks=1:halt_on_error=1",
+  "partial_read_error_cleanup_executed": true,
+  "no_sanitizer_report": true,
+  "linked_libasan": true,
+  "runtime_sha256": "7db0b1b474f3aae91f56bb266f664f26fa00a96480701530b2b9f7ad7eef64d0",
+  "abi_tests_sha256": "21338a0110a132cdab7c04a533635161a50541ccc14339a4ac410a571ab49163",
+  "status": "PASS"
+}

@@ -191,9 +191,10 @@ impl RegionFailure {
                         ))
                     }
                 };
-                diag.code = Some(DiagnosticCode::LifetimeConstraintViolation);
-                diag.span = span;
-                diag
+                // DIAG-8: E2016 is owned by the TypeChecker phase; this bridge
+                // routes the structured region failure through the owner's
+                // constructor instead of building the diagnostic itself.
+                luna_semantic::typechecker::lifetime_constraint_violation(diag.message, span)
             }
         }
     }

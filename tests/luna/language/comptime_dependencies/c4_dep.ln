@@ -1,0 +1,3 @@
+module c4_dep {
+    export fn value() -> i32 { return 1; }
+}

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 fn temp_root(label: &str) -> PathBuf {
-    std::env::temp_dir().join(format!(
+    luna_test_support::owned_temp_root().join(format!(
         "luna_enum_tag_codegen_{label}_{}_{}",
         std::process::id(),
         std::time::SystemTime::now()

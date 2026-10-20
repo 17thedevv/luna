@@ -1,0 +1,16 @@
+{
+  "gate": "asan-instrumentation",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "ldd",
+    "/home/runner/work/_temp/r5-runtime-asan/runtime-asan/abi_tests"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan",
+  "started_utc": "2026-10-17T12:18:34Z",
+  "exit": 0,
+  "seconds": 0.016248837999995658,
+  "log_sha256": "ae10315f1ecd7f95dadb8d36b567d0cec88445897339e4b05cedb70eda6bd42a",
+  "status": "PASS",
+  "log": "asan-instrumentation.log.gz",
+  "compressed_sha256": "1fe4750ee0fea1a85bdda439cd056017f6483b4ad392a8a4b6a91beb1173aed5"
+}

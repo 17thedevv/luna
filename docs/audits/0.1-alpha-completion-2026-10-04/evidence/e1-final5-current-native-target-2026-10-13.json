@@ -1,0 +1,303 @@
+{
+  "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+  "verification": "49 actual fresh COFF object headers + LLIB target headers; native executions separately recorded by final matrix/qualification",
+  "objects": [
+    {
+      "object": "libs\\external\\alloc\\arc.obj",
+      "sha256": "7710ca64f7e25f5e4649146021948a68c582861ed0384190352aea1600f4eb3f",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\binaryheap.obj",
+      "sha256": "ab0e6ac692636e41f3042e53f0cc24532d44d1e94be749ef55f9c7e7ce56b395",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\box.obj",
+      "sha256": "926e8f50dc388f990ac04d594459a467c6e8051b62adfc5219c9a3d73991eafe",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\btreemap.obj",
+      "sha256": "05237211ea40134a10ab9e7e5342f254de9b5d70fe5bdd11d7d221432f57cfaf",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\btreeset.obj",
+      "sha256": "a8d0fd37e8e1f4f3f503e09224e9a41927671839a82439175fd0eea7fcd38422",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\global.obj",
+      "sha256": "a305b83ca889cf4f7db7a1bc9c4ad259675146966d69f97e56d48516e896d3b5",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\hashmap.obj",
+      "sha256": "d98b5dc989bc03d54984fbf4cb8b7a0d97b49ea9725d8ee8bcb58fbeb82a3bd5",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\hashset.obj",
+      "sha256": "c3e38ab4974deb7065fb87ee69e57fa5c6ec3ff1e23a2ed28d5d0e2176665ac1",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\iter_collect.obj",
+      "sha256": "8dcf26c881617aa52fab61c89c91f41be6dfe186fc635cc707d4ad9bfdcaf409",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\raw_table.obj",
+      "sha256": "deea1f26805e910459fd3d10559c7c1e0724998202965aecc61d50ae70671d15",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\rc.obj",
+      "sha256": "8559f011b0b46b4f6179a79e7fe1337f005c19922c7d676ded5e1ff291e876d2",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\string.obj",
+      "sha256": "1d5f616a30200d9c05322d5c8ba65367bd6743bf51a52d182f4f9eeb5d0290d0",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\thread.obj",
+      "sha256": "996d07a1b9cbbc4ebaa961b29d386e0a3e77fedd94acbc694817e90864317dca",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\vec.obj",
+      "sha256": "64eb494789e7117079eca540e81e0fd6f67c2f5910e130b5595bb415cc2e18bd",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\alloc\\vecdeque.obj",
+      "sha256": "3039edd9db79a253430b170254ce0710df5bd14f9239296a595a1c1360da3ee0",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\algo.obj",
+      "sha256": "2824bff60928d9f1f50135fa3a4d9428dac717d9cc520057a0584581e06614c8",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\atomic.obj",
+      "sha256": "d45bebd2bfd8c7fde10c20e37090911723566207cc79d7a841e65203f3793b80",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\cell.obj",
+      "sha256": "2c527e48ed41bfa220f86d495845061afb1008594fb74cd142d7492733ffceb5",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\clone.obj",
+      "sha256": "e54bdfc8a9d53cf6d431e2b8c1c8847d6a6ce3db9d636e2e94e0bc995cc2186a",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\cmp.obj",
+      "sha256": "ab63b7510c2ec4e2020ea06d0632f0445a7821d4e9908c6a6fc10d660871dbeb",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\convert.obj",
+      "sha256": "fcfd99c4bc016dd9147d1d1d2b6e3c1b1aada59fb77988e5a05d80227aedd09c",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\copy.obj",
+      "sha256": "84a40161d15b775ec4948ac18c4ef4200335305e446258534800b9a25b95d33f",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\default.obj",
+      "sha256": "1717128679d4792ec85e281dbeaf299daf216fc479434833b8a3fa88d57d2add",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\float.obj",
+      "sha256": "8ed340f0f295179cc21139deceeec5bcc22e5a6153191b69c3098c01b8ea8000",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\fmt.obj",
+      "sha256": "2880427bc9f10b3adf3cde9ed202911f74001ae5d033c805290465ce86b37af4",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\hash.obj",
+      "sha256": "35481e8e0377aa3f666e29ac7f2a73f2ad2712c7a032f7921127b47a3cb91590",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\iter_adapters.obj",
+      "sha256": "7af41bf2629e27c2ee3d0e8e38c1247fa6021ee4cbad99eac514035d6bcaaf3c",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\iter_consumers.obj",
+      "sha256": "63844c72553760887a3d2955501b3eb865f9821d9be013a02f23e838f4ae51d6",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\mem.obj",
+      "sha256": "feddfe0912d845920668f60ea0d0182e1f7a87454d25d90cc3c91414614390f9",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\num.obj",
+      "sha256": "b10d6ba492532aa041056c4b641d8c5fab3a3525ad5b6d23018471a280f3c8ad",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\panic.obj",
+      "sha256": "dc6ce091565f20df39ba74ff1172334b523a2283982240267e43a18a56d53594",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\ptr.obj",
+      "sha256": "fe4babcd5078a986e9b1acc1c6f9847d0383d682a218137da777dc5dabfb90d1",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\random.obj",
+      "sha256": "cf92c636c097e803bbac563fa5f877bd42a3c0edf68680827485bd212a207243",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\result.obj",
+      "sha256": "9b35246c5c0a78407d16640a2712673495e36e0f65ad4f41dd974993532b258b",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\slice.obj",
+      "sha256": "69591415cf118040c50a0df432763277332a5d87cca8dc449bc6151093d5bf45",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\sync.obj",
+      "sha256": "adbe46691b91ef20061b7ddd70e4bc2e3843ea9d0cf6aa1b2b862a120b6e7738",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\time.obj",
+      "sha256": "f126a4ef4556649f2e8ebce3f66c1b198192f03e0bb8bb55f1c3429079bab5d4",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\core\\try.obj",
+      "sha256": "f803739dfeb37b402e8bcc8d02734f153ecbb9feda76a8c97fa6ab2e4dab30a5",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\crypto\\crypto.obj",
+      "sha256": "da2b2db23be59168a8325a71c8855b94ab05e0afa1c2a436953e6124f50ba01f",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\encoding\\encoding.obj",
+      "sha256": "63067335f6cfedd0f682b33d2f15faf7f81abfe81d7048368b628a72ba0b2bb3",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\file\\file.obj",
+      "sha256": "26ba5b4f63dae738cc0feffd6ab941806b905d787602a9ed3e7a2f4c26e5c522",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\io\\io.obj",
+      "sha256": "57966cf16d89779e1063d9513f2deee3c29ca6e802621a64307ee039c1304191",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\json\\json.obj",
+      "sha256": "d98ecb00cc647b289bd69d62244a6f7527f6a2bb5bc74ce156c1e7517b113f3b",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\lang\\drop.obj",
+      "sha256": "42f32a165786ca315e14278fb47fdce68d1abb05608d2fcba06697e35c18fb99",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\lang\\into_iterator.obj",
+      "sha256": "d7d020e2a8c468f13ba85351c28527462539ee3029d7c34b7c089308d94e0026",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\lang\\iterator.obj",
+      "sha256": "797ce00b26a0c805e7dd40f04e91d9d63d94b5d6cbc46dea8bb2d266eae8f5bf",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\lang\\option.obj",
+      "sha256": "e570a63d3e3580f8dfd662c7a4d3fc8215d009a751c48c1b0cfd1200be8eab6b",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\net\\net.obj",
+      "sha256": "55ab00a81db7d8a8886ad72d2f6e80bbfa9555a51883250f6cada45b4b560576",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "object": "libs\\external\\path\\path.obj",
+      "sha256": "5fd49f3b3abc0cc1ad1899aee6748e7bccb1636e36a1cb23c3c6cfb5cda1adc9",
+      "coff_machine": "0x8664",
+      "artifact_target": "x86_64-pc-windows-gnu"
+    }
+  ],
+  "rust_toolchain": "rustc 1.98.0 (88d9e12ae 2026-08-18)\nbinary: rustc\ncommit-hash: 88d9e12ae178fab0fb5cc050a94da85685d449ea\ncommit-date: 2026-08-18\nhost: x86_64-pc-windows-msvc\nrelease: 1.98.0\nLLVM version: 22.1.8\n",
+  "ubuntu_gnu_normal": "NOT VERIFIED",
+  "ubuntu_gnu_asan": "NOT VERIFIED"
+}

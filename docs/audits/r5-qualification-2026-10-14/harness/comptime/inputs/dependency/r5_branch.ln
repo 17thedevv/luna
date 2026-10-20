@@ -1,0 +1,9 @@
+import "r5_taken";
+import "r5_untaken";
+module r5_branch {
+    fn choose(flag: bool) -> i32 {
+        if flag { return r5_untaken::value(); }
+        return r5_taken::value();
+    }
+    export fn value() -> i32 { dec result = comptime { r5_branch::choose(false) }; return result; }
+}

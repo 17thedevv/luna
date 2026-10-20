@@ -1,0 +1,2 @@
+import "absent_provider";
+fn main() -> i32 { return 0; }

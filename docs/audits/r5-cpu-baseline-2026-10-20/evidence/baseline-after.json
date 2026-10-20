@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:/Users/84387/.cargo/bin/cargo.exe",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "luna-rs/Cargo.toml",
+    "-p",
+    "luna-backend",
+    "--lib",
+    "target_contract::tests",
+    "--",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "seconds": 1.7295663000004424,
+  "log": "baseline-after.log",
+  "log_sha256": "5961b9e25d300fe01b8c2c919b961ca3a5dbdfc57af5b140b623adba6ffb3cc8"
+}

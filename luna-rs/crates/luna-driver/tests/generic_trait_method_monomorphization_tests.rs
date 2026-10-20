@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!(
+    let dir = luna_test_support::owned_temp_root().join(format!(
         "luna_generic_trait_method_{}_{}_{}",
         name,
         std::process::id(),

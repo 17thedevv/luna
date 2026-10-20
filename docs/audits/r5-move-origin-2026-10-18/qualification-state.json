@@ -1,0 +1,126 @@
+{
+  "observed_date": "2026-10-20",
+  "status": "READY_FOR_RELEASE_REVIEW",
+  "implementation_pin": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "candidate": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "harness_commits": {
+    "ubuntu": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
+    "windows": "896876d8694a4010d4f050187afe0af774b2b4a7"
+  },
+  "lane_ledger": "evidence/pin-8525067f/lane-state.json",
+  "artifact_verification": "evidence/pin-8525067f/all-artifact-verification.json",
+  "remaining": [
+    "Maintainer chooses PR/main/tag/publication and release identity",
+    "Build release packages from the selected verified release commit, then clean Windows/Ubuntu package smoke; verify assets/checksums/tag and final closing record"
+  ],
+  "historical_superseded_state": {
+    "observed_at_utc": "2026-10-18T10:40:39.088400+00:00",
+    "status": "SUPERSEDED_DURING_QUALIFICATION_DIAG_3_DECLARATION_FINDING",
+    "implementation_pin": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+    "previous_pin": "67146195fb025951ca51d54365fd3a47ef9544e6",
+    "previous_result": "SUPERSEDED_DURING_QUALIFICATION_DIAG_4_6_FINDINGS",
+    "candidate": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+    "no_carry": true,
+    "protocol": {
+      "compiler": 25,
+      "metadata": 9,
+      "mvir": 5,
+      "format": 2
+    },
+    "required_lanes": [
+      "ubuntu-normal",
+      "ubuntu-runtime-asan",
+      "ubuntu-comptime-vm",
+      "ubuntu-workspace-triage",
+      "ubuntu-workspace-final",
+      "windows-normal",
+      "windows-workspace-triage",
+      "windows-workspace-final"
+    ],
+    "remaining": [
+      "Finish declaration/implementation/candidate and source-anchor audit, repair preflight, then select replacement pin and reacquire all eight lanes",
+      "Verify all terminal evidence and final requirement audit",
+      "Reconcile closure/public documentation and advance candidate only after qualification"
+    ],
+    "maintainer_actions_not_performed": [
+      "tag",
+      "main merge",
+      "PR",
+      "release publication"
+    ],
+    "local_preflight": "evidence/identity-order-preflight.json",
+    "historical_67146195": {
+      "status": "SUPERSEDED_DURING_QUALIFICATION_DIAG_4_6_FINDINGS",
+      "harness_commit": "6eab700e5fe211a407b6a7f9aebb16a150a4cbf3",
+      "runs": {
+        "ubuntu": {
+          "id": 39099784852,
+          "url": "https://github.com/17thedevv/luna/actions/runs/39099784852",
+          "normal_job": 117593507802,
+          "asan_job": 117593507841,
+          "comptime_vm_job": 117593507631,
+          "status": "IN_PROGRESS"
+        },
+        "ubuntu_workspace": {
+          "id": 39099784909,
+          "url": "https://github.com/17thedevv/luna/actions/runs/39099784909",
+          "triage_job": 117593507908,
+          "status": "TRIAGE_IN_PROGRESS_FINAL_DEPENDENT"
+        },
+        "windows": {
+          "id": 39099784890,
+          "url": "https://github.com/17thedevv/luna/actions/runs/39099784890",
+          "normal_job": 117593507765,
+          "triage_job": 117593507889,
+          "status": "NORMAL_AND_TRIAGE_IN_PROGRESS_FINAL_DEPENDENT"
+        }
+      },
+      "reason": "Remaining message-dependent dedup and nondeterministic multi-function diagnostic emission",
+      "asan": {
+        "status": "PASS_IN_EXECUTED_SCOPE",
+        "verification": "evidence/pin-67146195/ubuntu-asan-verification.json"
+      }
+    },
+    "runs": {
+      "ubuntu": {
+        "id": 39101753234,
+        "url": "https://github.com/17thedevv/luna/actions/runs/39101753234",
+        "normal_job": 117599279820,
+        "asan_job": 117599279909,
+        "comptime_vm_job": 117599279876,
+        "status": "ALL_THREE_JOBS_SUCCESS_SUPERSEDED_PIN"
+      },
+      "ubuntu_workspace": {
+        "id": 39101753252,
+        "url": "https://github.com/17thedevv/luna/actions/runs/39101753252",
+        "triage_job": 117599279870,
+        "status": "TRIAGE_AND_FINAL_SUCCESS_SUPERSEDED_PIN",
+        "final_job": 117621419161
+      },
+      "windows": {
+        "id": 39101753210,
+        "url": "https://github.com/17thedevv/luna/actions/runs/39101753210",
+        "normal_job": 117599279674,
+        "triage_job": 117599279777,
+        "status": "NORMAL_TRIAGE_FINAL_SUCCESS_SUPERSEDED_PIN",
+        "final_job": 117619646590
+      }
+    },
+    "harness_commit": "bf35297b7797215eabf01572b0531a78ab62511c",
+    "superseded_reason": "DIAG-3 previous declaration/impl locations missing and DIAG-2 bare-return primary fabricated",
+    "d3d0ffe8_asan": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "verification": "evidence/pin-d3d0ffe8/ubuntu-asan-verification.json"
+    },
+    "local_repair_preflight": "evidence/declaration-preflight.json",
+    "replacement_pin": null,
+    "job_success_does_not_equal_artifact_verification": true
+  }
+}

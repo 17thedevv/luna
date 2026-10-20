@@ -1,0 +1,37 @@
+{
+  "source_head": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+  "prototype_sha256": "53782930bf832d099075096e63c4b7a1a77f4ac79842514fba601b7fbd37e5c0",
+  "status": "user-type feasibility only; canonical provider unchanged; approval pending",
+  "missing_dll_acquisition": [
+    {
+      "profile": "debug",
+      "provider_mode": "artifact",
+      "build_exit": 3221225781,
+      "build_stderr": "",
+      "run_exit": null,
+      "run_stderr": null,
+      "cli_sha256": "bd80e80b7b2a1da65b787e4a28791367797079f20041b8233f8e9cf307153aac"
+    },
+    {
+      "profile": "release",
+      "provider_mode": "source",
+      "build_exit": 3221225781,
+      "build_stderr": "",
+      "run_exit": null,
+      "run_stderr": null,
+      "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8"
+    },
+    {
+      "profile": "release",
+      "provider_mode": "artifact",
+      "build_exit": 3221225781,
+      "build_stderr": "",
+      "run_exit": null,
+      "run_stderr": null,
+      "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8"
+    }
+  ],
+  "verified_acquisition": "e1-range-inclusive-prototype-parity-2026-10-13.json",
+  "test_model_output": "known test-generated dump restored; isolated helper focused 9 PASS",
+  "failed_gate": "e1-workspace-final4-2026-10-13.json"
+}

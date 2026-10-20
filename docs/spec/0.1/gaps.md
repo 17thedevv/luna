@@ -11,7 +11,42 @@ otherwise. Some fixes may now be present; each original finding requires a
 fresh check before being marked closed. The merged manifest has 49 providers.
 V01-ARCH-02 is newly observed in the imported source, not the old audit.
 
-## Confirmed audit defects
+## Current qualification — 2026-10-20
+
+Current qualification — 2026-10-20: **RELEASE BLOCKED by package CPU identity drift**.
+The eight completed lanes at `8525067f` are preserved, but clean Windows package
+smoke fails on a different CPU. [Finding and baseline repair](../../audits/r5-cpu-baseline-2026-10-20/README.md).
+A new implementation pin must reacquire all eight lanes and clean package smoke
+on both hosts. Candidate remains `8525067f`; no merge/tag/publication occurred.
+Strict target identity validation and the adopted language contracts remain mandatory.
+Earlier qualification snapshots below retain their dated scopes.
+
+## Prior reconciliation — 2026-10-14
+
+The [R4 ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md)
+supersedes historical pending/open wording only within the explicitly recorded
+scope: A/C/D/E-wave closures and their follow-ups are reconciled against
+`3f8646c6`, with regression evidence at `e4f9fb53`. Earlier failures below stay
+dated evidence. The old 24-row repair ledger is preserved and migrated losslessly;
+its historical PASS entries are not silently promoted to complete current
+certification or assigned a new introducing fix commit.
+
+| Area | Current implementation/evidence state | Remaining obligation |
+| --- | --- | --- |
+| Closure / async / partial cleanup | A1/A2/A3 and A2-FU1/FU2 closed in tested scope | Exact R5 candidate regression; no universal ownership-domain claim |
+| Casts / raw views / logical NOT | A4/A5/A6 closed in tested scope | Preserve invalid-program and loan controls in R5 |
+| Calls / impl metadata / projections / artifact identity | C1..C5 closed in tested scope; original C1 comparison failure retained | C4-FU1 precision deferred, not missing-dependency correctness |
+| Diagnostics | D1/D2 and D1-FU2/E1 admission controls establish bounded code/span/phase behavior | Complete structural DIAG-1..10 and V01-DIAG-01 remainder mandatory in R5 |
+| Provider graphs / retained contracts | D3/D4 scoped closure; async-provider finding and D4-FU1 closed separately | Full advertised target/exact-candidate qualification; 49 builds are not every API |
+| Grammar / arithmetic | E2 closed; E1 qualified (236/236 and 3/3 full runs) | Standalone comptime statements remain unsupported; complete formal grammar debt stays explicit |
+| Native targets / VM | Windows GNU tested scope; VM layout tested in 64-bit GNU only | Ubuntu GNU normal/ASan and wider layout certification remain absent |
+
+See [diagnostic inventory](../../audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md)
+and [accepted deferrals / known limits](../../audits/0.1-alpha-completion-2026-10-04/r4/known-limitations.md).
+Release remains BLOCKED / NOT VERIFIED pending the
+[R5 checklist](../../audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md).
+
+## Historical confirmed audit defects — revision 3dac3ac
 
 | Audit ID | Priority | Requirement violated / observed failure |
 |---|---|---|
@@ -37,18 +72,21 @@ instrumented pipeline evidence, not a claimed full profile of every old suite.
 
 | ID | Contract / correction | Current implementation or documentation |
 |---|---|---|
-| V01-GRAMMAR-01 | Comma-separated struct fields; reject semicolon delimiters | CLI confirms both modes accept and execute semicolon-delimited fields despite the rejection requirement |
-| V01-GRAMMAR-02 | Retained parenthesized foreach head from normative Rule K.4 | CLI confirms both modes reject the contract head and accept the unparenthesized implementation form; reconciliation must retain an explicit decision |
-| V01-GRAMMAR-03 | Receiver shorthand equivalence from Rule K.5 | CLI confirms both modes reject &self shorthand; the complete equivalence contract remains a requirement |
-| V01-DIAG-01 | DIAG-1 requires typed diagnostic codes for every compiler error | The foreach/receiver parser failures render `error:` without a code in both modes; the private-field rejection correctly renders E1003. Code identity/propagation still needs a focused diagnostic audit |
-| V01-ARCH-02 | Compiler must not map library macro names, streams, suffixes or callee spellings | Imported D:/fdlang macro_engine.rs contains the eight-name/format_macro interception and print_val/newline lookup. It violates the retained boundary; preservation in Git is not semantic approval |
+| V01-GRAMMAR-01 | Comma-separated struct fields; reject semicolon delimiters | **Implemented** — semicolon delimiters reject with typed `E0002` and a primary span in both modes; comma-separated fields accept and run |
+| V01-GRAMMAR-02 | Retained parenthesized foreach head from normative Rule K.4 | **Implemented** — `for (pattern in expression)` accepts and runs in both modes; the unparenthesized head is retained only as LEGACY / CHARACTERIZATION and is not standardized 0.1 syntax |
+| V01-GRAMMAR-03 | Receiver shorthand equivalence from Rule K.5 | **Implemented** — `&self`, `&rw self` and bare `self` receivers build and run in both modes; duplicate/non-first receivers reject with a typed code |
+| V01-DIAG-01 | DIAG-1 requires typed diagnostic codes for every compiler error | **Evidence-backed parts closed in E2** — parser failures (including the foreach/receiver cases) render typed codes with source spans in both modes. Remaining structural invariants are R5 preconditions, not deferred: a mandatory primary span for every source-originated error, structural related labels for multi-position errors, constructor/emission enforcement of DIAG-1/DIAG-2, and no ad-hoc untyped error paths |
+| V01-ARCH-02 | Compiler must not map library macro names, streams, suffixes or callee spellings | The historical eight-name/format_macro interception is absent from the selected pin's MacroEngine. [Permanent CLI controls](../../../luna-rs/crates/luna-cli/tests/v01_arch_02_macro_decoupling_tests.rs) exercise eight user-defined macro names and namespaced shadowing. Exact-pin workspace results remain pending; source inspection alone is not full behavioral certification |
 | V01-DOC-01 | Visibility-02: fields default public independently of type accessibility | Old grammar skill/reference says private by default; corrected to the approved amendment |
 | V01-DOC-02 | `requires life(...)` is the current relation spelling | Older docs/skills use removed `where outlives`; current guidance is corrected without changing the relation model |
-| V01-DOC-03 | Luna .ln/.llib, 32 providers, six language contract families plus OptionExt contribution | Old overview/bootstrap pages claim Mellis core.ms, 25 providers or four families; current entry points are replaced |
+| V01-DOC-03 | Luna .ln/.llib, 49 current component providers, six language contract families plus OptionExt contribution | The original 32-provider audit and earlier Mellis/core.ms counts are historical. The current [sysroot manifest](../../../luna-rs/libs/external/sysroot.toml) declares 49 providers; exact-pin rebuild/header/object verification is a separate release gate |
 
-V01-GRAMMAR rows are conformance gaps or unverified contracts, not new parser
-fixes made by this documentation task. Historical plans retain their original
-examples under a historical-role notice.
+V01-GRAMMAR rows record the current conformance state of retained 0.1
+requirements, verified by a CLI run on the exact candidate recorded in
+`evidence/cli-examples.json`. The reconciled behavior does not adopt any syntax
+beyond those requirements: the unparenthesized foreach head stays a legacy
+characterization, and no stdlib program or official documentation may rely on it.
+Historical plans retain their original examples under a historical-role notice.
 
 ## Decisions still required
 
@@ -60,11 +98,61 @@ V01-DESIGN-03 was resolved by maintainer adoption on 2026-10-06: ordinary
 integer arithmetic is checked and identical across debug/release; overflow,
 division by zero, `MIN / -1` and out-of-range shifts are deterministic failures,
 and compile-time instances are diagnostics. See [Semantics](semantics.md).
-Implementation and acceptance for the checked-arithmetic behavior remain a
-separate task (E1); this entry records the adopted decision only.
+**Implemented and qualified — E-wave CLOSED 2026-10-13 (E1)**: the runtime lowering uses LLVM overflow
+intrinsics for `+ - *`, dominance-ordered guards for `/ % << >>` and unary
+negation, and the comptime evaluator matches it; explicit modular arithmetic is
+available through `std::wrapping_add/sub/mul`, which are compiler-recognized
+language items and never trap. The maintainer approved compiler24 after a
+genuine compiler23 artifact was shown to retain unchecked execution when DCE
+removed unused integer operations. The later approved terminal Option slot
+exposed a generic enum payload alignment defect for i128-bearing owned items.
+The maintainer approved the generic alignment repair and compiler25 boundary;
+real artifact24 is also rejected. Metadata9/MVIR5/format2 remain unchanged.
+See the [alignment continuation](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md)
+and the [2026-10-12 repair record](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-REPAIR-2026-10-12.md),
+which documents the adopted diagnostic ownership amendments, the DCE repair and
+the provider identity/AST parity repairs. The
+[E-wave closure report](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md)
+records the current qualification boundary: three consecutive default-parallel
+workspace runs, four-mode 59-row matrices, real compiler22/23/24 rejection and
+the resolved diagnostic-ownership precondition. The historical blocker text
+below is retained unchanged.
+
+**E1-FU-DIAG-01 — RESOLVED 2026-10-13 by phase-owned admission. The paragraph
+below is the retained historical blocker record (confirmed 2026-10-12 at
+`2fcce5a4ea1973100a3d8a99781e1188aeed5d78`); it is preserved unchanged.**
+
+Resolution: diagnostic ownership is now explicit per phase — Parser owns
+E0003/E0005 for annotation grammar and names; Resolver owns E1009 for the
+protected compiler namespace and trusted language-item bindings, plus E1010 for
+structured macro admission failures; TypeChecker owns E2032 for contextual
+attributes, `#[link]` on the program entry and intrinsic signatures; Comptime
+admission stays E4005 with a primary source span, and internal
+invalid/unexpanded fallbacks are Infrastructure E6001. Typed check/build
+ownership evidence is recorded in the
+[E-wave closure report](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md).
+
+**Historical record:** DIAG-8 in the
+[diagnostic contract](../../diagnostics/diagnostics-v1.md) assigns E0005 to
+Parser alone. Reserved intrinsic declarations/renames are rejected by the
+semantic attribute processor; `#[link]` on entry `main` is rejected by the
+TypeChecker. Both emit E0005, violating phase ownership despite correct typed
+rejection and source spans. Resolver also constructs E0005 for language-item
+validation. The annotation description in the registry does not waive DIAG-8.
+See the [blocker report](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md)
+for reproductions, first divergence and repair alternatives requiring an
+ownership decision. Historical Stage 4 evidence is retained; its DONE claim
+does not discharge this precondition.
 
 No new format-macro hook, interpolation syntax, runtime opcode or container
 language item is adopted. These require their own complete generic contract.
+
+**Standalone comptime statements — support gap, confirmed 2026-10-12.**
+`comptime { ... }` in statement position is parsed but currently not admitted
+for execution. The maintainer approved fail-closed E4005 from Comptime admission
+with a source span, replacing the erroneous TypeChecker E0003 fallback.
+Expression-form comptime and const MVIR evaluation remain supported. This
+diagnostic repair does not claim statement execution support.
 
 V01-DESIGN-01 was resolved by maintainer adoption of Option A on 2026-10-04:
 [METHOD-RESOLUTION-v1](method-resolution-v1.md). The resolver's complete
@@ -77,7 +165,7 @@ invalid static casts diagnose, invalid dynamic casts trap, and arithmetic/
 bitwise/shift/negation operators on char reject. The approval and acceptance
 apply to their recorded baseline, not every newly merged addition.
 
-## Evidence not completed
+## Evidence not completed by the historical 3dac3ac audit
 
 - All compiler integration tests, exhaustive input/generic domains, sanitizers
   and fuzzing have not been verified by the stdlib audit.
@@ -94,21 +182,27 @@ apply to their recorded baseline, not every newly merged addition.
   they must be corrected as tests, not treated as reasons to alter valid APIs.
 
 
-## Documentation CLI characterization — 2026-10-03
+## Documentation CLI characterization
 
 [evidence/cli-examples.json](evidence/cli-examples.json) records eight standalone
-fixtures in source-only and artifact-only sysroots, 16 attempts total. Eight
-attempts meet their positive/negative requirements; six expose the three grammar
-gaps above; two characterize the accepted unparenthesized implementation form.
-The custom outln macro returns a value and emits no output, demonstrating that
-this name currently uses ordinary expansion. These checks are not a certification
-of every macro, field visibility or language capability.
+fixtures in source-only and artifact-only sysroots, 16 attempts total, re-run on
+the current candidate. Sixteen attempts meet their requirement or are an explicit
+characterization: the three former grammar gaps (`reject_semicolon_fields`,
+`foreach_parenthesized_contract`, `receiver_shorthand_contract`) now meet their
+contract in both modes, and the two unparenthesized-foreach attempts stay
+`characterization` (legacy, contract not asserted). The custom outln macro returns
+a value and emits no output, demonstrating that this name currently uses ordinary
+expansion. These checks are not a certification of every macro, field visibility
+or language capability.
 
-The [integration CLI run](../../integration/evidence/cli-examples.json), after
-rebuilding the merged CLI/runtime and all 49 providers, repeats the same 16
-attempts and outcomes. All three grammar gaps remain reproduced. The custom
-macro case uses an integer argument; it does not exercise or excuse the newly
-imported format-string interception recorded as V01-ARCH-02.
+[historical-2026-10-04/](evidence/historical-2026-10-04/cli-examples.json) preserves
+the pre-fix record, where the same three cases were unmet; history is kept as
+history and is never rewritten to look like a pass.
+
+The [integration CLI run](../../integration/evidence/cli-examples.json) repeats the
+same 16 attempts with the merged CLI/runtime and all providers. The custom macro
+case uses an integer argument; it does not exercise or excuse the imported
+format-string interception recorded as V01-ARCH-02.
 
 
 ## Alpha module additions — implementation update 2026-10-04

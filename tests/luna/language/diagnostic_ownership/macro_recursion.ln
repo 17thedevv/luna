@@ -1,0 +1,2 @@
+macro repeat { () => { repeat!() } }
+fn main() -> i32 { return repeat!(); }

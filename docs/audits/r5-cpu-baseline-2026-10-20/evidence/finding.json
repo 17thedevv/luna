@@ -1,0 +1,26 @@
+{
+  "id": "R5-PACKAGE-CPU-01",
+  "date": "2026-10-20",
+  "status": "CONFIRMED_RELEASE_BLOCKER",
+  "implementation_pin": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "package_source": "b515783782408b2279fc4c534c125182bb5a41cf",
+  "workflow_run": 39383661819,
+  "windows_smoke_job": 118499625040,
+  "ubuntu_smoke_job": 118499625018,
+  "windows_observation": "quickstart-build exits1: strict CPU identity mismatch, expected znver3, got generic; __lang_drop bootstrap E1004",
+  "ubuntu_observation": "Same-package independent clean smoke PASS",
+  "requirement": "Clean Windows/Ubuntu package smoke must PASS before merge/tag/publication; advertised target packages must not depend on build-runner host CPU",
+  "contract": "docs/spec/0.1/modules.md: strict CPU/features equality remains mandatory",
+  "owning_stage": "Backend TargetConfig::default selects host CPU/features while canonicalizing the advertised triple",
+  "repair": "Select generic CPU and empty optional features for the two existing advertised release targets; preserve native defaults outside the matrix and all strict identity validation",
+  "protocol_change": false,
+  "supersedes_release_readiness": true,
+  "no_pass_transfer_to_new_pin": true,
+  "compiler_branch": "r5-diag-repair",
+  "authorization": "Existing human authorization to repair, qualify and release only after all gates pass",
+  "archive_sha256": {
+    "failed-package-drop.llib": "d5896b62ce56a8872bd070db91e50ce0cdfc3a0ff65dc84dbeb39490a010b06f",
+    "luna-package-smoke-x86_64-pc-windows-gnu-39383661819-1.zip": "03a2c7f7763263222b72015f37035c23d1241273c34a40676d31e069f99d84ed",
+    "luna-package-smoke-x86_64-unknown-linux-gnu-39383661819-1.zip": "9040d90d24664eb57400e8da679e16b17e0e0e1fe0c741f5778029ed9104dc44"
+  }
+}

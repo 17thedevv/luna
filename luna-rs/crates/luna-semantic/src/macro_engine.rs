@@ -25,6 +25,14 @@ pub struct MatchFailure {
     pub span: Span,
 }
 
+/// Expansion transports failures; Resolver admission owns rule/recursion
+/// diagnostics, while diagnostics from Parser re-entry retain their origin.
+#[derive(Debug, Clone)]
+pub enum MacroExpansionFailure {
+    Diagnostic(Diagnostic),
+    Rule { message: String, span: Span },
+}
+
 pub struct MacroEngine<'a> {
     pub arena: &'a mut AstArena,
     pub source_manager: &'a luna_common::source::SourceManager,
@@ -33,6 +41,7 @@ pub struct MacroEngine<'a> {
     pub tables: &'a SemanticTables,
     pub current_scope: ScopeId,
     pub diagnostics: Vec<Diagnostic>,
+    failures: Vec<MacroExpansionFailure>,
     recursion_depth: u32,
     lexical_bindings: Vec<std::collections::HashSet<crate::symbol::IdentKey>>,
 }
@@ -59,6 +68,7 @@ impl<'a> MacroEngine<'a> {
             tables,
             current_scope: ScopeId(0),
             diagnostics: Vec::new(),
+            failures: Vec::new(),
             recursion_depth: 0,
             lexical_bindings: Vec::new(),
         }
@@ -116,16 +126,19 @@ impl<'a> MacroEngine<'a> {
         self.symbol_table.ambiguity_diagnostic(name, context, self.current_scope, span)
     }
 
-    pub fn expand_items(&mut self, items: Vec<Item>) -> Result<Vec<Item>, Vec<Diagnostic>> {
+    pub fn expand_items(&mut self, items: Vec<Item>) -> Result<Vec<Item>, Vec<MacroExpansionFailure>> {
         let mut expanded_items = Vec::new();
         for item in items {
             expanded_items.extend(self.expand_block_item(item));
         }
 
-        if self.diagnostics.is_empty() {
+        if self.diagnostics.is_empty() && self.failures.is_empty() {
             Ok(expanded_items)
         } else {
-            Err(self.diagnostics.clone())
+            let mut failures: Vec<_> = self.diagnostics.iter().cloned()
+                .map(MacroExpansionFailure::Diagnostic).collect();
+            failures.extend(self.failures.clone());
+            Err(failures)
         }
     }
 
@@ -515,14 +528,10 @@ impl<'a> MacroEngine<'a> {
                 };
 
                 if self.recursion_depth > 128 {
-                    self.diagnostics.push(
-                        Diagnostic::error(format!(
-                            "recursion limit reached while expanding macro `{}`",
-                            macro_name
-                        ))
-                        .with_code(DiagnosticCode::InvalidSyntax)
-                        .with_span(span),
-                    );
+                    self.failures.push(MacroExpansionFailure::Rule {
+                        message: format!("recursion limit reached while expanding macro `{}`", macro_name),
+                        span: span,
+                    });
                     return ty_id;
                 }
 
@@ -563,20 +572,15 @@ impl<'a> MacroEngine<'a> {
                     if failure.pos < raw_tokens.len() {
                         diag_span = raw_tokens[failure.pos].span;
                     }
-                    self.diagnostics.push(
-                        Diagnostic::error(format!("macro `{}` expected {}", macro_name, failure.expected))
-                            .with_code(DiagnosticCode::InvalidSyntax)
-                            .with_span(diag_span)
-                    );
+                    self.failures.push(MacroExpansionFailure::Rule {
+                        message: format!("macro `{}` expected {}", macro_name, failure.expected),
+                        span: diag_span,
+                    });
                 } else {
-                    self.diagnostics.push(
-                        Diagnostic::error(format!(
-                            "no rule in macro `{}` matched the invocation arguments",
-                            macro_name
-                        ))
-                        .with_code(DiagnosticCode::InvalidSyntax)
-                        .with_span(span),
-                    );
+                    self.failures.push(MacroExpansionFailure::Rule {
+                        message: format!("no rule in macro `{}` matched the invocation arguments", macro_name),
+                        span: span,
+                    });
                 }
                 ty_id
             }
@@ -670,14 +674,10 @@ impl<'a> MacroEngine<'a> {
         };
 
         if self.recursion_depth > 128 {
-            self.diagnostics.push(
-                Diagnostic::error(format!(
-                    "recursion limit reached while expanding macro `{}`",
-                    macro_name
-                ))
-                .with_code(DiagnosticCode::InvalidSyntax)
-                .with_span(call_span),
-            );
+            self.failures.push(MacroExpansionFailure::Rule {
+                message: format!("recursion limit reached while expanding macro `{}`", macro_name),
+                span: call_span,
+            });
             return self.arena.alloc_expr(Expr::Literal(Token::new(TokenKind::IntegerLiteral, call_span), "0".to_string()));
         }
 
@@ -722,20 +722,15 @@ impl<'a> MacroEngine<'a> {
             if failure.pos < raw_tokens.len() {
                 diag_span = raw_tokens[failure.pos].span;
             }
-            self.diagnostics.push(
-                Diagnostic::error(format!("macro `{}` expected {}", macro_name, failure.expected))
-                    .with_code(DiagnosticCode::InvalidSyntax)
-                    .with_span(diag_span)
-            );
+            self.failures.push(MacroExpansionFailure::Rule {
+                message: format!("macro `{}` expected {}", macro_name, failure.expected),
+                span: diag_span,
+            });
         } else {
-            self.diagnostics.push(
-                Diagnostic::error(format!(
-                    "no rule in macro `{}` matched the invocation arguments",
-                    macro_name
-                ))
-                .with_code(DiagnosticCode::InvalidSyntax)
-                .with_span(call_span),
-            );
+            self.failures.push(MacroExpansionFailure::Rule {
+                message: format!("no rule in macro `{}` matched the invocation arguments", macro_name),
+                span: call_span,
+            });
         }
         self.arena.alloc_expr(Expr::Literal(Token::new(TokenKind::IntegerLiteral, call_span), "0".to_string()))
     }
@@ -773,14 +768,10 @@ impl<'a> MacroEngine<'a> {
         };
 
         if self.recursion_depth > 128 {
-            self.diagnostics.push(
-                Diagnostic::error(format!(
-                    "recursion limit reached while expanding macro `{}`",
-                    macro_name
-                ))
-                .with_code(DiagnosticCode::InvalidSyntax)
-                .with_span(call_span),
-            );
+            self.failures.push(MacroExpansionFailure::Rule {
+                message: format!("recursion limit reached while expanding macro `{}`", macro_name),
+                span: call_span,
+            });
             return None;
         }
 
@@ -853,11 +844,10 @@ impl<'a> MacroEngine<'a> {
             if failure.pos < raw_tokens.len() {
                 diag_span = raw_tokens[failure.pos].span;
             }
-            self.diagnostics.push(
-                Diagnostic::error(format!("macro `{}` expected {}", macro_name, failure.expected))
-                    .with_code(DiagnosticCode::InvalidSyntax)
-                    .with_span(diag_span)
-            );
+            self.failures.push(MacroExpansionFailure::Rule {
+                message: format!("macro `{}` expected {}", macro_name, failure.expected),
+                span: diag_span,
+            });
         }
         None
     }

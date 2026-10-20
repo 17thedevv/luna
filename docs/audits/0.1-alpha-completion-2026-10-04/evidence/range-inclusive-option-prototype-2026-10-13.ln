@@ -1,0 +1,73 @@
+import <iter_adapters>;
+import <mem>;
+
+module probe {
+    export struct Inclusive<T> {
+        current: std::Option<T>,
+        end: T,
+        exhausted: bool,
+    };
+    export fn inclusive<T>(start: T, end: T) -> Inclusive<T> {
+        return Inclusive<T> { current: std::Option::Some(start), end: end, exhausted: false };
+    }
+    impl<T: std::iter::Step> std::Iterator<T> for Inclusive<T> {
+        fn next(self: &rw Self) -> std::Option<T> life_from(self) {
+            if self.exhausted { return std::Option::None; }
+            dec rw terminal = false;
+            dec rw following: std::Option<T> = std::Option::None;
+            {
+                match self.current.as_ref() {
+                    std::Option::Some(current) -> {
+                        if current.step_greater(&self.end) { return std::Option::None; }
+                        if current.step_eq(&self.end) {
+                            terminal = true;
+                        } else {
+                            following = std::Option::Some(current.step_forward());
+                        }
+                    },
+                    std::Option::None -> { return std::Option::None; },
+                }
+            }
+            if terminal { self.exhausted = true; }
+            return std::mem::replace<std::Option<T>>(&rw self.current, following);
+        }
+    }
+}
+
+struct Counter { value: i32, drop_ptr: *rw i32 };
+impl std::Drop for Counter {
+    fn drop(self: &rw Self) { unsafe { *self.drop_ptr = *self.drop_ptr + 1; } }
+}
+impl std::iter::Step for Counter {
+    fn step_forward(self: &Self) -> Self { return Counter { value: self.value + 1, drop_ptr: self.drop_ptr }; }
+    fn step_less(self: &Self, other: &Self) -> bool { return self.value < other.value; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return self.value == other.value; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return self.value > other.value; }
+}
+
+fn noncopy(drop_ptr: *rw i32) -> i32 {
+    dec rw values = probe::inclusive(Counter { value: 2147483646i32, drop_ptr: drop_ptr }, Counter { value: 2147483647i32, drop_ptr: drop_ptr });
+    {
+        dec first = values.next();
+        match first { std::Option::Some(v) -> { if v.value != 2147483646i32 { return 1; } }, std::Option::None -> { return 2; }, }
+    }
+    {
+        dec last = values.next();
+        match last { std::Option::Some(v) -> { if v.value != 2147483647i32 { return 3; } }, std::Option::None -> { return 4; }, }
+    }
+    match values.next() { std::Option::Some(v) -> { return 5; }, std::Option::None -> {}, }
+    match values.next() { std::Option::Some(v) -> { return 6; }, std::Option::None -> {}, }
+    return 0;
+}
+
+fn main() -> i32 {
+    dec rw boundary = probe::inclusive(254u8, 255u8);
+    match boundary.next() { std::Option::Some(v) -> { if v != 254u8 { return 1; } }, std::Option::None -> { return 2; }, }
+    match boundary.next() { std::Option::Some(v) -> { if v != 255u8 { return 3; } }, std::Option::None -> { return 4; }, }
+    match boundary.next() { std::Option::Some(v) -> { return 5; }, std::Option::None -> {}, }
+    dec rw drops = 0;
+    if noncopy(&rw drops) != 0 { return 6; }
+    if drops != 3 { return 7; }
+    return 0;
+}
+

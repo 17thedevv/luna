@@ -1,0 +1,15 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "label": "docs-validator",
+  "command": [
+    "python",
+    "D:\\r5-39032926577\\windows-checkout\\docs\\tools\\validate_v01_docs.py"
+  ],
+  "cwd": "D:\\r5-39032926577\\windows-checkout",
+  "start_utc": "2026-10-17T14:25:04.946135+00:00",
+  "end_utc": "2026-10-17T14:25:05.493504+00:00",
+  "elapsed_seconds": 0.547,
+  "exit": 0,
+  "log": "docs-validator.log",
+  "log_sha256": "2107e10ac23b112a2093212998f55e48c56d2961dab8e731d7052d902a36adf6"
+}

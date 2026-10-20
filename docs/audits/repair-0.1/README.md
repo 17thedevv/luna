@@ -2,6 +2,12 @@
 
 # Luna 0.1 Repair Ledger & Verification Record
 
+**Historical ledger boundary.** Current wave/follow-up reconciliation is in
+the [R4 exact ledger](../0.1-alpha-completion-2026-10-04/r4/README.md).
+The original status.json remains byte-identical; its
+[snapshot and migration](../0.1-alpha-completion-2026-10-04/r4/legacy-status.migrated.json)
+retain all 24 records without turning historical PASS into release certification.
+
 Baseline Commit: `97d5e8402cefca4cd7f99ffb031a5917d73acb1c`  
 Branch: `codex/antigravity-repair-0.1`  
 Executor: Antigravity  
@@ -10,7 +16,10 @@ Status: **PARTIAL — IN PROGRESS (Full diagnostic contract and native multi-pla
 Latest compiler integrity follow-up: [2026-10-03 repair and verification](compiler-integrity-repair-2026-10-03.md). The three independently reproduced defects are addressed there; this does not certify the whole diagnostic contract or all provider APIs.
 
 ## Scope & Mandate
-This ledger tracks the systematic repair, compiler decoupling, stdlib verification, and release gating specified in `docs/agent-handoff/antigravity-repair-plan-2026-10-03.md`.
+This historical task referenced `docs/agent-handoff/antigravity-repair-plan-2026-10-03.md`,
+which is absent from the current tracked tree. The original reference is retained
+as provenance, not presented as a live plan. The maintained completion scope is
+the [0.1 completion plan](../0.1-alpha-completion-2026-10-04/README.md).
 All work adheres to the Luna 0.1 architectural principles:
 1. No compiler hardcoding of standard library types or macros.
 2. Standard library is a consumer of the language; compiler gaps are fixed generically with user-defined reproducers.

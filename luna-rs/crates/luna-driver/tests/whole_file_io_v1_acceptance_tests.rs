@@ -14,7 +14,7 @@ fn temp_dir(label: &str) -> PathBuf {
         .duration_since(UNIX_EPOCH)
         .expect("clock after epoch")
         .as_nanos();
-    let dir = std::env::temp_dir().join(format!(
+    let dir = luna_test_support::owned_temp_root().join(format!(
         "luna_whole_file_io_{label}_{}_{}",
         std::process::id(),
         nonce

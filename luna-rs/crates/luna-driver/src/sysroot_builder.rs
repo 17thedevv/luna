@@ -447,7 +447,7 @@ mod tests {
 
     #[test]
     fn test_lock_guard_cleanup_on_drop() {
-        let temp_dir = std::env::temp_dir().join("luna_lock_test_drop");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_lock_test_drop");
         let lock_path = temp_dir.join(".build.lock");
         let _ = std::fs::remove_dir_all(&temp_dir);
         let _ = std::fs::create_dir_all(&temp_dir);
@@ -464,7 +464,7 @@ mod tests {
 
     #[test]
     fn test_lock_guard_cleanup_on_error() {
-        let temp_dir = std::env::temp_dir().join("luna_lock_test_err");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_lock_test_err");
         let lock_path = temp_dir.join(".build.lock");
         let _ = std::fs::remove_dir_all(&temp_dir);
         let _ = std::fs::create_dir_all(&temp_dir);
@@ -483,7 +483,7 @@ mod tests {
 
     #[test]
     fn test_lock_guard_mutual_exclusion() {
-        let temp_dir = std::env::temp_dir().join("luna_lock_test_mutex");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_lock_test_mutex");
         let lock_path = temp_dir.join(".build.lock");
         let _ = std::fs::remove_dir_all(&temp_dir);
         let _ = std::fs::create_dir_all(&temp_dir);

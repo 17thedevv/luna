@@ -1,0 +1,8 @@
+Internal ctest changing into directory: C:/r5b-39056178610/runtime
+Test project C:/r5b-39056178610/runtime
+    Start 1: RuntimeAbiTests
+1/1 Test #1: RuntimeAbiTests ..................   Passed    0.60 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.62 sec

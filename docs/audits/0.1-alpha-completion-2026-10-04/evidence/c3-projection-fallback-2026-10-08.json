@@ -1,0 +1,51 @@
+{
+  "task": "C3 — associated projection / fallback / proof depth",
+  "status": "PASS (implementation fix)",
+  "date": "2026-10-08",
+  "branch": "c3-projection-fallback",
+  "base": "22c33366",
+  "class": "IMPLEMENTATION FIX",
+  "counterexamples": [
+    {
+      "id": "C3-1",
+      "reducer": "tests/luna/language/projection_fallback/deep_bound_70.ln",
+      "original_failure": "a valid chain of 70 blanket impls was rejected with E2021 'The type `Leaf` does not implement trait `L70`'",
+      "layer": "constraint / trait-obligation solving (trait_bound_proof.rs)",
+      "root_cause": "prove_trait_goal returned false when the expansion stack reached the fixed 64-frame bound, leaking an internal search limit into language behaviour as a false 'unsatisfied'",
+      "fix": "named termination guard MAX_PROOF_DEPTH = 256; exact-cycle detection (stack.contains) unchanged"
+    },
+    {
+      "id": "C3-2",
+      "reducer": "tests/luna/language/projection_fallback/nested_projection_concrete.ln",
+      "original_failure": "a chained projection `proj3::Top::Middle::Leaf` was rejected with E1001 even though each step resolves",
+      "layer": "type-path resolution (associated projection normalization)",
+      "root_cause": "the path prefix was resolved only through the symbol table, so a type segment before the final associated name aborted the walk",
+      "fix": "resolve the prefix left to right: descend module segments, stop at a type (or type parameter), then project the remaining segments"
+    }
+  ],
+  "diagnostics_confirmed": {
+    "cyclic_projection": "E2008 E_ASSOC_TYPE_CYCLE (structured)",
+    "ambiguous_projection": "E2019 E_AMBIGUOUS_ASSOCIATED_TYPE (structured; exactly one diagnostic, no cascade)",
+    "cyclic_bound": "E2021 still rejects a genuinely cyclic blanket bound — termination intact"
+  },
+  "unverified_or_unsupported": [
+    "generic chained projection `T::Middle::Leaf` requires an associated-type bound (`type Assoc: Trait`), which the grammar does not currently accept; fail-closed with a structured diagnostic (E2007 / parse error)"
+  ],
+  "changed_files": [
+    "luna-rs/crates/luna-semantic/src/trait_bound_proof.rs (MAX_PROOF_DEPTH = 256)",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs (left-to-right type-path resolution with chained projection)",
+    "luna-rs/crates/luna-cli/tests/projection_fallback_cli.rs",
+    "tests/luna/language/projection_fallback/*.ln"
+  ],
+  "focused": {
+    "command": "cargo test -p luna-cli --test projection_fallback_cli (plus luna-semantic, trait_argument_bounds_cli, interface_constraints_cli)",
+    "result": "projection_fallback_cli 1 passed; trait_argument_bounds_cli 1 passed; interface_constraints_cli 1 passed; luna-semantic 0 failed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 212 binaries, 1344 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — both changes only widen the accepted program set; no codegen or artifact-schema change for previously valid programs",
+  "verdict": "C3: CONFORMANT IN TESTED SCOPE (deep valid bounds unblocked, chained concrete projection resolved, projection/cycle/ambiguity diagnostics structured)"
+}

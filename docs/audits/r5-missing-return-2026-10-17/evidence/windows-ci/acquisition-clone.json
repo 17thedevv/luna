@@ -1,0 +1,20 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "label": "acquisition-clone",
+  "command": [
+    "git",
+    "-c",
+    "core.longpaths=true",
+    "clone",
+    "--no-checkout",
+    "https://github.com/17thedevv/luna.git",
+    "D:\\r5-39032926577\\windows-checkout"
+  ],
+  "cwd": "D:\\r5-39032926577",
+  "start_utc": "2026-10-17T12:34:39.490516+00:00",
+  "end_utc": "2026-10-17T12:34:42.556108+00:00",
+  "elapsed_seconds": 3.062,
+  "exit": 0,
+  "log": "acquisition-clone.log",
+  "log_sha256": "ce3d922c60bef5708dacfca4b7a766bc3666a2582643e92bbcf49ff5d21b488a"
+}

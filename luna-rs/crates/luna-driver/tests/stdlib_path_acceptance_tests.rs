@@ -9,7 +9,7 @@ use std::process::Command;
 mod canonical_artifacts;
 
 fn create_temp_dir() -> PathBuf {
-    let dir = std::env::temp_dir().join(format!(
+    let dir = luna_test_support::owned_temp_root().join(format!(
         "luna_path_semantics_{}_{}",
         std::process::id(),
         std::time::SystemTime::now()

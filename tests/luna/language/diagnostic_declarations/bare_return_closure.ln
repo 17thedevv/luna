@@ -1,0 +1,7 @@
+// This comment must never be selected as a diagnostic source location.
+fn main() -> i32 {
+    dec callback = || -> i32 { // invalid return contract
+        return;
+    };
+    return 0;
+}

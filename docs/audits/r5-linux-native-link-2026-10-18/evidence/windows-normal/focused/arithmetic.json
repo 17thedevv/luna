@@ -1,0 +1,24 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "focused/arithmetic",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--test",
+    "checked_arithmetic_qualification_cli",
+    "--test",
+    "wrapping_arithmetic_cli",
+    "--test",
+    "range_inclusive_cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T19:14:00.927096+00:00",
+  "end_utc": "2026-10-17T19:26:53.737937+00:00",
+  "elapsed_seconds": 772.812,
+  "exit": 0,
+  "log": "focused/arithmetic.log",
+  "log_sha256": "1c124438365c6d35222d4ec51c5db8018b224d42c4f8f8575f3684706e1de5b8"
+}

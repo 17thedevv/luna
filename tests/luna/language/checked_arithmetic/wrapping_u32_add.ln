@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec a: u32 = 4294967295;
+    dec b: u32 = 1;
+    dec x = std::wrapping_add(a, b);
+    if x == 0 { return 0; }
+    return 7;
+}

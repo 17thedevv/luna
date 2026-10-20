@@ -1,0 +1,208 @@
+{
+  "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "status": "PASS",
+  "artifacts": [
+    {
+      "artifact_id": 12147840345,
+      "name": "r5-ubuntu-workspace-final-39128925234-1",
+      "workflow_run": {
+        "id": 39128925234,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac"
+      },
+      "archive_sha256": "b8667786dfbad9ebee87bcf57d783dd752335b38e3ea3c897a11529dd8872608",
+      "size_in_bytes": 83564,
+      "local_path": "D:\\r5-8525067f\\ci-artifacts\\r5-ubuntu-workspace-final-39128925234-1.zip",
+      "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "harness_commit": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
+      "status": "PASS",
+      "checks": {
+        "file_hashes": 61,
+        "compressed_log_hashes": 29,
+        "raw_log_hashes": 29
+      },
+      "gates": 29,
+      "workspace": {
+        "result_groups": 236,
+        "passed": 1421,
+        "failed": 0,
+        "ignored": 1,
+        "ignored_lines": [
+          "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+        ]
+      },
+      "providers": {
+        "count": 49,
+        "target": "x86_64-unknown-linux-gnu",
+        "object": "ELF64 x86_64",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "basis": "Recorded provider headers and object identities in hash-verified acquisition"
+      },
+      "repeated_identical_log_records": [
+        "code-tree-identity"
+      ],
+      "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree 254f67a76a93a80866fa4be4e9b5ffd95fb5ef49\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
+    },
+    {
+      "artifact_id": 12141543866,
+      "name": "r5-ubuntu-workspace-triage-39128925234-1",
+      "workflow_run": {
+        "id": 39128925234,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac"
+      },
+      "archive_sha256": "6b8ff0b29e616b027bfab10744e6af88c8727b04b47328727fefa347481f74a4",
+      "size_in_bytes": 83612,
+      "local_path": "D:\\r5-8525067f\\ci-artifacts\\r5-ubuntu-workspace-triage-39128925234-1.zip",
+      "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "harness_commit": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
+      "status": "PASS",
+      "checks": {
+        "file_hashes": 61,
+        "compressed_log_hashes": 29,
+        "raw_log_hashes": 29
+      },
+      "gates": 29,
+      "workspace": {
+        "result_groups": 236,
+        "passed": 1421,
+        "failed": 0,
+        "ignored": 1,
+        "ignored_lines": [
+          "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+        ]
+      },
+      "providers": {
+        "count": 49,
+        "target": "x86_64-unknown-linux-gnu",
+        "object": "ELF64 x86_64",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "basis": "Recorded provider headers and object identities in hash-verified acquisition"
+      },
+      "repeated_identical_log_records": [
+        "code-tree-identity"
+      ],
+      "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree 254f67a76a93a80866fa4be4e9b5ffd95fb5ef49\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
+    },
+    {
+      "artifact_id": 12139843108,
+      "name": "r5-ubuntu-normal-39128925234-1",
+      "workflow_run": {
+        "id": 39128925234,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac"
+      },
+      "archive_sha256": "456acb3de5361cf50b327b4113a04a78558ac065050bcc2296bcbadbbe5ffd76",
+      "size_in_bytes": 191377,
+      "local_path": "D:\\r5-8525067f\\ci-artifacts\\r5-ubuntu-normal-39128925234-1.zip",
+      "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "harness_commit": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
+      "status": "PASS",
+      "checks": {
+        "file_hashes": 123,
+        "compressed_log_hashes": 48,
+        "raw_log_hashes": 48
+      },
+      "gates": 48,
+      "workspace": null,
+      "providers": {
+        "count": 49,
+        "target": "x86_64-unknown-linux-gnu",
+        "object": "ELF64 x86_64",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "basis": "Recorded provider headers and object identities in hash-verified acquisition"
+      },
+      "repeated_identical_log_records": [],
+      "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree 254f67a76a93a80866fa4be4e9b5ffd95fb5ef49\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
+    },
+    {
+      "artifact_id": 12137640794,
+      "name": "r5-ubuntu-comptime-vm-39128925234-1",
+      "workflow_run": {
+        "id": 39128925234,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac"
+      },
+      "archive_sha256": "605c3c1c88e8bdaf78681a8e79452c621822eddc64a676dd2d1b7e879d1a08aa",
+      "size_in_bytes": 16212195,
+      "local_path": "D:\\r5-8525067f\\ci-artifacts\\r5-ubuntu-comptime-vm-39128925234-1.zip",
+      "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "harness_commit": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
+      "status": "PASS",
+      "checks": {
+        "file_hashes": 982,
+        "compressed_log_hashes": 28,
+        "raw_log_hashes": 28
+      },
+      "gates": 28,
+      "workspace": null,
+      "providers": {
+        "count": 49,
+        "target": "x86_64-unknown-linux-gnu",
+        "object": "ELF64 x86_64",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "basis": "Recorded provider headers and object identities in hash-verified acquisition"
+      },
+      "repeated_identical_log_records": [],
+      "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree 254f67a76a93a80866fa4be4e9b5ffd95fb5ef49\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
+    },
+    {
+      "artifact_id": 12137501206,
+      "name": "r5-ubuntu-runtime-asan-39128925234-1",
+      "workflow_run": {
+        "id": 39128925234,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac"
+      },
+      "archive_sha256": "3d4f4eaa2febe9dc589d8bbae0ab8bd8d202c761c7b194f2df3d28cfa44351c8",
+      "size_in_bytes": 22048,
+      "local_path": "D:\\r5-8525067f\\ci-artifacts\\r5-ubuntu-runtime-asan-39128925234-1.zip",
+      "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "harness_commit": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
+      "status": "PASS",
+      "checks": {
+        "file_hashes": 43,
+        "compressed_log_hashes": 19,
+        "raw_log_hashes": 19
+      },
+      "gates": 19,
+      "workspace": null,
+      "providers": null,
+      "repeated_identical_log_records": [],
+      "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree 254f67a76a93a80866fa4be4e9b5ffd95fb5ef49\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
+    }
+  ],
+  "errors": [],
+  "scope": "ZIP SHA-256/size/CRC; inventory; clean exact pin; gate exits; compressed and raw log digests; workspace totals; recorded provider identities",
+  "release": "PENDING COMPLETE EIGHT-LANE RECONCILIATION"
+}

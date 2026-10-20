@@ -1,0 +1,8 @@
+struct Record { value: i32, };
+fn take(record: Record) { }
+fn f(flag: bool, other: bool) -> i32 {
+    dec record = Record { value: 1 };
+    if flag { take(record); } else { if other { take(record); } }
+    return record.value;
+}
+fn main() -> i32 { return f(true, false); }

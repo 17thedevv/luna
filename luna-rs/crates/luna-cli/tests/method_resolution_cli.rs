@@ -93,7 +93,7 @@ fn method_applicability_and_binder_identity_survive_provider_modes_and_order() {
                     continue;
                 }
                 let run = Command::new(exe)
-                    .current_dir(std::env::temp_dir())
+                    .current_dir(luna_test_support::owned_temp_root())
                     .output()
                     .unwrap();
                 if !run.status.success() {

@@ -5,6 +5,17 @@ use luna_common::ids::SymbolId;
 
 type Goal = (SemanticTypeId, SymbolId, Vec<SemanticTypeId>);
 
+/// Internal termination guard for trait-bound expansion.
+///
+/// Exact goal cycles are already rejected by the recursion-stack check
+/// (`stack.contains`); this bound only stops pathological goals whose structural
+/// type grows on every recursion, which can never repeat exactly. It must be
+/// large enough that a legitimate finite proof graph is never blocked: a chain
+/// of `N` blanket impls legitimately needs `N` expansion frames, so a low bound
+/// turns a valid program into a false "does not implement" diagnostic.
+const MAX_PROOF_DEPTH: usize = 256;
+
+
 impl<'a> TypeChecker<'a> {
     pub(super) fn prove_trait_bound(
         &mut self,
@@ -30,7 +41,7 @@ impl<'a> TypeChecker<'a> {
         let goal = (receiver, trait_id, arguments.clone());
         // A recursive assumption is not evidence. Bound expansion must also
         // terminate for goals whose structural type grows on every recursion.
-        if stack.contains(&goal) || stack.len() >= 64 {
+        if stack.contains(&goal) || stack.len() >= MAX_PROOF_DEPTH {
             return false;
         }
         stack.push(goal);

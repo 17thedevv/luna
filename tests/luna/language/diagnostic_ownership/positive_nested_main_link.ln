@@ -1,0 +1,8 @@
+module helpers {
+    #[link(name = "nested_main_helper")]
+    export fn main(value: i32) -> i32 { return value + 1; }
+}
+fn main() -> i32 {
+    if helpers::main(41) == 42 { return 0; }
+    return 1;
+}

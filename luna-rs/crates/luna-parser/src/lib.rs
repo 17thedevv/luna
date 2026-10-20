@@ -8,6 +8,56 @@ pub mod pat;
 pub mod stmt;
 pub mod ty;
 
+/// Grammar admission for source and materialized declarations.
+pub fn invalid_using_scope(span: Span) -> Diagnostic {
+    Diagnostic::source_error(DiagnosticCode::InvalidSyntax, span,
+        "using is restricted to file/module scope")
+        .in_phase(luna_common::diagnostic::DiagnosticPhase::Parser)
+}
+
+/// Attribute-name grammar admission also used for materialized macro/provider
+/// AST. The Parser constructs E0005; semantic callers only propagate it.
+pub fn validate_annotation_names(
+    annotations: &[luna_ast::Annotation],
+    sources: &luna_common::source::SourceManager,
+) -> Vec<Diagnostic> {
+    annotations.iter().filter_map(|annotation| {
+        let source = &sources.get_file(annotation.name.file_id)?.source;
+        let name = source.get(annotation.name.start as usize..annotation.name.end as usize)?;
+        if is_annotation_name(name) { None } else {
+            Some(Diagnostic::source_error(DiagnosticCode::InvalidAnnotation,
+                annotation.name, format!("unknown attribute `{name}`")))
+        }
+    }).collect()
+}
+
+fn is_annotation_name(name: &str) -> bool {
+    matches!(name, "derive" | "repr" | "test" | "inline" | "no_mangle" | "link" | "lang" | "sync_noescape")
+}
+
+/// Literal grammar is admitted by Parser, before semantic value/range typing.
+/// Materialized provider AST uses the same functions before binding resolution.
+pub fn decode_integer_literal(text: &str, span: Span) -> Result<luna_lexer::literal::IntegerLiteral, Diagnostic> {
+    luna_lexer::literal::decode_integer(text).map_err(|message|
+        Diagnostic::source_error(DiagnosticCode::InvalidSyntax, span,
+            format!("E_INVALID_INTEGER_LITERAL: {message}")))
+}
+
+pub fn decode_byte_literal(text: &str, character: bool, span: Span) -> Result<Vec<u8>, Diagnostic> {
+    luna_lexer::literal::decode_bytes(text, character).map_err(|message|
+        Diagnostic::source_error(DiagnosticCode::InvalidSyntax, span,
+            format!("E_INVALID_BYTE_LITERAL: {message}")))
+}
+
+pub fn validate_literal_syntax(token: Token, text: &str) -> Result<(), Diagnostic> {
+    match token.kind {
+        TokenKind::IntegerLiteral => decode_integer_literal(text, token.span).map(|_| ()),
+        TokenKind::ByteLiteral | TokenKind::ByteStringLiteral =>
+            decode_byte_literal(text, token.kind == TokenKind::ByteLiteral, token.span).map(|_| ()),
+        _ => Ok(()),
+    }
+}
+
 pub struct Parser<'a> {
     tokens: Vec<Token>,
     pos: usize,

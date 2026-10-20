@@ -1,5 +1,10 @@
 # Kế hoạch hoàn thiện Luna 0.1-alpha.1 — 2026-10-04
 
+Current reconciliation, 2026-10-14: [R4 exact ledger and R5 handoff](r4/README.md).
+This plan retains its original baseline and historical findings. E-wave is
+CLOSED / QUALIFIED IN TESTED SCOPE at e4f9fb53, stored by 3f8646c6. R4 changes
+docs/evidence only; R5 remains PENDING / RELEASE BLOCKED.
+
 Đối chiếu bản review do maintainer cung cấp với branch
 `codex/antigravity-repair-0.1`, HEAD
 `c8d0559500e78ef85c96ac842e824e639917cbad`; merge-base với main là

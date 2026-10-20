@@ -4,7 +4,7 @@ use std::fs;
 use std::path::PathBuf;
 
 fn create_temp_dir(test_name: &str) -> PathBuf {
-    let dir = std::env::temp_dir()
+    let dir = luna_test_support::owned_temp_root()
         .join("luna_struct_lifetime_tests")
         .join(test_name);
     let _ = fs::remove_dir_all(&dir);
@@ -642,7 +642,7 @@ fn test_struct_life_17_llib_version_compatibility() {
     let reader_res = MlibReader::read_manifest(&mut cursor);
     assert!(reader_res.is_err(), "STRUCT-LIFE-17: Incompatible version must be rejected by MlibReader");
     match reader_res.err().unwrap() {
-        MlibError::VersionMismatch(found) => {
+        MlibError::VersionMismatch { component: "format", found, .. } => {
             assert_eq!(found, 999);
         }
         other => panic!("STRUCT-LIFE-17: Expected VersionMismatch, got {:?}", other),

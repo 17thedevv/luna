@@ -1,0 +1,4 @@
+fn f(flag: bool) -> i32 {
+    if flag { return 7; }
+}
+fn main() -> i32 { return f(false); }

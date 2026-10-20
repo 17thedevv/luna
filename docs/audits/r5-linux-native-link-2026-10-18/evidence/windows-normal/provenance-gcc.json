@@ -1,0 +1,15 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "provenance-gcc",
+  "command": [
+    "gcc",
+    "-dumpmachine"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T18:02:25.952642+00:00",
+  "end_utc": "2026-10-17T18:02:25.952642+00:00",
+  "elapsed_seconds": 0.0,
+  "exit": 0,
+  "log": "provenance-gcc.log",
+  "log_sha256": "5a93bd82f1f12e8b275a5cb5df82e8bac02d52c05d53b534913d0bc49ac46b9b"
+}

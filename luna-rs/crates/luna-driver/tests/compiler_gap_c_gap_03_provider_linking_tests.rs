@@ -17,7 +17,7 @@ fn run_executable(exe_path: &Path) -> (i32, String, String) {
 }
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join(format!("luna_c_gap_03_{}_{}", name, std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    let dir = luna_test_support::owned_temp_root().join(format!("luna_c_gap_03_{}_{}", name, std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
     fs::create_dir_all(&dir).expect("Failed to create temp dir");
     dir
 }

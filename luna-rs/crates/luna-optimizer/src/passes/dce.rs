@@ -2,7 +2,9 @@ use luna_mvir::{Function, Instruction, Terminator, Operand};
 use crate::pass::Pass;
 use std::collections::HashSet;
 
-pub struct DeadCodeElimination;
+pub struct DeadCodeElimination {
+    integer_types: Option<HashSet<u32>>,
+}
 
 impl Pass for DeadCodeElimination {
     fn name(&self) -> &'static str {
@@ -126,7 +128,13 @@ impl Pass for DeadCodeElimination {
                     // Keep instructions with side effects or used ones
                     // INVARIANT: mọi Call, HeapFree, Drop đều effectful trừ khi purity analysis chứng minh ngược lại (TRIPWIRE CẢNH BÁO).
                     let has_side_effects = matches!(val.inst, Instruction::Store { .. } | Instruction::StoreAnchored { .. } | Instruction::CallDirect { .. } | Instruction::CallIndirect { .. } | Instruction::CallClosure { .. } | Instruction::CallVirt { .. } | Instruction::CallIntrinsic { .. } | Instruction::MakeClosure { .. } | Instruction::HeapAlloc | Instruction::HeapFree { .. } | Instruction::Drop { .. } | Instruction::DropVirt { .. } | Instruction::BoundsCheck { .. });
-                    has_side_effects || used_values.contains(&inst_id.0) || (inst_id.0 < func.arg_count as u32)
+                    let arithmetic_may_trap = matches!(val.inst,
+                        Instruction::Add { .. } | Instruction::Sub { .. } |
+                        Instruction::Mul { .. } | Instruction::Div { .. } |
+                        Instruction::Rem { .. } | Instruction::Shl { .. } |
+                        Instruction::Shr { .. } | Instruction::Neg { .. })
+                        && self.integer_types.as_ref().is_none_or(|types| types.contains(&val.ty.0));
+                    has_side_effects || arithmetic_may_trap || used_values.contains(&inst_id.0) || (inst_id.0 < func.arg_count as u32)
                 });
                 if block.insts.len() != initial_len {
                     pass_changed = true;
@@ -146,6 +154,12 @@ impl Pass for DeadCodeElimination {
 
 impl DeadCodeElimination {
     pub fn new() -> Self {
-        Self
+        // Without immutable numeric facts, fail closed: ordinary arithmetic may
+        // trap even when its value is unused. Explicit wrapping stays CallIntrinsic.
+        Self { integer_types: None }
+    }
+
+    pub fn with_integer_types(types: impl IntoIterator<Item = u32>) -> Self {
+        Self { integer_types: Some(types.into_iter().collect()) }
     }
 }

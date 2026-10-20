@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-20",
+  "status": "CLEAN_PROPOSED_MERGE_WITH_QUALIFIED_IMPLEMENTATION_TREES",
+  "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
+  "head": "e640ef455036d93c4a8f254e043ce666db2d3321",
+  "tested_implementation": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "proposed_merge_tree": "e8240a3983be68fa6830d499ec2d5ab67f925ae3",
+  "implementation_objects": {
+    "luna-rs": "254f67a76a93a80866fa4be4e9b5ffd95fb5ef49",
+    "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+    "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4",
+    "CMakeLists.txt": "e963f1a5ae5c3a2677f19ebf664e871f14ca6100"
+  },
+  "refs_modified": false,
+  "scope": "Read-only merge-tree rehearsal; this does not perform or authorize merge/tag/publication"
+}

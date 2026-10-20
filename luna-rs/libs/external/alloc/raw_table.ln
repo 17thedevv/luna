@@ -1,3 +1,5 @@
+import <num>;
+
 import <__alloc_global>;
 import <ptr>;
 import <mem>;
@@ -91,10 +93,10 @@ import <__lang_iterator>;
     }
 
     fn mix_hash(h: u64) -> u64 {
-    dec rw z = (h ^ (h >> 30u64)) * 13787848793156543929u64;
-    z = (z ^ (z >> 27u64)) * 10723151780598845931u64;
-    return z ^ (z >> 31u64);
-}
+        dec rw z = std::wrapping_mul(h ^ (h >> 30u64), 13787848793156543929u64);
+        z = std::wrapping_mul(z ^ (z >> 27u64), 10723151780598845931u64);
+        return z ^ (z >> 31u64);
+    }
 
 impl<K, V> RawTable<K, V> {
         export fn len(self: &Self) -> u64 {
@@ -698,3 +700,4 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
     }
 
 extern fn __luna_panic_default();
+

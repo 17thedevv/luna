@@ -1,0 +1,10 @@
+{
+  "date": "2026-10-20",
+  "source": "Explicit human reply to the release decision question in this chat",
+  "authorization": "Tạo PR, merge và phát hành sau khi package smoke Windows/Ubuntu PASS",
+  "release_tag": "v0.1.0-alpha.1",
+  "pr": "https://github.com/17thedevv/luna/pull/7",
+  "condition": "Both independent Windows/Ubuntu package smoke jobs PASS before merge/tag/publication",
+  "release_source_policy": "Tag the exact immutable source commit used for the successful package build. Verify main PR integration retains identical implementation trees; evidence/report descendants remain distinct.",
+  "status": "AUTHORIZED_PENDING_PACKAGE_ACQUISITION_AND_SMOKE"
+}

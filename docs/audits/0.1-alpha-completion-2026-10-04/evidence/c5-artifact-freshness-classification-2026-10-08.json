@@ -1,0 +1,48 @@
+{
+  "task": "C5 — artifact freshness classification",
+  "status": "PASS (implementation fix)",
+  "date": "2026-10-08",
+  "branch": "c5-artifact-freshness-classification",
+  "base": "5994f5a3",
+  "class": "IMPLEMENTATION FIX",
+  "counterexample": {
+    "id": "C5-1",
+    "what": "format / compiler / MVIR / semantic-metadata version mismatches all surfaced as the same MlibError::VersionMismatch(u16) and rendered as `invalid manifest: VersionMismatch(N)`",
+    "why_it_matters": "the user and tests could not tell which boundary rejected the artifact; only the bare number differed",
+    "layer": "artifact header/version validation (luna-llib reader)",
+    "fix": "MlibError::VersionMismatch { component, found, expected } with component in {format, compiler, mvir, semantic-metadata}"
+  },
+  "classes_after_fix": {
+    "FORMAT_INCOMPATIBLE": "VersionMismatch { component: \"format\" } (header format_version)",
+    "COMPILER_INCOMPATIBLE": "VersionMismatch { component: \"compiler\" }",
+    "MVIR_INCOMPATIBLE": "VersionMismatch { component: \"mvir\" }",
+    "METADATA_INCOMPATIBLE": "VersionMismatch { component: \"semantic-metadata\" } (semantic metadata section version)",
+    "TARGET_INCOMPATIBLE": "TargetMismatch (header target triple vs manifest)",
+    "OBJECT_IDENTITY_MISMATCH": "ObjectIntegrityMismatch (object hash/size/format vs manifest)",
+    "INTERFACE_STALE": "'dependency interface fingerprint mismatch for provider ...' (interface_constraints_cli)",
+    "EXECUTION_STALE": "'dependency execution fingerprint mismatch for provider ...' (comptime_dependency_precision_cli)",
+    "TAMPERED_SECTION": "SectionChecksumMismatch (section checksum)"
+  },
+  "harness": "luna-rs/crates/luna-cli/tests/fresh_artifact_classification_cli.rs",
+  "harness_method": "publish a real provider .llib and mutate one boundary per case (header format/compiler/mvir/target triple, semantic-metadata section version, object payload) with the section checksum refreshed so validation reaches the boundary under test",
+  "observed": [
+    "every stale class is rejected deterministically with a classified reason",
+    "no executable is published for a stale artifact",
+    "a freshly published artifact builds and runs (control)"
+  ],
+  "related_finding": {
+    "id": "FIND-ASYNC-PROVIDER-01",
+    "note": "remains independent: the parameterless-async provider `.llib` corruption is a deeper serialization/decode issue (`CorruptedData`), not one of the freshness classes above; not fixed inside C5"
+  },
+  "focused": {
+    "command": "cargo test -p luna-cli --test fresh_artifact_classification_cli (plus luna-llib, struct_lifetime_contract_acceptance_tests)",
+    "result": "fresh_artifact_classification_cli 1 passed; luna-llib 24 passed; struct_lifetime_contract_acceptance_tests 1 passed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 214 binaries, 1346 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — diagnostics/classification only; artifact schema and the accepted-artifact set are unchanged",
+  "verdict": "C5: CONFORMANT IN TESTED SCOPE (each freshness/staleness class rejects deterministically with a classified reason; fresh artifacts build and run)"
+}

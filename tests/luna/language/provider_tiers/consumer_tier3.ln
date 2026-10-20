@@ -1,0 +1,2 @@
+import "a";
+fn main() -> i32 { return a::value() - 8; }

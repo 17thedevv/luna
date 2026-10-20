@@ -25,7 +25,7 @@ fn test_sysroot_options() -> (Sysroot, CompilerOptions) {
 }
 
 fn create_temp_dir(name: &str) -> PathBuf {
-    let dir = std::env::temp_dir().join("luna_alloc_box_tests").join(name);
+    let dir = luna_test_support::owned_temp_root().join("luna_alloc_box_tests").join(name);
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
     dir

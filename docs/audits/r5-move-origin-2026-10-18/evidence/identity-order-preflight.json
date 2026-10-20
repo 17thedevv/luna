@@ -1,0 +1,54 @@
+{
+  "status": "PASS_LOCAL_PREFLIGHT_ONLY",
+  "observed_at_utc": "2026-10-18T05:46:36.007408+00:00",
+  "source_base": "67146195fb025951ca51d54365fd3a47ef9544e6",
+  "source_identity": "Implementation files hashed in identity-order-source-review.json; working-tree repair before selecting immutable pin",
+  "fresh_remote_checkout": false,
+  "runtime_reused_from": "C:/r5-52ef3711/windows-build/runtime/libluna-runtime.a",
+  "cli_sha256": "e56e7c64665682dfc630b178b31ed48dcd7c3a6a60646e26cc5803d6d6f38e4e",
+  "public_matrix": {
+    "origin_negatives": 7,
+    "distinct_partial_move_negatives": 1,
+    "multi_function_negatives": 1,
+    "provider_modes": 2,
+    "negative_check_and_build_commands": 58,
+    "native_valid_control_runs": 2,
+    "multi_function_independent_checks_per_mode": 4
+  },
+  "total_passed": 90,
+  "logs": {
+    "normalized-common.log.gz": {
+      "raw_sha256": "c3e9ef896435654dd8b0e2e0d8eadfeb5e8cb9c702eed9efde8953aebe6dd433",
+      "compressed_sha256": "170a91538e085402c4fed8f6408e635ba1b6981d3a62e71cc71c722fe7079fa9",
+      "passed": 15,
+      "failed": 0,
+      "ignored": 0,
+      "groups": 2
+    },
+    "normalized-borrowck.log.gz": {
+      "raw_sha256": "06be81049fdf8806df740d30bc465db60c1371b0426fbeb05b55d65e86d24b5f",
+      "compressed_sha256": "0ea0006d7cd2a0325c3677ecf2470d28cea4da9fa0850f7230e22c23b2ade529",
+      "passed": 65,
+      "failed": 0,
+      "ignored": 0,
+      "groups": 12
+    },
+    "normalized-cli.log.gz": {
+      "raw_sha256": "66ef1e4926442db11e7e3b8bb4b7bc30ec19242ca4e6f169d97187efe6acb247",
+      "compressed_sha256": "bb71ca60dc3f74eb961358887e21c02cb12f55f836d651fa87f28414ee45bb1c",
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "groups": 1
+    },
+    "normalized-regressions.log.gz": {
+      "raw_sha256": "838d71208bee53266bb180469aa21fcf14067383026f60f71410542e7da6f6fb",
+      "compressed_sha256": "5ab88c86e92228f2c6bc39e43efa96aff0dfa796239c58abed8a002efd22b927",
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "groups": 3
+    }
+  },
+  "release_gate": "NOT CLAIMED; all eight fresh lanes and final release audit required"
+}

@@ -1,0 +1,18 @@
+{
+  "gate": "remote-url",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "git",
+    "remote",
+    "get-url",
+    "origin"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan/checkout",
+  "started_utc": "2026-10-17T18:00:31Z",
+  "exit": 0,
+  "seconds": 0.0014397739999978398,
+  "log_sha256": "6d78b4e7610b575ea218b9778a67a97604a34aab1def3156f98768ac67d3e22b",
+  "status": "PASS",
+  "log": "remote-url.log.gz",
+  "compressed_sha256": "dbf8a0bf7dc3d8f10342a7aec01e5127077e5af6a60cc578c1ea9710ff54ad50"
+}

@@ -66,6 +66,33 @@ fn main() -> i32 { return 0; }
         mixed_err.contains("error[E0002]") || mixed_err.contains("E0002"),
         "expected E0002 diagnostic code for mixed fields, got: {mixed_err}"
     );
+
+    // A negative parser case must carry a typed code AND a primary span at the
+    // offending field, not a bare file-start or coded-but-locationless message.
+    assert!(
+        err_msg.contains("negative.ln:3:"),
+        "E0002 must carry a primary span at the offending field, got: {err_msg}"
+    );
+    assert!(
+        mixed_err.contains("mixed.ln:4:"),
+        "E0002 must carry a primary span in the mixed case, got: {mixed_err}"
+    );
+
+    // Parity: the rejection and its span must hold against a fresh artifact sysroot too.
+    let artifact_check = modes.check(&modes.artifact, &negative_path);
+    assert!(
+        !artifact_check.status.success(),
+        "semicolon fields must be rejected in artifact mode"
+    );
+    let artifact_err = render(&artifact_check);
+    assert!(
+        artifact_err.contains("E0002"),
+        "artifact mode must render E0002: {artifact_err}"
+    );
+    assert!(
+        artifact_err.contains("negative.ln:3:"),
+        "artifact mode must carry the primary span: {artifact_err}"
+    );
 }
 
 #[test]
@@ -87,7 +114,15 @@ fn test_v01_grammar_02_parenthesized_foreach() {
     let run = Command::new(exe).output().unwrap();
     assert_eq!(run.status.code(), Some(0), "run failed: {}", render(&run));
 
-    // Characterization: legacy unparenthesized foreach also works
+    // Parity: the canonical parenthesized head must also run against a fresh artifact sysroot.
+    let (artifact_exe, artifact_build) = modes.build(&modes.artifact, &target, "foreach_paren_artifact_exe");
+    assert!(artifact_build.status.success(), "artifact build failed: {}", render(&artifact_build));
+    let artifact_run = Command::new(artifact_exe).output().unwrap();
+    assert_eq!(artifact_run.status.code(), Some(0), "artifact run failed: {}", render(&artifact_run));
+
+    // LEGACY / CHARACTERIZATION (not standardized 0.1 syntax): the unparenthesized
+    // head is still accepted by the parser and must not be treated as canonical.
+    // This asserts current behavior only; it does not promote the form.
     let legacy_fixture = repo_root.join("tests/luna/language/spec_v01/foreach_current_parser.ln");
     let legacy_target = temp.join("foreach_legacy.ln");
     fs::copy(&legacy_fixture, &legacy_target).unwrap();
@@ -96,6 +131,35 @@ fn test_v01_grammar_02_parenthesized_foreach() {
     assert!(legacy_build.status.success(), "legacy build failed: {}", render(&legacy_build));
     let legacy_run = Command::new(legacy_exe).output().unwrap();
     assert_eq!(legacy_run.status.code(), Some(0), "legacy run failed: {}", render(&legacy_run));
+}
+
+#[test]
+fn test_v01_grammar_02b_cstyle_for_unaffected() {
+    // The legacy foreach characterization must not disturb the C-style head.
+    let modes = ProviderModes::fresh();
+    let temp = modes.source.join("test_grammar_02b");
+    fs::create_dir_all(&temp).unwrap();
+
+    let source = r#"
+fn main() -> i32 {
+    dec rw total: i32 = 0;
+    for (dec rw round: i32 = 0; round < 3; round += 1) {
+        total = total + round;
+    }
+    return total - 3;
+}
+"#;
+    let path = temp.join("cstyle_for.ln");
+    fs::write(&path, source).unwrap();
+
+    for root in [&modes.source, &modes.artifact] {
+        let check = modes.check(root, &path);
+        assert!(check.status.success(), "C-style for must check: {}", render(&check));
+        let (exe, build) = modes.build(root, &path, "cstyle_for_exe");
+        assert!(build.status.success(), "C-style for must build: {}", render(&build));
+        let run = Command::new(exe).output().unwrap();
+        assert_eq!(run.status.code(), Some(0), "C-style for must run: {}", render(&run));
+    }
 }
 
 #[test]

@@ -25,22 +25,22 @@ impl<T, E> Result<T, E> {
     export fn as_ref(self: &Self) -> Result<&T, &E> life_from(self) {
         if self.is_ok() {
             unsafe {
-                return Result::Ok(&*(((self as *Self as u64) + (8 as u64)) as *T));
+                return Result::Ok(&*(((self as *Self as u64) + (alignof(Self) as u64)) as *T));
             }
         }
         unsafe {
-            return Result::Err(&*(((self as *Self as u64) + (8 as u64)) as *E));
+            return Result::Err(&*(((self as *Self as u64) + (alignof(Self) as u64)) as *E));
         }
     }
 
     export fn as_mut(self: &rw Self) -> Result<&rw T, &rw E> life_from(self) {
         if self.is_ok() {
             unsafe {
-                return Result::Ok(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw T));
+                return Result::Ok(&rw *(((self as *rw Self as u64) + (alignof(Self) as u64)) as *rw T));
             }
         }
         unsafe {
-            return Result::Err(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw E));
+            return Result::Err(&rw *(((self as *rw Self as u64) + (alignof(Self) as u64)) as *rw E));
         }
     }
 

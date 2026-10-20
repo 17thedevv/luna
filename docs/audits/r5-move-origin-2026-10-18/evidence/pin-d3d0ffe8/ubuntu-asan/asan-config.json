@@ -1,0 +1,26 @@
+{
+  "gate": "asan-config",
+  "tested_commit": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+  "command": [
+    "cmake",
+    "-S",
+    "/home/runner/work/_temp/r5-runtime-asan/checkout/runtime",
+    "-B",
+    "/home/runner/work/_temp/r5-runtime-asan/runtime-asan",
+    "-G",
+    "Ninja",
+    "-DCMAKE_BUILD_TYPE=Debug",
+    "-DCMAKE_C_COMPILER=gcc",
+    "-DCMAKE_CXX_COMPILER=g++",
+    "-DCMAKE_C_FLAGS=-fsanitize=address -fno-omit-frame-pointer",
+    "-DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan",
+  "started_utc": "2026-10-18T05:47:43Z",
+  "exit": 0,
+  "seconds": 1.0161102699999844,
+  "log_sha256": "961b2d750b71e1da70fe3ac70e5a189869f63615e83109b43a3b7f6bf6f1af07",
+  "status": "PASS",
+  "log": "asan-config.log.gz",
+  "compressed_sha256": "7f7878a842ba184f082d35a5bce3efbe825663e41857f4d13c6b90e8a12ba683"
+}

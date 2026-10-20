@@ -1,0 +1,29 @@
+{
+  "observed_at_utc": "2026-10-18T05:42:42.196546+00:00",
+  "review_base": "67146195fb025951ca51d54365fd3a47ef9544e6",
+  "status": "NO_ADDITIONAL_FINDING_IN_REVIEWED_DIAG_4_6_REPAIR_DELTA",
+  "scope": "Manual review of identity, normalization, analyzer/mono dedup, Driver check/compile result boundaries and public regression oracles. Not exact-pin qualification or a universal compiler audit.",
+  "observations": [
+    "Source event identity requires a typed code and anchored primary span; message text and related wording do not select an event. Global/unanchored and uncoded diagnostics are preserved.",
+    "Normalization sorts by source file name/range/context and code rather than allocation or function/hash traversal; the lookup map is never iterated to emit diagnostics.",
+    "Duplicate event normalization retains structural cause spans, upgrades severity to error when needed, and does not allow a source event to inherit a provider-contract exemption. Related labels are ordered by location.",
+    "Public semantic-only check, check-with-session and compile-with-session normalize every returned error vector using that session source manager; public signatures and compile acceptance remain unchanged.",
+    "Move/borrow/semantic/mono dedup now compares typed identity, including distinct partial moves under Drop. Conditional-drop diagnostics attach a valid originating move when available.",
+    "Original move-state provenance join, subtree invalidation and field-cause preservation remain intact; no serialized schema, ABI, lang item, intrinsic or stdlib-name branch is added.",
+    "Regression asserts codes, counts and actual source locations, independent CLI processes, check/build parity, source/fresh-artifact parity and native valid controls; internal tests cover identity, cause union, deterministic path ordering and normalization idempotence."
+  ],
+  "file_sha256": {
+    "luna-rs/crates/luna-common/src/diagnostic.rs": "a0e2502914cf225968e02e5d998ec244ccb821065a7530ed03a5fde397fa6ea6",
+    "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs": "62adc9ef10cf7de52fa5156c27b3f9c07958c95a7c906ca9670a001d8b4bcc25",
+    "luna-rs/crates/luna-borrowck/src/move_analysis.rs": "24d4adfc5bf11cdd921fad16eca54c86354085c75081c6835a9f75930fe19d59",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "bdcef4d349bcff6c5e5044d38c48dd216326c74b85191d93db2dc22edea6d043",
+    "luna-rs/crates/luna-driver/src/lib.rs": "44156da70461bba4e4fa035e383fc946437fbf33bfcefe9b7d4ab4708955b11b",
+    "luna-rs/crates/luna-cli/tests/move_origin_join_cli.rs": "c2fcb04a144e1c08c123c258e2a1efe9e1425891acccac5bdd5bb3d9d42e9915"
+  },
+  "remaining": [
+    "Local preflight complete: 15 common, 65 borrowck, expanded CLI matrix and 9 existing diagnostic regressions pass",
+    "Select immutable implementation pin; reacquire and verify all eight release lanes",
+    "Complete final DIAG-1..10 and full release requirement reconciliation before candidate advancement"
+  ],
+  "skill_impact": "REFINEMENT: capability validation now requires distinct identical-wording events and multi-function diagnostics across independent processes; related skill overlap reviewed, no contract change."
+}

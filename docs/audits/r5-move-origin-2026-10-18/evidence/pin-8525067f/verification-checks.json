@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-20",
+  "artifact_count": 8,
+  "artifact_bytes": 60089261,
+  "archive_verification": "all-artifact-verification.json",
+  "verifier_rejection_controls": {
+    "passed": 6,
+    "failed": 0,
+    "cases": [
+      "ZIP digest tampering",
+      "wrong Ubuntu pin",
+      "wrong Windows pin",
+      "inventory member tampering",
+      "raw Windows log hash mismatch",
+      "falsified workspace total"
+    ]
+  },
+  "docs": {
+    "documents": 235,
+    "pages": 30,
+    "local_links": 1886,
+    "errors": 0
+  },
+  "producer_inventory_drift": "PASS",
+  "local_log_hashes": {
+    "checked": 38,
+    "mismatched": 0,
+    "missing": 0,
+    "interrupted_records_excluded": 5
+  },
+  "skill_impact": "none: evidence acquisition/closure did not establish a new semantic or architectural rule"
+}

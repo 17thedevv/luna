@@ -1,0 +1,35 @@
+{
+  "scope": "Partial build and payload check only; independent consumer smoke and full release verification remain required",
+  "results": [
+    {
+      "id": 12247950063,
+      "name": "luna-package-x86_64-unknown-linux-gnu-39385567878-1",
+      "status": "PAYLOAD_HASHES_PASS",
+      "files": 105,
+      "providers": 49,
+      "source": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    {
+      "id": 12247847140,
+      "name": "luna-package-build-evidence-x86_64-pc-windows-gnu-39385567878-1",
+      "status": "BUILD_STREAMS_PASS",
+      "streams": 128,
+      "source": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    {
+      "id": 12247381322,
+      "name": "luna-package-build-evidence-x86_64-unknown-linux-gnu-39385567878-1",
+      "status": "BUILD_STREAMS_PASS",
+      "streams": 128,
+      "source": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    {
+      "id": 12246944830,
+      "name": "luna-package-x86_64-pc-windows-gnu-39385567878-1",
+      "status": "PAYLOAD_HASHES_PASS",
+      "files": 105,
+      "providers": 49,
+      "source": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+// This comment must never be selected as a diagnostic source location.
+fn f() -> i32 {
+    return (1, 2); // invalid expression
+}
+fn main() -> i32 { return 0; }

@@ -1,0 +1,54 @@
+{
+  "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "protocol": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "windows_gates": {
+    "fresh_pin": true,
+    "runtime_abi": true,
+    "providers_49": true,
+    "focused_acde": true,
+    "docs_examples": true,
+    "docs_validator": true,
+    "quickstart": true,
+    "workspace": true,
+    "artifact_independence": true
+  },
+  "ubuntu_normal": "STRICT TARGET CONTRACT GATE FAIL / RECONCILIATION REQUIRED",
+  "ubuntu_asan": "PASS IN C RUNTIME ABI/PARTIAL-READ CLEANUP SCOPE",
+  "diagnostics": {
+    "DIAG-1": "BROKEN",
+    "DIAG-2": "PARTIAL",
+    "DIAG-3": "BROKEN",
+    "DIAG-4": "BROKEN",
+    "DIAG-5": "PARTIAL",
+    "DIAG-6": "UNVERIFIED",
+    "DIAG-7": "PARTIAL",
+    "DIAG-8": "BROKEN",
+    "DIAG-9": "BROKEN",
+    "DIAG-10": "PARTIAL"
+  },
+  "verdict": "BLOCKED",
+  "evidence": {
+    "windows-provenance.json": "c3306b136bfeccffdb04b020563a3bca3db423d68c2324135352c1d38ed34491",
+    "windows-runtime-abi.json": "799443c6901a0cddd04aa08ca9d6314140a2e5e58996313893a424b07ddb54f5",
+    "windows-sysroot-provenance.json": "f44516494d7fac41001853d9df5f18faff94564101e987b7703648168360ffa6",
+    "windows-focused-summary.json": "b7376508b89a84485c63a7a01d397cbaea8a84e27f07e0760c23d5091fa7ec14",
+    "windows-quickstart.json": "449de852dc00f9ffafc874540adeaffa10fa608d3700acd358b7780420c5ce8c",
+    "windows-docs-examples.json": "140ccb3d0c0610b49b61e85946a77012d45edf62749258031be3d9b6804963d9",
+    "windows-docs-validator.json": "64a5ed710166797aa274585e3b534f825b3bc145657473576341350bd7e09c8d",
+    "windows-workspace-summary.json": "1b6a1ecfd3f23b5ffb60065088d7a0afb5f68f8259f9037f489d1490cefec2cc",
+    "windows-final-identity.json": "639523cb60e743fc3a347ecd35926817b325af150a8b169d47d15fdd10a1ba30",
+    "ubuntu-normal-target-finding.json": "5527f96b28847fce16121ff2867a220a5a30cef8590f58b6d433747c46de69f2",
+    "ubuntu-asan-artifact-verification.json": "cfa8953ce1fae7777b4b0dadc776448b2e99e89672824e366880e87b5a9b529f",
+    "diagnostics-summary.json": "2b6a03f50f0666c920a42955f654fb0898cdc6f395a47e9e7ca4727a10010854",
+    "diagnostics-invariant-verdicts.json": "3ebec90fc1d62118240851c811b759e7d6b033f48a0f63107033b435a3a3c751",
+    "diagnostics-manual-findings.json": "4231895dab8a757a6b673801fba0414c225090d8d18cbcbe1f5320e99e5dbb79",
+    "diagnostics-per-code-inventory.json": "386de660e910dcfcc8ef3c31599508c6b90a1e9d75c977beb34ee4af6b6cce5d",
+    "workspace-triage.log.gz": "ed3b22e6e57bca853aed4d9fabc79aeaea0828a7c1263082a30914c1d40856dc",
+    "workspace-final.log.gz": "56ded851dccece864eac7c56c6643866765d0d5840af780a76ddb744b57cc621"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "artifact_sha256": "bc6b514b3ab83af83da84027101c2abbadbd5e8e60776b0d2d8721768c8851a9",
+  "manifest_files_verified": 120,
+  "gate_logs_verified": 47,
+  "original_archive": "ubuntu-normal.zip",
+  "status": "HASHES_VERIFIED; lane verdict is retained in summary, not overridden"
+}

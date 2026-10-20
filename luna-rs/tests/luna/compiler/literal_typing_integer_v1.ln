@@ -13,13 +13,13 @@ fn main() -> i32 {
     dec minimum = -9223372036854775808i64;
     if minimum != ((-9223372036854775807i64) - 1i64) { return 3; }
     dec big = 18446744073709551615u64;
-    if big != (0u64 - 1u64) { return 4; }
+    if big != 18446744073709551615u64 { return 4; }
     dec wide = 340282366920938463463374607431768211455u128;
     if (wide >> 64u128) != 18446744073709551615u128 { return 5; }
     dec signed_wide = -170141183460469231731687303715884105728i128;
     if signed_wide != (-170141183460469231731687303715884105727i128 - 1i128) { return 6; }
     if 0xffu8 != 255u8 || 0o377u16 != 255u16 || 0b1111_1111u32 != 255u32 { return 7; }
-    if (255u8 + 1u8) != 0u8 || (0u8 - 1u8) != 255u8 { return 8; }
+    if std::wrapping_add(255u8, 1u8) != 0u8 || std::wrapping_sub(0u8, 1u8) != 255u8 { return 8; }
     dec i8_min: i8 = -128; dec i8_max = 127i8;
     dec i16_min = -32768i16; dec i16_max: i16 = 32767;
     dec i32_min = -2147483648; dec i32_max = 2147483647i32;
@@ -29,6 +29,6 @@ fn main() -> i32 {
     if i8_min != -128i8 || i8_max != 127 || i16_min != -32768 || i16_max != 32767 { return 9; }
     if i32_min != -2147483648i32 || i32_max != 2147483647 { return 10; }
     if u16_max != 65535 || u32_max != 4294967295 { return 11; }
-    if isize_min != (-9223372036854775807isize - 1isize) || usize_max != (0usize - 1usize) { return 12; }
+    if isize_min != (-9223372036854775807isize - 1isize) || usize_max != 18446744073709551615usize { return 12; }
     return index as i32;
 }

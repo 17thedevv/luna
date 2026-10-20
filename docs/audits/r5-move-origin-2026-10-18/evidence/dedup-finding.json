@@ -1,0 +1,19 @@
+{
+  "observed_implementation": "67146195fb025951ca51d54365fd3a47ef9544e6",
+  "scope": "Local public CLI preflight; compiler byte hash matches the recorded 67146195 preflight",
+  "status": "CONFIRMED_DIAG_4_EVENT_COLLAPSE",
+  "command": [
+    "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+    "check",
+    "D:\\r5-67146195\\review\\distinct_partial_moves.ln",
+    "--quiet"
+  ],
+  "exit": 1,
+  "cli_sha256": "b4bcae61dd4913108a92f224ec17cf92c8c2969a65845a658fe8d7b39092a0f6",
+  "expected_primary_lines": [
+    7,
+    8
+  ],
+  "actual_E3002_count": 1,
+  "cause": "Message-based dedup collapses two distinct forbidden partial-move events"
+}

@@ -1,0 +1,47 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "workflow_run": 39056178504,
+  "artifact_id": 12112417848,
+  "artifact_sha256": "b18276a61cd1abe8feb11be8fdce71bb1605518cf1ace2c67b8a1ec98898b46e",
+  "manifest_files_verified": 122,
+  "gate_logs_verified": 48,
+  "status": "PASS_IN_EXECUTED_SCOPE",
+  "scope": "Ubuntu GNU normal, including unchanged native math regressions; complete workspace acquired separately",
+  "former_failures_now_pass": [
+    "global_std_namespace_closure_matches_fresh_source_and_artifact_only_sysroots",
+    "ordinary_core_surface_is_canonical_and_matches_fresh_artifacts",
+    "phase4c_fresh_session_source_vs_llib_parity",
+    "test_float_semantics_and_operations",
+    "test_standard_conversions"
+  ],
+  "native_math_ffi_modes": [
+    "source",
+    "fresh artifact"
+  ],
+  "missing_return_cli": "PASS",
+  "summary": {
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "harness_commit": "14a608660cdec0c3bb8884ab893f74acda200dcd",
+    "lane": "normal",
+    "actual_native_target": "x86_64-pc-linux-gnu",
+    "advertised_target": "x86_64-unknown-linux-gnu",
+    "scope": "Descriptive execution on actual native target; no advertised-target equivalence or normalization",
+    "status": "PASS_IN_EXECUTED_LANE_SCOPE",
+    "failure": null,
+    "failed_gates": [],
+    "r5_verdict": "NOT DETERMINED BY THIS LANE",
+    "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION",
+    "gate_count": 48
+  },
+  "docs_examples": {
+    "rows": 16,
+    "contract_met": 14,
+    "characterization_only": 2,
+    "note": "legacy unparenthesized foreach is characterized, not normative acceptance"
+  },
+  "initial_status": "CLEAN",
+  "protected_compiler_runtime_tests_diff": "EMPTY",
+  "final_status": " M docs/documentation-index.json\n M docs/documentation-index.md\n",
+  "final_worktree_fully_clean": false,
+  "final_status_scope": "Only generated documentation inventory changed; normal success does not establish an entirely clean final worktree. Full workspace lanes and hosted Windows normal separately enforce clean final status."
+}

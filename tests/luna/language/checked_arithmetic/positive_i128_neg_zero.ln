@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec value: i128 = 0 - 1;
+    dec shifted = value + (1 as i128);
+    dec negated = -(shifted);
+    if negated == 0 { return 0; }
+    return 7;
+}

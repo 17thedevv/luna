@@ -1,0 +1,32 @@
+{
+  "gate": "focused-a-casts",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--no-fail-fast",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "cast_contract_cli",
+    "--test",
+    "cast_poison_cli",
+    "--test",
+    "raw_slice_view_a5_cli",
+    "--test",
+    "raw_slice_provenance_cli",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T18:09:23Z",
+  "exit": 0,
+  "seconds": 749.848097429,
+  "log_sha256": "a0b7965b38dea0d9ceb6ae118aaeb032f615f01fcdd771d7d63c3ca0d3784d8e",
+  "status": "PASS",
+  "log": "focused-a-casts.log.gz",
+  "compressed_sha256": "4725d03dfbc7eebca22b0094f13255c5e8293f167b722a67302eeb0ef3a33728"
+}

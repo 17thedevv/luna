@@ -1,0 +1,22 @@
+{
+  "gate": "runtime-abi",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/runner/work/_temp/r5-normal/runtime",
+    "-R",
+    "^RuntimeAbiTests$",
+    "--output-on-failure",
+    "--no-tests=error",
+    "-V"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal",
+  "started_utc": "2026-10-17T18:00:41Z",
+  "exit": 0,
+  "seconds": 1.1733000140000058,
+  "log_sha256": "a23bd6c0f4a0614025263d8071df9d85f54f0af397a7b19b770a0988d90962a4",
+  "status": "PASS",
+  "log": "runtime-abi.log.gz",
+  "compressed_sha256": "d629bb8ced9d3f50c1b192fb1a5d6eb2ce5f3e1edc2f73f68e20749f6aaecb38"
+}

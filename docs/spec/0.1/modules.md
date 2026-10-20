@@ -1,5 +1,14 @@
 # Luna 0.1 — modules, bootstrap and artifacts
 
+Implementation status — 2026-10-14: the
+[R4 ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md) records
+source/fresh-artifact provider and call-contract scopes. Current protocol is
+compiler25 / semantic metadata9 / MVIR5 / format2. E1 preserves genuine
+compiler22/23/24 artifacts and their rejection evidence; fresh25 parity and
+relocation are qualified at `e4f9fb53`. Rebuild through the official path after
+an identity rejection; no automatic compiler repair or publisher-authentication
+claim follows from checksums. Exact candidate and advertised-target gates remain R5.
+
 ## Providers and namespaces
 
 `import` acquires a provider. `module` creates an inline namespace. `::` resolves
@@ -79,7 +88,10 @@ including the canonical sysroot manifest, rather than an incidental file stem.
 The current execution identity protocol hashes provider source bytes with a
 versioned domain tag. It conservatively includes private bodies and formatting,
 but excludes session arena offsets and dependency load order. Compiler header
-protocol version 14 rejects compiler versions 1–13. This revision requires
+protocol introduced at compiler14 rejects earlier execution identities. The
+current compiler25 boundary additionally rejects versions1–24, including
+pre-repair generic enum ABI artifacts; metadata9/MVIR5/format2 remain unchanged.
+This revision requires
 revalidated raw-to-safe slice promotion and checked memory-hook identities
 and callable safety in addition to
 native integrity envelopes and portable payload checksums, and retains
@@ -101,7 +113,11 @@ language release readiness.
 Target identity binds the selected triple, CPU/features, emitted object format,
 LLVM default ABI/data-layout identity, pointer width and endianness. All fields
 must match the consuming target configuration; this implementation uses strict
-CPU/features equality rather than assuming cross-machine compatibility. The
+CPU/features equality rather than assuming cross-machine compatibility. For the
+two advertised x86_64 GNU targets, the release default selects CPU `generic`
+with no optional host features, so the configured contract does not depend on
+the build or consumer machine. Explicitly constructed target configurations
+still bind their complete CPU/features; mismatches continue to reject. The
 artifact header and manifest must agree on the triple. Embedded objects must
 be valid relocatable objects with the expected format, architecture, width and
 endianness where represented by the object container. An existing object

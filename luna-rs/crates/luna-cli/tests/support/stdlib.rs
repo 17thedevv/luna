@@ -1,11 +1,9 @@
 //! Fresh, isolated providers exercised only through the public compiler CLI.
 #![allow(dead_code)] // Individual CLI suites use different parts of this support module.
+use luna_test_support::TempWorkspace;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Output};
-use std::sync::atomic::{AtomicU64, Ordering};
-
-static PROVIDER_ROOT_COUNTER: AtomicU64 = AtomicU64::new(0);
 
 pub fn workspace_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -17,7 +15,7 @@ pub fn workspace_root() -> PathBuf {
 }
 
 pub struct ProviderModes {
-    work: PathBuf,
+    work: TempWorkspace,
     pub source: PathBuf,
     pub artifact: PathBuf,
 }
@@ -65,19 +63,10 @@ impl ProviderModes {
     }
 
     pub fn fresh_with_source_edit(edit: impl FnOnce(&Path)) -> Self {
-        let work = std::env::temp_dir().join(format!(
-            "luna_cli_parity_{}_{}_{}",
-            std::process::id(),
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos(),
-            PROVIDER_ROOT_COUNTER.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir(&work).unwrap();
+        let work = TempWorkspace::new("cli_parity");
         let modes = Self {
-            source: work.join("source"),
-            artifact: work.join("artifact"),
+            source: work.child("source"),
+            artifact: work.child("artifact"),
             work,
         };
         // POSIX executable names have no suffix; keep them separate from roots
@@ -155,22 +144,6 @@ impl ProviderModes {
             .env("LUNA_SYSROOT", root)
             .output()
             .unwrap()
-    }
-}
-
-impl Drop for ProviderModes {
-    fn drop(&mut self) {
-        // Only the unique directory created above is owned by this harness.
-        if self.work.parent() == Some(std::env::temp_dir().as_path())
-            && self
-                .work
-                .file_name()
-                .unwrap()
-                .to_string_lossy()
-                .starts_with("luna_cli_parity_")
-        {
-            let _ = fs::remove_dir_all(&self.work);
-        }
     }
 }
 

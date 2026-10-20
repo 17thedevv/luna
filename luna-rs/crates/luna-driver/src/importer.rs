@@ -51,7 +51,7 @@ pub fn resolve_collected_imports(
                 Ok(_) => continue,
                 Err(err) => {
                     for d in err.into_diagnostics() {
-                        diagnostics.push(d.with_span(span));
+                        diagnostics.push(import_context(d, span));
                     }
                     continue;
                 }
@@ -111,7 +111,7 @@ pub fn resolve_collected_imports(
                     }
                     Err(err) => {
                         for d in err.into_diagnostics() {
-                            diagnostics.push(d.with_span(span));
+                            diagnostics.push(import_context(d, span));
                         }
                     }
                 }
@@ -137,4 +137,13 @@ pub fn resolve_imports(
     let res = resolve_collected_imports(imports, arena, session, context);
     eprintln!("DEBUG: resolve_imports returning {:?}", res.is_ok());
     res
+}
+/// Keep a provider's original primary location; import sites are context.
+fn import_context(mut diagnostic: luna_common::Diagnostic, span: luna_common::Span) -> luna_common::Diagnostic {
+    if diagnostic.span.is_some() {
+        diagnostic = diagnostic.with_related(span, "Imported here");
+    } else {
+        diagnostic.span = Some(span);
+    }
+    diagnostic
 }

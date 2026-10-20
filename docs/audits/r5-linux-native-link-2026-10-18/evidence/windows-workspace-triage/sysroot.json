@@ -1,0 +1,16 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "sysroot",
+  "command": [
+    "C:\\r5b-39056178610\\cargo-target\\debug\\luna.exe",
+    "build-sysroot",
+    "--quiet"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T18:05:46.002957+00:00",
+  "end_utc": "2026-10-17T18:06:56.169423+00:00",
+  "elapsed_seconds": 70.157,
+  "exit": 0,
+  "log": "sysroot.log",
+  "log_sha256": "8fa38d8b6e5f4eeb1b109c3bb957cc90909c631f82080634c9285ac9f7668116"
+}

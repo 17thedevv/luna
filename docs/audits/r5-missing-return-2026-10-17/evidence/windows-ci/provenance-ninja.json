@@ -1,0 +1,15 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "label": "provenance-ninja",
+  "command": [
+    "ninja",
+    "--version"
+  ],
+  "cwd": "D:\\r5-39032926577\\windows-checkout",
+  "start_utc": "2026-10-17T12:34:47.935598+00:00",
+  "end_utc": "2026-10-17T12:34:48.060593+00:00",
+  "elapsed_seconds": 0.125,
+  "exit": 0,
+  "log": "provenance-ninja.log",
+  "log_sha256": "f7204ca4d4bbe623e6045a5088ac906c5e1966b4fd2a11af9d156bad3327526f"
+}

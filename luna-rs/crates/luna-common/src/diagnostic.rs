@@ -22,6 +22,8 @@ pub enum DiagnosticCode {
     InvalidVisibility = 1006,
     WildcardImportProhibited = 1007,
     AmbiguousSymbol = 1008,
+    InvalidCompilerBinding = 1009,
+    InvalidMacroExpansion = 1010,
     TypeMismatch = 2001,
     CannotDereference = 2002,
     CannotIndex = 2003,
@@ -53,6 +55,7 @@ pub enum DiagnosticCode {
     LoopControlOutsideLoop = 2029,
     NonFfiSafeType = 2030,
     ExplicitDropCall = 2031,
+    InvalidAttributeApplication = 2032,
     UseAfterMove = 3001,
     PartialMoveUnderDrop = 3002,
     BorrowConflict = 3003,
@@ -81,6 +84,94 @@ pub enum DiagnosticCode {
 }
 
 impl DiagnosticCode {
+    pub const fn owner(self) -> DiagnosticPhase {
+        match self.number() / 1000 {
+            0 => DiagnosticPhase::Parser,
+            1 => DiagnosticPhase::Resolver,
+            2 => DiagnosticPhase::TypeChecker,
+            3 => DiagnosticPhase::Borrowck,
+            4 => DiagnosticPhase::AsyncComptime,
+            5 => DiagnosticPhase::Mono,
+            _ => DiagnosticPhase::Infrastructure,
+        }
+    }
+    /// Every diagnostic code, in freezing order. `docs/diagnostics/diagnostics-v1.md`
+    /// (DIAG-10) requires exact parity between this list and the specification.
+    pub const ALL: &'static [DiagnosticCode] = &[
+        DiagnosticCode::ExpectedToken,
+        DiagnosticCode::UnexpectedToken,
+        DiagnosticCode::InvalidSyntax,
+        DiagnosticCode::UnclosedDelimiter,
+        DiagnosticCode::InvalidAnnotation,
+        DiagnosticCode::UnresolvedSymbol,
+        DiagnosticCode::DuplicateDefinition,
+        DiagnosticCode::PrivateSymbolAccess,
+        DiagnosticCode::UnresolvedModuleProvider,
+        DiagnosticCode::CyclicModuleDependency,
+        DiagnosticCode::InvalidVisibility,
+        DiagnosticCode::WildcardImportProhibited,
+        DiagnosticCode::AmbiguousSymbol,
+        DiagnosticCode::InvalidCompilerBinding,
+        DiagnosticCode::InvalidMacroExpansion,
+        DiagnosticCode::TypeMismatch,
+        DiagnosticCode::CannotDereference,
+        DiagnosticCode::CannotIndex,
+        DiagnosticCode::CopyDropConflict,
+        DiagnosticCode::ConflictingTraitImpl,
+        DiagnosticCode::OrphanImpl,
+        DiagnosticCode::UnresolvedTraitImpl,
+        DiagnosticCode::AssociatedTypeCycle,
+        DiagnosticCode::InfiniteSizeRecursiveType,
+        DiagnosticCode::NonObjectSafeTrait,
+        DiagnosticCode::InvalidLvalue,
+        DiagnosticCode::InvalidUnaryOp,
+        DiagnosticCode::InvalidBinaryOp,
+        DiagnosticCode::DuplicateField,
+        DiagnosticCode::DuplicateVariant,
+        DiagnosticCode::LifetimeConstraintViolation,
+        DiagnosticCode::MissingField,
+        DiagnosticCode::NoAssociatedType,
+        DiagnosticCode::AmbiguousAssociatedType,
+        DiagnosticCode::CannotCallNonFunction,
+        DiagnosticCode::TraitBoundNotSatisfied,
+        DiagnosticCode::NonExhaustivePattern,
+        DiagnosticCode::CannotMutateImmutable,
+        DiagnosticCode::InvalidMainSignature,
+        DiagnosticCode::UnsafeOperationOutsideUnsafe,
+        DiagnosticCode::InvalidCast,
+        DiagnosticCode::AwaitOutsideAsync,
+        DiagnosticCode::InvalidTryOperator,
+        DiagnosticCode::LoopControlOutsideLoop,
+        DiagnosticCode::NonFfiSafeType,
+        DiagnosticCode::ExplicitDropCall,
+        DiagnosticCode::InvalidAttributeApplication,
+        DiagnosticCode::UseAfterMove,
+        DiagnosticCode::PartialMoveUnderDrop,
+        DiagnosticCode::BorrowConflict,
+        DiagnosticCode::MissingReturnValue,
+        DiagnosticCode::LocalBorrowEscape,
+        DiagnosticCode::UseOfUninitializedValue,
+        DiagnosticCode::UseAfterDrop,
+        DiagnosticCode::RawStorageAnchorMismatch,
+        DiagnosticCode::RawStorageAnchorViolation,
+        DiagnosticCode::AsyncBorrowAcrossAwait,
+        DiagnosticCode::ComptimeStepLimitExceeded,
+        DiagnosticCode::ComptimeUnserializableEscape,
+        DiagnosticCode::ComptimePanic,
+        DiagnosticCode::ComptimeEvaluationFailed,
+        DiagnosticCode::MonomorphizationBarrier,
+        DiagnosticCode::InfiniteMonomorphizationRecursion,
+        DiagnosticCode::BackendInvariantViolation,
+        DiagnosticCode::ObjectEmissionFailure,
+        DiagnosticCode::LinkerFailure,
+        DiagnosticCode::SysrootConfigurationFailure,
+        DiagnosticCode::ProviderReadFailure,
+        DiagnosticCode::OutputWriteFailure,
+        DiagnosticCode::InvalidArtifactOutput,
+        DiagnosticCode::ProviderConfigurationError,
+        DiagnosticCode::ProcessExecutionFailure,
+    ];
+
     pub const fn number(self) -> u16 {
         self as u16
     }
@@ -99,6 +190,19 @@ pub enum DiagnosticLevel {
     Note,
 }
 
+/// Stable phase partitions from DIAG-8. This is compiler admission metadata,
+/// not a change to serialized artifacts or the diagnostic code discriminants.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DiagnosticPhase {
+    Parser,
+    Resolver,
+    TypeChecker,
+    Borrowck,
+    AsyncComptime,
+    Mono,
+    Infrastructure,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Diagnostic {
     pub level: DiagnosticLevel,
@@ -106,12 +210,30 @@ pub struct Diagnostic {
     pub span: Option<Span>,
     pub message: String,
     pub related: Vec<DiagnosticLabel>,
+    /// DIAG-2: true only for diagnostics whose subject is a provider/manifest
+    /// contract rather than a source construct. Every other diagnostic carrying
+    /// a source-range code must have a primary span; producers must fix the
+    /// span rather than fabricating a location.
+    pub contract_diagnostic: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DiagnosticLabel { pub span: Span, pub message: String }
 
 impl Diagnostic {
+    /// DIAG-4: only coded, anchored source events have a deduplication identity.
+    /// Preserve global diagnostics and uncoded events rather than merging them.
+    pub fn same_identity(&self, other: &Self) -> bool {
+        self.code.is_some() && self.span.is_some()
+            && self.code == other.code && self.span == other.span
+    }
+
+    /// Infrastructure owns compiler invariant reporting, including failures
+    /// discovered by an earlier stage after source admission.
+    pub fn invariant_error(message: impl Into<String>) -> Self {
+        Self::error(message).with_code(DiagnosticCode::BackendInvariantViolation)
+            .in_phase(DiagnosticPhase::Infrastructure)
+    }
     pub fn error(message: impl Into<String>) -> Self {
         Self {
             level: DiagnosticLevel::Error,
@@ -119,11 +241,49 @@ impl Diagnostic {
             span: None,
             message: message.into(),
             related: Vec::new(),
+            contract_diagnostic: false,
         }
+    }
+
+    /// A diagnostic about a provider/manifest contract rather than a source
+    /// construct (module identity conflicts, cyclic providers, canonical path
+    /// defects). It is declared explicitly so the DIAG-2 audit can tell a
+    /// deliberate non-source subject from a producer that forgot its span.
+    pub fn contract_error(code: DiagnosticCode, message: impl Into<String>) -> Self {
+        assert!(code.number() < 6000, "contract diagnostics carry a source-range code");
+        Self {
+            level: DiagnosticLevel::Error,
+            code: Some(code),
+            span: None,
+            message: message.into(),
+            related: Vec::new(),
+            contract_diagnostic: true,
+        }
+    }
+
+    /// DIAG-2: a source diagnostic that is neither anchored to a primary span
+    /// nor declared as a provider/manifest contract diagnostic is a defect at
+    /// its producer.
+    pub fn violates_source_anchor_contract(&self) -> bool {
+        matches!(self.code, Some(code) if code.number() < 6000)
+            && self.span.is_none()
+            && !self.contract_diagnostic
     }
 
     pub fn with_code(mut self, code: DiagnosticCode) -> Self {
         self.code = Some(code);
+        self
+    }
+
+    pub fn source_error(code: DiagnosticCode, span: Span, message: impl Into<String>) -> Self {
+        assert!(code.number() < 6000, "source diagnostics require a source owning phase");
+        Self::error(message).with_code(code).with_span(span)
+    }
+
+    /// Fail closed if a phase attempts to construct another phase's code.
+    pub fn in_phase(self, phase: DiagnosticPhase) -> Self {
+        assert_eq!(self.code.expect("phase-owned diagnostics require a code").owner(),
+            phase, "DIAG-8: diagnostic emitted by a non-owning phase");
         self
     }
 
@@ -183,7 +343,7 @@ impl Diagnostic {
 
         for label in &self.related {
             out.push_str(&Self { level: DiagnosticLevel::Note, code: None, span: Some(label.span),
-                message: label.message.clone(), related: Vec::new() }.render(source_manager));
+                message: label.message.clone(), related: Vec::new(), contract_diagnostic: false }.render(source_manager));
         }
         out
     }
@@ -206,10 +366,117 @@ fn display_text(text: &str, initial_column: usize) -> (String, usize) {
     (rendered, column)
 }
 
+/// Canonical source order and identity, independent of rendered wording or
+/// function/hash-map traversal order. Duplicate events retain every cause span.
+pub fn normalize_diagnostics(diagnostics: &mut Vec<Diagnostic>, sources: &SourceManager) {
+    fn location(span: Span, sources: &SourceManager) -> (String, u32, u32, u32) {
+        let file = sources.get_file(span.file_id)
+            .map(|file| file.name.clone()).unwrap_or_else(|| format!("#{}", span.file_id.0));
+        (file, span.start, span.end, span.ctxt.0)
+    }
+    diagnostics.sort_by_cached_key(|diagnostic| {
+        let point = diagnostic.span.map(|span| location(span, sources)).unwrap_or_default();
+        (diagnostic.span.is_none(), point, diagnostic.code.map(|code| code.number()).unwrap_or(65535))
+    });
+    let mut seen = std::collections::HashMap::new();
+    let mut normalized: Vec<Diagnostic> = Vec::with_capacity(diagnostics.len());
+    for diagnostic in std::mem::take(diagnostics) {
+        if let (Some(code), Some(span)) = (diagnostic.code, diagnostic.span) {
+            if let Some(&index) = seen.get(&(code, span)) {
+                let existing: &mut Diagnostic = &mut normalized[index];
+                if diagnostic.level == DiagnosticLevel::Error { existing.level = DiagnosticLevel::Error; }
+                existing.contract_diagnostic &= diagnostic.contract_diagnostic;
+                existing.related.extend(diagnostic.related);
+                continue;
+            }
+            seen.insert((code, span), normalized.len());
+        }
+        normalized.push(diagnostic);
+    }
+    for diagnostic in &mut normalized {
+        diagnostic.related.sort_by_cached_key(|label| location(label.span, sources));
+        diagnostic.related.dedup_by(|left, right| left.span == right.span);
+    }
+    *diagnostics = normalized;
+}
+
 #[cfg(test)]
 mod tests {
     use super::{Diagnostic, DiagnosticCode};
+    use crate::diagnostic::DiagnosticPhase;
+    use crate::ids::{FileId, Span};
     use crate::source::SourceManager;
+
+    /// DIAG-7: every registered code declares a canonical identity and span
+    /// policy. Source-range codes require a primary span from their producer;
+    /// infrastructure codes are never anchored to a source construct.
+    #[test]
+    fn every_registered_code_declares_its_identity_and_span_policy() {
+        let anchor = Span::new(FileId(0), 0, 1);
+        for code in DiagnosticCode::ALL {
+            let code = *code;
+            let number = code.number();
+            assert_eq!(code.to_string(), format!("E{number:04}"), "diagnostic identity");
+            assert_eq!(
+                DiagnosticCode::ALL
+                    .iter()
+                    .filter(|candidate| candidate.number() == number)
+                    .count(),
+                1,
+                "diagnostic number {number} must be unique"
+            );
+            let source_range = number < 6000;
+            assert_eq!(
+                source_range,
+                !matches!(code.owner(), DiagnosticPhase::Infrastructure),
+                "{code} owner must decide its span policy"
+            );
+            if source_range {
+                assert!(
+                    !Diagnostic::source_error(code, anchor, "policy")
+                        .violates_source_anchor_contract(),
+                    "{code} must be anchorable with a primary span"
+                );
+                assert!(
+                    Diagnostic::error("policy")
+                        .with_code(code)
+                        .violates_source_anchor_contract(),
+                    "{code} producer must supply a primary span"
+                );
+            } else {
+                assert!(
+                    !Diagnostic::error("policy")
+                        .with_code(code)
+                        .violates_source_anchor_contract(),
+                    "{code} infrastructure diagnostics are not source-anchored"
+                );
+            }
+        }
+    }
+
+    /// DIAG-2: a source diagnostic must carry the primary span of the construct
+    /// that produced it, or declare itself a provider/manifest contract
+    /// diagnostic. Anything else is a producer defect, never a fabricated span.
+    #[test]
+    fn source_diagnostics_are_anchored_or_declared_contract_diagnostics() {
+        let anchor = Span::new(FileId(0), 0, 4);
+        assert!(!Diagnostic::source_error(DiagnosticCode::UseAfterMove, anchor, "anchored")
+            .violates_source_anchor_contract());
+        assert!(
+            !Diagnostic::contract_error(DiagnosticCode::UnresolvedSymbol, "manifest defect")
+                .violates_source_anchor_contract()
+        );
+        assert!(
+            Diagnostic::error("producer forgot the span")
+                .with_code(DiagnosticCode::UseAfterMove)
+                .violates_source_anchor_contract()
+        );
+        assert!(
+            !Diagnostic::error("infrastructure failure")
+                .with_code(DiagnosticCode::ProviderReadFailure)
+                .violates_source_anchor_contract()
+        );
+    }
 
     #[test]
     fn candidate_labels_remain_structural_across_rendering() {
@@ -241,6 +508,52 @@ mod tests {
             diagnostic.render(&SourceManager::new()),
             "error[E3001]: Use of moved value `value`\n"
         );
+    }
+
+    #[test]
+    fn diagnostic_identity_uses_code_and_primary_span_instead_of_wording() {
+        let span = Span::new(FileId(0), 1, 2);
+        let first = Diagnostic::source_error(DiagnosticCode::PartialMoveUnderDrop, span, "first wording");
+        let rewritten = Diagnostic::source_error(DiagnosticCode::PartialMoveUnderDrop, span, "different wording")
+            .with_related(Span::new(FileId(0), 5, 6), "another explanation");
+        assert!(first.same_identity(&rewritten));
+        let next_event = Diagnostic::source_error(DiagnosticCode::PartialMoveUnderDrop,
+            Span::new(FileId(0), 3, 4), "first wording");
+        assert!(!first.same_identity(&next_event));
+        let next_kind = Diagnostic::source_error(DiagnosticCode::UseAfterMove, span, "first wording");
+        assert!(!first.same_identity(&next_kind));
+        assert!(!Diagnostic::error("uncoded error").same_identity(&Diagnostic::error("uncoded error")));
+        let global = Diagnostic::invariant_error("independent global faults");
+        assert!(!global.same_identity(&global));
+    }
+
+    #[test]
+    fn normalization_orders_source_paths_and_preserves_all_structural_causes() {
+        let mut sources = SourceManager::new();
+        let b = sources.add_file("b.ln".to_string(), "one two".to_string());
+        let a = sources.add_file("a.ln".to_string(), "one two".to_string());
+        let primary_a = Span::new(a, 0, 3);
+        let primary_b = Span::new(b, 0, 3);
+        let cause_a = Span::new(a, 4, 7);
+        let cause_b = Span::new(b, 4, 7);
+        let first = Diagnostic::source_error(DiagnosticCode::UseAfterMove, primary_a, "first wording")
+            .with_related(cause_b, "cause b");
+        let second = Diagnostic::source_error(DiagnosticCode::UseAfterMove, primary_a, "other wording")
+            .with_related(cause_a, "cause a");
+        let later = Diagnostic::source_error(DiagnosticCode::UseAfterMove, primary_b, "first wording");
+        for input in [vec![later.clone(), first.clone(), second.clone()], vec![second, later, first]] {
+            let mut diagnostics = input;
+            diagnostics.push(Diagnostic::invariant_error("global one"));
+            diagnostics.push(Diagnostic::invariant_error("global two"));
+            super::normalize_diagnostics(&mut diagnostics, &sources);
+            assert_eq!(diagnostics.len(), 4);
+            assert_eq!(diagnostics[0].span, Some(primary_a));
+            assert_eq!(diagnostics[1].span, Some(primary_b));
+            assert_eq!(diagnostics[0].related.iter().map(|label| label.span).collect::<Vec<_>>(), vec![cause_a, cause_b]);
+            let once = diagnostics.clone();
+            super::normalize_diagnostics(&mut diagnostics, &sources);
+            assert_eq!(diagnostics, once);
+        }
     }
 
     #[test]
@@ -280,5 +593,75 @@ mod tests {
         let rendered = diagnostic.render(&manager);
         assert!(rendered.contains("emoji.ln:1:6"), "{rendered}");
         assert!(rendered.contains("   |        ^^^^\n"), "{rendered}");
+    }
+}
+
+/// DIAG-10: exact parity between `DiagnosticCode::ALL` and the frozen registry
+/// `docs/diagnostics/diagnostics-v1.md`.
+#[cfg(test)]
+mod registry_parity {
+    use super::{DiagnosticCode, DiagnosticPhase};
+
+    const DOCS: &str = include_str!("../../../../docs/diagnostics/diagnostics-v1.md");
+
+    #[test]
+    fn phase_partitions_match_every_registry_owner() {
+        for code in DiagnosticCode::ALL {
+            let needle = format!("| `{code}` |");
+            let row = DOCS.lines().find(|line| line.starts_with(&needle)).unwrap();
+            let fields: Vec<_> = row.split('|').map(str::trim).collect();
+            let expected = match code.owner() {
+                DiagnosticPhase::Parser => "Parser",
+                DiagnosticPhase::Resolver => "Resolver",
+                DiagnosticPhase::TypeChecker => "TypeChecker",
+                DiagnosticPhase::Borrowck => "Borrowck",
+                DiagnosticPhase::AsyncComptime => "Async/Comptime",
+                DiagnosticPhase::Mono => "Mono",
+                DiagnosticPhase::Infrastructure => "Infrastructure",
+            };
+            assert_eq!(fields[4], expected, "{code} registry owner");
+        }
+    }
+
+    #[test]
+    fn every_code_is_documented_unique_and_named() {
+        let mut seen = std::collections::BTreeSet::new();
+        for code in DiagnosticCode::ALL {
+            let number = code.number();
+            assert!(seen.insert(number), "duplicate diagnostic number {number}");
+            let needle = format!("E{number:04}");
+            assert!(
+                DOCS.contains(&format!("| `{needle}` |")),
+                "{needle} is missing from the diagnostics registry table"
+            );
+            assert!(
+                DOCS.contains(&format!("{code:?}")),
+                "{code:?} name is missing from the diagnostics registry"
+            );
+        }
+    }
+
+    #[test]
+    fn documented_codes_all_exist_in_the_enum() {
+        let numbers: std::collections::BTreeSet<u16> =
+            DiagnosticCode::ALL.iter().map(|code| code.number()).collect();
+        for line in DOCS.lines() {
+            let Some(rest) = line.strip_prefix("| `E") else {
+                continue;
+            };
+            let Some((digits, tail)) = rest.split_once('`') else {
+                continue;
+            };
+            // Only exact code rows (`| `E1001` | ...`) count; range rows such as
+            // `| `E1000`–`E1999` | ...` are excluded.
+            if !tail.starts_with(" |") {
+                continue;
+            }
+            let number: u16 = digits.parse().expect("numeric diagnostic id");
+            assert!(
+                numbers.contains(&number),
+                "registry documents E{number:04} but DiagnosticCode has no such code"
+            );
+        }
     }
 }

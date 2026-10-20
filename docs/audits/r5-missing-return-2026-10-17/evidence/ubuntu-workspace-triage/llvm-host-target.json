@@ -1,0 +1,16 @@
+{
+  "gate": "llvm-host-target",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "llvm-config-18",
+    "--host-target"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage/checkout",
+  "started_utc": "2026-10-17T12:29:01Z",
+  "exit": 0,
+  "seconds": 0.0037434059999981173,
+  "log_sha256": "1c7da408e283702561a445e700b61c0f55a082230a3cfe323208841221274a6a",
+  "status": "PASS",
+  "log": "llvm-host-target.log.gz",
+  "compressed_sha256": "92d475c24f0cec63b4d87f8aef7e60d91cb94fa217cdb4c6a963647a3a5d992c"
+}

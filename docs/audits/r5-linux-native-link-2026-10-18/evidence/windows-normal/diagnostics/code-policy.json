@@ -1,0 +1,18 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "diagnostics/code-policy",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "-p",
+    "luna-common",
+    "every_registered_code_declares_its_identity_and_span_policy"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T19:53:00.247313+00:00",
+  "end_utc": "2026-10-17T19:53:00.325433+00:00",
+  "elapsed_seconds": 0.079,
+  "exit": 0,
+  "log": "diagnostics/code-policy.log",
+  "log_sha256": "ca4836827bb9885c5191954e2f98d1f5e6a7e242cae45c5e33d4d15fc15d5894"
+}

@@ -1,0 +1,8 @@
+fn main() -> i32 {
+    dec a: i64 = (9223372036854775807u64) as i64;
+    dec b: i64 = 1;
+    dec x = std::wrapping_add(a, b);
+    dec expect: i64 = (0 - ((9223372036854775807u64) as i64)) - 1;
+    if x == expect { return 0; }
+    return 7;
+}

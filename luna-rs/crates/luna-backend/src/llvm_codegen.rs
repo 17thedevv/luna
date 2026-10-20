@@ -4,10 +4,10 @@ use std::path::Path;
 use inkwell::context::Context;
 use inkwell::module::Module as InkwellModule;
 use inkwell::builder::Builder;
-use inkwell::values::BasicValueEnum;
+use inkwell::values::{BasicValueEnum, IntValue};
 use inkwell::basic_block::BasicBlock as InkwellBasicBlock;
-use inkwell::types::{BasicTypeEnum, BasicType};
-use inkwell::targets::{Target, TargetMachine, InitializationConfig, FileType};
+use inkwell::types::{BasicTypeEnum, BasicType, IntType};
+use inkwell::targets::{Target, TargetMachine, InitializationConfig, FileType, TargetData};
 use inkwell::OptimizationLevel;
 
 use luna_mvir::{Module as MvirModule, Function as MvirFunction, Instruction, Terminator, Operand, ValueId, ValueData, LabelId};
@@ -53,14 +53,31 @@ pub struct TargetConfig {
 impl Default for TargetConfig {
     fn default() -> Self {
         Target::initialize_all(&InitializationConfig::default());
-        let mut triple = TargetMachine::get_default_triple().as_str().to_str().unwrap_or("x86_64-pc-windows-gnu").to_string();
-        if triple.contains("-msvc") {
-            triple = triple.replace("-msvc", "-gnu");
-        }
+        let host = TargetMachine::get_default_triple().as_str().to_str().unwrap_or("x86_64-pc-windows-gnu").to_string();
+        // R5-FU-TARGET-01: the artifact records the canonical Luna release
+        // triple, not the host LLVM spelling. Hosts outside the release matrix
+        // keep their own spelling instead of being advertised as a Luna target.
+        let supported = crate::target_matrix::canonical_supported_target(&host);
+        let triple = match supported {
+            Some(target) => target.triple().to_string(),
+            None => host,
+        };
         Self {
             triple,
-            cpu: TargetMachine::get_host_cpu_name().to_string(),
-            features: TargetMachine::get_host_cpu_features().to_string(),
+            // A release sysroot must be consumable on another machine of the
+            // same advertised target. Host tuning would make its strict CPU /
+            // feature identity depend on whichever runner built the package.
+            // Keep exact identity checks; select one shared portable baseline.
+            cpu: if supported.is_some() {
+                "generic".into()
+            } else {
+                TargetMachine::get_host_cpu_name().to_string()
+            },
+            features: if supported.is_some() {
+                String::new()
+            } else {
+                TargetMachine::get_host_cpu_features().to_string()
+            },
             optimization: OptimizationLevel::Default,
         }
     }
@@ -85,6 +102,7 @@ pub struct LLVMBackend<'a, 'ctx> {
     link_name_map: HashMap<String, String>,
     supports_comdat: bool,
     target_config: TargetConfig,
+    target_data: Option<TargetData>,
 }
 
 impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
@@ -107,6 +125,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             link_name_map: HashMap::new(),
             supports_comdat: target_config.supports_comdat(),
             target_config: target_config.clone(),
+            target_data: None,
         }
     }
     
@@ -132,73 +151,41 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
         self.llvm_module.get_function(actual_name)
     }
 
-    fn layout_size(&self, ty_id: SemanticTypeId) -> u64 {
-        match self.semantic_ctx.types.get(ty_id) {
-            SemanticType::Primitive(BuiltinType::I8 | BuiltinType::U8 | BuiltinType::Bool) => 1,
-            SemanticType::Primitive(BuiltinType::I16 | BuiltinType::U16) => 2,
-            SemanticType::Primitive(BuiltinType::I32 | BuiltinType::U32 | BuiltinType::F32 | BuiltinType::Char) => 4,
-            SemanticType::Primitive(BuiltinType::I64 | BuiltinType::U64 | BuiltinType::Isize | BuiltinType::Usize | BuiltinType::F64 | BuiltinType::String) => 8,
-            SemanticType::Primitive(BuiltinType::I128 | BuiltinType::U128) => 16,
-            SemanticType::Pointer(..) | SemanticType::Reference(..) => 8,
-            SemanticType::Slice(..) => 16,
-            SemanticType::Array(elem, len) => self.layout_size(*elem) * len,
-            SemanticType::Struct(_, _, field_tys) => {
-                let mut offset = 0;
-                for &f in field_tys {
-                    let align = self.layout_align(f);
-                    if align > 0 && offset % align != 0 {
-                        offset += align - (offset % align);
-                    }
-                    offset += self.layout_size(f);
-                }
-                let struct_align = self.layout_align(ty_id);
-                if struct_align > 0 && offset % struct_align != 0 {
-                    offset += struct_align - (offset % struct_align);
-                }
-                offset
-            }
-            SemanticType::Tuple(types) => {
-                let mut offset = 0;
-                for &f in types {
-                    let align = self.layout_align(f);
-                    if align > 0 && offset % align != 0 {
-                        offset += align - (offset % align);
-                    }
-                    offset += self.layout_size(f);
-                }
-                let tuple_align = types.iter().map(|&t| self.layout_align(t)).max().unwrap_or(1);
-                if tuple_align > 0 && offset % tuple_align != 0 {
-                    offset += tuple_align - (offset % tuple_align);
-                }
-                offset
-            }
-            SemanticType::Enum(_, _, variants) => {
-                let max_payload_size = variants.iter().map(|&v| self.layout_size(v)).max().unwrap_or(0);
-                let words = std::cmp::max(2, (max_payload_size + 7) / 8);
-                8 + words * 8
-            }
-            _ => {
-                match self.map_type(ty_id) {
-                    Ok(ty) => ty.size_of().map(|size| size.get_zero_extended_constant().unwrap_or(8)).unwrap_or(8),
-                    Err(_) => 8,
-                }
-            }
-        }
+    fn target_layout(&self) -> Result<&TargetData, BackendError> {
+        self.target_data.as_ref().ok_or_else(|| BackendError::InvariantViolation(
+            "target layout unavailable before lowering".into()))
     }
 
-    fn layout_align(&self, ty_id: SemanticTypeId) -> u64 {
-        match self.semantic_ctx.types.get(ty_id) {
-            SemanticType::Primitive(BuiltinType::I8 | BuiltinType::U8 | BuiltinType::Bool) => 1,
-            SemanticType::Primitive(BuiltinType::I16 | BuiltinType::U16) => 2,
-            SemanticType::Primitive(BuiltinType::I32 | BuiltinType::U32 | BuiltinType::F32 | BuiltinType::Char) => 4,
-            SemanticType::Primitive(BuiltinType::I64 | BuiltinType::U64 | BuiltinType::Isize | BuiltinType::Usize | BuiltinType::F64 | BuiltinType::String) => 8,
-            SemanticType::Primitive(BuiltinType::I128 | BuiltinType::U128) => 16,
-            SemanticType::Pointer(..) | SemanticType::Reference(..) => 8,
-            SemanticType::Struct(_, _, field_tys) => {
-                field_tys.iter().map(|&f| self.layout_align(f)).max().unwrap_or(8)
-            }
-            _ => 8,
-        }
+    fn layout_size(&self, ty_id: SemanticTypeId) -> Result<u64, BackendError> {
+        Ok(self.target_layout()?.get_abi_size(&self.map_type(ty_id)?))
+    }
+
+    fn layout_align(&self, ty_id: SemanticTypeId) -> Result<u64, BackendError> {
+        Ok(u64::from(self.target_layout()?.get_abi_alignment(&self.map_type(ty_id)?)))
+    }
+
+    /// One representation for both runtime and constant enums. A zero-length
+    /// array carries the strongest payload alignment without storing a value.
+    /// The word buffer covers all variants; the outer struct pads the tag before
+    /// the payload. No library name, host layout or session identity participates.
+    fn enum_type(&self, payloads: &[BasicTypeEnum<'ctx>], layout: &TargetData)
+        -> Result<BasicTypeEnum<'ctx>, BackendError>
+    {
+        let word: BasicTypeEnum<'ctx> = self.context.i64_type().into();
+        let anchor = payloads.iter().copied().chain(std::iter::once(word))
+            .max_by_key(|ty| layout.get_abi_alignment(ty)).unwrap();
+        let alignment = u64::from(layout.get_abi_alignment(&anchor));
+        let size = payloads.iter().map(|ty| layout.get_abi_size(ty)).max().unwrap_or(0).max(16);
+        let bytes = size.checked_add(alignment - 1)
+            .and_then(|v| (v / alignment).checked_mul(alignment))
+            .ok_or_else(|| BackendError::InvariantViolation("enum payload layout overflow".into()))?;
+        let words: u32 = bytes.div_ceil(8).try_into()
+            .map_err(|_| BackendError::InvariantViolation("enum payload exceeds LLVM array length".into()))?;
+        let buffer: BasicTypeEnum<'ctx> = self.context.i64_type().array_type(words).into();
+        let storage = if layout.get_abi_alignment(&anchor) > layout.get_abi_alignment(&word) {
+            self.context.struct_type(&[anchor.array_type(0).into(), buffer], false).into()
+        } else { buffer };
+        Ok(self.context.struct_type(&[self.context.i32_type().into(), storage], false).into())
     }
 
     fn map_type(&self, ty_id: SemanticTypeId) -> Result<BasicTypeEnum<'ctx>, BackendError> {
@@ -239,11 +226,9 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 Ok(self.context.struct_type(&field_types, false).into())
             }
             SemanticType::Enum(_, _, variants) => {
-                let i32_ty = self.context.i32_type();
-                let max_payload_size = variants.iter().map(|&v| self.layout_size(v)).max().unwrap_or(0);
-                let words = std::cmp::max(2, (max_payload_size + 7) / 8);
-                let payload_array_ty = self.context.i64_type().array_type(words as u32);
-                Ok(self.context.struct_type(&[i32_ty.into(), payload_array_ty.into()], false).into())
+                let payloads = variants.iter().map(|&v| self.map_type(v))
+                    .collect::<Result<Vec<_>, _>>()?;
+                self.enum_type(&payloads, self.target_layout()?)
             }
             SemanticType::Tuple(elem_tys) => {
                 let mut field_types = Vec::new();
@@ -259,7 +244,9 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
 
             SemanticType::Array(elem_ty, len) => {
                 let elem_type = self.map_type(*elem_ty)?;
-                Ok(elem_type.array_type(*len as u32).into())
+                let len = (*len).try_into().map_err(|_| BackendError::InvariantViolation(
+                    "array layout exceeds LLVM array length".into()))?;
+                Ok(elem_type.array_type(len).into())
             }
             SemanticType::Slice(_) => {
                 let ptr_ty = self.context.ptr_type(inkwell::AddressSpace::default());
@@ -301,6 +288,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
         }
         self.llvm_module.set_triple(&machine.get_triple());
         self.llvm_module.set_data_layout(&machine.get_target_data().get_data_layout());
+        self.target_data = Some(machine.get_target_data());
         self.declare_functions()?;
         let mut user_main_func = None;
         for func in &self.module.functions {
@@ -418,6 +406,12 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             i32_type.into(), i32_type.into(),
         ], false);
         self.llvm_module.add_function("__luna_bounds_fail", bounds_type, None);
+
+        // Declare `__luna_overflow_fail(ptr, i32) -> void` and
+        // `__luna_div_zero_fail(ptr, i32) -> void` (checked arithmetic traps).
+        let arith_trap_type = void_type.fn_type(&[ptr_type.into(), i32_type.into()], false);
+        self.llvm_module.add_function("__luna_overflow_fail", arith_trap_type, None);
+        self.llvm_module.add_function("__luna_div_zero_fail", arith_trap_type, None);
 
         // Declare `__luna_panic(ptr, i64, ptr, i64, i32, i32) -> void`
         let panic_type = void_type.fn_type(&[
@@ -629,8 +623,8 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::HeapAlloc => {
                 let alloc_fn = self.get_function("__luna_alloc")
                     .ok_or_else(|| BackendError::InvariantViolation("__luna_alloc declaration missing".into()))?;
-                let size = self.context.i64_type().const_int(self.layout_size(data.ty), false);
-                let align = self.context.i64_type().const_int(self.layout_align(data.ty).max(1), false);
+                let size = self.context.i64_type().const_int(self.layout_size(data.ty)?, false);
+                let align = self.context.i64_type().const_int(self.layout_align(data.ty)?.max(1), false);
                 let call = self.builder.build_call(alloc_fn, &[size.into(), align.into()], &format!("v{}", id.0)).unwrap();
                 call.try_as_basic_value().left().ok_or_else(|| BackendError::InvariantViolation("__luna_alloc returned void".into()))
             }
@@ -669,7 +663,15 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let res = self.builder.build_float_neg(val.into_float_value(), &format!("v{}", id.0)).unwrap();
                     Ok(res.into())
                 } else {
-                    let res = self.builder.build_int_neg(val.into_int_value(), &format!("v{}", id.0)).unwrap();
+                    let v = val.into_int_value();
+                    // Signed `-MIN` is not representable and must trap. Unsigned
+                    // negation keeps its existing modular behavior.
+                    if !self.is_unsigned_operand(value, _func) {
+                        let min = self.int_min_value(v.get_type());
+                        let is_min = self.builder.build_int_compare(inkwell::IntPredicate::EQ, v, min, &format!("negmin_{}", id.0)).unwrap();
+                        self.emit_guarded_trap(is_min, "__luna_overflow_fail", id.0)?;
+                    }
+                    let res = self.builder.build_int_neg(v, &format!("v{}", id.0)).unwrap();
                     Ok(res.into())
                 }
             }
@@ -691,7 +693,10 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 } else {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
-                    let res = self.builder.build_int_add(l, r, &format!("v{}", id.0)).unwrap();
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let op = if is_unsigned { "uadd" } else { "sadd" };
+                    let (res, overflow) = self.checked_int_binop(op, l, r, id.0)?;
+                    self.emit_guarded_trap(overflow, "__luna_overflow_fail", id.0)?;
                     Ok(res.into())
                 }
             }
@@ -738,7 +743,10 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 } else {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
-                    let res = self.builder.build_int_sub(l, r, &format!("v{}", id.0)).unwrap();
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let op = if is_unsigned { "usub" } else { "ssub" };
+                    let (res, overflow) = self.checked_int_binop(op, l, r, id.0)?;
+                    self.emit_guarded_trap(overflow, "__luna_overflow_fail", id.0)?;
                     Ok(res.into())
                 }
             }
@@ -751,7 +759,10 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 } else {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
-                    let res = self.builder.build_int_mul(l, r, &format!("v{}", id.0)).unwrap();
+                    let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    let op = if is_unsigned { "umul" } else { "smul" };
+                    let (res, overflow) = self.checked_int_binop(op, l, r, id.0)?;
+                    self.emit_guarded_trap(overflow, "__luna_overflow_fail", id.0)?;
                     Ok(res.into())
                 }
             }
@@ -765,6 +776,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
                     let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    self.emit_div_guards(l, r, is_unsigned, id.0)?;
                     let res = if is_unsigned {
                         self.builder.build_int_unsigned_div(l, r, &format!("v{}", id.0)).unwrap()
                     } else {
@@ -783,6 +795,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let l = l_val.into_int_value();
                     let r = r_val.into_int_value();
                     let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                    self.emit_div_guards(l, r, is_unsigned, id.0)?;
                     let res = if is_unsigned {
                         self.builder.build_int_unsigned_rem(l, r, &format!("v{}", id.0)).unwrap()
                     } else {
@@ -848,13 +861,25 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::Shl { left, right } => {
                 let l = self.generate_operand(left)?.into_int_value();
                 let r = self.generate_operand(right)?.into_int_value();
+                let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                let lhs_width = self.int_bit_width(l.get_type());
+                self.emit_shift_count_guard(r, lhs_width, id.0)?;
                 let res = self.builder.build_left_shift(l, r, &format!("v{}", id.0)).unwrap();
+                // Value overflow: `x * 2^n` must stay representable, i.e. shifting
+                // the result back must recover the operand exactly. This also holds
+                // for negative operands (arithmetic right shift), and the count was
+                // already validated, so no invalid shift is executed.
+                let back = self.builder.build_right_shift(res, r, !is_unsigned, &format!("shl_back_{}", id.0)).unwrap();
+                let lost = self.builder.build_int_compare(inkwell::IntPredicate::NE, back, l, &format!("shl_lost_{}", id.0)).unwrap();
+                self.emit_guarded_trap(lost, "__luna_overflow_fail", id.0)?;
                 Ok(res.into())
             }
             Instruction::Shr { left, right } => {
                 let l = self.generate_operand(left)?.into_int_value();
                 let r = self.generate_operand(right)?.into_int_value();
                 let is_unsigned = self.is_unsigned_operand(left, _func) || self.is_unsigned_operand(right, _func);
+                let lhs_width = self.int_bit_width(l.get_type());
+                self.emit_shift_count_guard(r, lhs_width, id.0)?;
                 let res = self.builder.build_right_shift(l, r, !is_unsigned, &format!("v{}", id.0)).unwrap();
                 Ok(res.into())
             }
@@ -1242,12 +1267,12 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     // Slot 1: size as pointer
                     let concrete_ty_id = self.semantic_ctx.tables.symbol_types.get(concrete_sym).copied()
                         .unwrap_or(luna_semantic::SemanticTypeId(0));
-                    let size_val = self.context.i64_type().const_int(self.layout_size(concrete_ty_id), false);
+                    let size_val = self.context.i64_type().const_int(self.layout_size(concrete_ty_id)?, false);
                     let size_ptr = size_val.const_to_pointer(ptr_ty);
                     fn_ptrs.push(size_ptr);
 
                     // Slot 2: align as pointer
-                    let align_val = self.context.i64_type().const_int(self.layout_align(concrete_ty_id), false);
+                    let align_val = self.context.i64_type().const_int(self.layout_align(concrete_ty_id)?, false);
                     let align_ptr = align_val.const_to_pointer(ptr_ty);
                     fn_ptrs.push(align_ptr);
 
@@ -1427,7 +1452,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     let ptr_val = self.generate_operand(value)?;
                     let (size, align) = if let Operand::Value(val_id) = value {
                         if let Some(val_data) = _func.values.get(val_id.0 as usize) {
-                            (self.layout_size(val_data.ty), self.layout_align(val_data.ty).max(1))
+                            (self.layout_size(val_data.ty)?, self.layout_align(val_data.ty)?.max(1))
                         } else {
                             (8, 8)
                         }
@@ -1452,7 +1477,7 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     _ => data.ty,
                 };
                 let elem_size = if elem_semantic_ty != SemanticTypeId(0) {
-                    self.layout_size(elem_semantic_ty)
+                    self.layout_size(elem_semantic_ty)?
                 } else {
                     1
                 };
@@ -1855,16 +1880,47 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 }
             }
             Instruction::SizeOf { ty } => {
-                let size = self.layout_size(*ty);
+                let size = self.layout_size(*ty)?;
                 Ok(self.context.i64_type().const_int(size, false).into())
             }
             Instruction::AlignOf { ty } => {
-                let align = self.layout_align(*ty);
+                let align = self.layout_align(*ty)?;
                 Ok(self.context.i64_type().const_int(align, false).into())
             }
             Instruction::MarkInit { .. } | Instruction::Nop => {
                 // Marker instructions for borrow-checking and cleanup; no runtime effect.
                 Ok(self.context.i32_type().const_zero().into())
+            }
+            Instruction::CallIntrinsic { kind, args } => {
+                use luna_semantic::semantic_tables::IntrinsicKind;
+                match kind {
+                    IntrinsicKind::WrappingAdd | IntrinsicKind::WrappingSub | IntrinsicKind::WrappingMul => {
+                        if args.len() != 2 {
+                            return Err(BackendError::InvariantViolation(format!(
+                                "wrapping intrinsic expects 2 operands, got {}", args.len())));
+                        }
+                        let l_val = self.generate_operand(&args[0])?;
+                        let r_val = self.generate_operand(&args[1])?;
+                        if !l_val.is_int_value() || !r_val.is_int_value() {
+                            return Err(BackendError::InvariantViolation(
+                                "wrapping intrinsics are integer-only".into()));
+                        }
+                        let l = l_val.into_int_value();
+                        let r = r_val.into_int_value();
+                        // Plain LLVM add/sub/mul are modular (no nsw/nuw), so this
+                        // is the sanctioned unchecked path and never traps.
+                        let name = format!("v{}", id.0);
+                        let res = match kind {
+                            IntrinsicKind::WrappingAdd => self.builder.build_int_add(l, r, &name),
+                            IntrinsicKind::WrappingSub => self.builder.build_int_sub(l, r, &name),
+                            IntrinsicKind::WrappingMul => self.builder.build_int_mul(l, r, &name),
+                            _ => unreachable!("guarded by the outer match"),
+                        }.unwrap();
+                        Ok(res.into())
+                    }
+                    other => Err(BackendError::InvariantViolation(format!(
+                        "Unhandled intrinsic in LLVM backend: {:?}", other))),
+                }
             }
             unhandled => {
                 return Err(BackendError::InvariantViolation(format!(
@@ -1930,6 +1986,146 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             }
         }
         Ok(())
+    }
+
+    /// Emit `if guard { <trap>(file, line); unreachable }` with the trap in a
+    /// block that dominates the dangerous operation, then continue in the
+    /// fall-through block. Guards must always run before the risky instruction.
+    fn emit_guarded_trap(&self, guard: IntValue<'ctx>, trap_fn: &str, id: u32) -> Result<(), BackendError> {
+        let current_fn = self.builder.get_insert_block().unwrap().get_parent().unwrap();
+        let ok_bb = self.context.append_basic_block(current_fn, &format!("arith_ok_{}", id));
+        let fail_bb = self.context.append_basic_block(current_fn, &format!("arith_fail_{}", id));
+        self.builder.build_conditional_branch(guard, fail_bb, ok_bb).unwrap();
+        self.builder.position_at_end(fail_bb);
+        let trap = self.get_function(trap_fn).ok_or_else(|| {
+            BackendError::InvariantViolation(format!("{trap_fn} declaration missing"))
+        })?;
+        let file_name = self.llvm_module.get_name().to_str().unwrap_or("<unknown>");
+        let file_str = self.builder.build_global_string_ptr(file_name, "arith_file").unwrap();
+        let line = self.context.i32_type().const_zero();
+        self.builder
+            .build_call(trap, &[file_str.as_pointer_value().into(), line.into()], "")
+            .unwrap();
+        self.builder.build_unreachable().unwrap();
+        self.builder.position_at_end(ok_bb);
+        Ok(())
+    }
+
+    fn int_bit_width(&self, ty: IntType<'ctx>) -> u64 {
+        ty.get_bit_width() as u64
+    }
+
+    fn int_min_value(&self, ty: IntType<'ctx>) -> IntValue<'ctx> {
+        let width = self.int_bit_width(ty);
+        if width == 0 {
+            return ty.const_zero();
+        }
+        if width <= 64 {
+            ty.const_int(1u64 << (width - 1), false)
+        } else if width == 128 {
+            // 1 << 127: high word 0x8000_0000_0000_0000, low word 0.
+            ty.const_int_arbitrary_precision(&[0, 1u64 << 63])
+        } else {
+            ty.const_int(1u64 << (width - 1), false)
+        }
+    }
+
+    /// `{result, overflow}` from the LLVM overflow intrinsic for +, -, *.
+    fn checked_int_binop(
+        &self,
+        op: &str,
+        l: IntValue<'ctx>,
+        r: IntValue<'ctx>,
+        id: u32,
+    ) -> Result<(IntValue<'ctx>, IntValue<'ctx>), BackendError> {
+        let ty = l.get_type();
+        let width = self.int_bit_width(ty);
+        let name = format!("llvm.{}.with.overflow.i{}", op, width);
+        let struct_ty = self
+            .context
+            .struct_type(&[ty.into(), self.context.bool_type().into()], false);
+        let fn_ty = struct_ty.fn_type(&[ty.into(), ty.into()], false);
+        let func = match self.llvm_module.get_function(&name) {
+            Some(f) => f,
+            None => self.llvm_module.add_function(&name, fn_ty, None),
+        };
+        let call = self
+            .builder
+            .build_call(func, &[l.into(), r.into()], &format!("ovf_{}", id))
+            .map_err(|e| {
+                BackendError::InvariantViolation(format!("overflow intrinsic call failed: {e}"))
+            })?;
+        let sv = call
+            .try_as_basic_value()
+            .left()
+            .ok_or_else(|| {
+                BackendError::InvariantViolation("overflow intrinsic returned void".into())
+            })?
+            .into_struct_value();
+        let result = self
+            .builder
+            .build_extract_value(sv, 0, &format!("ovf_val_{}", id))
+            .unwrap()
+            .into_int_value();
+        let overflow = self
+            .builder
+            .build_extract_value(sv, 1, &format!("ovf_bit_{}", id))
+            .unwrap()
+            .into_int_value();
+        Ok((result, overflow))
+    }
+
+    /// Guard divisor == 0 (div/rem by zero trap) and, for signed integers,
+    /// MIN / -1 and MIN % -1 (overflow trap) *before* the division executes.
+    fn emit_div_guards(
+        &self,
+        l: IntValue<'ctx>,
+        r: IntValue<'ctx>,
+        is_unsigned: bool,
+        id: u32,
+    ) -> Result<(), BackendError> {
+        let ty = r.get_type();
+        let zero = ty.const_zero();
+        let is_zero = self
+            .builder
+            .build_int_compare(inkwell::IntPredicate::EQ, r, zero, &format!("dz_{}", id))
+            .unwrap();
+        self.emit_guarded_trap(is_zero, "__luna_div_zero_fail", id)?;
+        if !is_unsigned {
+            let min = self.int_min_value(ty);
+            let is_min = self
+                .builder
+                .build_int_compare(inkwell::IntPredicate::EQ, l, min, &format!("dmin_{}", id))
+                .unwrap();
+            let minus_one = ty.const_all_ones();
+            let is_neg_one = self
+                .builder
+                .build_int_compare(inkwell::IntPredicate::EQ, r, minus_one, &format!("dneg1_{}", id))
+                .unwrap();
+            let danger = self
+                .builder
+                .build_and(is_min, is_neg_one, &format!("dovf_{}", id))
+                .unwrap();
+            self.emit_guarded_trap(danger, "__luna_overflow_fail", id)?;
+        }
+        Ok(())
+    }
+
+    /// Guard a shift count: the raw unsigned comparison `count >= lhs_width`
+    /// catches both `count >= width` and a negative count (whose bit pattern is
+    /// huge), so no invalid shift is ever executed.
+    fn emit_shift_count_guard(
+        &self,
+        r: IntValue<'ctx>,
+        lhs_width: u64,
+        id: u32,
+    ) -> Result<(), BackendError> {
+        let width_const = r.get_type().const_int(lhs_width, false);
+        let too_big = self
+            .builder
+            .build_int_compare(inkwell::IntPredicate::UGE, r, width_const, &format!("shcnt_{}", id))
+            .unwrap();
+        self.emit_guarded_trap(too_big, "__luna_overflow_fail", id)
     }
 
     fn is_unsigned_operand(&self, op: &Operand, func: &MvirFunction) -> bool {
@@ -2063,6 +2259,43 @@ mod cast_invariant_tests {
     use luna_semantic::ty::{LifetimeId, Mutability};
 
     #[test]
+    fn generic_enum_storage_covers_and_aligns_every_variant_on_configured_targets() {
+        for triple in ["x86_64-pc-windows-gnu", "x86_64-unknown-linux-gnu"] {
+            let mut semantic = SemanticContext::new();
+            let byte = semantic.types.intern(SemanticType::Primitive(BuiltinType::U8));
+            let wide = semantic.types.intern(SemanticType::Primitive(BuiltinType::I128));
+            let array = semantic.types.intern(SemanticType::Array(wide, 3));
+            let tuple = semantic.types.intern(SemanticType::Tuple(vec![byte, wide]));
+            let record = semantic.types.intern(SemanticType::Struct(SymbolId(100), vec![], vec![byte, array]));
+            let nested = semantic.types.intern(SemanticType::Enum(SymbolId(101), vec![], vec![byte, tuple]));
+            let envelope = semantic.types.intern(SemanticType::Enum(SymbolId(102), vec![], vec![record, nested]));
+            let too_large = semantic.types.intern(SemanticType::Array(byte, u64::from(u32::MAX) + 1));
+            let context = Context::create();
+            let module = MvirModule::new();
+            let config = TargetConfig { triple: triple.into(), cpu: "generic".into(), features: String::new(), optimization: OptimizationLevel::None };
+            let mut backend = LLVMBackend::new(&context, &module, &semantic, "enum_layout", &config);
+            backend.compile().unwrap();
+            let layout = backend.target_layout().unwrap();
+            assert!(matches!(backend.map_type(too_large), Err(BackendError::InvariantViolation(message))
+                if message.contains("array length")));
+            for (enum_ty, variants) in [(nested, vec![byte, tuple]), (envelope, vec![record, nested])] {
+                let lowered = backend.map_type(enum_ty).unwrap().into_struct_type();
+                let offset = layout.offset_of_element(&lowered, 1).unwrap();
+                let size = backend.layout_size(enum_ty).unwrap();
+                let align = backend.layout_align(enum_ty).unwrap();
+                assert_eq!(size, layout.get_abi_size(&lowered));
+                assert_eq!(size % align, 0);
+                for variant in variants {
+                    let variant_align = backend.layout_align(variant).unwrap();
+                    assert_eq!(offset % variant_align, 0, "{triple}: misaligned payload");
+                    assert!(align >= variant_align);
+                    assert!(size >= offset + backend.layout_size(variant).unwrap());
+                }
+            }
+        }
+    }
+
+    #[test]
     fn malformed_typed_casts_reject_before_representation_lowering() {
         let mut semantic = SemanticContext::new();
         let i32_ty = semantic.types.intern(SemanticType::Primitive(BuiltinType::I32));
@@ -2093,6 +2326,35 @@ mod cast_invariant_tests {
             let cast = ValueData::new(Instruction::Cast { value: Operand::Value(ValueId(0)), target_ty: target }, target, None);
             let result = backend.generate_inst(ValueId(1), &cast, &function);
             assert!(matches!(result, Err(BackendError::InvariantViolation(ref message)) if message.contains(reason)), "{result:?}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod target_selection_tests {
+    use super::*;
+
+    /// R5-FU-TARGET-01: on a supported host the artifact target identity is the
+    /// canonical Luna release triple, never the host LLVM spelling.
+    #[test]
+    fn default_target_config_records_the_canonical_luna_triple() {
+        let host = TargetMachine::get_default_triple()
+            .as_str()
+            .to_str()
+            .unwrap_or_default()
+            .to_string();
+        let config = TargetConfig::default();
+        match crate::target_matrix::canonical_supported_target(&host) {
+            Some(target) => {
+                assert_eq!(config.triple, target.triple(), "host {host}");
+                assert!(crate::target_matrix::SUPPORTED_TARGETS
+                    .iter()
+                    .any(|supported| supported.triple() == config.triple));
+            }
+            None => assert_eq!(
+                config.triple, host,
+                "hosts outside the release matrix keep their own spelling"
+            ),
         }
     }
 }

@@ -1,0 +1,48 @@
+{
+  "observed_at_utc": "2026-10-17T18:08:45.642418+00:00",
+  "implementation_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "review_base": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+  "status": "NO_NEW_FINDING_IN_REVIEWED_COMPILER_DELTA; qualification still pending",
+  "scope": "Manual source inspection of the compiler repair delta since the historical candidate. Not a universal language/stdlib audit or a substitute for required tests.",
+  "current_report_head": "8ba21f86e1f7081c7a2641c94cacebbdbb86b44d",
+  "implementation_trees_unchanged_at_report_head": [
+    "luna-rs",
+    "runtime",
+    "tests"
+  ],
+  "observations": [
+    {
+      "area": "Comptime diagnostic identity",
+      "source": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
+      "finding": "StepLimitExceeded maps to E4002; PointerEscape/ResourceEscape/ResourceLeak map to E4003 by typed variants; other evaluation errors remain E4005. The typechecker uses this identity while attaching the originating source span.",
+      "regression": "diag_per_code_coverage_cli and p2a_tests; selected-pin terminal results pending"
+    },
+    {
+      "area": "Run error ownership",
+      "source": "luna-rs/crates/luna-cli/src/main.rs",
+      "finding": "compile_and_render returns the originating diagnostic; directory creation and process launch errors have their own output/process codes; the CLI no longer wraps all errors as E6009.",
+      "regression": "run_keeps_compiler_diagnostics_instead_of_reclassifying_them; selected-pin terminal result pending"
+    },
+    {
+      "area": "Missing returns",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "finding": "Non-void fallthrough emits existing MissingReturn after cleanup emission, with source-bearing Nop from the enclosing declaration; async body checks its output type. Return analysis follows feasible literal Boolean edges while preserving both successors for runtime conditions. Void/tail/explicit return paths remain separate.",
+      "regression": "missing_return_cli covers empty, branch, loop/break, generic, method, closure, async, default entry and imported generic negatives in check/build source/artifact modes, plus valid native controls; selected-pin terminal result pending"
+    },
+    {
+      "area": "Native Linux link",
+      "source": "luna-rs/crates/luna-backend/src/linker.rs",
+      "finding": "Both executable entrypoints append shared system-library suffix after objects/static runtime. Linux gets -lm; existing Windows libraries and macOS behavior are preserved. No library/provider/type/symbol special-casing, intrinsic, serialized schema or ABI change.",
+      "regression": "native_math_link_cli preflight passes on Windows in both provider modes; Linux normal adds the three unchanged failing driver suites; selected-pin terminal results pending"
+    }
+  ],
+  "unresolved_findings_in_reviewed_delta": [],
+  "file_sha256": {
+    "luna-rs/crates/luna-semantic/src/comptime/value.rs": "fad45d04fb25528314786b861d4a67e5c77161ea6cc7e61dda32156c41116c37",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "0594a2f675016411c73651685cf0851b193de1decd069db63991f51fe102d442",
+    "luna-rs/crates/luna-cli/src/main.rs": "92a61eba6c1ebe41af8b5c683bea975cf1b2a9265a36c16daae081331e2ba639",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "8a783bc4fc7936d0f91e6432451fbc934df9d925782eb4ca7abde4716561c63d",
+    "luna-rs/crates/luna-borrowck/src/return_analysis.rs": "fe2aaf1533cacf251515cbc06fea07bc480fe6d01edf6a606e3015f5a7e01e72",
+    "luna-rs/crates/luna-backend/src/linker.rs": "bffc750935bd7db9cd615c6ac33f8e1a152416f16760b9177a55a1e365f0d4e6"
+  }
+}

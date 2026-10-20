@@ -1,0 +1,26 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "focused/casts-views",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--test",
+    "cast_contract_cli",
+    "--test",
+    "cast_poison_cli",
+    "--test",
+    "raw_slice_view_a5_cli",
+    "--test",
+    "raw_slice_provenance_cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T18:13:48.177063+00:00",
+  "end_utc": "2026-10-17T18:27:46.270842+00:00",
+  "elapsed_seconds": 838.094,
+  "exit": 0,
+  "log": "focused/casts-views.log",
+  "log_sha256": "e9aa799bc588a5d7dddef6ec07898c138a5983c26ec40465fec1b952e7c3d4b2"
+}

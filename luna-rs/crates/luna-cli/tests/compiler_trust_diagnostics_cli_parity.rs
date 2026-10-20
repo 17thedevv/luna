@@ -65,18 +65,12 @@ fn provider_authority_and_diagnostics_have_source_artifact_parity() {
             "E2006",
         );
         let copied = check(root, &fixtures.join("slice_consumer.ln"), &binary_copy);
-        if root == &modes.artifact {
-            // With fresh artifact dependencies, reach the actual authorization gate.
-            rejects(&copied, "E2006");
-        } else {
-            // Mixing an artifact with source dependencies fails fingerprint validation
-            // first. Preserve strict rejection rather than bypassing that validator.
-            let text = rejects(&copied, "E6001");
-            assert!(
-                text.contains("dependency interface fingerprint mismatch"),
-                "{text}"
-            );
-        }
+        // Fresh source and artifact dependencies have the same canonical interface
+        // identity. Copying a valid bundle does not grant provider authority in
+        // either mode: both must reach the orphan-impl authorization gate.
+        // Genuine interface changes remain covered by nominal_layout_cli and
+        // interface_constraints_cli; the reader's fingerprint checks stay strict.
+        rejects(&copied, "E2006");
 
         // Explicitly searching the actual canonical directory must retain authority.
         assert!(

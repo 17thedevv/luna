@@ -1,0 +1,629 @@
+{
+  "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+  "final_workspace": "e1-workspace-final6-2026-10-13.json",
+  "final_matrix_prefix": "e1-final5-",
+  "preserved_workspace_attempts": [
+    {
+      "file": "e1-workspace-final5-2026-10-13.json",
+      "sha256": "6b6d2029cd310c7cfd9bb5c1a1c2b392adaef21b99cbec58a4ee8d1cff534568",
+      "reason": "Host exec session ended during run 2. Run 1 completed green (219 binaries, 231 groups, 1404 passed / 0 failed / 1 ignored, exit 0, same HEAD), but the three-run set is incomplete, so it is preserved as a partial attempt, not as the qualification. The qualification set was re-run as final6 at the same pin e4f9fb53.",
+      "counts": [
+        {
+          "run": 1,
+          "start_utc": "2026-10-13T10:51:55.749493+00:00",
+          "elapsed_seconds": 12181.414,
+          "head_before": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+          "head_after": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+          "exit": 0,
+          "binaries": 219,
+          "doc_test_groups": 12,
+          "passed": 1404,
+          "failed": 0,
+          "ignored": 1,
+          "result_groups": 231,
+          "log_sha256": "8d04aae094748d2d605b814785471742a2148da5c7cb437459d96de4eed95544",
+          "arithmetic_modes": [],
+          "cli_debug_sha256_after": "32c6d15907989de5b04b3c5670137192aaca5c5ad1dcc155afc886fe535fe349",
+          "cli_release_sha256_after": "e685dbcd6263978a44af0a9d56c227514c76950e5def4c8e94d89f810f213f74",
+          "code_diff_empty_after": true,
+          "log_archive": "e1-workspace-final5-2026-10-13-run1.txt.gz"
+        }
+      ]
+    },
+    {
+      "file": "e1-workspace-final4-2026-10-13.json",
+      "sha256": "97aee8e80241e07e022732e1f08868561f89b48c8e489df80d527334f27a4384",
+      "reason": "138 binaries, 877 passed / 1 failed / 1 ignored; RangeInclusive advanced after terminal MAX. Maintainer approved Option slot; a wider Probe exposed generic enum alignment. Repair requires compiler25 and preserves real compiler24 rejection. A tracked test MVIR dump was separately moved to owned output in 356b1028.",
+      "counts": [
+        {
+          "run": 1,
+          "start_utc": "2026-10-13T04:12:06.486180+00:00",
+          "elapsed_seconds": 8600.251,
+          "head_before": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+          "head_after": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+          "exit": 101,
+          "binaries": 138,
+          "doc_test_groups": 0,
+          "passed": 877,
+          "failed": 1,
+          "ignored": 1,
+          "result_groups": 138,
+          "log_sha256": "fe7a60141d49559b0cbcc0114d4ed11ab3a8047880c0aea51e4242379a8b833d",
+          "arithmetic_modes": [],
+          "cli_debug_sha256_after": "bd80e80b7b2a1da65b787e4a28791367797079f20041b8233f8e9cf307153aac",
+          "cli_release_sha256_after": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+          "code_diff_empty_after": false,
+          "log_archive": "e1-workspace-final4-2026-10-13-run1.txt.gz"
+        }
+      ]
+    },
+    {
+      "file": "e1-workspace-final-2026-10-13.json",
+      "sha256": "0f9f7c9f7773a59cd03225dde0c359e679019e620573dc9921f55066d522fa09",
+      "reason": "Unit test compile error E0433: Arc missing; no test ran. Fixed only the test import in b9841cfe.",
+      "counts": [
+        {
+          "run": 1,
+          "start_utc": "2026-10-13T02:44:58.988308+00:00",
+          "elapsed_seconds": 33.593,
+          "head_before": "1b5dfab0cc73facf4eb0ce58defb047d215fd445",
+          "head_after": "1b5dfab0cc73facf4eb0ce58defb047d215fd445",
+          "exit": 101,
+          "binaries": 0,
+          "doc_test_groups": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "result_groups": 0,
+          "log_sha256": "c5200ba22b3b3fe2739c1234b173553f848431879e3c7c74483f1ac45d18c915",
+          "arithmetic_modes": [],
+          "log_archive": "e1-workspace-final-2026-10-13-run1.txt.gz"
+        }
+      ]
+    },
+    {
+      "file": "e1-workspace-final2-2026-10-13.json",
+      "sha256": "1c57bf2a1a1e33086883e161813d1870739f8f0ba5e3a790edbbb9f15f199f25",
+      "reason": "Windows denied removing live debug luna.exe while recorders used it; no test ran. Corrected scheduling, no source change.",
+      "counts": [
+        {
+          "run": 1,
+          "start_utc": "2026-10-13T02:50:31.463267+00:00",
+          "elapsed_seconds": 82.777,
+          "head_before": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+          "head_after": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+          "exit": 101,
+          "binaries": 0,
+          "doc_test_groups": 0,
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0,
+          "result_groups": 0,
+          "log_sha256": "64ecbc5c5df18bbb705c2a3f41f24f68da3c1304e1d3f90bbc55fb3582ae9e77",
+          "arithmetic_modes": [],
+          "log_archive": "e1-workspace-final2-2026-10-13-run1.txt.gz"
+        }
+      ]
+    },
+    {
+      "file": "e1-workspace-final3-2026-10-13.json",
+      "sha256": "2928eff7e6018fecb8fadc948bcd69f8317100aed233ee99273e72c14cf18282",
+      "reason": "30 binaries, 96 passed / 1 failed. E1 full qualification passed; trust test retained obsolete E6001 expectation for matching fresh source/artifact interfaces. Correct E2006 rejects copied protected provider in both modes. Test-only reconciliation 939d53e0, strict stale nominal interface rejection focused control passed.",
+      "counts": [
+        {
+          "run": 1,
+          "start_utc": "2026-10-13T03:03:24.532820+00:00",
+          "elapsed_seconds": 2976.833,
+          "head_before": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+          "head_after": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+          "exit": 101,
+          "binaries": 30,
+          "doc_test_groups": 0,
+          "passed": 96,
+          "failed": 1,
+          "ignored": 0,
+          "result_groups": 30,
+          "log_sha256": "74e16b7849b45ca909a4b3b080b4fa6ef0a1c0af35dde5d9ead3aa301cdb756e",
+          "arithmetic_modes": [],
+          "cli_debug_sha256_after": "b95b8b600d9eb2156cf3aeb49e07a1f07c49a548b46ca3c1c4961492dacdc305",
+          "cli_release_sha256_after": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+          "code_diff_empty_after": true,
+          "log_archive": "e1-workspace-final3-2026-10-13-run1.txt.gz"
+        }
+      ]
+    }
+  ],
+  "preserved_matrix_acquisitions": [
+    {
+      "file": "e1-final-debug-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "1b5dfab0cc73facf4eb0ce58defb047d215fd445",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "d1dd9fb0c37a06476590b00fb87d89f065719beb19b2c344e42fafe4f677ac52",
+        "source_input_sha256": "cc84e2d2110cf6bd4a6297533a9cde10336f6521cd2e95ebe8d38b34cc016a32",
+        "cli": "D:/fdlang/luna-rs/target/debug/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+        "profile": "debug",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final-debug-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "1b5dfab0cc73facf4eb0ce58defb047d215fd445",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "d1dd9fb0c37a06476590b00fb87d89f065719beb19b2c344e42fafe4f677ac52",
+        "source_input_sha256": "cc84e2d2110cf6bd4a6297533a9cde10336f6521cd2e95ebe8d38b34cc016a32",
+        "cli": "D:/fdlang/luna-rs/target/debug/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/artifact",
+        "profile": "debug",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final-release-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "1b5dfab0cc73facf4eb0ce58defb047d215fd445",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "d1d1cfe1da095c50ee3fc151f5e03c7dfabed2daf7ca52784e7a1240f84c30c3",
+        "source_input_sha256": "cc84e2d2110cf6bd4a6297533a9cde10336f6521cd2e95ebe8d38b34cc016a32",
+        "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+        "profile": "release",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final-release-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "1b5dfab0cc73facf4eb0ce58defb047d215fd445",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "d1d1cfe1da095c50ee3fc151f5e03c7dfabed2daf7ca52784e7a1240f84c30c3",
+        "source_input_sha256": "cc84e2d2110cf6bd4a6297533a9cde10336f6521cd2e95ebe8d38b34cc016a32",
+        "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/artifact",
+        "profile": "release",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final2-debug-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "132dae54e160cac349a23519d3cda630ed7185c0d53040252ffc79c2bec02f15",
+        "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+        "cli": "D:/fdlang/luna-rs/target/debug/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+        "profile": "debug",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "UNEXPECTED_EXIT": 3,
+          "TRAP": 31,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": false
+      },
+      "failed_rows": [
+        {
+          "fixture": "constfold_signed_add_i8",
+          "outcome": "UNEXPECTED_EXIT",
+          "timeout": true
+        },
+        {
+          "fixture": "constfold_unsigned_mul_u8",
+          "outcome": "UNEXPECTED_EXIT",
+          "timeout": true
+        },
+        {
+          "fixture": "discarded_unsigned_div_zero_u32",
+          "outcome": "UNEXPECTED_EXIT",
+          "timeout": true
+        }
+      ]
+    },
+    {
+      "file": "e1-final2-debug-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "132dae54e160cac349a23519d3cda630ed7185c0d53040252ffc79c2bec02f15",
+        "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+        "cli": "D:/fdlang/luna-rs/target/debug/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/artifact",
+        "profile": "debug",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "UNEXPECTED_EXIT": 3,
+          "TRAP": 31,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": false
+      },
+      "failed_rows": [
+        {
+          "fixture": "constfold_signed_add_i8",
+          "outcome": "UNEXPECTED_EXIT",
+          "timeout": true
+        },
+        {
+          "fixture": "constfold_unsigned_mul_u8",
+          "outcome": "UNEXPECTED_EXIT",
+          "timeout": true
+        },
+        {
+          "fixture": "discarded_unsigned_div_zero_u32",
+          "outcome": "UNEXPECTED_EXIT",
+          "timeout": true
+        }
+      ]
+    },
+    {
+      "file": "e1-final2-release-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+        "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+        "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+        "profile": "release",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 33,
+          "UNEXPECTED_EXIT": 1,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": false
+      },
+      "failed_rows": [
+        {
+          "fixture": "constfold_unsigned_mul_u8",
+          "outcome": "UNEXPECTED_EXIT",
+          "timeout": true
+        }
+      ]
+    },
+    {
+      "file": "e1-final2-release-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+        "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+        "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/artifact",
+        "profile": "release",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 33,
+          "UNEXPECTED_EXIT": 1,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": false
+      },
+      "failed_rows": [
+        {
+          "fixture": "constfold_unsigned_mul_u8",
+          "outcome": "UNEXPECTED_EXIT",
+          "timeout": true
+        }
+      ]
+    },
+    {
+      "file": "e1-final3-debug-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "132dae54e160cac349a23519d3cda630ed7185c0d53040252ffc79c2bec02f15",
+        "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+        "cli": "D:/fdlang/luna-rs/target/debug/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+        "profile": "debug",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final3-debug-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "132dae54e160cac349a23519d3cda630ed7185c0d53040252ffc79c2bec02f15",
+        "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+        "cli": "D:/fdlang/luna-rs/target/debug/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/artifact",
+        "profile": "debug",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final3-release-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+        "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+        "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+        "profile": "release",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final3-release-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+        "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+        "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/artifact",
+        "profile": "release",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final4-debug-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "7d9630f419726e58140952991e4bb8557983814a2c1cf2fd13f8994d800f6222",
+        "source_input_sha256": "002b16bda425cd6d0e78ce8e62a6ddb64ca8ce03bc7a5f1effeaf01810e16e93",
+        "cli": "D:/fdlang/luna-rs/target/debug/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+        "profile": "debug",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final4-debug-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "7d9630f419726e58140952991e4bb8557983814a2c1cf2fd13f8994d800f6222",
+        "source_input_sha256": "002b16bda425cd6d0e78ce8e62a6ddb64ca8ce03bc7a5f1effeaf01810e16e93",
+        "cli": "D:/fdlang/luna-rs/target/debug/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/artifact",
+        "profile": "debug",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final4-release-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+        "source_input_sha256": "002b16bda425cd6d0e78ce8e62a6ddb64ca8ce03bc7a5f1effeaf01810e16e93",
+        "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+        "profile": "release",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final4-release-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+        "source_input_sha256": "002b16bda425cd6d0e78ce8e62a6ddb64ca8ce03bc7a5f1effeaf01810e16e93",
+        "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+        "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/artifact",
+        "profile": "release",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final5-debug-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "5d08acde7a986682673576f9b5f4a7b2df4b3fc7bc90ee0393e82655da5312bd",
+        "source_input_sha256": "3c22a04f8bd3e721ebe670848f8d248f7a05e91eb3650abfedac9050b5444e5f",
+        "cli": "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+        "sysroot": "D:\\fdlang\\.e1-fp-b99152562efa448c8ecf6d0573a3feeb\\source",
+        "profile": "debug",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final5-debug-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "5d08acde7a986682673576f9b5f4a7b2df4b3fc7bc90ee0393e82655da5312bd",
+        "source_input_sha256": "3c22a04f8bd3e721ebe670848f8d248f7a05e91eb3650abfedac9050b5444e5f",
+        "cli": "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+        "sysroot": "D:\\fdlang\\.e1-fp-b99152562efa448c8ecf6d0573a3feeb\\artifact",
+        "profile": "debug",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final5-release-source-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "e685dbcd6263978a44af0a9d56c227514c76950e5def4c8e94d89f810f213f74",
+        "source_input_sha256": "3c22a04f8bd3e721ebe670848f8d248f7a05e91eb3650abfedac9050b5444e5f",
+        "cli": "D:\\fdlang\\luna-rs\\target\\release\\luna.exe",
+        "sysroot": "D:\\fdlang\\.e1-fp-b99152562efa448c8ecf6d0573a3feeb\\source",
+        "profile": "release",
+        "provider_mode": "source",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    },
+    {
+      "file": "e1-final5-release-artifact-2026-10-13.meta.json",
+      "metadata": {
+        "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+        "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "cli_sha256": "e685dbcd6263978a44af0a9d56c227514c76950e5def4c8e94d89f810f213f74",
+        "source_input_sha256": "3c22a04f8bd3e721ebe670848f8d248f7a05e91eb3650abfedac9050b5444e5f",
+        "cli": "D:\\fdlang\\luna-rs\\target\\release\\luna.exe",
+        "sysroot": "D:\\fdlang\\.e1-fp-b99152562efa448c8ecf6d0573a3feeb\\artifact",
+        "profile": "release",
+        "provider_mode": "fresh-artifact",
+        "rows": 59,
+        "outcomes": {
+          "COMPILE_ERROR": 4,
+          "TRAP": 34,
+          "PASS": 9,
+          "WRAP": 12
+        },
+        "contract_met": true
+      },
+      "failed_rows": []
+    }
+  ],
+  "alignment_continuation": "REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md",
+  "preserved_alignment_baseline": "e1-enum-alignment-before-repair-2026-10-13.json",
+  "timeout_interpretation": "final2 native timeouts occurred during concurrent Cargo build. They remain failures. Isolated replay and all final3 matrices without Cargo passed with unchanged timeout/classifier and source; this supports a scheduling association, not a claim that a timeout is a trap."
+}

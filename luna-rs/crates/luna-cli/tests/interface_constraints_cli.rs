@@ -212,7 +212,7 @@ fn public_constraints_change_identity_without_binder_spelling_or_declaration_ord
                 render(&build)
             );
             let run = Command::new(exe)
-                .current_dir(std::env::temp_dir())
+                .current_dir(luna_test_support::owned_temp_root())
                 .output()
                 .unwrap();
             assert!(run.status.success(), "{mode}/{variant}: {}", render(&run));

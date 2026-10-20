@@ -22,7 +22,7 @@ fn main() -> i32 {
     dec u128_max = (((1 as u128) << (127 as u128)) - (1 as u128)) * (2 as u128) + (1 as u128);
     append(u128_max, &rw output);
     dec i128_min = -((1 as i128) << (126 as i128)) - ((1 as i128) << (126 as i128));
-    dec i128_max = ((1 as i128) << (126 as i128)) + ((1 as i128) << (126 as i128)) - (1 as i128);
+    dec i128_max = (((1 as i128) << (126 as i128)) - (1 as i128)) + ((1 as i128) << (126 as i128));
     append(i128_min, &rw output);
     append(i128_max, &rw output);
     append(18446744073709551615usize, &rw output);

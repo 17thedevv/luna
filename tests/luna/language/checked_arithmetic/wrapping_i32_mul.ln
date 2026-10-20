@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec a: i32 = 65536;
+    dec b: i32 = 65536;
+    dec x = std::wrapping_mul(a, b);
+    if x == 0 { return 0; }
+    return 7;
+}

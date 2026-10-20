@@ -415,6 +415,7 @@ dependencies = [
  "luna-common",
  "luna-driver",
  "luna-llib",
+ "luna-test-support",
  "serde",
  "serde_json",
  "toml",
@@ -444,6 +445,7 @@ dependencies = [
  "luna-optimizer",
  "luna-parser",
  "luna-semantic",
+ "luna-test-support",
  "regex",
  "serde",
  "sha2",
@@ -510,6 +512,10 @@ dependencies = [
  "luna-parser",
  "serde",
 ]
+
+[[package]]
+name = "luna-test-support"
+version = "0.1.0"
 
 [[package]]
 name = "memchr"

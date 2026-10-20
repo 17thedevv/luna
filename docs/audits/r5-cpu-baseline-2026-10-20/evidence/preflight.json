@@ -1,0 +1,51 @@
+{
+  "status": "PASS_IN_LOCAL_PREFLIGHT_SCOPE",
+  "before": {
+    "exit": 101,
+    "cpu": "alderlake",
+    "expected": "generic",
+    "evidence": "baseline-before.json"
+  },
+  "after": {
+    "backend_target_tests": 4,
+    "backend_failed": 0,
+    "cli_suites": 1,
+    "native_provider_modes": 2,
+    "target_mismatch_rejections": 22,
+    "cli_failed": 0,
+    "evidence": [
+      "baseline-after.json",
+      "artifact-target-after.json"
+    ]
+  },
+  "runtime": "Reused C:/r5-8525067f/windows-build/runtime/libluna-runtime.a; no fresh-runtime certification",
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "source_changed": [
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs",
+    "luna-rs/crates/luna-backend/src/target_contract.rs",
+    "luna-rs/crates/luna-cli/tests/artifact_target_contract_cli.rs"
+  ],
+  "qualification": "PENDING_NEW_IMMUTABLE_PIN_AND_EIGHT_LANES",
+  "file_sha256": {
+    "artifact-target-after.json": "4470ebd1f581303300c200ebe27f8eadb1a4382df68a3e04d0b0c41650f1a162",
+    "artifact-target-after.log": "9c8aa8d5796e26b7ee902b68e13fb314fd8c153ff7fb5e52867e07a426455a03",
+    "attempt1-artifact-metadata.json": "720ddf18413fe2f958f1cb5c2da7f323e4facb1e31d4058b5292669723c788f2",
+    "baseline-after.json": "30902ea92d3833ec5a8904883d744a4619521b0bac09d59bbe3f7b9e4ad51777",
+    "baseline-after.log": "5961b9e25d300fe01b8c2c919b961ca3a5dbdfc57af5b140b623adba6ffb3cc8",
+    "baseline-before.json": "d20adb774ca2a76ee6ef63bd85bafda1c1b391c45865ada17fa1faaf4932ea9d",
+    "baseline-before.log": "aec155d7db35d972ca1559cd2036fe8ca948197f621aae970d15244f9b0b8ab4",
+    "failed-drop-manifest.json": "b494fe3f0481d63055c692be1c6b4f4dce5f521e0f8fc36c8c4339c83ce3661f",
+    "failed-package-drop.llib": "d5896b62ce56a8872bd070db91e50ce0cdfc3a0ff65dc84dbeb39490a010b06f",
+    "finding.json": "570807991f1095a7dd4f6a269a72ad7f44d9fed035b9b0945c5fea4d61f557e7",
+    "luna-package-smoke-x86_64-pc-windows-gnu-39383661819-1.zip": "03a2c7f7763263222b72015f37035c23d1241273c34a40676d31e069f99d84ed",
+    "luna-package-smoke-x86_64-unknown-linux-gnu-39383661819-1.zip": "9040d90d24664eb57400e8da679e16b17e0e0e1fe0c741f5778029ed9104dc44"
+  },
+  "hash_basis": "Exact acquired bytes in preflight-acquired-bytes.zip; readable JSON copies may undergo Git EOL normalization",
+  "raw_archive": "preflight-acquired-bytes.zip",
+  "raw_archive_sha256": "e440e9d74c522cd8211fbce0f85a41cb6e9c902e295c624e24748037ae86b3bb"
+}

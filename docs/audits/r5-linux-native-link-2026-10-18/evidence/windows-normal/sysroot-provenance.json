@@ -1,0 +1,405 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "compiler": 25,
+  "metadata": 9,
+  "mvir": 5,
+  "format": 2,
+  "provider_count": 49,
+  "providers": [
+    {
+      "name": "result",
+      "path": "core/result",
+      "library_sha256": "617fac8fc5c199db52707fbd1f8b1de8fca45db79edc0b369e5cf195a935b015",
+      "object_sha256": "9b35246c5c0a78407d16640a2712673495e36e0f65ad4f41dd974993532b258b",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "ptr",
+      "path": "core/ptr",
+      "library_sha256": "9fcaecb48b45c16819c7e9b42717e0a9c904361c132b4be14a95d7143a56b7c2",
+      "object_sha256": "fe4babcd5078a986e9b1acc1c6f9847d0383d682a218137da777dc5dabfb90d1",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "slice",
+      "path": "core/slice",
+      "library_sha256": "0afa8ff32bef675dd58c35b45dab103f7d66020776242142c81dcf1b6fc1d7df",
+      "object_sha256": "be1daf4950232a90dea106dc96b641539203a7d9313de9c9ee9d963e56ff36d3",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "mem",
+      "path": "core/mem",
+      "library_sha256": "d9042efa41cd429af9fbd49296b0ace74081e2374dc49ca435cc178ac5d7d08d",
+      "object_sha256": "cb0978ac873d8b878a0500ec00e7e24e411ceca0beb87779c8b9aa27429f7b19",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "cell",
+      "path": "core/cell",
+      "library_sha256": "011ba76f781849439e262c1433d7072eabc3eded1e8dd7a4298c5d0ddc2192a0",
+      "object_sha256": "2c527e48ed41bfa220f86d495845061afb1008594fb74cd142d7492733ffceb5",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "atomic",
+      "path": "core/atomic",
+      "library_sha256": "1cd086e32156bf66258607be985a0c450df81569ef0d0bf04d1733f551b337c6",
+      "object_sha256": "9ef420251fd35f27558844a53b77f7d893b6263ad07475d82a0ec86bdf2dd554",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "sync",
+      "path": "core/sync",
+      "library_sha256": "c7172c09aa6813eeaa85bdb91c68f085d1efee594d60d0f97c80c58338829b2e",
+      "object_sha256": "71e44a872aec34a9170817407143ff1ea0e22322bdc9098db973c7464d0dac42",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "cmp",
+      "path": "core/cmp",
+      "library_sha256": "6dbd29e120b9ad55c998bef6da5d464312fc1eaf591407b896359948d6c7a636",
+      "object_sha256": "a561db5998b0b8e3d15f31fc07ee1785f807b9b2e09ec657dad7f2f39caffc4f",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "hash",
+      "path": "core/hash",
+      "library_sha256": "bdac99264e2f14ba1e6812a99c7e3e32d28915c6f27aa2844bf423b3986054fd",
+      "object_sha256": "81e9eed569be53945ef3cec119c0928dded2db8f6193cbdefe34080c4346d3c7",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "clone",
+      "path": "core/clone",
+      "library_sha256": "a7d6cc031fdbd4d062a471f73a1e9b04fbd6b5724a850625e40020c6878345de",
+      "object_sha256": "4a50f57a3ec3e81ed2198607111cb1ef36bce91750f39d2875ce0c2514dc69bf",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "copy",
+      "path": "core/copy",
+      "library_sha256": "feb110da6e5aa20d47c432972a0ee7ab006b78bb85975621e638642e3703e4f5",
+      "object_sha256": "84a40161d15b775ec4948ac18c4ef4200335305e446258534800b9a25b95d33f",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "iter_adapters",
+      "path": "core/iter_adapters",
+      "library_sha256": "fe15cdb045eb929a3612ef79b72913761eba7068ad5c3a5aa11c1fe1dab60e59",
+      "object_sha256": "9f9cba44aa7e556e75d41c4ec4bf02f33817ae410dbcb33457e0260a0fc8fb2f",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "iter_consumers",
+      "path": "core/iter_consumers",
+      "library_sha256": "d3f71e9eba0a7119b5db80f6c41d13b4a629ec99249cae6cba72cda34ba5384f",
+      "object_sha256": "63844c72553760887a3d2955501b3eb865f9821d9be013a02f23e838f4ae51d6",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "algo",
+      "path": "core/algo",
+      "library_sha256": "e4a7b90bd31f7ce47c235d8df87a4a8f375fc5c8ee7399edada8f702c366d612",
+      "object_sha256": "f24675d101b56403baa51bca5da1345c407bf3ad30c10559dc4ecff714e4094c",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "time",
+      "path": "core/time",
+      "library_sha256": "cb462b45d96fee0278204d46f8a1a3538f4f99f3c874c8ad476ed7d3348015a5",
+      "object_sha256": "80d01b85b88a290d05eb60a73952c8f13ffff2431e724610ba7d26e51be85478",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "try",
+      "path": "core/try",
+      "library_sha256": "784de518168cfda7b0580e7e93522c0d9e96a7da79a05cdcdec438d2950a66d6",
+      "object_sha256": "a7b25f7958a94ae2b3e28a61f65daa3b89fe5d14c5a61484e9183c6ac3e60329",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "io",
+      "path": "io/io",
+      "library_sha256": "0e7a23ae29bd3118c9c4fa5c89ec6baeb29fc73d35accce73134c8da138520d6",
+      "object_sha256": "d22a5a2bc314929b60c4e337c7a0fb232735fe0bcd806116430bac7bf0bfbab0",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "file",
+      "path": "file/file",
+      "library_sha256": "ca9f12bf5b5e3f74114f28cab49529a7cfaa798f6cdf6aae530759cb381ab268",
+      "object_sha256": "9935e37ced673a01df502227f3c46997cf3554a023effbcdcc58b9f78746d289",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "path",
+      "path": "path/path",
+      "library_sha256": "08275e15ba1407ad4d23e42ae1201922b058df4f528cd10631aaa61c91ce5743",
+      "object_sha256": "1ff90bf2ae3c5139b8a6df645bd770d58e3bf8ffd441c7913aff8861534f94a9",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "net",
+      "path": "net/net",
+      "library_sha256": "2ed785a57e72806ac18f7c3b3e13ba9a73d98672c7ebf19e8dc6235e056dffa9",
+      "object_sha256": "c1527c612bf377e04eefd1da94bf872317eb1a7356f891271292e17199040ff9",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "random",
+      "path": "core/random",
+      "library_sha256": "da47725580676b4c59f4c7f7975742200bcf9ffebbbeab466d16def606e0b417",
+      "object_sha256": "11a03e9394bef3fada6e45a9931decb38df1752fee4b5055acbe2f858a02fe69",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "encoding",
+      "path": "encoding/encoding",
+      "library_sha256": "038169338415e78a54a7294372e892f83f45258e6866067b139d0e9b1e56c7c6",
+      "object_sha256": "fdd7aef70f5c13370c693b4a743a85afa5904872563772ea386a91ff5840e5a1",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "crypto",
+      "path": "crypto/crypto",
+      "library_sha256": "3ff302f0eb77cd32d642a4485e16d59bdf6deb716efa0097e001b5f95d8f9fac",
+      "object_sha256": "5366b779ce6b0612efed423ab4dbc7eeaf62cd05cc93ad336a733f9bc5433f77",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "json",
+      "path": "json/json",
+      "library_sha256": "f8219e210c003ab3e47f8809f4435753cefd06e9befb639421d165311dcf8ebb",
+      "object_sha256": "ea0e282360f27c5b9783188f59803a9be4a363bf167c6df8cf0a4acc0ca1d7f8",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "num",
+      "path": "core/num",
+      "library_sha256": "894143735d74e7c78f1649c14f3b6ca735e3504781695955c8a54dacd5b72675",
+      "object_sha256": "061022ecda63255820d497de8a0b2328599008e0496e25b2cdc1a40212c5d419",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "default",
+      "path": "core/default",
+      "library_sha256": "e65b8b51f27a618ba30f7699ced7da91c34d476c3daba756672fc346e8e811c1",
+      "object_sha256": "2035d1f6de6355f5d8441d68395587edcb381d9edae6fc233d1f5a28f98e5652",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "convert",
+      "path": "core/convert",
+      "library_sha256": "1d18aaf3e29da96485d1da2d51b129de95dd2b0d68a63e0781564ff4027b06e8",
+      "object_sha256": "c6344820aac9a16c79600d6e9c79b8fd673490b7396f83d9f1e780ca463e01ee",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "float",
+      "path": "core/float",
+      "library_sha256": "399d8c95789947c929dd3f6c5be48ce199e608e2426da15f55b1248e91c26a12",
+      "object_sha256": "1b89b786602fa42c983988512335a2825ea2f805a8190b48fb9c4719d4d530bf",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "fmt",
+      "path": "core/fmt",
+      "library_sha256": "9211359709663105a3d51d5228f3a13e7e9c8f2126d917992dafaf1a8cf6055e",
+      "object_sha256": "2880427bc9f10b3adf3cde9ed202911f74001ae5d033c805290465ce86b37af4",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "box",
+      "path": "alloc/box",
+      "library_sha256": "f0222e56f71263bf0b8f86ec29193b1f1edecc0995e3f59602c1cee95e2ea34c",
+      "object_sha256": "926e8f50dc388f990ac04d594459a467c6e8051b62adfc5219c9a3d73991eafe",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "vec",
+      "path": "alloc/vec",
+      "library_sha256": "03a828d2215641a3de3528db92812019c43d36d129978f7fcb5edaf24a16864f",
+      "object_sha256": "64eb494789e7117079eca540e81e0fd6f67c2f5910e130b5595bb415cc2e18bd",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "string",
+      "path": "alloc/string",
+      "library_sha256": "2d7ae0d2c5c3fff64724e57aec48233bcb219c28b67c0bfd5d0db5cb247eb035",
+      "object_sha256": "98b365f91bfdf4c700e7966c1d6e3c0a78536582a45bd01c6dff52e244a24dd0",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "hashmap",
+      "path": "alloc/hashmap",
+      "library_sha256": "0aefde7dfef997edea25080af2f990c0daad99dcfb1fa22919e126f212c546fc",
+      "object_sha256": "d98b5dc989bc03d54984fbf4cb8b7a0d97b49ea9725d8ee8bcb58fbeb82a3bd5",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "hashset",
+      "path": "alloc/hashset",
+      "library_sha256": "8c9cb2e423d6571051126979e8fd0b7cea46d8ba62747720ceccf19b940ac53d",
+      "object_sha256": "c3e38ab4974deb7065fb87ee69e57fa5c6ec3ff1e23a2ed28d5d0e2176665ac1",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "iter_collect",
+      "path": "alloc/iter_collect",
+      "library_sha256": "de5b99418f5ce91fabb08d44e62989a6ca6fa31e85726549cd37c4f601da56e9",
+      "object_sha256": "8dcf26c881617aa52fab61c89c91f41be6dfe186fc635cc707d4ad9bfdcaf409",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "rc",
+      "path": "alloc/rc",
+      "library_sha256": "b21303e3267dd88f840422972910e4550230a67cdbf586786b81768449140133",
+      "object_sha256": "8559f011b0b46b4f6179a79e7fe1337f005c19922c7d676ded5e1ff291e876d2",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "arc",
+      "path": "alloc/arc",
+      "library_sha256": "fbe6f38e0aa66149717d82c8986cb9b7f2fe2134948881e8c322b8e1cc87bc8d",
+      "object_sha256": "7710ca64f7e25f5e4649146021948a68c582861ed0384190352aea1600f4eb3f",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "vecdeque",
+      "path": "alloc/vecdeque",
+      "library_sha256": "a5d66c3aee7a5fcb23d48c967c8b1e6e74d337ff8ecc85ec548b9b8cf8a12cf4",
+      "object_sha256": "3039edd9db79a253430b170254ce0710df5bd14f9239296a595a1c1360da3ee0",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "binaryheap",
+      "path": "alloc/binaryheap",
+      "library_sha256": "8f34eca4f2061cdd6a71bb85fff18081c729c45d75780844dcc606d61f3997d4",
+      "object_sha256": "ab0e6ac692636e41f3042e53f0cc24532d44d1e94be749ef55f9c7e7ce56b395",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "btreemap",
+      "path": "alloc/btreemap",
+      "library_sha256": "6cb5c759cac95199907d7ceea0319e1b786742ff044c1cd1dffe12d30ab1dfb8",
+      "object_sha256": "05237211ea40134a10ab9e7e5342f254de9b5d70fe5bdd11d7d221432f57cfaf",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "btreeset",
+      "path": "alloc/btreeset",
+      "library_sha256": "63fd65dc873b786f1f382d729563c8fd31ecc1b0024b1c535400f2762c9b9319",
+      "object_sha256": "a8d0fd37e8e1f4f3f503e09224e9a41927671839a82439175fd0eea7fcd38422",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "thread",
+      "path": "alloc/thread",
+      "library_sha256": "a18c1e6e913d3975b4c5e28b0acddff99eb8494e25c2adb8dfaa405f4443abbb",
+      "object_sha256": "ea8214f747fe2ea6a3910a542d1bb752f687d5a10328d75592ac50cb2f76d830",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "panic",
+      "path": "core/panic",
+      "library_sha256": "c199fcc76a3ef4969458a1fdffc1d7a2fd8aae69c34c467fc23f95af62ad8b12",
+      "object_sha256": "ff4c1140e536d468c1b0d0262aa3938209b8eaf4464290450bfc60f18fce27eb",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "__alloc_global",
+      "path": "alloc/global",
+      "library_sha256": "289e7ed3524987957bed2b84885e3dc765ddcbed25c1c3ec99d518420f5be918",
+      "object_sha256": "a305b83ca889cf4f7db7a1bc9c4ad259675146966d69f97e56d48516e896d3b5",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "__raw_table",
+      "path": "alloc/raw_table",
+      "library_sha256": "692f0a75bc234c2858f14bb6f5d0c3081d8e74d8c485bebb57520f9c44d531c7",
+      "object_sha256": "eb124172f072d57c2f529ee23dd02eab75a0a7977b8fabbaf9b4f44c316d2028",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "__lang_drop",
+      "path": "lang/drop",
+      "library_sha256": "b524f47a404e95ed58eab550923393e54cbb8bc352cf55262c79b72c63a13c4e",
+      "object_sha256": "42f32a165786ca315e14278fb47fdce68d1abb05608d2fcba06697e35c18fb99",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "__lang_option",
+      "path": "lang/option",
+      "library_sha256": "ff1ffe24901d18367a94da7cbe4372d6f4da3f8b4a16d0c07523659329a4ab53",
+      "object_sha256": "e570a63d3e3580f8dfd662c7a4d3fc8215d009a751c48c1b0cfd1200be8eab6b",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "__lang_iterator",
+      "path": "lang/iterator",
+      "library_sha256": "4b880700382b85faf28bd06ee9828771fd59eeeba7e7145c9015d2d78680418c",
+      "object_sha256": "797ce00b26a0c805e7dd40f04e91d9d63d94b5d6cbc46dea8bb2d266eae8f5bf",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    },
+    {
+      "name": "__lang_into_iterator",
+      "path": "lang/into_iterator",
+      "library_sha256": "f1b18dfe2dacee9eb233310450ae1c2f01ef95a77dfe3f74d005ed3cdacf3966",
+      "object_sha256": "d7d020e2a8c468f13ba85351c28527462539ee3029d7c34b7c089308d94e0026",
+      "target": "x86_64-pc-windows-gnu",
+      "coff_machine": "0x8664"
+    }
+  ],
+  "cli_debug_sha256": "4d8cfedc3c29c9b0c653af8a44b942679ec1703c26ce10697b69c345dd3a02c5",
+  "cli_release_sha256": "ce338f41e4e1e69f3ed090db69f4487a1e48409a954f4ce9cd89ffe882929d01",
+  "runtime_sha256": "d054a71172b7e57915c29ff743bd37364625f01d904834291073b7710367f923"
+}

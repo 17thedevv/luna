@@ -15,6 +15,13 @@ pub enum ImportSymbolResult {
     Conflict { existing: SymbolId },
 }
 
+/// Resolver-owned duplicate-binding diagnostic, including both declarations.
+pub fn duplicate_definition_diagnostic(span: Span, previous: Span, message: impl Into<String>) -> luna_common::Diagnostic {
+    luna_common::Diagnostic::source_error(luna_common::DiagnosticCode::DuplicateDefinition, span, message)
+        .in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
+        .with_related(previous, "previous definition")
+}
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum SymbolKind {
     Function,
@@ -90,6 +97,8 @@ pub struct SymbolTable {
     pub scopes: Vec<Scope>,
     pub symbols: Vec<Symbol>,
     pub imported_paths: HashMap<SymbolId, Vec<String>>,
+    /// Consumer-side binding locations remain real even for metadata symbols.
+    pub import_binding_spans: HashMap<(ScopeId, SymbolId), Span>,
     pub namespace_aliases: std::collections::HashSet<SymbolId>,
     pub lookup_provider: Option<ProviderId>,
     pub macro_environments: HashMap<SymbolId, HashMap<String, Vec<SymbolId>>>,
@@ -102,6 +111,7 @@ impl SymbolTable {
             scopes: Vec::new(),
             symbols: Vec::new(),
             imported_paths: Default::default(),
+            import_binding_spans: Default::default(),
             namespace_aliases: std::collections::HashSet::new(),
             lookup_provider: None,
             macro_environments: Default::default(),
@@ -153,12 +163,10 @@ impl SymbolTable {
                 let existing_sym = &self.symbols[existing_sym_id.0 as usize];
                 if existing_sym.span != span {
                     diagnostics.push(
-                        luna_common::Diagnostic::error(format!(
+                        duplicate_definition_diagnostic(span, existing_sym.span, format!(
                             "Duplicate definition of symbol `{}` in the same scope",
                             name
-                        ))
-                        .with_code(luna_common::DiagnosticCode::DuplicateDefinition)
-                        .with_span(span),
+                        )),
                     );
                 }
                 // Return the existing symbol to avoid breaking downstream
@@ -311,7 +319,19 @@ impl SymbolTable {
         }
     }
 
+    pub fn is_program_entry(&self, symbol: SymbolId) -> bool {
+        let symbol = self.get_symbol(symbol);
+        symbol.name == "main" && symbol.scope == ScopeId(0)
+            && symbol.provider_id.is_none() && self.lookup_provider.is_none()
+    }
+
     pub fn is_accessible_with_ctxt(&self, symbol: SymbolId, scope: ScopeId, provider: Option<ProviderId>, ctxt: SyntaxContext) -> bool {
+        // A binding introduced by this expansion belongs to its generated
+        // lexical scope. Definition-site authority is for uncaptured names
+        // resolved from the macro environment, not expansion-local parameters.
+        if ctxt != SyntaxContext::ROOT && self.get_symbol(symbol).ctxt == ctxt {
+            return self.is_accessible(symbol, scope, provider);
+        }
         let origin = self.macro_origins.borrow().get(&ctxt).copied();
         let (scope, provider) = origin.map(|(scope, provider, _)| (scope, provider)).unwrap_or((scope, provider));
         self.is_accessible(symbol, scope, provider)

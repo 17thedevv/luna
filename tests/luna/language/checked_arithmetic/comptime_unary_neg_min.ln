@@ -1,0 +1,2 @@
+const VALUE: i32 = 0 - ((0 - 2147483647) - 1);
+fn main() -> i32 { return 0; }

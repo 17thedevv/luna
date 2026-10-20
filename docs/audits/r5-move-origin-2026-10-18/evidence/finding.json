@@ -1,0 +1,37 @@
+{
+  "tested_implementation": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "scope": "Local public CLI preflight; existing fresh sysroot/runtime reused, not a release qualification lane",
+  "cli_sha256": "0195173e7ac4b4ac0fac6c1d42d5a65d3dad05690e3be51e4c06977ef7ceebec",
+  "status": "CONFIRMED_DIAG_3_9_GAP",
+  "finding": "Nested move joins lose the antecedent source span while retaining E3001 primary source span",
+  "observations": [
+    {
+      "command": [
+        "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+        "check",
+        "D:\\r5-3a72f946\\diag-review\\nested_branch_moves.ln",
+        "--quiet"
+      ],
+      "exit": 1,
+      "typed_E3001": true,
+      "primary_location": true,
+      "related_origin": false,
+      "stderr_sha256": "46a88c942daf1fa68729125eb86ad5fadf924ad27647eb4910b55345e6444483"
+    },
+    {
+      "command": [
+        "D:\\fdlang\\luna-rs\\target\\debug\\luna.exe",
+        "build",
+        "D:\\r5-3a72f946\\diag-review\\nested_branch_moves.ln",
+        "--quiet",
+        "-o",
+        "D:/r5-3a72f946/diag-review/invalid_branch.exe"
+      ],
+      "exit": 1,
+      "typed_E3001": true,
+      "primary_location": true,
+      "related_origin": false,
+      "stderr_sha256": "46a88c942daf1fa68729125eb86ad5fadf924ad27647eb4910b55345e6444483"
+    }
+  ]
+}
