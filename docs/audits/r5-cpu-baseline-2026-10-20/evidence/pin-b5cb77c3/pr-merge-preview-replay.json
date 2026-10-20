@@ -1,0 +1,43 @@
+{
+  "scope": "Supplemental PR merge-preview full-workspace regression; not one of the eight qualification lanes",
+  "tested_implementation_pin": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "implementation_tree": "a738989a3869ebe054024a8ac6dd49a96c485d7b",
+  "observations": [
+    {
+      "run_id": 39385574588,
+      "job_id": 118504482297,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39385574588/job/118504482297",
+      "pull_request_head": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "merge_preview": "c33088e8a133924730faa44abb9033d22374537d",
+      "base": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
+      "result": "FAIL",
+      "elapsed_minutes": 102.77,
+      "failure": {
+        "test": "missing_return_rejects_reachable_paths_and_preserves_valid_returns_in_both_modes",
+        "observed_before_failure": "All 20 source-mode check/build negative cases emitted E3004 with source anchors.",
+        "stage": "Build of the valid closure control",
+        "diagnostic": "error[E6001]: Backend Error: Compiler internal invariant violated: In function closure_5157 (val ValueId(3), inst FieldPtr { base: Value(ValueId(0)), field_idx: 1, field_name: None }): InvariantViolation(\"Invalid FieldPtr field index\")"
+      }
+    },
+    {
+      "run_id": 39388194121,
+      "job_id": 118513073098,
+      "url": "https://github.com/17thedevv/luna/actions/runs/39388194121/job/118513073098",
+      "pull_request_head": "d1079eef46ebc6f1f42d6a8c3f09140247e1f8d4",
+      "merge_preview": "641391a9b7046d33ea1463a6f0bca87d76093656",
+      "base": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
+      "result": "PASS",
+      "elapsed_minutes": 243.33,
+      "command": "cargo test --workspace -- --test-threads=1",
+      "replayed_test": {
+        "name": "missing_return_rejects_reachable_paths_and_preserves_valid_returns_in_both_modes",
+        "result": "1 passed / 0 failed",
+        "started_utc": "2026-10-20T09:22:31Z",
+        "finished_utc": "2026-10-20T09:24:14Z",
+        "backend_error_reproduced": false
+      },
+      "implementation_tree": "a738989a3869ebe054024a8ac6dd49a96c485d7b",
+      "note": "The implementation tree matches the qualified pin in both merge previews. The earlier failure is preserved; the replay passed, and neither run is counted as an exact-pin qualification lane."
+    }
+  ]
+}

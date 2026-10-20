@@ -4,11 +4,12 @@
 
 # Luna 0.1 status — 2026-10-20
 
-**RELEASE BLOCKED: clean Windows package smoke exposed host CPU identity drift.**
+**RELEASE BLOCKED: one final replacement workspace lane and archive reconciliation remain.**
 The eight lanes at `8525067f` remain historical qualification evidence, but that
-pin is not sufficient for distribution across machines. [Finding and repair](docs/audits/r5-cpu-baseline-2026-10-20/README.md).
-Default release target configuration is being repaired; a new implementation
-pin must reacquire all eight lanes and both clean package smokes.
+pin is not sufficient for distribution across machines. The portable CPU repair
+at `b5cb77c3` now has **7/8 lanes and seven ZIP artifacts independently verified**;
+Windows workspace final is running. Both clean Windows/Ubuntu package smokes at
+`cd9cd188` PASS. [Finding, repair and current evidence](docs/audits/r5-cpu-baseline-2026-10-20/README.md).
 
 Candidate/tested pin: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`, fast-forwarded
 from `c085449b` without force. Main remains `401a95a8`.
@@ -33,9 +34,12 @@ E3004 is produced and covered; the contrary finding was retracted. The earlier
 Local interrupted/PDB attempts are historical, never passing evidence.
 
 Maintainer authorized PR/main/tag/publication after package smoke PASS on 2026-10-20.
-PR #7 is draft. Remaining full-goal work: packages
-built from the selected verified release commit, clean Windows/Ubuntu package
-smoke and final asset/checksum/tag reconciliation. The concrete
+PR #7 is draft. The PR merge-preview full workspace and formatting checks PASS;
+an earlier closure ICE did not recur and is preserved with its successful replay.
+Remaining full-goal work: finish Windows workspace final, verify its ZIP and
+reconcile all eight lane archives, advance the candidate, finalize the PR, merge,
+tag `v0.1.0-alpha.1` at the exact packaged source, publish the two verified
+packages with checksums, then write the closing record. The concrete
 [handoff](docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md) is ready.
 No release publication or new semantic freeze is claimed.
 
