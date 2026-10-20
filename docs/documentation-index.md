@@ -1,6 +1,6 @@
 # Luna 0.1 documentation inventory
 
-Updated 2026-10-20. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
+Updated 2026-10-21. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
 
 All repository-authored tracked Markdown and new versioned/archived/audit documents are classified below. Agent guidance is included. Vendor documentation, generated build logs and test-failure dumps are excluded. Website pages are generated from the same baseline.
 
@@ -29,6 +29,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [README.md](../README.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [ROADMAP.md](../ROADMAP.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [Status.md](../Status.md) | guidance | [conformance](spec/0.1/conformance.md) |
+| [distribution/windows/README.md](../distribution/windows/README.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/LanguageReference.md](LanguageReference.md) | guidance | [syntax](spec/0.1/syntax.md) |
 | [docs/MVIR.md](MVIR.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/PROJECT_STATUS.md](PROJECT_STATUS.md) | guidance | [conformance](spec/0.1/conformance.md) |
@@ -114,6 +115,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md](audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md](audits/r5-move-origin-2026-10-18/REQUIREMENTS.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md](audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/r5-public-download-2026-10-21/README.md](audits/r5-public-download-2026-10-21/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-qualification-2026-10-14/REPORT-R5-QUALIFICATION-2026-10-14.md](audits/r5-qualification-2026-10-14/REPORT-R5-QUALIFICATION-2026-10-14.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-qualification-2026-10-14/harness/comptime/historical-c4-characterization.md](audits/r5-qualification-2026-10-14/harness/comptime/historical-c4-characterization.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/repair-0.1/README.md](audits/repair-0.1/README.md) | evidence | [conformance](spec/0.1/conformance.md) |

@@ -1,0 +1,106 @@
+{
+  "status": "PASS",
+  "installer_sha256": "adb15aa0c50a8d72bccaa447cfabd23c68010da547672c0db2c9a3184e7af5fd",
+  "workflow_run": "39474143676",
+  "lock_sha256": "cf326de8eb8d2aeb6874d3a379eb3404a4351149d0496e64c6ac284d38eea0ed",
+  "steps": [
+    {
+      "label": "build-tamper-test",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "reject-tampered-payload",
+      "exit": 7,
+      "expected": null
+    },
+    {
+      "label": "install",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "version-clean-path-stale-env",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "read-start-menu-shortcut",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "start-menu-command-prompt",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "llvm-version",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "quickstart-build",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "quickstart-native",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "stdlib-build",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "stdlib-native",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "quickstart-run",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "missing-source-exit",
+      "exit": 1,
+      "expected": 1
+    },
+    {
+      "label": "reinstall",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "uninstall",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "install-preexisting-path",
+      "exit": 0,
+      "expected": 0
+    },
+    {
+      "label": "uninstall-preexisting-path",
+      "exit": 0,
+      "expected": 0
+    }
+  ],
+  "post_uninstall_path": [
+    "%USERPROFILE%\\.dotnet\\tools;%USERPROFILE%\\.cargo\\bin;%USERPROFILE%\\AppData\\Local\\Microsoft\\WindowsApps;D:\\a\\_temp\\luna-installer-smoke\\unrelated user tool",
+    2
+  ],
+  "post_uninstall_ownership": null,
+  "providers": 49,
+  "payload_hashes": 105,
+  "unicode_space_path": true,
+  "host_tools_required": false,
+  "tampered_payload_rejected": true,
+  "reinstall_path_unique": true,
+  "preexisting_path_preserved": true,
+  "user_file_preserved": true
+}

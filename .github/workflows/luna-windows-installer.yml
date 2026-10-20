@@ -1,0 +1,60 @@
+name: Luna Windows online installer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [luna-installer]
+    paths:
+      - distribution/windows/**
+      - .github/workflows/luna-windows-installer.yml
+
+permissions:
+  contents: read
+
+jobs:
+  installer:
+    runs-on: windows-2022
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Acquire pinned build tools
+        shell: pwsh
+        run: |
+          python distribution/windows/acquire_inno.py --out "$env:RUNNER_TEMP/inno"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup toolchain install 1.98.0 --profile minimal
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup default 1.98.0
+      - name: Build the production installer
+        shell: pwsh
+        run: >-
+          python distribution/windows/build_installer.py
+          --iscc "$env:RUNNER_TEMP/inno/compiler/ISCC.exe"
+          --out "$env:RUNNER_TEMP/luna-installer-dist"
+      - name: Install, compile, run, reinstall, uninstall and reject tampered downloads
+        shell: pwsh
+        run: >-
+          python distribution/windows/smoke_installer.py
+          --installer "$env:RUNNER_TEMP/luna-installer-dist/lunainstaller.exe"
+          --iscc "$env:RUNNER_TEMP/inno/compiler/ISCC.exe"
+          --out "$env:RUNNER_TEMP/luna-installer-smoke"
+      - name: Preserve installer smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-installer-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/luna-installer-smoke/evidence/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Preserve verified release installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: luna-windows-installer-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/luna-installer-dist/lunainstaller.exe
+            ${{ runner.temp }}/luna-installer-dist/lunainstaller.exe.sha256
+            ${{ runner.temp }}/luna-installer-dist/build-summary.json
+          if-no-files-found: error
+          retention-days: 30

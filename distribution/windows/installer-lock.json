@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "distribution_version": "0.1.0-alpha.1",
+  "target": "x86_64-pc-windows-gnu",
+  "luna": {
+    "name": "luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip",
+    "root": "luna-0.1.0-alpha.1-x86_64-pc-windows-gnu",
+    "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip",
+    "sha256": "bbdc2a0fa55e82666c9bf26802ab5fa8f844b338e02848490a691f867b7c14dd",
+    "bytes": 15511635,
+    "unpacked_bytes": 79830157,
+    "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+    "qualification_pin": "b5cb77c3286f583c43c41d0e56f4136903ebb842"
+  },
+  "llvm": {
+    "name": "luna-llvm18-link-tools-windows-x86_64.zip",
+    "sha256": "ce917ee0b4bbee231ad60eca3c384ccc6089606dc84e2a387cad4d01da0b53b2",
+    "bytes": 125853051,
+    "unpacked_bytes": 376681747,
+    "version": "18.1.8",
+    "source_url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/clang%2Bllvm-18.1.8-x86_64-pc-windows-msvc.tar.xz",
+    "source_sha256": "22c5907db053026cc2a8ff96d21c0f642a90d24d66c23c6d28ee7b1d572b82e8",
+    "license_url": "https://raw.githubusercontent.com/llvm/llvm-project/llvmorg-18.1.8/llvm/LICENSE.TXT",
+    "files": {
+      "packages/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu/bin/concrt140.dll": "573229a07f38ab9d2fc2e1a5b98e9243b9b39100323180c83ad7ddaf98eee46a",
+      "packages/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu/bin/msvcp140.dll": "9fee6f36547d6f6ea7ca0338655555dba6bb0f798bc60334d29b94d1547da4da",
+      "packages/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu/bin/msvcp140_1.dll": "8731a93e519c2595c9fd489e6d9ac07e964448c0da1c8ee9ee500a7989482617",
+      "packages/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu/bin/msvcp140_2.dll": "366af8e071f004da5d95a832a46b2e8821a8e0294340a93f7c95cf48c441067e",
+      "packages/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu/bin/msvcp140_atomic_wait.dll": "c61a28711f8c6e9bfd4879cf5f53b013d653badad308abe3e887c694b223d6f0",
+      "packages/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu/bin/msvcp140_codecvt_ids.dll": "9b45fd069bd0076d8abfeb7c3c30a1f5c5fc8e7124017853a93d831a346c3d21",
+      "packages/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu/bin/vcruntime140.dll": "9d2b40f0395cc5d1b4d5ea17b84970c29971d448c37104676db577586d4ad1b1",
+      "packages/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu/bin/vcruntime140_1.dll": "34048abaa070ecc13b318cea31425f4ca3edd133d350318ac65259e6058c8b32",
+      "toolchains/llvm/LICENSE.TXT": "8d85c1057d742e597985c7d4e6320b015a9139385cff4cbae06ffc0ebe89afee",
+      "toolchains/llvm/bin/LLVM-C.dll": "466a8e8bd90531d164dd3705c0ff608608eaad4f4b8da12f72b4e752f120a8de",
+      "toolchains/llvm/bin/clang.exe": "03e9199b6f87683a3c479c2d629bca4bc33e380bc7194e4fcce56fe8163ad275",
+      "toolchains/llvm/bin/concrt140.dll": "573229a07f38ab9d2fc2e1a5b98e9243b9b39100323180c83ad7ddaf98eee46a",
+      "toolchains/llvm/bin/ld.lld.exe": "dfc7d9a43d8f09d456c48420e64b2be5f54303085e8affdecd34ff346bb42571",
+      "toolchains/llvm/bin/llc.exe": "7d900ddc6e17ebc4438a39589e4319cc80fc019ae2f189fb52afd5370f1948e7",
+      "toolchains/llvm/bin/msvcp140.dll": "9fee6f36547d6f6ea7ca0338655555dba6bb0f798bc60334d29b94d1547da4da",
+      "toolchains/llvm/bin/msvcp140_1.dll": "8731a93e519c2595c9fd489e6d9ac07e964448c0da1c8ee9ee500a7989482617",
+      "toolchains/llvm/bin/msvcp140_2.dll": "366af8e071f004da5d95a832a46b2e8821a8e0294340a93f7c95cf48c441067e",
+      "toolchains/llvm/bin/msvcp140_atomic_wait.dll": "c61a28711f8c6e9bfd4879cf5f53b013d653badad308abe3e887c694b223d6f0",
+      "toolchains/llvm/bin/msvcp140_codecvt_ids.dll": "9b45fd069bd0076d8abfeb7c3c30a1f5c5fc8e7124017853a93d831a346c3d21",
+      "toolchains/llvm/bin/vcruntime140.dll": "9d2b40f0395cc5d1b4d5ea17b84970c29971d448c37104676db577586d4ad1b1",
+      "toolchains/llvm/bin/vcruntime140_1.dll": "34048abaa070ecc13b318cea31425f4ca3edd133d350318ac65259e6058c8b32"
+    },
+    "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-llvm18-link-tools-windows-x86_64.zip"
+  },
+  "gnu": {
+    "name": "winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64ucrt-12.0.0-r3.zip",
+    "url": "https://github.com/brechtsanders/winlibs_mingw/releases/download/14.2.0posix-12.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-14.2.0-mingw-w64ucrt-12.0.0-r3.zip",
+    "sha256": "88868d745b807f083a117ff69348d8bc021ad7389aa503379dbed1866efcaeb9",
+    "bytes": 246962421,
+    "unpacked_bytes": 875001081,
+    "version": "GCC 14.2.0 / MinGW-w64 12.0.0 UCRT r3"
+  },
+  "inno_setup": {
+    "name": "innosetup-6.7.3.exe",
+    "url": "https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe",
+    "sha256": "9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732",
+    "bytes": 10592232
+  }
+}

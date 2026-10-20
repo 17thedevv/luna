@@ -15,7 +15,13 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / 'docs/spec/0.1'
 SITE = ROOT / 'docs/site'
-STATUS_DATE = '2026-10-20'
+STATUS_DATE = '2026-10-21'
+QUALIFICATION_ROOT = ROOT / 'docs/audits/r5-cpu-baseline-2026-10-20'
+QUALIFICATION = json.loads((QUALIFICATION_ROOT / 'qualification-state.json').read_text(encoding='utf-8'))
+PUBLISHED = QUALIFICATION['status'] == 'PUBLISHED_PRERELEASE'
+RELEASE_URL = 'https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1'
+RELEASE_BOUNDARY = ('Release: v0.1.0-alpha.1 prerelease published; qualification passed in tested scope'
+                    if PUBLISHED else 'Release conformance: BLOCKED / NOT VERIFIED')
 ADOPTED = {
     'docs/normative-rules-p0-p1.md', 'docs/runtime/abi-v1.md',
     'docs/diagnostics/diagnostics-v1.md', 'docs/project/rename-luna-v1.md',
@@ -37,6 +43,7 @@ CURRENT = {
     'docs/SemanticInvariants.md', 'docs/PROJECT_STATUS.md', 'docs/RoadMap.md',
     'docs/site/README.md',
     'docs/documentation-index.md',
+    'distribution/windows/README.md',
 }
 
 
@@ -226,12 +233,14 @@ def page(target, body, language='en', title='Luna 0.1'):
     links = [(SITE / 'en/index.html', 'EN'), (SITE / 'vi/index.html', 'VI'),
              (SITE / 'spec/index.html', 'Spec 0.1'), (SITE / 'spec/gaps.html', 'Gaps')]
     navigation = ' '.join(f'<a href="{relative(path)}">{label}</a>' for path, label in links)
+    if PUBLISHED:
+        navigation += f' <a href="{RELEASE_URL}">Downloads</a>'
     text = f'''<!DOCTYPE html>
 <html lang="{language}"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(title)}</title><link rel="stylesheet" href="{relative(SITE / 'assets/styles.css')}">
 <style>main{{max-width:960px;margin:auto;padding:2rem}}table{{width:100%;border-collapse:collapse}}td,th{{padding:.6rem;border:1px solid #777;text-align:left}}pre{{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}}code{{font-family:monospace}}nav a{{margin-right:1rem}}.version-note{{padding:1rem;border:1px solid #777}}</style></head>
 <body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav>{navigation}</nav></div></header>
-<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated {STATUS_DATE}</p>
+<main><p class="version-note">Contract baseline 0.1 · {RELEASE_BOUNDARY} · Updated {STATUS_DATE}</p>
 {body}</main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>
 '''
     target.write_text(text, encoding='utf-8')
@@ -248,8 +257,16 @@ def site_pages():
         title = 'Tài liệu Luna 0.1' if vietnamese else 'Luna 0.1 documentation'
         body = f'<h1>{title}</h1>'
         body += ('<p>Giữ các contract đã định nghĩa; implementation còn thiếu được ghi riêng trong danh sách khoảng hở. Spec và release conformance là hai trạng thái khác nhau.</p>' if vietnamese else '<p>Defined contracts are retained. Implementation failures and missing evidence are tracked separately; the baseline is not release certification.</p>')
-        ledger_url = Path(os.path.relpath(ROOT / 'docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md', target.parent)).as_posix()
-        body += f'<p><a href="{ledger_url}">R4 release ledger / R5 handoff</a>: The previous eight-lane qualification is superseded for release: clean Windows package smoke exposed CPU identity drift; baseline repair and fresh qualification are pending.</p>'
+        evidence_url = Path(os.path.relpath(QUALIFICATION_ROOT / 'README.md', target.parent)).as_posix()
+        if PUBLISHED:
+            body += f'<p><a href="{evidence_url}">Release qualification</a>: all eight replacement lanes and CI archives verified; both clean package smokes passed. The alpha release retains its documented limitations.</p>'
+            base = 'https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/'
+            body += (f'<p><a href="{base}lunainstaller.exe">Windows online installer</a> · '
+                     f'<a href="{base}luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip">Windows ZIP (contains bin/luna.exe)</a> · '
+                     f'<a href="{base}luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip">Ubuntu ZIP</a> · '
+                     f'<a href="{base}SHA256SUMS">SHA256SUMS</a></p>')
+        else:
+            body += f'<p><a href="{evidence_url}">Current qualification evidence</a>: release qualification is pending.</p>'
         for chapter in ('syntax', 'semantics', 'macros', 'modules', 'stdlib', 'runtime', 'conformance', 'gaps'):
             rel = Path(os.path.relpath(SITE / f'spec/{chapter}.html', target.parent)).as_posix()
             body += f'<p><a href="{rel}">{chapter.title()}</a></p>'

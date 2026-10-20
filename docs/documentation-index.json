@@ -105,6 +105,11 @@
     "owner": "conformance"
   },
   {
+    "path": "distribution/windows/README.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/LanguageReference.md",
     "role": "guidance",
     "owner": "syntax"
@@ -526,6 +531,11 @@
   },
   {
     "path": "docs/audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/r5-public-download-2026-10-21/README.md",
     "role": "evidence",
     "owner": "conformance"
   },

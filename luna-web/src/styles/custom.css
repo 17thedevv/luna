@@ -847,8 +847,8 @@ body:has(.splash-container) .content-panel:has(#_top) {
 
 .luna-quick-install a {
   color: inherit !important;
-  text-decoration: none !important;
-  pointer-events: none;
+  text-decoration: underline !important;
+  text-underline-offset: 0.2em;
 }
 
 .luna-prompt-symbol {

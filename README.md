@@ -9,6 +9,30 @@ ownership/lifetime contracts and a native C runtime. The canonical compiler is
 `luna-rs/`; source uses `.ln`, library artifacts use `.llib`, runtime identity uses
 `__luna_*`. Mellis/fdlang are historical names.
 
+## Download Luna 0.1.0-alpha.1
+
+The current distribution is an **alpha prerelease**. Stable `0.1.0` has not been released.
+
+**Windows:** [Download lunainstaller.exe](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/lunainstaller.exe)
+([SHA-256](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/lunainstaller.exe.sha256)).
+The small online setup downloads and verifies Luna, LLVM 18 and GNU/MinGW,
+installs for the current user, and optionally adds Luna to PATH. No administrator
+account or Rust/Cargo is needed. See the [installer details](distribution/windows/README.md).
+
+| Platform | Download | Compiler in the ZIP |
+|---|---|---|
+| Windows x86_64 GNU | [Windows ZIP](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip) | `bin/luna.exe` |
+| Ubuntu 24.04 x86_64 GNU | [Ubuntu ZIP](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip) | `bin/luna` |
+
+Verify the ZIP with [SHA256SUMS](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/SHA256SUMS).
+See [release notes](https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1)
+and [installation instructions](https://lunalang.netlify.app/getting-started/).
+Keep `bin`, `runtime` and `libs/external` together after extraction. The Windows
+ZIP contains the compiler executable. Portable ZIP users install LLVM 18 and
+a native GNU toolchain separately; Windows portable users also need the
+Microsoft Visual C++ runtime. The Windows installer handles its private
+dependencies automatically. Rust/Cargo is not required to use these packages.
+
 ## Specification and readiness
 
 Start at [Luna 0.1 specification](docs/spec/0.1/README.md),
@@ -16,18 +40,18 @@ Start at [Luna 0.1 specification](docs/spec/0.1/README.md),
 and [document inventory](docs/documentation-index.md).
 
 The baseline retains defined contracts even where implementation is incomplete.
-**Release is blocked by a clean-package portability finding.**
-Pin `8525067f` completed eight hosted qualification lanes, but independent
-Windows package smoke rejects its sysroot on a different CPU (`generic` versus
-`znver3`). The [CPU baseline repair](docs/audits/r5-cpu-baseline-2026-10-20/README.md)
-preserves strict identity validation and selects a shared baseline for the two
-advertised targets. A replacement pin must qualify all eight lanes and both
-clean package smokes. Candidate remains `8525067f`; main remains `401a95a8`.
-Versions remain **25/9/5/2**. PR #7 stays draft; no tag or release is published.
+**Luna 0.1.0-alpha.1 is published.** The [CPU baseline repair](docs/audits/r5-cpu-baseline-2026-10-20/README.md)
+at `b5cb77c3` passed all eight Windows/Ubuntu qualification lanes, with all eight
+CI ZIPs independently verified. Both clean package smokes passed. The annotated
+tag points to exact packaged source `cd9cd188`, whose implementation trees match
+the qualified pin. Candidate is `b5cb77c3`; PR #7 and the release closure PR #8
+are merged. [Release closure](docs/audits/r5-cpu-baseline-2026-10-20/release-closure.json)
+records the immutable SHAs and published asset digests. Protocol versions remain
+**25/9/5/2**. Qualification applies to the declared tested scope and limitations.
 
 The [previous qualification report](docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md)
 and original archives remain historical evidence. [Release authorization and scope](docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md)
-remain valid, conditional on the required passing gates.
+record the authorization and the completed passing gates.
 
 The [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)
 and later [R5 historical qualification](docs/audits/r5-final-2026-10-16/REPORT-R5-QUALIFICATION-2026-10-16.md)
@@ -49,7 +73,8 @@ macro names, stream prefixes and newline suffixes must not select stdlib callees
 
 ## Build and verify
 
-The audited target is Windows x86_64 GNU with LLVM 18 and a Release C runtime.
+The release targets are Windows x86_64 GNU and Ubuntu 24.04 x86_64 GNU with
+LLVM 18 and a Release C runtime. Source development requires Rust/Cargo.
 Set `LLVM_SYS_180_PREFIX` to the LLVM 18 installation and configure the target C
 compiler/linker in PATH. Other targets require their own evidence.
 
