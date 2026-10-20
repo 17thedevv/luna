@@ -3,9 +3,9 @@
   "implementation_pin": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
   "introducing_fix": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
   "previous_implementation": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
-  "candidate": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
-  "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
-  "status": "QUALIFICATION_COMPLETE_PENDING_RELEASE",
+  "candidate": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "main": "97422d2cb5feaac0361c14e620843785dd09615b",
+  "status": "PUBLISHED_PRERELEASE",
   "versions": {
     "compiler": 25,
     "metadata": 9,
@@ -305,7 +305,7 @@
       }
     }
   },
-  "remaining": "Eight exact-pin lanes and all eight CI ZIPs are verified; both clean package smokes pass. Advance the existing candidate ref, finalize and merge PR #7, tag the exact packaged source commit, publish the two verified packages and checksums, then record final closure.",
+  "remaining": "No outstanding qualification, merge or publication step remains.",
   "verified_package_smokes": {
     "status": "PASS",
     "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
@@ -320,9 +320,13 @@
     "consumer_steps_per_target": 7,
     "verifier_rejection_controls": 4
   },
-  "observed_utc": "2026-10-20 14:37:26 UTC",
+  "observed_utc": "2026-10-20 14:42:03 UTC",
   "pr_merge_preview_replay": "evidence/pin-b5cb77c3/pr-merge-preview-replay.json",
   "verified_lane_count": 8,
   "artifact_manifest": "evidence/pin-b5cb77c3/ci-artifact-manifest.json",
-  "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json"
+  "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
+  "release_tag": "v0.1.0-alpha.1",
+  "release_url": "https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1",
+  "pr_merge_commit": "97422d2cb5feaac0361c14e620843785dd09615b",
+  "release_closure": "release-closure.json"
 }

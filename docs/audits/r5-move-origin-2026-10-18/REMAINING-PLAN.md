@@ -1,6 +1,6 @@
 # Kế hoạch hoàn tất Luna 0.1
 
-Cập nhật 2026-10-20: **qualification tại pin sửa CPU `b5cb77c3` đạt 8/8 lane**.
+Cập nhật 2026-10-20: **Luna `v0.1.0-alpha.1` đã phát hành prerelease; goal 0.1 hoàn tất**.
 Tám lane tại `8525067f` giữ nguyên scope lịch sử; clean Windows package smoke
 đã phát hiện CPU identity phụ thuộc máy, nên verdict release cũ bị thay thế.
 [Trạng thái hiện tại](../r5-cpu-baseline-2026-10-20/qualification-state.json):
@@ -8,11 +8,12 @@ Tám lane tại `8525067f` giữ nguyên scope lịch sử; clean Windows packag
 group, 1422 passed/0 failed/1 ignored. Hai package Windows/Ubuntu từ source
 `cd9cd188` đã build và clean hosted smoke PASS.
 PR merge-preview full workspace cũng PASS sau khi một lượt trước gặp ICE closure;
-replay được ghi rõ trong evidence. Candidate vẫn `8525067f`; PR #7 draft; main,
-tag và publication còn pending. Qualification và archive reconciliation đã
-đóng; tiếp tục fast-forward candidate, hoàn tất PR, merge và phát hành theo
-quyền maintainer. [Hồ sơ sửa và bằng chứng](../r5-cpu-baseline-2026-10-20/README.md).
-Goal đầy đủ vẫn active. Phần dưới giữ kế hoạch và baseline ngày 2026-10-18.
+replay được ghi rõ trong evidence. Candidate đã fast-forward tới `b5cb77c3`; PR #7
+đã merge vào main tại `97422d2c`; tag annotated `v0.1.0-alpha.1` trỏ đúng source
+đóng gói `cd9cd188`; hai package và `SHA256SUMS` đã publish và xác minh.
+[Hồ sơ sửa và bằng chứng](../r5-cpu-baseline-2026-10-20/README.md) ·
+[release closure](../r5-cpu-baseline-2026-10-20/release-closure.json).
+Phần dưới giữ checklist và baseline gốc để truy vết.
 
 Kế hoạch này tiếp nối [kế hoạch hoàn tất gốc](../0.1-alpha-completion-2026-10-04/README.md),
 [ledger R4](../0.1-alpha-completion-2026-10-04/r4/README.md) và
@@ -134,6 +135,10 @@ không còn blocker trong adopted scope; kết quả có thể kiểm tra lại 
 merge main hay release publication; giữ các trạng thái đó riêng biệt.
 
 ## 6. Phát hành dưới quyền maintainer
+
+**Kết quả 2026-10-20:** maintainer authorization đã thực hiện. PR #7 merged;
+candidate đã fast-forward; tag `v0.1.0-alpha.1` và Windows/Ubuntu packages cùng
+`SHA256SUMS` đã publish, tải lại và kiểm tra digest. Xem [release closure](../r5-cpu-baseline-2026-10-20/release-closure.json).
 
 - Sau lệnh maintainer, tạo PR/merge main, chọn tag/version và công bố release.
   Ưu tiên giữ implementation đã qualify. Nếu merge làm thay đổi release

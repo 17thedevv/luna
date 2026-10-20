@@ -11,12 +11,12 @@
   },
   "candidate": {
     "ref": "luna-0.1-alpha.1-candidate",
-    "sha": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
-    "note": "Retained historical candidate until all replacement lanes and archives close"
+    "sha": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+    "note": "Fast-forwarded from 8525067f after all replacement qualification lanes and archives passed"
   },
-  "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
-  "status": "QUALIFICATION_COMPLETE_PENDING_RELEASE",
-  "observed_utc": "2026-10-20 14:37:26 UTC",
+  "main": "97422d2cb5feaac0361c14e620843785dd09615b",
+  "status": "PUBLISHED_PRERELEASE",
+  "observed_utc": "2026-10-20 14:42:03 UTC",
   "lanes": [
     {
       "key": "windows-normal",
@@ -348,5 +348,8 @@
   "verified_lane_count": 8,
   "supplemental_pr_merge_preview": "pr-merge-preview-replay.json",
   "artifact_manifest": "ci-artifact-manifest.json",
-  "artifact_verification": "all-artifact-verification.json"
+  "artifact_verification": "all-artifact-verification.json",
+  "release_tag": "v0.1.0-alpha.1",
+  "release_url": "https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1",
+  "release_closure": "../../release-closure.json"
 }
