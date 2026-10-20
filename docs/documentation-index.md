@@ -100,6 +100,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/0.1-alpha-completion-2026-10-04/r4/target-matrix.md](audits/0.1-alpha-completion-2026-10-04/r4/target-matrix.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/alpha-modules-2026-10-03/README.md](audits/alpha-modules-2026-10-03/README.md) | evidence | [modules](spec/0.1/modules.md) |
 | [docs/audits/provider-config-relative-2026-10-04/README.md](audits/provider-config-relative-2026-10-04/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
+| [docs/audits/r5-cpu-baseline-2026-10-20/README.md](audits/r5-cpu-baseline-2026-10-20/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-final-2026-10-16/REPORT-R5-QUALIFICATION-2026-10-16.md](audits/r5-final-2026-10-16/REPORT-R5-QUALIFICATION-2026-10-16.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-linux-native-link-2026-10-18/README.md](audits/r5-linux-native-link-2026-10-18/README.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md](audits/r5-linux-native-link-2026-10-18/REQUIREMENTS.md) | evidence | [conformance](spec/0.1/conformance.md) |

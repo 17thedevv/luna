@@ -4,14 +4,17 @@
 
 # Luna 0.1 status — 2026-10-20
 
-**READY FOR RELEASE REVIEW at exact implementation/candidate `8525067f`.**
-Qualification is complete in the adopted tested scope. Full release remains pending.
+**RELEASE BLOCKED: clean Windows package smoke exposed host CPU identity drift.**
+The eight lanes at `8525067f` remain historical qualification evidence, but that
+pin is not sufficient for distribution across machines. [Finding and repair](docs/audits/r5-cpu-baseline-2026-10-20/README.md).
+Default release target configuration is being repaired; a new implementation
+pin must reacquire all eight lanes and both clean package smokes.
 
 Candidate/tested pin: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`, fast-forwarded
 from `c085449b` without force. Main remains `401a95a8`.
 Protocol: compiler / semantic metadata / MVIR / format **25 / 9 / 5 / 2**.
 
-All eight hosted Windows/Ubuntu lanes PASS. All eight original artifact ZIPs
+At the superseded implementation, all eight Windows/Ubuntu lanes PASS. Original ZIPs
 are retained and independently verified. Four full workspace runs each have
 **1421 passed / 0 failed / 1 ignored**. Both normal lanes build 49 canonical
 providers. Windows strict L002 replay passes 4/4; comptime per host reports

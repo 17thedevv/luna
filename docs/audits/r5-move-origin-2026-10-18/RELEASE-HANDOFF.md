@@ -1,7 +1,9 @@
 # Luna 0.1-alpha.1 — maintainer review handoff
 
-**READY FOR RELEASE REVIEW —2026-10-20.** Qualification is complete in the
-adopted tested scope. The full release goal remains active.
+**SUPERSEDED FOR RELEASE —2026-10-20.** Eight-lane qualification at8525067f
+remains valid in its executed scope, but clean Windows package smoke fails on
+a different CPU. The [CPU baseline repair](../r5-cpu-baseline-2026-10-20/README.md)
+requires a new pin and complete requalification. The full goal remains active.
 
 Candidate/tested implementation: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
 Candidate fast-forwarded from `c085449b` without force.

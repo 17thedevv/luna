@@ -82,7 +82,8 @@ def main():
             assert actual == qualified, f'Unqualified implementation tree: {part}'
             trees[part] = actual
         tools = dict(rustc=run('rustc', ['rustc', '-vV']), gcc=run('gcc', ['gcc', '-dumpmachine']),
-                     llvm=run('llvm', [env['LLVM_CONFIG_PATH'], '--version']))
+                     llvm=run('llvm', [env['LLVM_CONFIG_PATH'], '--version']),
+                     llvm_host=run('llvm-host', [Path(env['LLVM_HOME']) / 'bin' / ('llc.exe' if windows else 'llc'), '--version']))
         assert tools['llvm'].startswith('18.')
         if windows:
             assert tools['gcc'].startswith('x86_64') and 'mingw' in tools['gcc']
@@ -123,12 +124,20 @@ def main():
             assert raw[10:74].split(b'\0')[0].decode() == a.target
             native = obj.read_bytes()
             assert (native[:2] == b'\x64\x86') if windows else (native[:5] == b'\x7fELF\x02' and struct.unpack('<H', native[18:20])[0] == 62)
+            published = json.loads(run('manifest-' + provider['name'], [cli, 'manifest', lib], source))
+            contract = published['target']
+            assert contract['target_triple'] == a.target and contract['cpu'] == 'generic' and contract['features'] == ''
+            assert contract['pointer_width'] == 64 and contract['endianness'] == 'little'
+            assert published['object_metadata']['size'] == len(native)
+            assert bytes(published['object_metadata']['hash']).hex() == digest(obj)
             for item in (lib, obj):
                 destination = package / 'libs/external' / item.relative_to(external)
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(item, destination)
             provider_records.append(dict(name=provider['name'], path=stem,
-                                         library_sha256=digest(lib), object_sha256=digest(obj)))
+                                         library_sha256=digest(lib), object_sha256=digest(obj),
+                                         cpu=contract['cpu'], features=contract['features'],
+                                         object_format=contract['object_format'], abi=contract['abi']))
         assert 'pub const SEMANTIC_METADATA_VERSION: u16 = 9;' in (source / 'luna-rs/crates/luna-llib/src/format.rs').read_text(encoding='utf-8')
         shutil.copy2(source / 'tests/luna/language/spec_v01/basic_reference.ln', package / 'examples/quickstart.ln')
         (package / 'examples/stdlib.ln').write_text(
@@ -168,6 +177,8 @@ From a writable project directory:
 
 Both examples must exit0. manifest.json and SHA256SUMS record every payload file.
 Providers are artifact-only:49 canonical LLIB/object pairs, without source fallback.
+Both release targets use CPU generic with no optional host features. Strict
+CPU/features identity checking is retained; the package does not select host tuning.
 ASan qualification applies only to the C runtime test lane, not this Release build.
 Standalone comptime statements remain unsupported; VM/layout is scoped to64-bit GNU.
 See the release notes for retained contracts, deferrals and diagnostic exceptions.

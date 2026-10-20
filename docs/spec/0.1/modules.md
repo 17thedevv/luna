@@ -113,7 +113,11 @@ language release readiness.
 Target identity binds the selected triple, CPU/features, emitted object format,
 LLVM default ABI/data-layout identity, pointer width and endianness. All fields
 must match the consuming target configuration; this implementation uses strict
-CPU/features equality rather than assuming cross-machine compatibility. The
+CPU/features equality rather than assuming cross-machine compatibility. For the
+two advertised x86_64 GNU targets, the release default selects CPU `generic`
+with no optional host features, so the configured contract does not depend on
+the build or consumer machine. Explicitly constructed target configurations
+still bind their complete CPU/features; mismatches continue to reject. The
 artifact header and manifest must agree on the triple. Embedded objects must
 be valid relocatable objects with the expected format, architecture, width and
 endianness where represented by the object container. An existing object

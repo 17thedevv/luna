@@ -57,14 +57,27 @@ impl Default for TargetConfig {
         // R5-FU-TARGET-01: the artifact records the canonical Luna release
         // triple, not the host LLVM spelling. Hosts outside the release matrix
         // keep their own spelling instead of being advertised as a Luna target.
-        let triple = match crate::target_matrix::canonical_supported_target(&host) {
+        let supported = crate::target_matrix::canonical_supported_target(&host);
+        let triple = match supported {
             Some(target) => target.triple().to_string(),
             None => host,
         };
         Self {
             triple,
-            cpu: TargetMachine::get_host_cpu_name().to_string(),
-            features: TargetMachine::get_host_cpu_features().to_string(),
+            // A release sysroot must be consumable on another machine of the
+            // same advertised target. Host tuning would make its strict CPU /
+            // feature identity depend on whichever runner built the package.
+            // Keep exact identity checks; select one shared portable baseline.
+            cpu: if supported.is_some() {
+                "generic".into()
+            } else {
+                TargetMachine::get_host_cpu_name().to_string()
+            },
+            features: if supported.is_some() {
+                String::new()
+            } else {
+                TargetMachine::get_host_cpu_features().to_string()
+            },
             optimization: OptimizationLevel::Default,
         }
     }
