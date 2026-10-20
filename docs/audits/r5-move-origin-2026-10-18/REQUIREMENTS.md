@@ -1,5 +1,10 @@
 # Luna 0.1 replacement qualification requirements — closure
 
+**Historical pin only.** The Windows package portability failure superseded
+this release verdict. The requirements below remain mandatory; their current
+replacement evidence at `b5cb77c3` is tracked in the
+[CPU-baseline qualification](../r5-cpu-baseline-2026-10-20/README.md).
+
 **2026-10-20: READY FOR RELEASE REVIEW.** Tested implementation and candidate:
 `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
 The [original checklist](../0.1-alpha-completion-2026-10-04/r4/r5-checklist.md),

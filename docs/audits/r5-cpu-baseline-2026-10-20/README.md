@@ -70,6 +70,10 @@ The [current state](qualification-state.json) records the replacement runs.
 ASan and comptime/VM Ubuntu archives are independently verified at `b5cb77c3`:
 1025 file hashes, 47 compressed log hashes and 47 raw log hashes, with no mismatch.
 The remaining six qualification lanes are pending; no eight-lane verdict is made.
+The [lane ledger](evidence/pin-b5cb77c3/lane-state.json) lists every required
+lane. Independent acquisition checks use `verify_ci_artifacts.py` with
+`--require-generic-cpu`; [CPU/features mutation controls](evidence/pin-b5cb77c3/cpu-baseline-verifier-controls.json)
+retain coherent ZIP/inventory digests and still reject the wrong baseline.
 
 [Package run 39385567878](https://github.com/17thedevv/luna/actions/runs/39385567878)
 builds the exact immutable source `cd9cd1884d2e49c0f03979597ca73e92043b7fe7`,

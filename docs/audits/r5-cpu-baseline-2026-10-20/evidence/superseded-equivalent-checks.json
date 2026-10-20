@@ -1,0 +1,2633 @@
+{
+  "observed_utc": "2026-10-20T07:53:10.534091+00:00",
+  "reason": "Repeated supplemental checks at superseded PR/document heads have identical compiler/runtime/tests/build trees. Retain package-source cd9cd188 supplemental checks and latest PR-head d1079eef checks, plus all eight mandatory qualification lanes. This releases hosted-runner capacity without transferring or fabricating any result.",
+  "retained_runs": [
+    39385574588,
+    39385574515,
+    39388194186,
+    39388194121,
+    39385567905,
+    39385567963
+  ],
+  "runs": [
+    {
+      "id": 39385390934,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39385390934",
+      "jobs_before_request": [
+        {
+          "id": 118503877568,
+          "name": "Formatting acceptance (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385390934,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27
+            }
+          ]
+        },
+        {
+          "id": 118503877903,
+          "name": "Formatting acceptance (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385390934,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27
+            }
+          ]
+        },
+        {
+          "id": 118503877941,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39385390934,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16
+            }
+          ]
+        }
+      ],
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39385390812,
+      "name": "Phase 5 platform verification",
+      "head_sha": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39385390812",
+      "jobs_before_request": [
+        {
+          "id": 118503876596,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39385390812,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build canonical sysroot artifacts",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16
+            }
+          ]
+        },
+        {
+          "id": 118503876849,
+          "name": "RuntimeAbiTests (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385390812,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118503876949,
+          "name": "Whole-File I/O parity (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385390812,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ]
+        },
+        {
+          "id": 118503876980,
+          "name": "Runtime partial-read cleanup (Ubuntu + ASan)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385390812,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure runtime with AddressSanitizer",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build sanitized runtime tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests with leak detection",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118503876984,
+          "name": "Whole-File I/O parity (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385390812,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ]
+        },
+        {
+          "id": 118503877063,
+          "name": "RuntimeAbiTests (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385390812,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        }
+      ],
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39385383862,
+      "name": "Phase 5 platform verification",
+      "head_sha": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39385383862",
+      "jobs_before_request": [
+        {
+          "id": 118503854808,
+          "name": "Runtime partial-read cleanup (Ubuntu + ASan)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385383862,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure runtime with AddressSanitizer",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build sanitized runtime tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests with leak detection",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118503855116,
+          "name": "RuntimeAbiTests (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385383862,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118503855118,
+          "name": "RuntimeAbiTests (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385383862,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118503855138,
+          "name": "Whole-File I/O parity (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385383862,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ]
+        },
+        {
+          "id": 118503855157,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39385383862,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build canonical sysroot artifacts",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16
+            }
+          ]
+        },
+        {
+          "id": 118503855294,
+          "name": "Whole-File I/O parity (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385383862,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ]
+        }
+      ],
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39385383840,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39385383840",
+      "jobs_before_request": [
+        {
+          "id": 118503854708,
+          "name": "Formatting acceptance (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385383840,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27
+            }
+          ]
+        },
+        {
+          "id": 118503855172,
+          "name": "Formatting acceptance (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39385383840,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27
+            }
+          ]
+        },
+        {
+          "id": 118503855185,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39385383840,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16
+            }
+          ]
+        }
+      ],
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39386228457,
+      "name": "Phase 5 platform verification",
+      "head_sha": "054500a3a32eb8b4d24b61cdcef54997067681ba",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39386228457",
+      "jobs_before_request": [
+        {
+          "id": 118506614833,
+          "name": "Runtime partial-read cleanup (Ubuntu + ASan)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39386228457,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure runtime with AddressSanitizer",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build sanitized runtime tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests with leak detection",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118506614952,
+          "name": "Whole-File I/O parity (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39386228457,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ]
+        },
+        {
+          "id": 118506615107,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39386228457,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build canonical sysroot artifacts",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16
+            }
+          ]
+        },
+        {
+          "id": 118506615121,
+          "name": "RuntimeAbiTests (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39386228457,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118506615139,
+          "name": "Whole-File I/O parity (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39386228457,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 14
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15
+            }
+          ]
+        },
+        {
+          "id": 118506615155,
+          "name": "RuntimeAbiTests (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39386228457,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        }
+      ],
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39386228439,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "054500a3a32eb8b4d24b61cdcef54997067681ba",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39386228439",
+      "jobs_before_request": [
+        {
+          "id": 118506614665,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39386228439,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16
+            }
+          ]
+        },
+        {
+          "id": 118506614980,
+          "name": "Formatting acceptance (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39386228439,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 12
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 13
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 25
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 26
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 27
+            }
+          ]
+        },
+        {
+          "id": 118506615114,
+          "name": "Formatting acceptance (macos-15-intel)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39386228439,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 11
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "pending",
+              "conclusion": null,
+              "number": 12
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 13
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 25
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 26
+            }
+          ]
+        }
+      ],
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39387717716,
+      "name": "Phase 5 platform verification",
+      "head_sha": "7c59e914d588a2ba73f024fc45ed53b41f8a3ad5",
+      "status": "queued",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39387717716",
+      "jobs_before_request": [
+        {
+          "id": 118511475128,
+          "name": "Runtime partial-read cleanup (Ubuntu + ASan)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39387717716,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure runtime with AddressSanitizer",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build sanitized runtime tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests with leak detection",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118511475492,
+          "name": "RuntimeAbiTests (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39387717716,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118511475506,
+          "name": "Whole-File I/O parity (ubuntu-24.04)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39387717716,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run Whole-File I/O source and artifact parity",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 13
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 14
+            }
+          ]
+        },
+        {
+          "id": 118511475527,
+          "name": "RuntimeAbiTests (macos-15-intel)",
+          "status": "completed",
+          "conclusion": "success",
+          "run_id": 39387717716,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Configure native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Build runtime and ABI tests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run RuntimeAbiTests",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Complete job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            }
+          ]
+        },
+        {
+          "id": 118511475834,
+          "name": "Whole-File I/O parity (macos-15-intel)",
+          "status": "queued",
+          "conclusion": null,
+          "run_id": 39387717716,
+          "logs_url": null,
+          "steps": null
+        },
+        {
+          "id": 118511475840,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39387717716,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build canonical sysroot artifacts",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 6
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "pending",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16
+            }
+          ]
+        }
+      ],
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39387717438,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "7c59e914d588a2ba73f024fc45ed53b41f8a3ad5",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39387717438",
+      "jobs_before_request": [
+        {
+          "id": 118511473503,
+          "name": "Formatting acceptance (ubuntu-24.04)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39387717438,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 10
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 11
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 12
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 13
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 25
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 26
+            }
+          ]
+        },
+        {
+          "id": 118511473869,
+          "name": "Formatting acceptance (macos-15-intel)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39387717438,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install Linux build dependencies",
+              "status": "completed",
+              "conclusion": "skipped",
+              "number": 3
+            },
+            {
+              "name": "Install macOS build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build native runtime for executable acceptance",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 7
+            },
+            {
+              "name": "Run generic trait-bound validation regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 8
+            },
+            {
+              "name": "Run generic integer cast signedness regression",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 9
+            },
+            {
+              "name": "Run public CLI source and fresh-artifact formatting parity",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 10
+            },
+            {
+              "name": "Run Unicode scalar and source/artifact CLI parity",
+              "status": "pending",
+              "conclusion": null,
+              "number": 11
+            },
+            {
+              "name": "Run generic char operator and CLI parity regression",
+              "status": "pending",
+              "conclusion": null,
+              "number": 12
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 13
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 25
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 26
+            }
+          ]
+        },
+        {
+          "id": 118511473898,
+          "name": "Full workspace regression (Ubuntu)",
+          "status": "in_progress",
+          "conclusion": null,
+          "run_id": 39387717438,
+          "logs_url": null,
+          "steps": [
+            {
+              "name": "Set up job",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 1
+            },
+            {
+              "name": "Run actions/checkout@v4",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 2
+            },
+            {
+              "name": "Install build dependencies",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 3
+            },
+            {
+              "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 4
+            },
+            {
+              "name": "Build native runtime",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 5
+            },
+            {
+              "name": "Build canonical sysroot artifacts from current sources",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 6
+            },
+            {
+              "name": "Run full workspace regression",
+              "status": "in_progress",
+              "conclusion": null,
+              "number": 7
+            },
+            {
+              "name": "Check patch whitespace",
+              "status": "pending",
+              "conclusion": null,
+              "number": 8
+            },
+            {
+              "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+              "status": "pending",
+              "conclusion": null,
+              "number": 15
+            },
+            {
+              "name": "Post Run actions/checkout@v4",
+              "status": "pending",
+              "conclusion": null,
+              "number": 16
+            }
+          ]
+        }
+      ],
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    }
+  ]
+}
