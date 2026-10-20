@@ -95,7 +95,13 @@ def verify_sysroot():
         assert struct.unpack('<HHH',data[4:10])==(2,25,5)
         target=data[10:74].split(b'\0')[0].decode();assert target=='x86_64-pc-windows-gnu', target
         assert struct.unpack('<H',obj.read_bytes()[:2])[0]==0x8664
-        providers.append(dict(name=provider['name'],path=provider['path'],library_sha256=sha(lib),object_sha256=sha(obj),target=target,coff_machine='0x8664'))
+        published=json.loads(subprocess.check_output([str(CLI),'manifest',str(lib)],cwd=SRC,env=ENV,text=True))
+        contract=published['target']
+        assert contract['target_triple']==target and contract['cpu']=='generic' and contract['features']==''
+        assert contract['object_format']=='COFF' and contract['pointer_width']==64
+        assert published['object_metadata']['size']==obj.stat().st_size
+        assert bytes(published['object_metadata']['hash']).hex()==sha(obj)
+        providers.append(dict(name=provider['name'],path=provider['path'],library_sha256=sha(lib),object_sha256=sha(obj),target=target,coff_machine='0x8664',cpu=contract['cpu'],features=contract['features'],abi=contract['abi']))
     assert len(providers)==len(list(root.rglob('*.llib')))==49
     versions=(SRC/'luna-rs/crates/luna-llib/src/format.rs').read_text()
     assert re.search(r'const SEMANTIC_METADATA_VERSION: u16 = 9;',versions)
@@ -120,7 +126,7 @@ def focused():
         'casts-views':['cast_contract_cli','cast_poison_cli','raw_slice_view_a5_cli','raw_slice_provenance_cli'],
         'calls':['named_arguments_cli','default_arguments_cli','default_omission_cli','call_arity_cli'],
         'traits-comptime':['impl_header_metadata_cli','projection_fallback_cli','comptime_dependency_precision_cli','comptime_loans_cli'],
-        'diagnostics':['diagnostic_conformance_cli','expression_span_precision_cli','comptime_diagnostic_cascade_cli','compiler_trust_diagnostics_cli_parity','diag_per_code_coverage_cli','missing_return_cli','move_origin_join_cli'],
+        'diagnostics':['diagnostic_conformance_cli','expression_span_precision_cli','comptime_diagnostic_cascade_cli','compiler_trust_diagnostics_cli_parity','diagnostic_declaration_locations_cli','diag_per_code_coverage_cli','missing_return_cli','move_origin_join_cli'],
         'providers':['provider_tiers_cli','retained_contracts_cli','alpha_modules_cli','module_const_storage_cli','fresh_artifact_classification_cli','native_math_link_cli'],
         'arithmetic':['checked_arithmetic_qualification_cli','wrapping_arithmetic_cli','range_inclusive_cli'],
         'grammar-harness':['v01_grammar_acceptance_tests','test_temp_workspace_lifecycle_cli'],

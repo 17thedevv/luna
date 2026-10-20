@@ -21,7 +21,7 @@ import time
 import tomllib
 import traceback
 
-PIN = os.environ.get("R5_TESTED_COMMIT", "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5")
+PIN = os.environ.get("R5_TESTED_COMMIT", "b5cb77c3286f583c43c41d0e56f4136903ebb842")
 REPOSITORY = "https://github.com/17thedevv/luna.git"
 TARGET = "x86_64-unknown-linux-gnu"
 
@@ -168,7 +168,7 @@ def providers(rec, llvm_host_target):
         pointer_width = envelope[cursor]
         row = dict(name=entry["name"], path=entry["path"], format=fmt,
                    compiler=compiler, mvir=mvir, metadata=metadata, target=target,
-                   manifest_target=strings[4], object_format=strings[7], abi=strings[8],
+                   manifest_target=strings[4], cpu=strings[5], features=strings[6], object_format=strings[7], abi=strings[8],
                    pointer_width=pointer_width, native_elf64_little_endian=elf,
                    elf_type=e_type, elf_machine=e_machine,
                    library_sha256=digest(library), object_sha256=digest(obj),
@@ -176,7 +176,7 @@ def providers(rec, llvm_host_target):
                    embedded_equals_sidecar=embedded == native)
         # R5-FU-TARGET-01: the artifact records the canonical Luna release
         # target, not the host LLVM spelling. The host triple stays provenance.
-        row["native_integrity_valid"] = (fmt, compiler, mvir, metadata) == (2, 25, 5, 9) and target == TARGET and strings[4] == target and pointer_width == 64 and elf and e_type == 1 and e_machine == 62 and native == embedded
+        row["native_integrity_valid"] = (fmt, compiler, mvir, metadata) == (2, 25, 5, 9) and target == TARGET and strings[4] == target and strings[5] == 'generic' and strings[6] == '' and pointer_width == 64 and elf and e_type == 1 and e_machine == 62 and native == embedded
         row["advertised_target_match"] = target == TARGET
         row["valid"] = row["native_integrity_valid"] and row["advertised_target_match"]
         rows.append(row)
@@ -234,7 +234,7 @@ def normal(rec, provenance, *, probe_only=False, skip_workspace=False):
         ("focused-a-casts", "luna-cli", ["cast_contract_cli", "cast_poison_cli", "raw_slice_view_a5_cli", "raw_slice_provenance_cli"]),
         ("focused-c-calls", "luna-cli", ["named_arguments_cli", "default_arguments_cli", "default_omission_cli", "call_arity_cli"]),
         ("focused-c-comptime", "luna-cli", ["impl_header_metadata_cli", "projection_fallback_cli", "comptime_dependency_precision_cli", "comptime_loans_cli"]),
-        ("focused-d-diagnostics", "luna-cli", ["diagnostic_conformance_cli", "expression_span_precision_cli", "comptime_diagnostic_cascade_cli", "compiler_trust_diagnostics_cli_parity", "diag_per_code_coverage_cli", "missing_return_cli", "move_origin_join_cli"]),
+        ("focused-d-diagnostics", "luna-cli", ["diagnostic_conformance_cli", "expression_span_precision_cli", "comptime_diagnostic_cascade_cli", "compiler_trust_diagnostics_cli_parity", "diagnostic_declaration_locations_cli", "diag_per_code_coverage_cli", "missing_return_cli", "move_origin_join_cli"]),
         ("focused-d-providers", "luna-cli", ["provider_tiers_cli", "retained_contracts_cli", "alpha_modules_cli", "module_const_storage_cli", "fresh_artifact_classification_cli", "native_math_link_cli"]),
         ("arithmetic-grammar-harness", "luna-cli", ["checked_arithmetic_qualification_cli", "wrapping_arithmetic_cli", "v01_grammar_acceptance_tests", "test_temp_workspace_lifecycle_cli"]),
         ("format-unicode", "luna-cli", ["stdlib_format_cli_acceptance", "char_scalar_cli_parity", "char_operator_cli_parity"]),

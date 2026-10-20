@@ -1,0 +1,8 @@
+{
+  "run_id": 39385383820,
+  "source_commit": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "observed_live_before_cancellation": true,
+  "reason": "Push triggered the old package workflow before its qualified-pin environment was updated; new source trees differ from configured old8525067f, so that run cannot pass the qualification identity gate. Replaced by the correctly pinned acquisition, not a reset due to observation timeout.",
+  "action": "Authorized repository API cancel request accepted202",
+  "evidence_claim": "NONE"
+}
