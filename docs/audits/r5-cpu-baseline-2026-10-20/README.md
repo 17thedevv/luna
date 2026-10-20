@@ -56,9 +56,12 @@ and rejection of unsupported 32-bit lowering. Public CLI preflight PASS: relocat
 22 check/build mismatch rejections (including CPU/features) retain E6001. Local preflight reuses the native runtime and is not
 an exact-pin qualification claim.
 
-Next: complete preflight and docs consistency; select an immutable implementation
-pin; reacquire all eight lanes and both independent package smokes; verify all
-archives; advance candidate only after closure. No main merge/tag/publication
+Implementation pin selected: `b5cb77c3286f583c43c41d0e56f4136903ebb842`.
+Preflight and docs consistency PASS. Qualification harness and package workflow
+now select that pin, including generic CPU/empty-features checks on all49 bundles
+and declaration-location additions in both focused diagnostic batches.
+Reacquire all eight lanes and both independent package smokes; verify archives;
+advance candidate only after closure. No main merge/tag/publication
 before these gates pass. Keep failed package attempt1 as failure history.
 
 Compiler Change

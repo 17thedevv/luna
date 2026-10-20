@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 env:
-  LUNA_QUALIFIED_PIN: 8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5
+  LUNA_QUALIFIED_PIN: b5cb77c3286f583c43c41d0e56f4136903ebb842
   CARGO_TERM_COLOR: never
 
 jobs:

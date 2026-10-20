@@ -16,7 +16,7 @@ env:
   # selection, typed comptime E4002/E4003, per-code coverage, plus the
   # declaration/identity/ordering repairs. compiler25/metadata9/MVIR5/format2
   # unchanged; every lane reacquires this SHA.
-  R5_TESTED_COMMIT: 8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5
+  R5_TESTED_COMMIT: b5cb77c3286f583c43c41d0e56f4136903ebb842
   R5_REPOSITORY_URL: https://github.com/17thedevv/luna.git
   CARGO_TERM_COLOR: never
 

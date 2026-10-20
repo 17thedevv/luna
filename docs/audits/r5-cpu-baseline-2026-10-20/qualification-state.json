@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-20",
+  "implementation_pin": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "introducing_fix": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "previous_implementation": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "candidate": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
+  "status": "ACQUIRING_REPLACEMENT_QUALIFICATION",
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "required_lanes": [
+    "windows-normal",
+    "windows-workspace-triage",
+    "windows-workspace-final",
+    "ubuntu-normal",
+    "ubuntu-runtime-asan",
+    "ubuntu-comptime-vm",
+    "ubuntu-workspace-triage",
+    "ubuntu-workspace-final"
+  ],
+  "package_smoke": [
+    "windows-clean-consumer",
+    "ubuntu-clean-consumer"
+  ],
+  "no_prior_pin_pass_transfer": true,
+  "preflight": "evidence/preflight.json",
+  "maintainer_authorization": "../r5-move-origin-2026-10-18/evidence/pin-8525067f/release-authorization.json",
+  "pr": "https://github.com/17thedevv/luna/pull/7",
+  "runs": "Recorded after workflow dispatch; no passing acquisition claim yet"
+}
