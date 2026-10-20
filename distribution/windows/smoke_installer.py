@@ -8,6 +8,7 @@ from pathlib import Path
 import shutil
 import subprocess
 import threading
+import time
 import winreg
 
 STATE = r'Software\Luna\Installer'
@@ -66,7 +67,8 @@ def main():
                      LUNA_RUNTIME_LIB='X:\\stale runtime.lib', LUNA_HOME='X:\\stale home')
 
     def run(label, command, expect=0, env=None):
-        result = subprocess.run(list(map(str, command)), cwd=work, env=env, capture_output=True, timeout=900)
+        invocation = command if isinstance(command, str) else list(map(str, command))
+        result = subprocess.run(invocation, cwd=work, env=env, capture_output=True, timeout=900)
         (evidence / (label + '.stdout')).write_bytes(result.stdout)
         (evidence / (label + '.stderr')).write_bytes(result.stderr)
         report['steps'].append(dict(label=label, exit=result.returncode, expected=expect))
@@ -80,6 +82,18 @@ def main():
     def setup(label, exe, directory, tasks='addtopath', expect=0):
         return run(label, [exe, '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/NOICONS',
                            '/DIR=' + str(directory), '/TASKS=' + tasks, '/LOG=' + str(evidence / (label + '.log'))], expect)
+
+    def uninstall(label):
+        log = evidence / (label + '.log')
+        run(label, [install / 'unins000.exe', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/LOG=' + str(log)])
+        # Inno's original unins000.exe can exit while the relocated second
+        # phase is still finishing its script and removing temporary files.
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            if log.exists() and 'Uninstallation process succeeded.' in log.read_text(encoding='utf-8-sig'):
+                return
+            time.sleep(0.2)
+        raise AssertionError(label + ': uninstaller second phase did not complete')
 
     try:
         # The real downloader must reject bytes whose digest differs from the lock
@@ -119,6 +133,18 @@ def main():
         assert len(list((package / 'libs/external').rglob('*.llib'))) == 49
         version = run('version-clean-path-stale-env', [cli, '--version'], env=child_env)
         assert version.stdout.strip() == b'luna 0.1.0'
+        shortcut_script = work / 'read-shortcut.ps1'
+        shortcut_script.write_text('param([string]$ShortcutPath)\n'
+                                  '$s = (New-Object -ComObject WScript.Shell).CreateShortcut($ShortcutPath)\n'
+                                  '$s | Select-Object TargetPath, Arguments | ConvertTo-Json\n')
+        shortcut_path = Path(os.environ['APPDATA']) / 'Microsoft/Windows/Start Menu/Programs/Luna/Luna Command Prompt.lnk'
+        shortcut = json.loads(run('read-start-menu-shortcut', [shutil.which('pwsh'), '-NoProfile', '-File',
+                                                             shortcut_script, shortcut_path]).stdout)
+        assert Path(shortcut['TargetPath']).name.lower() == 'cmd.exe'
+        assert shortcut['Arguments'] == '/K ""' + str(install / 'bin/luna-shell.cmd') + '""'
+        prompt = run('start-menu-command-prompt', '"' + shortcut['TargetPath'] + '" /D ' +
+                     shortcut['Arguments'].replace('/K ', '/C ', 1), env=child_env)
+        assert b'luna 0.1.0' in prompt.stdout
         run('llvm-version', [install / 'toolchains/llvm/bin/llc.exe', '--version'], env=child_env)
         for name in ('quickstart', 'stdlib'):
             fixture_source = work / (name + '.ln')
@@ -137,8 +163,7 @@ def main():
         note.write_text('user file must survive uninstall')
         sentinel = str(a.out / 'unrelated user tool')
         write_path((added[0] + ';' + sentinel, added[1]))
-        run('uninstall', [install / 'unins000.exe', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART',
-                          '/LOG=' + str(evidence / 'uninstall.log')])
+        uninstall('uninstall')
         current = registry('Environment', 'Path')
         report['post_uninstall_path'] = current
         report['post_uninstall_ownership'] = registry(STATE, 'OwnPath')
@@ -152,7 +177,7 @@ def main():
         setup('install-preexisting-path', a.installer.resolve(), install)
         assert registry('Environment', 'Path') == preexisting
         assert registry(STATE, 'OwnPath') is None
-        run('uninstall-preexisting-path', [install / 'unins000.exe', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART'])
+        uninstall('uninstall-preexisting-path')
         assert registry('Environment', 'Path') == preexisting
         report.update(status='PASS', providers=49, payload_hashes=len(manifest['files']),
                       unicode_space_path=True, host_tools_required=False, tampered_payload_rejected=True,
