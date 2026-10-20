@@ -1,0 +1,24 @@
+Luna 0.1.0-alpha.1 online installer
+
+This installer downloads and checks fixed SHA-256 hashes for the released Luna
+package, a minimal LLVM 18.1.8 payload, and a WinLibs GNU toolchain. An Internet
+connection is required. All components are installed privately for this user.
+Only Luna's bin directory is optionally added to the user PATH. Existing system
+toolchains and LLVM_HOME are not changed.
+
+The original Luna compiler/runtime/provider files are not rebuilt or modified.
+The release manifest and LICENSE-NOTICE.txt remain in the installed package.
+The source snapshot declares no project license; this installer adds no grant.
+
+Third-party files retain their copyright and license terms. LLVM and its runtime
+DLLs are copied from the official clang+llvm 18.1.8 Windows archive; its license,
+source URL and original archive hash accompany the payload. The WinLibs archive
+is downloaded unchanged from its publisher and includes its original notices.
+Sources and component details are recorded in installer-lock.json.
+
+Release: https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1
+LLVM: https://github.com/llvm/llvm-project/releases/tag/llvmorg-18.1.8
+WinLibs: https://winlibs.com/
+
+After installation, open a new terminal or use Luna Command Prompt from Start.
+The uninstaller removes only installer-owned files and its own user PATH entry.
