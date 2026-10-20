@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-21",
+  "scope": "Public alpha release availability, ZIP/payload integrity and local Windows native smoke; Ubuntu native execution remains the recorded hosted package smoke, not a local rerun.",
+  "release": "https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1",
+  "distribution_version": "v0.1.0-alpha.1",
+  "draft": false,
+  "prerelease": true,
+  "anonymous_access": true,
+  "assets": [
+    {
+      "name": "luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip",
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip",
+      "http_status": 200,
+      "bytes": 15511635,
+      "sha256": "bbdc2a0fa55e82666c9bf26802ab5fa8f844b338e02848490a691f867b7c14dd",
+      "api_digest_matches": true,
+      "executable": "bin/luna.exe",
+      "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "qualified_implementation": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "providers": 49,
+      "payload_files_checked": 105,
+      "archive_files": 107,
+      "crc": "PASS",
+      "payload_hashes": "PASS",
+      "native_machine": "AMD64"
+    },
+    {
+      "name": "luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip",
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip",
+      "http_status": 200,
+      "bytes": 15894110,
+      "sha256": "86884370d1bea203dddcececf442ea6340600d2edeaa8609d384632878b5c3e4",
+      "api_digest_matches": true,
+      "executable": "bin/luna",
+      "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "qualified_implementation": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "providers": 49,
+      "payload_files_checked": 105,
+      "archive_files": 107,
+      "crc": "PASS",
+      "payload_hashes": "PASS",
+      "native_machine": "AMD64"
+    },
+    {
+      "name": "SHA256SUMS",
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/SHA256SUMS",
+      "http_status": 200,
+      "bytes": 225,
+      "sha256": "09fcf49798eb70dda79bd248bf153ec0d8b8f3539f8168b756b8e4238b582ebc",
+      "api_digest_matches": true
+    }
+  ],
+  "local_windows_smoke": {
+    "status": "PASS",
+    "scope": "Local Windows alderlake host using the freshly downloaded public ZIP; the raw script summary carries a hosted-job template, but workflow_run is null and this invocation is local.",
+    "evidence": "local-windows-smoke.zip",
+    "evidence_sha256": "eba91208249f7b965373612b72ea4594789d82100eba4ff3df21be6b6ec4a71d",
+    "steps": [
+      {
+        "label": "version",
+        "exit": 0,
+        "expected_exit": 0
+      },
+      {
+        "label": "llvm-host",
+        "exit": 0,
+        "expected_exit": 0
+      },
+      {
+        "label": "quickstart-build",
+        "exit": 0,
+        "expected_exit": 0
+      },
+      {
+        "label": "quickstart-native",
+        "exit": 0,
+        "expected_exit": 0
+      },
+      {
+        "label": "stdlib-build",
+        "exit": 0,
+        "expected_exit": 0
+      },
+      {
+        "label": "stdlib-native",
+        "exit": 0,
+        "expected_exit": 0
+      },
+      {
+        "label": "missing-provider-control",
+        "exit": 1,
+        "expected_exit": 1
+      }
+    ],
+    "providers_checked": 49,
+    "payload_hashes_checked": 105,
+    "source_fallback": false
+  },
+  "ubuntu_native_evidence": "../r5-cpu-baseline-2026-10-20/evidence/package-cd9cd188/release-package-verification.json"
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "attempt": 1,
+    "run": 39472754245,
+    "source_commit": "5446ac3ce16bd4d8c6a72cf05d04e0a2dc14bc86",
+    "artifact_id": 12287813537,
+    "artifact_sha256": "014550af295fe88606beb2912daa1ca332c5dbe19bf575fd896c81067d51f699",
+    "evidence": "installer-smoke-attempt1.zip",
+    "status": "FAIL",
+    "reason": "Harness checked PATH before the relocated Inno uninstaller completed; native install/build/run/reinstall passed. Superseded by a harness that awaits the completion log."
+  },
+  {
+    "attempt": 2,
+    "run": 39473204990,
+    "source_commit": "85bba864a2cd5e0c3acac46fb915b3be8f323387",
+    "artifact_id": 12287224611,
+    "artifact_sha256": "a879965ee534379e5939ff74964d290dda7e9fb8f19a6f5acc287fb590abd9e8",
+    "evidence": "installer-smoke-attempt2.zip",
+    "status": "FAIL",
+    "reason": "Harness checked PATH before the relocated Inno uninstaller completed; native install/build/run/reinstall passed. Superseded by a harness that awaits the completion log."
+  },
+  {
+    "attempt": 3,
+    "run": 39473579125,
+    "source_commit": "2aac02f0",
+    "artifact_id": 12287214895,
+    "artifact_sha256": "52d134cb491e94be8fc970d25f93be1fedaa073470d8c33c18a6732cfc49bcd4",
+    "evidence": "installer-smoke-attempt3.zip",
+    "status": "FAIL",
+    "reason": "WScript.Shell returned ANSI-converted Unicode shortcut arguments; superseded by direct verification of MS-SHLLINK Unicode StringData and execution of the stored arguments."
+  }
+]
