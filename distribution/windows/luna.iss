@@ -113,7 +113,8 @@ begin
     RaiseException('Installed Luna failed its version check. See the setup log; user PATH was not changed.');
   if not WizardIsTaskSelected('addtopath') then Exit;
   PathEntry := ExpandConstant('{app}\bin');
-  if RegQueryDWordValue(HKCU, StateKey, 'OwnPath', Added) and (Added = 1) then Exit;
+  if RegQueryDWordValue(HKCU64, StateKey, 'OwnPath', Added) then
+    if Added = 1 then Exit;
   PreviousPathPresent := RegQueryStringValue(HKCU, 'Environment', 'Path', CurrentPath);
   if ContainsPath(CurrentPath, PathEntry) then Exit;
   PreviousPath := CurrentPath;
@@ -135,23 +136,27 @@ function InitializeUninstall(): Boolean;
 var Value: Cardinal;
 begin
   Result := True;
-  OwnPath := RegQueryDWordValue(HKCU, StateKey, 'OwnPath', Value) and (Value = 1);
-  PreviousPathPresent := RegQueryDWordValue(HKCU, StateKey, 'PreviousPathPresent', Value) and (Value = 1);
-  RegQueryStringValue(HKCU, StateKey, 'PreviousPath', PreviousPath);
-  RegQueryStringValue(HKCU, StateKey, 'InstalledPath', InstalledPath);
-  RegQueryStringValue(HKCU, StateKey, 'PathEntry', PathEntry);
+  OwnPath := False;
+  if RegQueryDWordValue(HKCU64, StateKey, 'OwnPath', Value) then OwnPath := Value = 1;
+  PreviousPathPresent := False;
+  if RegQueryDWordValue(HKCU64, StateKey, 'PreviousPathPresent', Value) then PreviousPathPresent := Value = 1;
+  RegQueryStringValue(HKCU64, StateKey, 'PreviousPath', PreviousPath);
+  RegQueryStringValue(HKCU64, StateKey, 'InstalledPath', InstalledPath);
+  RegQueryStringValue(HKCU64, StateKey, 'PathEntry', PathEntry);
+  Log(Format('Luna PATH ownership: %d; entry: %s', [Ord(OwnPath), PathEntry]));
 end;
 
 procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 var CurrentPath: String;
 begin
   if CurUninstallStep <> usPostUninstall then Exit;
-  if OwnPath and RegQueryStringValue(HKCU, 'Environment', 'Path', CurrentPath) then begin
+  if OwnPath and RegQueryStringValue(HKCU64, 'Environment', 'Path', CurrentPath) then begin
     if CurrentPath = InstalledPath then begin
       if PreviousPathPresent then RegWriteExpandStringValue(HKCU, 'Environment', 'Path', PreviousPath)
       else RegDeleteValue(HKCU, 'Environment', 'Path');
     end else RegWriteExpandStringValue(HKCU, 'Environment', 'Path', WithoutPath(CurrentPath, PathEntry));
   end;
+  Log('Luna PATH cleanup completed.');
   RegDeleteValue(HKCU, StateKey, 'OwnPath');
   RegDeleteValue(HKCU, StateKey, 'PreviousPathPresent');
   RegDeleteValue(HKCU, StateKey, 'PreviousPath');
