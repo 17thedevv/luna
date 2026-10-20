@@ -1,0 +1,58 @@
+{
+  "status": "PUBLISHED_PRERELEASE",
+  "date_utc": "2026-10-20",
+  "observed_utc": "2026-10-20 14:42:03 UTC",
+  "qualification": {
+    "tested_implementation_pin": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+    "lane_count": 8,
+    "status": "PASS",
+    "archive_manifest": "evidence/pin-b5cb77c3/ci-artifact-manifest.json",
+    "archive_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
+    "package_smoke": "evidence/package-cd9cd188/release-package-verification.json"
+  },
+  "candidate": {
+    "ref": "luna-0.1-alpha.1-candidate",
+    "previous_sha": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+    "sha": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+    "update": "fast-forward"
+  },
+  "pull_request": {
+    "number": 7,
+    "url": "https://github.com/17thedevv/luna/pull/7",
+    "merged": true,
+    "merge_commit": "97422d2cb5feaac0361c14e620843785dd09615b"
+  },
+  "main": "97422d2cb5feaac0361c14e620843785dd09615b",
+  "tag": {
+    "name": "v0.1.0-alpha.1",
+    "annotated_tag_object": "0d91c1291dc5541600f653b5b62de10d491d6b0d",
+    "peeled_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+    "tag_commit_is_ancestor_of_main": true
+  },
+  "release": {
+    "id": 418508685,
+    "url": "https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1",
+    "published_at": "2026-10-20T14:40:41Z",
+    "draft": false,
+    "prerelease": true,
+    "assets": [
+      {
+        "name": "luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip",
+        "size_in_bytes": 15511635,
+        "sha256": "bbdc2a0fa55e82666c9bf26802ab5fa8f844b338e02848490a691f867b7c14dd"
+      },
+      {
+        "name": "luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip",
+        "size_in_bytes": 15894110,
+        "sha256": "86884370d1bea203dddcececf442ea6340600d2edeaa8609d384632878b5c3e4"
+      },
+      {
+        "name": "SHA256SUMS",
+        "size_in_bytes": 225,
+        "sha256": "09fcf49798eb70dda79bd248bf153ec0d8b8f3539f8168b756b8e4238b582ebc"
+      }
+    ],
+    "downloaded_assets_reverified": true,
+    "package_checksums_verified": true
+  }
+}

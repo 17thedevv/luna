@@ -1,23 +1,24 @@
 # Luna 0.1-alpha.1 — maintainer review handoff
 
-**CURRENT REPLACEMENT STATUS — 2026-10-20:** `b5cb77c3` has 8/8 qualification
-lanes and all eight ZIPs independently verified. Windows workspace final PASS
-(236 groups, 1422/0/1). Both clean package smokes PASS from `cd9cd188`, and the
-current PR merge-preview full workspace passes, including the closure control
-that failed once in an earlier run. Candidate remains `8525067f`, main
-`401a95a8`, and PR #7 is ready for the authorized merge and release sequence. See the
+**CURRENT RELEASE STATUS — 2026-10-20:** Luna `v0.1.0-alpha.1` is published as
+a prerelease. `b5cb77c3` has 8/8 qualification lanes and all eight ZIPs
+independently verified. Windows workspace final PASS (236 groups, 1422/0/1).
+Both clean package smokes PASS from `cd9cd188`; PR #7 merged as `97422d2c` after
+the PR merge-preview full workspace and formatting checks passed. Candidate is
+fast-forwarded to `b5cb77c3`; the annotated tag points to exact package source
+`cd9cd188`, which is an ancestor of main. See the
 [CPU baseline repair and current evidence](../r5-cpu-baseline-2026-10-20/README.md)
-and its [merge-preview replay record](../r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/pr-merge-preview-replay.json).
+and its [release closure record](../r5-cpu-baseline-2026-10-20/release-closure.json).
 
 **SUPERSEDED FOR RELEASE — 2026-10-20.** Eight-lane qualification at
 `8525067f` remains valid in its executed scope, but its clean Windows package
-smoke failed on a different CPU. The replacement pin now closes all eight lanes
-and archive checks. The full goal remains active until merge and publication.
+smoke failed on a different CPU. The replacement pin closes all eight lanes and
+archive checks; the authorized merge and publication are complete.
 
-Candidate/tested implementation: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
-Candidate fast-forwarded from `c085449b` without force.
-Main remains `401a95a872f0fdfb9840640f41cc4ac629cb17cd`.
-Evidence/docs branch: `r5-diag-repair`; its implementation trees match the pin.
+Current tested implementation: `b5cb77c3286f583c43c41d0e56f4136903ebb842`.
+Candidate `luna-0.1-alpha.1-candidate` was fast-forwarded from `8525067f`.
+Main merge commit: `97422d2cb5feaac0361c14e620843785dd09615b`.
+Packaged source and annotated tag target: `cd9cd1884d2e49c0f03979597ca73e92043b7fe7`.
 
 [Report](REPORT-R5-QUALIFICATION-8525067f.md) ·
 [Eight verified archives](evidence/pin-8525067f/all-artifact-verification.json) ·
@@ -29,10 +30,10 @@ Strict L002 4/4. Comptime per host 88 PASS/0 FAIL/8 characterized.
 Both normal lanes rebuild49 providers. ASan covers the C runtime only.
 Versions:compiler 25/metadata 9/MVIR 5/format 2.
 
-## Proposed PR
+## Merged PR
 
 Title: **Qualify Luna 0.1-alpha.1 on Windows GNU and Ubuntu GNU**.
-Base: `main`. Head: existing `r5-diag-repair` after the evidence commit.
+PR #7 merged into `main` on 2026-10-20 at `97422d2cb5feaac0361c14e620843785dd09615b`.
 
 PR description:
 
@@ -48,32 +49,28 @@ lane passes strict L002 4/4; comptime/VM reports 88 pass and 8 characterized;
 Ubuntu runtime ASan passes. Exact pins, jobs, archive digests and limits are in
 the report and machine-readable manifest.
 
-## Proposed release and package checks
+## Published release and package checks
 
 Authorized tag: `v0.1.0-alpha.1` (human approval received 2026-10-20).
-Two packages use the canonical target names. Each contains compiler CLI,
+The [prerelease is published](https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1).
+The tag points to the exact package source commit. Two packages use the canonical target names. Each contains compiler CLI,
 native runtime, 49 canonical LLIB/object bundles, protocol/target/source/build
 manifest, checksums, license notice and usage instructions. Document LLVM18 and GNU
 toolchain prerequisites explicitly.
 
-Build from the selected verified release commit. Smoke each downloaded package
-in a separate clean Windows/Ubuntu job without a source checkout or external
-sysroot: verify identities/hashes, then build/run the public quickstart and
-a stdlib provider case using the package runtime/sysroot. Preserve all evidence.
+Both packages passed clean hosted Windows/Ubuntu consumer smokes. The published
+ZIPs and `SHA256SUMS` were downloaded and their API digests, sizes and package
+checksums verified. The tag target's compiler/runtime/test trees match the
+qualified implementation pin.
 
-Before tagging, prove release code-tree identity against the qualified pin;
-requalify if implementation or artifact identity changes. Reconcile tag,
-assets/checksums and release notes, then write the final closing record.
-
-## Remaining authority and work
+## Authorization and completed actions
 
 Human authorization received 2026-10-20: create PR, merge and publish
 `v0.1.0-alpha.1` after Windows/Ubuntu package smoke PASS. [PR #7](https://github.com/17thedevv/luna/pull/7)
-is open as a draft. No merge/tag/publication has happened. The new package workflow
-builds an immutable source commit with the same qualified implementation trees;
-separate jobs verify the downloaded packages without a source checkout.
-The tag will identify the exact packaged source commit, with main integration
-recorded separately. [Authorization record](evidence/pin-8525067f/release-authorization.json).
+is merged; the candidate advanced, the exact source tag was pushed, and the
+prerelease assets were published and verified. [Authorization record](evidence/pin-8525067f/release-authorization.json)
+and [release closure](../r5-cpu-baseline-2026-10-20/release-closure.json) preserve
+the evidence. No qualification, merge or publication work remains.
 
 No project LICENSE file exists in the source snapshot. Packaging preserves that
 state with a license notice rather than inventing a license grant. CLI output
