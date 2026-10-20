@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-20",
+  "runs": [
+    39383668019,
+    39383667862
+  ],
+  "source_commit": "b515783782408b2279fc4c534c125182bb5a41cf",
+  "observed_live_before_cancellation": true,
+  "reason": "Supplemental phase5/6 checks on the package source superseded by the confirmed CPU release blocker; cancel obsolete implementation acquisitions to free hosted-runner capacity. Current b5cb77c3 implementation checks and all replacement qualification lanes remain untouched.",
+  "evidence_claim": "NONE; completed subjob results and cancellation remain in GitHub history"
+}
