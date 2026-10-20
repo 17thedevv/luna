@@ -1,3 +1,7 @@
+<!-- luna-doc-role: guidance -->
+
+> **Luna 0.1 — guidance.** Current guidance. The versioned baseline and adopted amendments govern; implementation failures remain gaps, not semantic overrides. See the [versioned specification](../../docs/spec/0.1/README.md).
+
 # Windows online installer
 
 `lunainstaller.exe` installs the existing Luna **0.1.0-alpha.1** package plus
