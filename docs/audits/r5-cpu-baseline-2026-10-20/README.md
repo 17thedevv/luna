@@ -1,9 +1,14 @@
 # R5 release-package CPU baseline repair
 
-Date: 2026-10-20. **Release blocked; replacement qualification required.**
-Candidate remains `8525067f`; main remains `401a95a8`; PR #7 is draft.
-Maintainer authorization for `v0.1.0-alpha.1` remains conditional on passing
-all qualification and clean Windows/Ubuntu package checks.
+Date: 2026-10-20. **Release pending the final Windows workspace lane and complete
+eight-lane archive reconciliation.** Candidate remains `8525067f`; main remains
+`401a95a8`; PR #7 is draft. The replacement implementation pin is
+`b5cb77c3`; seven of eight exact-pin lanes and their ZIP artifacts are verified.
+The Windows workspace final is running as
+[job 118589976770](https://github.com/17thedevv/luna/actions/runs/39385567963/job/118589976770).
+Both clean Windows and Ubuntu package smokes PASS at source `cd9cd188`, whose
+implementation trees match the replacement pin. Maintainer authorization for
+`v0.1.0-alpha.1` remains active after the qualification gates close.
 
 ## Confirmed finding
 
@@ -67,11 +72,15 @@ before these gates pass. Keep failed package attempt1 as failure history.
 ## Replacement acquisition progress
 
 The [current state](qualification-state.json) records the replacement runs.
-ASan and comptime/VM Ubuntu archives are independently verified at `b5cb77c3`:
-1025 file hashes, 47 compressed log hashes and 47 raw log hashes, with no mismatch.
-The remaining six qualification lanes are pending; no eight-lane verdict is made.
-The [lane ledger](evidence/pin-b5cb77c3/lane-state.json) lists every required
-lane. Independent acquisition checks use `verify_ci_artifacts.py` with
+Seven lanes are PASS and independently reconciled at `b5cb77c3`: Ubuntu normal,
+ASan, comptime/VM, workspace triage and workspace final; Windows native normal
+and workspace triage. Their seven ZIPs have verified digest, size, CRC,
+compressed/raw logs and recorded gates, with no mismatch. Only Windows workspace
+final and complete eight-lane reconciliation remain. The
+[lane ledger](evidence/pin-b5cb77c3/lane-state.json) lists every required lane.
+The supplemental [PR merge-preview replay](evidence/pin-b5cb77c3/pr-merge-preview-replay.json)
+records an earlier full-workspace closure ICE and a successful replay at the
+same implementation tree. Independent acquisition checks use `verify_ci_artifacts.py` with
 `--require-generic-cpu`; [CPU/features mutation controls](evidence/pin-b5cb77c3/cpu-baseline-verifier-controls.json)
 retain coherent ZIP/inventory digests and still reject the wrong baseline.
 

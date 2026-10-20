@@ -66,6 +66,241 @@
       "providers": null,
       "repeated_identical_log_records": [],
       "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree a738989a3869ebe054024a8ac6dd49a96c485d7b\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
+    },
+    {
+      "artifact_id": 12253391317,
+      "name": "r5-ubuntu-workspace-triage-39385567905-1",
+      "workflow_run": {
+        "id": 39385567905,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+      },
+      "archive_sha256": "5defbfcc9d931f7b406d390774a4b21cc9282a7ceb5089ef081774a67299a1cf",
+      "size_in_bytes": 83420,
+      "local_path": "docs\\audits\\r5-cpu-baseline-2026-10-20\\evidence\\pin-b5cb77c3\\archives\\r5-ubuntu-workspace-triage-39385567905-1.zip",
+      "tested_commit": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "status": "PASS",
+      "checks": {
+        "file_hashes": 61,
+        "compressed_log_hashes": 29,
+        "raw_log_hashes": 29
+      },
+      "gates": 29,
+      "workspace": {
+        "result_groups": 236,
+        "passed": 1422,
+        "failed": 0,
+        "ignored": 1,
+        "ignored_lines": [
+          "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+        ]
+      },
+      "providers": {
+        "count": 49,
+        "target": "x86_64-unknown-linux-gnu",
+        "object": "ELF64 x86_64",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "basis": "Recorded provider headers and object identities in hash-verified acquisition"
+      },
+      "repeated_identical_log_records": [
+        "code-tree-identity"
+      ],
+      "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree a738989a3869ebe054024a8ac6dd49a96c485d7b\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
+    },
+    {
+      "artifact_id": 12252234586,
+      "name": "r5-ubuntu-normal-39385567905-1",
+      "workflow_run": {
+        "id": 39385567905,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+      },
+      "archive_sha256": "248166572662c8031a6ceaca683c2bf8175dc61c0a75f7398cf67a3315bc5344",
+      "size_in_bytes": 191992,
+      "local_path": "docs\\audits\\r5-cpu-baseline-2026-10-20\\evidence\\pin-b5cb77c3\\archives\\r5-ubuntu-normal-39385567905-1.zip",
+      "tested_commit": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "status": "PASS",
+      "checks": {
+        "file_hashes": 123,
+        "compressed_log_hashes": 48,
+        "raw_log_hashes": 48
+      },
+      "gates": 48,
+      "workspace": null,
+      "providers": {
+        "count": 49,
+        "target": "x86_64-unknown-linux-gnu",
+        "object": "ELF64 x86_64",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "basis": "Recorded provider headers and object identities in hash-verified acquisition"
+      },
+      "repeated_identical_log_records": [],
+      "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree a738989a3869ebe054024a8ac6dd49a96c485d7b\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
+    },
+    {
+      "artifact_id": 12258834785,
+      "name": "r5-windows-workspace-triage-39385567963-1",
+      "workflow_run": {
+        "id": 39385567963,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+      },
+      "archive_sha256": "9846fee031c2a0ffd1ab522504c67195e206992c3404e221ac041ba78889f565",
+      "size_in_bytes": 104143,
+      "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-windows-workspace-triage-39385567963-1.zip",
+      "tested_commit": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "status": "PASS",
+      "checks": {
+        "recorded_log_hashes": 15,
+        "acquisition_gates": 14
+      },
+      "gates": 14,
+      "workspace": {
+        "result_groups": 236,
+        "passed": 1422,
+        "failed": 0,
+        "ignored": 1,
+        "ignored_lines": [
+          "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+        ]
+      },
+      "boundary": null,
+      "providers": {
+        "count": 49,
+        "target": "x86_64-pc-windows-gnu",
+        "object": "COFF 0x8664",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "archived_bundles_checked": 0
+      },
+      "code_tree_identity": {
+        "luna-rs": "a738989a3869ebe054024a8ac6dd49a96c485d7b",
+        "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+        "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4"
+      }
+    },
+    {
+      "artifact_id": 12252351370,
+      "name": "r5-windows-gnu-39385567963-1",
+      "workflow_run": {
+        "id": 39385567963,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+      },
+      "archive_sha256": "db9e467293a107a38d42c96edab5375be5587d892b8ba95ca32ee014605ef0c4",
+      "size_in_bytes": 43178775,
+      "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-windows-gnu-39385567963-1.zip",
+      "tested_commit": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "status": "PASS",
+      "checks": {
+        "recorded_log_hashes": 383,
+        "acquisition_gates": 35
+      },
+      "gates": 35,
+      "workspace": null,
+      "boundary": {
+        "comptime_passed": 88,
+        "comptime_characterized": 8,
+        "strict_bounds_rows": 4,
+        "trap": "L002: index 3, length 2",
+        "native_exits": [
+          3221226505,
+          3221226505,
+          3221226505,
+          3221226505
+        ]
+      },
+      "providers": {
+        "count": 49,
+        "target": "x86_64-pc-windows-gnu",
+        "object": "COFF 0x8664",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "archived_bundles_checked": 98
+      },
+      "code_tree_identity": {
+        "luna-rs": "a738989a3869ebe054024a8ac6dd49a96c485d7b",
+        "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+        "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4"
+      }
+    },
+    {
+      "artifact_id": 12263624610,
+      "name": "r5-ubuntu-workspace-final-39385567905-1",
+      "workflow_run": {
+        "id": 39385567905,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+      },
+      "archive_sha256": "e7602838f5c83e27d821e03fc14beafba165fe29aed8cc7e5c7192384214711b",
+      "size_in_bytes": 83695,
+      "local_path": "docs\\audits\\r5-cpu-baseline-2026-10-20\\evidence\\pin-b5cb77c3\\archives\\r5-ubuntu-workspace-final-39385567905-1.zip",
+      "tested_commit": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "status": "PASS",
+      "checks": {
+        "file_hashes": 61,
+        "compressed_log_hashes": 29,
+        "raw_log_hashes": 29
+      },
+      "gates": 29,
+      "workspace": {
+        "result_groups": 236,
+        "passed": 1422,
+        "failed": 0,
+        "ignored": 1,
+        "ignored_lines": [
+          "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+        ]
+      },
+      "providers": {
+        "count": 49,
+        "target": "x86_64-unknown-linux-gnu",
+        "object": "ELF64 x86_64",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "basis": "Recorded provider headers and object identities in hash-verified acquisition"
+      },
+      "repeated_identical_log_records": [
+        "code-tree-identity"
+      ],
+      "code_tree_identity": "100644 blob e963f1a5ae5c3a2677f19ebf664e871f14ca6100\tCMakeLists.txt\n040000 tree a738989a3869ebe054024a8ac6dd49a96c485d7b\tluna-rs\n040000 tree 60cb194d21d570965980c092f4911db66e57827e\truntime\n040000 tree 30ed79cd973a64a3e66f8f18b6c86a0094b54ca4\ttests"
     }
   ],
   "errors": [],

@@ -1,9 +1,18 @@
 # Luna 0.1-alpha.1 — maintainer review handoff
 
-**SUPERSEDED FOR RELEASE —2026-10-20.** Eight-lane qualification at8525067f
-remains valid in its executed scope, but clean Windows package smoke fails on
-a different CPU. The [CPU baseline repair](../r5-cpu-baseline-2026-10-20/README.md)
-requires a new pin and complete requalification. The full goal remains active.
+**CURRENT REPLACEMENT STATUS — 2026-10-20:** `b5cb77c3` has 7/8 qualification
+lanes and seven ZIPs independently verified. Windows workspace final is running.
+Both clean package smokes PASS from `cd9cd188`, and the current PR merge-preview
+full workspace passes, including the closure control that failed once in an
+earlier run. Candidate remains `8525067f`, main `401a95a8`, and PR #7 remains a
+draft pending the final lane and complete archive reconciliation. See the
+[CPU baseline repair and current evidence](../r5-cpu-baseline-2026-10-20/README.md)
+and its [merge-preview replay record](../r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/pr-merge-preview-replay.json).
+
+**SUPERSEDED FOR RELEASE — 2026-10-20.** Eight-lane qualification at
+`8525067f` remains valid in its executed scope, but its clean Windows package
+smoke failed on a different CPU. The replacement pin must close all eight lanes
+and archive checks before release. The full goal remains active.
 
 Candidate/tested implementation: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
 Candidate fast-forwarded from `c085449b` without force.
