@@ -16,18 +16,18 @@ Start at [Luna 0.1 specification](docs/spec/0.1/README.md),
 and [document inventory](docs/documentation-index.md).
 
 The baseline retains defined contracts even where implementation is incomplete.
-**Qualification is complete in the adopted tested scope: READY FOR RELEASE REVIEW.**
-Implementation/candidate `8525067f` passes all eight hosted Windows GNU/Ubuntu GNU
-lanes and independent verification of all eight original ZIPs. Four complete
-workspaces each report 1421 passed / 0 failed / 1 ignored. Candidate advanced
-without force; main remains `401a95a8`. Protocol is **25/9/5/2**.
+**Release is blocked by a clean-package portability finding.**
+Pin `8525067f` completed eight hosted qualification lanes, but independent
+Windows package smoke rejects its sysroot on a different CPU (`generic` versus
+`znver3`). The [CPU baseline repair](docs/audits/r5-cpu-baseline-2026-10-20/README.md)
+preserves strict identity validation and selects a shared baseline for the two
+advertised targets. A replacement pin must qualify all eight lanes and both
+clean package smokes. Candidate remains `8525067f`; main remains `401a95a8`.
+Versions remain **25/9/5/2**. PR #7 stays draft; no tag or release is published.
 
-[Final report](docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md) ·
-[Requirements](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md) ·
-[Targets](docs/audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md) ·
-[Limits](docs/audits/r5-move-origin-2026-10-18/LIMITATIONS.md).
-PR/main/tag/publication and release-package clean-install smoke remain pending;
-qualification does not mean the full release goal is complete.
+The [previous qualification report](docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md)
+and original archives remain historical evidence. [Release authorization and scope](docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md)
+remain valid, conditional on the required passing gates.
 
 The [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)
 and later [R5 historical qualification](docs/audits/r5-final-2026-10-16/REPORT-R5-QUALIFICATION-2026-10-16.md)

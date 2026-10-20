@@ -1,0 +1,20 @@
+[
+  {
+    "raw_name": "artifact-target-after.log",
+    "raw_sha256": "9c8aa8d5796e26b7ee902b68e13fb314fd8c153ff7fb5e52867e07a426455a03",
+    "archive": "artifact-target-after.log.gz",
+    "archive_sha256": "e4138a81566001f51dc95c5e499051950d56693738d60ba9a36fea8f11938e06"
+  },
+  {
+    "raw_name": "baseline-after.log",
+    "raw_sha256": "5961b9e25d300fe01b8c2c919b961ca3a5dbdfc57af5b140b623adba6ffb3cc8",
+    "archive": "baseline-after.log.gz",
+    "archive_sha256": "3527df780ae524981a09d073d1d9d440eb39251df9acef8442c47132fe4348ec"
+  },
+  {
+    "raw_name": "baseline-before.log",
+    "raw_sha256": "aec155d7db35d972ca1559cd2036fe8ca948197f621aae970d15244f9b0b8ab4",
+    "archive": "baseline-before.log.gz",
+    "archive_sha256": "3d5fbf1a15b3cce73195335a17e67abe8edb1fb3eb55159c98812bf607ada72d"
+  }
+]

@@ -232,6 +232,18 @@ mod tests {
     use super::*;
 
     #[test]
+    fn default_release_contract_uses_a_machine_independent_cpu_baseline() {
+        let config = TargetConfig::default();
+        if crate::target_matrix::canonical_supported_target(&config.triple).is_some() {
+            assert_eq!(config.cpu, "generic");
+            assert!(config.features.is_empty());
+            let contract = config.target_contract().unwrap();
+            assert_eq!(contract.cpu, "generic");
+            assert!(contract.features.is_empty());
+        }
+    }
+
+    #[test]
     fn contracts_follow_llvm_platform_and_pointer_layout() {
         for (triple, format, width) in [
             ("x86_64-pc-windows-gnu", "COFF", 64),

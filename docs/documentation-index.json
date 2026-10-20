@@ -460,6 +460,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/r5-cpu-baseline-2026-10-20/README.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/r5-final-2026-10-16/REPORT-R5-QUALIFICATION-2026-10-16.md",
     "role": "evidence",
     "owner": "conformance"

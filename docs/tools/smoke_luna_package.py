@@ -68,6 +68,7 @@ def main():
         assert len(list(external.rglob('*.llib'))) == len(list(external.rglob('*.obj'))) == 49
         assert not list(external.rglob('*.ln')) and not list(external.rglob('*.ms'))
         for provider in manifest['providers']:
+            assert provider['cpu'] == 'generic' and provider['features'] == ''
             lib = external / (provider['path'] + '.llib')
             obj = external / (provider['path'] + '.obj')
             raw = lib.read_bytes()
@@ -97,6 +98,8 @@ def main():
 
         version = run('version', [cli, '--version'])
         assert version.stdout.decode().strip() == manifest['cli_version'] == 'luna 0.1.0'
+        llvm_host = run('llvm-host', [Path(env['LLVM_HOME']) / 'bin' / ('llc.exe' if os.name == 'nt' else 'llc'), '--version'])
+        summary['consumer_llvm_host'] = llvm_host.stdout.decode('utf-8', errors='replace')
         for name in ('quickstart', 'stdlib'):
             fixture = programs / (name + '.ln')
             shutil.copyfile(package / 'examples' / fixture.name, fixture)

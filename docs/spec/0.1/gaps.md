@@ -13,18 +13,13 @@ V01-ARCH-02 is newly observed in the imported source, not the old audit.
 
 ## Current qualification — 2026-10-20
 
-Current qualification — 2026-10-20: **READY FOR RELEASE REVIEW** at
-`8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5` (tested implementation and candidate).
-All eight hosted Windows/Ubuntu lanes and original ZIPs are independently
-verified. Four full workspaces each report 1421/0/1. Diagnostic-origin,
-identity/order and declaration-location follow-ups are included at this pin.
-[Final report](../../audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md) ·
-[Requirements](../../audits/r5-move-origin-2026-10-18/REQUIREMENTS.md) ·
-[Targets](../../audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md) ·
-[Limits](../../audits/r5-move-origin-2026-10-18/LIMITATIONS.md).
-Publication and clean release-package smoke remain pending. This changes no
-normative contract, deferral authority or target scope. Earlier snapshots below
-remain dated evidence and do not describe the current qualification status.
+Current qualification — 2026-10-20: **RELEASE BLOCKED by package CPU identity drift**.
+The eight completed lanes at `8525067f` are preserved, but clean Windows package
+smoke fails on a different CPU. [Finding and baseline repair](../../audits/r5-cpu-baseline-2026-10-20/README.md).
+A new implementation pin must reacquire all eight lanes and clean package smoke
+on both hosts. Candidate remains `8525067f`; no merge/tag/publication occurred.
+Strict target identity validation and the adopted language contracts remain mandatory.
+Earlier qualification snapshots below retain their dated scopes.
 
 ## Prior reconciliation — 2026-10-14
 

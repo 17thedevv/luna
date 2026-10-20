@@ -1,0 +1,20 @@
+{
+  "command": [
+    "C:/Users/84387/.cargo/bin/cargo.exe",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "artifact_target_contract_cli",
+    "--",
+    "--nocapture"
+  ],
+  "exit": 0,
+  "seconds": 145.34948429999986,
+  "log": "artifact-target-after.log",
+  "log_sha256": "9c8aa8d5796e26b7ee902b68e13fb314fd8c153ff7fb5e52867e07a426455a03",
+  "scope": "Local preflight with reused native runtime, fresh CLI source/artifact roots; not exact-pin release qualification"
+}
