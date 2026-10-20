@@ -16,21 +16,23 @@ Start at [Luna 0.1 specification](docs/spec/0.1/README.md),
 and [document inventory](docs/documentation-index.md).
 
 The baseline retains defined contracts even where implementation is incomplete.
-**Release conformance is blocked**, not certified by historical FROZEN labels.
-Current qualification is tracked in the [move-origin repair report](docs/audits/r5-move-origin-2026-10-18/README.md)
-and its [replacement requirements](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md).
-Implementation `3a72f946` completed all eight release lanes, including full
-Windows/Ubuntu workspace triage/final (each 1414 passed, 0 failed, 1 ignored).
-Final review then found missing or obsolete antecedent spans in E3001 diagnostics
-across joins and reinitialization. Follow-up review also found message-based
-dedup and unstable multi-function diagnostic order. The generic repairs need a
-new pin and fresh qualification. Candidate remains `c085449b`.
-Protocol remains compiler/metadata/MVIR/format **25/9/5/2**.
+**Qualification is complete in the adopted tested scope: READY FOR RELEASE REVIEW.**
+Implementation/candidate `8525067f` passes all eight hosted Windows GNU/Ubuntu GNU
+lanes and independent verification of all eight original ZIPs. Four complete
+workspaces each report 1421 passed / 0 failed / 1 ignored. Candidate advanced
+without force; main remains `401a95a8`. Protocol is **25/9/5/2**.
+
+[Final report](docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md) ·
+[Requirements](docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md) ·
+[Targets](docs/audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md) ·
+[Limits](docs/audits/r5-move-origin-2026-10-18/LIMITATIONS.md).
+PR/main/tag/publication and release-package clean-install smoke remain pending;
+qualification does not mean the full release goal is complete.
 
 The [R4 release ledger](docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md)
 and later [R5 historical qualification](docs/audits/r5-final-2026-10-16/REPORT-R5-QUALIFICATION-2026-10-16.md)
 retain their exact tested scopes. Historical passes cannot certify a newer pin.
-See [current limitations](docs/audits/r5-missing-return-2026-10-17/RELEASE-HANDOFF.md)
+See [current limitations](docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md)
 and the [executable R5 checklist](docs/audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md).
 
 The historical [2026-10-02 audit](docs/audits/stdlib-2026-10-02/README.md) found compiler and

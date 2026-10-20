@@ -1,6 +1,11 @@
 # Kế hoạch hoàn tất Luna 0.1
 
-Ngày: 2026-10-18. Trạng thái: **ĐANG THỰC HIỆN / CHƯA ĐỦ ĐIỀU KIỆN PHÁT HÀNH**.
+Cập nhật 2026-10-20: **READY FOR RELEASE REVIEW tại `8525067f`**.
+Bước 1–4 đã đóng trong adopted tested scope: tám lane và tám ZIP được xác minh.
+Candidate đã fast-forward đến pin; bước 5 theo [closure report](REPORT-R5-QUALIFICATION-8525067f.md).
+Bước 6 còn pending: maintainer PR/main/tag/publication, build gói từ release commit
+đã xác minh, clean Windows/Ubuntu package smoke và closing record cuối.
+Goal đầy đủ vẫn active. Phần dưới giữ kế hoạch và baseline ngày 2026-10-18.
 
 Kế hoạch này tiếp nối [kế hoạch hoàn tất gốc](../0.1-alpha-completion-2026-10-04/README.md),
 [ledger R4](../0.1-alpha-completion-2026-10-04/r4/README.md) và

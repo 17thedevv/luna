@@ -1,77 +1,43 @@
-# Replacement qualification requirements
+# Luna 0.1 replacement qualification requirements — closure
 
-The original [R5 checklist](../0.1-alpha-completion-2026-10-04/r4/r5-checklist.md)
-and [full completion matrix](../r5-linux-native-link-2026-10-18/REQUIREMENTS.md)
-retain their scope. This replacement must reacquire all eight lanes after the
-move-origin and diagnostic identity/order repairs; no historical PASS substitutes for a new-pin result.
+**2026-10-20: READY FOR RELEASE REVIEW.** Tested implementation and candidate:
+`8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
+The [original checklist](../0.1-alpha-completion-2026-10-04/r4/r5-checklist.md),
+[completion scope](../r5-linux-native-link-2026-10-18/REQUIREMENTS.md) and
+[remaining plan](REMAINING-PLAN.md) retain their requirements.
 
-| Required evidence | Current status |
-| --- | --- |
-| Ubuntu normal: native build/runtime/49 providers, focused/diagnostics, target, docs and quickstart | PENDING NEW PIN |
-| Ubuntu sanitized C runtime ABI and partial-read cleanup | PENDING NEW PIN |
-| Ubuntu comptime/VM/layout boundary, with characterizations separate | PENDING NEW PIN |
-| Ubuntu full workspace no-fail-fast triage | PENDING NEW PIN |
-| Ubuntu full workspace default-parallel final after triage | PENDING NEW PIN |
-| Windows native normal: build/runtime/49 providers, 12 focused batches, diagnostics, docs, quickstart, comptime and strict L002 replay | PENDING NEW PIN |
-| Windows full workspace no-fail-fast triage | PENDING NEW PIN |
-| Windows full workspace default-parallel final after triage | PENDING NEW PIN |
-| Diagnostic provenance | New CLI reducers for nested/equal-state/loop joins, field reinitialization, compacted fields and imported generic artifacts; exact primary/related lines, repeated checks, build parity and native valid controls |
-| Diagnostic identity/order | Distinct identical-wording E3002 events; source order across multiple functions and independent check processes; check/build and source/artifact parity; structural-cause union and idempotence |
-| Internal dataflow | Predecessor permutations, origin-only convergence, compacted field provenance and subtree invalidation; affected borrowck regressions |
-| DIAG-1..10 final review | Preserve typed identities, primary/structural related spans, poison, deterministic identity, phase admission and the 72-code inventory; eight reserved and four non-portable fixture limits stay explicit |
-| Final closure | Verify every archive/hash/exit/target/mode, reconcile public docs and ledger, then fast-forward candidate only after all requirements pass |
-| Maintainer decision | Tag, main merge, PR creation and publication remain reserved; deliver a concrete qualified handoff first |
-
-Previous implementation `3a72f946` completed all eight lanes, including four
-workspace passes of 1414/0/1, but failed final diagnostic-origin review. Its
-complete [evidence](../r5-linux-native-link-2026-10-18/README.md) is historical.
-Candidate remains `c085449b` until the replacement qualifies.
-
-## Integration closure (2026-10-18)
-
-Two repair lines existed and were integrated before qualification, so the eight
-lanes below run once at a single implementation SHA:
-
-| Line | Content | Status |
+| Requirement | Implementation/regression and exact-pin evidence | Verdict |
 | --- | --- | --- |
-| `r5-diag-repair` (base `5d20e571`) | DIAG-1..10 repair wave, canonical target selection (`canonical_supported_target`), typed comptime `E4002`/`E4003`, `run` no longer reclassifies compiler diagnostics as `E6009`, per-code coverage suite | verified end-to-end at `c085449b` (candidate) |
-| `r5-missing-return` (`ce886d09`) | duplicate-definition/candidate handling, language-item and coherence ownership, symbol/registry identity, semantic-table and metadata anchors, declaration location CLI suite + fixtures | local preflight only (reused runtime, no fresh clone) |
+| R5-PIN | All eight ZIPs: fresh remote clone/detach, exact pin, clean initial/final state, recorded tools and source-tree objects matched against Git | PASS |
+| R5-BUILD | Both native hosts: runtime ABI, debug/release CLI, official 49-provider rebuild; versions 25/9/5/2; canonical native object/header identities | PASS |
+| R5-FOCUSED | Ownership/drop/async, casts/views, calls/defaults, traits/comptime, provider/module/retained contracts, arithmetic/grammar, formatting/Unicode, artifact target, registry and I/O named gates; source/fresh-artifact controls preserved | PASS |
+| DIAG-1 | Typed CLI/Driver and comptime identities; run retains original compile code; per-code coverage and compiler trust regression | PASS IN REVIEWED SCOPE |
+| DIAG-2/3 | Real declaration/composite-expression anchors; previous-definition, impl/candidate, import and language-item locations; source-anchor policy and structural labels. Declaration-location suite passes all four complete workspaces and local focused acquisition | PASS IN REVIEWED SCOPE |
+| DIAG-4/6 | Typed source-event identity; structural cause union; public source ordering; identical-wording distinct events and independent multi-function CLI processes; common identity/idempotence regressions | PASS IN REVIEWED SCOPE |
+| DIAG-5 | Error-type poison consumers and visible-root cascade suppression; cast_poison_cli, comptime_diagnostic_cascade_cli, diagnostic_conformance_cli | PASS IN REVIEWED SCOPE |
+| DIAG-7/8/10 | 72-code identity/span policy, typed phase ownership and exact registry parity; inventory64 produced/8 reserved/4 declared fixture limits/debt 0 with reasons | PASS WITH DECLARED LIMITS |
+| DIAG-9/internal dataflow | Nested/equal-state/loop joins, origin-only convergence, predecessor permutations, reinitialization and compacted-field causes; check/build and source/artifact negatives plus native controls | PASS |
+| E3004 | Missing-return negatives reject before executable publication with spanned E3004; valid return/loop controls execute in both provider modes | PASS; earlier no-producer claim RETRACTED |
+| Native Linux math linkage | Generic linker suffix plus independent FFI parity; five unchanged regressions across three driver suites (19 tests) | PASS |
+| Arithmetic/bounds | Checked/wrapping signature assertions L003/L005; hosted strict bounds debug/release x source/artifact, L002 index 3 length 2 in every stderr | PASS |
+| R5-COMPTIME-LIMITS | Each host88 PASS/0 FAIL/8 characterized; layout/VM/static/runtime controls; standalone statement rejection; characterization kept separate | PASS IN NAMED GNU64 SCOPE |
+| R5-TARGET-WINDOWS | Hosted normal plus triage/final; GNU LLIB/COFF 0x8664; native ABI/I/O/format/Unicode/parity | PASS |
+| R5-TARGET-UBUNTU | Native canonical x86_64-unknown-linux-gnu/ELF64; normal48 gate records plus triage/final | PASS |
+| R5-ASAN-UBUNTU | 19 gates; libasan.so.8; partial-read cleanup executes; RuntimeAbiTests 100%; no sanitizer/leak report | PASS IN C RUNTIME SCOPE |
+| R5-DOCS | Native example gates:14 contract rows plus2 legacy characterizations; docs validator and native quickstart; current public docs/site regenerated separately | PASS |
+| R5-FULL Windows | Triage --no-fail-fast then default-parallel final; each 236 groups,1421 passed/0 failed/1 ignored, exit 0 | PASS |
+| R5-FULL Ubuntu | Triage --no-fail-fast then default-parallel final; each 236 groups,1421/0/1, exit 0 | PASS |
+| R5-REVIEW | [Source/evidence reconciliation](evidence/pin-8525067f/closure-review.json); [eight original ZIPs, metadata and independent verification](evidence/pin-8525067f/all-artifact-verification.json); no unresolved finding in reviewed adopted scope | COMPLETE IN TESTED SCOPE |
+| Candidate advancement | Remote candidate fast-forwarded c085449b→8525067f without force; main unchanged | DONE |
+| Maintainer handoff | [Concrete proposal](RELEASE-HANDOFF.md), [report](REPORT-R5-QUALIFICATION-8525067f.md), [targets](TARGET-MATRIX.md), [limits](LIMITATIONS.md), [ledger](evidence/pin-8525067f/lane-state.json) | READY FOR REVIEW |
+| Full release | Maintainer PR/main/tag/publication; packages from verified release commit, clean Windows/Ubuntu package smoke and final asset/tag reconciliation | PENDING; goal remains active |
 
-Integration is the merge commit `8525067f` on `r5-diag-repair` (clean merge, no
-conflicts). Verified on the merged tree: `cargo check` clean;
-`diagnostic_declaration_locations_cli` 3/3; per-code coverage suite;
-`luna-common` 15 (registry parity + per-code identity/span policy);
-`luna-semantic` 27.
+Ignored test in each workspace:
+`mutable_references::sem_mutref_06_invalid_fixture`.
+Original failures, superseded pins and local interruptions remain historical.
+No prior-pin PASS, arbitrary crash, timeout or missing DLL is accepted.
+No new semantic freeze, target expansion or blanket API certification follows.
 
-**Retraction (E3004).** The DIAG-7 coverage work recorded "E3004 has no
-producer: a non-void body that can fall through is accepted". That was an
-artifact of the divergent base, not a compiler defect: a probe at the integrated
-tree reports `E3004` for both `fn f() -> i32 { }` and a declaration-only body,
-`missing_return_cli.rs` covers it, and the producer inventory now records
-`E3004` as produced with an anchored producer
-(`luna-borrowck/src/return_analysis.rs`) plus automated coverage. The corrected
-inventory is produced 64 / reserved 8 / unreachable-in-test 4 / coverage debt 0,
-where the four declared limits are `E3007`, `E6002`, `E6003`, `E6009` with their
-reasons.
-
-**Diagnostic provenance and identity/order** requirements are closed by the
-integrated suites: declaration locations (`E1002`, `E2001`, `E2005`, `E2006`,
-`E2019` with structural related labels and repeated-check idempotence), the
-comptime codes, the per-code identity/span-policy contract test and the 72-code
-inventory that the diagnostics lane re-verifies.
-
-## Lane acquisition at the integrated pin
-
-| Lane | Where | Evidence |
-| --- | --- | --- |
-| Windows native normal | local exact-pin runner | `D:/r5-8525067f/windows/events.jsonl` |
-| Windows workspace triage / final | local exact-pin runner | same runner, `workspace-*` labels |
-| Ubuntu normal / runtime-asan / comptime-vm / workspace triage / workspace final | CI workflow run 23 (`aa3ed8ab` → tested `8525067f`) | artifacts `r5-ubuntu-*` |
-
-The focused diagnostics batch in every lane now includes
-`diagnostic_declaration_locations_cli`, `missing_return_cli` and
-`diag_per_code_coverage_cli`, so identity, spans and declaration coverage are
-gated together at the pin.
-
-No PASS is carried from any earlier pin; the candidate moves only after all
-eight lanes pass at `8525067f`.
+Hosted focused diagnostics includes per-code, missing-return and move-origin
+suites. It does not separately select declaration-location; that suite runs
+in all complete workspaces. This corrects earlier wording about every focused batch.

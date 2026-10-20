@@ -1,69 +1,136 @@
 {
-  "task": "Luna 0.1 completion — exact-pin lane ledger",
+  "task": "Luna 0.1 completion \u00e2\u20ac\u201d exact-pin lane ledger",
   "tested_implementation_pin": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
   "implementation_branch": "r5-diag-repair",
   "harness_commit": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
-  "versions": { "compiler": 25, "metadata": 9, "mvir": 5, "format": 2 },
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
   "candidate": {
     "ref": "luna-0.1-alpha.1-candidate",
-    "sha": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
-    "note": "not advanced; fast-forward happens only after all eight lanes pass at the tested pin"
+    "sha": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+    "note": "Fast-forwarded without force after all eight exact-pin lanes and all eight ZIP archives passed independent verification. Remote verified 2026-10-20."
   },
   "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
   "lanes": [
     {
       "lane": "Windows native normal",
-      "where": "local exact-pin runner D:/r5-8525067f/windows (evidence kept) and hosted CI run 39276394971 job 118141683149 (authoritative acquisition)",
-      "status": "PASS_IN_EXECUTED_SCOPE (local) + CI_REACQUIRING",
+      "where": "CI run 39276394971 job 118141683149",
+      "status": "PASS_IN_EXECUTED_SCOPE",
       "evidence": {
         "build": "build-summary.json status PASS (runtime ABI, debug+release CLI, 49 providers, target x86_64-pc-windows-gnu)",
-        "focused": "focused-summary.json status PASS, 12/12 batches exit 0 (includes diagnostics batch with declaration-location, missing-return and per-code coverage suites)",
+        "focused": "12/12 batches exit0; hosted diagnostics includes per-code, missing-return and move-origin suites. Declaration-location suite passes in both complete workspace runs; local focused acquisition additionally ran it.",
         "diagnostics": "diagnostics-summary.json status PASS",
         "quickstart": "quickstart.json status PASS",
-        "comptime": "comptime/qualification2.json exit 0 (first attempt failed on a stale nested-harness pin and is preserved as a tooling attempt)",
-        "strict_l002_replay": "docs/audits/r5-move-origin-2026-10-18/evidence/pin-8525067f/strict-bounds/summary.json 4/4 PASS (debug/release x source/artifact, trap signature L002 index 3 length 2, native exit 3)"
-      }
+        "comptime": "88 PASS / 0 FAIL / 8 CHARACTERIZED in hosted normal archive",
+        "strict_l002_replay": "Hosted archive strict-bounds/summary.json: debug/release x source/artifact 4/4; L002 index3 length2; native exit 3221226505 accompanied by the required Luna signature (local replay exit3 is separate evidence)."
+      },
+      "url": "https://github.com/17thedevv/luna/actions/runs/39276394971/job/118141683149",
+      "artifact_verification": "all-artifact-verification.json"
     },
     {
       "lane": "Windows workspace triage",
-      "where": "hosted CI run 39276394971 job 118141682645",
-      "status": "CI_RUNNING",
-      "note": "three local attempts were interrupted by host-session ends (preserved under interrupted/ with records, never counted as evidence); a stale PDB set then caused LNK1207 and was cleared. The lane now runs on the hosted runner so it is independent of the agent session."
+      "where": "CI run 39276394971 job 118141682645",
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "note": "three local attempts were interrupted by host-session ends (preserved under interrupted/ with records, never counted as evidence); a stale PDB set then caused LNK1207 and was cleared. The lane now runs on the hosted runner so it is independent of the agent session.",
+      "url": "https://github.com/17thedevv/luna/actions/runs/39276394971/job/118141682645",
+      "artifact_verification": "all-artifact-verification.json",
+      "evidence": {
+        "passed": 1421,
+        "failed": 0,
+        "ignored": 1,
+        "result_groups": 236,
+        "exit": 0,
+        "ignored_test": "mutable_references::sem_mutref_06_invalid_fixture"
+      }
     },
     {
       "lane": "Windows workspace final",
-      "where": "hosted CI run 39276394971 (needs triage)",
-      "status": "SCHEDULED_AFTER_TRIAGE"
+      "where": "CI run 39276394971 job 118243423793",
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "url": "https://github.com/17thedevv/luna/actions/runs/39276394971/job/118243423793",
+      "artifact_verification": "all-artifact-verification.json",
+      "evidence": {
+        "passed": 1421,
+        "failed": 0,
+        "ignored": 1,
+        "result_groups": 236,
+        "exit": 0,
+        "ignored_test": "mutable_references::sem_mutref_06_invalid_fixture"
+      }
     },
     {
       "lane": "Ubuntu normal",
       "where": "CI run 23 job 117679870941",
-      "status": "PASS",
-      "evidence": { "conclusion": "success", "started": "2026-10-18T12:49:55Z", "completed": "2026-10-18T14:38:08Z" }
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "evidence": {
+        "conclusion": "success",
+        "started": "2026-10-18T12:49:55Z",
+        "completed": "2026-10-18T14:38:08Z"
+      },
+      "run_id": 39128925234,
+      "artifact_verification": "all-artifact-verification.json"
     },
     {
       "lane": "Ubuntu runtime ASan",
       "where": "CI run 23 job 117679870857",
-      "status": "PASS",
-      "evidence": { "conclusion": "success", "started": "2026-10-18T12:49:54Z", "completed": "2026-10-18T12:50:41Z" }
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "evidence": {
+        "conclusion": "success",
+        "started": "2026-10-18T12:49:54Z",
+        "completed": "2026-10-18T12:50:41Z"
+      },
+      "run_id": 39128925234,
+      "artifact_verification": "all-artifact-verification.json"
     },
     {
       "lane": "Ubuntu comptime/VM",
       "where": "CI run 23 job 117679870976",
-      "status": "PASS",
-      "evidence": { "conclusion": "success", "started": "2026-10-18T12:49:55Z", "completed": "2026-10-18T12:54:39Z" }
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "evidence": {
+        "conclusion": "success",
+        "started": "2026-10-18T12:49:55Z",
+        "completed": "2026-10-18T12:54:39Z"
+      },
+      "run_id": 39128925234,
+      "artifact_verification": "all-artifact-verification.json"
     },
     {
       "lane": "Ubuntu workspace triage",
       "where": "CI run 23 job 117679870999",
-      "status": "PASS",
-      "evidence": { "conclusion": "success" }
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "evidence": {
+        "conclusion": "success",
+        "passed": 1421,
+        "failed": 0,
+        "ignored": 1,
+        "result_groups": 236,
+        "exit": 0,
+        "ignored_test": "mutable_references::sem_mutref_06_invalid_fixture"
+      },
+      "run_id": 39128925234,
+      "artifact_verification": "all-artifact-verification.json"
     },
     {
       "lane": "Ubuntu workspace final",
       "where": "CI run 23 job 117720597415 (needs triage)",
-      "status": "PASS",
-      "evidence": { "conclusion": "success", "started": "2026-10-18T15:57:58Z", "completed": "2026-10-18T19:05:54Z" }
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "evidence": {
+        "conclusion": "success",
+        "started": "2026-10-18T15:57:58Z",
+        "completed": "2026-10-18T19:05:54Z",
+        "passed": 1421,
+        "failed": 0,
+        "ignored": 1,
+        "result_groups": 236,
+        "exit": 0,
+        "ignored_test": "mutable_references::sem_mutref_06_invalid_fixture"
+      },
+      "run_id": 39128925234,
+      "artifact_verification": "all-artifact-verification.json"
     }
   ],
   "additional_repo_workflows_at_pin": {
@@ -74,13 +141,21 @@
     "Runtime partial-read cleanup (Ubuntu + ASan)": "success"
   },
   "artifact_verification": {
-    "local_lane_digests": "docs/tools/verify_lane_evidence.py: 19 digests recomputed, 0 mismatched, 0 missing",
-    "ci_artifacts": "PENDING: CI artifact ZIP digests require an authenticated download"
+    "ci_artifacts": "PASS: eight exact ZIP byte streams retained in archives/; SHA-256/size/CRC, clean exact pin, source trees, gate exits and recorded log hashes independently checked",
+    "manifest": "ci-artifact-manifest.json",
+    "verification": "all-artifact-verification.json",
+    "review": "closure-review.json",
+    "local_lane_digests": "38 recorded log/archive digests checked, zero mismatch/missing; five interrupted records excluded; nonzero historical tooling attempt is not PASS"
   },
   "open_items": [
-    "Windows workspace triage + final re-run at the tested pin",
-    "CI artifact ZIP digest verification (needs authenticated download)",
-    "candidate fast-forward after the lanes close",
-    "maintainer release actions (tag, main merge, PR, package smoke) remain reserved"
-  ]
+    "Maintainer chooses PR/main/tag/publication and release identity",
+    "Build release packages from the selected verified release commit, then clean Windows/Ubuntu package smoke; verify assets/checksums/tag and final closing record"
+  ],
+  "date": "2026-10-20",
+  "status": "READY_FOR_RELEASE_REVIEW",
+  "candidate_before": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+  "harness_commits": {
+    "ubuntu": "aa3ed8abc2f9001e35530ca3ed473191c40a80ac",
+    "windows": "896876d8694a4010d4f050187afe0af774b2b4a7"
+  }
 }

@@ -1,14 +1,19 @@
 # R5 move-origin joins
 
-Current checkpoint — 2026-10-18: all eight d3d0ffe8 CI jobs have completed
-successfully, but that pin is superseded by confirmed DIAG-2/3 findings.
-Current uncommitted repairs pass 214 local preflight tests, with
-[archived logs and hashes](evidence/declaration-preflight.json). No replacement
-qualification pin is selected. The
-[remaining completion plan](REMAINING-PLAN.md) defines the ordered work and
-acceptance criteria through maintainer release and clean-package smoke.
+Current qualification — 2026-10-20: **READY FOR RELEASE REVIEW** at tested
+implementation/candidate `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
+All eight hosted lanes and all eight original ZIPs are independently verified.
+Four full workspaces each report 1421 passed / 0 failed / 1 ignored.
+Candidate fast-forwarded without force; main remains `401a95a8`.
 
-Status: compiler repair under validation; candidate remains `c085449b`.
+[Closure report](REPORT-R5-QUALIFICATION-8525067f.md) ·
+[Requirements](REQUIREMENTS.md) · [Target matrix](TARGET-MATRIX.md) ·
+[Limitations](LIMITATIONS.md) · [Maintainer handoff](RELEASE-HANDOFF.md).
+Release packages, clean-package smoke, PR/main/tag/publication remain pending;
+the full goal is not complete. The [remaining plan](REMAINING-PLAN.md) retains
+that scope. Historical repair/acquisition checkpoints follow.
+
+## Historical repair checkpoints
 
 All eight release lanes passed at implementation `3a72f946`, including full
 workspace triage/final on both Windows and Ubuntu (each 1414 passed, 0 failed,

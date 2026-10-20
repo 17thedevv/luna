@@ -1,0 +1,134 @@
+{
+  "date": "2026-10-20",
+  "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "review_base": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+  "status": "COMPLETE_IN_TESTED_ADOPTED_SCOPE",
+  "scope": "Final reconciliation of inherited R5 checklist, integrated repair delta and eight exact-pin evidence archives; not universal API/domain, sanitizer or language freeze certification.",
+  "diag_invariants": [
+    {
+      "id": "DIAG-1",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "Typed CLI and Driver errors; run retains originating compile diagnostics. Typed comptime variants map step limits to E4002 and escapes to E4003.",
+      "regressions": "diag_per_code_coverage_cli; p2a_tests; diagnostic_conformance_cli"
+    },
+    {
+      "id": "DIAG-2",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "Source constructors carry real anchors; render boundaries enforce source-anchor policy. Provider/manifest-contract diagnostics are declared separately; bare-return and composite-expression anchors retained.",
+      "regressions": "diagnostic_declaration_locations_cli; expression_span_precision_cli; source_diagnostics_are_anchored_or_declared_contract_diagnostics"
+    },
+    {
+      "id": "DIAG-3",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "Symbols, fields, variants, import bindings, language items, impl/coherence and candidate paths preserve prior/candidate spans as structural labels. Move/loan antecedents remain structural.",
+      "regressions": "diagnostic_declaration_locations_cli; diagnostic_conformance_cli; move_origin_join_cli"
+    },
+    {
+      "id": "DIAG-4",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "Identity is code and primary span, independent of wording. Distinct identical-wording events survive; normalized duplicates retain structural cause union.",
+      "regressions": "diagnostic identity/normalization common tests; move_origin_join_cli"
+    },
+    {
+      "id": "DIAG-5",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "Error-type poison propagation and visible-root cascade suppression remain guarded; no blanket downstream suppression.",
+      "regressions": "cast_poison_cli; comptime_diagnostic_cascade_cli; diagnostic_conformance_cli"
+    },
+    {
+      "id": "DIAG-6",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "Public Driver boundaries normalize by source path/range/code; move provenance converges independently of ownership state and joins under deterministic origin selection.",
+      "regressions": "normalization idempotence; origin_join_is_order_independent_and_reaches_a_fixed_point; multi-process move_origin_join_cli"
+    },
+    {
+      "id": "DIAG-7",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "72-code identity/span policy, producer and behavioral-reference inventory checked. 64 produced; 8 reserved without producers; 4 produced conditions lack portable fixture triggers, with reasons; undeclared coverage debt zero.",
+      "regressions": "every_registered_code_declares_its_identity_and_span_policy; diag_per_code_coverage_cli; diag_producer_inventory.py --check"
+    },
+    {
+      "id": "DIAG-8",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "Codes retain one declared owner. Resolver and TypeChecker constructors own cross-stage requests; phase checks reject wrong construction. Infrastructure owns compiler invariant errors.",
+      "regressions": "phase_partitions_match_every_registry_owner; compiler_trust_diagnostics_cli_parity; semantic/coherence/registration tests"
+    },
+    {
+      "id": "DIAG-9",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "Origins survive equal/different-state joins and origin-only fixed points; actual reinitialization invalidates stale subtree origins while compaction preserves valid field causes. Loans retain conflict sites.",
+      "regressions": "move_origin_join_cli; internal origin_join_tests; diagnostic_conformance_cli"
+    },
+    {
+      "id": "DIAG-10",
+      "status": "VERIFIED_IN_REVIEWED_SCOPE",
+      "source_observation": "72 numerical discriminants, strings and documented owners retain exact registry parity. No protocol number changes in the repair delta.",
+      "regressions": "registry_parity; format.rs constants25/9/5/2"
+    }
+  ],
+  "source_git_blob_sha256": {
+    "luna-rs/crates/luna-common/src/diagnostic.rs": "498fdb3b89e29842da245785cdf18099b077ffb5235f6bb5e08fa8c9d9011d20",
+    "luna-rs/crates/luna-borrowck/src/move_analysis.rs": "22e2ea5d7c119d241d6882f4ff59f35d80d52e7d167518daa07490cd143e9f1e",
+    "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs": "53c4439d3d1230438c8bc93f3274763b6487009d588a5b678928489b0cc0bcf9",
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": "ca560f0404174c0f23cecb685c4ea55f7b6961790629979821bc3def1fbfab5b",
+    "luna-rs/crates/luna-semantic/src/symbol.rs": "90dee0a23b4ee6470fecf848ad32e14ab6e124b082c5f90fbbc403b54234c037",
+    "luna-rs/crates/luna-semantic/src/coherence.rs": "f1e34cb8a0ce4f98d4a26ac8af31f083fef3a172e0c239c50d466f5c912dca0e",
+    "luna-rs/crates/luna-semantic/src/lang_item.rs": "23e405283f620dcfe1f32284e17fc4cac2c56f49bf8a9b3c1326978c75ed1abf",
+    "luna-rs/crates/luna-semantic/src/resolver.rs": "387da22d6a43ed181c12c45ed9bb1ba6d3b2fe1fc7893eb24de6ebd30ccb90da",
+    "luna-rs/crates/luna-semantic/src/comptime/value.rs": "0482db9b33a4ad85f11a78e8f8553529f8ff00f5bf75a16891294f941a3bdd59",
+    "luna-rs/crates/luna-driver/src/lib.rs": "975ce8868f9c8732f6c47efa5411d9302d896de0147e22f7765212766f2c98f9",
+    "luna-rs/crates/luna-driver/src/metadata_decoder.rs": "6e6eeea24a83adb9e4fa01ab9e98e2f2fdb4c1bf2bed69fcc8408dbe24006c8b",
+    "luna-rs/crates/luna-driver/src/registry.rs": "5dfb77d9516f4291c68da689bde0008226b4880298019ff0ec3cc87884dee047",
+    "luna-rs/crates/luna-mvir/src/generator.rs": "7435af1ee1b08a32f8ad450f57efa550e3521180326298b7cebf72a09e51870b",
+    "luna-rs/crates/luna-borrowck/src/return_analysis.rs": "67bc0037597769721df29f6beb0d0aad4a16fdead0234c6eded493c141119244",
+    "luna-rs/crates/luna-backend/src/linker.rs": "bffc750935bd7db9cd615c6ac33f8e1a152416f16760b9177a55a1e365f0d4e6",
+    "luna-rs/crates/luna-cli/src/main.rs": "fca496dec6bb5698ff1184fc8c30eaee53cf00e43fc89a4a81bb51fc39a7a369"
+  },
+  "artifact_verification": "all-artifact-verification.json",
+  "asan": {
+    "instrumentation": "libasan.so.8",
+    "partial_read_cleanup": "PASS",
+    "ctest": "100% tests passed",
+    "sanitizer_errors": 0,
+    "scope": "C runtime and RuntimeAbiTests only"
+  },
+  "comptime": {
+    "windows": {
+      "passed": 88,
+      "failed": 0,
+      "characterized": 8
+    },
+    "ubuntu": {
+      "passed": 88,
+      "failed": 0,
+      "characterized": 8
+    }
+  },
+  "verifier_rejection_controls": [
+    "ZIP digest tampering",
+    "wrong Ubuntu pin",
+    "wrong Windows pin",
+    "inventory member tampering",
+    "raw Windows log hash mismatch",
+    "falsified workspace total"
+  ],
+  "unresolved_findings_in_reviewed_scope": [],
+  "known_limits": [
+    "Eight reserved diagnostic codes; four produced codes without portable behavioral fixture triggers (see inventory reasons)",
+    "Standalone comptime statements unsupported; eight final-if probes characterized, not conformance",
+    "64-bit GNU layout scope; C runtime ASan only",
+    "C4-FU1 precision and D1-FU1 presentation deferred by maintainer; V01-DESIGN-04 formal grammar/document debt remains declared",
+    "No blanket provider API, performance, fuzzing or unadvertised-target claim"
+  ],
+  "remaining": [
+    "Maintainer PR/main/tag/publication and release identity decision",
+    "Release-package build and clean Windows/Ubuntu package smoke from the chosen verified release commit",
+    "Final tag/assets/checksum/release-note reconciliation"
+  ],
+  "introducing_commits": {
+    "move_origins": "67146195fb025951ca51d54365fd3a47ef9544e6",
+    "identity_order": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+    "declaration_locations": "ce886d09dd0607ce1e42f548d6a5226662569fae",
+    "integration": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5"
+  }
+}

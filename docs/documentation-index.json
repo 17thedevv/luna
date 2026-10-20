@@ -490,7 +490,17 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/r5-move-origin-2026-10-18/LIMITATIONS.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/r5-move-origin-2026-10-18/README.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md",
     "role": "evidence",
     "owner": "conformance"
   },
@@ -500,7 +510,17 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/audits/r5-move-origin-2026-10-18/REQUIREMENTS.md",
+    "role": "evidence",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/audits/r5-move-origin-2026-10-18/TARGET-MATRIX.md",
     "role": "evidence",
     "owner": "conformance"
   },
