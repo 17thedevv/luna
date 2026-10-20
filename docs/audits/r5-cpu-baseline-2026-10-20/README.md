@@ -1,16 +1,17 @@
 # R5 release-package CPU baseline repair
 
-Date: 2026-10-20. **All eight replacement qualification lanes and ZIP archives
-are verified.** Candidate remains `8525067f`; main remains `401a95a8`; PR #7 is
-draft while the authorized merge and release steps are completed. The tested
-implementation pin is `b5cb77c3`, and the packaged source is `cd9cd188`.
+Date: 2026-10-20. **Luna 0.1.0-alpha.1 is published as a prerelease.** All eight
+replacement qualification lanes and ZIP archives are verified. Candidate is
+`b5cb77c3`; main includes merge commit `97422d2c`; PR #7 is merged. The annotated
+tag points to the exact packaged source `cd9cd188`, whose implementation trees
+match tested pin `b5cb77c3`.
 The [complete archive manifest and verification](evidence/pin-b5cb77c3/ci-artifact-manifest.json)
 and [eight-lane reconciliation](evidence/pin-b5cb77c3/all-artifact-verification.json)
 record all eight digest-matched archives, including the final Windows workspace
 [job 118589976770](https://github.com/17thedevv/luna/actions/runs/39385567963/job/118589976770).
-Both clean Windows and Ubuntu package smokes PASS at source `cd9cd188`, whose
-implementation trees match the replacement pin. Maintainer authorization for
-`v0.1.0-alpha.1` remains active after the qualification gates close.
+Both clean Windows and Ubuntu package smokes PASS. The published [release](https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1)
+contains both verified ZIPs and `SHA256SUMS`; each downloaded asset was checked
+against its GitHub digest and the package checksums. See [release closure](release-closure.json).
 
 ## Confirmed finding
 
@@ -104,6 +105,11 @@ on `alderlake`, using only its packaged runtime/providers after relocation.
 Its CI builder reported `znver3`. This local check is separate from the two
 required hosted smokes and does not replace qualification. The prior failed
 Windows package remains historical failure evidence.
+
+The [release closure record](release-closure.json) ties the 8/8 qualification,
+fast-forwarded candidate, merged PR #7, annotated tag, main merge commit and
+published assets together. The tag identifies the tested package source commit;
+the main merge commit contains that tag target as an ancestor.
 
 Compiler Change
 
