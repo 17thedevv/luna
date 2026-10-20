@@ -31,6 +31,30 @@ pub struct LlibReader;
 pub type MlibReader = LlibReader;
 
 #[cfg(test)]
+mod mvir_wire_regression_tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn heap_free_decodes_at_writer_opcode_17() {
+        // writer.rs emits HeapFree as: opcode 17, Value operand tag 0, u32 id.
+        let mut bytes = Cursor::new(vec![17, 0, 7, 0, 0, 0]);
+        let instruction = LlibReader::deserialize_instruction(&mut bytes).unwrap();
+        assert!(matches!(
+            instruction,
+            MlibInstruction::HeapFree { value: MlibOperand::Value(7) }
+        ));
+        assert_eq!(bytes.position(), 6);
+    }
+
+    #[test]
+    fn stale_heap_free_opcode_15_is_not_accepted() {
+        let mut bytes = Cursor::new(vec![15, 0, 7, 0, 0, 0]);
+        assert!(LlibReader::deserialize_instruction(&mut bytes).is_err());
+    }
+}
+
+#[cfg(test)]
 mod raw_anchor_validation_tests {
     use super::*;
     use crate::metadata::{CanonicalInterface, CanonicalType, ExportedSymbol, StableSymbolId};
@@ -1020,10 +1044,10 @@ impl LlibReader {
                 let right = Self::deserialize_operand(r)?;
                 Ok(MlibInstruction::NotEq { left, right })
             }
+            // Writer-owned MVIR5 wire tag for HeapFree. Eq is tag 8.
             17 => {
-                let left = Self::deserialize_operand(r)?;
-                let right = Self::deserialize_operand(r)?;
-                Ok(MlibInstruction::Eq { left, right })
+                let value = Self::deserialize_operand(r)?;
+                Ok(MlibInstruction::HeapFree { value })
             }
             22 => {
                 let left = Self::deserialize_operand(r)?;
@@ -1128,10 +1152,6 @@ impl LlibReader {
             13 => {
                 let value = Self::deserialize_operand(r)?;
                 Ok(MlibInstruction::Drop { value })
-            }
-            15 => {
-                let value = Self::deserialize_operand(r)?;
-                Ok(MlibInstruction::HeapFree { value })
             }
             18 => Ok(MlibInstruction::ListNew),
             0x21 => {
