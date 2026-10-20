@@ -38,7 +38,7 @@
       "asan_job": 118504460874,
       "comptime_job": 118504460970,
       "triage_job": 118504460603,
-      "status": "QUEUED_AT_INITIAL_OBSERVATION",
+      "status": "SEE_LATEST_ACQUISITION_OBSERVATION",
       "final": "dependent on triage"
     },
     "windows": {
@@ -46,7 +46,7 @@
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567963",
       "normal_job": 118504461023,
       "triage_job": 118504461236,
-      "status": "NORMAL_SETUP_ACTIVE_TRIAGE_QUEUED_AT_INITIAL_OBSERVATION",
+      "status": "SEE_LATEST_ACQUISITION_OBSERVATION",
       "final": "dependent on triage"
     },
     "packages": {
@@ -54,7 +54,7 @@
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567878",
       "ubuntu_build_job": 118504460445,
       "windows_build_job": 118504460774,
-      "status": "UBUNTU_BUILD_ACTIVE_WINDOWS_QUEUED_AT_INITIAL_OBSERVATION",
+      "status": "SEE_LATEST_ACQUISITION_OBSERVATION",
       "smoke": "separate dependent consumer jobs"
     }
   },
@@ -66,7 +66,28 @@
       "file_hashes": 43,
       "compressed_log_hashes": 19,
       "raw_log_hashes": 19
+    },
+    "ubuntu-comptime-vm": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "file_hashes": 982,
+      "compressed_log_hashes": 28,
+      "raw_log_hashes": 28
     }
   },
-  "remaining": "Seven qualification lanes, both package smokes and archive reconciliation; no candidate advancement or release action yet"
+  "remaining": "Six qualification lanes and complete eight-lane reconciliation; package gates closed. Candidate/main/tag/publication remain pending qualification.",
+  "verified_package_smokes": {
+    "status": "PASS",
+    "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+    "targets": [
+      "x86_64-pc-windows-gnu",
+      "x86_64-unknown-linux-gnu"
+    ],
+    "artifact_verification": "evidence/package-cd9cd188/release-package-verification.json",
+    "original_ci_archives": 6,
+    "provider_count_per_package": 49,
+    "payload_files_per_package": 105,
+    "consumer_steps_per_target": 7,
+    "verifier_rejection_controls": 4
+  }
 }

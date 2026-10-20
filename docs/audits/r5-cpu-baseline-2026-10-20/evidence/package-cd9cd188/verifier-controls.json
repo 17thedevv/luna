@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "positive": "release-package-verification.json",
+  "controls": [
+    {
+      "case": "wrong-source",
+      "exit": 1,
+      "status": "REJECTED_AS_EXPECTED",
+      "stderr_tail": [
+        "    assert artifact['workflow_run']['head_sha'] == a.source",
+        "           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "AssertionError"
+      ]
+    },
+    {
+      "case": "wrong-qualified-pin",
+      "exit": 1,
+      "status": "REJECTED_AS_EXPECTED",
+      "stderr_tail": [
+        "    assert trees == source_trees",
+        "           ^^^^^^^^^^^^^^^^^^^^^",
+        "AssertionError"
+      ]
+    },
+    {
+      "case": "wrong-outer-digest",
+      "exit": 1,
+      "status": "REJECTED_AS_EXPECTED",
+      "stderr_tail": [
+        "    assert sha(raw) == artifact['digest'].removeprefix('sha256:')",
+        "           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "AssertionError"
+      ]
+    },
+    {
+      "case": "altered-smoke-stream",
+      "exit": 1,
+      "status": "REJECTED_AS_EXPECTED",
+      "stderr_tail": [
+        "    assert sha(z.read(prefix + ref['path'])) == ref['sha256']",
+        "           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+        "AssertionError"
+      ]
+    }
+  ],
+  "scope": "Controls affect temporary copies only; original CI ZIPs retained unchanged"
+}

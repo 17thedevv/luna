@@ -1,0 +1,460 @@
+{
+  "status": "PASS",
+  "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+  "qualified_implementation": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "code_tree_objects": {
+    "luna-rs": "a738989a3869ebe054024a8ac6dd49a96c485d7b",
+    "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+    "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4",
+    "CMakeLists.txt": "e963f1a5ae5c3a2677f19ebf664e871f14ca6100"
+  },
+  "artifacts": [
+    {
+      "id": 12247950063,
+      "name": "luna-package-x86_64-unknown-linux-gnu-39385567878-1",
+      "sha256": "b92cc7f161828c3c9491aef815e5240f97b0ab44d9ae3e469d75cd9f75042c45",
+      "bytes": 15623725,
+      "status": "PASS"
+    },
+    {
+      "id": 12247847140,
+      "name": "luna-package-build-evidence-x86_64-pc-windows-gnu-39385567878-1",
+      "sha256": "3cbee11d56d9f4f1f73261f6515d4c0645c744cf291960bab8f0920b85991c52",
+      "bytes": 104917,
+      "status": "PASS"
+    },
+    {
+      "id": 12247773693,
+      "name": "luna-package-smoke-x86_64-unknown-linux-gnu-39385567878-1",
+      "sha256": "6162587caa62e6ee742e55b33f0a9146b044e39124a978d2663c9d228f83e47b",
+      "bytes": 5175,
+      "status": "PASS"
+    },
+    {
+      "id": 12247664061,
+      "name": "luna-package-smoke-x86_64-pc-windows-gnu-39385567878-1",
+      "sha256": "60ea4bd5ff26e1b50d66c34adf1d16d7fabb88959ab2a20109d6ebe300e004c2",
+      "bytes": 5159,
+      "status": "PASS"
+    },
+    {
+      "id": 12247381322,
+      "name": "luna-package-build-evidence-x86_64-unknown-linux-gnu-39385567878-1",
+      "sha256": "d42c349ed2a0827fe2458e19ff2e474f5fe3143d900bc280a28d00e36d0e76f7",
+      "bytes": 104882,
+      "status": "PASS"
+    },
+    {
+      "id": 12246944830,
+      "name": "luna-package-x86_64-pc-windows-gnu-39385567878-1",
+      "sha256": "0aa976fc16f813f5a5412e5fe00859047387a7bb8a89170ebc056affc8a3b44b",
+      "bytes": 15239867,
+      "status": "PASS"
+    }
+  ],
+  "builds": {
+    "x86_64-pc-windows-gnu": {
+      "summary": {
+        "status": "PASS",
+        "release_tag": "v0.1.0-alpha.1",
+        "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+        "qualified_implementation": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+        "target": "x86_64-pc-windows-gnu",
+        "archive": "luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip",
+        "archive_sha256": "bbdc2a0fa55e82666c9bf26802ab5fa8f844b338e02848490a691f867b7c14dd",
+        "archive_bytes": 15511635,
+        "providers": 49,
+        "code_tree_objects": {
+          "luna-rs": "a738989a3869ebe054024a8ac6dd49a96c485d7b",
+          "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+          "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4",
+          "CMakeLists.txt": "e963f1a5ae5c3a2677f19ebf664e871f14ca6100"
+        },
+        "cli_version": "luna 0.1.0",
+        "runtime_sha256": "67b4d0b7858496a18346d8df1262b2f036132806b6c965d9949fa4aa4dd44fff"
+      },
+      "stream_hashes": 128,
+      "commands": 64
+    },
+    "x86_64-unknown-linux-gnu": {
+      "summary": {
+        "status": "PASS",
+        "release_tag": "v0.1.0-alpha.1",
+        "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+        "qualified_implementation": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+        "target": "x86_64-unknown-linux-gnu",
+        "archive": "luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip",
+        "archive_sha256": "86884370d1bea203dddcececf442ea6340600d2edeaa8609d384632878b5c3e4",
+        "archive_bytes": 15894110,
+        "providers": 49,
+        "code_tree_objects": {
+          "luna-rs": "a738989a3869ebe054024a8ac6dd49a96c485d7b",
+          "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+          "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4",
+          "CMakeLists.txt": "e963f1a5ae5c3a2677f19ebf664e871f14ca6100"
+        },
+        "cli_version": "luna 0.1.0",
+        "runtime_sha256": "7aab7fe718fdd27b79fc4555ec8db7a47b27bf5f392959d4817aa532d4a1780b"
+      },
+      "stream_hashes": 128,
+      "commands": 64
+    }
+  },
+  "packages": {
+    "x86_64-unknown-linux-gnu": {
+      "name": "luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip",
+      "sha256": "86884370d1bea203dddcececf442ea6340600d2edeaa8609d384632878b5c3e4",
+      "bytes": 15894110,
+      "manifest_sha256": "e99b60f41d3dcddfc663e3ee62e1d77439ed47daac6561bfb8220dd053b985d1",
+      "payload_files": 105,
+      "providers": 49,
+      "cli_version": "luna 0.1.0",
+      "runtime_path": "runtime/libluna-runtime.a"
+    },
+    "x86_64-pc-windows-gnu": {
+      "name": "luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip",
+      "sha256": "bbdc2a0fa55e82666c9bf26802ab5fa8f844b338e02848490a691f867b7c14dd",
+      "bytes": 15511635,
+      "manifest_sha256": "d98f41f9d956b17343a6d7efc5f94eb75cb3050d6263e54d2f8d5d05f4da1504",
+      "payload_files": 105,
+      "providers": 49,
+      "cli_version": "luna 0.1.0",
+      "runtime_path": "runtime/luna-runtime.lib"
+    }
+  },
+  "smokes": {
+    "x86_64-unknown-linux-gnu": {
+      "summary": {
+        "status": "PASS",
+        "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+        "qualified_implementation": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+        "target": "x86_64-unknown-linux-gnu",
+        "archive": "luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip",
+        "archive_sha256": "86884370d1bea203dddcececf442ea6340600d2edeaa8609d384632878b5c3e4",
+        "environment": "Separate hosted job; no source checkout; external LUNA variables cleared",
+        "workflow_run": "39385567878",
+        "steps": [
+          {
+            "label": "version",
+            "command": [
+              "/tmp/luna-smoke-39385567878/install/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu/bin/luna",
+              "--version"
+            ],
+            "cwd": "/tmp/luna-smoke-39385567878/programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.142,
+            "stdout": {
+              "path": "version.stdout",
+              "sha256": "9c1688c9ca64f7439d18262cfdcf678dd9a4713dc8a3eac5ecea80316f66239f"
+            },
+            "stderr": {
+              "path": "version.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "label": "llvm-host",
+            "command": [
+              "/usr/lib/llvm-18/bin/llc",
+              "--version"
+            ],
+            "cwd": "/tmp/luna-smoke-39385567878/programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.119,
+            "stdout": {
+              "path": "llvm-host.stdout",
+              "sha256": "ed9984b05443d0ec4ca6bc0bff6661350a46bd78fdf66ec124c120976b2d84f2"
+            },
+            "stderr": {
+              "path": "llvm-host.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "label": "quickstart-build",
+            "command": [
+              "/tmp/luna-smoke-39385567878/install/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu/bin/luna",
+              "build",
+              "/tmp/luna-smoke-39385567878/programs/quickstart.ln",
+              "--quiet",
+              "--no-config",
+              "-o",
+              "/tmp/luna-smoke-39385567878/programs/quickstart"
+            ],
+            "cwd": "/tmp/luna-smoke-39385567878/programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.708,
+            "stdout": {
+              "path": "quickstart-build.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "quickstart-build.stderr",
+              "sha256": "91d351d28a6adf640d665ae4a7ec5f2fabdfc0a521f9780a6cfd182616cbf3f5"
+            }
+          },
+          {
+            "label": "quickstart-native",
+            "command": [
+              "/tmp/luna-smoke-39385567878/programs/quickstart"
+            ],
+            "cwd": "/tmp/luna-smoke-39385567878/programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.001,
+            "stdout": {
+              "path": "quickstart-native.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "quickstart-native.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "label": "stdlib-build",
+            "command": [
+              "/tmp/luna-smoke-39385567878/install/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu/bin/luna",
+              "build",
+              "/tmp/luna-smoke-39385567878/programs/stdlib.ln",
+              "--quiet",
+              "--no-config",
+              "-o",
+              "/tmp/luna-smoke-39385567878/programs/stdlib"
+            ],
+            "cwd": "/tmp/luna-smoke-39385567878/programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.438,
+            "stdout": {
+              "path": "stdlib-build.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "stdlib-build.stderr",
+              "sha256": "3d150d38106dafe731e410ab467423f2fa271d2c152a01e50e067adc6c6a219d"
+            }
+          },
+          {
+            "label": "stdlib-native",
+            "command": [
+              "/tmp/luna-smoke-39385567878/programs/stdlib"
+            ],
+            "cwd": "/tmp/luna-smoke-39385567878/programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.001,
+            "stdout": {
+              "path": "stdlib-native.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "stdlib-native.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "label": "missing-provider-control",
+            "command": [
+              "/tmp/luna-smoke-39385567878/install/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu/bin/luna",
+              "check",
+              "/tmp/luna-smoke-39385567878/programs/stdlib.ln",
+              "--no-config"
+            ],
+            "cwd": "/tmp/luna-smoke-39385567878/programs",
+            "exit": 1,
+            "expected_exit": 1,
+            "seconds": 0.121,
+            "stdout": {
+              "path": "missing-provider-control.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "missing-provider-control.stderr",
+              "sha256": "afc3cf8abab118c37ed2fc886b4a1d16189f93e1403ffa55d34ac1a08f1d8623"
+            }
+          }
+        ],
+        "consumer_llvm_host": "Ubuntu LLVM version 18.1.3\n  Optimized build.\n  Default target: x86_64-pc-linux-gnu\n  Host CPU: znver4\n\n  Registered Targets:\n    aarch64     - AArch64 (little endian)\n    aarch64_32  - AArch64 (little endian ILP32)\n    aarch64_be  - AArch64 (big endian)\n    amdgcn      - AMD GCN GPUs\n    arm         - ARM\n    arm64       - ARM64 (little endian)\n    arm64_32    - ARM64 (little endian ILP32)\n    armeb       - ARM (big endian)\n    avr         - Atmel AVR Microcontroller\n    bpf         - BPF (host endian)\n    bpfeb       - BPF (big endian)\n    bpfel       - BPF (little endian)\n    hexagon     - Hexagon\n    lanai       - Lanai\n    loongarch32 - 32-bit LoongArch\n    loongarch64 - 64-bit LoongArch\n    m68k        - Motorola 68000 family\n    mips        - MIPS (32-bit big endian)\n    mips64      - MIPS (64-bit big endian)\n    mips64el    - MIPS (64-bit little endian)\n    mipsel      - MIPS (32-bit little endian)\n    msp430      - MSP430 [experimental]\n    nvptx       - NVIDIA PTX 32-bit\n    nvptx64     - NVIDIA PTX 64-bit\n    ppc32       - PowerPC 32\n    ppc32le     - PowerPC 32 LE\n    ppc64       - PowerPC 64\n    ppc64le     - PowerPC 64 LE\n    r600        - AMD GPUs HD2XXX-HD6XXX\n    riscv32     - 32-bit RISC-V\n    riscv64     - 64-bit RISC-V\n    sparc       - Sparc\n    sparcel     - Sparc LE\n    sparcv9     - Sparc V9\n    systemz     - SystemZ\n    thumb       - Thumb\n    thumbeb     - Thumb (big endian)\n    ve          - VE\n    wasm32      - WebAssembly 32-bit\n    wasm64      - WebAssembly 64-bit\n    x86         - 32-bit X86: Pentium-Pro and above\n    x86-64      - 64-bit X86: EM64T and AMD64\n    xcore       - XCore\n    xtensa      - Xtensa 32\n",
+        "package_manifest_sha256": "e99b60f41d3dcddfc663e3ee62e1d77439ed47daac6561bfb8220dd053b985d1",
+        "payload_hashes_checked": 105,
+        "providers_checked": 49,
+        "source_fallback": false,
+        "external_luna_variables": [],
+        "runtime_path": "runtime/libluna-runtime.a",
+        "cli_version": "luna 0.1.0"
+      },
+      "stream_hashes": 14
+    },
+    "x86_64-pc-windows-gnu": {
+      "summary": {
+        "status": "PASS",
+        "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+        "qualified_implementation": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+        "target": "x86_64-pc-windows-gnu",
+        "archive": "luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip",
+        "archive_sha256": "bbdc2a0fa55e82666c9bf26802ab5fa8f844b338e02848490a691f867b7c14dd",
+        "environment": "Separate hosted job; no source checkout; external LUNA variables cleared",
+        "workflow_run": "39385567878",
+        "steps": [
+          {
+            "label": "version",
+            "command": [
+              "D:\\luna-smoke-39385567878\\install\\luna-0.1.0-alpha.1-x86_64-pc-windows-gnu\\bin\\luna.exe",
+              "--version"
+            ],
+            "cwd": "D:\\luna-smoke-39385567878\\programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.031,
+            "stdout": {
+              "path": "version.stdout",
+              "sha256": "9c1688c9ca64f7439d18262cfdcf678dd9a4713dc8a3eac5ecea80316f66239f"
+            },
+            "stderr": {
+              "path": "version.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "label": "llvm-host",
+            "command": [
+              "C:\\r5-llvm18\\bin\\llc.exe",
+              "--version"
+            ],
+            "cwd": "D:\\luna-smoke-39385567878\\programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.016,
+            "stdout": {
+              "path": "llvm-host.stdout",
+              "sha256": "b65d7a4d6822f6af0e568ef949a2c54861486337a45c530075be9777c265eefc"
+            },
+            "stderr": {
+              "path": "llvm-host.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "label": "quickstart-build",
+            "command": [
+              "D:\\luna-smoke-39385567878\\install\\luna-0.1.0-alpha.1-x86_64-pc-windows-gnu\\bin\\luna.exe",
+              "build",
+              "D:\\luna-smoke-39385567878\\programs\\quickstart.ln",
+              "--quiet",
+              "--no-config",
+              "-o",
+              "D:\\luna-smoke-39385567878\\programs\\quickstart.exe"
+            ],
+            "cwd": "D:\\luna-smoke-39385567878\\programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 1.25,
+            "stdout": {
+              "path": "quickstart-build.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "quickstart-build.stderr",
+              "sha256": "91d351d28a6adf640d665ae4a7ec5f2fabdfc0a521f9780a6cfd182616cbf3f5"
+            }
+          },
+          {
+            "label": "quickstart-native",
+            "command": [
+              "D:\\luna-smoke-39385567878\\programs\\quickstart.exe"
+            ],
+            "cwd": "D:\\luna-smoke-39385567878\\programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.016,
+            "stdout": {
+              "path": "quickstart-native.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "quickstart-native.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "label": "stdlib-build",
+            "command": [
+              "D:\\luna-smoke-39385567878\\install\\luna-0.1.0-alpha.1-x86_64-pc-windows-gnu\\bin\\luna.exe",
+              "build",
+              "D:\\luna-smoke-39385567878\\programs\\stdlib.ln",
+              "--quiet",
+              "--no-config",
+              "-o",
+              "D:\\luna-smoke-39385567878\\programs\\stdlib.exe"
+            ],
+            "cwd": "D:\\luna-smoke-39385567878\\programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.625,
+            "stdout": {
+              "path": "stdlib-build.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "stdlib-build.stderr",
+              "sha256": "3d150d38106dafe731e410ab467423f2fa271d2c152a01e50e067adc6c6a219d"
+            }
+          },
+          {
+            "label": "stdlib-native",
+            "command": [
+              "D:\\luna-smoke-39385567878\\programs\\stdlib.exe"
+            ],
+            "cwd": "D:\\luna-smoke-39385567878\\programs",
+            "exit": 0,
+            "expected_exit": 0,
+            "seconds": 0.0,
+            "stdout": {
+              "path": "stdlib-native.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "stdlib-native.stderr",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          },
+          {
+            "label": "missing-provider-control",
+            "command": [
+              "D:\\luna-smoke-39385567878\\install\\luna-0.1.0-alpha.1-x86_64-pc-windows-gnu\\bin\\luna.exe",
+              "check",
+              "D:\\luna-smoke-39385567878\\programs\\stdlib.ln",
+              "--no-config"
+            ],
+            "cwd": "D:\\luna-smoke-39385567878\\programs",
+            "exit": 1,
+            "expected_exit": 1,
+            "seconds": 0.203,
+            "stdout": {
+              "path": "missing-provider-control.stdout",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            "stderr": {
+              "path": "missing-provider-control.stderr",
+              "sha256": "26eb11f95577fcc94079e5f8c251ce5476f782b5b2943222a4a2d5839f8930a0"
+            }
+          }
+        ],
+        "consumer_llvm_host": "LLVM (http://llvm.org/):\n  LLVM version 18.1.8\n  Optimized build.\n  Default target: x86_64-pc-windows-msvc\n  Host CPU: znver3\n\n  Registered Targets:\n    aarch64     - AArch64 (little endian)\n    aarch64_32  - AArch64 (little endian ILP32)\n    aarch64_be  - AArch64 (big endian)\n    amdgcn      - AMD GCN GPUs\n    arm         - ARM\n    arm64       - ARM64 (little endian)\n    arm64_32    - ARM64 (little endian ILP32)\n    armeb       - ARM (big endian)\n    avr         - Atmel AVR Microcontroller\n    bpf         - BPF (host endian)\n    bpfeb       - BPF (big endian)\n    bpfel       - BPF (little endian)\n    hexagon     - Hexagon\n    lanai       - Lanai\n    loongarch32 - 32-bit LoongArch\n    loongarch64 - 64-bit LoongArch\n    mips        - MIPS (32-bit big endian)\n    mips64      - MIPS (64-bit big endian)\n    mips64el    - MIPS (64-bit little endian)\n    mipsel      - MIPS (32-bit little endian)\n    msp430      - MSP430 [experimental]\n    nvptx       - NVIDIA PTX 32-bit\n    nvptx64     - NVIDIA PTX 64-bit\n    ppc32       - PowerPC 32\n    ppc32le     - PowerPC 32 LE\n    ppc64       - PowerPC 64\n    ppc64le     - PowerPC 64 LE\n    r600        - AMD GPUs HD2XXX-HD6XXX\n    riscv32     - 32-bit RISC-V\n    riscv64     - 64-bit RISC-V\n    sparc       - Sparc\n    sparcel     - Sparc LE\n    sparcv9     - Sparc V9\n    systemz     - SystemZ\n    thumb       - Thumb\n    thumbeb     - Thumb (big endian)\n    ve          - VE\n    wasm32      - WebAssembly 32-bit\n    wasm64      - WebAssembly 64-bit\n    x86         - 32-bit X86: Pentium-Pro and above\n    x86-64      - 64-bit X86: EM64T and AMD64\n    xcore       - XCore\n",
+        "package_manifest_sha256": "d98f41f9d956b17343a6d7efc5f94eb75cb3050d6263e54d2f8d5d05f4da1504",
+        "payload_hashes_checked": 105,
+        "providers_checked": 49,
+        "source_fallback": false,
+        "external_luna_variables": [],
+        "runtime_path": "runtime/luna-runtime.lib",
+        "cli_version": "luna 0.1.0"
+      },
+      "stream_hashes": 14
+    }
+  },
+  "scope": "Original CI ZIP digests/size/CRC; clean immutable source; GNU/ELF/COFF provider bytes; payload and checksum manifests; build ABI; separate native consumer logs; source-fallback negative control"
+}
