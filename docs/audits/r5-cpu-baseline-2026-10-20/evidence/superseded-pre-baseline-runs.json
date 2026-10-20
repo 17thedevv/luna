@@ -1,0 +1,54 @@
+{
+  "observed_utc": "2026-10-20T07:29:31.857513+00:00",
+  "reason": "Supplemental workspace acquisitions use pre-baseline implementation 8525067f; replaced by current qualification at b5cb77c3 and current PR checks. Completed jobs retain original conclusions; cancellation is not PASS evidence.",
+  "runs": [
+    {
+      "id": 39383008945,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "2467b36ea696d0a1daf0a26a73e6aa1a0e06255e",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39383008945",
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39383008943,
+      "name": "Phase 5 platform verification",
+      "head_sha": "2467b36ea696d0a1daf0a26a73e6aa1a0e06255e",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39383008943",
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39381735368,
+      "name": "Phase 6 formatting verification",
+      "head_sha": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39381735368",
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    },
+    {
+      "id": 39381735255,
+      "name": "Phase 5 platform verification",
+      "head_sha": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "status": "in_progress",
+      "conclusion": null,
+      "html_url": "https://github.com/17thedevv/luna/actions/runs/39381735255",
+      "cancel_exit": 0,
+      "cancel_response": {
+        "status": 202
+      }
+    }
+  ]
+}

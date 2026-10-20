@@ -64,6 +64,31 @@ Reacquire all eight lanes and both independent package smokes; verify archives;
 advance candidate only after closure. No main merge/tag/publication
 before these gates pass. Keep failed package attempt1 as failure history.
 
+## Replacement acquisition progress
+
+The [current state](qualification-state.json) records the replacement runs.
+ASan and comptime/VM Ubuntu archives are independently verified at `b5cb77c3`:
+1025 file hashes, 47 compressed log hashes and 47 raw log hashes, with no mismatch.
+The remaining six qualification lanes are pending; no eight-lane verdict is made.
+
+[Package run 39385567878](https://github.com/17thedevv/luna/actions/runs/39385567878)
+builds the exact immutable source `cd9cd1884d2e49c0f03979597ca73e92043b7fe7`,
+whose implementation trees match `b5cb77c3`. Both clean hosted consumer smokes
+PASS. [Independent package verification](evidence/package-cd9cd188/release-package-verification.json)
+reconciles all six original CI ZIP digests, sizes and CRCs, build stream hashes,
+two distribution payloads with 105 files and 49 canonical providers each, and
+seven consumer steps per target. Missing-provider controls still reject E1004.
+[Four verifier controls](evidence/package-cd9cd188/verifier-controls.json)
+reject wrong source, wrong qualified pin, wrong outer digest and changed smoke
+stdout even after repairing its outer ZIP digest.
+
+The exact Windows ZIP also passes a
+[supplemental local consumer](evidence/package-cd9cd188/supplemental-local-windows-smoke.json)
+on `alderlake`, using only its packaged runtime/providers after relocation.
+Its CI builder reported `znver3`. This local check is separate from the two
+required hosted smokes and does not replace qualification. The prior failed
+Windows package remains historical failure evidence.
+
 Compiler Change
 
     Capability: Default artifacts for an advertised target have one CPU baseline.

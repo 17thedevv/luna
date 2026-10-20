@@ -1,0 +1,122 @@
+[
+  {
+    "id": 12247950063,
+    "name": "luna-package-x86_64-unknown-linux-gnu-39385567878-1",
+    "size_in_bytes": 15623725,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247950063",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247950063/zip",
+    "expired": false,
+    "created_at": "2026-10-20T07:20:04Z",
+    "expires_at": "2026-11-19T07:20:03Z",
+    "updated_at": "2026-10-20T07:20:04Z",
+    "digest": "sha256:b92cc7f161828c3c9491aef815e5240f97b0ab44d9ae3e469d75cd9f75042c45",
+    "workflow_run": {
+      "id": 39385567878,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/package-cd9cd188/archives/luna-package-x86_64-unknown-linux-gnu-39385567878-1.zip"
+  },
+  {
+    "id": 12247847140,
+    "name": "luna-package-build-evidence-x86_64-pc-windows-gnu-39385567878-1",
+    "size_in_bytes": 104917,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247847140",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247847140/zip",
+    "expired": false,
+    "created_at": "2026-10-20T07:26:27Z",
+    "expires_at": "2026-11-19T07:26:27Z",
+    "updated_at": "2026-10-20T07:26:27Z",
+    "digest": "sha256:3cbee11d56d9f4f1f73261f6515d4c0645c744cf291960bab8f0920b85991c52",
+    "workflow_run": {
+      "id": 39385567878,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/package-cd9cd188/archives/luna-package-build-evidence-x86_64-pc-windows-gnu-39385567878-1.zip"
+  },
+  {
+    "id": 12247773693,
+    "name": "luna-package-smoke-x86_64-unknown-linux-gnu-39385567878-1",
+    "size_in_bytes": 5175,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247773693",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247773693/zip",
+    "expired": false,
+    "created_at": "2026-10-20T07:33:48Z",
+    "expires_at": "2026-11-19T07:33:47Z",
+    "updated_at": "2026-10-20T07:33:48Z",
+    "digest": "sha256:6162587caa62e6ee742e55b33f0a9146b044e39124a978d2663c9d228f83e47b",
+    "workflow_run": {
+      "id": 39385567878,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/package-cd9cd188/archives/luna-package-smoke-x86_64-unknown-linux-gnu-39385567878-1.zip"
+  },
+  {
+    "id": 12247664061,
+    "name": "luna-package-smoke-x86_64-pc-windows-gnu-39385567878-1",
+    "size_in_bytes": 5159,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247664061",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247664061/zip",
+    "expired": false,
+    "created_at": "2026-10-20T07:33:18Z",
+    "expires_at": "2026-11-19T07:33:17Z",
+    "updated_at": "2026-10-20T07:33:18Z",
+    "digest": "sha256:60ea4bd5ff26e1b50d66c34adf1d16d7fabb88959ab2a20109d6ebe300e004c2",
+    "workflow_run": {
+      "id": 39385567878,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/package-cd9cd188/archives/luna-package-smoke-x86_64-pc-windows-gnu-39385567878-1.zip"
+  },
+  {
+    "id": 12247381322,
+    "name": "luna-package-build-evidence-x86_64-unknown-linux-gnu-39385567878-1",
+    "size_in_bytes": 104882,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247381322",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247381322/zip",
+    "expired": false,
+    "created_at": "2026-10-20T07:20:03Z",
+    "expires_at": "2026-11-19T07:20:02Z",
+    "updated_at": "2026-10-20T07:20:03Z",
+    "digest": "sha256:d42c349ed2a0827fe2458e19ff2e474f5fe3143d900bc280a28d00e36d0e76f7",
+    "workflow_run": {
+      "id": 39385567878,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/package-cd9cd188/archives/luna-package-build-evidence-x86_64-unknown-linux-gnu-39385567878-1.zip"
+  },
+  {
+    "id": 12246944830,
+    "name": "luna-package-x86_64-pc-windows-gnu-39385567878-1",
+    "size_in_bytes": 15239867,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12246944830",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12246944830/zip",
+    "expired": false,
+    "created_at": "2026-10-20T07:26:29Z",
+    "expires_at": "2026-11-19T07:26:28Z",
+    "updated_at": "2026-10-20T07:26:29Z",
+    "digest": "sha256:0aa976fc16f813f5a5412e5fe00859047387a7bb8a89170ebc056affc8a3b44b",
+    "workflow_run": {
+      "id": 39385567878,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/package-cd9cd188/archives/luna-package-x86_64-pc-windows-gnu-39385567878-1.zip"
+  }
+]
