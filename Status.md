@@ -4,12 +4,12 @@
 
 # Luna 0.1 status — 2026-10-20
 
-**RELEASE BLOCKED: one final replacement workspace lane and archive reconciliation remain.**
+**Qualification complete; authorized merge and release sequence is underway.**
 The eight lanes at `8525067f` remain historical qualification evidence, but that
 pin is not sufficient for distribution across machines. The portable CPU repair
-at `b5cb77c3` now has **7/8 lanes and seven ZIP artifacts independently verified**;
-Windows workspace final is running. Both clean Windows/Ubuntu package smokes at
-`cd9cd188` PASS. [Finding, repair and current evidence](docs/audits/r5-cpu-baseline-2026-10-20/README.md).
+at `b5cb77c3` has **8/8 lanes and all eight ZIP artifacts independently verified**.
+Windows workspace final passed (236 groups, 1422/0/1). Both clean Windows/Ubuntu
+package smokes at `cd9cd188` PASS. [Finding, repair and current evidence](docs/audits/r5-cpu-baseline-2026-10-20/README.md).
 
 Candidate/tested pin: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`, fast-forwarded
 from `c085449b` without force. Main remains `401a95a8`.
@@ -36,9 +36,8 @@ Local interrupted/PDB attempts are historical, never passing evidence.
 Maintainer authorized PR/main/tag/publication after package smoke PASS on 2026-10-20.
 PR #7 is draft. The PR merge-preview full workspace and formatting checks PASS;
 an earlier closure ICE did not recur and is preserved with its successful replay.
-Remaining full-goal work: finish Windows workspace final, verify its ZIP and
-reconcile all eight lane archives, advance the candidate, finalize the PR, merge,
-tag `v0.1.0-alpha.1` at the exact packaged source, publish the two verified
+Remaining full-goal work: advance the existing candidate ref, finalize and merge
+PR #7, tag `v0.1.0-alpha.1` at the exact packaged source, publish the two verified
 packages with checksums, then write the closing record. The concrete
 [handoff](docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md) is ready.
 No release publication or new semantic freeze is claimed.

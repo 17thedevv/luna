@@ -5,7 +5,7 @@
   "previous_implementation": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
   "candidate": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
   "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
-  "status": "ACQUIRING_REPLACEMENT_QUALIFICATION",
+  "status": "QUALIFICATION_COMPLETE_PENDING_RELEASE",
   "versions": {
     "compiler": 25,
     "metadata": 9,
@@ -38,7 +38,7 @@
       "asan_job": 118504460874,
       "comptime_job": 118504460970,
       "triage_job": 118504460603,
-      "status": "FOUR_LANES_PASS_FINAL_LANE_ARTIFACT_VERIFIED",
+      "status": "FIVE_LANES_PASS_ALL_ARCHIVES_VERIFIED",
       "final": "dependent on triage",
       "final_job": 118548395239,
       "final_status": "PASS"
@@ -48,32 +48,37 @@
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567963",
       "normal_job": 118504461023,
       "triage_job": 118504461236,
-      "status": "TWO_LANES_PASS_FINAL_IN_PROGRESS",
+      "status": "THREE_LANES_PASS_ALL_ARCHIVES_VERIFIED",
       "final": "dependent on triage",
       "final_job": 118589976770,
-      "final_status": "IN_PROGRESS"
+      "final_status": "PASS",
+      "final_artifact_id": 12273890402,
+      "final_artifact_sha256": "bdb7843564c7a8d28ea1633988033f20b4e9967eb8c2fb5acd3b8aab56b1d113"
     },
     "packages": {
       "id": 39385567878,
       "url": "https://github.com/17thedevv/luna/actions/runs/39385567878",
       "ubuntu_build_job": 118504460445,
       "windows_build_job": 118504460774,
-      "status": "SEE_LATEST_ACQUISITION_OBSERVATION",
-      "smoke": "separate dependent consumer jobs"
+      "status": "WINDOWS_AND_UBUNTU_CLEAN_PACKAGE_SMOKES_PASS",
+      "smoke": "PASS on both clean hosted consumers"
     }
   },
   "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
   "verified_lanes": {
     "ubuntu-comptime-vm": {
       "status": "PASS_IN_EXECUTED_SCOPE",
-      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
       "artifact_id": 12248270213,
+      "archive_sha256": "74847f9e590ffc48d82104600b9c7eccf751235a3413c7df35a02cd056047f4b",
+      "archive_size_in_bytes": 16170404,
       "checks": {
         "file_hashes": 982,
         "compressed_log_hashes": 28,
         "raw_log_hashes": 28
       },
       "gates": 28,
+      "workspace": null,
       "providers": {
         "count": 49,
         "target": "x86_64-unknown-linux-gnu",
@@ -89,19 +94,25 @@
     },
     "ubuntu-runtime-asan": {
       "status": "PASS_IN_EXECUTED_SCOPE",
-      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
       "artifact_id": 12247791206,
+      "archive_sha256": "861787dadd580a9341960ce29684d4fde08d52febb22bb4ab7a472e731395100",
+      "archive_size_in_bytes": 22028,
       "checks": {
         "file_hashes": 43,
         "compressed_log_hashes": 19,
         "raw_log_hashes": 19
       },
-      "gates": 19
+      "gates": 19,
+      "workspace": null,
+      "providers": null
     },
     "ubuntu-workspace-triage": {
       "status": "PASS_IN_EXECUTED_SCOPE",
-      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
       "artifact_id": 12253391317,
+      "archive_sha256": "5defbfcc9d931f7b406d390774a4b21cc9282a7ceb5089ef081774a67299a1cf",
+      "archive_size_in_bytes": 83420,
       "checks": {
         "file_hashes": 61,
         "compressed_log_hashes": 29,
@@ -132,14 +143,17 @@
     },
     "ubuntu-normal": {
       "status": "PASS_IN_EXECUTED_SCOPE",
-      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
       "artifact_id": 12252234586,
+      "archive_sha256": "248166572662c8031a6ceaca683c2bf8175dc61c0a75f7398cf67a3315bc5344",
+      "archive_size_in_bytes": 191992,
       "checks": {
         "file_hashes": 123,
         "compressed_log_hashes": 48,
         "raw_log_hashes": 48
       },
       "gates": 48,
+      "workspace": null,
       "providers": {
         "count": 49,
         "target": "x86_64-unknown-linux-gnu",
@@ -155,8 +169,10 @@
     },
     "windows-workspace-triage": {
       "status": "PASS_IN_EXECUTED_SCOPE",
-      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
       "artifact_id": 12258834785,
+      "archive_sha256": "9846fee031c2a0ffd1ab522504c67195e206992c3404e221ac041ba78889f565",
+      "archive_size_in_bytes": 104143,
       "checks": {
         "recorded_log_hashes": 15,
         "acquisition_gates": 14
@@ -186,13 +202,16 @@
     },
     "windows-normal": {
       "status": "PASS_IN_EXECUTED_SCOPE",
-      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
       "artifact_id": 12252351370,
+      "archive_sha256": "db9e467293a107a38d42c96edab5375be5587d892b8ba95ca32ee014605ef0c4",
+      "archive_size_in_bytes": 43178775,
       "checks": {
         "recorded_log_hashes": 383,
         "acquisition_gates": 35
       },
       "gates": 35,
+      "workspace": null,
       "providers": {
         "count": 49,
         "target": "x86_64-pc-windows-gnu",
@@ -220,8 +239,10 @@
     },
     "ubuntu-workspace-final": {
       "status": "PASS_IN_EXECUTED_SCOPE",
-      "artifact_verification": "evidence/pin-b5cb77c3/partial-artifact-verification.json",
+      "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
       "artifact_id": 12263624610,
+      "archive_sha256": "e7602838f5c83e27d821e03fc14beafba165fe29aed8cc7e5c7192384214711b",
+      "archive_size_in_bytes": 83695,
       "checks": {
         "file_hashes": 61,
         "compressed_log_hashes": 29,
@@ -249,9 +270,42 @@
         },
         "basis": "Recorded provider headers and object identities in hash-verified acquisition"
       }
+    },
+    "windows-workspace-final": {
+      "status": "PASS_IN_EXECUTED_SCOPE",
+      "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json",
+      "artifact_id": 12273890402,
+      "archive_sha256": "bdb7843564c7a8d28ea1633988033f20b4e9967eb8c2fb5acd3b8aab56b1d113",
+      "archive_size_in_bytes": 104154,
+      "checks": {
+        "recorded_log_hashes": 15,
+        "acquisition_gates": 14
+      },
+      "gates": 14,
+      "workspace": {
+        "result_groups": 236,
+        "passed": 1422,
+        "failed": 0,
+        "ignored": 1,
+        "ignored_lines": [
+          "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+        ]
+      },
+      "providers": {
+        "count": 49,
+        "target": "x86_64-pc-windows-gnu",
+        "object": "COFF 0x8664",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "archived_bundles_checked": 0
+      }
     }
   },
-  "remaining": "Windows workspace final and complete eight-lane archive reconciliation; both clean package smokes are PASS. Candidate, main, tag and publication remain pending final qualification.",
+  "remaining": "Eight exact-pin lanes and all eight CI ZIPs are verified; both clean package smokes pass. Advance the existing candidate ref, finalize and merge PR #7, tag the exact packaged source commit, publish the two verified packages and checksums, then record final closure.",
   "verified_package_smokes": {
     "status": "PASS",
     "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
@@ -266,6 +320,9 @@
     "consumer_steps_per_target": 7,
     "verifier_rejection_controls": 4
   },
-  "observed_utc": "2026-10-20 12:23:14 UTC",
-  "pr_merge_preview_replay": "evidence/pin-b5cb77c3/pr-merge-preview-replay.json"
+  "observed_utc": "2026-10-20 14:37:26 UTC",
+  "pr_merge_preview_replay": "evidence/pin-b5cb77c3/pr-merge-preview-replay.json",
+  "verified_lane_count": 8,
+  "artifact_manifest": "evidence/pin-b5cb77c3/ci-artifact-manifest.json",
+  "artifact_verification": "evidence/pin-b5cb77c3/all-artifact-verification.json"
 }

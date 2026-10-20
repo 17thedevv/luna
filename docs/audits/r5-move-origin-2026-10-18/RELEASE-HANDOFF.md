@@ -1,18 +1,18 @@
 # Luna 0.1-alpha.1 — maintainer review handoff
 
-**CURRENT REPLACEMENT STATUS — 2026-10-20:** `b5cb77c3` has 7/8 qualification
-lanes and seven ZIPs independently verified. Windows workspace final is running.
-Both clean package smokes PASS from `cd9cd188`, and the current PR merge-preview
-full workspace passes, including the closure control that failed once in an
-earlier run. Candidate remains `8525067f`, main `401a95a8`, and PR #7 remains a
-draft pending the final lane and complete archive reconciliation. See the
+**CURRENT REPLACEMENT STATUS — 2026-10-20:** `b5cb77c3` has 8/8 qualification
+lanes and all eight ZIPs independently verified. Windows workspace final PASS
+(236 groups, 1422/0/1). Both clean package smokes PASS from `cd9cd188`, and the
+current PR merge-preview full workspace passes, including the closure control
+that failed once in an earlier run. Candidate remains `8525067f`, main
+`401a95a8`, and PR #7 is ready for the authorized merge and release sequence. See the
 [CPU baseline repair and current evidence](../r5-cpu-baseline-2026-10-20/README.md)
 and its [merge-preview replay record](../r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/pr-merge-preview-replay.json).
 
 **SUPERSEDED FOR RELEASE — 2026-10-20.** Eight-lane qualification at
 `8525067f` remains valid in its executed scope, but its clean Windows package
-smoke failed on a different CPU. The replacement pin must close all eight lanes
-and archive checks before release. The full goal remains active.
+smoke failed on a different CPU. The replacement pin now closes all eight lanes
+and archive checks. The full goal remains active until merge and publication.
 
 Candidate/tested implementation: `8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5`.
 Candidate fast-forwarded from `c085449b` without force.
@@ -34,18 +34,19 @@ Versions:compiler 25/metadata 9/MVIR 5/format 2.
 Title: **Qualify Luna 0.1-alpha.1 on Windows GNU and Ubuntu GNU**.
 Base: `main`. Head: existing `r5-diag-repair` after the evidence commit.
 
-Proposed description:
+PR description:
 
-The 0.1 candidate now includes typed comptime errors, originating diagnostics
-under run, missing-return rejection, Linux native math linkage, deterministic
-move/loan origins and diagnostic identity/order, plus structural declaration,
-impl and candidate locations. Eight exact-pin Windows/Ubuntu lanes and original
-ZIP/manifest/raw/compressed-log evidence are independently verified.
+This PR advances the Luna 0.1 candidate with the qualified portable CPU baseline
+and its release documentation. All eight exact-pin Windows/Ubuntu qualification
+lanes and their CI ZIPs are independently verified. The Windows and Ubuntu
+packages also pass clean hosted consumer smoke tests from the exact packaged
+source commit `cd9cd1884d2e49c0f03979597ca73e92043b7fe7`.
 
-Validation:four complete workspaces 1421/0/1; native debug/release CLI,
-runtime ABI and49 providers per target; focused A/C/D/E, retained contracts,
-diagnostic structure/registry/coverage, docs/examples/quickstart, strict L002,
-bounded comptime/VM and runtime ASan. Exact pins, jobs and limits are in the report.
+Validation: four complete workspaces report 236 groups, 1422 passed, 0 failed,
+1 ignored; both normal lanes verify 49 providers per target; the Windows native
+lane passes strict L002 4/4; comptime/VM reports 88 pass and 8 characterized;
+Ubuntu runtime ASan passes. Exact pins, jobs, archive digests and limits are in
+the report and machine-readable manifest.
 
 ## Proposed release and package checks
 
