@@ -98,6 +98,8 @@ def main():
             rejected = a.out / 'rejected install'
             setup('reject-tampered-payload', negative / 'lunainstaller.exe', rejected, expect=None)
             server.shutdown()
+        rejected_log = (evidence / 'reject-tampered-payload.log').read_text(encoding='utf-8-sig')
+        assert 'File hash is incorrect' in rejected_log, 'Negative control must fail specifically on SHA-256 verification'
         assert not (rejected / 'bin/luna.exe').exists()
         assert registry('Environment', 'Path') == before
         assert registry(UNINSTALL, 'Inno Setup: App Path') is None
@@ -138,7 +140,9 @@ def main():
         run('uninstall', [install / 'unins000.exe', '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART',
                           '/LOG=' + str(evidence / 'uninstall.log')])
         current = registry('Environment', 'Path')
-        assert current and sentinel in current[0].split(';') and entry not in current[0].split(';')
+        report['post_uninstall_path'] = current
+        report['post_uninstall_ownership'] = registry(STATE, 'OwnPath')
+        assert current and sentinel in current[0].split(';') and entry not in current[0].split(';'), 'Uninstall PATH preservation/removal failed'
         assert note.read_text() == 'user file must survive uninstall'
         assert not cli.exists() and not (package / 'bin/luna.exe').exists()
         assert registry(STATE, 'OwnPath') is None and registry(UNINSTALL, 'Inno Setup: App Path') is None
