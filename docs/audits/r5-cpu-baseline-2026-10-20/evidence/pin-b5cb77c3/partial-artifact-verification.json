@@ -69,6 +69,7 @@
     }
   ],
   "errors": [],
+  "required_cpu_baseline": "generic;features=",
   "scope": "ZIP SHA-256/size/CRC; inventory; clean exact pin; gate exits; compressed and raw log digests; workspace totals; recorded provider identities",
   "release": "PENDING COMPLETE EIGHT-LANE RECONCILIATION"
 }
