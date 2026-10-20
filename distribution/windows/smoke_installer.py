@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import struct
 import subprocess
 import threading
 import time
@@ -37,6 +38,29 @@ def write_path(value):
 def sha(path):
     with Path(path).open('rb') as stream:
         return hashlib.file_digest(stream, 'sha256').hexdigest()
+
+
+def shortcut_strings(path):
+    # Read actual Unicode StringData (MS-SHLLINK 2.4). WScript.Shell exposes
+    # Arguments through an ANSI conversion on some Windows versions.
+    # https://learn.microsoft.com/openspecs/windows_protocols/ms-shllink/17b69472-0f34-4bcf-b290-eccdb8de224b
+    data = path.read_bytes()
+    assert struct.unpack_from('<I', data)[0] == 0x4c
+    flags = struct.unpack_from('<I', data, 0x14)[0]
+    assert flags & 0x80, 'Shortcut must store Unicode StringData'
+    offset = 0x4c
+    if flags & 1:
+        offset += 2 + struct.unpack_from('<H', data, offset)[0]
+    if flags & 2:
+        offset += struct.unpack_from('<I', data, offset)[0]
+    values = {}
+    for mask, name in [(4, 'name'), (8, 'relative_path'), (16, 'working_directory'), (32, 'arguments'), (64, 'icon')]:
+        if flags & mask:
+            count = struct.unpack_from('<H', data, offset)[0]
+            offset += 2
+            values[name] = data[offset:offset + count * 2].decode('utf-16-le')
+            offset += count * 2
+    return values
 
 
 def main():
@@ -141,9 +165,12 @@ def main():
         shortcut = json.loads(run('read-start-menu-shortcut', [shutil.which('pwsh'), '-NoProfile', '-File',
                                                              shortcut_script, shortcut_path]).stdout)
         assert Path(shortcut['TargetPath']).name.lower() == 'cmd.exe'
-        assert shortcut['Arguments'] == '/K ""' + str(install / 'bin/luna-shell.cmd') + '""'
+        shutil.copyfile(shortcut_path, evidence / 'Luna Command Prompt.lnk')
+        stored_shortcut = shortcut_strings(shortcut_path)
+        (evidence / 'shortcut-unicode-strings.json').write_text(json.dumps(stored_shortcut, indent=2) + '\n')
+        assert stored_shortcut['arguments'] == '/K ""' + str(install / 'bin/luna-shell.cmd') + '""'
         prompt = run('start-menu-command-prompt', '"' + shortcut['TargetPath'] + '" /D ' +
-                     shortcut['Arguments'].replace('/K ', '/C ', 1), env=child_env)
+                     stored_shortcut['arguments'].replace('/K ', '/C ', 1), env=child_env)
         assert b'luna 0.1.0' in prompt.stdout
         run('llvm-version', [install / 'toolchains/llvm/bin/llc.exe', '--version'], env=child_env)
         for name in ('quickstart', 'stdlib'):
