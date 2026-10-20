@@ -147,6 +147,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/history/pre-0.1/worktree-phase6-formatting-notes.md](history/pre-0.1/worktree-phase6-formatting-notes.md) | historical | [stdlib](spec/0.1/stdlib.md) |
 | [docs/implementation_plan.md](implementation_plan.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/implementation_plan_mvir.md](implementation_plan_mvir.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/installation.md](installation.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/integration/2026-10-03-all-worktrees.md](integration/2026-10-03-all-worktrees.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/lang-item-roadmap-catalog.md](lang-item-roadmap-catalog.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/luna_artifact_identity_refactoring.md](luna_artifact_identity_refactoring.md) | historical | [modules](spec/0.1/modules.md) |

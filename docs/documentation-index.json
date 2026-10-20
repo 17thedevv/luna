@@ -695,6 +695,11 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/installation.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/integration/2026-10-03-all-worktrees.md",
     "role": "evidence",
     "owner": "conformance"

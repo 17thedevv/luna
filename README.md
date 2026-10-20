@@ -26,7 +26,7 @@ account or Rust/Cargo is needed. See the [installer details](distribution/window
 
 Verify the ZIP with [SHA256SUMS](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/SHA256SUMS).
 See [release notes](https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1)
-and [installation instructions](https://lunalang.netlify.app/getting-started/).
+and [installation instructions](docs/installation.md).
 Keep `bin`, `runtime` and `libs/external` together after extraction. The Windows
 ZIP contains the compiler executable. Portable ZIP users install LLVM 18 and
 a native GNU toolchain separately; Windows portable users also need the
