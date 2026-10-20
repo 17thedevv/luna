@@ -1,0 +1,193 @@
+{
+  "status": "PASS",
+  "date": "2026-10-21",
+  "scope": "Windows online installer delivery, private toolchain and native smoke; original Luna compiler/runtime/provider bits unchanged",
+  "source_commit": "1e22611c2f432e98baa57cbdbb66296935499799",
+  "installer_lock_sha256": "cf326de8eb8d2aeb6874d3a379eb3404a4351149d0496e64c6ac284d38eea0ed",
+  "workflow_run": 39474143676,
+  "workflow_url": "https://github.com/17thedevv/luna/actions/runs/39474143676",
+  "ci_artifacts": [
+    {
+      "id": 12289365420,
+      "name": "luna-windows-installer-39474143676-1",
+      "sha256": "1583a6ed64bb781906be9ad612acc033f5e3baf9ad0e529a6d8816d7ed986377",
+      "verified": true
+    },
+    {
+      "id": 12288806550,
+      "name": "luna-installer-smoke-39474143676-1",
+      "sha256": "b56c7666053ff4ea7c96543dac6bd8913ca9c010f4620651012fa51358b0a3ff",
+      "verified": true
+    }
+  ],
+  "release_assets": [
+    {
+      "name": "lunainstaller.exe",
+      "id": 660121370,
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/lunainstaller.exe",
+      "http_status": 200,
+      "bytes": 2741814,
+      "sha256": "adb15aa0c50a8d72bccaa447cfabd23c68010da547672c0db2c9a3184e7af5fd",
+      "api_digest_matches": true,
+      "anonymous_access": true
+    },
+    {
+      "name": "lunainstaller.exe.sha256",
+      "id": 660121465,
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/lunainstaller.exe.sha256",
+      "http_status": 200,
+      "bytes": 85,
+      "sha256": "25035199aa3a196aadf381f6fbe13865ddd459e90fa4a16376a3f40bc97487bc",
+      "api_digest_matches": true,
+      "anonymous_access": true
+    },
+    {
+      "name": "installer-build.json",
+      "id": 660121524,
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/installer-build.json",
+      "http_status": 200,
+      "bytes": 398,
+      "sha256": "454e30409c745d64a55a00f71e51adf2c5337c89e1df3c2f82a36e18fc7d5898",
+      "api_digest_matches": true,
+      "anonymous_access": true
+    },
+    {
+      "name": "installer-lock.json",
+      "id": 660121591,
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/installer-lock.json",
+      "http_status": 200,
+      "bytes": 4768,
+      "sha256": "cf326de8eb8d2aeb6874d3a379eb3404a4351149d0496e64c6ac284d38eea0ed",
+      "api_digest_matches": true,
+      "anonymous_access": true
+    },
+    {
+      "name": "INSTALLER-SHA256SUMS",
+      "id": 660121644,
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/INSTALLER-SHA256SUMS",
+      "http_status": 200,
+      "bytes": 369,
+      "sha256": "319662ccf6fbfe6ff40f04d8c1f1ab329a394f48dad1116e24fed699594f3150",
+      "api_digest_matches": true,
+      "anonymous_access": true
+    },
+    {
+      "name": "luna-llvm18-link-tools-windows-x86_64.zip",
+      "id": 660091374,
+      "url": "https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-llvm18-link-tools-windows-x86_64.zip",
+      "http_status": 200,
+      "bytes": 125853051,
+      "sha256": "ce917ee0b4bbee231ad60eca3c384ccc6089606dc84e2a387cad4d01da0b53b2",
+      "api_digest_matches": true,
+      "anonymous_access": true
+    }
+  ],
+  "smoke": {
+    "status": "PASS",
+    "installer_sha256": "adb15aa0c50a8d72bccaa447cfabd23c68010da547672c0db2c9a3184e7af5fd",
+    "workflow_run": "39474143676",
+    "lock_sha256": "cf326de8eb8d2aeb6874d3a379eb3404a4351149d0496e64c6ac284d38eea0ed",
+    "steps": [
+      {
+        "label": "build-tamper-test",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "reject-tampered-payload",
+        "exit": 7,
+        "expected": null
+      },
+      {
+        "label": "install",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "version-clean-path-stale-env",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "read-start-menu-shortcut",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "start-menu-command-prompt",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "llvm-version",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "quickstart-build",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "quickstart-native",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "stdlib-build",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "stdlib-native",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "quickstart-run",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "missing-source-exit",
+        "exit": 1,
+        "expected": 1
+      },
+      {
+        "label": "reinstall",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "uninstall",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "install-preexisting-path",
+        "exit": 0,
+        "expected": 0
+      },
+      {
+        "label": "uninstall-preexisting-path",
+        "exit": 0,
+        "expected": 0
+      }
+    ],
+    "post_uninstall_path": [
+      "%USERPROFILE%\\.dotnet\\tools;%USERPROFILE%\\.cargo\\bin;%USERPROFILE%\\AppData\\Local\\Microsoft\\WindowsApps;D:\\a\\_temp\\luna-installer-smoke\\unrelated user tool",
+      2
+    ],
+    "post_uninstall_ownership": null,
+    "providers": 49,
+    "payload_hashes": 105,
+    "unicode_space_path": true,
+    "host_tools_required": false,
+    "tampered_payload_rejected": true,
+    "reinstall_path_unique": true,
+    "preexisting_path_preserved": true,
+    "user_file_preserved": true
+  },
+  "unsigned": true,
+  "superseded_attempts": "installer-attempts.json"
+}

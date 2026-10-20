@@ -1,0 +1,10 @@
+{
+  "file": "lunainstaller.exe",
+  "sha256": "adb15aa0c50a8d72bccaa447cfabd23c68010da547672c0db2c9a3184e7af5fd",
+  "bytes": 2741814,
+  "test_build": false,
+  "lock_sha256": "cf326de8eb8d2aeb6874d3a379eb3404a4351149d0496e64c6ac284d38eea0ed",
+  "source_commit": "1e22611c2f432e98baa57cbdbb66296935499799",
+  "workflow_run": "39474143676",
+  "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)"
+}

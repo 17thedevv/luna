@@ -18,7 +18,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
         </div>
         <div class="luna-badge">
           <span class="luna-badge-dot"></span>
-          <span>Luna v0.1 • Systems Language</span>
+          <span>Luna 0.1.0-alpha.1 • Prerelease</span>
         </div>
       </div>
 
@@ -33,19 +33,19 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
       </p>
 
       <div class="luna-hero-actions">
-        <a href="/getting-started/" class="luna-btn luna-btn-primary"><span>Get Started</span><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg></a>
+        <a href="/getting-started/" class="luna-btn luna-btn-primary"><span>Download &amp; Install</span><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg></a>
         <a href="/language-tour/" class="luna-btn luna-btn-secondary"><span>Language Tour</span></a>
         <a href="https://github.com/17thedevv/luna.git" target="_blank" rel="noopener" class="luna-btn luna-btn-secondary"><svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg><span>GitHub</span></a>
       </div>
 
       <div class="luna-quick-install">
         <div class="luna-quick-line">
-          <span class="luna-prompt-symbol">$</span>
-          <span class="luna-quick-code">git clone https://github.com/17thedevv/luna.git</span>
+          <span class="luna-prompt-symbol">↓</span>
+          <a class="luna-quick-code" href="https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/lunainstaller.exe">Windows setup (lunainstaller.exe)</a>
         </div>
         <div class="luna-quick-line">
-          <span class="luna-prompt-symbol">$</span>
-          <span class="luna-quick-code">cd luna/luna-rs &amp;&amp; cargo build --release</span>
+          <span class="luna-prompt-symbol">↓</span>
+          <a class="luna-quick-code" href="https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip">Ubuntu x86_64 ZIP</a>
         </div>
       </div>
     </div>
@@ -503,37 +503,27 @@ fn setup() {
   <section class="luna-section">
     <div class="luna-section-header">
       <div class="luna-section-tag">Getting Started</div>
-      <h2 class="luna-section-title">From Source to Binary in Minutes</h2>
-      <p class="luna-section-desc">
-        Luna builds using the standard Rust toolchain and LLVM.
-      </p>
+      <h2 class="luna-section-title">Download. Install. Run.</h2>
+      <p class="luna-section-desc">Use the alpha binary distribution. Rust/Cargo is needed only for source development.</p>
     </div>
-
     <div class="luna-quickstart-grid">
       <div class="luna-step">
         <div class="luna-step-num">1</div>
-        <h4>Build the Compiler</h4>
-        <p>Clone the Luna repository and build the release binary via Cargo.</p>
-        <pre class="luna-step-code"><code>git clone https://github.com/17thedevv/luna.git
-cd luna/luna-rs &amp;&amp; cargo build --release</code></pre>
+        <h4>Install Luna</h4>
+        <p><a href="/getting-started/">Download the Windows installer or Ubuntu ZIP</a> and follow the platform instructions.</p>
+        <pre class="luna-step-code"><code>0.1.0-alpha.1</code></pre>
       </div>
-
       <div class="luna-step">
         <div class="luna-step-num">2</div>
-        <h4>Write Your Code</h4>
-        <p>Save your first program to a <code>.ln</code> source file.</p>
-        <pre class="luna-step-code"><code>fn main() -&gt; i32 &#123;
-    std::io::println("Hello, Luna!");
-    return 0;
-&#125;</code></pre>
+        <h4>Open a Terminal</h4>
+        <p>Open Luna Command Prompt or a new terminal. Copy the packaged <code>examples/quickstart.ln</code> into your project.</p>
+        <pre class="luna-step-code"><code>luna --version</code></pre>
       </div>
-
       <div class="luna-step">
         <div class="luna-step-num">3</div>
         <h4>Compile &amp; Run</h4>
-        <p>Invoke the Luna compiler CLI to emit native code and run.</p>
-        <pre class="luna-step-code"><code>./target/release/luna run hello.ln
-// Output: Hello, Luna!</code></pre>
+        <p>The packaged quickstart returns exit code 0. Continue with the language tour to edit your program.</p>
+        <pre class="luna-step-code"><code>luna run quickstart.ln --quiet</code></pre>
       </div>
     </div>
   </section>

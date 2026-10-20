@@ -18,5 +18,6 @@ python -m http.server 8000
 
 Serve the repository root so links to adopted contracts/source files resolve.
 Open /docs/site/vi/index.html or /docs/site/en/index.html. The language contract
-is retained despite incomplete implementation; every page identifies release
-conformance as blocked/unverified. Website publication is not part of this task.
+and release qualification remain separate. Every page reports the recorded
+release state; a published boundary requires verified qualification and package
+closure records. Entry pages link to the public Windows/Ubuntu downloads.

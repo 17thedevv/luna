@@ -60,22 +60,24 @@ for row in inventory:
 
 pages = list((ROOT / 'docs/site').rglob('*.html'))
 review_boundary = 'Qualification: READY FOR RELEASE REVIEW IN TESTED SCOPE; publication pending'
+published_boundary = 'Release: v0.1.0-alpha.1 prerelease published; qualification passed in tested scope'
 review_evidence_checked = False
 for page in pages:
     text = page.read_text(encoding='utf-8')
     PageLinks(page).feed(text)
     boundary = re.search(r'<p class="version-note">(.*?)</p>', text, re.S)
     if boundary is None or not any(state in boundary.group(1) for state in (
-            'BLOCKED / NOT VERIFIED', review_boundary)):
+            'BLOCKED / NOT VERIFIED', review_boundary, published_boundary)):
         errors.append(f'Missing readiness boundary: {page.relative_to(ROOT)}')
-    if boundary is not None and review_boundary in boundary.group(1) and not review_evidence_checked:
+    if (boundary is not None and any(state in boundary.group(1) for state in (review_boundary, published_boundary))
+            and not review_evidence_checked):
         review_evidence_checked = True
         # The clean Windows package failure superseded the old 8525067f
         # release verdict. Historical passes cannot reopen current readiness.
         qualification_root = ROOT / 'docs/audits/r5-cpu-baseline-2026-10-20'
         qualification = json.loads((qualification_root / 'qualification-state.json').read_text(encoding='utf-8'))
         evidence_root = qualification_root / 'evidence/pin-b5cb77c3'
-        if qualification['status'] != 'READY_FOR_RELEASE_REVIEW':
+        if qualification['status'] not in ('READY_FOR_RELEASE_REVIEW', 'PUBLISHED_PRERELEASE'):
             errors.append('Release-review boundary requires closed CPU-baseline qualification')
             continue
         if not all((evidence_root / name).is_file() for name in ('all-artifact-verification.json', 'lane-state.json')):
@@ -84,7 +86,8 @@ for page in pages:
         verification = json.loads((evidence_root / 'all-artifact-verification.json').read_text(encoding='utf-8'))
         ledger = json.loads((evidence_root / 'lane-state.json').read_text(encoding='utf-8'))
         if not (ledger['tested_implementation_pin'] == qualification['implementation_pin']
-                and verification['status'] == 'PASS' and len(verification['artifacts']) == 8
+                and verification['status'] == 'PASS' and not verification['errors']
+                and len(verification['artifacts']) == 8
                 and verification['required_cpu_baseline'] == 'generic;features='
                 and len(ledger['lanes']) == 8
                 and all(lane['status'] == 'PASS_IN_EXECUTED_SCOPE' for lane in ledger['lanes'])
@@ -92,6 +95,23 @@ for page in pages:
                         for artifact in verification['artifacts'])
                 and ledger['candidate']['sha'] == ledger['tested_implementation_pin']):
             errors.append('Release-review boundary requires eight verified exact-pin lanes and qualified candidate')
+        if published_boundary in boundary.group(1):
+            closure = json.loads((qualification_root / 'release-closure.json').read_text(encoding='utf-8'))
+            packages = json.loads((qualification_root / 'evidence/package-cd9cd188/release-package-verification.json').read_text(encoding='utf-8'))
+            targets = {'x86_64-pc-windows-gnu', 'x86_64-unknown-linux-gnu'}
+            if not (qualification['status'] == closure['status'] == 'PUBLISHED_PRERELEASE'
+                    and closure['qualification']['tested_implementation_pin'] == qualification['implementation_pin']
+                    and closure['pull_request']['merged'] and not closure['release']['draft']
+                    and closure['release']['prerelease']
+                    and closure['tag']['name'] == qualification['release_tag'] == 'v0.1.0-alpha.1'
+                    and closure['tag']['peeled_commit'] == packages['source_commit']
+                    and packages['qualified_implementation'] == qualification['implementation_pin']
+                    and packages['status'] == 'PASS' and set(packages['smokes']) == targets
+                    and all(row['summary']['status'] == 'PASS' for row in packages['smokes'].values())
+                    and {asset['name']: asset['sha256'] for asset in closure['release']['assets']
+                         if asset['name'].endswith('.zip')}
+                        == {package['name']: package['sha256'] for package in packages['packages'].values()}):
+                errors.append('Published boundary requires matching release, tag, assets and both package smokes')
 
 for source in (ROOT / 'docs/tools').glob('*.py'):
     ast.parse(source.read_text(encoding='utf-8'), filename=str(source))

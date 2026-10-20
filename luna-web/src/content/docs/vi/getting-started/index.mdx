@@ -1,137 +1,109 @@
 ---
 title: Bắt đầu với Luna
-description: Hướng dẫn cài đặt Luna và viết chương trình đầu tiên trong vòng chưa đầy 5 phút.
+description: Tải Luna 0.1.0-alpha.1 cho Windows hoặc Ubuntu và chạy ví dụ trong gói.
 ---
 
-import { Tabs, TabItem, Card, CardGrid, Aside } from '@astrojs/starlight/components';
+import { Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
-## Yêu cầu môi trường
+## Tải xuống
 
-Trước khi cài đặt Luna, hãy đảm bảo hệ thống của bạn đã cài đặt các công cụ sau:
+Bản hiện tại là **0.1.0-alpha.1**, một bản alpha prerelease. Chưa phát hành stable `0.1.0`.
 
-| Công cụ | Mục đích | Hướng dẫn cài đặt |
-|---------|----------|-------------------|
-| **Rust** (1.75+) | Biên dịch compiler từ mã nguồn | [rustup.rs](https://rustup.rs/) |
-| **LLVM 17+** | Backend sinh mã máy tối ưu | [llvm.org](https://llvm.org/) |
-| **Clang** | Liên kết nhị phân bản địa (linking) | Đi kèm với LLVM |
-| **Git** | Sao chép kho lưu trữ | [git-scm.com](https://git-scm.com/) |
+## Bộ cài Windows (đề xuất)
 
-## Cài đặt
+[Tải lunainstaller.exe](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/lunainstaller.exe) · [SHA-256](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/lunainstaller.exe.sha256)
+
+Chạy bộ cài, chọn thư mục và giữ tùy chọn thêm Luna vào user PATH. Setup tự tải Luna, LLVM 18.1.8 và GNU/MinGW rồi kiểm SHA-256 trước khi giải nén. Không cần quyền admin hoặc Rust/Cargo. Cần Windows x86_64, Windows 10 1809 trở lên, Internet, khoảng 390 MB tải xuống và 1,5 GB cho các thành phần đã cài.
+
+Mặc định cài tại `%LOCALAPPDATA%\Programs\Luna`. Mở **Luna Command Prompt** từ Start hoặc mở terminal mới rồi chạy `luna --version`. Gỡ cài qua Windows Settings → Apps → Luna. Bộ cài chưa có chữ ký số.
+
+Trong PowerShell, có thể kiểm setup trước khi chạy bằng `Get-FileHash .\lunainstaller.exe -Algorithm SHA256`, so sánh với file `.sha256` bên trên.
+
+Để thử ví dụ với vị trí cài mặc định:
+
+```powershell
+$package = "$env:LOCALAPPDATA\Programs\Luna\packages\luna-0.1.0-alpha.1-x86_64-pc-windows-gnu"
+Copy-Item "$package\examples\quickstart.ln" .
+luna run .\quickstart.ln --quiet
+$LASTEXITCODE
+```
+
+Nếu chọn thư mục khác, thay đường dẫn `$package` tương ứng. Ví dụ kết thúc với mã `0`.
+
+## ZIP portable
+
+| Nền tảng | Gói tải | Chương trình trong ZIP |
+|---|---|---|
+| Windows x86_64 GNU | [Tải ZIP Windows](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip) | `bin/luna.exe` |
+| Ubuntu 24.04 x86_64 GNU | [Tải ZIP Ubuntu](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip) | `bin/luna` |
+
+[SHA256SUMS](https://github.com/17thedevv/luna/releases/download/v0.1.0-alpha.1/SHA256SUMS) · [Release notes](https://github.com/17thedevv/luna/releases/tag/v0.1.0-alpha.1)
+
+ZIP Windows chứa compiler `.exe`, runtime và các artifact thư viện chuẩn. Giữ `bin`, `runtime` và `libs/external` cùng nhau sau khi giải nén. Không cần Rust/Cargo để dùng các gói này.
+
+## Yêu cầu cho ZIP portable
+
+- Cả hai nền tảng cần **LLVM 18** và **GNU C/C++ toolchain x86_64** bản địa.
+- Windows cần `LLVM-C.dll` trên `PATH` và [Microsoft Visual C++ runtime x64](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist). [Bản phân phối LLVM 18.1.8 chính thức](https://github.com/llvm/llvm-project/releases/tag/llvmorg-18.1.8), `clang+llvm-18.1.8-x86_64-pc-windows-msvc.tar.xz`, có các công cụ và DLL cần thiết. Đặt `LLVM_HOME` vào thư mục đã giải nén có chứa `bin`.
+- Trên Ubuntu 24.04, cài `build-essential`, `llvm-18` và `unzip`.
+
+LLVM và GNU là công cụ bên ngoài, không đi kèm ZIP Luna. Release này chưa có gói đã qualify cho macOS, ARM hoặc các nền tảng khác.
+
+## Kiểm tra, giải nén và chạy
+
+Tải ZIP đúng nền tảng và `SHA256SUMS` vào cùng một thư mục có quyền ghi.
 
 <Tabs>
-  <TabItem label="Linux / macOS">
-    ```bash
-    # Sao chép kho lưu trữ
-    git clone https://github.com/17thedevv/luna.git
-    cd luna/luna-rs
+  <TabItem label="Windows PowerShell">
+    So sánh hash bên dưới với dòng Windows trong `SHA256SUMS`:
 
-    # Biên dịch ở chế độ release
-    cargo build --release
+    ```powershell
+    Get-FileHash .\luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip -Algorithm SHA256
+    Expand-Archive .\luna-0.1.0-alpha.1-x86_64-pc-windows-gnu.zip -DestinationPath .
+    $lunaPackage = (Resolve-Path .\luna-0.1.0-alpha.1-x86_64-pc-windows-gnu).Path
 
-    # Thêm vào PATH (tùy chọn)
-    export PATH="$PWD/target/release:$PATH"
+    # Thay đường dẫn LLVM/GNU bằng vị trí đã cài trên máy.
+    $env:LLVM_HOME = 'C:\LLVM18'
+    $env:PATH = "$lunaPackage\bin;$env:LLVM_HOME\bin;C:\mingw64\bin;$env:PATH"
 
-    # Kiểm tra cài đặt
     luna --version
+    luna build "$lunaPackage\examples\quickstart.ln" -o .\quickstart.exe
+    .\quickstart.exe
+    $LASTEXITCODE
+    luna build "$lunaPackage\examples\stdlib.ln" -o .\stdlib.exe
+    .\stdlib.exe
+    $LASTEXITCODE
     ```
   </TabItem>
-  <TabItem label="Windows">
-    ```powershell
-    # Sao chép kho lưu trữ
-    git clone https://github.com/17thedevv/luna.git
-    cd luna\luna-rs
+  <TabItem label="Ubuntu 24.04">
+    ```bash
+    sudo apt-get install build-essential llvm-18 unzip
+    sha256sum -c SHA256SUMS --ignore-missing
+    unzip luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu.zip
+    export LUNA_HOME="$PWD/luna-0.1.0-alpha.1-x86_64-unknown-linux-gnu"
+    export LLVM_HOME=/usr/lib/llvm-18
+    export PATH="$LUNA_HOME/bin:$LLVM_HOME/bin:$PATH"
+    chmod +x "$LUNA_HOME/bin/luna"
 
-    # Biên dịch ở chế độ release
-    cargo build --release
-
-    # Thêm vào PATH (tùy chọn)
-    $env:PATH = "$PWD\target\release;$env:PATH"
-
-    # Kiểm tra cài đặt
     luna --version
+    luna build "$LUNA_HOME/examples/quickstart.ln" -o quickstart
+    ./quickstart
+    echo $?
+    luna build "$LUNA_HOME/examples/stdlib.ln" -o stdlib
+    ./stdlib
+    echo $?
     ```
   </TabItem>
 </Tabs>
 
-<Aside type="tip">
-  **Mẹo:** Biên dịch ở chế độ release (`--release`) tạo ra nhị phân trình biên dịch nhanh hơn đáng kể. Các bản dựng debug thuận tiện cho việc phát triển nhưng sẽ chậm hơn rõ rệt khi biên dịch các chương trình lớn.
-</Aside>
-
-## Chương trình đầu tiên
-
-Tạo một tệp có tên `hello.ln`:
-
-```luna
-fn main() -> i32 {
-    dec name = "Luna";
-    std::io::println("Xin chào từ {}! 🌙", name);
-
-    dec numbers = [1, 2, 3, 4, 5];
-    dec rw sum: i32 = 0;
-    for n in &numbers {
-        sum = sum + *n;
-    }
-    std::io::println("Tổng: {}", sum);
-
-    return 0;
-}
-```
-
-### Biên dịch và Chạy
-
-```bash
-# Biên dịch và chạy trong một bước duy nhất
-luna run hello.ln
-
-# Hoặc biên dịch thành file nhị phân riêng
-luna build hello.ln -o hello
-./hello
-```
-
-### Kết quả mong đợi
-
-```
-Xin chào từ Luna! 🌙
-Tổng: 15
-```
-
-## Phân tích mã nguồn
-
-| Thành phần | Ý nghĩa |
-|------------|---------|
-| `fn main() -> i32` | Hàm điểm vào (entry point) trả về mã trạng thái thoát |
-| `dec name = "Luna"` | Khai báo biến bất biến với tự động suy luận kiểu |
-| `dec rw sum: i32 = 0` | Khai báo biến khả ghi (`rw`) với chú giải kiểu rõ ràng |
-| `&numbers` | Vay mượn (borrowing) — tham chiếu chia sẻ tới mảng |
-| `*n` | Giải tham chiếu (dereference) để lấy giá trị |
-| `std::io::println(...)` | Xuất dữ liệu định dạng từ thư viện chuẩn |
-| `return 0` | Lệnh trả về tường minh (0 biểu thị thành công) |
+`luna --version` in ra `luna 0.1.0`; manifest của gói ghi rõ đây là bản alpha. Cả hai ví dụ đều kết thúc với mã thoát `0`, không yêu cầu in ra console.
 
 <Aside type="note">
-  Trong Luna, các biến **mặc định là bất biến**. Hãy sử dụng từ khóa `rw` (rewritable) khi bạn cần thay đổi giá trị của một binding: `dec rw count = 0;`. Thiết kế này ngăn chặn các lỗi đột biến ngoài ý muốn và bảo đảm an toàn dữ liệu đa luồng (data-race freedom) ngay tại thời điểm biên dịch.
+  Xóa các override `LUNA_SYSROOT` và `LUNA_RUNTIME_LIB` cũ trước khi dùng gói. Compiler tìm runtime và 49 provider chuẩn theo vị trí của chính nó. Lỗi thiếu `LLVM-C.dll` trên Windows nghĩa là LLVM chưa có trên `PATH`.
 </Aside>
 
-## Các bước tiếp theo
+## Dự án của bạn
 
-<CardGrid>
-  <Card title="Khám phá ngôn ngữ" icon="open-book">
-    Tìm hiểu toàn diện về cú pháp, hệ thống kiểu, mô hình sở hữu, trait và module của Luna.
+Chép `examples/quickstart.ln` vào thư mục dự án có quyền ghi, chỉnh sửa rồi dùng `luna build` hoặc `luna run`. File `stdlib.ln` trong gói minh họa `import <vec>;` tường minh và chạy bằng artifact thư viện của gói.
 
-    [Bắt đầu khám phá →](/vi/language-tour/)
-  </Card>
-  <Card title="Thư viện chuẩn" icon="document">
-    Tìm hiểu về Vec, String, Option, Result, HashMap, I/O và các kiểu nền tảng khác.
-
-    [Duyệt Thư viện chuẩn →](/vi/stdlib/)
-  </Card>
-  <Card title="Tham khảo cú pháp" icon="information">
-    Tài liệu tra cứu đầy đủ cho tất cả các từ khóa, toán tử và cấu trúc ngôn ngữ.
-
-    [Xem Cú pháp →](/vi/reference/syntax/)
-  </Card>
-  <Card title="Lộ trình phát triển" icon="star">
-    Xem kế hoạch phát triển sắp tới — macro, comptime, WebAssembly và hơn thế nữa.
-
-    [Xem Lộ trình →](/vi/roadmap/)
-  </Card>
-</CardGrid>
+Tiếp tục với [Khám phá ngôn ngữ](/vi/language-tour/) hoặc [Thư viện chuẩn](/vi/stdlib/). Nếu phát triển từ source, xem [hướng dẫn build trong repository](https://github.com/17thedevv/luna#build-and-verify).
