@@ -1,6 +1,7 @@
 # Public download audit — 2026-10-21
 
-Verdict: **COMPLETE** in the released alpha package and download-documentation scope.
+Verdict: **COMPLETE** for public alpha downloads, installer qualification and
+repository installation guidance; **PARTIAL** for deployment of the public website.
 The released version is `0.1.0-alpha.1`; stable `0.1.0` is not published.
 This audit does not certify every language feature.
 
@@ -63,6 +64,15 @@ None of those unsuccessful attempts is counted as acceptance.
 [Superseded attempts](installer-attempts.json) ·
 [Build record](installer-build.json) ·
 [Installer source and build instructions](../../../distribution/windows/README.md).
+
+## Public website deployment
+
+The EN/VI website sources and local production build contain the download links
+and current instructions. After PR #9 merged, the public Netlify site still
+served the old source-only guide. The available Netlify dashboard session is
+at its login page, with no configured local CLI credentials. Deployment is not
+claimed complete. The [repository installation guide](../../installation.md)
+is the current public fallback linked by the README and GitHub Release.
 
 [Machine-readable verification](public-download-verification.json) ·
 [Local smoke evidence](local-windows-smoke.zip) ·
