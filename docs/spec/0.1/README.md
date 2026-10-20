@@ -3,6 +3,22 @@
 Contract baseline: **0.1**. Release conformance: **BLOCKED / NOT VERIFIED**.
 Consolidated 2026-10-03 at compiler revision `3dac3ac`.
 
+Current qualification — 2026-10-20: **RELEASE BLOCKED by package CPU identity drift**.
+The eight completed lanes at `8525067f` are preserved, but clean Windows package
+smoke fails on a different CPU. [Finding and baseline repair](../../audits/r5-cpu-baseline-2026-10-20/README.md).
+A new implementation pin must reacquire all eight lanes and clean package smoke
+on both hosts. Candidate remains `8525067f`; no merge/tag/publication occurred.
+Strict target identity validation and the adopted language contracts remain mandatory.
+Earlier qualification snapshots below retain their dated scopes.
+
+Prior implementation status reconciliation — 2026-10-14: the
+[R4 exact release ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md)
+records A/C/D/E-wave closures, candidate input `3f8646c6`, tested implementation
+`e4f9fb53` and protocol 25/9/5/2. E-wave is qualified in its Windows GNU tested
+scope. Ubuntu GNU normal/ASan, the complete DIAG-1..10 structural audit and the
+recorded comptime/VM limits are not certified by those closures. R5 is PENDING.
+This status update changes no normative contract or advertised target scope.
+
 Subsequent [all-worktree integration](../../integration/2026-10-03-all-worktrees.md)
 preserves newer implementation and prior approved records. The original audit
 and CLI evidence keep their revision boundary; they do not certify the merge.

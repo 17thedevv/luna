@@ -1,0 +1,159 @@
+{
+  "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "status": "PASS",
+  "artifacts": [
+    {
+      "artifact_id": 12222663261,
+      "name": "r5-windows-workspace-final-39276394971-1",
+      "workflow_run": {
+        "id": 39276394971,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "896876d8694a4010d4f050187afe0af774b2b4a7"
+      },
+      "archive_sha256": "887e53b89382e08dd38aa24a4f261a019af1dade685b4eb0fc4b302e5be25318",
+      "size_in_bytes": 103775,
+      "local_path": "D:\\r5-8525067f\\ci-artifacts\\r5-windows-workspace-final-39276394971-1.zip",
+      "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "harness_commit": "896876d8694a4010d4f050187afe0af774b2b4a7",
+      "status": "PASS",
+      "checks": {
+        "recorded_log_hashes": 15,
+        "acquisition_gates": 14
+      },
+      "gates": 14,
+      "workspace": {
+        "result_groups": 236,
+        "passed": 1421,
+        "failed": 0,
+        "ignored": 1,
+        "ignored_lines": [
+          "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+        ]
+      },
+      "boundary": null,
+      "providers": {
+        "count": 49,
+        "target": "x86_64-pc-windows-gnu",
+        "object": "COFF 0x8664",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "archived_bundles_checked": 0
+      },
+      "code_tree_identity": {
+        "luna-rs": "254f67a76a93a80866fa4be4e9b5ffd95fb5ef49",
+        "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+        "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4"
+      }
+    },
+    {
+      "artifact_id": 12214091484,
+      "name": "r5-windows-workspace-triage-39276394971-1",
+      "workflow_run": {
+        "id": 39276394971,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "896876d8694a4010d4f050187afe0af774b2b4a7"
+      },
+      "archive_sha256": "cc8a5733db9a3b46694807384a5df3c9bc8dae4132574a75744f004557d83a04",
+      "size_in_bytes": 103803,
+      "local_path": "D:\\r5-8525067f\\ci-artifacts\\r5-windows-workspace-triage-39276394971-1.zip",
+      "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "harness_commit": "896876d8694a4010d4f050187afe0af774b2b4a7",
+      "status": "PASS",
+      "checks": {
+        "recorded_log_hashes": 15,
+        "acquisition_gates": 14
+      },
+      "gates": 14,
+      "workspace": {
+        "result_groups": 236,
+        "passed": 1421,
+        "failed": 0,
+        "ignored": 1,
+        "ignored_lines": [
+          "test mutable_references::sem_mutref_06_invalid_fixture ... ignored"
+        ]
+      },
+      "boundary": null,
+      "providers": {
+        "count": 49,
+        "target": "x86_64-pc-windows-gnu",
+        "object": "COFF 0x8664",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "archived_bundles_checked": 0
+      },
+      "code_tree_identity": {
+        "luna-rs": "254f67a76a93a80866fa4be4e9b5ffd95fb5ef49",
+        "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+        "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4"
+      }
+    },
+    {
+      "artifact_id": 12206242031,
+      "name": "r5-windows-gnu-39276394971-1",
+      "workflow_run": {
+        "id": 39276394971,
+        "repository_id": 1301089755,
+        "head_repository_id": 1301089755,
+        "head_branch": "r5-diag-repair",
+        "head_sha": "896876d8694a4010d4f050187afe0af774b2b4a7"
+      },
+      "archive_sha256": "74264fc2ed6cf10fcf7e1609d2d0371bde30f3e67a6ab7ed1fbe721a579cfbfd",
+      "size_in_bytes": 43288887,
+      "local_path": "D:\\r5-8525067f\\ci-artifacts\\r5-windows-gnu-39276394971-1.zip",
+      "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+      "harness_commit": "896876d8694a4010d4f050187afe0af774b2b4a7",
+      "status": "PASS",
+      "checks": {
+        "recorded_log_hashes": 383,
+        "acquisition_gates": 35
+      },
+      "gates": 35,
+      "workspace": null,
+      "boundary": {
+        "comptime_passed": 88,
+        "comptime_characterized": 8,
+        "strict_bounds_rows": 4,
+        "trap": "L002: index 3, length 2",
+        "native_exits": [
+          3221226505,
+          3221226505,
+          3221226505,
+          3221226505
+        ]
+      },
+      "providers": {
+        "count": 49,
+        "target": "x86_64-pc-windows-gnu",
+        "object": "COFF 0x8664",
+        "versions": {
+          "compiler": 25,
+          "metadata": 9,
+          "mvir": 5,
+          "format": 2
+        },
+        "archived_bundles_checked": 98
+      },
+      "code_tree_identity": {
+        "luna-rs": "254f67a76a93a80866fa4be4e9b5ffd95fb5ef49",
+        "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+        "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4"
+      }
+    }
+  ],
+  "errors": [],
+  "scope": "ZIP SHA-256/size/CRC; inventory; clean exact pin; gate exits; compressed and raw log digests; workspace totals; recorded provider identities",
+  "release": "PENDING COMPLETE EIGHT-LANE RECONCILIATION"
+}

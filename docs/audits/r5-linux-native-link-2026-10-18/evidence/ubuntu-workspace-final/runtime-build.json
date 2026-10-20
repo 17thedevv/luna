@@ -1,0 +1,18 @@
+{
+  "gate": "runtime-build",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cmake",
+    "--build",
+    "/home/runner/work/_temp/r5-workspace-final/runtime",
+    "--parallel"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-final",
+  "started_utc": "2026-10-17T21:03:42Z",
+  "exit": 0,
+  "seconds": 4.326594381000007,
+  "log_sha256": "949fdfe06ae87f17f126804e701ad51df1578761e8b5631212893644745f1c42",
+  "status": "PASS",
+  "log": "runtime-build.log.gz",
+  "compressed_sha256": "f7c5b02cf307708e24d7c20ca443ec8c40669b86b7085c7006e4410e15db9353"
+}

@@ -88,17 +88,30 @@ lang_item_table! {
     (DropInPlace, "drop_in_place", Function);
     (SliceFromRawParts, "slice_from_raw_parts", Function);
     (SliceFromRawPartsMut, "slice_from_raw_parts_mut", Function);
+    (WrappingAdd, "wrapping_add", Function);
+    (WrappingSub, "wrapping_sub", Function);
+    (WrappingMul, "wrapping_mul", Function);
 }
 
 impl LangItem {
     pub fn is_memory_intrinsic(self) -> bool {
         matches!(self, Self::DropInPlace | Self::SliceFromRawParts | Self::SliceFromRawPartsMut)
     }
+
+    /// Explicit modular integer arithmetic intrinsics. These are the only
+    /// sanctioned unchecked-arithmetic operations; ordinary operators stay
+    /// checked. Recognition is by resolved lang-item identity, never by callee
+    /// or library symbol names.
+    pub fn is_wrapping_intrinsic(self) -> bool {
+        matches!(self, Self::WrappingAdd | Self::WrappingSub | Self::WrappingMul)
+    }
 }
 
 #[derive(Clone, Debug)]
 pub struct LangItemRegistry {
     items: [Option<SymbolId>; LangItem::COUNT],
+    /// Session-local provenance reconstructed from source or canonical AST.
+    origins: [Option<Span>; LangItem::COUNT],
     reverse: HashMap<SymbolId, LangItem>,
 }
 
@@ -106,6 +119,7 @@ impl LangItemRegistry {
     pub fn new() -> Self {
         Self {
             items: [None; LangItem::COUNT],
+            origins: [None; LangItem::COUNT],
             reverse: HashMap::new(),
         }
     }
@@ -135,6 +149,12 @@ impl LangItemRegistry {
         }
     }
 
+    pub fn inject_raw_with_span(&mut self, item: LangItem, sym: SymbolId, span: Span) {
+        let vacant = self.items[item.as_usize()].is_none();
+        self.inject_raw(item, sym);
+        if vacant { self.origins[item.as_usize()] = Some(span); }
+    }
+
     pub fn from_symbol(&self, sym: SymbolId) -> Option<LangItem> {
         self.reverse.get(&sym).copied()
     }
@@ -142,21 +162,30 @@ impl LangItemRegistry {
     pub fn register(&mut self, item: LangItem, sym: SymbolId, actual_target: LangItemTarget, span: Span, diagnostics: &mut Vec<Diagnostic>) {
         let expected_target = item.target();
         if actual_target != expected_target {
-            diagnostics.push(Diagnostic::error(format!("language item `{}` requires target {:?}, but found {:?}", item.name(), expected_target, actual_target)).with_code(DiagnosticCode::InvalidAnnotation).with_span(span));
+            diagnostics.push(Diagnostic::error(format!("language item `{}` requires target {:?}, but found {:?}", item.name(), expected_target, actual_target)).with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver).with_span(span));
             return;
         }
 
         if let Some(&existing_item) = self.reverse.get(&sym) {
-            diagnostics.push(Diagnostic::error(format!("symbol is already registered as language item `{}`", existing_item.name())).with_code(DiagnosticCode::DuplicateDefinition).with_span(span));
+            let mut diagnostic = Diagnostic::source_error(DiagnosticCode::DuplicateDefinition, span, format!("symbol is already registered as language item `{}`", existing_item.name()));
+            if let Some(previous) = self.origins[existing_item.as_usize()] {
+                diagnostic = diagnostic.with_related(previous, "previous language-item registration");
+            }
+            diagnostics.push(diagnostic);
             return;
         }
 
         if let Some(_old_sym) = self.items[item.as_usize()] {
-            diagnostics.push(Diagnostic::error(format!("language item `{}` is defined multiple times", item.name())).with_code(DiagnosticCode::DuplicateDefinition).with_span(span));
+            let mut diagnostic = Diagnostic::source_error(DiagnosticCode::DuplicateDefinition, span, format!("language item `{}` is defined multiple times", item.name()));
+            if let Some(previous) = self.origins[item.as_usize()] {
+                diagnostic = diagnostic.with_related(previous, "previous language-item registration");
+            }
+            diagnostics.push(diagnostic);
             return;
         }
 
         self.items[item.as_usize()] = Some(sym);
+        self.origins[item.as_usize()] = Some(span);
         self.reverse.insert(sym, item);
     }
 
@@ -166,6 +195,7 @@ impl LangItemRegistry {
                 if let Some(&new_sym) = symbol_map.get(&old_sym) {
                     if self.items[i].is_none() {
                         self.items[i] = Some(new_sym);
+                        self.origins[i] = other.origins[i];
                         // We need the enum variant to put into reverse map!
                         // But we don't have it easily from index.
                         // However, other.reverse has old_sym -> item!
@@ -176,5 +206,39 @@ impl LangItemRegistry {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod declaration_origin_tests {
+    use super::{LangItem, LangItemRegistry, LangItemTarget};
+    use luna_common::{DiagnosticCode, Span};
+    use luna_common::ids::{FileId, SymbolId};
+    use std::collections::HashMap;
+
+    #[test]
+    fn duplicate_registrations_keep_origins_through_injection() {
+        let first = Span::new(FileId(1), 10, 14);
+        let second = Span::new(FileId(1), 30, 34);
+        let mut registry = LangItemRegistry::new();
+        let mut diagnostics = Vec::new();
+        registry.register(LangItem::Copy, SymbolId(1), LangItemTarget::Trait, first, &mut diagnostics);
+        assert!(diagnostics.is_empty());
+        for item in [LangItem::Copy, LangItem::Drop] {
+            let symbol = if item == LangItem::Copy { SymbolId(2) } else { SymbolId(1) };
+            registry.register(item, symbol, LangItemTarget::Trait, second, &mut diagnostics);
+            let diagnostic = diagnostics.pop().unwrap();
+            assert_eq!(diagnostic.code, Some(DiagnosticCode::DuplicateDefinition));
+            assert_eq!(diagnostic.span, Some(second));
+            assert_eq!(diagnostic.related.iter().map(|label| label.span).collect::<Vec<_>>(), vec![first]);
+        }
+        let mut injected = LangItemRegistry::new();
+        injected.inject_from(&registry, &HashMap::from([(SymbolId(1), SymbolId(7))]));
+        injected.register(LangItem::Copy, SymbolId(8), LangItemTarget::Trait, second, &mut diagnostics);
+        assert_eq!(diagnostics.pop().unwrap().related[0].span, first);
+        let mut canonical = LangItemRegistry::new();
+        canonical.inject_raw_with_span(LangItem::Copy, SymbolId(9), first);
+        canonical.register(LangItem::Copy, SymbolId(10), LangItemTarget::Trait, second, &mut diagnostics);
+        assert_eq!(diagnostics.pop().unwrap().related[0].span, first);
     }
 }

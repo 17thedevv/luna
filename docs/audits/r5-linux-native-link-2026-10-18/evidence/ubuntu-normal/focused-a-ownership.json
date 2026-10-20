@@ -1,0 +1,30 @@
+{
+  "gate": "focused-a-ownership",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--no-fail-fast",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "generic_drop_cli",
+    "--test",
+    "async_cleanup_cli",
+    "--test",
+    "async_provider_export_cli",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T18:03:32Z",
+  "exit": 0,
+  "seconds": 351.13533225200007,
+  "log_sha256": "6af001d90bc0a13bf3ae09fda7cdfb116ee65a152eccf18eb01045c6f016bb34",
+  "status": "PASS",
+  "log": "focused-a-ownership.log.gz",
+  "compressed_sha256": "a5a60eb52f6382796ee48bb8fc40ab345b7067350cad81350bbaa42a41c58dda"
+}

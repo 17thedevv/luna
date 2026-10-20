@@ -1,0 +1,17 @@
+// C-GAP isolation: safe Option projection, no range or iterator.
+import <result>;
+struct Wide { marker: i128 };
+struct Holder { value: std::Option<Wide>, force_alignment: i128 };
+fn main() -> i32 {
+    dec holder = Holder { value: std::Option::Some(Wide { marker: 123456789123456789i128 }), force_alignment: 0i128 };
+    match holder.value.as_ref() {
+        std::Option::Some(value) -> {
+            // Pointer formation and address inspection require no unsafe dereference.
+            dec address = value as *Wide as u64;
+            if address % (alignof(Wide) as u64) != 0u64 { return 17; }
+            if value.marker != 123456789123456789i128 { return 18; }
+        },
+        std::Option::None -> { return 19; },
+    }
+    return 0;
+}

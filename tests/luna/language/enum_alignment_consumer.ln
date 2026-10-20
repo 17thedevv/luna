@@ -1,0 +1,50 @@
+import "enum_alignment_provider";
+import <result>;
+#[link(name = "strlen")]
+extern fn strlen(value: str) -> usize;
+const ENUM_SIZE: usize = comptime { aligned::footprint<aligned::Wide>() };
+const ENUM_ALIGN: usize = comptime { aligned::alignment<aligned::Wide>() };
+const ARRAY_SIZE: usize = comptime { sizeof([aligned::Envelope<aligned::Wide>; 2]) as usize };
+const NESTED_SIZE: usize = comptime { sizeof(aligned::Nested) as usize };
+const STR_SIZE: usize = comptime { sizeof(str) as usize };
+fn main() -> i32 {
+    if ENUM_SIZE != (sizeof(aligned::Envelope<aligned::Wide>) as usize) { return 1; }
+    if ENUM_ALIGN != (alignof(aligned::Envelope<aligned::Wide>) as usize) { return 2; }
+    if ENUM_ALIGN != 16usize { return 3; }
+    if ARRAY_SIZE != (sizeof([aligned::Envelope<aligned::Wide>; 2]) as usize) { return 4; }
+    if NESTED_SIZE != (sizeof(aligned::Nested) as usize) { return 5; }
+    if STR_SIZE != (sizeof(str) as usize) { return 6; }
+    match *aligned::value() {
+        aligned::Envelope::Value(v) -> { if v.prefix != 7u8 || v.marker != 123456789123456789i128 || v.tail != 11u64 { return 7; } },
+        aligned::Envelope::Empty -> { return 8; },
+        aligned::Envelope::Pair(p, v) -> { return 9; },
+    }
+    match *aligned::pair() {
+        aligned::Envelope::Pair(p, v) -> { if p != 3u8 || v.marker != 123456789123456789i128 { return 10; } },
+        aligned::Envelope::Empty -> { return 11; },
+        aligned::Envelope::Value(v) -> { return 12; },
+    }
+    if aligned::nested().prefix != 1u8 || aligned::nested().tail != 22i128 { return 13; }
+    match aligned::make(123456789123456789i128) {
+        aligned::Envelope::Value(v) -> { if v.marker != 123456789123456789i128 { return 14; } },
+        aligned::Envelope::Empty -> { return 15; },
+        aligned::Envelope::Pair(p, v) -> { return 16; },
+    }
+    dec rw option: std::Option<aligned::Wide> = std::Option::Some(aligned::Wide { prefix: 1u8, marker: 19i128, tail: 2u64 });
+    match option.as_ref() { std::Option::Some(v) -> { if (v as *aligned::Wide as u64) % 16u64 != 0u64 { return 17; } }, std::Option::None -> { return 18; }, }
+    match option.as_mut() { std::Option::Some(v) -> { v.marker = 23i128; }, std::Option::None -> { return 19; }, }
+    if option.unwrap().marker != 23i128 { return 20; }
+    dec rw result: std::Result<u8, aligned::Wide> = std::Result::Err(aligned::Wide { prefix: 1u8, marker: 29i128, tail: 2u64 });
+    match result.as_ref() { std::Result::Err(v) -> { if (v as *aligned::Wide as u64) % 16u64 != 0u64 { return 21; } if v.marker != 29i128 { return 22; } }, std::Result::Ok(v) -> { return 23; }, }
+    match result.as_mut() { std::Result::Err(v) -> { v.marker = 31i128; }, std::Result::Ok(v) -> { return 24; }, }
+    match result { std::Result::Err(v) -> { if v.marker != 31i128 { return 25; } }, std::Result::Ok(v) -> { return 26; }, }
+    dec rw small: std::Result<u8, aligned::Wide> = std::Result::Ok(7u8);
+    match small.as_ref() { std::Result::Ok(v) -> { if *v != 7u8 { return 27; } }, std::Result::Err(v) -> { return 28; }, }
+    match small.as_mut() { std::Result::Ok(v) -> { *v = 9u8; }, std::Result::Err(v) -> { return 29; }, }
+    if small.unwrap() != 9u8 { return 30; }
+    match *aligned::addressed() {
+        aligned::Addressed::Data(text, v) -> { if strlen(text) != 7usize || v.marker != 123456789123456789i128 { return 31; } },
+        aligned::Addressed::Empty -> { return 32; },
+    }
+    return 0;
+}

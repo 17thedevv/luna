@@ -1,0 +1,48 @@
+{
+  "task": "A2-FU1 — shared DropFlagPlan / DropFlagTransition",
+  "status": "DONE",
+  "date": "2026-10-09",
+  "branch": "a2-fu1-drop-flag-plan",
+  "base": "f4b7c0de",
+  "class": "REFACTOR (anti-drift) — no semantics change",
+  "problem": "the synchronous cleanup (`drop_flags::elaborate`) and the async suspension cleanup (`suspension::compute_async_cleanup_plan`) each duplicated the same per-instruction ownership-state transition loop: Live -> true, Moved|Dropped|Uninitialized -> false, ConditionallyMoved/PartialMoved -> skip.",
+  "change": {
+    "new_module": "luna-rs/crates/luna-borrowck/src/drop_flag_plan.rs",
+    "shared_model": "DropFlagTransition { Initialize, Reinitialize, MoveOut, Destroy, ConditionalMove } plus `plan_drop_flag_transitions(func, ctx, summaries, tracked) -> HashMap<ValueId, Vec<(Place, DropFlagTransition)>>` and `DropFlagTransition::flag_value()`",
+    "sync_path": "drop_flags::elaborate calls the planner and lowers flag_value() into a per-place bool alloca",
+    "async_path": "suspension::compute_async_cleanup_plan calls the planner and maps flag_value() into the async environment fields",
+    "principle": "shared ownership-state semantics; separate physical storage (sync alloca vs async env field). No ValueId/env-index abstraction is shared."
+  },
+  "shared_model_evidence": [
+    "drop_flag_plan::tests::transition_mapping_is_the_shared_contract (classify + flag_value table)",
+    "drop_flag_plan::tests::both_cleanup_paths_share_the_planner (asserts drop_flags.rs and suspension.rs both reference plan_drop_flag_transitions and neither keeps the classifier)"
+  ],
+  "guards": {
+    "generic_drop_cli": "1 passed (closure_env_* and A3 partial-aggregate reducers included)",
+    "a2_suspension_cleanup_tests": "3 passed",
+    "async_cleanup_cli": "1 passed",
+    "async_provider_export_cli": "2 passed",
+    "luna-llib (MVIR wire regressions)": "0 failed",
+    "luna-borrowck": "0 failed"
+  },
+  "not_in_scope": [
+    "closure ownership semantics",
+    "async frame layout beyond consuming the shared plan",
+    "MVIR changes",
+    "serialized artifact changes",
+    "C4-FU1",
+    "general cleanup-subsystem cleanup"
+  ],
+  "focused": {
+    "command": "cargo test -p luna-cli --test generic_drop_cli --test async_cleanup_cli --test async_provider_export_cli; cargo test -p luna-driver --test a2_suspension_cleanup_tests; cargo test -p luna-llib; cargo test -p luna-borrowck",
+    "result": "all passed (generic_drop_cli 1, async_cleanup_cli 1, async_provider_export_cli 2, a2_suspension_cleanup_tests 3, luna-llib 0 failed, luna-borrowck 0 failed)"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 219 binaries, 1364 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "observed_flake": "two earlier full parallel runs each reported exactly one failure, in a different luna-driver acceptance suite (stdlib_phase4b_combinators_tests::test_option_filter: `remove_artifacts` NotFound; whole_file_io_v1_acceptance_tests::whole_file_io_source_and_fresh_artifact_parity: temp source sysroot missing provider `path`). Both binaries pass in isolation and the final run is green; the parallel test binaries contend on the shared repo `libs/external` sysroot, so this is a pre-existing harness concurrency fragility, not a regression.",
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — internal refactor; the emitted ownership transitions are unchanged, so generated MVIR and artifacts are unchanged",
+  "verdict": "A2-FU1: DONE — the shared DropFlagPlan/DropFlagTransition model is used by both the synchronous and async cleanup paths, with no duplicated transition logic remaining"
+}

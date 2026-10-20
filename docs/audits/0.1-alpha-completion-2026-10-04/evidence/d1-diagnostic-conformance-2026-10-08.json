@@ -1,0 +1,51 @@
+{
+  "task": "D1 — DIAG-1..10 diagnostic conformance",
+  "status": "PASS (implementation fix)",
+  "date": "2026-10-08",
+  "branch": "d1-diagnostic-conformance",
+  "base": "7b3c5185",
+  "class": "IMPLEMENTATION FIX (registry) + coverage",
+  "contract": "docs/diagnostics/diagnostics-v1.md (adopted-contract, DIAG-1..10). Identity = code + phase + span/origin; rendered wording is presentation only.",
+  "counterexample": {
+    "id": "D1-1",
+    "what": "DIAG-10 requires automated parity between the specification and `DiagnosticCode::ALL`, but `DiagnosticCode::ALL` did not exist, so the documented parity mechanism was unimplementable",
+    "layer": "diagnostic registry (luna-common)",
+    "fix": "added `DiagnosticCode::ALL` (all 68 codes) plus `registry_parity` unit tests: every code is documented, uniquely numbered and named; every exact code row in the registry exists in the enum (range rows like `E1000`-`E1999` excluded)"
+  },
+  "diag_matrix": {
+    "DIAG-1": "PASS — parser (E0001), resolver (E1001), borrowck (E3001) fixtures are coded; no bare `error:` line",
+    "DIAG-2": "PASS — primary source span with file:line:column and caret on the offending token",
+    "DIAG-3": "PASS — ambiguous method (E1008) keeps structural related locations (>=2 `-->` labels)",
+    "DIAG-4": "PASS — a poisoned cast emits exactly one root diagnostic",
+    "DIAG-5": "PASS — repeated `check` produces byte-identical diagnostics",
+    "DIAG-6": "PASS — `check` and `build` produce the same diagnostic identity (deduplicated across phases)",
+    "DIAG-7": "PASS — E0001 parser / E1001 resolver / E3001 borrowck land in the correct phase range",
+    "DIAG-8": "PASS — a stale artifact diagnostic names the offending provider and the failing boundary",
+    "DIAG-9": "PASS — the same consumer-side violation reports identical diagnostic identity from a source provider and a relocated .llib provider",
+    "DIAG-10": "FIXED — `DiagnosticCode::ALL` + registry parity tests"
+  },
+  "harness": "luna-rs/crates/luna-cli/tests/diagnostic_conformance_cli.rs (+ luna-common registry_parity unit tests)",
+  "existing_guards_referenced": [
+    "expression_diagnostic_spans_cli (DIAG-2 spans)",
+    "projection_fallback_cli (E2008/E2019)",
+    "raw_slice_provenance_cli (E3003/E3005)",
+    "cast_poison_cli (DIAG-4)",
+    "fresh_artifact_classification_cli (DIAG-7/8)",
+    "generic_drop_cli (E3001)"
+  ],
+  "observations_non_blocking": [
+    "D1-FU1: the use-after-move (E3001) message renders an internal value name (`%v5.0`); this is rendering/presentation, not diagnostic identity",
+    "D1-FU2: a comptime failure reports both the root (E1001) and the comptime wrapper (E4005); recorded as a possible cross-phase duplicate for review, not asserted"
+  ],
+  "focused": {
+    "command": "cargo test -p luna-cli --test diagnostic_conformance_cli (plus luna-common)",
+    "result": "diagnostic_conformance_cli 4 passed; luna-common 10 passed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 215 binaries, 1352 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — a registry const and tests; no serialized diagnostic/origin metadata change",
+  "verdict": "D1: CONFORMANT IN TESTED SCOPE (DIAG-1..10 matrix PASS; registry parity now enforced)"
+}

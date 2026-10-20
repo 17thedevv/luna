@@ -1,0 +1,85 @@
+import <iter_adapters>;
+
+// The observer pointers refer to main's counters, which outlive every probe.
+// Only this test's Drop/Step instrumentation dereferences them under unsafe.
+struct Probe { value: i32, marker: i128, drops: *rw i32, steps: *rw i32 };
+impl std::Drop for Probe {
+    fn drop(self: &rw Self) { unsafe { *self.drops = *self.drops + 1; } }
+}
+impl std::iter::Step for Probe {
+    fn step_forward(self: &Self) -> Self {
+        unsafe { *self.steps = *self.steps + 1; }
+        return Probe { value: self.value + 1, marker: self.marker, drops: self.drops, steps: self.steps };
+    }
+    fn step_less(self: &Self, other: &Self) -> bool { return self.value < other.value; }
+    fn step_eq(self: &Self, other: &Self) -> bool { return self.value == other.value; }
+    fn step_greater(self: &Self, other: &Self) -> bool { return self.value > other.value; }
+}
+fn probe(value: i32, drops: *rw i32, steps: *rw i32) -> Probe {
+    return Probe { value: value, marker: 123456789123456789i128, drops: drops, steps: steps };
+}
+fn full(drops: *rw i32, steps: *rw i32) -> i32 {
+    dec rw values = std::iter::range_inclusive(probe(2147483646i32, drops, steps), probe(2147483647i32, drops, steps));
+    {
+        dec first = values.next();
+        match first {
+            std::Option::Some(v) -> { if v.value != 2147483646i32 { return 1; } if v.marker != 123456789123456789i128 { return 2; } },
+            std::Option::None -> { return 3; },
+        }
+    }
+    {
+        dec last = values.next();
+        match last {
+            std::Option::Some(v) -> { if v.value != 2147483647i32 { return 4; } if v.marker != 123456789123456789i128 { return 5; } },
+            std::Option::None -> { return 6; },
+        }
+    }
+    if values.next().is_some() { return 7; }
+    if values.next().is_some() { return 8; }
+    if values.current.is_some() { return 9; }
+    return 0;
+}
+fn singleton(drops: *rw i32, steps: *rw i32) -> i32 {
+    dec rw values = std::iter::range_inclusive(probe(2147483647i32, drops, steps), probe(2147483647i32, drops, steps));
+    {
+        match values.next() {
+            std::Option::Some(v) -> { if v.value != 2147483647i32 { return 1; } },
+            std::Option::None -> { return 2; },
+        }
+    }
+    if values.next().is_some() { return 3; }
+    return 0;
+}
+fn early(drops: *rw i32, steps: *rw i32) -> i32 {
+    dec rw values = std::iter::range_inclusive(probe(2147483646i32, drops, steps), probe(2147483647i32, drops, steps));
+    match values.next() { std::Option::Some(v) -> {}, std::Option::None -> { return 1; }, }
+    return 0;
+}
+fn unused(drops: *rw i32, steps: *rw i32) {
+    dec values = std::iter::range_inclusive(probe(2147483646i32, drops, steps), probe(2147483647i32, drops, steps));
+}
+fn inverted(drops: *rw i32, steps: *rw i32) -> i32 {
+    dec rw values = std::iter::range_inclusive(probe(2, drops, steps), probe(1, drops, steps));
+    if values.next().is_some() { return 1; }
+    if values.next().is_some() { return 2; }
+    return 0;
+}
+fn main() -> i32 {
+    dec rw drops = 0;
+    dec rw steps = 0;
+    if full(&rw drops, &rw steps) != 0 { return 1; }
+    if drops != 3 || steps != 1 { return 2; }
+    drops = 0; steps = 0;
+    if singleton(&rw drops, &rw steps) != 0 { return 3; }
+    if drops != 2 || steps != 0 { return 4; }
+    drops = 0; steps = 0;
+    if early(&rw drops, &rw steps) != 0 { return 5; }
+    if drops != 3 || steps != 1 { return 6; }
+    drops = 0; steps = 0;
+    unused(&rw drops, &rw steps);
+    if drops != 2 || steps != 0 { return 7; }
+    drops = 0; steps = 0;
+    if inverted(&rw drops, &rw steps) != 0 { return 8; }
+    if drops != 2 || steps != 0 { return 9; }
+    return 0;
+}

@@ -22,7 +22,7 @@ fn parse_and_process(src: &str, allow_internal: bool) -> (SemanticContext, Vec<l
     let mut attr_processor = AttributeProcessor::new(&mut arena, &mut source_manager, file_id);
     let items = match attr_processor.process_items(items) {
         Ok(items) => items,
-        Err(diags) => return (SemanticContext::new(), diags),
+        Err(failures) => return (SemanticContext::new(), luna_semantic::TypeChecker::admit_attribute_expansion_failures(failures)),
     };
 
     let mut ctx = SemanticContext::new();
@@ -30,6 +30,9 @@ fn parse_and_process(src: &str, allow_internal: bool) -> (SemanticContext, Vec<l
 
     let mut resolver = Resolver::new(&mut ctx, &arena, &source_manager);
     resolver.resolve_items(&items);
+    if ctx.diagnostics.is_empty() {
+        luna_semantic::TypeChecker::new(&mut ctx, &arena, &source_manager).typecheck_items(&items);
+    }
 
     let diags = ctx.diagnostics.clone();
     (ctx, diags)

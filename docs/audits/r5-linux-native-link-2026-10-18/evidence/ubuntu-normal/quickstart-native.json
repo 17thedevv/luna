@@ -1,0 +1,15 @@
+{
+  "gate": "quickstart-native",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "/home/runner/work/_temp/r5-normal/evidence/quickstart/program"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/evidence/quickstart",
+  "started_utc": "2026-10-17T19:44:36Z",
+  "exit": 0,
+  "seconds": 0.001691698999820801,
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "status": "PASS",
+  "log": "quickstart-native.log.gz",
+  "compressed_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+}

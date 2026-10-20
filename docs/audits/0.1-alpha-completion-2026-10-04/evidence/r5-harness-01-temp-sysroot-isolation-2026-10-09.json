@@ -1,0 +1,54 @@
+{
+  "task": "R5-HARNESS-01 — deterministic test infrastructure (temp sysroot ownership/isolation)",
+  "status": "FIXED",
+  "date": "2026-10-09",
+  "branch": "r5-harness-temp-sysroot-isolation",
+  "base": "d7129cd1",
+  "problems": {
+    "unbounded_temp_growth": {
+      "evidence": "3467 abandoned %TEMP%\\luna* directories / 21.3 GB across runs; runs aborted with `Os { code: 112, kind: StorageFull }` at support/stdlib.rs:34",
+      "root_cause": "suite-local helpers created unique temp sysroots with no owner: `ProviderModes` had only a heuristic Drop, and ~90 driver suites built paths from std::env::temp_dir() and never removed them",
+      "status": "ROOT CAUSE IDENTIFIED + FIXED"
+    },
+    "parallel_shared_output": {
+      "evidence": "full workspace run failed compiler_gap_c_gap_12_safe_loan_effect_tests with `build fresh canonical sysroot for artifact parity: \"Build lock already exists\"`; the same binary passed in isolation (4/4) and the single test passed alone (1/1)",
+      "root_cause": "suite helpers made paths unique with pid + SystemTime::now() only; Windows SystemTime granularity is coarse (~15 ms), so two tests running in parallel inside one binary produced the SAME directory, hence the same .build.lock and artifacts",
+      "status": "REPRODUCED + FIXED (owned_temp_root() now returns a unique child per call, so clock resolution cannot alias two tests)"
+    }
+  },
+  "fix": {
+    "new_crate": "luna-rs/crates/luna-test-support (dev-dependency of luna-cli and luna-driver)",
+    "primitives": [
+      "TempWorkspace: RAII owner of a unique %TEMP% directory; removes it on Drop (including panic unwind). Removal is guarded structurally: name prefix `luna_test_ws_`, direct child of the process temp dir, and a marker file the type wrote.",
+      "owned_temp_root(): one owned root per test process for suite helpers that hand a PathBuf to existing call sites.",
+      "sweep_orphan_workspaces(): once-per-process reclamation of workspaces whose owning pid is no longer alive (covers process-lifetime sysroots and killed runs)."
+    ],
+    "conversions": [
+      "ProviderModes now owns a TempWorkspace (hand-rolled Drop and its path heuristic removed)",
+      "108 test files / 123 call sites switched from std::env::temp_dir() to the owned root; 6 unit-test sites in luna-driver/src likewise"
+    ],
+    "explicitly_not_done": [
+      "no `ignore NotFound` added to remove_artifacts()",
+      "no compiler semantics, provider protocol or cache-invalidation change"
+    ]
+  },
+  "guards": {
+    "luna-test-support unit tests": "drop removes workspace; panic unwind removes workspace; sequential workspaces do not accumulate; retain keeps for inspection; guard refuses to delete a foreign directory; sweep reclaims orphans but spares living/markerless dirs",
+    "temp_workspace_lifecycle_cli (4 requested + 2)": "sequential ProviderModes::fresh() drops cleanly; dropped workspace leaves no sysroot; panic unwind cleans up; process temp root is owned+stable; parallel workspaces are distinct; a failing compile still leaves the workspace removable",
+    "d1_fu2_completeness": "already-diagnosed comptime failures are suppressed only while a visible error-level root diagnostic exists; otherwise the compiler fails closed (unit test + CLI matrix)"
+  },
+  "acceptance": {
+    "mode": "same parallel mode as the release gate (no --test-threads=1)",
+    "runs": [
+      { "run": "A", "binaries": 224, "passed": 1383, "failed": 0, "ignored": 1, "exit": 0, "temp_before": "0 dirs / 0 GB", "temp_after": "1 dir / 0 GB" },
+      { "run": "B", "binaries": 224, "passed": 1383, "failed": 0, "ignored": 1, "exit": 0, "temp_before": "1 dir / 0 GB", "temp_after": "1 dir / 0 GB" },
+      { "run": "C", "binaries": 224, "passed": 1383, "failed": 0, "ignored": 1, "exit": 0, "temp_before": "1 dir / 0 GB", "temp_after": "1 dir / 0 GB" }
+    ],
+    "residual": "bounded residual cleanup: one 0-byte directory owned by the last test process, reclaimed by the next process's orphan sweep. Known infrastructure limitation for 0.1-alpha.1; it is NOT a claim that every temp directory is removed the moment a process exits.",
+    "sweep_guard": "only directories named luna_test_ws_*, directly under the process temp dir, carrying the marker file, AND owned by a pid that is no longer alive are removed; a running process's workspace is never touched",
+    "note": "temp is measured as count and total size of %TEMP%\\luna* before and after each full workspace run"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — test infrastructure only",
+  "verdict": "R5-HARNESS-01: CLOSED / FIXED IN TESTED SCOPE (owned temp workspaces, no unbounded accumulation, per-test isolation preserved under parallel execution)"
+}

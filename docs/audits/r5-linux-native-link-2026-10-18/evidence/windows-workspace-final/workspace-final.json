@@ -1,0 +1,24 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "workspace-final",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "--workspace"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T20:58:43.335853+00:00",
+  "end_utc": "2026-10-18T00:20:38.947694+00:00",
+  "elapsed_seconds": 12115.422,
+  "exit": 0,
+  "log": "workspace-final.log",
+  "log_sha256": "588e810a47a19a3a94760a3e1c3a0216c052a6269e380d474cbf79e01fc30414",
+  "result_groups": 234,
+  "passed": 1414,
+  "failed": 0,
+  "ignored": 1,
+  "binaries": 222,
+  "log_archive": "workspace-final.log.gz",
+  "archive_sha256": "d3ce07756c04806f3399b4c0be93af90be5dfefb84edc3ff709a81b77eaf261e"
+}

@@ -1,0 +1,9 @@
+export module amb2 {
+    export trait A { type Item; }
+    export trait B { type Item; }
+    export struct Dual {};
+    impl A for Dual { type Item = i32; }
+    impl B for Dual { type Item = bool; }
+}
+fn takes<T: amb2::A + amb2::B>(value: T::Item) -> i32 { return 0; }
+fn main() -> i32 { return 0; }

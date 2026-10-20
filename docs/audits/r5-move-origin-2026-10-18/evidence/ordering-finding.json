@@ -1,0 +1,49 @@
+{
+  "status": "CONFIRMED_DIAG_6_SOURCE_ORDER_GAP",
+  "observed_implementation": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "scope": "Original-binary local CLI checks. Driver, monomorphization and MVIR-generator blobs are identical at 67146195; this is source-equivalence evidence rather than a fresh qualification lane.",
+  "primary_line_orders": [
+    [
+      10,
+      5
+    ],
+    [
+      5,
+      10
+    ],
+    [
+      5,
+      10
+    ],
+    [
+      5,
+      10
+    ],
+    [
+      10,
+      5
+    ],
+    [
+      10,
+      5
+    ]
+  ],
+  "expected_stable_order": [
+    5,
+    10
+  ],
+  "shared_source_blobs": {
+    "luna-rs/crates/luna-driver/src/lib.rs": {
+      "52ef3711813ac0e2ded272f5ebe71897752766bc": "4d0551bdc45aec9ce5a4a6b441acd5756080fe86",
+      "67146195fb025951ca51d54365fd3a47ef9544e6": "4d0551bdc45aec9ce5a4a6b441acd5756080fe86"
+    },
+    "luna-rs/crates/luna-mvir/src/generator.rs": {
+      "52ef3711813ac0e2ded272f5ebe71897752766bc": "b2d88832eaa97d1da3b0d50c7d44de393b5ca608",
+      "67146195fb025951ca51d54365fd3a47ef9544e6": "b2d88832eaa97d1da3b0d50c7d44de393b5ca608"
+    },
+    "luna-rs/crates/luna-semantic/src/mono.rs": {
+      "52ef3711813ac0e2ded272f5ebe71897752766bc": "95953f510ea0d476c97a6b61b2c17b5746d87ee1",
+      "67146195fb025951ca51d54365fd3a47ef9544e6": "95953f510ea0d476c97a6b61b2c17b5746d87ee1"
+    }
+  }
+}

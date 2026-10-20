@@ -1,0 +1,23 @@
+[
+  {
+    "record": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a1-closure-env-2026-10-06.json",
+    "original_reference": "scratch/workspace-a1.log",
+    "accessible": true,
+    "archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/historical-scratch_workspace-a1.log.gz",
+    "raw_sha256": "9f030ae1175d2ff1d77a2b1257bf4890ec7fd71d991d1dc1ea3f4c0984624d69"
+  },
+  {
+    "record": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a6-unary-logical-not-2026-10-07.json",
+    "original_reference": "scratch/a6/not_free.ln",
+    "accessible": true,
+    "archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/historical-scratch_a6_not_free.ln.gz",
+    "raw_sha256": "8dbd4d744e99e0b68577d13c7bed7b7d8f8ee3c4200075ecb5d6f15e267004c2"
+  },
+  {
+    "record": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c1-reconcile-candidate-final-2026-10-06.json",
+    "original_reference": "scratch/workspace-candidate2.log",
+    "accessible": true,
+    "archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/historical-scratch_workspace-candidate2.log.gz",
+    "raw_sha256": "b17734e9e610bd0572612476b8a9073b8023a1216dd0b88c7a7e1ed5184ff2c9"
+  }
+]

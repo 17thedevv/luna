@@ -1,0 +1,14 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "harness_commit": "0301ff9e824299f95b06a63e297fe08bae40a6a6",
+  "lane": "comptime-vm",
+  "actual_native_target": "x86_64-pc-linux-gnu",
+  "advertised_target": "x86_64-unknown-linux-gnu",
+  "scope": "Descriptive execution on actual native target; no advertised-target equivalence or normalization",
+  "status": "PASS_IN_EXECUTED_LANE_SCOPE",
+  "failure": null,
+  "failed_gates": [],
+  "r5_verdict": "NOT DETERMINED BY THIS LANE",
+  "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION",
+  "gate_count": 28
+}

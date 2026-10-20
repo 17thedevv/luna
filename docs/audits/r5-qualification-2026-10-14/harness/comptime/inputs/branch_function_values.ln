@@ -1,0 +1,11 @@
+fn choose(flag: bool) -> i32 {
+    if flag { return 11; }
+    return 23;
+}
+const TRUE_VALUE: i32 = comptime { choose(true) };
+const FALSE_VALUE: i32 = comptime { choose(false) };
+fn main() -> i32 {
+    if TRUE_VALUE != 11 || FALSE_VALUE != 23 { return 1; }
+    if choose(true) != TRUE_VALUE || choose(false) != FALSE_VALUE { return 2; }
+    return 0;
+}

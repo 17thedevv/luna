@@ -4,6 +4,20 @@ Contract status and implementation status are separate. An adopted rule remains
 a requirement while its implementation can be partial, broken or unverified.
 This specification refresh is not a compiler repair or a release certification.
 
+Current qualification — 2026-10-20: **RELEASE BLOCKED by package CPU identity drift**.
+The eight completed lanes at `8525067f` are preserved, but clean Windows package
+smoke fails on a different CPU. [Finding and baseline repair](../../audits/r5-cpu-baseline-2026-10-20/README.md).
+A new implementation pin must reacquire all eight lanes and clean package smoke
+on both hosts. Candidate remains `8525067f`; no merge/tag/publication occurred.
+Strict target identity validation and the adopted language contracts remain mandatory.
+Earlier qualification snapshots below retain their dated scopes.
+
+Prior evidence reconciliation — 2026-10-14: see the
+[R4 release ledger](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md).
+The E-wave qualification at `e4f9fb53`, stored by closure `3f8646c6`, is scoped
+Windows GNU evidence. R5 exact-candidate qualification is still PENDING;
+release status remains BLOCKED / NOT VERIFIED.
+
 ## Status vocabulary
 
 | Status | Meaning |
@@ -29,6 +43,12 @@ substitute for a source rejection. Registry documentation must distinguish
 normative coverage requirements from a claim that every current error path
 already satisfies them.
 
+The [R4 diagnostic inventory](../../audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md)
+uses the exact adopted DIAG-1..10 numbering. The historical D1 table mislabels
+several numbers; its green reducers do not establish universal constructor,
+emission, event-origin or per-code coverage. The complete structural remainder
+is a mandatory R5 precondition, not an accepted deferral.
+
 ## Required acceptance boundaries
 
 1. Language and library behavior: real `.ln` fixtures via the public Luna CLI,
@@ -48,10 +68,13 @@ already satisfies them.
 
 Adopted 2026-10-06 (D3). Supported, release-gated targets:
 
-| Target | Status | Required evidence |
-|---|---|---|
-| `x86_64-pc-windows-gnu` | SUPPORTED / RELEASE-GATED | native/full regression |
-| `x86_64-unknown-linux-gnu` (Ubuntu) | SUPPORTED / RELEASE-GATED | normal CI + ASan |
+| Target | Adopted scope | Qualification at the R4 input | Required R5 evidence |
+|---|---|---|---|
+| `x86_64-pc-windows-gnu` | SUPPORTED / RELEASE-GATED | VERIFIED IN E-WAVE TESTED SCOPE at e4f9fb53 | exact candidate clean native/full regression and CI |
+| `x86_64-unknown-linux-gnu` (Ubuntu) | SUPPORTED / RELEASE-GATED | NOT VERIFIED (normal and ASan) | exact candidate normal CI + ASan with instrumented scope recorded |
+
+The [detailed target matrix](../../audits/0.1-alpha-completion-2026-10-04/r4/target-matrix.md)
+separates native evidence from job configuration and host-toolchain identity.
 
 NOT ADVERTISED in 0.1-alpha.1: macOS, freestanding and every other target. A
 target that currently compiles but is not listed here remains
@@ -68,10 +91,12 @@ changes; regenerate sysroot artifacts through the official path; run required
 focused and relevant workspace regressions; verify diagnostics and parity; and
 publish the exact supported target matrix and any accepted deferrals.
 
-Current readiness is **BLOCKED** by [gaps.md](gaps.md). The latest audit built
-all providers and completed substantial checks, but did not complete all compiler
-tests, sanitizer/fuzzing, all targets or all generic/data domains. Historical
-green test counts do not supersede a later counterexample.
+Current readiness is **BLOCKED** by [gaps.md](gaps.md) and the
+[R5 checklist](../../audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md).
+E-wave completed three Windows workspace regressions and 236/236 arithmetic
+acquisitions; this does not complete Ubuntu/ASan, the structural diagnostic
+inventory, every generic/data domain, broader sanitizers or fuzzing. Historical
+green counts do not supersede a later counterexample.
 
 ## Retained 0.1 contract scope
 

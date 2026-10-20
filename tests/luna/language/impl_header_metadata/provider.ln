@@ -1,0 +1,12 @@
+export module meta {
+    export trait Describe { fn describe(&self) -> i32; }
+    export trait Ranked<V> { fn rank(&self, value: V) -> V; }
+    export struct Alpha { value: i32 };
+    export struct Beta { value: i32 };
+    export struct Pair<T> { value: T };
+    impl Describe for Alpha { fn describe(&self) -> i32 { return self.value; } }
+    impl Describe for Beta { fn describe(&self) -> i32 { return self.value + 100; } }
+    impl<T: Describe> Pair<T> { export fn inner(&self) -> i32 { return Describe::describe(&self.value); } }
+    impl Ranked<i32> for Pair<i32> { fn rank(&self, value: i32) -> i32 { return value + 1; } }
+    impl Ranked<bool> for Pair<bool> { fn rank(&self, value: bool) -> bool { return value; } }
+}

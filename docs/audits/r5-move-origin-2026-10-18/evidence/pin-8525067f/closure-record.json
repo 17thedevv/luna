@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-20",
+  "tested_implementation": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "qualification_report_commit": "e640ef455036d93c4a8f254e043ce666db2d3321",
+  "report_branch": "r5-diag-repair",
+  "candidate_before": "c085449b207b5860b1d7a79bee221c2ff3d357c3",
+  "candidate_after": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "candidate_update": "fast-forward, no force; verified remote",
+  "main": "401a95a872f0fdfb9840640f41cc4ac629cb17cd",
+  "implementation_trees_unchanged": true,
+  "goal_status": "ACTIVE_PENDING_MAINTAINER_RELEASE_AND_PACKAGE_SMOKE",
+  "pr_tag_release_actions": "not performed; decision requested after concrete handoff"
+}

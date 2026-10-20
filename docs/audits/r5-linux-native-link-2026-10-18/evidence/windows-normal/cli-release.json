@@ -1,0 +1,19 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "cli-release",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "build",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--release"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T18:03:25.134862+00:00",
+  "end_utc": "2026-10-17T18:05:30.591966+00:00",
+  "elapsed_seconds": 125.469,
+  "exit": 0,
+  "log": "cli-release.log",
+  "log_sha256": "8b765a2b803b0fd4cb9da41bee115e13f99c4bf834f8861529f1fd3a5881aa05"
+}

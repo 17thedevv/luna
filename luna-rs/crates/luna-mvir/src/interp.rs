@@ -162,6 +162,26 @@ fn integer_mask(width: IntWidth) -> u128 {
     }
 }
 
+/// Modular (2^N) interpretation of an integer at the target width. This is the
+/// comptime counterpart of the wrapping intrinsics' runtime lowering: it never
+/// diagnoses overflow, unlike the checked operator paths.
+fn wrap_to_width(value: i128, width: IntWidth) -> i128 {
+    let bits = width.bit_width();
+    if bits >= 128 {
+        return value;
+    }
+    let truncated = value & ((1i128 << bits) - 1);
+    let signed = matches!(
+        width,
+        IntWidth::I8 | IntWidth::I16 | IntWidth::I32 | IntWidth::I64 | IntWidth::ISize
+    );
+    if signed && (truncated & (1i128 << (bits - 1))) != 0 {
+        truncated - (1i128 << bits)
+    } else {
+        truncated
+    }
+}
+
 fn static_runtime_value(ty: &crate::static_data::StaticType, value: &crate::static_data::StaticValue) -> Result<RuntimeValue, ComptimeError> {
     use crate::static_data::{StaticType as T, StaticValue as V};
     Ok(match (ty, value) {
@@ -921,8 +941,18 @@ impl<'a> MvirInterpreter<'a> {
                                     Instruction::Shl { .. } | Instruction::Shr { .. } => {
                                         let shift = u32::try_from(right).ok().filter(|&n| n < width.bit_width())
                                             .ok_or_else(|| ComptimeError::Custom("integer shift count out of range".into()))?;
-                                        if matches!(&val_data.inst, Instruction::Shl { .. }) { left.wrapping_shl(shift) }
-                                        else if width.is_signed() { left >> shift }
+                                        if matches!(&val_data.inst, Instruction::Shl { .. }) {
+                                            let shifted = cast_integer_value(left.wrapping_shl(shift), width, width);
+                                            // Parity with the runtime lowering: x * 2^n must stay
+                                            // representable, verified by shifting the result back to
+                                            // the operand (arithmetic for signed, logical for unsigned).
+                                            let back = if width.is_signed() { shifted >> shift }
+                                                else { (((shifted as u128) & integer_mask(width)) >> shift) as i128 };
+                                            if back != left {
+                                                return Err(ComptimeError::IntegerOverflow);
+                                            }
+                                            shifted
+                                        } else if width.is_signed() { left >> shift }
                                         else { (((left as u128) & integer_mask(width)) >> shift) as i128 }
                                     }
                                     _ => unreachable!(),
@@ -940,6 +970,29 @@ impl<'a> MvirInterpreter<'a> {
                             _ => return Err(ComptimeError::TypeMismatch("integer bitwise operand mismatch".into())),
                         }
                     }
+                    Instruction::CallIntrinsic { kind, args } => {
+                        use luna_semantic::semantic_tables::IntrinsicKind;
+                        if args.len() != 2 {
+                            return Err(ComptimeError::TypeMismatch(
+                                "wrapping intrinsic expects 2 operands".to_string()));
+                        }
+                        let l = self.eval_operand(&args[0])?;
+                        let r = self.eval_operand(&args[1])?;
+                        match (l, r) {
+                            (RuntimeValue::Int { val: v1, width }, RuntimeValue::Int { val: v2, .. }) => {
+                                let raw = match kind {
+                                    IntrinsicKind::WrappingAdd => v1.wrapping_add(v2),
+                                    IntrinsicKind::WrappingSub => v1.wrapping_sub(v2),
+                                    IntrinsicKind::WrappingMul => v1.wrapping_mul(v2),
+                                    other => return Err(ComptimeError::UnsupportedOperation(
+                                        format!("unsupported intrinsic in comptime: {other:?}"))),
+                                };
+                                RuntimeValue::Int { val: wrap_to_width(raw, width), width }
+                            }
+                            _ => return Err(ComptimeError::TypeMismatch(
+                                "wrapping intrinsics are integer-only".to_string())),
+                        }
+                    }
                     Instruction::BoundsCheck { index, len } => {
                         let idx = self.eval_operand(index)?.as_i128()?;
                         let l = self.eval_operand(len)?.as_i128()?;
@@ -952,11 +1005,11 @@ impl<'a> MvirInterpreter<'a> {
                         return Err(ComptimeError::ComptimeAwaitForbidden);
                     }
                     Instruction::SizeOf { ty } => {
-                        let size = self.calculate_size_of(*ty);
+                        let size = self.calculate_layout(*ty)?.0;
                         RuntimeValue::Int { val: size as i128, width: IntWidth::USize }
                     }
                     Instruction::AlignOf { ty } => {
-                        let align = self.calculate_align_of(*ty);
+                        let align = self.calculate_layout(*ty)?.1;
                         RuntimeValue::Int { val: align as i128, width: IntWidth::USize }
                     }
                     Instruction::Variant { enum_ty, variant_idx, args } => {
@@ -1313,68 +1366,63 @@ impl<'a> MvirInterpreter<'a> {
         Ok(RuntimeValue::Unit)
     }
 
-    fn calculate_size_of(&self, ty_id: SemanticTypeId) -> usize {
-        let sem_ty = self.ctx.types.get(ty_id);
-        match sem_ty {
-            SemanticType::Primitive(b) => match b {
-                luna_semantic::ty::BuiltinType::Bool => 1,
-                luna_semantic::ty::BuiltinType::Char => 4,
-                luna_semantic::ty::BuiltinType::I8 | luna_semantic::ty::BuiltinType::U8 => 1,
-                luna_semantic::ty::BuiltinType::I16 | luna_semantic::ty::BuiltinType::U16 => 2,
-                luna_semantic::ty::BuiltinType::I32 | luna_semantic::ty::BuiltinType::U32 | luna_semantic::ty::BuiltinType::F32 => 4,
-                luna_semantic::ty::BuiltinType::I64 | luna_semantic::ty::BuiltinType::U64 | luna_semantic::ty::BuiltinType::F64 => 8,
-                luna_semantic::ty::BuiltinType::I128 | luna_semantic::ty::BuiltinType::U128 => 16,
-                luna_semantic::ty::BuiltinType::Isize | luna_semantic::ty::BuiltinType::Usize => 8, // Assuming 64-bit for now
-                luna_semantic::ty::BuiltinType::String => 16,
-            },
-            SemanticType::Void => 0,
-            SemanticType::Pointer(..) | SemanticType::Reference(..) => 8,
-            SemanticType::Array(elem, len) => self.calculate_size_of(*elem) * (*len as usize),
-            SemanticType::Tuple(elems) => elems.iter().map(|&e| self.calculate_size_of(e)).sum(),
-            SemanticType::Struct(sym_id, _, _) => {
-                if let Some(fields) = self.ctx.tables.struct_fields.get(sym_id) {
-                    fields.iter().map(|f_sym| {
-                        let f_ty = self.ctx.tables.symbol_types.get(f_sym).copied().unwrap_or(SemanticTypeId(0));
-                        self.calculate_size_of(f_ty)
-                    }).sum()
-                } else {
-                    8
-                }
+    /// Layout model for the currently admitted 64-bit GNU targets. The VM has
+    /// no native memory; sizeof/alignof must still include native padding and
+    /// enum payload alignment. Other target conformance remains unverified.
+    fn calculate_layout(&self, ty_id: SemanticTypeId) -> Result<(usize, usize), ComptimeError> {
+        let overflow = || ComptimeError::UnsupportedOperation("type layout overflow".into());
+        let round = |size: usize, align: usize| -> Result<usize, ComptimeError> {
+            size.checked_add(align - 1).and_then(|v| (v / align).checked_mul(align))
+                .ok_or_else(overflow)
+        };
+        let aggregate = |fields: &[SemanticTypeId], minimum: usize| -> Result<(usize, usize), ComptimeError> {
+            let mut offset = 0usize;
+            let mut alignment = minimum;
+            for &field in fields {
+                let (size, align) = self.calculate_layout(field)?;
+                alignment = alignment.max(align);
+                offset = round(offset, align)?.checked_add(size).ok_or_else(overflow)?;
             }
-            _ => 8,
-        }
-    }
-
-    fn calculate_align_of(&self, ty_id: SemanticTypeId) -> usize {
-        let sem_ty = self.ctx.types.get(ty_id);
-        match sem_ty {
+            Ok((round(offset, alignment)?, alignment))
+        };
+        Ok(match self.ctx.types.get(ty_id) {
             SemanticType::Primitive(b) => match b {
-                luna_semantic::ty::BuiltinType::Bool => 1,
-                luna_semantic::ty::BuiltinType::Char => 4,
-                luna_semantic::ty::BuiltinType::I8 | luna_semantic::ty::BuiltinType::U8 => 1,
-                luna_semantic::ty::BuiltinType::I16 | luna_semantic::ty::BuiltinType::U16 => 2,
-                luna_semantic::ty::BuiltinType::I32 | luna_semantic::ty::BuiltinType::U32 | luna_semantic::ty::BuiltinType::F32 => 4,
-                luna_semantic::ty::BuiltinType::I64 | luna_semantic::ty::BuiltinType::U64 | luna_semantic::ty::BuiltinType::F64 => 8,
-                luna_semantic::ty::BuiltinType::I128 | luna_semantic::ty::BuiltinType::U128 => 8,
-                luna_semantic::ty::BuiltinType::Isize | luna_semantic::ty::BuiltinType::Usize => 8,
-                luna_semantic::ty::BuiltinType::String => 8,
+                BuiltinType::Bool | BuiltinType::I8 | BuiltinType::U8 => (1, 1),
+                BuiltinType::I16 | BuiltinType::U16 => (2, 2),
+                BuiltinType::Char | BuiltinType::I32 | BuiltinType::U32 | BuiltinType::F32 => (4, 4),
+                BuiltinType::I64 | BuiltinType::U64 | BuiltinType::F64 | BuiltinType::Isize | BuiltinType::Usize | BuiltinType::String => (8, 8),
+                BuiltinType::I128 | BuiltinType::U128 => (16, 16),
             },
-            SemanticType::Void => 1,
-            SemanticType::Pointer(..) | SemanticType::Reference(..) => 8,
-            SemanticType::Array(elem, _) => self.calculate_align_of(*elem),
-            SemanticType::Tuple(elems) => elems.iter().map(|&e| self.calculate_align_of(e)).max().unwrap_or(1),
-            SemanticType::Struct(sym_id, _, _) => {
-                if let Some(fields) = self.ctx.tables.struct_fields.get(sym_id) {
-                    fields.iter().map(|f_sym| {
-                        let f_ty = self.ctx.tables.symbol_types.get(f_sym).copied().unwrap_or(SemanticTypeId(0));
-                        self.calculate_align_of(f_ty)
-                    }).max().unwrap_or(1)
-                } else {
-                    8
+            SemanticType::Void | SemanticType::Never => (0, 1),
+            SemanticType::Pointer(_, inner) | SemanticType::Reference(_, _, inner) => {
+                if matches!(self.ctx.types.get(*inner), SemanticType::Slice(_) | SemanticType::DynTrait(_)) {
+                    (16, 8)
+                } else { (8, 8) }
+            },
+            SemanticType::Function { .. } => (8, 8),
+            SemanticType::Slice(_) | SemanticType::DynTrait(_) | SemanticType::Closure(..) => (16, 8),
+            SemanticType::Array(elem, len) => {
+                let (size, align) = self.calculate_layout(*elem)?;
+                (size.checked_mul((*len).try_into().map_err(|_| overflow())?).ok_or_else(overflow)?, align)
+            },
+            SemanticType::Tuple(fields) | SemanticType::Struct(_, _, fields) => aggregate(fields, 1)?,
+            SemanticType::Enum(_, _, variants) => {
+                let mut size = 16usize;
+                let mut align = 8usize;
+                for &variant in variants {
+                    let (variant_size, variant_align) = self.calculate_layout(variant)?;
+                    size = size.max(variant_size);
+                    align = align.max(variant_align);
                 }
-            }
-            _ => 8,
-        }
+                (align.checked_add(round(size, align)?).ok_or_else(overflow)?, align)
+            },
+            SemanticType::Future(inner) => {
+                let (size, align) = self.calculate_layout(*inner)?;
+                let alignment = align.max(4);
+                (round(round(4, align)?.checked_add(size).ok_or_else(overflow)?, alignment)?, alignment)
+            },
+            other => return Err(ComptimeError::UnsupportedOperation(format!("unresolved or unsupported layout type: {other:?}"))),
+        })
     }
 
 
@@ -1448,7 +1496,10 @@ impl MvirComptimeEngine {
     fn finish_preparation(&self, mut generator: crate::generator::MvirGenerator<'_>, func: Function, ctx: &SemanticContext) -> Result<PreparedComptime, ComptimeError> {
         generator.generate_comptime_dependencies(&func);
         if !generator.diagnostics.is_empty() {
-            return Err(ComptimeError::TypeMismatch(generator.diagnostics.iter().map(|d| d.message.clone()).collect::<Vec<_>>().join("; ")));
+            // The generator reached an unlowerable state that an earlier phase
+            // already diagnosed (e.g. an unresolved method). Preserve that
+            // provenance instead of restating it as a generic comptime failure.
+            return Err(ComptimeError::AlreadyDiagnosed);
         }
         if func.values.iter().any(|v| has_unresolved_projection(ctx, v.ty)) {
             return Err(ComptimeError::TypeMismatch("E_UNRESOLVED_PROJECTION: comptime function contains unresolved associated type projection".to_string()));

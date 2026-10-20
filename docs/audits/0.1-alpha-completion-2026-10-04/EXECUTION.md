@@ -1,5 +1,82 @@
 # Execution ledger — Luna 0.1 completion
 
+### R4 documentation reconciliation — 2026-10-14
+
+Branch `r4-release-docs-ledger`, base `3f8646c654b99b67bae57ee290b7a7e23d717b40`.
+The [exact ledger](r4/README.md) records A/C/D/E closure identities, approved
+deferrals, diagnostic structural gaps, target qualification and an executable
+R5 handoff. E-wave remains CLOSED / QUALIFIED IN TESTED SCOPE at implementation
+`e4f9fb530d72628c81dfa29d117afeb99cc7664c`; R5 remains PENDING / RELEASE BLOCKED.
+The 2026-10-14 cleanup checkpoint is accepted CLOSED; no further root cleanup
+is part of R4. Subsequent sections are dated historical checkpoints and preserve
+their failures and earlier pending wording. R4 changes no implementation,
+runtime or tests and does not rerun the three full regressions.
+
+### E-wave final qualification — 2026-10-13, CLOSED
+
+Tested source: `e4f9fb530d72628c81dfa29d117afeb99cc7664c`. Ordinary checked integer arithmetic, explicit wrapping,
+runtime/comptime and debug/release parity pass all 59 rows in four modes.
+Three consecutive default-parallel workspace runs pass; real22/23/24 reject,
+fresh25 and relocated macro provider pass. E2 remains CLOSED. Compiler25 /
+metadata9 / MVIR5 / format2. See [closure report](evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md)
+for source identity, lossless logs, the 46-row reconciliation and scoped limits.
+Closure integration is a documentation/evidence commit with the same tested
+code tree. Ubuntu GNU normal/ASan and broader DIAG audit remain R5 obligations;
+standalone comptime statement execution remains a documented support gap.
+Stop at preparation for R4; no main merge or release tag.
+
+### E-wave final qualification — 2026-10-13, approved RangeInclusive repair
+
+Production/test pin `939d53e0ad7719c7c4a3eb4b915173fedeb1a129` passes four
+59-row matrices (236 acquisitions), diagnostic ownership/identity, source/fresh
+artifact parity, real22/23 rejection and fresh24 relocation controls. A full
+default-parallel workspace run stops at 138 binaries: 877 passed / 1 failed /
+1 ignored / exit101. RangeInclusive advances after yielding MAX and correctly
+traps L005. Three consecutive workspace passes remain unmet; candidate stays
+`6017ba8d8db40cf0bc16498f639e5d830c0e827c`.
+The [blocker report](evidence/REPORT-E1-RANGE-BLOCKER-2026-10-13.md) records
+the first divergence, public-field compatibility decision, four-mode ordinary
+Luna/non-Copy prototype. The maintainer approved Option A: public current
+becomes Option, terminal extraction does not call Step, and Step stays checked.
+Canonical provider qualification passes all four modes, including a wider i128
+non-Copy Probe, after an independently approved generic enum alignment repair.
+Compiler25 rejects genuine24 ABI artifacts; metadata9/MVIR5/format2 remain.
+The [alignment record](evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md) preserves
+the pre-repair crashes and successful focused controls. Final qualification
+remains pending; the failed
+full run above remains FAIL. A test-generated tracked
+MVIR dump is separately isolated (9 focused tests PASS). No E-wave closure,
+candidate advancement, main merge, or release tag occurs at this checkpoint.
+
+### E-wave repair — 2026-10-12, qualification in progress
+
+E1-DIAG-OWNERSHIP-01 and supplemental E1010/literal/macro mappings are adopted
+and implemented with actual owning admission. Compiler24 is separately approved
+because real compiler23 artifacts can contain DCE-erased checked arithmetic.
+Metadata9/MVIR5/format2 are unchanged. Provider alias identity, macro expansion
+and statement relocation repairs retain strict artifact validation.
+See the [repair checkpoint](evidence/REPORT-E1-REPAIR-2026-10-12.md).
+The historical E0005 blocker checkpoint below is preserved; candidate remains
+`6017ba8d8db40cf0bc16498f639e5d830c0e827c` until final qualification succeeds.
+
+### E-wave diagnostic precondition — 2026-10-12, BLOCKED
+
+Implementation/verified source: `2fcce5a4ea1973100a3d8a99781e1188aeed5d78`.
+Candidate/E2 boundary: `6017ba8d8db40cf0bc16498f639e5d830c0e827c`, unchanged.
+Stage 2C/3 implementations and compiler23 versioning are present; current Stage 4
+readiness is blocked by E1-FU-DIAG-01 (semantic E0005 emission conflicts with
+Parser-only DIAG-8 ownership). The previous Stage 4 DONE claim is historical,
+not current release authority. No ownership/code mapping is changed.
+
+Fresh evidence: CLI build exit0; 14 diagnostic check/build reproductions;
+real compiler22 rejection test 1 passed / 0 failed / 0 ignored / exit0.
+Four comptime cases emit one E4005 per invocation. Full workspace qualification
+and native target acceptance are NOT VERIFIED; candidate is not advanced.
+See the [blocker report](evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md)
+for exact source trace, repair alternatives, historical matrix boundary and
+remaining qualification obligations. This entry records an incomplete E-wave
+checkpoint and does not perform R4 schema reconciliation or release tagging.
+
 Baseline implementation: `c8d0559500e78ef85c96ac842e824e639917cbad`.
 This supplements the dated [plan](README.md); no full release PASS is claimed.
 Current state remains **PARTIAL**. Revision-specific checkpoints are recorded

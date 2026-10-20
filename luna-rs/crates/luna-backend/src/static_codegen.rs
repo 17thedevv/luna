@@ -55,30 +55,9 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 )
                 .into(),
             StaticType::Enum(variants) => {
-                let max = variants
-                    .iter()
-                    .map(|v| self.static_type(v, layout).map(|t| layout.get_abi_size(&t)))
-                    .collect::<Result<Vec<_>, _>>()?
-                    .into_iter()
-                    .max()
-                    .unwrap_or(0);
-                let words = max.div_ceil(8).max(2);
-                self.context
-                    .struct_type(
-                        &[
-                            self.context.i32_type().into(),
-                            self.context
-                                .i64_type()
-                                .array_type(
-                                    words
-                                        .try_into()
-                                        .map_err(|_| invalid("constant enum payload too large"))?,
-                                )
-                                .into(),
-                        ],
-                        false,
-                    )
-                    .into()
+                let payloads = variants.iter().map(|v| self.static_type(v, layout))
+                    .collect::<Result<Vec<_>, _>>()?;
+                self.enum_type(&payloads, layout)?
             }
         })
     }
@@ -212,11 +191,14 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                 let payload_ty = variants
                     .get(*tag as usize)
                     .ok_or_else(|| invalid("constant enum tag out of range"))?;
-                let payload_array = llvm_ty
-                    .into_struct_type()
-                    .get_field_type_at_index(1)
-                    .unwrap()
-                    .into_array_type();
+                let storage = llvm_ty.into_struct_type().get_field_type_at_index(1)
+                    .ok_or_else(|| invalid("constant enum lacks payload storage"))?;
+                let payload_array = match storage {
+                    BasicTypeEnum::ArrayType(array) => array,
+                    BasicTypeEnum::StructType(aligned) => aligned.get_field_type_at_index(1)
+                        .ok_or_else(|| invalid("aligned enum lacks word buffer"))?.into_array_type(),
+                    _ => return Err(invalid("invalid enum payload storage")),
+                };
                 let mut bytes = vec![0u8; payload_array.len() as usize * 8];
                 let mut pointers = Vec::new();
                 self.pack_static(
@@ -249,13 +231,17 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
                     }
                     words[offset / 8] = pointer.const_to_int(self.context.i64_type());
                 }
-                llvm_ty
-                    .into_struct_type()
-                    .const_named_struct(&[
-                        self.context.i32_type().const_int(*tag as u64, false).into(),
-                        self.context.i64_type().const_array(&words).into(),
-                    ])
-                    .into()
+                let words = self.context.i64_type().const_array(&words);
+                let payload = match storage {
+                    BasicTypeEnum::ArrayType(_) => words.into(),
+                    BasicTypeEnum::StructType(aligned) => aligned.const_named_struct(&[
+                        aligned.get_field_type_at_index(0).unwrap().const_zero(), words.into(),
+                    ]).into(),
+                    _ => return Err(invalid("invalid enum payload storage")),
+                };
+                llvm_ty.into_struct_type().const_named_struct(&[
+                    self.context.i32_type().const_int(*tag as u64, false).into(), payload,
+                ]).into()
             }
             _ => return Err(invalid("constant storage initializer/type mismatch")),
         })

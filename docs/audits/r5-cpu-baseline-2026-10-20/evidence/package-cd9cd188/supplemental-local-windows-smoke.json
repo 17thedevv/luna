@@ -1,0 +1,43 @@
+{
+  "status": "PASS_IN_LOCAL_SUPPLEMENTAL_SCOPE",
+  "environment": "Local Windows alderlake host; relocated downloaded CI package outside repository; no local build or runtime reused",
+  "scope_note": "The unchanged uploaded smoke script uses a hosted-job environment template in its summary. This supplemental invocation is local, workflow_run is null, and does not satisfy either required hosted package smoke gate.",
+  "source_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+  "qualified_implementation": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "archive_sha256": "bbdc2a0fa55e82666c9bf26802ab5fa8f844b338e02848490a691f867b7c14dd",
+  "providers_checked": 49,
+  "payload_hashes_checked": 105,
+  "stream_hashes_verified": 14,
+  "steps": [
+    {
+      "label": "version",
+      "exit": 0
+    },
+    {
+      "label": "llvm-host",
+      "exit": 0
+    },
+    {
+      "label": "quickstart-build",
+      "exit": 0
+    },
+    {
+      "label": "quickstart-native",
+      "exit": 0
+    },
+    {
+      "label": "stdlib-build",
+      "exit": 0
+    },
+    {
+      "label": "stdlib-native",
+      "exit": 0
+    },
+    {
+      "label": "missing-provider-control",
+      "exit": 1
+    }
+  ],
+  "evidence": "supplemental-local-windows-smoke.zip",
+  "evidence_sha256": "56be1378097d8ffd1232aa88ed4385b636d9484f69fbe6bb770ee9500b12eb3a"
+}

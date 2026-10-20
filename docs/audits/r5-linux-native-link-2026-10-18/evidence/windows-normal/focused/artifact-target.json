@@ -1,0 +1,20 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "focused/artifact-target",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--test",
+    "artifact_target_contract_cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T19:48:10.052458+00:00",
+  "end_utc": "2026-10-17T19:50:02.165020+00:00",
+  "elapsed_seconds": 112.125,
+  "exit": 0,
+  "log": "focused/artifact-target.log",
+  "log_sha256": "e72a624e5f5d8000fbe1fe42b297301b4f52ab3855c9685b72f9731cbff633cf"
+}

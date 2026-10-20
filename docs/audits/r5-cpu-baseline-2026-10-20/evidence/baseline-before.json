@@ -1,0 +1,20 @@
+{
+  "command": [
+    "C:\\Users\\84387\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "luna-rs/Cargo.toml",
+    "-p",
+    "luna-backend",
+    "--lib",
+    "default_release_contract_uses_a_machine_independent_cpu_baseline",
+    "--",
+    "--nocapture"
+  ],
+  "exit": 101,
+  "seconds": 25.896558299999924,
+  "log": "baseline-before.log",
+  "log_sha256": "aec155d7db35d972ca1559cd2036fe8ca948197f621aae970d15244f9b0b8ab4",
+  "scope": "Before-fix regression; failure is expected, never qualification PASS"
+}

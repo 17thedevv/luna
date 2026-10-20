@@ -1,0 +1,15 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "provenance-cmake",
+  "command": [
+    "cmake",
+    "--version"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout",
+  "start_utc": "2026-10-17T18:02:26.390764+00:00",
+  "end_utc": "2026-10-17T18:02:27.057403+00:00",
+  "elapsed_seconds": 0.672,
+  "exit": 0,
+  "log": "provenance-cmake.log",
+  "log_sha256": "f6e81c2559f3ce00c5fdad01d7b226c301f5d6b07ee04f65db6dbfdc1cc5970b"
+}

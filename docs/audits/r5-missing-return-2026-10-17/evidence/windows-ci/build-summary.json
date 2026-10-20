@@ -1,0 +1,8 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "status": "PASS",
+  "cli_debug_sha256": "15678df628b415e153c7bcfaa2c946e289d657f8b65b9bcd9665c1d72eb0744c",
+  "cli_release_sha256": "5dac4627f00ff4216478e0db4e3c2dc11f9f70f0b81a18daba2254fb58d73a62",
+  "runtime_sha256": "aa7d248ee85091ae8e609f1fef5e283522f31c70e2d0285ac11d256e34e9d74c",
+  "time": "2026-10-17T12:39:22.141422+00:00"
+}

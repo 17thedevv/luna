@@ -1,0 +1,9 @@
+{
+  "source_head": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+  "status": "focused working-tree test correction; production unchanged",
+  "test_blob": "cbc6c11247e21fbb947ca47fc65af0117686240c",
+  "tests": "compiler_trust_diagnostics_cli_parity 1 PASS; nominal_layout_cli 1 PASS",
+  "failed_workspace": "e1-workspace-final3-2026-10-13.json",
+  "reason": "Canonical provider naming makes fresh source/artifact dependency interfaces match. Copied protected Slice still rejects E2006 in both modes. Genuine nominal interface changes still reject E6001 with no executable. No reader validation changed.",
+  "log_sha256": "0f7f649a2d3fb36205591dd1f2871efa081469d3c1d5b21704fc1a95d2b1e685"
+}

@@ -5,7 +5,7 @@ use std::process::Command;
 use luna_driver::{check, compile, CompilerOptions};
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
-    let mut dir = std::env::temp_dir();
+    let mut dir = luna_test_support::owned_temp_root();
     dir.push(format!(
         "luna_test_dispatch_{}_{}_{}",
         prefix,
@@ -60,7 +60,7 @@ impl Drop for SourceSysroot {
             Some(value) => std::env::set_var("LUNA_SYSROOT", value),
             None => std::env::remove_var("LUNA_SYSROOT"),
         }
-        if self.root.parent() == Some(std::env::temp_dir().as_path())
+        if self.root.starts_with(std::env::temp_dir())
             && self.root.file_name().is_some_and(|name| name.to_string_lossy().starts_with("luna_test_dispatch_source_sysroot_")) {
             let _ = fs::remove_dir_all(&self.root);
         }

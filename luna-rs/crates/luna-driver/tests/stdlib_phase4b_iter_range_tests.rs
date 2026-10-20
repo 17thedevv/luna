@@ -6,7 +6,7 @@ use luna_driver::{compile, CompilerOptions};
 use luna_driver::sysroot::Sysroot;
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
-    let mut dir = std::env::temp_dir();
+    let mut dir = luna_test_support::owned_temp_root();
     dir.push(format!(
         "luna_test_p4b_iter_{}_{}_{}",
         prefix,
@@ -237,7 +237,7 @@ fn test_range_and_inclusive_boundaries() {
             if v3.is_some() { return 19; } // Must be exhausted, not wrapped!
 
             // Boundary condition 2: u64 upper limit (MAX-1)..=MAX terminates cleanly without overflow!
-            dec u64_max = (0 as u64) - (1 as u64);
+            dec u64_max = 18446744073709551615u64;
             dec u64_max_minus_1 = u64_max - (1 as u64);
             dec rw ri_u64 = std::iter::range_inclusive(u64_max_minus_1, u64_max);
 
@@ -253,7 +253,7 @@ fn test_range_and_inclusive_boundaries() {
             if u_v3.is_some() { return 24; } // Must be exhausted!
 
             // Boundary condition 3: i64 upper limit (MAX-1)..=MAX terminates cleanly without overflow!
-            dec i64_max = (((0 as u64) - (1 as u64)) / (2 as u64)) as i64;
+            dec i64_max = 9223372036854775807i64;
             dec i64_max_minus_1 = i64_max - (1 as i64);
             dec rw ri_i64 = std::iter::range_inclusive(i64_max_minus_1, i64_max);
 

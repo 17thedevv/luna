@@ -1,0 +1,22 @@
+{
+  "gate": "runtime-abi",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "ctest",
+    "--test-dir",
+    "/home/runner/work/_temp/r5-workspace-triage/runtime",
+    "-R",
+    "^RuntimeAbiTests$",
+    "--output-on-failure",
+    "--no-tests=error",
+    "-V"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage",
+  "started_utc": "2026-10-17T12:29:04Z",
+  "exit": 0,
+  "seconds": 1.5999334979999986,
+  "log_sha256": "20618b13270d65403a49c49b4a7c953b93be726b07461ac8dbbbdcbe06369ebc",
+  "status": "PASS",
+  "log": "runtime-abi.log.gz",
+  "compressed_sha256": "02377db02edfb21b4efdc936da4bf3b270a36b3eddf0f75999bd88b67371b263"
+}

@@ -1,0 +1,17 @@
+{
+  "gate": "final-status",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "git",
+    "status",
+    "--porcelain"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T19:44:36Z",
+  "exit": 0,
+  "seconds": 0.16458451699963916,
+  "log_sha256": "2d3c285d07bf67837941aae264e6250cc4560f6aa6ae23d3d8fd1eb0d318aef3",
+  "status": "PASS",
+  "log": "final-status.log.gz",
+  "compressed_sha256": "8cc7c1fa01edf004c98a1549204aff7ceeeb3abcfe88ee7000dca27889a8e16a"
+}

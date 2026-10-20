@@ -55,7 +55,7 @@ fn malformed_trusted_intrinsic_signatures_fail_closed() {
         assert!(
             ctx.diagnostics
                 .iter()
-                .any(|d| d.code == Some(DiagnosticCode::InvalidAnnotation)),
+                .any(|d| d.code == Some(DiagnosticCode::InvalidAttributeApplication)),
             "accepted {source}: {:?}",
             ctx.diagnostics
         );
@@ -72,7 +72,7 @@ fn malformed_trusted_intrinsic_signatures_fail_closed() {
         assert!(
             ctx.diagnostics
                 .iter()
-                .any(|d| d.code == Some(DiagnosticCode::InvalidAnnotation)),
+                .any(|d| d.code == Some(DiagnosticCode::InvalidAttributeApplication)),
             "accepted {source}: {:?}",
             ctx.diagnostics
         );
@@ -86,7 +86,7 @@ fn untrusted_hooks_and_wrong_intrinsic_arity_are_rejected() {
     assert!(ctx
         .diagnostics
         .iter()
-        .any(|d| d.code == Some(DiagnosticCode::InvalidAnnotation)));
+        .any(|d| d.code == Some(DiagnosticCode::InvalidCompilerBinding)));
     for call in ["destroy<i32>()", "destroy<i32>(0 as *rw i32, 1)"] {
         let ctx = check(
             &format!(

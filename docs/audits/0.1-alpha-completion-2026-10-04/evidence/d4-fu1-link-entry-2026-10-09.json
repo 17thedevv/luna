@@ -1,0 +1,50 @@
+{
+  "task": "D4-FU1 — `#[link]` attribute placement on the program entry",
+  "status": "FIXED",
+  "date": "2026-10-09",
+  "branch": "d4-fu1-link-leading-attribute",
+  "base": "d4d980fb",
+  "retraction": {
+    "original_observation": "`#[link(...)]` as the first item of a file was rejected with E0003, so I added a preceding declaration to work around it.",
+    "verdict": "RETRACTED / MISDIAGNOSIS. The E0003 came from the invalid `extern \"C\" fn` spelling (the correct form is `extern fn`), not from attribute position. Verified on the current candidate: `#[link]` first item + `extern fn`, a leading comment, and a preceding item all build and run (exit 0)."
+  },
+  "corrected_finding": {
+    "trigger": "`#[link(name = \"abs\")] fn main() ...`",
+    "observed": "`check` PASSED (silent), `build` failed with `E6001 Backend Error: Compiler internal invariant violated: Function not found: __luna_user_main` — an ICE.",
+    "root_cause": "the generator applies `#[link]` as a symbol rename (generator.rs:1651-1675); on `main` this renames the compiler-owned entry symbol, so the entry alias is never emitted and the backend aborts.",
+    "classification": "FRONT-END VALIDATION GAP (DIAG-7: a known-layer error must fail before the backend) — RELEASE BLOCKER"
+  },
+  "contract_decision": "typed rejection in the front-end; `#[link]` must not be applied to the program entry `main`. The generator is NOT changed to silently ignore `#[link]`, and the check uses the front-end entry identity (`is_main`) rather than a backend name-string check.",
+  "fix": {
+    "site": "luna-semantic typechecker entry validation (the `is_main` site)",
+    "diagnostic": "InvalidAnnotation (E0005): \"`#[link]` cannot be applied to the program entry `main`\"",
+    "span": "the `#[link]` attribute name token, not the function body"
+  },
+  "acceptance_matrix": {
+    "#[link] fn main() -> i32": "E0005",
+    "#[link] fn main() (void)": "E0005",
+    "#[link] on helper": "build + run PASS",
+    "#[link] on another valid function": "semantics unchanged",
+    "main without attribute": "build + run PASS",
+    "#[link] first item on helper + extern fn": "PASS",
+    "#[link] after another item on helper + extern fn": "PASS"
+  },
+  "negative_requirements_met": [
+    "check and build emit the same diagnostic identity",
+    "no E6001 / no backend ICE",
+    "no executable is published",
+    "generator unchanged (no silent ignore)"
+  ],
+  "harness": "luna-rs/crates/luna-cli/tests/ffi_attribute_placement_cli.rs",
+  "focused": {
+    "command": "cargo test -p luna-cli --test ffi_attribute_placement_cli (plus retained_contracts_cli, diagnostic_conformance_cli, luna-semantic)",
+    "result": "ffi_attribute_placement_cli 1 passed; retained_contracts_cli 1 passed; diagnostic_conformance_cli 4 passed; luna-semantic 0 failed"
+  },
+  "workspace": {
+    "command": "cargo test --workspace --no-fail-fast",
+    "result": "PASS — 220 binaries, 1365 passed / 0 failed / 1 ignored, exit 0"
+  },
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — validation only; artifact representation unchanged, and the rejected program never produced a valid executable that would need compatibility",
+  "verdict": "D4-FU1: CLOSED / FIXED IN TESTED SCOPE (entry `#[link]` is a typed E0005 front-end rejection; no ICE, no executable; non-entry and normal FFI placements keep working)"
+}

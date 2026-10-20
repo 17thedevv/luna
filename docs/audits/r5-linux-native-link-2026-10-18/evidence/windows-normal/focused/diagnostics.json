@@ -1,0 +1,30 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "focused/diagnostics",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--test",
+    "diagnostic_conformance_cli",
+    "--test",
+    "expression_span_precision_cli",
+    "--test",
+    "comptime_diagnostic_cascade_cli",
+    "--test",
+    "compiler_trust_diagnostics_cli_parity",
+    "--test",
+    "diag_per_code_coverage_cli",
+    "--test",
+    "missing_return_cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T18:46:45.679048+00:00",
+  "end_utc": "2026-10-17T18:59:08.773494+00:00",
+  "elapsed_seconds": 743.093,
+  "exit": 0,
+  "log": "focused/diagnostics.log",
+  "log_sha256": "db661af749247bbc4d27a34ac94cc89c3231d4e3fee25d0b7d381cb0b980933b"
+}

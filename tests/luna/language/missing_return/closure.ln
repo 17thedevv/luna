@@ -1,0 +1,4 @@
+fn main() -> i32 {
+    dec callback = || -> i32 { };
+    return callback();
+}

@@ -1,0 +1,16 @@
+{
+  "gate": "disk-initial",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "df",
+    "-h"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T18:00:39Z",
+  "exit": 0,
+  "seconds": 0.01624092899999141,
+  "log_sha256": "3cb9f9712d95cac3a4138dea6933585fbc940f0456751a7066078650d88b95e8",
+  "status": "PASS",
+  "log": "disk-initial.log.gz",
+  "compressed_sha256": "7a50578d5785458764497ba7573392593eb6c3f9b089e4bf2dda8599e9579402"
+}

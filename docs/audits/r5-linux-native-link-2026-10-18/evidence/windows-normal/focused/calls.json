@@ -1,0 +1,26 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "label": "focused/calls",
+  "command": [
+    "C:\\Users\\runneradmin\\.cargo\\bin\\cargo.exe",
+    "test",
+    "--locked",
+    "-p",
+    "luna-cli",
+    "--test",
+    "named_arguments_cli",
+    "--test",
+    "default_arguments_cli",
+    "--test",
+    "default_omission_cli",
+    "--test",
+    "call_arity_cli"
+  ],
+  "cwd": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+  "start_utc": "2026-10-17T18:27:46.458576+00:00",
+  "end_utc": "2026-10-17T18:39:35.379110+00:00",
+  "elapsed_seconds": 708.907,
+  "exit": 0,
+  "log": "focused/calls.log",
+  "log_sha256": "7485ff684bfeec255b6bcda9c46aef465a6ed9ca00029fb7ee471a29c03b1d15"
+}

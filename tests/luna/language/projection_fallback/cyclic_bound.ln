@@ -1,0 +1,5 @@
+trait Marker {}
+struct Leaf {};
+impl<T: Marker> Marker for T {}
+fn needs<X: Marker>(x: X) -> i32 { return 0; }
+fn main() -> i32 { return needs(Leaf {}); }

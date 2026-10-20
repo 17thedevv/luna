@@ -1,0 +1,22 @@
+{
+  "gate": "diagnostic-code-policy",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-common",
+    "every_registered_code_declares_its_identity_and_span_policy"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T13:50:37Z",
+  "exit": 0,
+  "seconds": 0.06409199599966087,
+  "log_sha256": "6803e0dd42b395a0b8be4c636b7d9d30e459eb4971f35ae058d8ce86da6cfbdc",
+  "status": "PASS",
+  "log": "diagnostic-code-policy.log.gz",
+  "compressed_sha256": "37f1b9316fb4ac5f056feba3e3fa7e14d16d4bdace2332036130be49981afee4"
+}

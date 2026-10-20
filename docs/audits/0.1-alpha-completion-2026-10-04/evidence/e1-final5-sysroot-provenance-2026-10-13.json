@@ -1,0 +1,460 @@
+{
+  "source_sha": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+  "producer_cli_sha256": "5d08acde7a986682673576f9b5f4a7b2df4b3fc7bc90ee0393e82655da5312bd",
+  "source_ln_count": 49,
+  "artifact_ln_count": 0,
+  "source_artifact_count": 0,
+  "providers": [
+    {
+      "path": "libs\\external\\alloc\\arc.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "74380fa279b3abe6ccde0059be220704f1516cac66570bbcb69d7a840f0719e6",
+      "object_sha256": "7710ca64f7e25f5e4649146021948a68c582861ed0384190352aea1600f4eb3f",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\binaryheap.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "c59c8021917c2afb6cc754911a8b0d379068fd6ffcbb4c4b00baaa0f4ec25d5e",
+      "object_sha256": "ab0e6ac692636e41f3042e53f0cc24532d44d1e94be749ef55f9c7e7ce56b395",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\box.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "4572b0b54fd433170b74d97f97dc9d405d7211e16e7834d7e415882d192f533e",
+      "object_sha256": "926e8f50dc388f990ac04d594459a467c6e8051b62adfc5219c9a3d73991eafe",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\btreemap.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "c02c14051e7e0af01d73107508ac83bd212de85f8acfad23dd67ff71c1ba29db",
+      "object_sha256": "05237211ea40134a10ab9e7e5342f254de9b5d70fe5bdd11d7d221432f57cfaf",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\btreeset.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "d1109dded8969fe40433be606ce3010c3c2298a3f42dc78da9c6964f908c6744",
+      "object_sha256": "a8d0fd37e8e1f4f3f503e09224e9a41927671839a82439175fd0eea7fcd38422",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\global.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "ca27eb02d2251e859199db4a72952e50d0b1972cc02554bc92041f08d53e7ab6",
+      "object_sha256": "a305b83ca889cf4f7db7a1bc9c4ad259675146966d69f97e56d48516e896d3b5",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\hashmap.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "248c49a5a4b28a5bd184441143c051956603623ded399be6621c41d51918616b",
+      "object_sha256": "d98b5dc989bc03d54984fbf4cb8b7a0d97b49ea9725d8ee8bcb58fbeb82a3bd5",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\hashset.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "09fcae952f42d858ec0c4eec3c0b61aa4fda40ab0a78105c438d3a25cee9fb1e",
+      "object_sha256": "c3e38ab4974deb7065fb87ee69e57fa5c6ec3ff1e23a2ed28d5d0e2176665ac1",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\iter_collect.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "c25869bef2e860ccc1707abb5e3f41ad1e607960e06b2a3a5c49e8688d2d9b24",
+      "object_sha256": "8dcf26c881617aa52fab61c89c91f41be6dfe186fc635cc707d4ad9bfdcaf409",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\raw_table.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "a73a39143a6291cacad8de661c3f2ea9e074069a0271baa39c149e9faece9c33",
+      "object_sha256": "deea1f26805e910459fd3d10559c7c1e0724998202965aecc61d50ae70671d15",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\rc.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "16115507d8da3b369c9a53c231c940e3fcbd70e3dd1b336cdfa2da46f5c3b853",
+      "object_sha256": "8559f011b0b46b4f6179a79e7fe1337f005c19922c7d676ded5e1ff291e876d2",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\string.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "e6c65578e5e7cfa8361a03178da68fd049728c67b6c4ac17397215e3358a37f7",
+      "object_sha256": "1d5f616a30200d9c05322d5c8ba65367bd6743bf51a52d182f4f9eeb5d0290d0",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\thread.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "5995974a41208fab0dd6c4fe4399189a2823760467ee50efe4d3b188541d02c1",
+      "object_sha256": "996d07a1b9cbbc4ebaa961b29d386e0a3e77fedd94acbc694817e90864317dca",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\vec.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "85f45574f2b4b9697aba33adf61278e1beb1cad5f48c7b05527ed845291e3af1",
+      "object_sha256": "64eb494789e7117079eca540e81e0fd6f67c2f5910e130b5595bb415cc2e18bd",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\alloc\\vecdeque.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "a5a5c9b3cbbfa924dff8fbc7d8dccdba0a3226095293a7e0389b07a8c0bf702d",
+      "object_sha256": "3039edd9db79a253430b170254ce0710df5bd14f9239296a595a1c1360da3ee0",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\algo.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "eb869fa98d31c5e4ed1690c846e1fd1b4e98a0571db47b8673e51eb2bf6eeeb0",
+      "object_sha256": "2824bff60928d9f1f50135fa3a4d9428dac717d9cc520057a0584581e06614c8",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\atomic.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "a37cd258149ce2c18f8656b414113f674241e50a35dd52ee6b69fafe1bedbae5",
+      "object_sha256": "d45bebd2bfd8c7fde10c20e37090911723566207cc79d7a841e65203f3793b80",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\cell.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "e96f1e2619b33cf2fc8eddc20eff8ea0be3d063f59c2e14971b8d1227bed0ed5",
+      "object_sha256": "2c527e48ed41bfa220f86d495845061afb1008594fb74cd142d7492733ffceb5",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\clone.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "f27f1d612780aee608d053e5a56a322033d30f7564c5f6366a9e4547bed69e5e",
+      "object_sha256": "e54bdfc8a9d53cf6d431e2b8c1c8847d6a6ce3db9d636e2e94e0bc995cc2186a",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\cmp.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "22f3bdbc9b2703543215980a2904333d4d213db7ed9e6621eb737816ce6f25a5",
+      "object_sha256": "ab63b7510c2ec4e2020ea06d0632f0445a7821d4e9908c6a6fc10d660871dbeb",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\convert.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "5db9f28c33fea5ef4d17fe47d2d302dcba9e931be3cef7edbc452b24e57d7d4b",
+      "object_sha256": "fcfd99c4bc016dd9147d1d1d2b6e3c1b1aada59fb77988e5a05d80227aedd09c",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\copy.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "49756ffca03a048653a5926fd4adb9940673782e1f6a62205ea7ae7460ad952b",
+      "object_sha256": "84a40161d15b775ec4948ac18c4ef4200335305e446258534800b9a25b95d33f",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\default.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "0085d532bed1c96aba0cbb5b50e6db7e83af760f3511446494f48c6476645fe3",
+      "object_sha256": "1717128679d4792ec85e281dbeaf299daf216fc479434833b8a3fa88d57d2add",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\float.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "6adb61b9acd3c91fd1d8990b30d61ac93807184b8e227d753ccbd0d95c6ee43f",
+      "object_sha256": "8ed340f0f295179cc21139deceeec5bcc22e5a6153191b69c3098c01b8ea8000",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\fmt.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "a66959bad341010774a95afd029206243ae90badee11757784fa87aafc3d1860",
+      "object_sha256": "2880427bc9f10b3adf3cde9ed202911f74001ae5d033c805290465ce86b37af4",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\hash.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "ed7a953e4a794397ecd08fdae53499c30d7207e985c705e7a6225a80dae3e35f",
+      "object_sha256": "35481e8e0377aa3f666e29ac7f2a73f2ad2712c7a032f7921127b47a3cb91590",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\iter_adapters.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "f073fe60ef18f3e54a6f541bda80a12d812cd701e79a6eea4f5af93a94a62e00",
+      "object_sha256": "7af41bf2629e27c2ee3d0e8e38c1247fa6021ee4cbad99eac514035d6bcaaf3c",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\iter_consumers.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "a1bf29af4cdd9aac287a321f297da7cb4617ff7d7227a3dd5f2ea27bb8053a27",
+      "object_sha256": "63844c72553760887a3d2955501b3eb865f9821d9be013a02f23e838f4ae51d6",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\mem.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "a67ab03b1f9468307bfe82ffe10bb7214f1681fefbd92b8afed3061a779bf0f0",
+      "object_sha256": "feddfe0912d845920668f60ea0d0182e1f7a87454d25d90cc3c91414614390f9",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\num.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "4ea36df90c69983865a7d5605c71849c850e26db77169d067dd978080e00bbba",
+      "object_sha256": "b10d6ba492532aa041056c4b641d8c5fab3a3525ad5b6d23018471a280f3c8ad",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\panic.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "cceacf7dd9ec83b662a763fe04a3b5cc7bbe8a057c4e859d559fcce9cd48f0ce",
+      "object_sha256": "dc6ce091565f20df39ba74ff1172334b523a2283982240267e43a18a56d53594",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\ptr.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "75671ae353694d10be792859d412ceaa81bd5f9e844d5eef51f1c5dbd36ca963",
+      "object_sha256": "fe4babcd5078a986e9b1acc1c6f9847d0383d682a218137da777dc5dabfb90d1",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\random.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "f2e0d08e23a0bff29add58239f0bef3079752ab77cf66c2f989909dfc8eb5919",
+      "object_sha256": "cf92c636c097e803bbac563fa5f877bd42a3c0edf68680827485bd212a207243",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\result.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "cdc20af5b83ab27a31cf2c31a6af88804836f9257ccb43c07f53e2ca60e29210",
+      "object_sha256": "9b35246c5c0a78407d16640a2712673495e36e0f65ad4f41dd974993532b258b",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\slice.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "7cf009bc694f751bcc23891c963b77d1cb2d649188ec1efca12f7d65e422a057",
+      "object_sha256": "69591415cf118040c50a0df432763277332a5d87cca8dc449bc6151093d5bf45",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\sync.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "41ba2489a76e749df3b6d8b0ee1c0b58984ddd92a1a92bbe651f97efd122f19f",
+      "object_sha256": "adbe46691b91ef20061b7ddd70e4bc2e3843ea9d0cf6aa1b2b862a120b6e7738",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\time.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "186e99d6bbd765324527e0bebf0aa2970bac3a390b3dfa876e0bfc26d8df30d4",
+      "object_sha256": "f126a4ef4556649f2e8ebce3f66c1b198192f03e0bb8bb55f1c3429079bab5d4",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\core\\try.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "d378b98b89fbdbaf3972e9f07a95b863f11d2b3cfdcc43cee87d6c5a52ae3f4f",
+      "object_sha256": "f803739dfeb37b402e8bcc8d02734f153ecbb9feda76a8c97fa6ab2e4dab30a5",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\crypto\\crypto.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "ef9623ba41327f9fba3c00098220ef3b3f9b22feed4b183d9fe3c6dc678f56c6",
+      "object_sha256": "da2b2db23be59168a8325a71c8855b94ab05e0afa1c2a436953e6124f50ba01f",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\encoding\\encoding.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "27f75fd0351b9074cdd7632a4f7fd97826236f19d1cb5a4540610471203dfe4e",
+      "object_sha256": "63067335f6cfedd0f682b33d2f15faf7f81abfe81d7048368b628a72ba0b2bb3",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\file\\file.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "7eb6d11a4304b8e0a394f1af3f610859b35b3017593ad5892e731262bc06a326",
+      "object_sha256": "26ba5b4f63dae738cc0feffd6ab941806b905d787602a9ed3e7a2f4c26e5c522",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\io\\io.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "c62194135922275e7a47e0497fc05565d71f339559e1e13c33a2523f9a566eca",
+      "object_sha256": "57966cf16d89779e1063d9513f2deee3c29ca6e802621a64307ee039c1304191",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\json\\json.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "33e88db736f16619d953de8e3f55aeab4d9fe9a421d8953844cc186b67253eb8",
+      "object_sha256": "d98ecb00cc647b289bd69d62244a6f7527f6a2bb5bc74ce156c1e7517b113f3b",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\lang\\drop.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "f86ed8bc2c3b61fb99021c204932980b906f38a90a57023aa9a2a0ca5b07d232",
+      "object_sha256": "42f32a165786ca315e14278fb47fdce68d1abb05608d2fcba06697e35c18fb99",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\lang\\into_iterator.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "eaf4c70fd8f30459f14179cd0676f74ffb203bffd7940c24cc743ff4ea7d5905",
+      "object_sha256": "d7d020e2a8c468f13ba85351c28527462539ee3029d7c34b7c089308d94e0026",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\lang\\iterator.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "f0bc9fabe852c9b7f1b85f7995ffa237735a51dd449853212cf0c6bd63669172",
+      "object_sha256": "797ce00b26a0c805e7dd40f04e91d9d63d94b5d6cbc46dea8bb2d266eae8f5bf",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\lang\\option.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "67bd7388b3467aca29fcd9a7f975f3c0685769f6cc7a88f5d073d35a5c1e8614",
+      "object_sha256": "e570a63d3e3580f8dfd662c7a4d3fc8215d009a751c48c1b0cfd1200be8eab6b",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\net\\net.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "d8adc7bb01d6963a6da9f39989300a854b916837621327788467b2c7433efac5",
+      "object_sha256": "55ab00a81db7d8a8886ad72d2f6e80bbfa9555a51883250f6cada45b4b560576",
+      "target": "x86_64-pc-windows-gnu"
+    },
+    {
+      "path": "libs\\external\\path\\path.llib",
+      "format": 2,
+      "compiler": 25,
+      "mvir": 5,
+      "library_sha256": "b456eb8a3b3915fe6d16bebcf103e5114610155270d69fdb9bf713f484879b28",
+      "object_sha256": "5fd49f3b3abc0cc1ad1899aee6748e7bccb1636e36a1cb23c3c6cfb5cda1adc9",
+      "target": "x86_64-pc-windows-gnu"
+    }
+  ],
+  "native_target": {
+    "target_triple": "x86_64-pc-windows-gnu",
+    "cpu": "alderlake",
+    "features": "+prfchw,-cldemote,+avx,+aes,+sahf,+pclmul,-xop,+crc32,+xsaves,-avx512fp16,-usermsr,-sm4,+sse4.1,-avx512ifma,+xsave,-avx512pf,+sse4.2,-tsxldtrk,+ptwrite,-widekl,-sm3,+invpcid,+64bit,+xsavec,-avx10.1-512,-avx512vpopcntdq,+cmov,-avx512vp2intersect,-avx512cd,+movbe,-avxvnniint8,-avx512er,-amx-int8,-kl,-avx10.1-256,-sha512,+avxvnni,-rtm,+adx,+avx2,+hreset,+movdiri,+serialize,+vpclmulqdq,-avx512vl,-uintr,+clflushopt,-raoint,-cmpccxadd,+bmi,-amx-tile,+sse,+gfni,-avxvnniint16,-amx-fp16,+xsaveopt,+rdrnd,-avx512f,-amx-bf16,-avx512bf16,-avx512vnni,+cx8,-avx512bw,+sse3,-pku,+fsgsbase,-clzero,-mwaitx,-lwp,+lzcnt,+sha,+movdir64b,-wbnoinvd,-enqcmd,-prefetchwt1,-avxneconvert,-tbm,-pconfig,-amx-complex,+ssse3,+cx16,+bmi2,+fma,+popcnt,-avxifma,+f16c,-avx512bitalg,-rdpru,+clwb,+mmx,+sse2,+rdseed,-avx512vbmi2,-prefetchi,+rdpid,-fma4,-avx512vbmi,+shstk,+vaes,+waitpkg,-sgx,+fxsr,-avx512dq,-sse4a",
+    "object_format": "COFF",
+    "abi": "llvm-default;layout=e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
+    "pointer_width": 64,
+    "endianness": "little"
+  },
+  "acquisition_log": ".e1-sysroot25-final5.log"
+}

@@ -1,0 +1,32 @@
+{
+  "gate": "focused-c-comptime",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--no-fail-fast",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--test",
+    "impl_header_metadata_cli",
+    "--test",
+    "projection_fallback_cli",
+    "--test",
+    "comptime_dependency_precision_cli",
+    "--test",
+    "comptime_loans_cli",
+    "--",
+    "--nocapture"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T18:32:19Z",
+  "exit": 0,
+  "seconds": 383.3393055440001,
+  "log_sha256": "cb2ea2ea25b70b0dbf7a52e1f08c144a7583fe82fbbcc3b90a7859a738fc3f64",
+  "status": "PASS",
+  "log": "focused-c-comptime.log.gz",
+  "compressed_sha256": "3804bbf234993d46790d49db66ae8d844976066f7629f0fe02b9b0fb385478af"
+}

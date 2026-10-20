@@ -16,7 +16,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn temp_dir() -> PathBuf {
-    let path = std::env::temp_dir().join(format!(
+    let path = luna_test_support::owned_temp_root().join(format!(
         "luna_c_gap_12_{}_{}",
         std::process::id(),
         std::time::SystemTime::now()

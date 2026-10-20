@@ -1,0 +1,6 @@
+fn main() -> i32 {
+    dec a = true;
+    dec b = false;
+    if !(a && b) { return 0; }
+    return 1;
+}

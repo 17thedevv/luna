@@ -1,4 +1,4 @@
-// Contract requires rejection; current parser admits these delimiters.
+// Contract requires rejection; the parser rejects semicolon delimiters with typed E0002 and a span.
 struct Point { x: i32; y: i32; };
 fn main() -> i32 {
     dec point = Point { x: 10, y: 32 };

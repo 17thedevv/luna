@@ -1,0 +1,8 @@
+[package]
+name = "luna-test-support"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "luna_test_support"
+path = "src/lib.rs"

@@ -1,0 +1,18 @@
+{
+  "gate": "checkout",
+  "tested_commit": "d3d0ffe8d6495aee1f56257a1db817ce4107e992",
+  "command": [
+    "git",
+    "checkout",
+    "--detach",
+    "d3d0ffe8d6495aee1f56257a1db817ce4107e992"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-runtime-asan/checkout",
+  "started_utc": "2026-10-18T05:47:42Z",
+  "exit": 0,
+  "seconds": 0.9194508010000106,
+  "log_sha256": "e06b0710c6ab198cbbbb3005691e8459d5733c4897b4ba7fd251f2db97492aaf",
+  "status": "PASS",
+  "log": "checkout.log.gz",
+  "compressed_sha256": "fc5bb2ddd36068b689c61df2ed3ad176ba7d5a27e9be0e72b12fbd615bce1149"
+}

@@ -1,0 +1,18 @@
+{
+  "source_sha": "b9841cfef9ed6d81c7223f06547f44cfed5932db",
+  "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "cli_sha256": "f33e4e5a627b28464b9d5178c0c1d9e3a57e39807496ee2776ad6f5483bba2c8",
+  "source_input_sha256": "6dde95f934ee32ee9e6e62dc66cf5611eedcfb71d427eeaad0a66d793902e3e9",
+  "cli": "D:/fdlang/luna-rs/target/release/luna.exe",
+  "sysroot": "D:/fdlang/.e1-fp-b99152562efa448c8ecf6d0573a3feeb/source",
+  "profile": "release",
+  "provider_mode": "source",
+  "rows": 59,
+  "outcomes": {
+    "COMPILE_ERROR": 4,
+    "TRAP": 34,
+    "PASS": 9,
+    "WRAP": 12
+  },
+  "contract_met": true
+}

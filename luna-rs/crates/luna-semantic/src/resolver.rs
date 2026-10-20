@@ -161,6 +161,20 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         self.resolve_using_items(items, false);
     }
 
+    /// Resolver-owned admission of macro identity/rule expansion failures.
+    /// Parser diagnostics carried from token re-entry retain their own owner.
+    pub fn admit_macro_expansion_failures(
+        failures: Vec<crate::macro_engine::MacroExpansionFailure>,
+    ) -> Vec<luna_common::Diagnostic> {
+        failures.into_iter().map(|failure| match failure {
+            crate::macro_engine::MacroExpansionFailure::Diagnostic(diagnostic) => diagnostic,
+            crate::macro_engine::MacroExpansionFailure::Rule { message, span } => {
+                luna_common::Diagnostic::source_error(DiagnosticCode::InvalidMacroExpansion, span, message)
+                    .in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
+            }
+        }).collect()
+    }
+
     fn declare_macro_item(&mut self, item: &Item) {
         if let Item::Decl(decl_id) = item {
             let decl = &self.arena.decls[decl_id.0 as usize];
@@ -404,16 +418,19 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                     self.current_scope,
                 ) {
                     crate::symbol::ImportSymbolResult::Success
-                    | crate::symbol::ImportSymbolResult::AlreadyImported => {}
-                    crate::symbol::ImportSymbolResult::Conflict { .. } => {
+                    | crate::symbol::ImportSymbolResult::AlreadyImported => {
+                        self.ctx.symbol_table.import_binding_spans.entry((self.current_scope, sym_id)).or_insert(*name);
+                    }
+                    crate::symbol::ImportSymbolResult::Conflict { existing } => {
+                        let previous = self.ctx.symbol_table.import_binding_spans
+                            .get(&(self.current_scope, existing)).copied()
+                            .unwrap_or(self.ctx.symbol_table.get_symbol(existing).span);
                         // IMPORT-5: Conflicting imported root bindings are diagnosed deterministically
                         self.ctx.diagnostics.push(
-                            luna_common::diagnostic::Diagnostic::error(format!(
+                            crate::symbol::duplicate_definition_diagnostic(*name, previous, format!(
                                 "E1002: conflicting imported symbol `{}`: symbol already defined or imported from another provider",
                                 sym_name
-                            ))
-                            .with_code(DiagnosticCode::DuplicateDefinition)
-                            .with_span(*name),
+                            )),
                         );
                     }
                 }
@@ -421,7 +438,33 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         }
     }
 
-    fn check_lang_item(
+    /// Resolver admission of compiler-owned identity. This runs on every
+    /// declared item, including nested, macro-expanded and portable provider AST.
+    fn check_compiler_binding(&mut self, decl: &Decl) {
+        if let Decl::Function { name, .. } = decl {
+            let text = self.get_span_text(*name);
+            if text.starts_with("__luna_intrinsic_") && !self.ctx.allow_internal_lang_items {
+                self.ctx.diagnostics.push(luna_common::Diagnostic::source_error(
+                    DiagnosticCode::InvalidCompilerBinding, *name,
+                    format!("`{text}` uses the compiler-owned intrinsic namespace `__luna_intrinsic_`")));
+            }
+        }
+        for annotation in decl.annotations() {
+            if self.get_span_text(annotation.name) != "link" { continue; }
+            if let Some(argument) = annotation.args.first() {
+                if let Expr::Literal(token, _) = &self.arena.exprs[argument.value.0 as usize] {
+                    let text = self.get_span_text(token.span).trim_matches('"');
+                    if text.starts_with("__luna_intrinsic_") {
+                        self.ctx.diagnostics.push(luna_common::Diagnostic::source_error(
+                            DiagnosticCode::InvalidCompilerBinding, annotation.name,
+                            format!("`#[link(\"{text}\")]` claims the compiler-owned intrinsic namespace `__luna_intrinsic_`")));
+                    }
+                }
+            }
+        }
+    }
+
+fn check_lang_item(
         &mut self,
         annotations: &[luna_ast::Annotation],
         sym_id: luna_common::ids::SymbolId,
@@ -435,7 +478,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute can only be used in trusted compiler/core contexts",
                         )
-                        .with_code(DiagnosticCode::InvalidAnnotation)
+                        .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                         .with_span(annot.name),
                     );
                     continue;
@@ -445,7 +488,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute requires exactly one argument: `#[lang(\"name\")]`",
                         )
-                        .with_code(DiagnosticCode::InvalidAnnotation)
+                        .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                         .with_span(annot.name),
                     );
                     continue;
@@ -458,7 +501,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                                 luna_common::diagnostic::Diagnostic::error(
                                     "`#[lang(...)]` argument must be a string literal",
                                 )
-                                .with_code(DiagnosticCode::InvalidAnnotation)
+                                .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                                 .with_span(tok.span),
                             );
                             continue;
@@ -470,7 +513,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             luna_common::diagnostic::Diagnostic::error(
                                 "`#[lang(...)]` argument must be a string literal",
                             )
-                            .with_code(DiagnosticCode::InvalidAnnotation)
+                            .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                             .with_span(annot.name),
                         );
                         continue;
@@ -483,7 +526,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             "unknown language item `{}`",
                             arg_str
                         ))
-                        .with_code(DiagnosticCode::InvalidAnnotation)
+                        .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                         .with_span(tok_span),
                     );
                     continue;
@@ -513,7 +556,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         luna_common::diagnostic::Diagnostic::error(
                             "`#[lang]` attribute can only be used in trusted compiler/core contexts",
                         )
-                        .with_code(DiagnosticCode::InvalidAnnotation)
+                        .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                         .with_span(annot.name),
                     );
                     continue;
@@ -523,7 +566,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                         "`#[lang]` cannot be applied to {} declarations",
                         decl_kind
                     ))
-                    .with_code(DiagnosticCode::InvalidAnnotation)
+                    .with_code(DiagnosticCode::InvalidCompilerBinding).in_phase(luna_common::diagnostic::DiagnosticPhase::Resolver)
                     .with_span(annot.name),
                 );
             }
@@ -531,6 +574,16 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     }
 
     pub fn resolve_items(&mut self, items: &[Item]) {
+        // Parser-owned grammar re-admission of materialized AST precedes binding
+        // resolution. This also covers portable provider bodies and macro AST.
+        for expression in &self.arena.exprs {
+            if let Expr::Literal(token, text) = expression {
+                if let Err(diagnostic) = luna_parser::validate_literal_syntax(*token, text) {
+                    self.ctx.diagnostics.push(diagnostic);
+                }
+            }
+        }
+        if !self.ctx.diagnostics.is_empty() { return; }
         for item in items {
             self.declare_item(item, DeclarationContext::Free);
         }
@@ -541,6 +594,26 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
     fn declare_item(&mut self, item: &Item, context: DeclarationContext) {
         match item {
             Item::Decl(decl_id) => {
+                let admission_decl = &self.arena.decls[decl_id.0 as usize];
+                // Re-admit materialized AST grammar through its Parser owner;
+                // portable AST and macro output use the same boundary.
+                self.ctx.diagnostics.extend(luna_parser::validate_annotation_names(
+                    admission_decl.annotations(), self.source_manager));
+                if let Decl::Function { params, .. } = admission_decl {
+                    for parameter in params {
+                        let parameter_decl = &self.arena.decls[parameter.0 as usize];
+                        self.ctx.diagnostics.extend(luna_parser::validate_annotation_names(
+                            parameter_decl.annotations(), self.source_manager));
+                        self.check_unsupported_lang_item(parameter_decl.annotations(), "parameter");
+                    }
+                }
+                if let Decl::Enum { variants, .. } = admission_decl {
+                    for variant in variants {
+                        self.ctx.diagnostics.extend(luna_parser::validate_annotation_names(
+                            &variant.annotations, self.source_manager));
+                    }
+                }
+                self.check_compiler_binding(admission_decl);
                 let prev_scope = self.current_scope;
                 if let Some(&sym_id) = self.ctx.tables.decl_symbols.get(decl_id) {
                     if let Some(scope) = self.ctx.symbol_table.get_symbol(sym_id).inner_scope {
@@ -1258,8 +1331,7 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                     }
                     Decl::Using { span, .. } | Decl::UsingNamespace { span, .. } => {
                         if !matches!(self.ctx.symbol_table.scopes[self.current_scope.0 as usize].kind, crate::symbol::ScopeKind::Global | crate::symbol::ScopeKind::Module) {
-                            self.ctx.diagnostics.push(luna_common::Diagnostic::error("using is restricted to file/module scope")
-                                .with_code(DiagnosticCode::InvalidSyntax).with_span(*span));
+                            self.ctx.diagnostics.push(luna_parser::invalid_using_scope(*span));
                         }
                     },
                     Decl::Import { name, kind, .. } => {
@@ -1864,28 +1936,8 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
                             );
                             return;
                         }
-                        if matches!(sym.kind, crate::symbol::SymbolKind::Macro) {
-                            let name_str = segments
-                                .iter()
-                                .map(|seg| self.get_span_text(*seg))
-                                .collect::<Vec<_>>()
-                                .join("::");
-                            let span = Span {
-                                file_id: segments[0].file_id,
-                                start: segments[0].start,
-                                end: segments.last().unwrap().end,
-                                ctxt: segments[0].ctxt,
-                            };
-                            self.ctx.diagnostics.push(
-                                luna_common::Diagnostic::error(format!(
-                                    "macro '{}' cannot be used as a value",
-                                    name_str
-                                ))
-                                .with_code(DiagnosticCode::InvalidSyntax)
-                                .with_span(span),
-                            );
-                            return;
-                        }
+                        // Macro binding identity is resolved here; using it as a
+                        // runtime value is a TypeChecker admission failure.
                         self.ctx.tables.expr_symbols.insert(*expr_id, sym_id);
 
                         if !self.active_lambdas.is_empty() {
@@ -2423,4 +2475,25 @@ impl<'a, 'b, 'c> Resolver<'a, 'b, 'c> {
         self.ctx.tables.raw_storage_anchor_contracts.insert(struct_sym, canonical);
         self.ctx.tables.resolved_raw_storage_anchor_contracts.insert(struct_sym, resolved);
     }
+}
+
+/// DIAG-8: `E1008` (AmbiguousSymbol) is owned by the Resolver phase. Other
+/// phases that detect ambiguity construct the diagnostic through this
+/// owner-provided constructor instead of building it themselves.
+pub fn ambiguous_method_diagnostic(
+    name: &str,
+    candidates: &[(luna_common::Span, String)],
+    span: luna_common::Span,
+) -> luna_common::diagnostic::Diagnostic {
+    let names = candidates.iter().map(|(_, label)| label.as_str()).collect::<Vec<_>>();
+    let mut diagnostic = luna_common::diagnostic::Diagnostic::error(format!(
+        "Ambiguous method `{name}`: {}",
+        names.join(", ")
+    ))
+    .with_code(luna_common::DiagnosticCode::AmbiguousSymbol)
+    .with_span(span);
+    for (candidate_span, label) in candidates {
+        diagnostic = diagnostic.with_related(*candidate_span, format!("candidate {label}"));
+    }
+    diagnostic
 }

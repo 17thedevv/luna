@@ -1,0 +1,2047 @@
+{
+  "schema_version": 1,
+  "task": "R4 Release Documentation & Ledger",
+  "date": "2026-10-14",
+  "base_commit": "3f8646c654b99b67bae57ee290b7a7e23d717b40",
+  "implementation_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+  "branch": "r4-release-docs-ledger",
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "release_status": "BLOCKED_PENDING_R5",
+  "r4_scope": "docs/evidence only; no new runtime/compiler/test execution claims",
+  "closure_commit_policy": "R4 closure SHA is the Git commit containing final docs/evidence, reported externally after commit; no self-referential embedded hash",
+  "historical_pin_policy": "Several A1/C1 and legacy report hashes belong to earlier graph histories and are not ancestors of base. Preserve them verbatim, record canonical integrated closure SHAs here, and never call a re-verification commit the introducing fix.",
+  "records": [
+    {
+      "id": "A1",
+      "title": "Closure environment destruction and consume-on-call",
+      "closure_commit": "060aabb3897319e5f400da405470973c601a0871",
+      "implementation_commit": "3ef627759e0707b352c50abd33605ee0d0b82256",
+      "implementation_commits": [
+        "3ef627759e0707b352c50abd33605ee0d0b82256"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "generic_drop_cli",
+        "closure_drop_glue_identity"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A1-CLOSURE-ENV-2026-10-06.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a1-closure-env-2026-10-06.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "A2",
+      "title": "Async suspended cleanup",
+      "closure_commit": "f1e53f39602d7fc9e55229b386e7c3ec54b4c90f",
+      "implementation_commit": "6e93f2a714b96a54938201ce9c0bde967fe7c25f",
+      "implementation_commits": [
+        "6e93f2a714b96a54938201ce9c0bde967fe7c25f"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "async_cleanup_cli",
+        "a2_suspension_cleanup_tests"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-ASYNC-SUSPENSION-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-async-suspension-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "A2-FU1",
+      "title": "Shared DropFlagPlan / DropFlagTransition",
+      "closure_commit": "d4d980fb300ab9871674eefe36c038db4574e21b",
+      "implementation_commit": "0181fa9b457c9f7d9ea8a279f5d593d1b08b2448",
+      "implementation_commits": [
+        "0181fa9b457c9f7d9ea8a279f5d593d1b08b2448"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "async_cleanup_cli",
+        "a2_suspension_cleanup_tests"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU1-DROP-FLAG-PLAN-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-fu1-drop-flag-plan-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "A2-FU2",
+      "title": "CLI async source/fresh-artifact cleanup matrix",
+      "closure_commit": "47f402ea7057eb25740ebe7350e56a4e7d7e4d03",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "async_cleanup_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU2-CLI-MATRIX-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-fu2-cli-matrix-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "A3",
+      "title": "Remaining constant-index array elements after partial move",
+      "closure_commit": "c3e55f4f06631eac52187bd49e709d57bfe3308f",
+      "implementation_commit": "72771e5707a946ec024956d68e09af644b2c41ac",
+      "implementation_commits": [
+        "72771e5707a946ec024956d68e09af644b2c41ac"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "generic_drop_cli",
+        "p0b_drop_subplace_tests"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A3-PARTIAL-AGGREGATE-CLEANUP-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a3-partial-aggregate-cleanup-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "A4",
+      "title": "Cast rejection and poison containment",
+      "closure_commit": "7aee152852e10f5d25286c114d384a2e297e3083",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "cast_poison_cli",
+        "cast_contract_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A4-CAST-POISON-CONTAINMENT-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a4-cast-poison-containment-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "A5",
+      "title": "Raw slice/view loan transport",
+      "closure_commit": "54df3f4300d19f6a7e9921879342df062abafe50",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "raw_slice_view_a5_cli",
+        "raw_slice_provenance_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A5-RAW-SLICE-VIEW-CONTRACT-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a5-raw-slice-view-contract-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "A6",
+      "title": "Unary logical NOT on bool",
+      "closure_commit": "5939105d31434aee419b7dc36a15bd1f44c19d1f",
+      "implementation_commit": "929b7226ffeaf4fd1c243cccb1cb0f3e6615ba78",
+      "implementation_commits": [
+        "929b7226ffeaf4fd1c243cccb1cb0f3e6615ba78"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "unary_not_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A6-UNARY-LOGICAL-NOT-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a6-unary-logical-not-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "C1",
+      "title": "Named/default calls and comptime admission reconciliation",
+      "closure_commit": "52c96ed705b156752c7918682f138442283205ef",
+      "implementation_commit": "bf689274a313ff04b94ee1cf6e64e5fbaa0d26b5",
+      "implementation_commits": [
+        "bf689274a313ff04b94ee1cf6e64e5fbaa0d26b5",
+        "1decb031c9bc3d7e970f6c680abdbc7d116efc41",
+        "95f00a0827dfaf8ce644d87071755b9989a5f91e",
+        "cdb06682f375d9615665b26af72edef3c4d3eb0d",
+        "c49079cc6b8bc6da1bed72a20f3a19c11287b80b"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "named_arguments_cli",
+        "default_arguments_cli",
+        "default_omission_cli",
+        "comptime_loans_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C1-RECONCILE-2026-10-06.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c1-reconcile-candidate-final-2026-10-06.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": [
+        "Historical report c5c35c1e records a comparable failing workspace, not release PASS; A1 failure was closed separately; use canonical closure graph and final6 evidence"
+      ]
+    },
+    {
+      "id": "C2",
+      "title": "Per-impl-header metadata and interface identity",
+      "closure_commit": "22c33366a11f1d0b1331057a884b37e69bad42ed",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "impl_header_metadata_cli",
+        "interface_constraints_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C2-PER-IMPL-HEADER-METADATA-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c2-per-impl-header-metadata-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "C3",
+      "title": "Projection fallback and proof depth",
+      "closure_commit": "bf265798ef161f5ec340ec797f88f2cf085d4f75",
+      "implementation_commit": "3b1ac8c1e5dfe97d1cff66eb9f896e3bc29ed72b",
+      "implementation_commits": [
+        "3b1ac8c1e5dfe97d1cff66eb9f896e3bc29ed72b"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "projection_fallback_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C3-PROJECTION-FALLBACK-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c3-projection-fallback-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "C4",
+      "title": "Comptime execution dependencies, bounded static precision",
+      "closure_commit": "5994f5a3f90d753dd79c9c139fe2689e543d3710",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "comptime_dependency_precision_cli",
+        "artifact_execution_dependencies_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C4-COMPTIME-DEPENDENCY-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c4-comptime-dependency-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": [
+        "C4-FU1 precision deferred; withdrawn if-expression probe is not acceptance evidence"
+      ]
+    },
+    {
+      "id": "C5",
+      "title": "Artifact freshness classification",
+      "closure_commit": "7b3c51855eb83b3b7bfff1d8f6d3c1a5f7b0f2e8",
+      "implementation_commit": "4d1d2c18a07576368e091df6b6dda30484673bed",
+      "implementation_commits": [
+        "4d1d2c18a07576368e091df6b6dda30484673bed"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "fresh_artifact_classification_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C5-ARTIFACT-FRESHNESS-CLASSIFICATION-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c5-artifact-freshness-classification-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "D1",
+      "title": "Diagnostic registry and selected conformance reducers",
+      "closure_commit": "39004d69de418a81d74a2748a95a41d093ebc3bb",
+      "implementation_commit": "055cf0743a3a09dd24c85a1e24488e4e6cf5b6fd",
+      "implementation_commits": [
+        "055cf0743a3a09dd24c85a1e24488e4e6cf5b6fd"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "PARTIAL_STRUCTURAL_AUDIT",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "diagnostic_conformance_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-DIAGNOSTIC-CONFORMANCE-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d1-diagnostic-conformance-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": [
+        "R5-DIAG-STRUCTURAL: DIAG-1..10 complete construction/emission/coverage audit remains mandatory; original report misnumbers several invariants"
+      ]
+    },
+    {
+      "id": "D2",
+      "title": "Expression span precision",
+      "closure_commit": "35260b6bc299703d51c5242ffaadc220c1563211",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "expression_span_precision_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D2-EXPRESSION-SPANS-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d2-expression-spans-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "D3",
+      "title": "Tier-2/3 provider graph and rejection matrix",
+      "closure_commit": "70002d84b641b94c3aa0755983fff618e0bb6121",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "provider_tiers_cli",
+        "alpha_modules_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D3-PROVIDER-TIER23-MATRIX-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d3-provider-tier23-matrix-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": [
+        "Provider graph suite is bounded; building 49 providers is not full public API/domain certification; async finding closed separately"
+      ]
+    },
+    {
+      "id": "D4",
+      "title": "Retained language contracts",
+      "closure_commit": "4024abc6beede7b4bb0fb83f2d12a83ea14df39d",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "retained_contracts_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-RETAINED-CONTRACTS-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d4-retained-contracts-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "FIND-ASYNC-PROVIDER-01",
+      "title": "Real async provider HeapFree wire decoding",
+      "closure_commit": "f4b7c0de177cb24155777f7dfe9b2727a34827b7",
+      "implementation_commit": "13082834f262263f274f2f6d80b74ef8eda6d230",
+      "implementation_commits": [
+        "13082834f262263f274f2f6d80b74ef8eda6d230"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "async_provider_export_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/find-async-provider-01-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "D4-FU1",
+      "title": "Reject link on program entry; original leading-item observation retracted",
+      "closure_commit": "5122d3ce73268eb2e6021e79005be9f70c316b76",
+      "implementation_commit": "e2043d8c6173d11f28a8063ea731a325ea8aa525",
+      "implementation_commits": [
+        "e2043d8c6173d11f28a8063ea731a325ea8aa525",
+        "1b5dfab0cc73facf4eb0ce58defb047d215fd445"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "retained_contracts_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-FU1-LINK-ENTRY-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d4-fu1-link-entry-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "D1-FU2",
+      "title": "Suppress comptime cascade only with visible root",
+      "closure_commit": "d7129cd14beac6a9906ecd29d1704f8f91004e97",
+      "implementation_commit": "01898f01c4001dcbdfa1964ef7fc4897f67e46d3",
+      "implementation_commits": [
+        "01898f01c4001dcbdfa1964ef7fc4897f67e46d3",
+        "6f023bdefe687581c9ebf296b7dc848dba5f94e8"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "comptime_diagnostic_cascade_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-FU2-COMPTIME-DIAGNOSTIC-CASCADE-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d1-fu2-comptime-diagnostic-cascade-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": []
+    },
+    {
+      "id": "R5-HARNESS-01",
+      "title": "Owned temporary state, isolation, bounded residual cleanup",
+      "closure_commit": "ccc52c723ed799f17350d7e110fab72505b147c0",
+      "implementation_commit": "18a36854f1e0117fb4467ab643ce01e97d31d5fe",
+      "implementation_commits": [
+        "18a36854f1e0117fb4467ab643ce01e97d31d5fe",
+        "23e50a3653cd65ed7b0935e78e1aa72b95127642",
+        "6f023bdefe687581c9ebf296b7dc848dba5f94e8"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "test_temp_workspace_lifecycle_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/r5-harness-01-temp-sysroot-isolation-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": [
+        "One empty last-process directory can remain until the next orphan sweep; no claim of immediate cleanup of every directory"
+      ]
+    },
+    {
+      "id": "E2",
+      "title": "Grammar/spec reconciliation without grammar expansion",
+      "closure_commit": "6017ba8d8db40cf0bc16498f639e5d830c0e827c",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "coverage/documentation closure; introducing implementation not claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "v01_grammar_acceptance_tests"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E2-GRAMMAR-SPEC-RECONCILIATION-2026-10-11.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e2-grammar-spec-reconciliation-2026-10-11.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gaps": [
+        "V01-DIAG-01 structural remainder is a non-deferred R5 precondition",
+        "Complete formal grammar beyond adopted productions remains debt; legacy parser acceptance is not adoption"
+      ]
+    },
+    {
+      "id": "E1",
+      "title": "Checked arithmetic, provider admission/parity, terminal extraction and generic alignment",
+      "closure_commit": "3f8646c654b99b67bae57ee290b7a7e23d717b40",
+      "implementation_commit": "080c5099b05e873d92a3798ebb6626181bb59b28",
+      "implementation_commits": [
+        "080c5099b05e873d92a3798ebb6626181bb59b28",
+        "b92600d37dcebdbf1f5faff6d139daa5faf417e8",
+        "fbb6f3f5ea2475b41367e9c24ce760d545cea067",
+        "12b12f9dc08a12b684efc15881682f9f4d307de3",
+        "9df0abfa959d16dc3c7c2797f20f0a16b3c23506",
+        "2fcce5a4ea1973100a3d8a99781e1188aeed5d78",
+        "1b5dfab0cc73facf4eb0ce58defb047d215fd445",
+        "e4f9fb530d72628c81dfa29d117afeb99cc7664c"
+      ],
+      "implementation_provenance": "canonical integrated repair chain (principal commits; historical source aliases retained in reports)",
+      "preexisting_at_baseline": true,
+      "contract_status": "ADOPTED",
+      "implementation_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "verification_scope": "Named suite cases at the E1 tested pin; does not certify every input, API, diagnostic path or advertised target",
+      "suites": [
+        "checked_arithmetic_qualification_cli",
+        "wrapping_arithmetic_cli"
+      ],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-46-row-reconciliation-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-sysroot-provenance-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-current-native-target-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-compiler25-focused-summary-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final-acquisition-ledger-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-generated-arithmetic-audit-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-diagnostic-debug-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-diagnostic-release-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-source-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-source-2026-10-13.meta.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-artifact-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-artifact-2026-10-13.meta.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-source-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-source-2026-10-13.meta.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-artifact-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-artifact-2026-10-13.meta.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat22/num-compiler22.llib",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-compiler23.llib",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-compiler23.obj",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-source.ln",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/provenance.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.ll",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.llib",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.ln",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.obj",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/producer-build.txt.gz",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/provenance.json"
+      ],
+      "remaining_gaps": [
+        "Ubuntu GNU normal/ASan unverified",
+        "Standalone comptime statements unsupported",
+        "VM layout verified only in 64-bit GNU scope",
+        "R5 complete diagnostic audit outstanding"
+      ]
+    },
+    {
+      "id": "C4-FU1",
+      "title": "Branch-sensitive comptime dependency precision",
+      "closure_commit": "98b55952b5f51188318e8f447ab9d204355fc722",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "Maintainer deferral, no implementation repair claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "DEFERRED_TO_0_2",
+      "implementation_status": "DEFERRED_NON_BLOCKING",
+      "verified_at_commit": null,
+      "verification_scope": "Approved precision/presentation deferral only; cannot waive correctness or full diagnostic structure",
+      "suites": [],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md"
+      ],
+      "remaining_gaps": [
+        "Branch-sensitive comptime dependency precision remains unimplemented; reopen under conditions in known-limitations.md"
+      ]
+    },
+    {
+      "id": "D1-FU1",
+      "title": "E3001 presentation exposes internal value name",
+      "closure_commit": "98b55952b5f51188318e8f447ab9d204355fc722",
+      "implementation_commit": null,
+      "implementation_commits": [],
+      "implementation_provenance": "Maintainer deferral, no implementation repair claimed",
+      "preexisting_at_baseline": true,
+      "contract_status": "DEFERRED_TO_0_2",
+      "implementation_status": "DEFERRED_NON_BLOCKING",
+      "verified_at_commit": null,
+      "verification_scope": "Approved precision/presentation deferral only; cannot waive correctness or full diagnostic structure",
+      "suites": [],
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md"
+      ],
+      "remaining_gaps": [
+        "E3001 presentation exposes internal value name remains unimplemented; reopen under conditions in known-limitations.md"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json",
+      "sha256": "0086b151e13e7e1d467fd07fe14138163189f2e7f3c2cf4589f5f833dec45b0e",
+      "kind": "qualification-summary",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "mode": "default parallel; release CLI parity enabled",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "3/3 PASS; 1404 passed, 0 failed, 1 ignored per run",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "be4df5fcc7c89af5dd8f022f145d202b53ca0214dec0a3c9f5a7d9cefde42e8a",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-be4df5fcc7c89af5.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13-run1.txt.gz",
+      "sha256": "a3c298ecfade455413b22a26c2b1aef0c17c099deb9a7d611864ef1da9253ead",
+      "kind": "raw-log-gzip",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "mode": "default parallel",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "run 1: exit 0",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "a3c298ecfade455413b22a26c2b1aef0c17c099deb9a7d611864ef1da9253ead"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13-run2.txt.gz",
+      "sha256": "244bf531067e8324bfdb100f588102dbd101cb1bc49fb48e48b1da01140d2252",
+      "kind": "raw-log-gzip",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "mode": "default parallel",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "run 2: exit 0",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "244bf531067e8324bfdb100f588102dbd101cb1bc49fb48e48b1da01140d2252"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13-run3.txt.gz",
+      "sha256": "926f3818deac9827a397240a6d44596182fa36fd16de41ad3f7cf9cbc56cf087",
+      "kind": "raw-log-gzip",
+      "command": [
+        "cargo",
+        "test",
+        "--workspace"
+      ],
+      "mode": "default parallel",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "run 3: exit 0",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "926f3818deac9827a397240a6d44596182fa36fd16de41ad3f7cf9cbc56cf087"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A1-CLOSURE-ENV-2026-10-06.md",
+      "sha256": "38e112e648e1b933e7af12c220e331d57fc656aad79346fb265555e560cc275f",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "f814035b671e45f1a412c9b9d4d0202fa77905081a558de9ad72f4e072279af3",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-f814035b671e45f1.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a1-closure-env-2026-10-06.json",
+      "sha256": "cf7a98e2b33a462187e4361c98db080686b594e1744ad05b7e5fb2df1b5d096b",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "8d303f13dde07fe69a4331294e4cf503ad4cb9b65135f3aa5bd8c99658369c99",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-8d303f13dde07fe6.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-ASYNC-SUSPENSION-2026-10-07.md",
+      "sha256": "3d30ab39e5c0b6fc7533c79b9fde5571da0b37a0e0bf285bcfd8f1df37ff9de7",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "3d30ab39e5c0b6fc7533c79b9fde5571da0b37a0e0bf285bcfd8f1df37ff9de7"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-async-suspension-2026-10-07.json",
+      "sha256": "8b7ab6bfbd1ce2da4f8c158438afc2d363c97db217e17521c6506acaf583c6ca",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "8b7ab6bfbd1ce2da4f8c158438afc2d363c97db217e17521c6506acaf583c6ca"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU1-DROP-FLAG-PLAN-2026-10-09.md",
+      "sha256": "ab475be68f30d3945ac62c891413d7a98059dde0cf5b724153e63d896e64f493",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "ab475be68f30d3945ac62c891413d7a98059dde0cf5b724153e63d896e64f493"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-fu1-drop-flag-plan-2026-10-09.json",
+      "sha256": "d03ac4cf5c30618ca07329e7e166e3e9441b8d0e50e0d7a63d120cf560946416",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d03ac4cf5c30618ca07329e7e166e3e9441b8d0e50e0d7a63d120cf560946416"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU2-CLI-MATRIX-2026-10-07.md",
+      "sha256": "d379726657c8c4cd35fd97f19cb595ca13a9aa259f66ad6abef6a77a382240d3",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d379726657c8c4cd35fd97f19cb595ca13a9aa259f66ad6abef6a77a382240d3"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-fu2-cli-matrix-2026-10-07.json",
+      "sha256": "823ef03fcbb8737ae80e4743e886285c5b137c913b4f2ff88aed114e10497c31",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "823ef03fcbb8737ae80e4743e886285c5b137c913b4f2ff88aed114e10497c31"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A3-PARTIAL-AGGREGATE-CLEANUP-2026-10-07.md",
+      "sha256": "7f9bfc26dd46de12253f87305921c7afe2b1f75b9995fbe633045394e7845b7e",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "7f9bfc26dd46de12253f87305921c7afe2b1f75b9995fbe633045394e7845b7e"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a3-partial-aggregate-cleanup-2026-10-07.json",
+      "sha256": "589e4fd4508adc963b6d154991c76a194b249e941aa360a52708df17061ad5d1",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "589e4fd4508adc963b6d154991c76a194b249e941aa360a52708df17061ad5d1"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A4-CAST-POISON-CONTAINMENT-2026-10-07.md",
+      "sha256": "8abb6fe49ae4358cd0f1efa7b2bd77083aafd1a8c5cb508823624ca5f16193c0",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "8abb6fe49ae4358cd0f1efa7b2bd77083aafd1a8c5cb508823624ca5f16193c0"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a4-cast-poison-containment-2026-10-07.json",
+      "sha256": "0118d272334238747915ce4effd8cafbcaee3f7f324c957111d7742686f49041",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "0118d272334238747915ce4effd8cafbcaee3f7f324c957111d7742686f49041"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A5-RAW-SLICE-VIEW-CONTRACT-2026-10-07.md",
+      "sha256": "1550f85325d48791432cd3b2aa5733c0ddbc24f963567b856361b952c9b31820",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "1550f85325d48791432cd3b2aa5733c0ddbc24f963567b856361b952c9b31820"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a5-raw-slice-view-contract-2026-10-07.json",
+      "sha256": "8ca5528e20833d402906482e435653ddff859d635da62842c77d2920035244db",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "8ca5528e20833d402906482e435653ddff859d635da62842c77d2920035244db"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A6-UNARY-LOGICAL-NOT-2026-10-07.md",
+      "sha256": "ccbca5480599fab62961934414133f2bf03eb602bccab38655c1308b118a2239",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "ccbca5480599fab62961934414133f2bf03eb602bccab38655c1308b118a2239"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a6-unary-logical-not-2026-10-07.json",
+      "sha256": "e2500400013df7f88ca86626a6d9cdc79faf41732873a15ab8465d0e45d5fde6",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "e2500400013df7f88ca86626a6d9cdc79faf41732873a15ab8465d0e45d5fde6"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C1-RECONCILE-2026-10-06.md",
+      "sha256": "b5f26dabb9e5a1cca04f23a0a5a8bf6c8aa51b1dc766c183f80e27830a38e208",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d7da4cdde81ab80648d14efeec8862b0af9ae952e528927b734330d4bb3098c0",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d7da4cdde81ab806.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c1-reconcile-candidate-final-2026-10-06.json",
+      "sha256": "acaed9d82a3062220d91395a7bc049e26518047ab2411be0ddcd999428e67913",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "a01499c0fe1d645c194d18824dd497363c20b0d2ea16f15a7cf98db8bc5c4597",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-a01499c0fe1d645c.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C2-PER-IMPL-HEADER-METADATA-2026-10-08.md",
+      "sha256": "c6d81eade029d7cf2105d527d89206629ffda54bfe97330c6919b0ea76921519",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "c6d81eade029d7cf2105d527d89206629ffda54bfe97330c6919b0ea76921519"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c2-per-impl-header-metadata-2026-10-08.json",
+      "sha256": "babdfdde8c3f498119570ff896756f10392fdd0753e1905a7b076f8aa824bd51",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "babdfdde8c3f498119570ff896756f10392fdd0753e1905a7b076f8aa824bd51"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C3-PROJECTION-FALLBACK-2026-10-08.md",
+      "sha256": "337daae23e662c6dcb2c4a63bc4c9025a3daf21a73e7f8ba6d534d7c9f2bb7d6",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "337daae23e662c6dcb2c4a63bc4c9025a3daf21a73e7f8ba6d534d7c9f2bb7d6"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c3-projection-fallback-2026-10-08.json",
+      "sha256": "f29b2ed3d2ddd76a4caec6e93bc25ca1f751cf74d36620696811314281f6794e",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "f29b2ed3d2ddd76a4caec6e93bc25ca1f751cf74d36620696811314281f6794e"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C4-COMPTIME-DEPENDENCY-2026-10-08.md",
+      "sha256": "daf4ab42ccb5ee130634d0451c4f8e7824988f0cdc50c333866b48b6f41aa0c2",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "daf4ab42ccb5ee130634d0451c4f8e7824988f0cdc50c333866b48b6f41aa0c2"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c4-comptime-dependency-2026-10-08.json",
+      "sha256": "b9a9f51ffff9095323fd22884147c16cb1dbb0917d111a49b1d2c04aeb123936",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "b9a9f51ffff9095323fd22884147c16cb1dbb0917d111a49b1d2c04aeb123936"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C5-ARTIFACT-FRESHNESS-CLASSIFICATION-2026-10-08.md",
+      "sha256": "5f3578b19fd61633ea7c3c0700b403d5df7cc5fd1c9e5aff5e9cdcc15050eae1",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "5f3578b19fd61633ea7c3c0700b403d5df7cc5fd1c9e5aff5e9cdcc15050eae1"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c5-artifact-freshness-classification-2026-10-08.json",
+      "sha256": "65d3fb70f400c4f74c77519352e3aecc72fe13b02a84ec2688c47d2df7d9a375",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "65d3fb70f400c4f74c77519352e3aecc72fe13b02a84ec2688c47d2df7d9a375"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-DIAGNOSTIC-CONFORMANCE-2026-10-08.md",
+      "sha256": "98aa864732f8851462446222d2fc11241991d1f5c2815e36c0b2e6ad2cbb79e0",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "98aa864732f8851462446222d2fc11241991d1f5c2815e36c0b2e6ad2cbb79e0"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d1-diagnostic-conformance-2026-10-08.json",
+      "sha256": "cbca0b9e54f7bf40e6984b12fc90319d369ba4de84a3dfaac52343b9c0b3e78b",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "cbca0b9e54f7bf40e6984b12fc90319d369ba4de84a3dfaac52343b9c0b3e78b"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D2-EXPRESSION-SPANS-2026-10-08.md",
+      "sha256": "a568724137ee42fdac369f39aada604f16e9678b3b30d1c26c84fb591b297436",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "a568724137ee42fdac369f39aada604f16e9678b3b30d1c26c84fb591b297436"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d2-expression-spans-2026-10-08.json",
+      "sha256": "d695d618b2bf6b9b65197da4320ffeff9b3fa9e44e8dd65998e7ecf142586996",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d695d618b2bf6b9b65197da4320ffeff9b3fa9e44e8dd65998e7ecf142586996"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D3-PROVIDER-TIER23-MATRIX-2026-10-08.md",
+      "sha256": "8e19c7d01f11c63d1ed3a27abcd53c058267ea77f568f4994beca3fc7646f118",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "8e19c7d01f11c63d1ed3a27abcd53c058267ea77f568f4994beca3fc7646f118"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d3-provider-tier23-matrix-2026-10-08.json",
+      "sha256": "ee8ec60e4ed09489fd0a5e04fa6dea9cb0a1354dbb004ca3dbf083bf42279f86",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "ee8ec60e4ed09489fd0a5e04fa6dea9cb0a1354dbb004ca3dbf083bf42279f86"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-RETAINED-CONTRACTS-2026-10-08.md",
+      "sha256": "14bb33c64c3a198480a8f60527a68ce6dfecf31c88c6d29311d620836b4a842c",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "14bb33c64c3a198480a8f60527a68ce6dfecf31c88c6d29311d620836b4a842c"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d4-retained-contracts-2026-10-08.json",
+      "sha256": "412fdec8cbb16cab3d4951fa3a0de4ba9faf5a21f8ff7077ad4c71dc601a9a24",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "412fdec8cbb16cab3d4951fa3a0de4ba9faf5a21f8ff7077ad4c71dc601a9a24"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md",
+      "sha256": "86bcfa4f3ac3a813d157b0d001d483f70cea56f451a5dd0368ad5f47f7a41560",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "86bcfa4f3ac3a813d157b0d001d483f70cea56f451a5dd0368ad5f47f7a41560"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/find-async-provider-01-2026-10-09.json",
+      "sha256": "293e36c726f5d8c27367ef277964fb063a4f861fc8c38424b483d820edcec73b",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "293e36c726f5d8c27367ef277964fb063a4f861fc8c38424b483d820edcec73b"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-FU1-LINK-ENTRY-2026-10-09.md",
+      "sha256": "43c8c755bb4435f4bc6b44e01af3f29f430ce29d1f9a24f665837274bfd0e720",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "43c8c755bb4435f4bc6b44e01af3f29f430ce29d1f9a24f665837274bfd0e720"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d4-fu1-link-entry-2026-10-09.json",
+      "sha256": "ee6092294079c3f0a339ac8490bf0bc5171b638d2df3cca346da990f3c6c2d1a",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "ee6092294079c3f0a339ac8490bf0bc5171b638d2df3cca346da990f3c6c2d1a"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-FU2-COMPTIME-DIAGNOSTIC-CASCADE-2026-10-09.md",
+      "sha256": "3ce9906057e38943de7a8aa37bec5e282d2680a5a6907e75a2a2cefaaccc1a82",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "3ce9906057e38943de7a8aa37bec5e282d2680a5a6907e75a2a2cefaaccc1a82"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d1-fu2-comptime-diagnostic-cascade-2026-10-09.json",
+      "sha256": "9423dac3503b32746d7fb8d42b6dab729f07a69ab8c96cc27b644ddbee3d064b",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "9423dac3503b32746d7fb8d42b6dab729f07a69ab8c96cc27b644ddbee3d064b"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md",
+      "sha256": "f78971783c92a4b78ed599647e02502fd39c983039fa8d9c950ef36d27776520",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "f78971783c92a4b78ed599647e02502fd39c983039fa8d9c950ef36d27776520"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/r5-harness-01-temp-sysroot-isolation-2026-10-09.json",
+      "sha256": "0d3c093d7001dcf1422644153c1784a37131df27969bf93045a58b74734f4880",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "0d3c093d7001dcf1422644153c1784a37131df27969bf93045a58b74734f4880"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E2-GRAMMAR-SPEC-RECONCILIATION-2026-10-11.md",
+      "sha256": "0c067a278c5a1b9bc37942fa51cb204d5bee49f811de4655ae21ed0ac5d9c3b4",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "0c067a278c5a1b9bc37942fa51cb204d5bee49f811de4655ae21ed0ac5d9c3b4"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e2-grammar-spec-reconciliation-2026-10-11.json",
+      "sha256": "de5d5662a4d06be0482502c0a53f53fc2a576d4ecdf8d0ead2fccda529fae242",
+      "kind": "historical-summary",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated acquisition; no verdict rewritten",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "de5d5662a4d06be0482502c0a53f53fc2a576d4ecdf8d0ead2fccda529fae242"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md",
+      "sha256": "bb25dbe3b7835ddd912fc3f95e25d707739ca0db90c6065731d99ff300af4fe4",
+      "kind": "historical-report",
+      "command": null,
+      "mode": "recorded scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Historical dated report; see reconciliation",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "f6477805cdba17e846c966365cfce098afc54a1fe1ab8c7523614497b163b782",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-f6477805cdba17e8.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md",
+      "sha256": "1465e4c1ba1411324e50d773948c17b0b21d1dfff27a720964093e5baa73e58b",
+      "kind": "decision-record",
+      "command": null,
+      "mode": "formal defer section",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Maintainer decision preserved",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "816bfb1730393db906f884261afe3ddd29a35222bef08f7bea9739484b24d18d",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-816bfb1730393db9.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-46-row-reconciliation-2026-10-13.json",
+      "sha256": "304c35c7283c7855b8dbd1603c6877ac60249f5c23d18ace3321eca0d3e09ac1",
+      "kind": "saved-evidence",
+      "command": null,
+      "mode": "see recorded acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; bounded by original result including failed attempts",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "265dae51135c3af205a52681ffa7c64fe897cb22b1da34f5758e4544c9fc0e56",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-265dae51135c3af2.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-sysroot-provenance-2026-10-13.json",
+      "sha256": "e310f8ba387003241d8b7503f3a88311fbf15a5a99cc9d306da79bb75d6df6a0",
+      "kind": "saved-evidence",
+      "command": null,
+      "mode": "see recorded acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; bounded by original result including failed attempts",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "18e8d475028ada41843f9ac8aa79dff66b8a975753610ac97fa3cae8dc627cfb",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-18e8d475028ada41.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-current-native-target-2026-10-13.json",
+      "sha256": "889c515331052f41b6942fe5f1448b72c2db3a90d21869ead105bd2084690d3f",
+      "kind": "saved-evidence",
+      "command": null,
+      "mode": "see recorded acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; bounded by original result including failed attempts",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d2636a219176a1e0b99f31b6d6dca4f580319acfc0a0da22e4091f01774428be",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d2636a219176a1e0.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-compiler25-focused-summary-2026-10-13.json",
+      "sha256": "c669c28c25f03bef2054ab07157c024be217d00772104acbd93dd07dd9491841",
+      "kind": "saved-evidence",
+      "command": null,
+      "mode": "see recorded acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; bounded by original result including failed attempts",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "15b0645512885e43ba563f057a4487e7dd6be2e773681e12305c7b3417189b76",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-15b0645512885e43.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final-acquisition-ledger-2026-10-13.json",
+      "sha256": "d2bf15e250a388ae565b3c22965b8939f3f02f6580fa7aa2756117bc47744ad3",
+      "kind": "saved-evidence",
+      "command": null,
+      "mode": "see recorded acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; bounded by original result including failed attempts",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d5d2b73c9c160326792ef211b62bab92cd6cf33d32851d3f6d3f3a7e243881b7",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d5d2b73c9c160326.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-generated-arithmetic-audit-2026-10-13.json",
+      "sha256": "39edc71e0c1b2385240d4004e9241e327a6e97ac7c1bd8e3cdabb6ef38c4e7a4",
+      "kind": "saved-evidence",
+      "command": null,
+      "mode": "see recorded acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; bounded by original result including failed attempts",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "c7b58a80ce6e050c3fa248e8cf8961a644cb75eacbc199f57b2052caf7332075",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-c7b58a80ce6e050c.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-diagnostic-debug-2026-10-13.json",
+      "sha256": "ed908f4f4baa2ca634f7a4dad379983c7ef8c804972eba1f4899785ee5e5c728",
+      "kind": "saved-evidence",
+      "command": null,
+      "mode": "see recorded acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; bounded by original result including failed attempts",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "2fe2e569db92b8bd1167cff0fc36eee2b21eb1f478fe2aaf038ac10b94440a32",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-2fe2e569db92b8bd.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-diagnostic-release-2026-10-13.json",
+      "sha256": "28efbe99db7533b94b34cf0614fe1a1193cd1fc8a38514a37d6cdbc7ab00d9d9",
+      "kind": "saved-evidence",
+      "command": null,
+      "mode": "see recorded acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; bounded by original result including failed attempts",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "2638e52e936703df908f0f8bec510146989f28b4f0e255309db068ba3c813365",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-2638e52e936703df.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-source-2026-10-13.json",
+      "sha256": "112c0381651052a40cbf54913419893d1ad736aa977edd1edbad08373de61dda",
+      "kind": "arithmetic-matrix",
+      "command": null,
+      "mode": "debug/source",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "59/59 contract_met",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "1348d0722ed531d1f4296b5f42b6e15ed4f1f228385ce53c593488f585109097",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-1348d0722ed531d1.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-source-2026-10-13.meta.json",
+      "sha256": "4117236543be48791bee85a3eaa6f1bae2130eccee8c2af1926ebb31c94023ad",
+      "kind": "arithmetic-matrix",
+      "command": null,
+      "mode": "debug/source",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "59/59 contract_met",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "27289650acde3e60adfa9833c80a549bff7b7a6bccdb9130c6f5268efc731ed7",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-27289650acde3e60.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-artifact-2026-10-13.json",
+      "sha256": "112c0381651052a40cbf54913419893d1ad736aa977edd1edbad08373de61dda",
+      "kind": "arithmetic-matrix",
+      "command": null,
+      "mode": "debug/artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "59/59 contract_met",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "1348d0722ed531d1f4296b5f42b6e15ed4f1f228385ce53c593488f585109097",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-1348d0722ed531d1.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-artifact-2026-10-13.meta.json",
+      "sha256": "e2a95095890326d96b824ad527869ee4d3e4e607b04dbdea4202a8c25d98128d",
+      "kind": "arithmetic-matrix",
+      "command": null,
+      "mode": "debug/artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "59/59 contract_met",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "4c779ace1a1f2c32b1966e16b32228c8eadbceddb3af96311c5932b02d6fefe0",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-4c779ace1a1f2c32.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-source-2026-10-13.json",
+      "sha256": "112c0381651052a40cbf54913419893d1ad736aa977edd1edbad08373de61dda",
+      "kind": "arithmetic-matrix",
+      "command": null,
+      "mode": "release/source",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "59/59 contract_met",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "1348d0722ed531d1f4296b5f42b6e15ed4f1f228385ce53c593488f585109097",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-1348d0722ed531d1.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-source-2026-10-13.meta.json",
+      "sha256": "3f3ce6535cb92effe49917511a400eeafebde48a8516c51f950dabaa94ed4ae6",
+      "kind": "arithmetic-matrix",
+      "command": null,
+      "mode": "release/source",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "59/59 contract_met",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "35b9cd3bb38dc2d0b165b4092c2eb9bd10d440e2198eee1219386ad91e9bf252",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-35b9cd3bb38dc2d0.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-artifact-2026-10-13.json",
+      "sha256": "112c0381651052a40cbf54913419893d1ad736aa977edd1edbad08373de61dda",
+      "kind": "arithmetic-matrix",
+      "command": null,
+      "mode": "release/artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "59/59 contract_met",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "1348d0722ed531d1f4296b5f42b6e15ed4f1f228385ce53c593488f585109097",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-1348d0722ed531d1.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-artifact-2026-10-13.meta.json",
+      "sha256": "c1a3dedebf1d8ff7a1baadc27d1c8660541c26a16623027e2c45a6494eb684b2",
+      "kind": "arithmetic-matrix",
+      "command": null,
+      "mode": "release/artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "59/59 contract_met",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "03d5da09d12c8958f646ed9bdb7c767287eeb56fc04ec3bff027b368b6981782",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-03d5da09d12c8958.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat22/num-compiler22.llib",
+      "sha256": "9c21811220fbafb781d180e75f187a57d4f0397b9ca9eb0417e93d66051da485",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "9c21811220fbafb781d180e75f187a57d4f0397b9ca9eb0417e93d66051da485"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-compiler23.llib",
+      "sha256": "6a30f6bc10d288b3b3f1a99b826253f67222517a195f15ac4f62d161488cd39e",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "6a30f6bc10d288b3b3f1a99b826253f67222517a195f15ac4f62d161488cd39e"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-compiler23.obj",
+      "sha256": "5efbc82d38a9231590c88f1a879e08ce8fddc898d4dacf673cf1bbcd81aa8016",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "5efbc82d38a9231590c88f1a879e08ce8fddc898d4dacf673cf1bbcd81aa8016"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-source.ln",
+      "sha256": "e176c6e606845ab3f44fee747b8f6fd95862a846fee705e35fbcda02e087810f",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "e176c6e606845ab3f44fee747b8f6fd95862a846fee705e35fbcda02e087810f"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/provenance.json",
+      "sha256": "e46dfd315ad88868e06b1a8e915af034fb78568019f83b589154800915f0e84c",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d3ff27f00b66e24a0a15c81475c5bdbbe77302ea54285d89d6e5193f5edfe138",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d3ff27f00b66e24a.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.ll",
+      "sha256": "e190e828b093f64e02845792b952f25b6e8f3f5a45559ec4cb9a462158bc7bfb",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d69b214d2dac26748b2afb27ff27d3cc679ba6b5c81ef906d7e4e0cdde3f60cf",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d69b214d2dac2674.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.llib",
+      "sha256": "06ac93594c0bab1baba95c99c25864cb0e2b1976044043b80f713d2178806d22",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "06ac93594c0bab1baba95c99c25864cb0e2b1976044043b80f713d2178806d22"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.ln",
+      "sha256": "cdb127046c3e5bc5d6bc717b60f1db4926bb550102ee9eb81675781158e08085",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "8b14624fd95ccc42759142b6c80692439669b4d162eac9eb819613243b75d0cb",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-8b14624fd95ccc42.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.obj",
+      "sha256": "c047822a4f3f63dd325a75723a2c976d3479428a74b3b9de46d63b65687323a7",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "c047822a4f3f63dd325a75723a2c976d3479428a74b3b9de46d63b65687323a7"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/producer-build.txt.gz",
+      "sha256": "7b2437293890d8d1a8c921a930e39052026e004a884e31818e889e1a282f4402",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "7b2437293890d8d1a8c921a930e39052026e004a884e31818e889e1a282f4402"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/provenance.json",
+      "sha256": "9d9b394d9e5e7ae493df3aa3a22cc4e90d30f6fcefc1509e1dd3ddab5624062b",
+      "kind": "compatibility-artifact",
+      "command": null,
+      "mode": "real old compiler artifact",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved; never regenerated or header-patched",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "3933b5c9b62407ce5549a70969cad2260dc83303f1634520865d5f72d087db50",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-3933b5c9b62407ce.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/historical-scratch_workspace-a1.log.gz",
+      "sha256": "809946a4dae7ed30c5cc0144a86aac12d4de187d14e8ef60e65c43d8779b566e",
+      "kind": "historical-raw-log",
+      "command": null,
+      "mode": "original scratch acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved raw bytes; original PASS/FAIL verdict unchanged",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "809946a4dae7ed30c5cc0144a86aac12d4de187d14e8ef60e65c43d8779b566e"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/historical-scratch_a6_not_free.ln.gz",
+      "sha256": "8861932c172d2cf252a6cd2a311d940426a53c6c27407a8e8f5723d40f7748c4",
+      "kind": "historical-raw-log",
+      "command": null,
+      "mode": "original scratch acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved raw bytes; original PASS/FAIL verdict unchanged",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "8861932c172d2cf252a6cd2a311d940426a53c6c27407a8e8f5723d40f7748c4"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/historical-scratch_workspace-candidate2.log.gz",
+      "sha256": "3629d9de9b20457efd8b9170c0fe0c59d5ec6a7c031c594c3579a0fbb6d3babd",
+      "kind": "historical-raw-log",
+      "command": null,
+      "mode": "original scratch acquisition",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Preserved raw bytes; original PASS/FAIL verdict unchanged",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "3629d9de9b20457efd8b9170c0fe0c59d5ec6a7c031c594c3579a0fbb6d3babd"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/historical-path-resolution.json",
+      "sha256": "5d2caa26de1a6dcabf4b0471c9a4e8f71126a402450edd481c61bae00d64ec8c",
+      "kind": "historical-reference-resolution",
+      "command": null,
+      "mode": "local scratch provenance",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Availability and durable archive mapping; no new PASS",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "24173f7a20ca38b85ad043aad4cab76c00c2af5c91ea68463c431c4f425368ad",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-24173f7a20ca38b8.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/accepted-cleanup-checkpoint.json",
+      "sha256": "ed9adf8f595114e7ef3aced368ab3fc2def05f80e3ac3dd46fa228ef3ebf6cab",
+      "kind": "accepted-cleanup-checkpoint",
+      "command": null,
+      "mode": "user-accepted reported scope",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "CLOSED / VERIFIED IN REPORTED SCOPE; 2026-10-14",
+      "verified_at_commit": null,
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "b7b136d986cfc6834a9e78d44f356849e3c7aa6c46f7fede81d86ef092ec9740",
+      "acquired_bytes_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-b7b136d986cfc683.gz"
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-be4df5fcc7c89af5.gz",
+      "sha256": "3d2b70891780e9c5d471a4825ebcad74a17c9fc8b931e358ce14a1b4cd80ef0a",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "3d2b70891780e9c5d471a4825ebcad74a17c9fc8b931e358ce14a1b4cd80ef0a",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-f814035b671e45f1.gz",
+      "sha256": "b41a56f8b536be6580bac515837ffd89d70d45b62d0653c9502c152640694fac",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "b41a56f8b536be6580bac515837ffd89d70d45b62d0653c9502c152640694fac",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-8d303f13dde07fe6.gz",
+      "sha256": "4a3aacc37bffadfff20132f048409d5bd60ce4767e1ce45d24f109a8911f0c81",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "4a3aacc37bffadfff20132f048409d5bd60ce4767e1ce45d24f109a8911f0c81",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d7da4cdde81ab806.gz",
+      "sha256": "241b0184f31874e95cac55c93eb17a72b9fa9c1d67420fc593521582ac33c49a",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "241b0184f31874e95cac55c93eb17a72b9fa9c1d67420fc593521582ac33c49a",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-a01499c0fe1d645c.gz",
+      "sha256": "5bf7b88574e47f55e209ee167a1309337f7e2b7de8af52a93aa6aaf3a86829c4",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "5bf7b88574e47f55e209ee167a1309337f7e2b7de8af52a93aa6aaf3a86829c4",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-f6477805cdba17e8.gz",
+      "sha256": "5caae616d858f09c31103f1f4adbe4abf98be4becf97fa9ac04d4d0417b181f9",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "5caae616d858f09c31103f1f4adbe4abf98be4becf97fa9ac04d4d0417b181f9",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-816bfb1730393db9.gz",
+      "sha256": "caa94c1788e6e88ade0aac87abe371d28d0fb17de7b43230a6d846a4edf520e1",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "caa94c1788e6e88ade0aac87abe371d28d0fb17de7b43230a6d846a4edf520e1",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-265dae51135c3af2.gz",
+      "sha256": "d411d5403e8079faddcef486d3a9d149bc9e4e03a850e04d23e4800562b72158",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "d411d5403e8079faddcef486d3a9d149bc9e4e03a850e04d23e4800562b72158",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-18e8d475028ada41.gz",
+      "sha256": "86412c01c25bae42bf16577273acf5006de405d92f2c162b30693765e35afbaf",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "86412c01c25bae42bf16577273acf5006de405d92f2c162b30693765e35afbaf",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d2636a219176a1e0.gz",
+      "sha256": "7d1b10dbd3d41e4e4586f2b8ca60319d50767d1894b76f3b7e1e708521eb0d57",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "7d1b10dbd3d41e4e4586f2b8ca60319d50767d1894b76f3b7e1e708521eb0d57",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-15b0645512885e43.gz",
+      "sha256": "b1fa27a26cd58ebb8af1510b4adacebc94e980c73e188ce957336c4a64948095",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "b1fa27a26cd58ebb8af1510b4adacebc94e980c73e188ce957336c4a64948095",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d5d2b73c9c160326.gz",
+      "sha256": "413c67ae2a6bc86b420c3c14184c5e9c7a1a4e34cd502c8799b6d7bcfa60b4af",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "413c67ae2a6bc86b420c3c14184c5e9c7a1a4e34cd502c8799b6d7bcfa60b4af",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-c7b58a80ce6e050c.gz",
+      "sha256": "73d0c7f6eca45f919dcb410bc23d244b81f6e45d6d874de7494ab9a79d914d2e",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "73d0c7f6eca45f919dcb410bc23d244b81f6e45d6d874de7494ab9a79d914d2e",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-2fe2e569db92b8bd.gz",
+      "sha256": "6a17fbe36b78a080df13380ef8afba40c7ab615a291a889299ea856517c82f83",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "6a17fbe36b78a080df13380ef8afba40c7ab615a291a889299ea856517c82f83",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-2638e52e936703df.gz",
+      "sha256": "a8517057e6369da67f250a5bacfd9e08e33d2220ff73d6c085d4dea548ffaa51",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "a8517057e6369da67f250a5bacfd9e08e33d2220ff73d6c085d4dea548ffaa51",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-1348d0722ed531d1.gz",
+      "sha256": "dd9ff218a736837d42412c0f3e1730c4baeff7d39e2be384c38c4c8bc093b905",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "dd9ff218a736837d42412c0f3e1730c4baeff7d39e2be384c38c4c8bc093b905",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-27289650acde3e60.gz",
+      "sha256": "617c907ec46443ae9347d33fc736d8deba276d81586b14c4f2dd6659b3226987",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "617c907ec46443ae9347d33fc736d8deba276d81586b14c4f2dd6659b3226987",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-4c779ace1a1f2c32.gz",
+      "sha256": "2c19379b8ade1acb814b761f6d093da7e7dade77209451bef7c4c614710dd8b0",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "2c19379b8ade1acb814b761f6d093da7e7dade77209451bef7c4c614710dd8b0",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-35b9cd3bb38dc2d0.gz",
+      "sha256": "9c124dbd8bc7c11583c64c175b1582b1da9859e8150122ef7ce9788c874f3ab7",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "9c124dbd8bc7c11583c64c175b1582b1da9859e8150122ef7ce9788c874f3ab7",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-03d5da09d12c8958.gz",
+      "sha256": "a2e3ab97f8d7cee370aa6136b3dfd254654e524749705291f690d52f3ded8d7d",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "a2e3ab97f8d7cee370aa6136b3dfd254654e524749705291f690d52f3ded8d7d",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d3ff27f00b66e24a.gz",
+      "sha256": "50e0c59773545f17446dcea3bbfbe2edb05e23511fd8900f4ee82ffea50b55e7",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "50e0c59773545f17446dcea3bbfbe2edb05e23511fd8900f4ee82ffea50b55e7",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-d69b214d2dac2674.gz",
+      "sha256": "cf805ff53fdc3ea9d641e5417bf7c3ac4e3eb12d52396cf5ffe5462d6cf78ff9",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "cf805ff53fdc3ea9d641e5417bf7c3ac4e3eb12d52396cf5ffe5462d6cf78ff9",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-8b14624fd95ccc42.gz",
+      "sha256": "47eba49d7b257e2283e8bacc2e01815ba2b053aef8fa7dd177104f05ab439518",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "47eba49d7b257e2283e8bacc2e01815ba2b053aef8fa7dd177104f05ab439518",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-3933b5c9b62407ce.gz",
+      "sha256": "e6cc19e8440456c8edae4d31c65e17188e66f550087e69d219700bbf4e68a8e8",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "e6cc19e8440456c8edae4d31c65e17188e66f550087e69d219700bbf4e68a8e8",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-24173f7a20ca38b8.gz",
+      "sha256": "cdaaf9eaf38565a254d0b4575847fe83623479ccae436ec260550181cb6e3c59",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "cdaaf9eaf38565a254d0b4575847fe83623479ccae436ec260550181cb6e3c59",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    },
+    {
+      "path": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/acquired-b7b136d986cfc683.gz",
+      "sha256": "3f8ca8b3bcdb5b6bf739d4aee0764f365655c24afa026d83da1a857385b48611",
+      "hash_basis": "git_blob_bytes",
+      "acquired_workspace_sha256": "3f8ca8b3bcdb5b6bf739d4aee0764f365655c24afa026d83da1a857385b48611",
+      "kind": "acquired-byte-archive",
+      "command": null,
+      "mode": "Windows original text bytes before Git EOL normalization",
+      "target": "x86_64-pc-windows-gnu",
+      "result": "Lossless acquired bytes, no new execution claim",
+      "verified_at_commit": null
+    }
+  ],
+  "legacy_migration": {
+    "source": "docs/audits/repair-0.1/status.json",
+    "snapshot": "docs/audits/0.1-alpha-completion-2026-10-04/r4/legacy-status.snapshot.json",
+    "source_sha256": "b317cb34b24e97e2c1835590f98c66cd7c437de8ddea1360266a3b2db46afd4c",
+    "record_count": 24,
+    "output": "docs/audits/0.1-alpha-completion-2026-10-04/r4/legacy-status.migrated.json",
+    "source_workspace_sha256": "d9adc29c16c740eb42612ba5ffb3b25f935287100264a56e640c567b4f0beae2",
+    "snapshot_raw_archive": "docs/audits/0.1-alpha-completion-2026-10-04/r4/evidence/legacy-status.raw.json.gz"
+  },
+  "target_qualification": [
+    {
+      "target": "x86_64-pc-windows-gnu",
+      "profile": "native/E1 debug and release CLI",
+      "status": "VERIFIED_IN_TESTED_SCOPE",
+      "verified_at_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "remaining_gate": "R5 exact candidate clean checkout and native CI"
+    },
+    {
+      "target": "x86_64-unknown-linux-gnu",
+      "profile": "Ubuntu normal",
+      "status": "NOT_VERIFIED",
+      "verified_at_commit": null,
+      "evidence": [],
+      "remaining_gate": "R5 Ubuntu normal qualification"
+    },
+    {
+      "target": "x86_64-unknown-linux-gnu",
+      "profile": "Ubuntu ASan",
+      "status": "NOT_VERIFIED",
+      "verified_at_commit": null,
+      "evidence": [],
+      "remaining_gate": "R5 ASan runtime ABI and documented native scope"
+    }
+  ],
+  "hash_policy": "sha256 uses exact Git blob bytes; acquired_workspace_sha256 preserves captured Windows bytes; GZ archives retain text differing only through Git CRLF/LF conversion"
+}

@@ -56,11 +56,11 @@ impl ExternalComponentError {
     pub fn into_diagnostics(self) -> Vec<Diagnostic> {
         match self {
             ExternalComponentError::NotFound { name, searched_dir } => {
-                vec![Diagnostic::error(format!(
+                vec![Diagnostic::contract_error(luna_common::DiagnosticCode::UnresolvedModuleProvider, format!(
                     "external component `{}` not found in `{}`",
                     name,
                     searched_dir.display()
-                )).with_code(luna_common::DiagnosticCode::UnresolvedModuleProvider)]
+                ))]
             }
             ExternalComponentError::ReadFailed { path, error } => {
                 vec![Diagnostic::error(format!(
@@ -103,10 +103,10 @@ impl BootstrapError {
             BootstrapError::Sysroot(err) => err.into_diagnostics(),
             BootstrapError::Component(err) => err.into_diagnostics(),
             BootstrapError::MissingRequiredComponent(name) => {
-                vec![Diagnostic::error(format!(
+                vec![Diagnostic::contract_error(luna_common::DiagnosticCode::UnresolvedModuleProvider, format!(
                     "fatal error: required component `{}` could not be bootstrapped. Luna requires `{}` for language primitives and runtime items.",
                     name, name
-                )).with_code(luna_common::DiagnosticCode::UnresolvedModuleProvider)]
+                ))]
             }
         }
     }

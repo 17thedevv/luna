@@ -40,7 +40,7 @@ fn copy_dir_all(src: &Path, dst: &Path) -> std::io::Result<()> {
 }
 
 fn create_temp_dir(prefix: &str) -> PathBuf {
-    let mut dir = std::env::temp_dir();
+    let mut dir = luna_test_support::owned_temp_root();
     dir.push(format!(
         "luna_test_4c_{}_{}_{}",
         prefix,
@@ -448,7 +448,8 @@ fn test_float_to_int_truncation_bounds_valid() {
         fn main() -> i32 {
             // Blocker 1: -128.5f32 truncates toward zero to -128, which is valid i8!
             dec v1: i8 = (-128.5 as f32) as i8;
-            if v1 != ((0 as i8) - (128 as i8)) { return 1; }
+            // -128 without relying on wrapping arithmetic (now checked).
+            if v1 != ((0 as i8) - (127 as i8)) - (1 as i8) { return 1; }
 
             dec v2: i8 = (127.99 as f32) as i8;
             if v2 != (127 as i8) { return 2; }

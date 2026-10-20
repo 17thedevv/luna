@@ -1,0 +1,78 @@
+{
+  "source_sha": "939d53e0ad7719c7c4a3eb4b915173fedeb1a129",
+  "method": "Current-source review; behavioral evidence in final four-mode matrix and default-parallel workspace logs",
+  "sources": {
+    "luna-rs/crates/luna-mvir/src/generator.rs": "bd755125c5fc05750fa45ae62266855c7caaf95cd9fa74a987dc9557033239d3",
+    "luna-rs/crates/luna-optimizer/src/passes/dce.rs": "ce10402a38b8e31f6e2d2f03ea311fb1ccf1cce204958d9c9807632caaea3718",
+    "luna-rs/crates/luna-optimizer/src/passes/const_fold.rs": "40c83de79489a387b4c5148b613716dd93592382674010b530bfd0d6567760c3",
+    "luna-rs/crates/luna-backend/src/llvm_codegen.rs": "61aba1048d51b9dbfffa414433dcb353bcc26f9c62a55c0c22b1d89389094ea9"
+  },
+  "review": [
+    {
+      "path": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 675,
+      "classification": "ordinary usize subtraction; checked",
+      "reason": "Array-drop body is dominated by count != 0; subtraction remains checked."
+    },
+    {
+      "path": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 681,
+      "classification": "pointer element offset",
+      "reason": "Retains generic pointer arithmetic; no integer wrapping exemption."
+    },
+    {
+      "path": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2249,
+      "classification": "ordinary integer loop step; checked",
+      "reason": "Emits Instruction::Add and takes the same checked backend path."
+    },
+    {
+      "path": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2964,
+      "classification": "user assignment arithmetic; checked",
+      "reason": "Compound assignment uses ordinary Add/Sub/Mul/Div/Rem/Shl/Shr instructions."
+    },
+    {
+      "path": "luna-rs/crates/luna-optimizer/src/passes/dce.rs",
+      "line": 131,
+      "classification": "observable potential arithmetic traps",
+      "reason": "DCE retains integer arithmetic and dependencies even when the result is discarded; float/pointer facts allow dead nontrapping operations to be removed."
+    },
+    {
+      "path": "luna-rs/crates/luna-optimizer/src/passes/const_fold.rs",
+      "line": 19,
+      "classification": "constant folding",
+      "reason": "Uses checked operations and leaves invalid arithmetic unfurled for runtime trap; no wrapped substitute constant."
+    },
+    {
+      "path": "luna-rs/crates/luna-backend/src/llvm_codegen.rs",
+      "line": 2046,
+      "classification": "integer add/sub/mul",
+      "reason": "Signed/unsigned LLVM overflow intrinsic returns value+flag; guarded trap precedes use; no nsw/nuw as checks."
+    },
+    {
+      "path": "luna-rs/crates/luna-backend/src/llvm_codegen.rs",
+      "line": 2088,
+      "classification": "division/remainder",
+      "reason": "Zero and signed MIN/-1 guards precede LLVM div/rem, excluding undefined operations."
+    },
+    {
+      "path": "luna-rs/crates/luna-backend/src/llvm_codegen.rs",
+      "line": 875,
+      "classification": "shifts",
+      "reason": "Count guard precedes shift; unsigned count comparison rejects negative bit patterns and count >= width, including zero lhs; left-shift round trip enforces mathematical representability."
+    },
+    {
+      "path": "luna-rs/crates/luna-backend/src/llvm_codegen.rs",
+      "line": 1922,
+      "classification": "explicit wrapping",
+      "reason": "Authenticated CallIntrinsic wrapping operations lower to plain modular add/sub/mul without flags or trap."
+    }
+  ],
+  "skill_impact": "none; no conflicting owner/version guidance found in skills",
+  "targets": {
+    "windows_gnu": "Native executables run in final acquisition; manifest x86_64-pc-windows-gnu / COFF / 64-bit / little-endian",
+    "ubuntu_gnu_normal": "NOT VERIFIED; R5 obligation",
+    "ubuntu_gnu_asan": "NOT VERIFIED; R5 obligation"
+  }
+}

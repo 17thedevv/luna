@@ -1,0 +1,16 @@
+{
+  "gate": "disk-final",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "df",
+    "-h"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage",
+  "started_utc": "2026-10-17T21:02:54Z",
+  "exit": 0,
+  "seconds": 0.003724047999639879,
+  "log_sha256": "ad4ea9fb702c074095fed01b2b6f27910f50bb38c12014f4413787c7cf8705b8",
+  "status": "PASS",
+  "log": "disk-final.log.gz",
+  "compressed_sha256": "293e7eba8e93e6495921262521cc7cc6af8a3fd6cb58d84ae6be880c09e50a0d"
+}

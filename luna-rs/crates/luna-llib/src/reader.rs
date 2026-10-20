@@ -6,7 +6,11 @@ use crate::ir::{MlibModule, MlibFunction, MlibValue, MlibBlock, MlibInstruction,
 pub enum MlibError {
     Io(std::io::Error),
     InvalidMagic,
-    VersionMismatch(u16),
+    /// A version field of the artifact does not match this compiler. `component`
+    /// names the exact boundary (format / compiler / mvir / semantic-metadata)
+    /// so a rejection is classified instead of surfacing as an opaque
+    /// `CorruptedData`.
+    VersionMismatch { component: &'static str, found: u16, expected: u16 },
     UnsupportedContractVersion(u32),
     TargetMismatch,
     ObjectIntegrityMismatch(&'static str),
@@ -25,6 +29,30 @@ impl From<std::io::Error> for MlibError {
 
 pub struct LlibReader;
 pub type MlibReader = LlibReader;
+
+#[cfg(test)]
+mod mvir_wire_regression_tests {
+    use super::*;
+    use std::io::Cursor;
+
+    #[test]
+    fn heap_free_decodes_at_writer_opcode_17() {
+        // writer.rs emits HeapFree as: opcode 17, Value operand tag 0, u32 id.
+        let mut bytes = Cursor::new(vec![17, 0, 7, 0, 0, 0]);
+        let instruction = LlibReader::deserialize_instruction(&mut bytes).unwrap();
+        assert!(matches!(
+            instruction,
+            MlibInstruction::HeapFree { value: MlibOperand::Value(7) }
+        ));
+        assert_eq!(bytes.position(), 6);
+    }
+
+    #[test]
+    fn stale_heap_free_opcode_15_is_not_accepted() {
+        let mut bytes = Cursor::new(vec![15, 0, 7, 0, 0, 0]);
+        assert!(LlibReader::deserialize_instruction(&mut bytes).is_err());
+    }
+}
 
 #[cfg(test)]
 mod raw_anchor_validation_tests {
@@ -378,7 +406,11 @@ fn check_semantic_metadata_version(data: &[u8]) -> Result<(), MlibError> {
     if version == crate::format::SEMANTIC_METADATA_VERSION {
         Ok(())
     } else {
-        Err(MlibError::VersionMismatch(version))
+        Err(MlibError::VersionMismatch {
+            component: "semantic-metadata",
+            found: version,
+            expected: crate::format::SEMANTIC_METADATA_VERSION,
+        })
     }
 }
 
@@ -520,10 +552,18 @@ fn validate_target_header(header: &LlibHeader, manifest: &crate::format::Manifes
 
 fn validate_header_versions(header: &LlibHeader) -> Result<(), MlibError> {
     if header.compiler_version != crate::format::LLIB_COMPILER_VERSION {
-        return Err(MlibError::VersionMismatch(header.compiler_version));
+        return Err(MlibError::VersionMismatch {
+            component: "compiler",
+            found: header.compiler_version,
+            expected: crate::format::LLIB_COMPILER_VERSION,
+        });
     }
     if header.mvir_version != crate::format::LLIB_MVIR_VERSION {
-        return Err(MlibError::VersionMismatch(header.mvir_version));
+        return Err(MlibError::VersionMismatch {
+            component: "mvir",
+            found: header.mvir_version,
+            expected: crate::format::LLIB_MVIR_VERSION,
+        });
     }
     Ok(())
 }
@@ -582,7 +622,11 @@ fn read_header_and_sections<R: Read + Seek>(reader: &mut R) -> Result<(LlibHeade
     let header = LlibHeader::read_from(reader)?;
     if header.magic != LLIB_MAGIC && header.magic != MLIB_MAGIC { return Err(MlibError::InvalidMagic); }
     if header.format_version != LLIB_FORMAT_VERSION && header.format_version != MLIB_FORMAT_VERSION {
-        return Err(MlibError::VersionMismatch(header.format_version));
+        return Err(MlibError::VersionMismatch {
+            component: "format",
+            found: header.format_version,
+            expected: LLIB_FORMAT_VERSION,
+        });
     }
     validate_header_versions(&header)?;
     let header_end = reader.stream_position()?;
@@ -1000,10 +1044,10 @@ impl LlibReader {
                 let right = Self::deserialize_operand(r)?;
                 Ok(MlibInstruction::NotEq { left, right })
             }
+            // Writer-owned MVIR5 wire tag for HeapFree. Eq is tag 8.
             17 => {
-                let left = Self::deserialize_operand(r)?;
-                let right = Self::deserialize_operand(r)?;
-                Ok(MlibInstruction::Eq { left, right })
+                let value = Self::deserialize_operand(r)?;
+                Ok(MlibInstruction::HeapFree { value })
             }
             22 => {
                 let left = Self::deserialize_operand(r)?;
@@ -1108,10 +1152,6 @@ impl LlibReader {
             13 => {
                 let value = Self::deserialize_operand(r)?;
                 Ok(MlibInstruction::Drop { value })
-            }
-            15 => {
-                let value = Self::deserialize_operand(r)?;
-                Ok(MlibInstruction::HeapFree { value })
             }
             18 => Ok(MlibInstruction::ListNew),
             0x21 => {
@@ -1383,7 +1423,7 @@ mod semantic_metadata_version_tests {
         for version in 1..crate::format::LLIB_MVIR_VERSION {
             let mut header = crate::format::LlibHeader::new();
             header.mvir_version = version;
-            assert!(matches!(super::validate_header_versions(&header), Err(MlibError::VersionMismatch(v)) if v == version));
+            assert!(matches!(super::validate_header_versions(&header), Err(MlibError::VersionMismatch { component: "mvir", found, .. }) if found == version));
         }
     }
 
@@ -1396,7 +1436,7 @@ mod semantic_metadata_version_tests {
             header.write_to(&mut bytes).unwrap();
             let mut reader = std::io::Cursor::new(bytes);
             assert!(matches!(super::LlibReader::read_manifest(&mut reader),
-                Err(MlibError::VersionMismatch(version)) if version == header.compiler_version));
+                Err(MlibError::VersionMismatch { component: "compiler", found, .. }) if found == header.compiler_version));
         }
     }
 
@@ -1406,7 +1446,7 @@ mod semantic_metadata_version_tests {
         let bytes = old_version.to_le_bytes();
         assert!(matches!(
             check_semantic_metadata_version(&bytes),
-            Err(MlibError::VersionMismatch(version)) if version == old_version
+            Err(MlibError::VersionMismatch { component: "semantic-metadata", found, .. }) if found == old_version
         ));
     }
 

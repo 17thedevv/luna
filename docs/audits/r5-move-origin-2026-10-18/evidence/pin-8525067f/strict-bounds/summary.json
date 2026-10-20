@@ -1,0 +1,83 @@
+{
+  "tested_commit": "8525067f5e6b7c8d711e9df0cb5acf9606b1b0e5",
+  "fixture": "D:\\r5-8525067f\\windows-checkout\\tests\\luna\\language\\raw_slice_contract\\a5_slice_index_oob_trap.ln",
+  "fixture_sha256": "351fe67354b5914a3307cb966cb5374ef68a87cce7583ee4e484ed53404d3c4e",
+  "runtime_sha256": "4318d1418f8f67772c45fb618646141f3e36251b81433eafe34cbfe9bafff544",
+  "debug_sha256": "934ab47f31ee188968c8377f46e4c530c75df98a6c4803e94672f70b73950c34",
+  "release_sha256": "c54c5e20a564539118748a34b37b4e406849f28d0866515250e246d799509dd8",
+  "rows": [
+    {
+      "profile": "debug",
+      "mode": "source",
+      "command": [
+        "C:\\r5-8525067f\\windows-build\\cargo-target\\debug\\luna.exe",
+        "build",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\debug-source\\program.ln",
+        "--quiet",
+        "-I",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\debug-source\\sysroot",
+        "-o",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\debug-source\\program.exe"
+      ],
+      "build_exit": 0,
+      "native_exit": 3,
+      "expected": "L002: index 3, length 2",
+      "status": "PASS"
+    },
+    {
+      "profile": "debug",
+      "mode": "artifact",
+      "command": [
+        "C:\\r5-8525067f\\windows-build\\cargo-target\\debug\\luna.exe",
+        "build",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\debug-artifact\\program.ln",
+        "--quiet",
+        "-I",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\debug-artifact\\sysroot",
+        "-o",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\debug-artifact\\program.exe"
+      ],
+      "build_exit": 0,
+      "native_exit": 3,
+      "expected": "L002: index 3, length 2",
+      "status": "PASS"
+    },
+    {
+      "profile": "release",
+      "mode": "source",
+      "command": [
+        "C:\\r5-8525067f\\windows-build\\cargo-target\\release\\luna.exe",
+        "build",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\release-source\\program.ln",
+        "--quiet",
+        "-I",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\release-source\\sysroot",
+        "-o",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\release-source\\program.exe"
+      ],
+      "build_exit": 0,
+      "native_exit": 3,
+      "expected": "L002: index 3, length 2",
+      "status": "PASS"
+    },
+    {
+      "profile": "release",
+      "mode": "artifact",
+      "command": [
+        "C:\\r5-8525067f\\windows-build\\cargo-target\\release\\luna.exe",
+        "build",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\release-artifact\\program.ln",
+        "--quiet",
+        "-I",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\release-artifact\\sysroot",
+        "-o",
+        "D:\\fdlang\\docs\\audits\\r5-move-origin-2026-10-18\\evidence\\pin-8525067f\\strict-bounds\\release-artifact\\program.exe"
+      ],
+      "build_exit": 0,
+      "native_exit": 3,
+      "expected": "L002: index 3, length 2",
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS"
+}

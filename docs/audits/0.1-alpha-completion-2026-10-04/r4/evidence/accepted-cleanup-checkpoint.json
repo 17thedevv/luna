@@ -1,0 +1,20 @@
+{
+  "deleted_files": 254,
+  "retained_files": 9,
+  "retained_directories": 1,
+  "head": "3f8646c654b99b67bae57ee290b7a7e23d717b40",
+  "candidate": "3f8646c654b99b67bae57ee290b7a7e23d717b40",
+  "all_git_refs_unchanged": true,
+  "tracked_evidence_files_unchanged": 1009,
+  "tracked_diff_unchanged": true,
+  "code_tree_equal_to_tested_pin": true,
+  "taste_unchanged": true,
+  "docs_validator": {
+    "documents": 214,
+    "site_pages": 30,
+    "checked_local_links": 1571,
+    "errors": []
+  },
+  "final6_hashes_verified_after_cleanup": true,
+  "status": " M .commandcode/taste/taste.md\n?? .e1-fp-b99152562efa448c8ecf6d0573a3feeb/\n"
+}

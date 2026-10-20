@@ -17,6 +17,21 @@ use luna_common::ids::{FileId, Span};
 use luna_lexer::Lexer;
 use luna_parser::Parser;
 
+/// Transport from attribute transformation to its owning admission phase.
+/// Parser-produced diagnostics retain their original origin; contextual failures
+/// carry no code until TypeChecker emits them. No wire representation is changed.
+#[derive(Debug, Clone)]
+pub enum AttributeExpansionFailure {
+    Parser(Diagnostic),
+    Application { message: String, span: Span },
+}
+
+impl AttributeExpansionFailure {
+    pub fn application(message: impl Into<String>, span: Span) -> Self {
+        Self::Application { message: message.into(), span }
+    }
+}
+
 /// Tracks which trait definitions have been emitted to prevent duplicates.
 pub struct TraitEmitter<'arena> {
     emitted_traits: &'arena mut HashSet<String>,
@@ -43,7 +58,7 @@ impl<'arena> TraitEmitter<'arena> {
 ///
 /// The macro receives a context for inspecting the type and emitting code,
 /// and returns either generated items or a diagnostic error.
-pub type DeriveMacro = Arc<dyn Fn(&mut DeriveContext, &DeriveInput) -> Result<Vec<Item>, Diagnostic>>;
+pub type DeriveMacro = Arc<dyn Fn(&mut DeriveContext, &DeriveInput) -> Result<Vec<Item>, AttributeExpansionFailure>>;
 
 /// Context provided to derive macros for inspecting the target type and emitting code.
 pub struct DeriveContext<'arena> {
@@ -58,7 +73,7 @@ pub struct DeriveContext<'arena> {
     /// Expansion counter for generating unique identifiers
     expansion_counter: &'arena mut u32,
     /// Diagnostics accumulated during expansion
-    diagnostics: &'arena mut Vec<Diagnostic>,
+    diagnostics: &'arena mut Vec<AttributeExpansionFailure>,
     /// Tracks which trait definitions have been emitted
     emitted_traits: &'arena mut HashSet<String>,
     /// Extra items (like trait definitions) emitted during expansion
@@ -72,7 +87,7 @@ impl<'arena> DeriveContext<'arena> {
         file_id: FileId,
         derive_span: Span,
         expansion_counter: &'arena mut u32,
-        diagnostics: &'arena mut Vec<Diagnostic>,
+        diagnostics: &'arena mut Vec<AttributeExpansionFailure>,
         emitted_traits: &'arena mut HashSet<String>,
     ) -> Self {
         Self {
@@ -124,13 +139,10 @@ impl<'arena> DeriveContext<'arena> {
         format!("{}{}", prefix, *self.expansion_counter)
     }
 
-    /// Report a diagnostic error.
+    /// Record a contextual failure; the TypeChecker admission owns emission.
     pub fn error(&mut self, message: String, span: Option<Span>) {
-        let diag = match span {
-            Some(s) => Diagnostic::error(message).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(s),
-            None => Diagnostic::error(message).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(self.derive_span),
-        };
-        self.diagnostics.push(diag);
+        self.diagnostics.push(AttributeExpansionFailure::application(
+            message, span.unwrap_or(self.derive_span)));
     }
 
     /// Append a parsed item to the arena and return it.
@@ -173,7 +185,7 @@ impl<'arena> DeriveContext<'arena> {
                 Ok(result)
             }
             Err(()) => {
-                self.diagnostics.extend(parser.diagnostics);
+                self.diagnostics.extend(parser.diagnostics.into_iter().map(AttributeExpansionFailure::Parser));
                 Err(())
             }
         }
@@ -284,16 +296,16 @@ impl DeriveRegistry {
     /// These implementations are part of the standard library, not the compiler itself.
     fn register_builtin_derives(&mut self) {
         // Register Copy derive
-        let copy_derive = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, Diagnostic> {
+        let copy_derive = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, AttributeExpansionFailure> {
             let type_name = &input.name;
             let code = format!("impl std::Copy for {} {{}}", type_name);
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Copy for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
+                .map_err(|_| AttributeExpansionFailure::application(format!("failed to parse generated Copy for `{}`", type_name), ctx.derive_span))
         });
         self.register("Copy", copy_derive);
 
         // Register Debug derive
-        let debug = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, Diagnostic> {
+        let debug = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, AttributeExpansionFailure> {
             let type_name = &input.name;
 
             // First, emit the trait definition if not already emitted
@@ -309,12 +321,12 @@ impl DeriveRegistry {
             );
 
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Debug for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
+                .map_err(|_| AttributeExpansionFailure::application(format!("failed to parse generated Debug for `{}`", type_name), ctx.derive_span))
         });
         self.register("Debug", debug);
 
         // Register Clone derive
-        let clone = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, Diagnostic> {
+        let clone = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, AttributeExpansionFailure> {
             let type_name = &input.name;
 
             // First, emit the trait definition if not already emitted
@@ -367,12 +379,12 @@ impl DeriveRegistry {
 
 
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Clone for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
+                .map_err(|_| AttributeExpansionFailure::application(format!("failed to parse generated Clone for `{}`", type_name), ctx.derive_span))
         });
         self.register("Clone", clone);
 
         // Register PartialEq derive
-        let partial_eq = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, Diagnostic> {
+        let partial_eq = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, AttributeExpansionFailure> {
             let type_name = &input.name;
 
             // First, emit the trait definition if not already emitted
@@ -426,12 +438,12 @@ impl DeriveRegistry {
             };
 
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated PartialEq for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
+                .map_err(|_| AttributeExpansionFailure::application(format!("failed to parse generated PartialEq for `{}`", type_name), ctx.derive_span))
         });
         self.register("PartialEq", partial_eq);
 
         // Register Eq derive
-        let eq = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, Diagnostic> {
+        let eq = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, AttributeExpansionFailure> {
             let type_name = &input.name;
 
             // First, emit the trait definition if not already emitted
@@ -442,12 +454,12 @@ impl DeriveRegistry {
 
             let code = format!("impl Eq for {} {{}}", type_name);
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Eq for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
+                .map_err(|_| AttributeExpansionFailure::application(format!("failed to parse generated Eq for `{}`", type_name), ctx.derive_span))
         });
         self.register("Eq", eq);
 
         // Register Default derive
-        let default = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, Diagnostic> {
+        let default = Arc::new(|ctx: &mut DeriveContext, input: &DeriveInput| -> Result<Vec<Item>, AttributeExpansionFailure> {
             let type_name = &input.name;
 
             // First, emit the trait definition if not already emitted
@@ -506,13 +518,13 @@ impl DeriveRegistry {
                             format!("cannot derive Default for empty enum `{}`", type_name),
                             Some(input.name_span)
                         );
-                        return Err(Diagnostic::error(format!("cannot derive Default for empty enum `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation));
+                        return Err(AttributeExpansionFailure::application(format!("cannot derive Default for empty enum `{}`", type_name), ctx.derive_span));
                     }
                 }
             };
 
             ctx.parse_and_append_item(&code)
-                .map_err(|_| Diagnostic::error(format!("failed to parse generated Default for `{}`", type_name)).with_code(luna_common::DiagnosticCode::InvalidAnnotation).with_span(ctx.derive_span))
+                .map_err(|_| AttributeExpansionFailure::application(format!("failed to parse generated Default for `{}`", type_name), ctx.derive_span))
         });
         self.register("Default", default);
     }

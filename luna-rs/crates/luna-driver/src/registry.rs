@@ -63,6 +63,7 @@ pub struct ExternalImplKey {
 #[derive(Debug, Clone)]
 pub struct ExternalTraitImplEntry {
     pub decl_id: Option<luna_ast::DeclId>,
+    pub definition_span: Option<luna_common::Span>,
     pub trait_id: CanonicalSymbolId,
     pub self_type: luna_semantic::ty::SemanticTypeId,
     pub generic_params: Vec<CanonicalSymbolId>,
@@ -617,9 +618,8 @@ impl ModuleRegistry {
                         .iter()
                         .map(|&a| ctx.types.clone_type_from(a, &interface.types, &lookup_sym))
                         .collect();
-                    let dummy_span = luna_common::Span::default();
                     if ctx
-                        .check_impl_coherence(trait_sym, new_self_ty, &new_gps, &new_trait_args, dummy_span)
+                        .check_impl_coherence_with_origin(trait_sym, new_self_ty, &new_gps, &new_trait_args, entry.definition_span)
                         .is_err()
                     {
                         continue;
@@ -628,6 +628,7 @@ impl ModuleRegistry {
                         .trait_impl_entries
                         .push(luna_semantic::semantic_tables::TraitImplEntry {
                             decl_id: entry.decl_id,
+                            definition_span: entry.definition_span,
                             trait_id: trait_sym,
                             self_type: new_self_ty,
                             generic_params: new_gps,
@@ -902,17 +903,21 @@ impl ModuleRegistry {
             for canonical_path in entry.auto_visible_paths {
                 let parts: Vec<_> = canonical_path.split("::").collect();
                 if parts.len() != 2 || parts[0] != "std" {
-                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
-                        "Invalid auto-visible stdlib path `{canonical_path}`; expected `std::Name`"
-                    )).with_code(luna_common::DiagnosticCode::InvalidSyntax));
+                    ctx.diagnostics.push(luna_common::Diagnostic::contract_error(
+                        luna_common::DiagnosticCode::InvalidSyntax,
+                        format!("Invalid auto-visible stdlib path `{canonical_path}`; expected `std::Name`")
+                    ));
                     continue;
                 }
                 let Some(symbol_id) = Self::resolve_logical_path(ctx, provider_scope, canonical_path)
                 else {
-                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
-                        "Provider `{}` is missing auto-visible canonical path `{canonical_path}`",
-                        entry.provider_id
-                    )).with_code(luna_common::DiagnosticCode::UnresolvedSymbol));
+                    ctx.diagnostics.push(luna_common::Diagnostic::contract_error(
+                        luna_common::DiagnosticCode::UnresolvedSymbol,
+                        format!(
+                            "Provider `{}` is missing auto-visible canonical path `{canonical_path}`",
+                            entry.provider_id
+                        )
+                    ));
                     continue;
                 };
 
@@ -951,30 +956,38 @@ impl ModuleRegistry {
                 );
                 if let luna_semantic::symbol::ImportSymbolResult::Conflict { existing } = imported {
                     let existing_name = ctx.symbol_table.symbols[existing.0 as usize].name.clone();
-                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
-                        "Conflicting canonical stdlib export `{canonical_path}` (existing `{existing_name}`)"
-                    )).with_code(luna_common::DiagnosticCode::DuplicateDefinition));
+                    ctx.diagnostics.push(luna_common::Diagnostic::contract_error(
+                        luna_common::DiagnosticCode::DuplicateDefinition,
+                        format!("Conflicting canonical stdlib export `{canonical_path}` (existing `{existing_name}`)")
+                    ));
                 }
             }
 
             for binding in entry.language_items {
                 let Some(item) = luna_semantic::lang_item::LangItem::from_name(binding.lang_item)
                 else {
-                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
-                        "Unknown language item `{}` in canonical stdlib manifest",
-                        binding.lang_item
-                    )).with_code(luna_common::DiagnosticCode::UnresolvedSymbol));
+                    ctx.diagnostics.push(luna_common::Diagnostic::contract_error(
+                        luna_common::DiagnosticCode::UnresolvedSymbol,
+                        format!(
+                            "Unknown language item `{}` in canonical stdlib manifest",
+                            binding.lang_item
+                        )
+                    ));
                     continue;
                 };
                 let Some(symbol_id) = Self::resolve_logical_path(ctx, provider_scope, binding.canonical_path)
                 else {
-                    ctx.diagnostics.push(luna_common::Diagnostic::error(format!(
-                        "Provider `{}` is missing language-item path `{}` for `{}`",
-                        entry.provider_id, binding.canonical_path, binding.lang_item
-                    )).with_code(luna_common::DiagnosticCode::UnresolvedSymbol));
+                    ctx.diagnostics.push(luna_common::Diagnostic::contract_error(
+                        luna_common::DiagnosticCode::UnresolvedSymbol,
+                        format!(
+                            "Provider `{}` is missing language-item path `{}` for `{}`",
+                            entry.provider_id, binding.canonical_path, binding.lang_item
+                        )
+                    ));
                     continue;
                 };
-                ctx.lang_items.inject_raw(item, symbol_id);
+                let span = ctx.symbol_table.get_symbol(symbol_id).span;
+                ctx.lang_items.inject_raw_with_span(item, symbol_id, span);
             }
         }
     }
@@ -1129,6 +1142,21 @@ impl ModuleRegistry {
         ctx: &luna_semantic::SemanticContext,
         ranges: &ArenaRanges,
     ) -> ProviderInterface {
+        Self::extract_interface_from_owned_ranges(provider_name, provider_id, ctx, std::slice::from_ref(ranges))
+    }
+
+    /// Root source nodes and expansion nodes may be separated by imported AST.
+    /// Ownership is the union of those ranges, never the intervening providers.
+    pub fn extract_interface_from_owned_ranges(
+        provider_name: String,
+        provider_id: ProviderId,
+        ctx: &luna_semantic::SemanticContext,
+        ranges: &[ArenaRanges],
+    ) -> ProviderInterface {
+        let owns_decl = |id| ranges.iter().any(|range| range.decls.contains(&id));
+        let owns_expr = |id| ranges.iter().any(|range| range.exprs.contains(&id));
+        let owns_pat = |id| ranges.iter().any(|range| range.pats.contains(&id));
+        let owns_type = |id| ranges.iter().any(|range| range.types.contains(&id));
             let mut exported_symbols = HashMap::new();
             let global_scope = luna_semantic::symbol::ScopeId(0);
             let mut visited = HashSet::new();
@@ -1206,14 +1234,14 @@ impl ModuleRegistry {
 
         let is_impl_local = |key: &luna_semantic::semantic_tables::ImplKey| -> bool {
             if let Some(decl_ids) = ctx.tables.trait_impls.get(key) {
-                if decl_ids.iter().any(|d| ranges.decls.contains(&d.0)) {
+                if decl_ids.iter().any(|d| owns_decl(d.0)) {
                     return true;
                 }
             }
             if let Some(method_syms) = ctx.tables.impl_methods.get(key) {
                 if method_syms.iter().any(|&s| {
                     let sym = ctx.symbol_table.get_symbol(s);
-                    sym.decl_id.map_or(false, |d| ranges.decls.contains(&d.0))
+                    sym.decl_id.map_or(false, |d| owns_decl(d.0))
                         || sym.provider_id == Some(provider_id)
                         || sym.provider_id.is_none()
                 }) {
@@ -1371,7 +1399,7 @@ impl ModuleRegistry {
             let head_canon = head_sym.map(|s| Self::get_canonical(s, ctx, provider_id));
             let is_local_trait = canon_trait.provider_id == provider_id;
             let is_local_head = head_canon.as_ref().map_or(false, |h| h.provider_id == provider_id);
-            let is_local_decl = entry.decl_id.map_or(false, |did| ranges.decls.contains(&did.0));
+            let is_local_decl = entry.decl_id.map_or(false, |did| owns_decl(did.0));
             if is_local_trait || is_local_head || is_local_decl {
                 let canon_gps = entry
                     .generic_params
@@ -1380,6 +1408,7 @@ impl ModuleRegistry {
                     .collect();
                 trait_impl_entries.push(ExternalTraitImplEntry {
                     decl_id: entry.decl_id,
+                    definition_span: entry.definition_span,
                     trait_id: canon_trait,
                     self_type: entry.self_type,
                     generic_params: canon_gps,
@@ -1399,55 +1428,55 @@ impl ModuleRegistry {
         }
         let mut decl_symbols = HashMap::new();
         for (&id, &sym) in &ctx.tables.decl_symbols {
-            if ranges.decls.contains(&id.0) {
+            if owns_decl(id.0) {
                 decl_symbols.insert(id, sym);
             }
         }
         let mut method_to_impl_decl = HashMap::new();
         for (&m_decl, &i_decl) in &ctx.tables.method_to_impl_decl {
-            if ranges.decls.contains(&m_decl.0) {
+            if owns_decl(m_decl.0) {
                 method_to_impl_decl.insert(m_decl, i_decl);
             }
         }
         let mut expr_symbols = HashMap::new();
         for (&id, &sym) in &ctx.tables.expr_symbols {
-            if ranges.exprs.contains(&id.0) {
+            if owns_expr(id.0) {
                 expr_symbols.insert(id, sym);
             }
         }
         let mut pat_symbols = HashMap::new();
         for (&id, &sym) in &ctx.tables.pat_symbols {
-            if ranges.pats.contains(&id.0) {
+            if owns_pat(id.0) {
                 pat_symbols.insert(id, sym);
             }
         }
         let mut pat_types = HashMap::new();
         for (&id, &ty) in &ctx.tables.pat_types {
-            if ranges.pats.contains(&id.0) {
+            if owns_pat(id.0) {
                 pat_types.insert(id, ty);
             }
         }
         let mut expr_types = HashMap::new();
         for (&id, &ty) in &ctx.tables.expr_types {
-            if ranges.exprs.contains(&id.0) {
+            if owns_expr(id.0) {
                 expr_types.insert(id, ty);
             }
         }
         let mut expr_struct_init_indices = HashMap::new();
         for (&id, idxs) in &ctx.tables.expr_struct_init_indices {
-            if ranges.exprs.contains(&id.0) {
+            if owns_expr(id.0) {
                 expr_struct_init_indices.insert(id, idxs.clone());
             }
         }
         let mut expr_member_indices = HashMap::new();
         for (&id, &idx) in &ctx.tables.expr_member_indices {
-            if ranges.exprs.contains(&id.0) {
+            if owns_expr(id.0) {
                 expr_member_indices.insert(id, idx);
             }
         }
         let mut expr_substs = HashMap::new();
         for (&id, subst) in &ctx.tables.expr_substs {
-            if ranges.exprs.contains(&id.0) {
+            if owns_expr(id.0) {
                 let list: Vec<_> = subst.map.iter().map(|(&s, &t)| (s, t)).collect();
                 expr_substs.insert(id, list);
             }
@@ -1455,7 +1484,7 @@ impl ModuleRegistry {
 
         let mut raw_generic_param_symbols = HashMap::new();
         for (&(decl_id, idx), &gp_sym) in &ctx.tables.generic_param_symbols {
-            if ranges.decls.contains(&decl_id.0) {
+            if owns_decl(decl_id.0) {
                 raw_generic_param_symbols.insert((decl_id, idx), gp_sym);
             }
         }
@@ -1533,10 +1562,10 @@ impl ModuleRegistry {
             impl_associated_types,
             impl_self_types,
             checked_impl_headers: ctx.tables.checked_impl_headers.iter()
-                .filter(|(declaration, _)| ranges.decls.contains(&declaration.0))
+                .filter(|(declaration, _)| owns_decl(declaration.0))
                 .map(|(&declaration, header)| (declaration, header.clone())).collect(),
             decl_associated_types: ctx.tables.decl_associated_types.iter()
-                .filter(|((declaration, _), _)| ranges.decls.contains(&declaration.0))
+                .filter(|((declaration, _), _)| owns_decl(declaration.0))
                 .map(|(&(declaration, associated), &ty)|
                     ((declaration, Self::get_canonical(associated, ctx, provider_id)), ty)).collect(),
             impl_generic_params,
@@ -1544,12 +1573,12 @@ impl ModuleRegistry {
             trait_associated_type_symbols,
             internal_symbols,
             const_values: ctx.const_values.iter().filter(|(symbol, _)| {
-                ctx.symbol_table.get_symbol(**symbol).decl_id.is_some_and(|d| ranges.decls.contains(&d.0))
+                ctx.symbol_table.get_symbol(**symbol).decl_id.is_some_and(|d| owns_decl(d.0))
             }).map(|(s, v)| (*s, detached_const_value(v))).collect(),
-            comptime_values: ctx.comptime_values.iter().filter(|(expr, _)| ranges.exprs.contains(&expr.0))
+            comptime_values: ctx.comptime_values.iter().filter(|(expr, _)| owns_expr(expr.0))
                 .map(|(expr, v)| (*expr, detached_const_value(v))).collect(),
             module_constants: ctx.symbol_table.symbols.iter().filter(|s| {
-                s.kind == SymbolKind::Constant && s.decl_id.is_some_and(|d| ranges.decls.contains(&d.0))
+                s.kind == SymbolKind::Constant && s.decl_id.is_some_and(|d| owns_decl(d.0))
                     && matches!(ctx.symbol_table.scopes[s.scope.0 as usize].kind, ScopeKind::Global | ScopeKind::Module)
             }).map(|s| s.id).collect(),
             macro_environments,
@@ -1558,17 +1587,17 @@ impl ModuleRegistry {
             pat_symbols,
             pat_types,
             expr_types,
-            ast_types: ctx.tables.ast_type_to_semantic.iter().filter(|(ty, _)| ranges.types.contains(&ty.0))
+            ast_types: ctx.tables.ast_type_to_semantic.iter().filter(|(ty, _)| owns_type(ty.0))
                 .map(|(&source, &ty)| (source, ty)).collect(),
-            path_generic_bindings: ctx.tables.path_generic_bindings.iter().filter(|(expression, _)| ranges.exprs.contains(&expression.0))
+            path_generic_bindings: ctx.tables.path_generic_bindings.iter().filter(|(expression, _)| owns_expr(expression.0))
                 .map(|(&expression, bindings)| (expression, bindings.clone())).collect(),
             expr_substs,
             callable_signatures: ctx.tables.callable_signatures.keys().filter(|symbol| {
-                ctx.tables.symbol_decls.get(symbol).is_some_and(|decl| ranges.decls.contains(&decl.0))
+                ctx.tables.symbol_decls.get(symbol).is_some_and(|decl| owns_decl(decl.0))
             }).filter_map(|&symbol| ctx.tables.callable_signature(symbol, &ctx.symbol_table)
                 .map(|signature| (symbol, signature.clone()))).collect(),
             call_argument_bindings: ctx.tables.call_argument_bindings.iter()
-                .filter(|(expression, _)| ranges.exprs.contains(&expression.0))
+                .filter(|(expression, _)| owns_expr(expression.0))
                 .map(|(&expression, binding)| (expression, binding.clone())).collect(),
             expr_struct_init_indices,
             expr_member_indices,

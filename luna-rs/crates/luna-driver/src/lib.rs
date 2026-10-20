@@ -238,6 +238,11 @@ fn verify_items_lifetime(
 /// or `Ok(())` if the program would have passed the semantic gate.
 pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     let mut session = CompilerSession::new();
+    let result = check_semantic_only_unordered(&mut session, file_name, input, options);
+    ordered_diagnostic_result(result, &session.source_manager)
+}
+
+fn check_semantic_only_unordered(mut session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     let file_id = session.source_manager.add_file(file_name.to_string(), input.clone());
     let lexer = Lexer::new(&input, file_id);
     let mut arena = AstArena::new();
@@ -245,6 +250,7 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
     let mut items = parser.parse_file().map_err(|_| parser.diagnostics.clone())?;
     if !parser.diagnostics.is_empty() { return Err(parser.diagnostics); }
     let mut semantic_ctx = SemanticContext::new();
+    semantic_ctx.current_file_id = Some(file_id);
 
     let search_paths_buf: Vec<std::path::PathBuf> = options.search_paths.iter().map(std::path::PathBuf::from).collect();
     let sysroot = search_paths_buf
@@ -270,8 +276,7 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
     let registry = std::mem::take(&mut driver_session.registry);
     drop(driver_session);
 
-    let mut attr_processor = luna_semantic::AttributeProcessor::new(&mut arena, &mut session.source_manager, file_id);
-    let items = attr_processor.process_items(items).map_err(|e| e)?;
+    let items = TypeChecker::prepare_attributes(&mut arena, &mut session.source_manager, file_id, items)?;
 
     registry.inject_into_ctx(&mut semantic_ctx);
 
@@ -288,7 +293,7 @@ pub fn check_semantic_only(file_name: &str, input: String, options: &CompilerOpt
         &semantic_ctx.symbol_table,
         &semantic_ctx.tables,
     );
-    let items = macro_engine.expand_items(items).map_err(|e| e)?;
+    let items = macro_engine.expand_items(items).map_err(Resolver::admit_macro_expansion_failures)?;
 
     Resolver::new(&mut semantic_ctx, &arena, &session.source_manager).resolve_items(&items);
     let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
@@ -329,6 +334,18 @@ pub fn check(file_name: &str, input: String, options: &CompilerOptions) -> Resul
 /// Runs `check` against a caller-owned session so rendered diagnostics can
 /// resolve their source spans through the same `SourceManager`.
 pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
+    let result = check_with_session_unordered(session, file_name, input, options);
+    ordered_diagnostic_result(result, &session.source_manager)
+}
+
+fn ordered_diagnostic_result<T>(result: Result<T, Vec<Diagnostic>>, sources: &luna_common::source::SourceManager) -> Result<T, Vec<Diagnostic>> {
+    result.map_err(|mut diagnostics| {
+        luna_common::diagnostic::normalize_diagnostics(&mut diagnostics, sources);
+        diagnostics
+    })
+}
+
+fn check_with_session_unordered(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     let file_id = session.source_manager.add_file(file_name.to_string(), input.clone());
     let lexer = Lexer::new(&input, file_id);
     let mut arena = AstArena::new();
@@ -336,6 +353,7 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
     let mut items = parser.parse_file().map_err(|_| parser.diagnostics.clone())?;
     if !parser.diagnostics.is_empty() { return Err(parser.diagnostics); }
     let mut semantic_ctx = SemanticContext::new();
+    semantic_ctx.current_file_id = Some(file_id);
     
     let search_paths_buf: Vec<std::path::PathBuf> = options.search_paths.iter().map(std::path::PathBuf::from).collect();
     let sysroot = search_paths_buf
@@ -376,8 +394,7 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
     let registry = std::mem::take(&mut driver_session.registry);
     drop(driver_session);
     
-    let mut attr_processor = luna_semantic::AttributeProcessor::new(&mut arena, &mut session.source_manager, file_id);
-    let items = attr_processor.process_items(items).map_err(|e| e)?;
+    let items = TypeChecker::prepare_attributes(&mut arena, &mut session.source_manager, file_id, items)?;
 
     registry.inject_into_ctx(&mut semantic_ctx);
 
@@ -394,7 +411,7 @@ pub fn check_with_session(session: &mut CompilerSession, file_name: &str, input:
         &semantic_ctx.symbol_table,
         &semantic_ctx.tables,
     );
-    let items = macro_engine.expand_items(items).map_err(|e| e)?;
+    let items = macro_engine.expand_items(items).map_err(Resolver::admit_macro_expansion_failures)?;
 
     Resolver::new(&mut semantic_ctx, &arena, &session.source_manager).resolve_items(&items);
     let comptime_engine = crate::comptime_admission::CheckedComptimeEngine {
@@ -444,11 +461,35 @@ pub fn compile(file_name: &str, input: String, options: &CompilerOptions) -> Res
     compile_with_session(&mut session, file_name, input, options)
 }
 
+/// DIAG-2/DIAG-7: the user-visible boundary enforces the primary-span policy.
+/// A source diagnostic (code below the infrastructure range) that is neither
+/// anchored to a primary span nor declared as a provider/manifest contract
+/// diagnostic is a compiler invariant failure, reported fail-closed instead of
+/// being rendered as a location-less source error.
+pub fn enforce_source_anchor_policy(diagnostics: &mut Vec<Diagnostic>) {
+    let offenders: Vec<String> = diagnostics
+        .iter()
+        .filter(|diagnostic| diagnostic.violates_source_anchor_contract())
+        .map(|diagnostic| match diagnostic.code {
+            Some(code) => format!("{code}: {}", diagnostic.message),
+            None => diagnostic.message.clone(),
+        })
+        .collect();
+    for offender in offenders {
+        diagnostics.push(Diagnostic::invariant_error(format!(
+            "source diagnostic is missing its primary span: {offender}"
+        )));
+    }
+}
+
 pub fn check_and_render(file_name: &str, input: String, options: &CompilerOptions) -> Result<(), String> {
     let mut session = CompilerSession::new();
     match check_with_session(&mut session, file_name, input, options) {
         Ok(()) => Ok(()),
-        Err(diags) => Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n")),
+        Err(mut diags) => {
+            enforce_source_anchor_policy(&mut diags);
+            Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n"))
+        }
     }
 }
 
@@ -456,11 +497,19 @@ pub fn compile_and_render(file_name: &str, input: String, options: &CompilerOpti
     let mut session = CompilerSession::new();
     match compile_with_session(&mut session, file_name, input, options) {
         Ok(()) => Ok(()),
-        Err(diags) => Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n")),
+        Err(mut diags) => {
+            enforce_source_anchor_policy(&mut diags);
+            Err(diags.iter().map(|d| d.render(&session.source_manager)).collect::<Vec<_>>().join("\n"))
+        }
     }
 }
 
 pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
+    let result = compile_with_session_unordered(session, file_name, input, options);
+    ordered_diagnostic_result(result, &session.source_manager)
+}
+
+fn compile_with_session_unordered(session: &mut CompilerSession, file_name: &str, input: String, options: &CompilerOptions) -> Result<(), Vec<Diagnostic>> {
     if (options.emit_llib || options.emit_mlib)
         && options.output_path.as_ref().is_some_and(|path| path.ends_with(".mlib"))
     {
@@ -498,6 +547,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             }
             // Semantic phase
             let mut semantic_ctx = SemanticContext::new();
+            semantic_ctx.current_file_id = Some(file_id);
             
             let main_expr_end = arena.exprs.len() as u32;
             let main_decl_end = arena.decls.len() as u32;
@@ -558,8 +608,9 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             let registry = std::mem::take(&mut driver_session.registry);
             drop(driver_session);
 
-            let mut attr_processor = luna_semantic::AttributeProcessor::new(&mut arena, &mut session.source_manager, file_id);
-            let items_mut = attr_processor.process_items(items_mut).map_err(|e| e)?;
+            let generated_start = (arena.exprs.len() as u32, arena.decls.len() as u32,
+                arena.pats.len() as u32, arena.types.len() as u32);
+            let items_mut = TypeChecker::prepare_attributes(&mut arena, &mut session.source_manager, file_id, items_mut)?;
 
             registry.inject_into_ctx(&mut semantic_ctx);
 
@@ -576,7 +627,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                 &semantic_ctx.symbol_table,
                 &semantic_ctx.tables,
             );
-            let items_mut = macro_engine.expand_items(items_mut).map_err(|e| e)?;
+            let items_mut = macro_engine.expand_items(items_mut).map_err(Resolver::admit_macro_expansion_failures)?;
 
             let mut resolver = Resolver::new(&mut semantic_ctx, &arena, &session.source_manager);
             resolver.resolve_items(&items_mut);
@@ -599,7 +650,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
             semantic_ctx.drop_glue_instances = drop_glues;
             
             for diag in semantic_ctx.diagnostics.clone() {
-                if !all_diagnostics.contains(&diag) {
+                if !all_diagnostics.iter().any(|existing| existing.same_identity(&diag)) {
                     all_diagnostics.push(diag);
                 }
             }
@@ -717,9 +768,10 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     _ => return None,
                 };
                 Some((ty.0, bits, signed))
-            });
+            }).collect::<Vec<_>>();
+            let integer_types = integer_ranges.iter().map(|fact| fact.0).collect::<Vec<_>>();
             pass_manager.add_pass(Box::new(luna_optimizer::ConstantFolding::with_integer_ranges(integer_ranges)));
-            pass_manager.add_pass(Box::new(luna_optimizer::DeadCodeElimination::new()));
+            pass_manager.add_pass(Box::new(luna_optimizer::DeadCodeElimination::with_integer_types(integer_types)));
             pass_manager.run(&mut module);
             if !options.quiet {
                 println!("-----------------");
@@ -888,7 +940,15 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                     pats: 0..main_pat_end,
                     types: 0..main_type_end,
                 };
-                let interface = crate::registry::ModuleRegistry::extract_interface_from_ctx(provider_name.clone(), main_provider_id, &semantic_ctx, &ranges);
+                let generated = crate::registry::ArenaRanges {
+                    exprs: generated_start.0..arena.exprs.len() as u32,
+                    decls: generated_start.1..arena.decls.len() as u32,
+                    pats: generated_start.2..arena.pats.len() as u32,
+                    types: generated_start.3..arena.types.len() as u32,
+                };
+                let interface = crate::registry::ModuleRegistry::extract_interface_from_owned_ranges(
+                    provider_name.clone(), main_provider_id, &semantic_ctx, &[ranges, generated],
+                );
                 let builder = crate::metadata_builder::MetadataBuilder::new(&registry, &interface, &summaries);
                 let semantic_metadata = Some(builder.build());
 
@@ -897,7 +957,7 @@ pub fn compile_with_session(session: &mut CompilerSession, file_name: &str, inpu
                         .with_code(luna_common::DiagnosticCode::ObjectEmissionFailure),
                 ])?;
                 luna_llib::LlibWriter::write_module(
-                    &module, &arena, &items, &input, manifest, semantic_metadata.as_ref(),
+                    &module, &arena, &items_mut, &input, manifest, semantic_metadata.as_ref(),
                     Some(&obj_bytes), &mut llib_buffer,
                 ).map_err(|error| vec![
                     Diagnostic::error(format!("Failed to serialize library artifact '{}': {}", llib_file, error))
@@ -1033,7 +1093,7 @@ mod publication_tests {
 
     #[test]
     fn test_atomic_publication_successful_replacement() {
-        let temp_dir = std::env::temp_dir().join("luna_pub_test_success");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_pub_test_success");
         let _ = std::fs::remove_dir_all(&temp_dir);
         std::fs::create_dir_all(&temp_dir).unwrap();
 
@@ -1065,7 +1125,7 @@ mod publication_tests {
 
     #[test]
     fn test_atomic_publication_failure_cleans_temp_and_preserves_old() {
-        let temp_dir = std::env::temp_dir().join("luna_pub_test_fail");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_pub_test_fail");
         let _ = std::fs::remove_dir_all(&temp_dir);
         std::fs::create_dir_all(&temp_dir).unwrap();
 
@@ -1094,7 +1154,7 @@ mod publication_tests {
 
     #[test]
     fn test_sibling_temp_discovery_isolation() {
-        let temp_dir = std::env::temp_dir().join("luna_pub_test_isolation");
+        let temp_dir = luna_test_support::owned_temp_root().join("luna_pub_test_isolation");
         let _ = std::fs::remove_dir_all(&temp_dir);
         std::fs::create_dir_all(&temp_dir).unwrap();
 

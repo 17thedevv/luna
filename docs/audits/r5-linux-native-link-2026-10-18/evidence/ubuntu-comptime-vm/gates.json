@@ -1,0 +1,517 @@
+[
+  {
+    "gate": "clone",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "clone",
+      "https://github.com/17thedevv/luna.git",
+      "/home/runner/work/_temp/r5-comptime-vm/checkout"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm",
+    "started_utc": "2026-10-17T18:00:45Z",
+    "exit": 0,
+    "seconds": 5.526679219000002,
+    "log_sha256": "e93d9bbd7872499fc3b69decee350cd1babbf2e4aa05c09a95fd072446635d91",
+    "status": "PASS",
+    "log": "clone.log.gz",
+    "compressed_sha256": "98e2effb9b0aad0731b5dcc7713c3b5df43d25e25f472c456f1d198f176493e6"
+  },
+  {
+    "gate": "checkout",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "checkout",
+      "--detach",
+      "3a72f9464fa921410b63551f7eac03414cf51e2b"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.3648656259999967,
+    "log_sha256": "e2f8bc8095ec95b2a4bb5caf7c9bb6612faa6e1f87d8abb9c0a5d73da18bfa90",
+    "status": "PASS",
+    "log": "checkout.log.gz",
+    "compressed_sha256": "c62fa410c3db61a330ad69cfe727a264763bb16e84ca02676b7d410440de2946"
+  },
+  {
+    "gate": "head",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.0036799370000011322,
+    "log_sha256": "0396c4e6c96ba40520d0f75e614f5baf6961f4cfbd8cf0d6c8f65fd989ab4c58",
+    "status": "PASS",
+    "log": "head.log.gz",
+    "compressed_sha256": "51f12fe5e8434c5fb6fde6b8643ade31c28f621046552491296501b328e5a5c4"
+  },
+  {
+    "gate": "initial-status",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.31566223699999796,
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status": "PASS",
+    "log": "initial-status.log.gz",
+    "compressed_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+  },
+  {
+    "gate": "detached",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "symbolic-ref",
+      "-q",
+      "HEAD"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 1,
+    "seconds": 0.0037063350000039463,
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status": "PASS",
+    "log": "detached.log.gz",
+    "compressed_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+  },
+  {
+    "gate": "remote-url",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "remote",
+      "get-url",
+      "origin"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.0014399410000009993,
+    "log_sha256": "6d78b4e7610b575ea218b9778a67a97604a34aab1def3156f98768ac67d3e22b",
+    "status": "PASS",
+    "log": "remote-url.log.gz",
+    "compressed_sha256": "dbf8a0bf7dc3d8f10342a7aec01e5127077e5af6a60cc578c1ea9710ff54ad50"
+  },
+  {
+    "gate": "os-release",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "cat",
+      "/etc/os-release"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.0014532209999913448,
+    "log_sha256": "87458b3b1f1ca0e5c693ade771de7007c3783bdc692fa6b39eb6414bf2af2763",
+    "status": "PASS",
+    "log": "os-release.log.gz",
+    "compressed_sha256": "d87c87220e5e9a326a87d8cd34927c774042daa4298372cf4c21b04168731fd1"
+  },
+  {
+    "gate": "uname",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "uname",
+      "-a"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.0014202119999993101,
+    "log_sha256": "cd8e31ad3f05d597238a1403bb5c2d25c975d53959c3d48af034216515712dc5",
+    "status": "PASS",
+    "log": "uname.log.gz",
+    "compressed_sha256": "2de7cf89ae868bee64884828c9b4cab31700f642393ae7db754d4b6bc320b3b9"
+  },
+  {
+    "gate": "gcc-target",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "gcc",
+      "-dumpmachine"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.007963836999991258,
+    "log_sha256": "08cababdf891ccbf96eb376f1e84f279f70302fb13d84e5f98637becdfc6d989",
+    "status": "PASS",
+    "log": "gcc-target.log.gz",
+    "compressed_sha256": "e8e5e9f6618ebad0031d4c14ee37483ba1239620667c0cb6cec14a55d6d22793"
+  },
+  {
+    "gate": "gcc-version",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "gcc",
+      "--version"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.0035152929999924254,
+    "log_sha256": "8497f84b2b8334c413d9c6166bd39d009ba55d2ff60a8f23e66dfa5819c2b048",
+    "status": "PASS",
+    "log": "gcc-version.log.gz",
+    "compressed_sha256": "64d434179361e9470365a73cabd8e91e9fc12c1a89c0da349de18bf3e74b85d7"
+  },
+  {
+    "gate": "cmake-version",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "cmake",
+      "--version"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.03204229499999656,
+    "log_sha256": "f6e81c2559f3ce00c5fdad01d7b226c301f5d6b07ee04f65db6dbfdc1cc5970b",
+    "status": "PASS",
+    "log": "cmake-version.log.gz",
+    "compressed_sha256": "290fa7fbdb746191e1604df28ea6dda6a2d47d51a9a0fa7bd4ce79b0d8f0f817"
+  },
+  {
+    "gate": "disk-initial",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "df",
+      "-h"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:51Z",
+    "exit": 0,
+    "seconds": 0.016088983000003054,
+    "log_sha256": "37fdd8826074b98105886216ead35bd4315a01e06bea1008045fc0d7cd5d6c5f",
+    "status": "PASS",
+    "log": "disk-initial.log.gz",
+    "compressed_sha256": "57763470df1247f474c4cc7a344f3dfb6898ff9ab30b0f1470af39f8917719b7"
+  },
+  {
+    "gate": "code-tree-identity",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "ls-tree",
+      "HEAD",
+      "luna-rs",
+      "runtime",
+      "tests",
+      "CMakeLists.txt"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:52Z",
+    "exit": 0,
+    "seconds": 0.0036368829999986474,
+    "log_sha256": "868e27b5c791859c5aa958e2ef6aa29fb54cd2f034c1ff097fd25c5398fad1fe",
+    "status": "PASS",
+    "log": "code-tree-identity.log.gz",
+    "compressed_sha256": "00a799a5ea7431f876e4fc3648c68f6923cb2b71ab274d029c39a72fb7c58e01"
+  },
+  {
+    "gate": "rustc",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "rustc",
+      "-vV"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:52Z",
+    "exit": 0,
+    "seconds": 0.015723081000004413,
+    "log_sha256": "f22d5e4e9ced367e774ce5bc140d9e6b1235c1882fec80d011044851f3ae6369",
+    "status": "PASS",
+    "log": "rustc.log.gz",
+    "compressed_sha256": "3bbc73e917112825daa074175c423dc871551bdad39c10b9031e615604bac2f8"
+  },
+  {
+    "gate": "llvm",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "llvm-config-18",
+      "--version"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:52Z",
+    "exit": 0,
+    "seconds": 0.17001344800000595,
+    "log_sha256": "b700ddf2ab6060f4dacc4ec19f8440b81e92e303fac663fa177b0154bbf9b844",
+    "status": "PASS",
+    "log": "llvm.log.gz",
+    "compressed_sha256": "28e5a116b761b3497e82bb6b676799b20b68db1441740360c5706ad15cb314f5"
+  },
+  {
+    "gate": "llvm-host-target",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "llvm-config-18",
+      "--host-target"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:52Z",
+    "exit": 0,
+    "seconds": 0.0037073570000103473,
+    "log_sha256": "1c7da408e283702561a445e700b61c0f55a082230a3cfe323208841221274a6a",
+    "status": "PASS",
+    "log": "llvm-host-target.log.gz",
+    "compressed_sha256": "92d475c24f0cec63b4d87f8aef7e60d91cb94fa217cdb4c6a963647a3a5d992c"
+  },
+  {
+    "gate": "cargo",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "cargo",
+      "--version"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:52Z",
+    "exit": 0,
+    "seconds": 0.015707297999995262,
+    "log_sha256": "c35608815f43d0b8788a9b826fad2bb17384f49fb328dc4fe64da9db5f5ef4d6",
+    "status": "PASS",
+    "log": "cargo.log.gz",
+    "compressed_sha256": "9f94010dd2fa2e3659e6811572f7be98f92870ca5bf0d866595b8b09150021db"
+  },
+  {
+    "gate": "runtime-config",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "cmake",
+      "-S",
+      "/home/runner/work/_temp/r5-comptime-vm/checkout/runtime",
+      "-B",
+      "/home/runner/work/_temp/r5-comptime-vm/runtime",
+      "-G",
+      "Ninja",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_C_COMPILER=gcc",
+      "-DCMAKE_CXX_COMPILER=g++"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm",
+    "started_utc": "2026-10-17T18:00:52Z",
+    "exit": 0,
+    "seconds": 0.5148669450000085,
+    "log_sha256": "838c32775d3139bc5ea9f0c1c6f7111b83e43157e7a29ceafebd1aabc75449d3",
+    "status": "PASS",
+    "log": "runtime-config.log.gz",
+    "compressed_sha256": "10c93c9c3634e2c382862d827c0420ca136458eed5c780fc0a55ba9b9e0925dd"
+  },
+  {
+    "gate": "runtime-build",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "cmake",
+      "--build",
+      "/home/runner/work/_temp/r5-comptime-vm/runtime",
+      "--parallel"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm",
+    "started_utc": "2026-10-17T18:00:52Z",
+    "exit": 0,
+    "seconds": 1.0696605449999907,
+    "log_sha256": "07ab10a49ba847227dc429989c8c4c2c6434f63d47e0db0272922efc75293516",
+    "status": "PASS",
+    "log": "runtime-build.log.gz",
+    "compressed_sha256": "aa2d227bc3ff7caebcc5f42901610002d9a2aaef2de1b6290a23a267a4a078ae"
+  },
+  {
+    "gate": "runtime-abi",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "ctest",
+      "--test-dir",
+      "/home/runner/work/_temp/r5-comptime-vm/runtime",
+      "-R",
+      "^RuntimeAbiTests$",
+      "--output-on-failure",
+      "--no-tests=error",
+      "-V"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm",
+    "started_utc": "2026-10-17T18:00:53Z",
+    "exit": 0,
+    "seconds": 1.417909721000001,
+    "log_sha256": "2474dfbc5dca1320573c036c26c26ef09d061cecf228a7a9a551b21e587d7dd5",
+    "status": "PASS",
+    "log": "runtime-abi.log.gz",
+    "compressed_sha256": "3ef5162d5ab79b0dda911a96431f1c2c63c0ed9c23bc42102763f5fdfb469559"
+  },
+  {
+    "gate": "cli-debug",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--manifest-path",
+      "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs/Cargo.toml",
+      "-p",
+      "luna-cli"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:00:55Z",
+    "exit": 0,
+    "seconds": 17.738342177999996,
+    "log_sha256": "5f51fe59a365731a0dd41f83879aa4ae0cd28fa2a33b01710d4c8587a259b173",
+    "status": "PASS",
+    "log": "cli-debug.log.gz",
+    "compressed_sha256": "2f7b42942c10d1596c3f42fa9307db49a9844db95496a65b5fd106680e7591fd"
+  },
+  {
+    "gate": "cli-release",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "cargo",
+      "build",
+      "--locked",
+      "--manifest-path",
+      "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs/Cargo.toml",
+      "-p",
+      "luna-cli",
+      "--release"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:01:12Z",
+    "exit": 0,
+    "seconds": 50.835206729999996,
+    "log_sha256": "493f42a78ccdc5faf2c06a3968d09196cbdfa4d40ec08eb740048201098beec5",
+    "status": "PASS",
+    "log": "cli-release.log.gz",
+    "compressed_sha256": "ace8e257fc659c41bf6bd86a533491b412887414e2a4c27e3ca2187adeb03124"
+  },
+  {
+    "gate": "sysroot",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs/target/debug/luna",
+      "build-sysroot",
+      "--quiet"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:02:03Z",
+    "exit": 0,
+    "seconds": 73.945439924,
+    "log_sha256": "8fa38d8b6e5f4eeb1b109c3bb957cc90909c631f82080634c9285ac9f7668116",
+    "status": "PASS",
+    "log": "sysroot.log.gz",
+    "compressed_sha256": "3ec3a8d65c0cb1752f2a634338b2ec853c1663493e977c3f7558d88a0b31d435"
+  },
+  {
+    "gate": "TARGET_CONTRACT",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "/usr/bin/python3",
+      "-c",
+      "import json,sys; artifact,advertised,host=sys.argv[1],sys.argv[2],sys.argv[3]; ok=artifact==advertised; print(json.dumps(dict(artifact_target=artifact,advertised_target=advertised,llvm_host_target=host,gate='MANDATORY TARGET_CONTRACT',status='PASS' if ok else 'FAIL',note='artifact records the canonical Luna target; host LLVM spelling is provenance only'))); sys.exit(0 if ok else 1)",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-pc-linux-gnu"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm",
+    "started_utc": "2026-10-17T18:03:17Z",
+    "exit": 0,
+    "seconds": 0.031919150000021546,
+    "log_sha256": "2b50653974f99353d50abc8caf1d1ad9c6c227f64b3f67a921539ca1efe70475",
+    "status": "PASS",
+    "log": "TARGET_CONTRACT.log.gz",
+    "compressed_sha256": "3926ba2bb8f5278b92b68746cd5d0dbf1b42460a0ef911b31903861a8e887969"
+  },
+  {
+    "gate": "comptime-vm-boundary",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "/usr/bin/python3",
+      "/home/runner/work/_temp/r5-comptime-vm/evidence/comptime/run_qualification.py",
+      "--checkout",
+      "/home/runner/work/_temp/r5-comptime-vm/checkout",
+      "--sysroot",
+      "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs",
+      "--debug",
+      "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs/target/debug/luna",
+      "--release",
+      "/home/runner/work/_temp/r5-comptime-vm/checkout/luna-rs/target/release/luna",
+      "--runtime",
+      "/home/runner/work/_temp/r5-comptime-vm/runtime/libluna-runtime.a",
+      "--label",
+      "ubuntu-acquisition1"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm",
+    "started_utc": "2026-10-17T18:03:17Z",
+    "exit": 0,
+    "seconds": 62.75902362800002,
+    "log_sha256": "250b0c4dfec5d4d0d01c346db985eb93fa65a08f8cb89c6c9b8f3776b857be86",
+    "status": "PASS",
+    "log": "comptime-vm-boundary.log.gz",
+    "compressed_sha256": "7965310cb61876907ae26c3d61777ccdc3dd3a8731fa80b0bd0fd3a3d4d511a0"
+  },
+  {
+    "gate": "protected-tree-diff",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "diff",
+      "--exit-code",
+      "HEAD",
+      "--",
+      "luna-rs",
+      "runtime",
+      "tests",
+      "CMakeLists.txt"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:04:20Z",
+    "exit": 0,
+    "seconds": 0.007812223999962953,
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status": "PASS",
+    "log": "protected-tree-diff.log.gz",
+    "compressed_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+  },
+  {
+    "gate": "final-status",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "git",
+      "status",
+      "--porcelain"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm/checkout",
+    "started_utc": "2026-10-17T18:04:20Z",
+    "exit": 0,
+    "seconds": 0.016550501999972766,
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "status": "PASS",
+    "log": "final-status.log.gz",
+    "compressed_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+  },
+  {
+    "gate": "disk-final",
+    "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+    "command": [
+      "df",
+      "-h"
+    ],
+    "cwd": "/home/runner/work/_temp/r5-comptime-vm",
+    "started_utc": "2026-10-17T18:04:20Z",
+    "exit": 0,
+    "seconds": 0.0035628530000053615,
+    "log_sha256": "56e5e13f6c023215aaeb28281d76f87c19f273497674cbc01ebb43585d93e45d",
+    "status": "PASS",
+    "log": "disk-final.log.gz",
+    "compressed_sha256": "0a1ecbe3d9dee08c9160d696196ca5aa22d6da43d7ddb224df6f16ed52691ac5"
+  }
+]

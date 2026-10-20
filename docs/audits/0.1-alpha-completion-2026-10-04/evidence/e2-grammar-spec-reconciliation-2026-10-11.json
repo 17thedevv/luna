@@ -1,0 +1,31 @@
+{
+  "task": "E2 — grammar / spec reconciliation (V01-GRAMMAR-01/02/03, V01-DIAG-01 partial)",
+  "status": "CLOSED / FIXED IN TESTED SCOPE",
+  "date": "2026-10-11",
+  "branch": "e2-grammar-spec-reconciliation",
+  "base": "c750faec",
+  "scope": "documentation + evidence + characterization only; no grammar expansion and no compiler semantics change",
+  "reconciled": {
+    "V01-GRAMMAR-01": "semicolon struct-field delimiters reject with typed E0002 and a primary span (both modes); comma fields accept and run",
+    "V01-GRAMMAR-02": "parenthesized `for (pattern in expr)` is the canonical 0.1 head and runs in both modes; the unparenthesized head is retained only as LEGACY / CHARACTERIZATION, never standardized, never used by stdlib or official docs; C-style for is unaffected",
+    "V01-GRAMMAR-03": "`&self`, `&rw self` and bare `self` receivers build and run in both modes; duplicate/non-first receivers reject with a typed code",
+    "V01-DIAG-01": "evidence-backed parts closed: parser failures render typed codes with source spans. Remaining structural invariants are R5 preconditions (mandatory primary span for every source-originated error, structural related labels, constructor/emission enforcement, no ad-hoc untyped paths) — not deferred"
+  },
+  "evidence": {
+    "recorder": "docs/tools/check_v01_examples.py re-run on the candidate (not hand-edited)",
+    "spec_v01": "docs/spec/0.1/evidence/cli-examples.json — 16 attempts: 14 met, 2 characterization (foreach_current_parser)",
+    "integration": "docs/integration/evidence/cli-examples.json — same 16 attempts",
+    "historical": "docs/spec/0.1/evidence/historical-2026-10-04/ and docs/integration/evidence/historical-2026-10-04/ preserve the pre-fix record (same three cases unmet) — history is never rewritten into a pass",
+    "validator": "docs/tools/validate_v01_docs.py now asserts the reconciled current evidence AND that the historical record still shows the gaps"
+  },
+  "tests": {
+    "v01_grammar_acceptance_tests": "7 passed — semicolon rejection with typed code + primary span in source and artifact modes; canonical parenthesized foreach in both modes; legacy unparenthesized foreach characterized; C-style for unaffected; receiver shorthand",
+    "luna-common registry_parity": "2 passed",
+    "diagnostic_conformance_cli": "4 passed"
+  },
+  "not_changed": ["compiler semantics", "parser grammar", "diagnostic registry contents", "MVIR", "artifact format", "provider protocol"],
+  "versions": { "compiler": 22, "metadata": 9, "mvir": 5, "format": 2 },
+  "bump": "none — documentation/evidence/characterization only",
+  "workspace": "PASS — 224 binaries, 1384 passed / 0 failed / 1 ignored, exit 0",
+  "verdict": "E2: CLOSED / FIXED IN TESTED SCOPE"
+}

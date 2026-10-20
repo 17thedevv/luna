@@ -1,0 +1,67 @@
+{
+  "observed_at_utc": "2026-10-17T18:05:02.363594+00:00",
+  "status": "PASS_DOCUMENTATION_CONSISTENCY_ONLY",
+  "base_head": "516a76577d7b606fe04ba3b51176aedcb6ad9d7c",
+  "implementation_pin": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "commands": [
+    {
+      "command": [
+        "python",
+        "docs/tools/build_v01_docs.py"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "python",
+        "docs/tools/validate_v01_docs.py"
+      ],
+      "exit": 0,
+      "documents": 228,
+      "site_pages": 30,
+      "checked_local_links": 1789,
+      "errors": []
+    }
+  ],
+  "scope": "Current public status and generated mirrors point to active qualification; release remains blocked. This check does not replace the exact-pin CLI examples or quickstart gates.",
+  "file_hashes": {
+    "README.md": "aca36013e6541ec7ad08dd439ae29e440eb23d18bf377a35bb0ed8084e778586",
+    "Status.md": "b12d2e7df1c0fac7fa82f5ed5b17706c35dfd19cbf45de8097142405ad2502f2",
+    "docs/spec/0.1/README.md": "b7663a3dc818384205f60020ce7099f2d8d250911405eaf81abce7b824c02cbf",
+    "docs/spec/0.1/conformance.md": "8129428481d7fc54a7fe6bb95bfd9d9c459c6ab29e7e89df0870e8fec787bcfa",
+    "docs/spec/0.1/gaps.md": "ed87b0e00e0efc3f72381650698eabd6104715b615a3e8cffbabf31534dbf0f3",
+    "docs/tools/build_v01_docs.py": "c7df69a7aa0af38495b152810d1706a4378e5d50b02c82167d9e9dc6338548e5",
+    "docs/documentation-index.md": "2c090c7491e1276fee91aba6ee4bd05a2618332f0c5b7a9551933f6af0ba152d",
+    "docs/documentation-index.json": "89afaefe49d4aaacee558bb2b73f015a2d532f13fe81cee9b5815654e32f369b",
+    "docs/site/compiler/index.html": "20c8ce67f82f058168f46b37b4124c0ce9a1c624e7b36ab84a213c771fa80e49",
+    "docs/site/design/index.html": "20c8ce67f82f058168f46b37b4124c0ce9a1c624e7b36ab84a213c771fa80e49",
+    "docs/site/en/compiler.html": "dfe7cc617eeb8b358d7650000846cf7f57efd40407a7fea0d5bf1bda7f2c8d3b",
+    "docs/site/en/docs.html": "691918bd8aedb720fd320bf1ae1c1d5b6c6e68d425254ad47c432c4c21b635d6",
+    "docs/site/en/index.html": "691918bd8aedb720fd320bf1ae1c1d5b6c6e68d425254ad47c432c4c21b635d6",
+    "docs/site/en/language.html": "7dc0d40b7c85509d1cd6e8f64770adb5edb1ff80f12ae3e273ab7503cc6a46f7",
+    "docs/site/examples/index.html": "26ba26d866e404732f2f987a5f2f1c81f1b232c9ba302576cd6f4d289283f75c",
+    "docs/site/index.html": "099c2eead9101d9971afc546a69999db2e1ab22ff92a859c3dbae7407e4b85bb",
+    "docs/site/language/index.html": "26ba26d866e404732f2f987a5f2f1c81f1b232c9ba302576cd6f4d289283f75c",
+    "docs/site/spec/alpha-module-plan.html": "8ae762a31dd062ca67ce66a149a85fbb1823d4d4dde3053b0277afa079ccae59",
+    "docs/site/spec/call-arguments-v1.html": "a397ac4d0b28b41db665d9f60ec335c666e976fafda305faf09c35c7716dca13",
+    "docs/site/spec/conformance.html": "bf90b575ad557889c27691c38ccac98481b47c08cb56e74a115818fa9f5c2272",
+    "docs/site/spec/gaps.html": "de4db8f36b50ea1f2badaf6736326936936f64e6070dc82f2fa735343bf232f6",
+    "docs/site/spec/index.html": "6f35d9d308e4e30d2f7b1ef1d6b14640f9b3024b702b2891c531a7d9da6fb20e",
+    "docs/site/spec/macros.html": "1c2094f75bb10afd087adfab6c2ef261b9dff8fd3a8c3e1f198e2c7c784a5f4b",
+    "docs/site/spec/method-resolution-v1.html": "91ca19e8180a9ac82861c36b43ccdbbc437db0cf45ce6f5194197fd172b3363b",
+    "docs/site/spec/module-const-storage-v1.html": "4003dbf7572c123045ec26ee1f0a320d7b6b283312fbce067529ce98d4bf651a",
+    "docs/site/spec/modules.html": "146eccb8ae3c3ebb12f42f3eec62bf65882c417b21da11ebc8e932cc7c1135a4",
+    "docs/site/spec/namespace-using-v1.html": "3a1eb1e61e2224bf51175fd3639c84b7663826e0a6282a695fb914dffddc5cbb",
+    "docs/site/spec/provider-config-v1.html": "688e05c055bb722355972c4e23e40b5ec30718e2acd1eb636c08a01a90883aa9",
+    "docs/site/spec/runtime.html": "5b7d537b8dbdd5ba8e4513be84c72d7887a59d3370f5a5ab401414b84af31a91",
+    "docs/site/spec/semantics.html": "cbeb785c1323400bf27923a0b25e44b3a4f0765b541e0509da9c8df1cb6c4d31",
+    "docs/site/spec/stdlib-inventory.html": "620c397e719845dda2fc93e2727d2e106cea43ba31f34541cd7e5c71e1050a97",
+    "docs/site/spec/stdlib.html": "319cade978051050451c1e46ce304c9a1d2a0daaba183496029a0597b4c71570",
+    "docs/site/spec/syntax.html": "98f0dbcf3d55a25e066fb3857150f12315b890455bc8adcc8116ba0ea615678c",
+    "docs/site/stdlib/index.html": "b7d6e35bb0328d52a21d59c438225ad4b6c8625ddfb732b7e7e5d84181a56aa2",
+    "docs/site/vi/compiler.html": "158532c4cdd7709a4d4a836260b673e825fa89d25f1deda83afa655282837049",
+    "docs/site/vi/docs.html": "23542481c9435ab4b9ef4148a1747a4ef812d1dd561fef465dcd706cb1da0624",
+    "docs/site/vi/index.html": "23542481c9435ab4b9ef4148a1747a4ef812d1dd561fef465dcd706cb1da0624",
+    "docs/site/vi/language.html": "9135706427f13f532f40817628087c1dd6aed180cf44484fdf9b4aa1bcbbae51"
+  }
+}

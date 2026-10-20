@@ -1,0 +1,10 @@
+{
+  "tested_commit": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "head": "9bda6f572fa5f9904379c08c625c28122fcd0c56",
+  "tracked_diff": "",
+  "index_diff": "",
+  "status": "",
+  "debug_cli_sha256": "159bdc026c4bff91981b0d349039edaa1f5fef0568747f8795af384ee76f50a6",
+  "release_cli_sha256": "18fbe84c96691b1655b21757d7e3ab87a769ae1f3432501d762d739e409ce2e1",
+  "runtime_sha256": "827ef92231b32b8c4681821e3832339658e961185648033eab6d25ef678e5637"
+}

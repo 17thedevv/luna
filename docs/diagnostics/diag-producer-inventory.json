@@ -1,0 +1,3616 @@
+{
+  "registry_size": 72,
+  "records": [
+    {
+      "code": "E0001",
+      "name": "ExpectedToken",
+      "number": 1,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-parser/src/decl.rs",
+          "line": 270,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/decl.rs",
+          "line": 293,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/decl.rs",
+          "line": 410,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/lib.rs",
+          "line": 243,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diagnostic_conformance_cli.rs",
+        "luna-rs/crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E0002",
+      "name": "UnexpectedToken",
+      "number": 2,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-parser/src/decl.rs",
+          "line": 399,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/lib.rs",
+          "line": 88,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/v01_grammar_acceptance_tests.rs",
+        "tests/luna/language/spec_v01/reject_semicolon_fields.ln"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E0003",
+      "name": "InvalidSyntax",
+      "number": 3,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/src/external.rs",
+          "line": 544,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/registry.rs",
+          "line": 907,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/decl.rs",
+          "line": 299,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/lib.rs",
+          "line": 13,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/lib.rs",
+          "line": 42,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/lib.rs",
+          "line": 48,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/lib.rs",
+          "line": 249,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/tests/namespace_using_parser_tests.rs",
+          "line": 45,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs",
+          "line": 89,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs",
+        "luna-rs/crates/luna-cli/tests/attribute_ownership_cli.rs",
+        "luna-rs/crates/luna-cli/tests/v01_grammar_acceptance_tests.rs",
+        "luna-rs/crates/luna-parser/tests/namespace_using_parser_tests.rs",
+        "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E0004",
+      "name": "UnclosedDelimiter",
+      "number": 4,
+      "producers": [],
+      "produced": false,
+      "reserved_no_producer": "UnclosedDelimiter: the lexer reports delimiter errors without this code in 0.1",
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "generic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E0005",
+      "name": "InvalidAnnotation",
+      "number": 5,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-parser/src/decl.rs",
+          "line": 13,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/decl.rs",
+          "line": 31,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/lib.rs",
+          "line": 28,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-parser/src/lib.rs",
+          "line": 85,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs",
+          "line": 85,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/attribute_ownership_cli.rs",
+        "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1001",
+      "name": "UnresolvedSymbol",
+      "number": 1001,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/src/registry.rs",
+          "line": 915,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/registry.rs",
+          "line": 970,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/registry.rs",
+          "line": 981,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+          "line": 135,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/macro_engine.rs",
+          "line": 505,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/macro_engine.rs",
+          "line": 638,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/macro_engine.rs",
+          "line": 664,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/macro_engine.rs",
+          "line": 1159,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 281,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 314,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 325,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 1977,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2119,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1367,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1694,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3049,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3060,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3157,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3612,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4919,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5073,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5234,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5303,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5586,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs",
+        "luna-rs/crates/luna-cli/tests/compiler_trust_diagnostics_cli_parity.rs",
+        "luna-rs/crates/luna-cli/tests/comptime_diagnostic_cascade_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs",
+        "luna-rs/crates/luna-cli/tests/diagnostic_conformance_cli.rs",
+        "luna-rs/crates/luna-cli/tests/module_const_storage_cli.rs",
+        "luna-rs/crates/luna-cli/tests/namespace_alias_export_cli.rs",
+        "luna-rs/crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1002",
+      "name": "DuplicateDefinition",
+      "number": 1002,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/src/external.rs",
+          "line": 476,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/registry.rs",
+          "line": 960,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+          "line": 170,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+          "line": 179,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 337,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/symbol.rs",
+          "line": 20,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs",
+        "luna-rs/crates/luna-cli/tests/diagnostic_declaration_locations_cli.rs",
+        "luna-rs/crates/luna-cli/tests/semantic_maturity_phase0.rs",
+        "luna-rs/crates/luna-driver/tests/provider_module_contract_acceptance_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1003",
+      "name": "PrivateSymbolAccess",
+      "number": 1003,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_field_visibility_acceptance_tests.rs",
+          "line": 100,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/macro_engine.rs",
+          "line": 514,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/macro_engine.rs",
+          "line": 655,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/macro_engine.rs",
+          "line": 757,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 407,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 319,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 1765,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 1792,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 1868,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 1934,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1377,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2874,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2896,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5015,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5060,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5215,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5239,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6478,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs",
+        "luna-rs/crates/luna-cli/tests/cast_contract_cli.rs",
+        "luna-rs/crates/luna-cli/tests/method_resolution_cli.rs",
+        "luna-rs/crates/luna-cli/tests/semantic_maturity_phase0.rs",
+        "luna-rs/crates/luna-driver/tests/struct_field_visibility_acceptance_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1004",
+      "name": "UnresolvedModuleProvider",
+      "number": 1004,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/src/error.rs",
+          "line": 59,
+          "span_policy": "contract"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/error.rs",
+          "line": 106,
+          "span_policy": "contract"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/importer.rs",
+          "line": 119,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "contract"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs",
+        "luna-rs/crates/luna-cli/tests/provider_tiers_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1005",
+      "name": "CyclicModuleDependency",
+      "number": 1005,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/src/external.rs",
+          "line": 170,
+          "span_policy": "contract"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/external.rs",
+          "line": 454,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/external.rs",
+          "line": 501,
+          "span_policy": "contract"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/importer.rs",
+          "line": 47,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/importer.rs",
+          "line": 62,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "contract",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1006",
+      "name": "InvalidVisibility",
+      "number": 1006,
+      "producers": [],
+      "produced": false,
+      "reserved_no_producer": "InvalidVisibility: visibility syntax is admitted by Parser grammar (E0003)",
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "generic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1007",
+      "name": "WildcardImportProhibited",
+      "number": 1007,
+      "producers": [],
+      "produced": false,
+      "reserved_no_producer": "WildcardImportProhibited: wildcard imports are rejected as unresolved (E1001)",
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "generic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1008",
+      "name": "AmbiguousSymbol",
+      "number": 1008,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2493,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/symbol.rs",
+          "line": 419,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs",
+        "luna-rs/crates/luna-cli/tests/diagnostic_conformance_cli.rs",
+        "luna-rs/crates/luna-cli/tests/impl_header_metadata_cli.rs",
+        "luna-rs/crates/luna-cli/tests/method_resolution_cli.rs"
+      ],
+      "structural_coverage": "owner-provided resolver constructor; see resolver::ambiguous_method_diagnostic + method_resolution"
+    },
+    {
+      "code": "E1009",
+      "name": "InvalidCompilerBinding",
+      "number": 1009,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+          "line": 165,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 448,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 459,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 481,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 491,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 504,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 516,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 529,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 559,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 569,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/memory_intrinsic_contract_tests.rs",
+          "line": 89,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/attribute_ownership_cli.rs",
+        "luna-rs/crates/luna-cli/tests/memory_intrinsic_identity_cli.rs",
+        "luna-rs/crates/luna-cli/tests/wrapping_arithmetic_cli.rs",
+        "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs",
+        "luna-rs/crates/luna-semantic/tests/memory_intrinsic_contract_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E1010",
+      "name": "InvalidMacroExpansion",
+      "number": 1010,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 172,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs",
+          "line": 91,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/attribute_ownership_cli.rs",
+        "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2001",
+      "name": "TypeMismatch",
+      "number": 2001,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_binding.rs",
+          "line": 83,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_binding.rs",
+          "line": 90,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_binding.rs",
+          "line": 101,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_binding.rs",
+          "line": 114,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_binding.rs",
+          "line": 122,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_binding.rs",
+          "line": 147,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_defaults.rs",
+          "line": 188,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_defaults.rs",
+          "line": 197,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_defaults.rs",
+          "line": 203,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_defaults.rs",
+          "line": 227,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lifetime.rs",
+          "line": 474,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 415,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 424,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 448,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 482,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 495,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 545,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 612,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 624,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 648,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 1889,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 1893,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1361,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1372,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1382,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1506,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2274,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2618,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3288,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3309,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3355,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3363,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3381,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3544,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3553,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3654,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3679,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3915,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3949,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3994,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4021,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4034,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4048,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4086,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4095,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4231,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4285,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4464,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4481,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4498,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4505,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4548,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4584,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4689,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4730,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4781,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4791,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4868,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4874,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5187,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5245,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5299,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5337,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5460,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5498,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5514,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5540,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5549,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5620,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5759,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5832,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6085,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6103,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6133,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6495,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/memory_intrinsic_contract_tests.rs",
+          "line": 103,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/attribute_ownership_cli.rs",
+        "luna-rs/crates/luna-cli/tests/call_arity_cli.rs",
+        "luna-rs/crates/luna-cli/tests/cast_contract_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
+        "luna-rs/crates/luna-cli/tests/diagnostic_declaration_locations_cli.rs",
+        "luna-rs/crates/luna-cli/tests/generic_typing_cli.rs",
+        "luna-rs/crates/luna-cli/tests/memory_intrinsic_identity_cli.rs",
+        "luna-rs/crates/luna-cli/tests/method_resolution_cli.rs",
+        "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/range_inclusive_cli.rs",
+        "luna-rs/crates/luna-cli/tests/v01_grammar_acceptance_tests.rs",
+        "luna-rs/crates/luna-driver/tests/adv_comptime_dyn_tests.rs",
+        "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs",
+        "luna-rs/crates/luna-semantic/tests/memory_intrinsic_contract_tests.rs"
+      ],
+      "structural_coverage": "owner-provided typechecker constructor; see typechecker::type_mismatch_diagnostic"
+    },
+    {
+      "code": "E2002",
+      "name": "CannotDereference",
+      "number": 2002,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6168,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/expression_diagnostic_spans_cli.rs",
+        "luna-rs/crates/luna-cli/tests/expression_span_precision_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2003",
+      "name": "CannotIndex",
+      "number": 2003,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5363,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5371,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5391,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5400,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5420,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/expression_diagnostic_spans_cli.rs",
+        "luna-rs/crates/luna-cli/tests/expression_span_precision_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2004",
+      "name": "CopyDropConflict",
+      "number": 2004,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1162,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1196,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2005",
+      "name": "ConflictingTraitImpl",
+      "number": 2005,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/coherence.rs",
+          "line": 132,
+          "span_policy": "contract"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/coherence.rs",
+          "line": 133,
+          "span_policy": "contract"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3755,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 283,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 325,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 355,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 377,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 402,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 427,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 590,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "contract",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diagnostic_declaration_locations_cli.rs",
+        "luna-rs/crates/luna-cli/tests/method_resolution_cli.rs",
+        "luna-rs/crates/luna-semantic/tests/p1a_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2006",
+      "name": "OrphanImpl",
+      "number": 2006,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/coherence.rs",
+          "line": 55,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/coherence.rs",
+          "line": 74,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 208,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 224,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 240,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 259,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 467,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 489,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 528,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/p1a_tests.rs",
+          "line": 569,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/compiler_trust_diagnostics_cli_parity.rs",
+        "luna-rs/crates/luna-cli/tests/diagnostic_declaration_locations_cli.rs",
+        "luna-rs/crates/luna-cli/tests/v01_grammar_acceptance_tests.rs",
+        "luna-rs/crates/luna-semantic/tests/p1a_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2007",
+      "name": "UnresolvedTraitImpl",
+      "number": 2007,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 671,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 731,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1024,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1703,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3839,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2008",
+      "name": "AssociatedTypeCycle",
+      "number": 2008,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 637,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/projection_fallback_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2009",
+      "name": "InfiniteSizeRecursiveType",
+      "number": 2009,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1263,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2010",
+      "name": "NonObjectSafeTrait",
+      "number": 2010,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2636,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2654,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2665,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2682,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2694,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2706,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2718,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2736,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2758,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3112,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/retained_contracts_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2011",
+      "name": "InvalidLvalue",
+      "number": 2011,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4834,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2012",
+      "name": "InvalidUnaryOp",
+      "number": 2012,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6180,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6194,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6201,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/expression_diagnostic_spans_cli.rs",
+        "luna-rs/crates/luna-cli/tests/expression_span_precision_cli.rs",
+        "luna-rs/crates/luna-cli/tests/unary_not_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2013",
+      "name": "InvalidBinaryOp",
+      "number": 2013,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4516,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2014",
+      "name": "DuplicateField",
+      "number": 2014,
+      "producers": [],
+      "produced": false,
+      "reserved_no_producer": "DuplicateField: struct-init field duplication is reported as E2001 today",
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "generic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2015",
+      "name": "DuplicateVariant",
+      "number": 2015,
+      "producers": [],
+      "produced": false,
+      "reserved_no_producer": "DuplicateVariant: no producer path in 0.1",
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "generic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2016",
+      "name": "LifetimeConstraintViolation",
+      "number": 2016,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/region_bridge.rs",
+          "line": 1213,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_callsite_cutover_tests.rs",
+          "line": 173,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_callsite_cutover_tests.rs",
+          "line": 342,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_callsite_cutover_tests.rs",
+          "line": 448,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_callsite_cutover_tests.rs",
+          "line": 533,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 118,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 152,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 253,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 368,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 420,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 470,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 503,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 562,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 679,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 956,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lifetime.rs",
+          "line": 468,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lifetime.rs",
+          "line": 480,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lifetime.rs",
+          "line": 484,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lifetime.rs",
+          "line": 490,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lifetime.rs",
+          "line": 496,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/lifetime.rs",
+          "line": 502,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2177,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2196,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2216,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2227,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2237,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2247,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2327,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2338,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2349,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2388,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2398,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1533,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2472,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2486,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2501,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2513,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2533,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6508,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-borrowck/tests/region_callsite_cutover_tests.rs",
+        "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+        "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
+        "luna-rs/crates/luna-cli/tests/struct_contract_cli_parity.rs",
+        "luna-rs/crates/luna-driver/tests/canonical_syntax_acceptance_tests.rs",
+        "luna-rs/crates/luna-driver/tests/compiler_gap_c_gap_12_safe_loan_effect_tests.rs",
+        "luna-rs/crates/luna-driver/tests/lifetime_def_site_acceptance_tests.rs",
+        "luna-rs/crates/luna-driver/tests/lifetime_outlives_acceptance_tests.rs",
+        "luna-rs/crates/luna-driver/tests/lifetime_virtual_dispatch_acceptance_tests.rs",
+        "luna-rs/crates/luna-driver/tests/stdlib_slice_borrow_acceptance_tests.rs",
+        "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs"
+      ],
+      "structural_coverage": "owner-provided typechecker constructor; see typechecker::lifetime_constraint_violation"
+    },
+    {
+      "code": "E2017",
+      "name": "MissingField",
+      "number": 2017,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3587,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5314,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2018",
+      "name": "NoAssociatedType",
+      "number": 2018,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 774,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1393,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2019",
+      "name": "AmbiguousAssociatedType",
+      "number": 2019,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 697,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 741,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1007,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diagnostic_declaration_locations_cli.rs",
+        "luna-rs/crates/luna-cli/tests/projection_fallback_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2020",
+      "name": "CannotCallNonFunction",
+      "number": 2020,
+      "producers": [],
+      "produced": false,
+      "reserved_no_producer": "CannotCallNonFunction: call misuse is reported as E2001 today",
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "generic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2021",
+      "name": "TraitBoundNotSatisfied",
+      "number": 2021,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 939,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2603,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3748,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3787,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3857,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3865,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3873,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3887,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3908,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3926,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3940,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3956,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4711,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
+        "luna-rs/crates/luna-cli/tests/method_resolution_cli.rs",
+        "luna-rs/crates/luna-cli/tests/projection_fallback_cli.rs",
+        "luna-rs/crates/luna-cli/tests/trait_argument_bounds_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2022",
+      "name": "NonExhaustivePattern",
+      "number": 2022,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5770,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5782,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5793,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2023",
+      "name": "CannotMutateImmutable",
+      "number": 2023,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 597,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4854,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5485,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5879,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6154,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6161,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6392,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6406,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6424,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6438,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6443,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs",
+        "luna-rs/crates/luna-cli/tests/method_resolution_cli.rs",
+        "luna-rs/crates/luna-cli/tests/module_const_storage_cli.rs",
+        "luna-rs/crates/luna-cli/tests/semantic_maturity_phase2a.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2024",
+      "name": "InvalidMainSignature",
+      "number": 2024,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3276,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/retained_contracts_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2025",
+      "name": "UnsafeOperationOutsideUnsafe",
+      "number": 2025,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 678,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4472,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4649,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5466,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5630,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6150,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/cast_contract_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
+        "luna-rs/crates/luna-cli/tests/memory_intrinsic_identity_cli.rs",
+        "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/raw_slice_provenance_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2026",
+      "name": "InvalidCast",
+      "number": 2026,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5622,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5660,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5671,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5687,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/cast_contract_cli.rs",
+        "luna-rs/crates/luna-cli/tests/cast_poison_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/expression_diagnostic_spans_cli.rs",
+        "luna-rs/crates/luna-cli/tests/expression_span_precision_cli.rs",
+        "luna-rs/crates/luna-cli/tests/retained_contracts_cli.rs",
+        "luna-rs/crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+      ],
+      "structural_coverage": "poison containment at the failing boundary: diagnostic_conformance_cli"
+    },
+    {
+      "code": "E2027",
+      "name": "AwaitOutsideAsync",
+      "number": 2027,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6073,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2028",
+      "name": "InvalidTryOperator",
+      "number": 2028,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5917,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 5990,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6064,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2029",
+      "name": "LoopControlOutsideLoop",
+      "number": 2029,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4112,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 4121,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2030",
+      "name": "NonFfiSafeType",
+      "number": 2030,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3498,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/retained_contracts_cli.rs",
+        "luna-rs/crates/luna-driver/tests/sem_maturity_phase2e_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2031",
+      "name": "ExplicitDropCall",
+      "number": 2031,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/tests/adv_async_dyn_tests.rs",
+          "line": 339,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+          "line": 669,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/method_resolution_cli.rs",
+        "luna-rs/crates/luna-driver/tests/adv_async_dyn_tests.rs",
+        "luna-rs/crates/luna-driver/tests/semantic_gate_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E2032",
+      "name": "InvalidAttributeApplication",
+      "number": 2032,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/attribute_application.rs",
+          "line": 26,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/attribute_application.rs",
+          "line": 39,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/attribute_application.rs",
+          "line": 56,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 74,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2219,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3232,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/memory_intrinsic_contract_tests.rs",
+          "line": 58,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/tests/memory_intrinsic_contract_tests.rs",
+          "line": 75,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/attribute_ownership_cli.rs",
+        "luna-rs/crates/luna-cli/tests/ffi_attribute_placement_cli.rs",
+        "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs",
+        "luna-rs/crates/luna-semantic/tests/memory_intrinsic_contract_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E3001",
+      "name": "UseAfterMove",
+      "number": 3001,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 135,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 140,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 155,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 691,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 692,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 441,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2b_tests.rs",
+          "line": 255,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/cast_contract_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
+        "luna-rs/crates/luna-cli/tests/diagnostic_conformance_cli.rs",
+        "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs",
+        "luna-rs/crates/luna-cli/tests/move_origin_join_cli.rs",
+        "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/retained_contracts_cli.rs",
+        "luna-rs/crates/luna-cli/tests/semantic_maturity_phase0.rs",
+        "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+        "luna-rs/crates/luna-driver/tests/p2b_tests.rs",
+        "luna-rs/crates/luna-driver/tests/sem_maturity_phase2b.rs"
+      ],
+      "structural_coverage": "related origin label: diagnostic_conformance_cli::related_spans_and_poison_containment_hold"
+    },
+    {
+      "code": "E3002",
+      "name": "PartialMoveUnderDrop",
+      "number": 3002,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 263,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 265,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 653,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 655,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/partial_move_tests.rs",
+          "line": 86,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/partial_move_tests.rs",
+          "line": 162,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p0b_drop_subplace_tests.rs",
+          "line": 36,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-borrowck/tests/partial_move_tests.rs",
+        "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs",
+        "luna-rs/crates/luna-cli/tests/move_origin_join_cli.rs",
+        "luna-rs/crates/luna-cli/tests/semantic_maturity_phase0.rs",
+        "luna-rs/crates/luna-driver/tests/p0b_drop_subplace_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E3003",
+      "name": "BorrowConflict",
+      "number": 3003,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1167,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1635,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1641,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1649,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1654,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1690,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1695,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1703,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1708,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1733,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 337,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 343,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2b_tests.rs",
+          "line": 230,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/raw_pointer_ffi_call_semantics_tests.rs",
+          "line": 21,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+        "luna-rs/crates/luna-cli/tests/comptime_loans_cli.rs",
+        "luna-rs/crates/luna-cli/tests/memory_intrinsic_identity_cli.rs",
+        "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/raw_slice_provenance_cli.rs",
+        "luna-rs/crates/luna-cli/tests/raw_slice_view_a5_cli.rs",
+        "luna-rs/crates/luna-cli/tests/semantic_maturity_phase0.rs",
+        "luna-rs/crates/luna-driver/tests/compiler_gap_c_gap_12_safe_loan_effect_tests.rs",
+        "luna-rs/crates/luna-driver/tests/p2b_tests.rs",
+        "luna-rs/crates/luna-driver/tests/raw_pointer_ffi_call_semantics_tests.rs",
+        "luna-rs/crates/luna-driver/tests/sem_gap_19_alias_safety_audit.rs",
+        "luna-rs/crates/luna-driver/tests/sem_maturity_phase2b.rs",
+        "luna-rs/crates/luna-driver/tests/sem_maturity_phase2e_tests.rs"
+      ],
+      "structural_coverage": "related loan label: diagnostic_conformance_cli::related_spans_and_poison_containment_hold"
+    },
+    {
+      "code": "E3004",
+      "name": "MissingReturnValue",
+      "number": 3004,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/return_analysis.rs",
+          "line": 54,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/missing_return_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E3005",
+      "name": "LocalBorrowEscape",
+      "number": 3005,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 1745,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/region_bridge.rs",
+          "line": 116,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/region_bridge.rs",
+          "line": 124,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/region_bridge.rs",
+          "line": 137,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 123,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 194,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 252,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 338,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 344,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 393,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 404,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+          "line": 575,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/adv_comptime_dyn_tests.rs",
+          "line": 267,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/adv_comptime_dyn_tests.rs",
+          "line": 287,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/adv_comptime_dyn_tests.rs",
+          "line": 326,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/adv_comptime_dyn_tests.rs",
+          "line": 784,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 345,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/sem_maturity_phase2d_b_tests.rs",
+          "line": 112,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-borrowck/tests/region_cutover_tests.rs",
+        "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
+        "luna-rs/crates/luna-cli/tests/generic_drop_cli.rs",
+        "luna-rs/crates/luna-cli/tests/literal_typing_cli_parity.rs",
+        "luna-rs/crates/luna-cli/tests/memory_intrinsic_identity_cli.rs",
+        "luna-rs/crates/luna-cli/tests/module_const_storage_cli.rs",
+        "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/raw_slice_provenance_cli.rs",
+        "luna-rs/crates/luna-cli/tests/raw_slice_view_a5_cli.rs",
+        "luna-rs/crates/luna-cli/tests/semantic_maturity_phase0.rs",
+        "luna-rs/crates/luna-driver/tests/adv_comptime_dyn_tests.rs",
+        "luna-rs/crates/luna-driver/tests/compiler_gap_c_gap_12_safe_loan_effect_tests.rs",
+        "luna-rs/crates/luna-driver/tests/lifetime_def_site_acceptance_tests.rs",
+        "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+        "luna-rs/crates/luna-driver/tests/sem_maturity_phase2b.rs",
+        "luna-rs/crates/luna-driver/tests/sem_maturity_phase2d_b_tests.rs",
+        "luna-rs/crates/luna-driver/tests/stdlib_option_result_borrow_acceptance_tests.rs",
+        "luna-rs/crates/luna-driver/tests/stdlib_slice_borrow_acceptance_tests.rs",
+        "luna-rs/crates/luna-semantic/tests/region_realization_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E3006",
+      "name": "UseOfUninitializedValue",
+      "number": 3006,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 150,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/compiler_trust_diagnostics_cli_parity.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E3007",
+      "name": "UseAfterDrop",
+      "number": 3007,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/move_analysis.rs",
+          "line": 145,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": "explicit destructor calls are rejected (E2001/E2031), so a dropped place cannot be read afterwards",
+      "span_policies": [
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E3010",
+      "name": "RawStorageAnchorMismatch",
+      "number": 3010,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 2289,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2463,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/literal_typing_cli_parity.rs",
+        "luna-rs/crates/luna-driver/tests/compiler_gap_c_gap_12_safe_loan_effect_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E3011",
+      "name": "RawStorageAnchorViolation",
+      "number": 3011,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 3367,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 207,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs",
+          "line": 220,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/resolver.rs",
+          "line": 2445,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1142,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 1562,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/literal_typing_cli_parity.rs",
+        "luna-rs/crates/luna-cli/tests/struct_contract_cli_parity.rs",
+        "luna-rs/crates/luna-driver/tests/compiler_gap_c_gap_12_safe_loan_effect_tests.rs",
+        "luna-rs/crates/luna-driver/tests/struct_lifetime_contract_acceptance_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E4001",
+      "name": "AsyncBorrowAcrossAwait",
+      "number": 4001,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/borrow_analysis.rs",
+          "line": 3641,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E4002",
+      "name": "ComptimeStepLimitExceeded",
+      "number": 4002,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 289,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
+          "line": 154,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-driver/tests/p2a_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E4003",
+      "name": "ComptimeUnserializableEscape",
+      "number": 4003,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 409,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 500,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
+          "line": 152,
+          "span_policy": "dynamic"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-driver/tests/p2a_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E4004",
+      "name": "ComptimePanic",
+      "number": 4004,
+      "producers": [],
+      "produced": false,
+      "reserved_no_producer": "ComptimePanic: no comptime panic/assert condition is reachable in 0.1",
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "generic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E4005",
+      "name": "ComptimeEvaluationFailed",
+      "number": 4005,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+          "line": 322,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/comptime/mod.rs",
+          "line": 8,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/comptime/value.rs",
+          "line": 157,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 191,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2239,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2303,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3390,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored",
+        "dynamic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/attribute_ownership_cli.rs",
+        "luna-rs/crates/luna-cli/tests/checked_arithmetic_qualification_cli.rs",
+        "luna-rs/crates/luna-cli/tests/comptime_diagnostic_cascade_cli.rs",
+        "luna-rs/crates/luna-cli/tests/comptime_loans_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
+        "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/wrapping_arithmetic_cli.rs",
+        "luna-rs/crates/luna-driver/tests/p2a_tests.rs",
+        "luna-rs/crates/luna-semantic/tests/attribute_phase_ownership_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E5001",
+      "name": "MonomorphizationBarrier",
+      "number": 5001,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-semantic/src/mono.rs",
+          "line": 1515,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/mono.rs",
+          "line": 1523,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/mono.rs",
+          "line": 1531,
+          "span_policy": "anchored"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/mono.rs",
+          "line": 1539,
+          "span_policy": "anchored"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "anchored"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/default_omission_cli.rs",
+        "luna-rs/crates/luna-cli/tests/generic_typing_cli.rs",
+        "luna-rs/crates/luna-cli/tests/interface_constraints_cli.rs",
+        "luna-rs/crates/luna-driver/tests/alloc_box_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E5002",
+      "name": "InfiniteMonomorphizationRecursion",
+      "number": 5002,
+      "producers": [],
+      "produced": false,
+      "reserved_no_producer": "InfiniteMonomorphizationRecursion: mono recursion is rejected through backend admission today",
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "generic"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E6001",
+      "name": "BackendInvariantViolation",
+      "number": 6001,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-borrowck/src/memory_intrinsic_body.rs",
+          "line": 72,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/error.rs",
+          "line": 75,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/error.rs",
+          "line": 76,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 31,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 797,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/tests/backend_fail_closed_tests.rs",
+          "line": 57,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 1175,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 1893,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 2300,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 2312,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 2321,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 2617,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 2838,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 2842,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 2857,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 3301,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-semantic/src/call_binding.rs",
+          "line": 67,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "dynamic",
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs",
+        "luna-rs/crates/luna-cli/tests/artifact_native_integrity_cli.rs",
+        "luna-rs/crates/luna-cli/tests/artifact_target_contract_cli.rs",
+        "luna-rs/crates/luna-cli/tests/call_arity_cli.rs",
+        "luna-rs/crates/luna-cli/tests/comptime_loans_cli.rs",
+        "luna-rs/crates/luna-cli/tests/default_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/ffi_attribute_placement_cli.rs",
+        "luna-rs/crates/luna-cli/tests/missing_return_cli.rs",
+        "luna-rs/crates/luna-cli/tests/named_arguments_cli.rs",
+        "luna-rs/crates/luna-cli/tests/nominal_layout_cli.rs",
+        "luna-rs/crates/luna-cli/tests/range_inclusive_cli.rs",
+        "luna-rs/crates/luna-driver/tests/backend_fail_closed_tests.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E6002",
+      "name": "ObjectEmissionFailure",
+      "number": 6002,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 851,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 919,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 957,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": "requires an LLVM object-write failure",
+      "span_policies": [
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E6003",
+      "name": "LinkerFailure",
+      "number": 6003,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 992,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": "requires a linker failure environment that is not reproducible portably",
+      "span_policies": [
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [],
+      "structural_coverage": null
+    },
+    {
+      "code": "E6004",
+      "name": "SysrootConfigurationFailure",
+      "number": 6004,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 181,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 185,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/error.rs",
+          "line": 40,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "dynamic",
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E6005",
+      "name": "ProviderReadFailure",
+      "number": 6005,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 142,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 166,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 175,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/error.rs",
+          "line": 70,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "dynamic",
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs"
+      ],
+      "structural_coverage": "typed CLI I/O failure: luna-cli src/main.rs fail() with ProviderReadFailure"
+    },
+    {
+      "code": "E6006",
+      "name": "OutputWriteFailure",
+      "number": 6006,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 270,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 704,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 968,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/artifact_native_integrity_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E6007",
+      "name": "InvalidArtifactOutput",
+      "number": 6007,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 132,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 518,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/lib.rs",
+          "line": 964,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "dynamic",
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E6008",
+      "name": "ProviderConfigurationError",
+      "number": 6008,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 41,
+          "span_policy": "dynamic"
+        },
+        {
+          "file": "luna-rs/crates/luna-cli/src/provider_config.rs",
+          "line": 22,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-driver/src/session.rs",
+          "line": 55,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": null,
+      "span_policies": [
+        "dynamic",
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/alpha_modules_cli.rs"
+      ],
+      "structural_coverage": null
+    },
+    {
+      "code": "E6009",
+      "name": "ProcessExecutionFailure",
+      "number": 6009,
+      "producers": [
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 153,
+          "span_policy": "infrastructure"
+        },
+        {
+          "file": "luna-rs/crates/luna-cli/src/main.rs",
+          "line": 280,
+          "span_policy": "infrastructure"
+        }
+      ],
+      "produced": true,
+      "reserved_no_producer": null,
+      "declared_unreachable_in_test": "requires a process-spawn failure; the run path no longer reclassifies compile diagnostics",
+      "span_policies": [
+        "infrastructure"
+      ],
+      "generic_emitter": null,
+      "automated_coverage": [
+        "luna-rs/crates/luna-cli/tests/diag_per_code_coverage_cli.rs"
+      ],
+      "structural_coverage": null
+    }
+  ],
+  "coverage_debt": []
+}

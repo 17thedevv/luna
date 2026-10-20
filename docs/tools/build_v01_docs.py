@@ -15,6 +15,7 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / 'docs/spec/0.1'
 SITE = ROOT / 'docs/site'
+STATUS_DATE = '2026-10-20'
 ADOPTED = {
     'docs/normative-rules-p0-p1.md', 'docs/runtime/abi-v1.md',
     'docs/diagnostics/diagnostics-v1.md', 'docs/project/rename-luna-v1.md',
@@ -119,18 +120,19 @@ def provider_inventory():
     audited_names = {provider['name'] for provider in original}
     text = '# Luna 0.1 provider inventory\n\nGenerated from [sysroot.toml](../../../luna-rs/libs/external/sysroot.toml). Provider identity is not a namespace or a completeness claim.\n\n'
     text += f'Current manifest: **{len(providers)} providers**. The [original audit manifest](evidence/sysroot-audit-baseline.toml) has {len(original)}; later additions are implementation inventory, not automatic spec adoption or conformance. Public/internal visibility controls import access, separately from exported declarations.\n\n'
-    text += '| Provider | Source component | Import visibility | Contract family | Evidence boundary |\n|---|---|---|---|---|\n'
+    text += 'Current evidence: all 49 fresh bundle/object hashes and target headers are preserved by [E1 provenance](../../audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-sysroot-provenance-2026-10-13.json). [R4 provider reconciliation](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md) records bounded D3 graph/API evidence; builds do not certify every public API or advertised target.\n\n'
+    text += '| Provider | Source component | Import visibility | Contract family | Historical audit boundary | Current build evidence |\n|---|---|---|---|---|---|\n'
     for provider in providers:
         source = provider['path'] + '.ln'
-        boundary = 'original 32-provider audit' if provider['name'] in audited_names else 'later addition; unverified'
-        text += f"| `{provider['name']}` | [{source}](../../../luna-rs/libs/external/{source}) | {provider['visibility']} | {provider.get('lang_contract', 'ordinary provider')} | {boundary} |\n"
+        boundary = 'original 32-provider audit' if provider['name'] in audited_names else 'later addition; outside original audit'
+        text += f"| `{provider['name']}` | [{source}](../../../luna-rs/libs/external/{source}) | {provider['visibility']} | {provider.get('lang_contract', 'ordinary provider')} | {boundary} | E1 fresh bundle verified; API scope per R4 |\n"
     text += '\nComponent builds and API conformance are separate. See [stdlib.md](stdlib.md) and [gaps.md](gaps.md).\n'
     (SPEC / 'stdlib-inventory.md').write_text(text, encoding='utf-8')
 
 
 def document_inventory(names):
     rows = [dict(path=name, role=role(name), owner=owner(name)) for name in names]
-    text = '# Luna 0.1 documentation inventory\n\nUpdated 2026-10-03. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).\n\n'
+    text = f'# Luna 0.1 documentation inventory\n\nUpdated {STATUS_DATE}. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).\n\n'
     text += 'All repository-authored tracked Markdown and new versioned/archived/audit documents are classified below. Agent guidance is included. Vendor documentation, generated build logs and test-failure dumps are excluded. Website pages are generated from the same baseline.\n\n'
     text += 'Historical bodies are preserved, with an authority notice. Replaced entry pages have pre-0.1 snapshots. A historical FROZEN statement is not current release certification.\n\n'
     text += '| Document | Role | Owning 0.1 chapter |\n|---|---|---|\n'
@@ -229,7 +231,7 @@ def page(target, body, language='en', title='Luna 0.1'):
 <title>{html.escape(title)}</title><link rel="stylesheet" href="{relative(SITE / 'assets/styles.css')}">
 <style>main{{max-width:960px;margin:auto;padding:2rem}}table{{width:100%;border-collapse:collapse}}td,th{{padding:.6rem;border:1px solid #777;text-align:left}}pre{{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}}code{{font-family:monospace}}nav a{{margin-right:1rem}}.version-note{{padding:1rem;border:1px solid #777}}</style></head>
 <body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav>{navigation}</nav></div></header>
-<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated {STATUS_DATE}</p>
 {body}</main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>
 '''
     target.write_text(text, encoding='utf-8')
@@ -246,6 +248,8 @@ def site_pages():
         title = 'Tài liệu Luna 0.1' if vietnamese else 'Luna 0.1 documentation'
         body = f'<h1>{title}</h1>'
         body += ('<p>Giữ các contract đã định nghĩa; implementation còn thiếu được ghi riêng trong danh sách khoảng hở. Spec và release conformance là hai trạng thái khác nhau.</p>' if vietnamese else '<p>Defined contracts are retained. Implementation failures and missing evidence are tracked separately; the baseline is not release certification.</p>')
+        ledger_url = Path(os.path.relpath(ROOT / 'docs/audits/0.1-alpha-completion-2026-10-04/r4/README.md', target.parent)).as_posix()
+        body += f'<p><a href="{ledger_url}">R4 release ledger / R5 handoff</a>: The previous eight-lane qualification is superseded for release: clean Windows package smoke exposed CPU identity drift; baseline repair and fresh qualification are pending.</p>'
         for chapter in ('syntax', 'semantics', 'macros', 'modules', 'stdlib', 'runtime', 'conformance', 'gaps'):
             rel = Path(os.path.relpath(SITE / f'spec/{chapter}.html', target.parent)).as_posix()
             body += f'<p><a href="{rel}">{chapter.title()}</a></p>'

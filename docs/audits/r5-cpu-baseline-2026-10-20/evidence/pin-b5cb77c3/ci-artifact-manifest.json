@@ -1,0 +1,166 @@
+[
+  {
+    "id": 12248270213,
+    "name": "r5-ubuntu-comptime-vm-39385567905-1",
+    "size_in_bytes": 16170404,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12248270213",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12248270213/zip",
+    "expired": false,
+    "created_at": "2026-10-20T07:30:58Z",
+    "expires_at": "2026-11-19T07:30:55Z",
+    "updated_at": "2026-10-20T07:30:58Z",
+    "digest": "sha256:74847f9e590ffc48d82104600b9c7eccf751235a3413c7df35a02cd056047f4b",
+    "workflow_run": {
+      "id": 39385567905,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-ubuntu-comptime-vm-39385567905-1.zip"
+  },
+  {
+    "id": 12247791206,
+    "name": "r5-ubuntu-runtime-asan-39385567905-1",
+    "size_in_bytes": 22028,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247791206",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12247791206/zip",
+    "expired": false,
+    "created_at": "2026-10-20T07:20:39Z",
+    "expires_at": "2026-11-19T07:20:38Z",
+    "updated_at": "2026-10-20T07:20:39Z",
+    "digest": "sha256:861787dadd580a9341960ce29684d4fde08d52febb22bb4ab7a472e731395100",
+    "workflow_run": {
+      "id": 39385567905,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-ubuntu-runtime-asan-39385567905-1.zip"
+  },
+  {
+    "id": 12253391317,
+    "node_id": "MDg6QXJ0aWZhY3QxMjI1MzM5MTMxNw==",
+    "name": "r5-ubuntu-workspace-triage-39385567905-1",
+    "size_in_bytes": 83420,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12253391317",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12253391317/zip",
+    "expired": false,
+    "digest": "sha256:5defbfcc9d931f7b406d390774a4b21cc9282a7ceb5089ef081774a67299a1cf",
+    "created_at": "2026-10-20T09:11:43Z",
+    "updated_at": "2026-10-20T09:11:43Z",
+    "expires_at": "2026-11-19T09:11:41Z",
+    "workflow_run": {
+      "id": 39385567905,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-ubuntu-workspace-triage-39385567905-1.zip"
+  },
+  {
+    "id": 12252234586,
+    "node_id": "MDg6QXJ0aWZhY3QxMjI1MjIzNDU4Ng==",
+    "name": "r5-ubuntu-normal-39385567905-1",
+    "size_in_bytes": 191992,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12252234586",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12252234586/zip",
+    "expired": false,
+    "digest": "sha256:248166572662c8031a6ceaca683c2bf8175dc61c0a75f7398cf67a3315bc5344",
+    "created_at": "2026-10-20T09:09:53Z",
+    "updated_at": "2026-10-20T09:09:53Z",
+    "expires_at": "2026-11-19T09:09:52Z",
+    "workflow_run": {
+      "id": 39385567905,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-ubuntu-normal-39385567905-1.zip"
+  },
+  {
+    "id": 12258834785,
+    "node_id": "MDg6QXJ0aWZhY3QxMjI1ODgzNDc4NQ==",
+    "name": "r5-windows-workspace-triage-39385567963-1",
+    "size_in_bytes": 104143,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12258834785",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12258834785/zip",
+    "expired": false,
+    "digest": "sha256:9846fee031c2a0ffd1ab522504c67195e206992c3404e221ac041ba78889f565",
+    "created_at": "2026-10-20T10:56:33Z",
+    "updated_at": "2026-10-20T10:56:33Z",
+    "expires_at": "2026-11-19T10:56:32Z",
+    "workflow_run": {
+      "id": 39385567963,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-windows-workspace-triage-39385567963-1.zip"
+  },
+  {
+    "id": 12252351370,
+    "node_id": "MDg6QXJ0aWZhY3QxMjI1MjM1MTM3MA==",
+    "name": "r5-windows-gnu-39385567963-1",
+    "size_in_bytes": 43178775,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12252351370",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12252351370/zip",
+    "expired": false,
+    "digest": "sha256:db9e467293a107a38d42c96edab5375be5587d892b8ba95ca32ee014605ef0c4",
+    "created_at": "2026-10-20T08:54:56Z",
+    "updated_at": "2026-10-20T08:54:56Z",
+    "expires_at": "2026-11-19T08:54:50Z",
+    "workflow_run": {
+      "id": 39385567963,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-windows-gnu-39385567963-1.zip"
+  },
+  {
+    "id": 12263624610,
+    "name": "r5-ubuntu-workspace-final-39385567905-1",
+    "size_in_bytes": 83695,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12263624610",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12263624610/zip",
+    "expired": false,
+    "created_at": "2026-10-20T12:20:23Z",
+    "expires_at": "2026-11-19T12:20:22Z",
+    "updated_at": "2026-10-20T12:20:23Z",
+    "digest": "sha256:e7602838f5c83e27d821e03fc14beafba165fe29aed8cc7e5c7192384214711b",
+    "workflow_run": {
+      "id": 39385567905,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-ubuntu-workspace-final-39385567905-1.zip"
+  },
+  {
+    "id": 12273890402,
+    "name": "r5-windows-workspace-final-39385567963-1",
+    "size_in_bytes": 104154,
+    "url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12273890402",
+    "archive_download_url": "https://api.github.com/repos/17thedevv/luna/actions/artifacts/12273890402/zip",
+    "expired": false,
+    "created_at": "2026-10-20T14:33:36Z",
+    "expires_at": "2026-11-19T14:33:36Z",
+    "updated_at": "2026-10-20T14:33:36Z",
+    "digest": "sha256:bdb7843564c7a8d28ea1633988033f20b4e9967eb8c2fb5acd3b8aab56b1d113",
+    "workflow_run": {
+      "id": 39385567963,
+      "repository_id": 1301089755,
+      "head_repository_id": 1301089755,
+      "head_branch": "r5-diag-repair",
+      "head_sha": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7"
+    },
+    "local_path": "docs/audits/r5-cpu-baseline-2026-10-20/evidence/pin-b5cb77c3/archives/r5-windows-workspace-final-39385567963-1.zip"
+  }
+]

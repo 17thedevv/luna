@@ -1,17 +1,18 @@
-DEBUG: resolve_collected_imports finished successfully
-DEBUG loading package: core/panic
-DEBUG: resolve_collected_imports finished successfully
-DEBUG: resolve_collected_imports finished successfully
-DEBUG loading package: __lang_option
-DEBUG: resolve_collected_imports finished successfully
-DEBUG: resolve_collected_imports finished successfully
-DEBUG: resolve_collected_imports finished successfully
-DEBUG loading package: core/panic
-DEBUG loading package: __lang_option
-DEBUG loading package: result
-DEBUG loading package: core/panic
-DEBUG loading package: __lang_option
-DEBUG: resolve_collected_imports finished successfully
-DEBUG: resolve_collected_imports finished successfully
-DEBUG: resolve_collected_imports finished successfully
-DEBUG: resolve_imports returning true
+error[E0002]: Struct fields must be separated by commas (','); semicolons (';') are forbidden in Luna 0.1
+  --> D:\fdlang\tests\luna\language\spec_v01\reject_semicolon_fields.ln:2:22
+   |
+2  | struct Point { x: i32; y: i32; };
+   |                      ^
+
+error[E0001]: Expected ';' after expression
+  --> D:\fdlang\tests\luna\language\spec_v01\reject_semicolon_fields.ln:2:25
+   |
+2  | struct Point { x: i32; y: i32; };
+   |                         ^
+
+error[E0003]: Expected expression.
+  --> D:\fdlang\tests\luna\language\spec_v01\reject_semicolon_fields.ln:2:32
+   |
+2  | struct Point { x: i32; y: i32; };
+   |                                ^
+

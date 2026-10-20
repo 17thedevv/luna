@@ -1,0 +1,22 @@
+{
+  "gate": "cli-release",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-workspace-triage/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--release"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage/checkout",
+  "started_utc": "2026-10-17T12:29:26Z",
+  "exit": 0,
+  "seconds": 63.735387788,
+  "log_sha256": "568e490c2915e09e3f9c326c5cb8ad6eb220fdef45648a65f74100374c2aa0f0",
+  "status": "PASS",
+  "log": "cli-release.log.gz",
+  "compressed_sha256": "25bb66a05df5298e7264dac2b34456bfb8f9c3de2720e690ebaa7cf4af052308"
+}

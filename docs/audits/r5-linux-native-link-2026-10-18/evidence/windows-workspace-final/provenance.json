@@ -1,0 +1,30 @@
+{
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "remote_url": "https://github.com/17thedevv/luna.git",
+  "head": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "initial_status": "",
+  "os": "Windows-2022Server-10.0.20348-SP0",
+  "machine": "AMD64",
+  "tools": {
+    "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-pc-windows-msvc\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+    "llvm": "18.1.8\n",
+    "gcc": "x86_64-w64-mingw32\n",
+    "cmake": "cmake version 3.31.6\n\nCMake suite maintained and supported by Kitware (kitware.com/cmake).\n",
+    "ninja": "1.13.2\n"
+  },
+  "source_tree_objects": {
+    "luna-rs": "9cdbdd2fd77aca264fefaa691fb0423e17d0c87e",
+    "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+    "tests": "fb2de6351cceed11e6b4da4ced0cc52083fa6bfe"
+  },
+  "env": {
+    "LLVM_SYS_180_PREFIX": "C:\\r5-llvm18",
+    "LLVM_CONFIG_PATH": "C:\\r5-llvm18\\bin\\llvm-config.exe",
+    "LLVM_HOME": "C:\\r5-llvm18",
+    "CARGO_TARGET_DIR": "C:\\r5b-39056178610\\cargo-target",
+    "LUNA_SYSROOT": "D:\\r5-39056178610\\windows-checkout\\luna-rs",
+    "LUNA_RUNTIME_LIB": "C:\\r5b-39056178610\\runtime\\libluna-runtime.a"
+  },
+  "note": "Fresh remote clone at the final implementation pin; output/build directories outside checkout",
+  "time": "2026-10-17T20:54:12.112413+00:00"
+}

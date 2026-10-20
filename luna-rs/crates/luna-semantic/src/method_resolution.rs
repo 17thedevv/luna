@@ -239,21 +239,20 @@ impl<'a> TypeChecker<'a> {
                 );
             }
             if applicable.len() > 1 {
-                let names = applicable
+                let candidates: Vec<(luna_common::Span, String)> = applicable
                     .iter()
-                    .map(|candidate| self.method_candidate_name(candidate))
-                    .collect::<Vec<_>>();
-                let mut diagnostic =
-                    Diagnostic::error(format!("Ambiguous method `{name}`: {}", names.join(", ")))
-                        .with_code(DiagnosticCode::AmbiguousSymbol)
-                        .with_span(span);
-                for candidate in applicable {
-                    diagnostic = diagnostic.with_related(
-                        self.ctx.symbol_table.get_symbol(candidate.method).span,
-                        format!("candidate {}", self.method_candidate_name(candidate)),
-                    );
-                }
-                self.ctx.diagnostics.push(diagnostic);
+                    .map(|candidate| {
+                        (
+                            self.ctx.symbol_table.get_symbol(candidate.method).span,
+                            self.method_candidate_name(candidate),
+                        )
+                    })
+                    .collect();
+                self.ctx.diagnostics.push(crate::resolver::ambiguous_method_diagnostic(
+                    name,
+                    &candidates,
+                    span,
+                ));
                 return self.ctx.types.error_id();
             }
         }
@@ -308,6 +307,7 @@ impl<'a> TypeChecker<'a> {
             current_async_fn: self.current_async_fn,
             comptime_engine: self.comptime_engine,
             current_return_type: self.current_return_type.clone(),
+            declaration_anchor: self.declaration_anchor,
             expected_expr_type: Vec::new(),
             comptime_prepared_functions: self.comptime_prepared_functions.clone(),
             populating_nominal_types: self.populating_nominal_types.clone(),

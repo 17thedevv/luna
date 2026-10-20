@@ -1,7 +1,7 @@
 use luna_ast::AstArena;
 use luna_common::ids::FileId;
 use luna_common::ids::SymbolId;
-use luna_common::Span;
+use luna_common::{Span, DiagnosticCode};
 use luna_ast::Visibility;
 use luna_lexer::Lexer;
 use luna_parser::Parser;
@@ -205,7 +205,7 @@ fn test_case_05_orphan_foreign_trait_foreign_type_fail() {
         setup_core_provider(ctx);
     });
     assert!(!success, "Expected failure for foreign trait on foreign type");
-    let has_orphan_err = ctx.diagnostics.iter().any(|d| d.message.contains("E_ORPHAN_IMPL"));
+    let has_orphan_err = ctx.diagnostics.iter().any(|d| d.code == Some(DiagnosticCode::OrphanImpl));
     assert!(has_orphan_err, "Expected E_ORPHAN_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
 
@@ -221,7 +221,7 @@ fn test_case_06_orphan_foreign_trait_primitive_fail() {
         setup_core_provider(ctx);
     });
     assert!(!success, "Expected failure for foreign trait on primitive type");
-    let has_orphan_err = ctx.diagnostics.iter().any(|d| d.message.contains("E_ORPHAN_IMPL"));
+    let has_orphan_err = ctx.diagnostics.iter().any(|d| d.code == Some(DiagnosticCode::OrphanImpl));
     assert!(has_orphan_err, "Expected E_ORPHAN_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
 
@@ -237,7 +237,7 @@ fn test_case_07_orphan_inherent_foreign_type_fail() {
         setup_core_provider(ctx);
     });
     assert!(!success, "Expected failure for inherent impl on foreign type");
-    let has_orphan_err = ctx.diagnostics.iter().any(|d| d.message.contains("E_ORPHAN_IMPL"));
+    let has_orphan_err = ctx.diagnostics.iter().any(|d| d.code == Some(DiagnosticCode::OrphanImpl));
     assert!(has_orphan_err, "Expected E_ORPHAN_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
 
@@ -256,7 +256,7 @@ fn test_case_08_orphan_generic_args_no_locality_fail() {
         setup_core_provider(ctx);
     });
     assert!(!success, "Expected failure when nominal head is foreign despite local contents");
-    let has_orphan_err = ctx.diagnostics.iter().any(|d| d.message.contains("E_ORPHAN_IMPL"));
+    let has_orphan_err = ctx.diagnostics.iter().any(|d| d.code == Some(DiagnosticCode::OrphanImpl));
     assert!(has_orphan_err, "Expected E_ORPHAN_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
 
@@ -280,7 +280,7 @@ fn test_case_09_coherence_duplicate_exact_fail() {
     let (ctx, success) = run_semantic(source);
     assert!(!success, "Expected failure for duplicate exact impls");
     let has_conflict = ctx.diagnostics.iter().any(|d| {
-        d.message.contains("E_CONFLICTING_TRAIT_IMPL") || d.message.contains("conflicting implementations for trait")
+        d.code == Some(DiagnosticCode::ConflictingTraitImpl)
     });
     assert!(has_conflict, "Expected E_CONFLICTING_TRAIT_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
@@ -311,6 +311,7 @@ fn test_case_10_coherence_local_vs_imported_duplicate_fail() {
             });
             // Simulate that an imported provider already implemented Clone for S
             ctx.tables.trait_impl_entries.push(luna_semantic::semantic_tables::TraitImplEntry {
+                definition_span: Some(Span::new(FileId(1), 5, 9)),
                 decl_id: None,
                 trait_id: clone_sym,
                 self_type: s_ty,
@@ -321,7 +322,7 @@ fn test_case_10_coherence_local_vs_imported_duplicate_fail() {
     );
     assert!(!success, "Expected failure when local impl collides with imported impl");
     let has_conflict = ctx.diagnostics.iter().any(|d| {
-        d.message.contains("E_CONFLICTING_TRAIT_IMPL") || d.message.contains("conflicting implementations for trait")
+        d.code == Some(DiagnosticCode::ConflictingTraitImpl)
     });
     assert!(has_conflict, "Expected E_CONFLICTING_TRAIT_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
@@ -335,6 +336,7 @@ fn test_case_11_coherence_cross_imported_providers_collision_fail() {
     // Provider A implemented Clone for Option
     let opt_ty = ctx.types.intern(SemanticType::Enum(option_sym, Vec::new(), Vec::new()));
     ctx.tables.trait_impl_entries.push(luna_semantic::semantic_tables::TraitImplEntry {
+        definition_span: Some(Span::new(FileId(1), 5, 9)),
         decl_id: None,
         trait_id: clone_sym,
         self_type: opt_ty,
@@ -343,10 +345,14 @@ fn test_case_11_coherence_cross_imported_providers_collision_fail() {
     });
 
     // Provider B attempts to also inject Clone for Option
-    let res = ctx.check_impl_coherence(clone_sym, opt_ty, &[], &[], Span::default());
+    let attempted = Span::new(FileId(2), 15, 19);
+    let res = ctx.check_impl_coherence(clone_sym, opt_ty, &[], &[], attempted);
     assert!(res.is_err(), "Expected coherence check to reject overlapping cross-imported impl");
+    let diagnostic = ctx.diagnostics.last().unwrap();
+    assert_eq!(diagnostic.span, Some(attempted));
+    assert_eq!(diagnostic.related.iter().map(|label| label.span).collect::<Vec<_>>(), vec![Span::new(FileId(1), 5, 9)]);
     let has_conflict = ctx.diagnostics.iter().any(|d| {
-        d.message.contains("E_CONFLICTING_TRAIT_IMPL") || d.message.contains("conflicting implementations for trait")
+        d.code == Some(DiagnosticCode::ConflictingTraitImpl)
     });
     assert!(has_conflict, "Expected E_CONFLICTING_TRAIT_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
@@ -368,7 +374,7 @@ fn test_case_12_coherence_primitive_duplicate_fail() {
     let (ctx, success) = run_semantic(source);
     assert!(!success, "Expected failure for duplicate impls on primitive type");
     let has_conflict = ctx.diagnostics.iter().any(|d| {
-        d.message.contains("E_CONFLICTING_TRAIT_IMPL") || d.message.contains("conflicting implementations for trait")
+        d.code == Some(DiagnosticCode::ConflictingTraitImpl)
     });
     assert!(has_conflict, "Expected E_CONFLICTING_TRAIT_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
@@ -393,7 +399,7 @@ fn test_case_13_coherence_generic_vs_concrete_overlap_fail() {
     let (ctx, success) = run_semantic(source);
     assert!(!success, "Expected failure for generic vs concrete overlap");
     let has_conflict = ctx.diagnostics.iter().any(|d| {
-        d.message.contains("E_CONFLICTING_TRAIT_IMPL") || d.message.contains("conflicting implementations for trait")
+        d.code == Some(DiagnosticCode::ConflictingTraitImpl)
     });
     assert!(has_conflict, "Expected E_CONFLICTING_TRAIT_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
@@ -418,7 +424,7 @@ fn test_case_14_coherence_two_generics_overlap_fail() {
     let (ctx, success) = run_semantic(source);
     assert!(!success, "Expected failure for two generic overlapping impls");
     let has_conflict = ctx.diagnostics.iter().any(|d| {
-        d.message.contains("E_CONFLICTING_TRAIT_IMPL") || d.message.contains("conflicting implementations for trait")
+        d.code == Some(DiagnosticCode::ConflictingTraitImpl)
     });
     assert!(has_conflict, "Expected E_CONFLICTING_TRAIT_IMPL diagnostic, got: {:?}", ctx.diagnostics);
 }
@@ -458,7 +464,7 @@ fn test_case_16_orphan_reference_head_fail() {
     let has_orphan_err = ctx
         .diagnostics
         .iter()
-        .any(|d| d.message.contains("E_ORPHAN_IMPL"));
+        .any(|d| d.code == Some(DiagnosticCode::OrphanImpl));
     assert!(
         has_orphan_err,
         "Expected E_ORPHAN_IMPL diagnostic, got: {:?}",
@@ -480,7 +486,7 @@ fn test_case_17_orphan_pointer_head_fail() {
     let has_orphan_err = ctx
         .diagnostics
         .iter()
-        .any(|d| d.message.contains("E_ORPHAN_IMPL"));
+        .any(|d| d.code == Some(DiagnosticCode::OrphanImpl));
     assert!(
         has_orphan_err,
         "Expected E_ORPHAN_IMPL diagnostic, got: {:?}",
@@ -519,7 +525,7 @@ fn test_case_19_orphan_slice_inherent_in_user_module_fail() {
     let has_orphan_err = ctx
         .diagnostics
         .iter()
-        .any(|d| d.message.contains("E_ORPHAN_IMPL"));
+        .any(|d| d.code == Some(DiagnosticCode::OrphanImpl));
     assert!(
         has_orphan_err,
         "Expected E_ORPHAN_IMPL diagnostic, got: {:?}",
@@ -560,8 +566,28 @@ fn test_case_21_slice_inherent_name_impersonation_fails() {
     });
     assert!(!success, "Expected failure when provider impersonates 'slice' name without capability");
     assert!(
-        ctx.diagnostics.iter().any(|d| d.message.contains("E_ORPHAN_IMPL")),
+        ctx.diagnostics.iter().any(|d| d.code == Some(DiagnosticCode::OrphanImpl)),
         "Expected E_ORPHAN_IMPL, got: {:?}",
         ctx.diagnostics
     );
+}
+
+#[test]
+fn legacy_provider_collision_is_declared_contract_diagnostic() {
+    let mut ctx = SemanticContext::new();
+    let (_, clone_sym, _, option_sym, _) = setup_core_provider(&mut ctx);
+    let self_type = ctx.types.intern(SemanticType::Enum(option_sym, Vec::new(), Vec::new()));
+    ctx.tables.trait_impl_entries.push(luna_semantic::semantic_tables::TraitImplEntry {
+        definition_span: None,
+        decl_id: None,
+        trait_id: clone_sym,
+        self_type,
+        generic_params: Vec::new(),
+        trait_args: Vec::new(),
+    });
+    assert!(ctx.check_impl_coherence_with_origin(clone_sym, self_type, &[], &[], None).is_err());
+    let diagnostic = ctx.diagnostics.last().unwrap();
+    assert_eq!(diagnostic.code, Some(DiagnosticCode::ConflictingTraitImpl));
+    assert_eq!(diagnostic.span, None);
+    assert!(diagnostic.contract_diagnostic);
 }

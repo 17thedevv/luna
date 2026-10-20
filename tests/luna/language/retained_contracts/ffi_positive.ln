@@ -1,0 +1,4 @@
+fn unused() -> i32 { return 0; }
+#[link(name = "abs")]
+extern fn abs(value: i32) -> i32;
+fn main() -> i32 { return abs(-5) - 5; }

@@ -1,0 +1,73 @@
+{
+  "observed_utc": "2026-10-20 07:36:14 UTC",
+  "implementation_pin": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+  "harness_commit": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+  "runs": {
+    "39385567905": [
+      {
+        "id": 118504460603,
+        "name": "Ubuntu GNU exact-pin workspace triage (--no-fail-fast)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 118504460874,
+        "name": "Ubuntu GNU C runtime ABI and partial-read cleanup ASan",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 118504460936,
+        "name": "Ubuntu GNU exact-pin descriptive normal acquisition (target contract enforced)",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 118504460970,
+        "name": "Ubuntu GNU64 descriptive comptime and VM boundary acquisition",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "39385567963": [
+      {
+        "id": 118504461023,
+        "name": "Windows GNU exact-pin native qualification",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 118504461236,
+        "name": "Windows GNU full workspace triage",
+        "status": "in_progress",
+        "conclusion": null
+      }
+    ],
+    "39385567878": [
+      {
+        "id": 118504460445,
+        "name": "Build package (x86_64-unknown-linux-gnu)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 118504460774,
+        "name": "Build package (x86_64-pc-windows-gnu)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 118507575382,
+        "name": "Clean package smoke (x86_64-pc-windows-gnu)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 118507575440,
+        "name": "Clean package smoke (x86_64-unknown-linux-gnu)",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  }
+}

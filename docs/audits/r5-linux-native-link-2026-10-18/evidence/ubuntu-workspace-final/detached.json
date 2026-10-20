@@ -1,0 +1,18 @@
+{
+  "gate": "detached",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "git",
+    "symbolic-ref",
+    "-q",
+    "HEAD"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-final/checkout",
+  "started_utc": "2026-10-17T21:03:40Z",
+  "exit": 1,
+  "seconds": 0.0037977119999936804,
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "status": "PASS",
+  "log": "detached.log.gz",
+  "compressed_sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+}

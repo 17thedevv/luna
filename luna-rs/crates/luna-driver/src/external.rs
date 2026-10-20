@@ -167,10 +167,10 @@ impl ExternalComponentLoader {
 
             if driver_session.registry.is_loading(&descriptor.name) {
                 return Err(ExternalComponentError::ImportFailed(vec![
-                    luna_common::Diagnostic::error(format!(
+                    luna_common::Diagnostic::contract_error(luna_common::DiagnosticCode::CyclicModuleDependency, format!(
                         "Cyclic module dependency detected involving external component `{}`",
                         descriptor.name
-                    )).with_code(luna_common::DiagnosticCode::CyclicModuleDependency),
+                    )),
                 ]));
             }
             driver_session.registry.start_loading(&descriptor.name);
@@ -238,8 +238,9 @@ impl ExternalComponentLoader {
 
             let mut shifted_provider_items = provider_items;
             for item in &mut shifted_provider_items {
-                if let Item::Decl(decl_id) = item {
-                    *decl_id = relocator.shift_decl_id(*decl_id);
+                match item {
+                    Item::Decl(decl_id) => *decl_id = relocator.shift_decl_id(*decl_id),
+                    Item::Stmt(stmt_id) => *stmt_id = luna_ast::StmtId(stmt_id.0 + relocator.stmt_offset),
                 }
             }
 
@@ -252,6 +253,7 @@ impl ExternalComponentLoader {
             // Perform semantic analysis
             let provider_id = driver_session.registry.allocate_id();
             let mut semantic_ctx = luna_semantic::SemanticContext::new();
+            semantic_ctx.current_file_id = Some(file_id);
             semantic_ctx.current_provider = Some(provider_id);
 
             semantic_ctx.current_provider_name = Some(descriptor.name.clone());
@@ -448,12 +450,16 @@ impl ExternalComponentLoader {
             return Ok(id);
         }
         if session.loading_paths.contains(&file) {
-            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::error(
-                format!("Cyclic module dependency through '{}'", descriptor.entry_file.display()))
-                .with_code(luna_common::DiagnosticCode::CyclicModuleDependency)]));
+            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::contract_error(
+                luna_common::DiagnosticCode::CyclicModuleDependency,
+                format!("Cyclic module dependency through '{}'", descriptor.entry_file.display()))]));
         }
         let mut canonical = descriptor.clone();
-        if matches!(descriptor.provenance, crate::discovery::ComponentProvenance::LocalProject) {
+        if let Some(entry) = session.sysroot.get_canonical_provider(&descriptor.entry_file) {
+            // A manifest alias is a discovery key, never a provider identity.
+            // Source and artifact admission must hash the same canonical name.
+            canonical.name = entry.name.clone();
+        } else if matches!(descriptor.provenance, crate::discovery::ComponentProvenance::LocalProject) {
             canonical.name = descriptor.entry_file.file_stem().and_then(|s| s.to_str()).unwrap_or(&descriptor.name).to_string();
             if descriptor.format == ComponentFormat::Llib {
                 if let Ok(mut input) = std::fs::File::open(&descriptor.entry_file) {
@@ -466,9 +472,9 @@ impl ExternalComponentLoader {
         // Identical logical identities from distinct physical providers must not
         // silently reuse an earlier provider. Configuration aliases do not rename identity.
         if session.registry.interfaces.values().any(|interface| interface.name == canonical.name) {
-            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::error(
-                format!("Distinct provider '{}' conflicts with loaded identity '{}'", descriptor.entry_file.display(), canonical.name))
-                .with_code(luna_common::DiagnosticCode::DuplicateDefinition)]));
+            return Err(ExternalComponentError::ImportFailed(vec![luna_common::Diagnostic::contract_error(
+                luna_common::DiagnosticCode::DuplicateDefinition,
+                format!("Distinct provider '{}' conflicts with loaded identity '{}'", descriptor.entry_file.display(), canonical.name))]));
         }
         session.loading_paths.insert(file.clone());
         let result = Self::load_uncached(&canonical, arena, session);
@@ -492,10 +498,10 @@ impl ExternalComponentLoader {
 
         if driver_session.registry.is_loading(&descriptor.name) {
             return Err(ExternalComponentError::ImportFailed(vec![
-                luna_common::Diagnostic::error(format!(
+                luna_common::Diagnostic::contract_error(luna_common::DiagnosticCode::CyclicModuleDependency, format!(
                     "Cyclic module dependency detected involving external component `{}`",
                     descriptor.name
-                )).with_code(luna_common::DiagnosticCode::CyclicModuleDependency),
+                )),
             ]));
         }
 
@@ -527,7 +533,7 @@ impl ExternalComponentLoader {
             return Err(ExternalComponentError::ParseFailed(parser.diagnostics));
         }
 
-        let mut provider_items = match parse_res {
+        let provider_items = match parse_res {
             Ok(items) => items,
             Err(_) => {
                 driver_session.registry.finish_loading();
@@ -558,9 +564,8 @@ impl ExternalComponentLoader {
         }
 
         // Process annotations for the component
-        let mut attr_processor =
-            luna_semantic::AttributeProcessor::new(&mut provider_arena, &mut driver_session.compiler_session.source_manager, file_id);
-        let shifted_provider_items_before_macro = match attr_processor.process_items(provider_items) {
+        let shifted_provider_items_before_macro = match luna_semantic::TypeChecker::prepare_attributes(
+            &mut provider_arena, &mut driver_session.compiler_session.source_manager, file_id, provider_items) {
             Ok(items) => items,
             Err(e) => {
                 driver_session.registry.finish_loading();
@@ -586,8 +591,9 @@ impl ExternalComponentLoader {
 
         let mut shifted_provider_items = shifted_provider_items_before_macro;
         for item in &mut shifted_provider_items {
-            if let Item::Decl(decl_id) = item {
-                *decl_id = relocator.shift_decl_id(*decl_id);
+            match item {
+                Item::Decl(decl_id) => *decl_id = relocator.shift_decl_id(*decl_id),
+                Item::Stmt(stmt_id) => *stmt_id = luna_ast::StmtId(stmt_id.0 + relocator.stmt_offset),
             }
         }
 
@@ -600,6 +606,7 @@ impl ExternalComponentLoader {
         // Perform semantic analysis
         let provider_id = driver_session.registry.allocate_id();
         let mut semantic_ctx = luna_semantic::SemanticContext::new();
+        semantic_ctx.current_file_id = Some(file_id);
         semantic_ctx.current_provider = Some(provider_id);
 
         semantic_ctx.current_provider_name = Some(descriptor.name.clone());
@@ -615,6 +622,33 @@ impl ExternalComponentLoader {
         );
         driver_session.registry.inject_into_ctx(&mut semantic_ctx);
 
+        // Providers use the same macro admission order as root compilation.
+        // Expanded declarations must reach their owning Parser/Resolver/
+        // TypeChecker checks before an interface can be published.
+        let mut resolver = luna_semantic::Resolver::new(
+            &mut semantic_ctx, global_arena, &driver_session.compiler_session.source_manager,
+        );
+        resolver.register_macros(&shifted_provider_items);
+        if !semantic_ctx.diagnostics.is_empty() {
+            driver_session.registry.finish_loading();
+            return Err(ExternalComponentError::SemanticFailed(semantic_ctx.diagnostics));
+        }
+        let mut macro_engine = luna_semantic::MacroEngine::new(
+            global_arena,
+            &driver_session.compiler_session.source_manager,
+            file_id,
+            &semantic_ctx.symbol_table,
+            &semantic_ctx.tables,
+        );
+        let shifted_provider_items = match macro_engine.expand_items(shifted_provider_items) {
+            Ok(items) => items,
+            Err(failures) => {
+                driver_session.registry.finish_loading();
+                return Err(ExternalComponentError::SemanticFailed(
+                    luna_semantic::Resolver::admit_macro_expansion_failures(failures),
+                ));
+            }
+        };
         let mut resolver =
             luna_semantic::Resolver::new(&mut semantic_ctx, global_arena, &driver_session.compiler_session.source_manager);
         resolver.resolve_items(&shifted_provider_items);

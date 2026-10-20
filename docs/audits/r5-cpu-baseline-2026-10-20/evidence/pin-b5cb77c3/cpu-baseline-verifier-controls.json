@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "controls": [
+    {
+      "field": "cpu",
+      "mutation": "znver3",
+      "status": "REJECTED_AS_EXPECTED",
+      "reason": "Provider CPU baseline mismatch"
+    },
+    {
+      "field": "features",
+      "mutation": "+avx",
+      "status": "REJECTED_AS_EXPECTED",
+      "reason": "Provider CPU baseline mismatch"
+    }
+  ],
+  "scope": "Temporary CPU/features mutations with coherent inventory and outer ZIP digests; original evidence unchanged"
+}

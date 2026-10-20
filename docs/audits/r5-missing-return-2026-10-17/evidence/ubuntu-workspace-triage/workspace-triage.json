@@ -1,0 +1,21 @@
+{
+  "gate": "workspace-triage",
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-workspace-triage/checkout/luna-rs/Cargo.toml",
+    "--workspace",
+    "--no-fail-fast"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-workspace-triage/checkout",
+  "started_utc": "2026-10-17T12:31:51Z",
+  "exit": 101,
+  "seconds": 10532.565889499,
+  "log_sha256": "101631cf4f3c275c6b62f29d814c4034cddfc75f5f877ca9dab4104dac58b9ec",
+  "status": "FAIL",
+  "log": "workspace-triage.log.gz",
+  "compressed_sha256": "8af5c75a3b32d362e25c4bd2bbb58a2c1cdf4503dbdb7b2517fe2071d0553edb"
+}

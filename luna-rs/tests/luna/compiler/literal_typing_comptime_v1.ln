@@ -18,7 +18,7 @@ impl ByteSource for Second { fn byte(self: &Second) -> u8 { dec bytes = b"Z"; re
 const FIRST: u8 = comptime { dec first = First {}; dec source: &dyn ByteSource = &first; source.byte() };
 const SECOND: u8 = comptime { dec second = Second {}; dec source: &dyn ByteSource = &second; source.byte() };
 fn main() -> i32 {
-    if BYTE != 255u8 || WIDE != (0u128 - 1u128) { return 1; }
+    if BYTE != 255u8 || WIDE != 340282366920938463463374607431768211455u128 { return 1; }
     if MINIMUM != (-170141183460469231731687303715884105727i128 - 1i128) { return 2; }
     if BYTES[2] != 255u8 { return 3; }
     if HIGH != 18446744073709551615u128 || ORDERED == false { return 4; }

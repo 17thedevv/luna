@@ -1,0 +1,5 @@
+struct Record {
+    value: i32, // previous definition
+    value: i32, // invalid definition
+};
+fn main() -> i32 { return 0; }

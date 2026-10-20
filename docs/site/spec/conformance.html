@@ -3,9 +3,11 @@
 <title>Luna 0.1 — conformance and release gates</title><link rel="stylesheet" href="../assets/styles.css">
 <style>main{max-width:960px;margin:auto;padding:2rem}table{width:100%;border-collapse:collapse}td,th{padding:.6rem;border:1px solid #777;text-align:left}pre{overflow:auto;padding:1rem;background:#161b22;color:#e6edf3}code{font-family:monospace}nav a{margin-right:1rem}.version-note{padding:1rem;border:1px solid #777}</style></head>
 <body><header class="topbar"><div class="container nav-wrap"><strong>Luna 0.1</strong><nav><a href="../en/index.html">EN</a> <a href="../vi/index.html">VI</a> <a href="index.html">Spec 0.1</a> <a href="gaps.html">Gaps</a></nav></div></header>
-<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-03</p>
+<main><p class="version-note">Contract baseline 0.1 · Release conformance: BLOCKED / NOT VERIFIED · Updated 2026-10-20</p>
 <h1 id="luna-01--conformance-and-release-gates">Luna 0.1 — conformance and release gates</h1>
 <p>Contract status and implementation status are separate. An adopted rule remains a requirement while its implementation can be partial, broken or unverified. This specification refresh is not a compiler repair or a release certification.</p>
+<p>Current qualification — 2026-10-20: <strong>RELEASE BLOCKED by package CPU identity drift</strong>. The eight completed lanes at <code>8525067f</code> are preserved, but clean Windows package smoke fails on a different CPU. <a href="../../audits/r5-cpu-baseline-2026-10-20/README.md">Finding and baseline repair</a>. A new implementation pin must reacquire all eight lanes and clean package smoke on both hosts. Candidate remains <code>8525067f</code>; no merge/tag/publication occurred. Strict target identity validation and the adopted language contracts remain mandatory. Earlier qualification snapshots below retain their dated scopes.</p>
+<p>Prior evidence reconciliation — 2026-10-14: see the <a href="../../audits/0.1-alpha-completion-2026-10-04/r4/README.md">R4 release ledger</a>. The E-wave qualification at <code>e4f9fb53</code>, stored by closure <code>3f8646c6</code>, is scoped Windows GNU evidence. R5 exact-candidate qualification is still PENDING; release status remains BLOCKED / NOT VERIFIED.</p>
 <h2 id="status-vocabulary">Status vocabulary</h2>
 <table>
 <tr><th>Status</th><th>Meaning</th></tr>
@@ -20,6 +22,7 @@
 <p>Historical FROZEN labels record previous decisions and dated acceptance, not blanket current release completion. READY FOR DESIGN/FREEZE REVIEW is not FROZEN.</p>
 <h2 id="diagnostics">Diagnostics</h2>
 <p>Retain DIAG-1–DIAG-10: typed stable codes, source spans for source errors, structured related spans, poison containment, deterministic order/deduplication, phase ownership, origin traceability and registry parity. Rendering wording is not diagnostic identity. A timeout or stack overflow is not an appropriate substitute for a source rejection. Registry documentation must distinguish normative coverage requirements from a claim that every current error path already satisfies them.</p>
+<p>The <a href="../../audits/0.1-alpha-completion-2026-10-04/r4/diagnostic-inventory.md">R4 diagnostic inventory</a> uses the exact adopted DIAG-1..10 numbering. The historical D1 table mislabels several numbers; its green reducers do not establish universal constructor, emission, event-origin or per-code coverage. The complete structural remainder is a mandatory R5 precondition, not an accepted deferral.</p>
 <h2 id="required-acceptance-boundaries">Required acceptance boundaries</h2>
 <p class="list-item">1. Language and library behavior: real <code>.ln</code> fixtures via the public Luna CLI,</p>
 <p>   checking exit, stdout/stderr and appropriate rejection.</p>
@@ -33,9 +36,28 @@
 <p>   including user-defined types independent of the original stdlib trigger.</p>
 <p class="list-item">6. Target claims: runtime ABI, linker and executable evidence per advertised</p>
 <p>   target/profile. A Windows pass cannot certify POSIX or freestanding behavior.</p>
+<h2 id="release-01-alpha1-target-matrix">Release 0.1-alpha.1 target matrix</h2>
+<p>Adopted 2026-10-06 (D3). Supported, release-gated targets:</p>
+<table>
+<tr><th>Target</th><th>Adopted scope</th><th>Qualification at the R4 input</th><th>Required R5 evidence</th></tr>
+<tr><td><code>x86_64-pc-windows-gnu</code></td><td>SUPPORTED / RELEASE-GATED</td><td>VERIFIED IN E-WAVE TESTED SCOPE at e4f9fb53</td><td>exact candidate clean native/full regression and CI</td></tr>
+<tr><td><code>x86_64-unknown-linux-gnu</code> (Ubuntu)</td><td>SUPPORTED / RELEASE-GATED</td><td>NOT VERIFIED (normal and ASan)</td><td>exact candidate normal CI + ASan with instrumented scope recorded</td></tr>
+</table>
+<p>The <a href="../../audits/0.1-alpha-completion-2026-10-04/r4/target-matrix.md">detailed target matrix</a> separates native evidence from job configuration and host-toolchain identity.</p>
+<p>NOT ADVERTISED in 0.1-alpha.1: macOS, freestanding and every other target. A target that currently compiles but is not listed here remains experimental/unverified and is not release-supported. The host toolchain triple (for example <code>x86_64-pc-windows-msvc</code>) is not a Luna target and MUST NOT be advertised as one. The maintainer confirms the final advertised matrix before tagging.</p>
 <h2 id="release-01-gate">Release 0.1 gate</h2>
 <p>Before declaring the release conformant, address confirmed compiler/library and architecture gaps; resolve normative disagreements without silent syntax changes; regenerate sysroot artifacts through the official path; run required focused and relevant workspace regressions; verify diagnostics and parity; and publish the exact supported target matrix and any accepted deferrals.</p>
-<p>Current readiness is <strong>BLOCKED</strong> by <a href="gaps.html">gaps.md</a>. The latest audit built all providers and completed substantial checks, but did not complete all compiler tests, sanitizer/fuzzing, all targets or all generic/data domains. Historical green test counts do not supersede a later counterexample.</p>
+<p>Current readiness is <strong>BLOCKED</strong> by <a href="gaps.html">gaps.md</a> and the <a href="../../audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md">R5 checklist</a>. E-wave completed three Windows workspace regressions and 236/236 arithmetic acquisitions; this does not complete Ubuntu/ASan, the structural diagnostic inventory, every generic/data domain, broader sanitizers or fuzzing. Historical green counts do not supersede a later counterexample.</p>
+<h2 id="retained-01-contract-scope">Retained 0.1 contract scope</h2>
+<p>Adopted 2026-10-06 (D4). The following contracts remain part of 0.1-alpha.1 and are NOT deferred to 0.2:</p>
+<table>
+<tr><th>Contract</th><th>Status</th></tr>
+<tr><td>NAMESPACE-USING-v1</td><td>KEEP</td></tr>
+<tr><td>PROVIDER-CONFIG-v1</td><td>KEEP</td></tr>
+<tr><td>MODULE-CONST-STORAGE-v1</td><td>KEEP</td></tr>
+<tr><td>CALL-ARGUMENTS-v1</td><td>KEEP</td></tr>
+</table>
+<p>Each is a release requirement. If any of them is not yet conformant, the release remains <strong>BLOCKED</strong>; an implementation gap does NOT automatically move a contract out of 0.1. Removing or deferring any of these requires a new explicit maintainer decision.</p>
 <h2 id="documentation-refresh-validation">Documentation refresh validation</h2>
 <p>Local documentation consistency is checked with <code>python docs/tools/validate_v01_docs.py</code>. It validates current links, authority roles, provider/hook inventories and generated pages. <code>python docs/tools/check_v01_examples.py</code> records CLI examples and known grammar failures in both source/artifact modes. These two commands intentionally separate documentation consistency from compiler conformance; known failures are retained in their evidence, not converted into success expectations.</p>
 <p>The CLI recorder defaults to the Windows debug executable and the audited GNU runtime archive. Other build locations can be selected with <code>LUNA_DOCS_CLI</code> and <code>LUNA_RUNTIME_LIB</code>; <code>LUNA_DOCS_TOOLCHAIN_PATH</code> optionally prepends toolchain directories to PATH, and <code>LUNA_DOCS_TEMP</code> selects temporary storage. Rebuild the matching CLI, runtime and sysroot artifacts before collecting new evidence. Use <code>LUNA_DOCS_EVIDENCE_OUT</code> to keep a later run separate from the original audit evidence; the integration run is stored in <code>docs/integration/evidence</code>.</p></main><footer class="footer"><div class="container">Generated from the versioned specification. Historical freeze evidence is not current release certification.</div></footer></body></html>

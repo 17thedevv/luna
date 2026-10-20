@@ -1,0 +1,125 @@
+trait L0 {}
+trait L1 {}
+trait L2 {}
+trait L3 {}
+trait L4 {}
+trait L5 {}
+trait L6 {}
+trait L7 {}
+trait L8 {}
+trait L9 {}
+trait L10 {}
+trait L11 {}
+trait L12 {}
+trait L13 {}
+trait L14 {}
+trait L15 {}
+trait L16 {}
+trait L17 {}
+trait L18 {}
+trait L19 {}
+trait L20 {}
+trait L21 {}
+trait L22 {}
+trait L23 {}
+trait L24 {}
+trait L25 {}
+trait L26 {}
+trait L27 {}
+trait L28 {}
+trait L29 {}
+trait L30 {}
+trait L31 {}
+trait L32 {}
+trait L33 {}
+trait L34 {}
+trait L35 {}
+trait L36 {}
+trait L37 {}
+trait L38 {}
+trait L39 {}
+trait L40 {}
+trait L41 {}
+trait L42 {}
+trait L43 {}
+trait L44 {}
+trait L45 {}
+trait L46 {}
+trait L47 {}
+trait L48 {}
+trait L49 {}
+trait L50 {}
+trait L51 {}
+trait L52 {}
+trait L53 {}
+trait L54 {}
+trait L55 {}
+trait L56 {}
+trait L57 {}
+trait L58 {}
+trait L59 {}
+trait L60 {}
+struct Leaf {};
+impl L0 for Leaf {}
+impl<T: L0> L1 for T {}
+impl<T: L1> L2 for T {}
+impl<T: L2> L3 for T {}
+impl<T: L3> L4 for T {}
+impl<T: L4> L5 for T {}
+impl<T: L5> L6 for T {}
+impl<T: L6> L7 for T {}
+impl<T: L7> L8 for T {}
+impl<T: L8> L9 for T {}
+impl<T: L9> L10 for T {}
+impl<T: L10> L11 for T {}
+impl<T: L11> L12 for T {}
+impl<T: L12> L13 for T {}
+impl<T: L13> L14 for T {}
+impl<T: L14> L15 for T {}
+impl<T: L15> L16 for T {}
+impl<T: L16> L17 for T {}
+impl<T: L17> L18 for T {}
+impl<T: L18> L19 for T {}
+impl<T: L19> L20 for T {}
+impl<T: L20> L21 for T {}
+impl<T: L21> L22 for T {}
+impl<T: L22> L23 for T {}
+impl<T: L23> L24 for T {}
+impl<T: L24> L25 for T {}
+impl<T: L25> L26 for T {}
+impl<T: L26> L27 for T {}
+impl<T: L27> L28 for T {}
+impl<T: L28> L29 for T {}
+impl<T: L29> L30 for T {}
+impl<T: L30> L31 for T {}
+impl<T: L31> L32 for T {}
+impl<T: L32> L33 for T {}
+impl<T: L33> L34 for T {}
+impl<T: L34> L35 for T {}
+impl<T: L35> L36 for T {}
+impl<T: L36> L37 for T {}
+impl<T: L37> L38 for T {}
+impl<T: L38> L39 for T {}
+impl<T: L39> L40 for T {}
+impl<T: L40> L41 for T {}
+impl<T: L41> L42 for T {}
+impl<T: L42> L43 for T {}
+impl<T: L43> L44 for T {}
+impl<T: L44> L45 for T {}
+impl<T: L45> L46 for T {}
+impl<T: L46> L47 for T {}
+impl<T: L47> L48 for T {}
+impl<T: L48> L49 for T {}
+impl<T: L49> L50 for T {}
+impl<T: L50> L51 for T {}
+impl<T: L51> L52 for T {}
+impl<T: L52> L53 for T {}
+impl<T: L53> L54 for T {}
+impl<T: L54> L55 for T {}
+impl<T: L55> L56 for T {}
+impl<T: L56> L57 for T {}
+impl<T: L57> L58 for T {}
+impl<T: L58> L59 for T {}
+impl<T: L59> L60 for T {}
+fn needs<X: L60>(x: X) -> i32 { return 0; }
+fn main() -> i32 { return needs(Leaf {}); }

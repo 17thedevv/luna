@@ -1,0 +1,2 @@
+export trait Foreign {} // first candidate
+export struct ForeignRecord { value: i32 }; // second candidate

@@ -6,6 +6,12 @@
 
 # Micro-backlog thực thi — Luna 0.1-alpha.1 (2026-10-06)
 
+R4 reconciliation, 2026-10-14: [exact ledger and R5 handoff](r4/README.md),
+base `3f8646c654b99b67bae57ee290b7a7e23d717b40`. Later closure/decision rows in
+that ledger supersede earlier OPEN wording below only in their tested scopes.
+Original failures and maintainer deferrals stay historical evidence. R5 is
+PENDING / RELEASE BLOCKED; complete DIAG-1..10 and Ubuntu normal/ASan are not PASS.
+
 Tách từ [kế hoạch còn lại](REMAINING-PLAN-2026-10-06.md) và
 [kế hoạch gốc 2026-10-04](README.md). Tham chiếu ledger [EXECUTION](EXECUTION.md),
 contract [CALL-ARGUMENTS-v1](../../spec/0.1/call-arguments-v1.md) và
@@ -323,6 +329,560 @@ workspace: 209 binaries, 1341 passed / 0 failed / 1 ignored (exit 0)
 release: still BLOCKED
 next correctness blocker: A6
 ```
+
+### A6 — Unary logical NOT
+
+Implementation fix. `!x` was rejected for every operand with E2012
+(`Unary operator `Not` is not yet supported`). The parser already produced
+`UnaryOp::Not`; the gap was in the typechecker (grouped with the unsupported
+BitNot/PostInc/PostDec) and the MVIR generator (no lowering). Fix: typechecker
+admits `bool -> bool` and rejects a non-bool operand with one E2012 (poisoned);
+generator lowers `!x` to `Eq { x, false }` — no new instruction, no MVIR schema
+change, so **no protocol bump**. Comptime and runtime share semantics.
+Bitwise NOT on integers is deliberately not added.
+
+```
+A6
+status: CLOSED / CONFORMANT IN TESTED SCOPE (implementation fix)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: unary_not_cli PASS + luna-semantic 0 failed + expression_diagnostic_spans_cli PASS
+workspace: 210 binaries, 1342 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: C2
+```
+
+### C2 — Per-impl-header metadata
+
+Freeze matrix found **no counterexample**. Each checked impl header keeps its
+identity, binders, constraints, trait arguments, associated types and method
+contracts through `.llib` serialization/decoding/reconstruction; two concrete
+`Describe` impls and `Ranked<i32>`/`Ranked<bool>` on the same nominal head are
+never merged; the graph resolves from a relocated artifact; an ambiguous method
+call rejects with E1008 (never picks the first candidate). Interface-fingerprint
+and stale-dependency semantics remain covered by `interface_constraints_cli`.
+Closes as a coverage certification; no compiler change was required and the
+protocol is unchanged.
+
+```
+C2
+status: CLOSED / CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: impl_header_metadata_cli PASS + interface_constraints_cli PASS + test_artifact_metadata_parity 9 PASS
+workspace: 211 binaries, 1343 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: C3
+```
+
+### C3 — Projection / fallback + proof depth
+
+Implementation fix. Two counterexamples:
+
+1. **Proof-depth guard leaked into the language** — a valid 70-deep blanket-impl
+   chain was rejected with `E2021 does not implement L70` (depth 60 passed) because
+   `prove_trait_goal` returned false at a fixed `stack.len() >= 64`. Fixed with a
+   named `MAX_PROOF_DEPTH = 256`; exact-cycle detection unchanged, so a genuinely
+   cyclic blanket bound still rejects.
+2. **Chained projection not resolved** — `Module::Type::Assoc::Nested` was rejected
+   with `E1001` because the prefix was resolved only through the symbol table.
+   Fixed by resolving the prefix left to right (descend modules, stop at a type,
+   then project the remaining segments).
+
+Structured diagnostics confirmed: `E2008` cyclic projection, `E2019` ambiguous
+projection (single, no cascade), `E2021` cyclic bound. Generic chained projection
+(`T::Assoc::Nested`) needs associated-type bounds (`type Assoc: Trait`), which the
+grammar does not accept — recorded, fail-closed. No protocol bump.
+
+```
+C3
+status: CONFORMANT IN TESTED SCOPE (implementation fix)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: projection_fallback_cli PASS + trait_argument_bounds_cli PASS + interface_constraints_cli PASS + luna-semantic 0 failed
+workspace: 212 binaries, 1344 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next correctness blocker: C4
+```
+
+### C4 — Comptime execution-dependency precision
+
+Freeze matrix (no counterexample in the tested scope). C4-1 direct body change
+(interface unchanged) rejects with a typed stale diagnostic; C4-2 transitive leaf
+change rejects; **C4-3 unused imported provider change does NOT invalidate** (no
+false-positive); C4-5 covered by C4-1; C4-6 source/artifact parity; C4-7 typed
+`dependency execution fingerprint mismatch`. `interface fingerprint != execution
+fingerprint` holds. Verdict wording: **sound and sufficiently precise in the
+tested scope** — the global claim "depends on exactly the executed providers" is
+NOT made, because branch-sensitive selection is unconfirmed (C4-FU1).
+
+Recorded limitation **C4-FU1** (non-blocking): branch-sensitive dependency
+selection. The comptime dependency set is a static call-graph walk, so a provider
+reachable only through an untaken branch can still be recorded — **sound but
+imprecise** (over-approximation), never a missing (unsound) dependency.
+
+```
+C4
+status: CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: comptime_dependency_precision_cli PASS (source + artifact)
+workspace: 213 binaries, 1345 passed / 0 failed / 1 ignored (exit 0)
+open follow-ups: C4-FU1 branch-sensitive dependency selection (non-blocking, precision)
+release: still BLOCKED
+next correctness blocker: C5
+```
+
+### C5 — Artifact freshness classification
+
+Implementation fix. Format/compiler/MVIR/semantic-metadata version mismatches all
+surfaced as the same `MlibError::VersionMismatch(u16)` (`invalid manifest:
+VersionMismatch(N)`), so the failing boundary was not identifiable. Fix: classify
+the boundary with `VersionMismatch { component, found, expected }` where
+`component ∈ {format, compiler, mvir, semantic-metadata}`. Target mismatch
+(`TargetMismatch`), object identity (`ObjectIntegrityMismatch`), section tampering
+(`SectionChecksumMismatch`), and interface/execution fingerprint staleness were
+already classified.
+
+Harness `fresh_artifact_classification_cli` mutates one boundary per case
+(header format/compiler/mvir/target triple, metadata section version, object
+payload — with the section checksum refreshed so validation reaches the boundary).
+Every stale class rejects deterministically with a classified reason; no
+executable is published; a fresh artifact builds and runs.
+
+`FIND-ASYNC-PROVIDER-01` stays independent (deeper serialization/`CorruptedData`
+issue, not a freshness class).
+
+```
+C5
+status: CONFORMANT IN TESTED SCOPE (implementation fix)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: fresh_artifact_classification_cli PASS + luna-llib 24 PASS + struct_lifetime_contract_acceptance_tests PASS
+workspace: 214 binaries, 1346 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: D-wave
+```
+
+### D1 — DIAG-1..10 diagnostic conformance
+
+Implementation fix + coverage. Counterexample **D1-1**: DIAG-10 requires parity
+between `docs/diagnostics/diagnostics-v1.md` and `DiagnosticCode::ALL`, but `ALL`
+did not exist. Fix: added `DiagnosticCode::ALL` (68 codes) + `registry_parity`
+unit tests (doc<->enum parity, uniqueness, naming; range rows excluded).
+
+Matrix: DIAG-1 typed code ✓, DIAG-2 source span ✓, DIAG-3 related spans ✓,
+DIAG-4 poison containment ✓, DIAG-5 determinism ✓, DIAG-6 dedup ✓, DIAG-7 phase
+ownership ✓, DIAG-8 origin traceability ✓, DIAG-9 source/artifact parity ✓,
+DIAG-10 FIXED.
+
+Non-blocking observations: D1-FU1 (E3001 message renders internal `%v5.0`);
+D1-FU2 (comptime failure emits E1001 + E4005 for one root).
+
+```
+D1
+status: CONFORMANT IN TESTED SCOPE (implementation fix + coverage)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: diagnostic_conformance_cli 4 PASS + luna-common 10 PASS
+workspace: 215 binaries, 1352 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: D2
+```
+
+### D2 — Expression span precision
+
+Coverage certification (no counterexample). Four targeted expression errors carry
+precise, stable, smallest-useful spans: E2002 invalid deref, E2012 invalid
+negation (`-value` on bool — invalid operand type, not feature support), E2026
+invalid char cast (span on `55296`, not the statement), E2003 invalid tuple
+projection. Harness `expression_span_precision_cli` asserts code, primary span
+line:column, caret width == token width, and identical rendered block between
+check/build and source/artifact. Guard `expression_diagnostic_spans_cli` PASS.
+
+```
+D2
+status: CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: expression_span_precision_cli PASS + expression_diagnostic_spans_cli PASS
+workspace: 216 binaries, 1353 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: D3
+```
+
+### D3 — Provider Tier-2 / Tier-3 matrix
+
+Coverage certification (no provider-boundary counterexample). Locks public
+interface -> serialized metadata -> dependency reconstruction -> consumer
+resolution. Tier-3 `consumer -> a -> b -> c` resolves and runs in all five modes
+(all-source, a-artifact, ab-artifact, all-artifact, relocated). Tier-2 surface
+(generic fn/type, trait+impl, comptime const, private helper reached from a public
+fn) survives the artifact boundary without leaking the private symbol. Missing
+dependency fails closed with E1004 (no source fallback). Stale classes covered by
+`interface_constraints_cli` / `comptime_dependency_precision_cli` /
+`fresh_artifact_classification_cli`.
+
+`FIND-ASYNC-PROVIDER-01` reproduces (zero-parameter exported `async fn` `.llib`
+import -> `CorruptedData`); recorded and **excluded** from D3 (root cause is a
+deeper serialization issue, not a Tier-2/3 boundary defect); still open.
+
+```
+D3
+status: CONFORMANT IN TESTED SCOPE (coverage certification)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: provider_tiers_cli 4 PASS + interface_constraints_cli / artifact_execution_dependencies_cli / alpha_modules_cli PASS
+workspace: 217 binaries, 1357 passed / 0 failed / 1 ignored (exit 0)
+excluded/open: FIND-ASYNC-PROVIDER-01
+release: still BLOCKED
+next: D4
+```
+
+### D4 — Retained contracts
+
+Ledger certification (no mega-test). Nine groups re-certified on the candidate;
+new reducers added only for gaps (FFI, dyn, entry, UTF-8, lifetime) with a
+positive and a negative/fail-closed case in source and artifact modes:
+lifetime (E3001), FFI (`extern fn` + `#[link]`; E2030), dyn (`&dyn` dispatch;
+E2010), closure (`generic_drop_cli`), async (`a2_suspension_cleanup_tests`,
+`async_cleanup_cli`), comptime (`comptime_dependency_precision_cli`,
+`artifact_execution_dependencies_cli`), UTF-8 (E2026), entry (`fn main(args:
+[str])`; E2024), backend (`fresh_artifact_classification_cli`).
+
+Guard batch all green. **FIND-ASYNC-PROVIDER-01 promoted to its own task**
+(decision B) — async runtime contract passes, provider-serialization finding
+stays OPEN. A2-FU1 stays OPEN (before R5). D4-FU1 observation: a file whose first
+item is `#[link(...)]` fails to parse (E0003).
+
+```
+D4
+status: CLOSED / CONFORMANT IN TESTED SCOPE (coverage certification / ledger)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: retained_contracts_cli PASS + guard batch (generic_drop/async_cleanup/a2_suspension/comptime_dependency/artifact_execution/provider_tiers/fresh_artifact) PASS
+workspace: 218 binaries, 1358 passed / 0 failed / 1 ignored (exit 0)
+promoted: FIND-ASYNC-PROVIDER-01 (own task)
+open: A2-FU1 (before R5); C4-FU1, D1-FU1, D1-FU2, D4-FU1
+release: still BLOCKED
+next: FIND-ASYNC-PROVIDER-01
+```
+
+### FIND-ASYNC-PROVIDER-01 — exported async provider `.llib` corruption (FIXED)
+
+Freeze matrix (controls) showed the trigger is **non-generic exported async**, not
+zero parameters: async zero-param, async parameterized and async void all failed;
+generic async and sync passed (their bodies never materialize, so they never emit
+`HeapFree`).
+
+First mismatch: the MVIR **instruction opcode table**. The writer emits `HeapFree`
+as opcode **17** (single operand); the reader's opcode-17 arm decoded `Eq` (two
+operands, a stray duplicate of opcode 8), while `HeapFree` sat at opcode 15 which
+the writer never emits. Only async-lowered bodies emit `HeapFree` (A2 future-env
+free) → 1-operand drift per occurrence → garbage `block_count` → abort /
+`CorruptedData`.
+
+Fix (`13082834`, authored by the maintainer): the reader decodes opcode 17 as
+`HeapFree { value }`; the stale opcode-15 arm is removed; MVIR wire unit tests
+added. A parallel local attempt was discarded as a duplicate. No protocol bump
+(schema and emitted bytes unchanged; previously-broken artifacts become readable).
+
+```
+FIND-ASYNC-PROVIDER-01
+status: CLOSED / FIXED IN TESTED SCOPE
+implementation_commit: 13082834
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: async_provider_export_cli 2 PASS + luna-llib 20 PASS (incl. MVIR wire tests)
+workspace: 219 binaries, 1362 passed / 0 failed / 1 ignored (exit 0)
+note: an earlier full run flagged one luna-driver combinators harness flake (remove_artifacts NotFound); the binary passes 9/9 in isolation and the re-run is green — pre-existing harness race, not a regression
+release: still BLOCKED
+next: A2-FU1
+```
+
+### A2-FU1 — shared DropFlagPlan / DropFlagTransition (DONE)
+
+Refactor (no semantics change). The sync cleanup (`drop_flags::elaborate`) and the
+async cleanup (`suspension::compute_async_cleanup_plan`) each duplicated the same
+per-instruction ownership-transition loop. New module
+`luna-borrowck/src/drop_flag_plan.rs` owns
+`DropFlagTransition { Initialize, Reinitialize, MoveOut, Destroy, ConditionalMove }`
++ `plan_drop_flag_transitions(...)`; both paths route through it and keep their own
+storage (sync: bool alloca; async: env field). Shared semantics, separate physical
+storage — the abstraction keys on `Place` + transition, not ValueId/env index.
+Unit tests prove the shared model (`transition_mapping_is_the_shared_contract`,
+`both_cleanup_paths_share_the_planner`).
+
+```
+A2-FU1
+status: DONE (anti-drift refactor; no semantics change)
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: generic_drop_cli/a2_suspension/async_cleanup/async_provider_export PASS + luna-llib/luna-borrowck 0 failed
+workspace: 219 binaries, 1364 passed / 0 failed / 1 ignored (exit 0)
+note: two earlier parallel runs each flaked one luna-driver acceptance test (different test each time; both pass in isolation) — pre-existing shared-sysroot concurrency fragility, not a regression
+release: still BLOCKED
+next: classify C4-FU1 / D1-FU1 / D1-FU2 / D4-FU1
+```
+
+### Debt classification (2026-10-09)
+
+| Debt | Classification | Before R5? |
+|---|---|---|
+| C4-FU1 branch-sensitive comptime deps | Sound but imprecise (static call-graph over-approximation) | **No — formally DEFERRED to 0.2** |
+| D1-FU1 E3001 renders `%v5.0` | Presentation leak (code/span/ownership all correct) | **No — formally DEFERRED (non-blocking presentation)** |
+| D1-FU2 comptime E1001 + E4005 | **Redundant cascade — FIXED** (provenance preserved at the comptime boundary) | Yes — CLOSED / FIXED IN TESTED SCOPE |
+| D4-FU1 `#[link]` placement | Corrected: `#[link]` on entry `main` → E6001 backend ICE | **Yes — RELEASE_BLOCKER** |
+| Harness parallel flakes | **FIXED** — `TempWorkspace` RAII ownership + orphan sweep; unbounded growth (3467 dirs / 21.3 GB → `StorageFull`) eliminated; bounded residual cleanup (one 0-byte dir reclaimed by the next process); per-test isolation preserved | Yes — CLOSED / FIXED IN TESTED SCOPE |
+
+Sequence from `d4d980fb`: D4-FU1 ✅ closed → D1-FU2 ✅ closed → R5-HARNESS-01 ✅ closed →
+C4-FU1 ✅ deferred → D1-FU1 ✅ deferred → regression workspace → E1/E2 → R4 → R5.
+
+### D4-FU1 — `#[link]` on the program entry (FIXED)
+
+Original observation (attribute-first → E0003) **RETRACTED as a misdiagnosis**: the
+E0003 came from the invalid `extern "C" fn` spelling, not attribute position.
+Verified: `#[link]` first item + `extern fn`, a leading comment, and a preceding
+item all build and run.
+
+Corrected finding: `#[link] fn main()` → `check` PASSED, `build` → **E6001 backend
+ICE** (`Function not found: __luna_user_main`), because `#[link]` renames the
+compiler-owned entry symbol (generator.rs:1651-1675). Front-end validation gap
+(DIAG-7), release blocker.
+
+Fix: reject `#[link]` on the entry `main` with `InvalidAnnotation` (E0005) at the
+front-end entry-identity site; span on the `#[link]` attribute; generator
+unchanged (no silent ignore).
+
+```
+D4-FU1
+status: CLOSED / FIXED IN TESTED SCOPE
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: ffi_attribute_placement_cli 1 PASS + retained_contracts_cli 1 + diagnostic_conformance_cli 4 + luna-semantic 0 failed
+workspace: 220 binaries, 1365 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: D1-FU2
+```
+
+### D1-FU2 — comptime diagnostic cascade (FIXED)
+
+One semantic error inside a comptime target produced `E1001` **and** a second,
+generic `E4005`. Classification: **redundant cascade**, not a legitimate causal
+pair — E4005's message embedded a lowering symptom (`unresolved method ...
+reached lowering`) caused by the already-diagnosed E1001, so it carried no
+independent failure.
+
+Root cause = provenance loss at the comptime evaluation boundary
+(`luna-mvir/src/interp.rs` `finish_preparation` flattened `generator.diagnostics`
+into a `ComptimeError::TypeMismatch` string, dropping code + span). Fix: a new
+`ComptimeError::AlreadyDiagnosed` variant returned by that generator-invariant
+path; `report_comptime_error` emits nothing for it. The distinction is
+**structural** (did the failure come from an already-diagnosed, unlowerable
+program?) — not the forbidden "if E1001 exists" shortcut — and every independent
+interpreter failure keeps its own variant and still reports E4005.
+
+```
+D1-FU2
+status: CLOSED / FIXED IN TESTED SCOPE
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: comptime_diagnostic_cascade_cli 4 + diagnostic_conformance_cli 4 + comptime_dependency_precision_cli 1 + artifact_execution_dependencies_cli 1 + adv_comptime_dyn_tests 16 + ui_tests 1 + luna-semantic 0 failed
+workspace: 221 binaries, 1369 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+next: R5-HARNESS-01
+```
+
+Note: two of the three workspace attempts on this branch exited 101 with
+`Os { code: 112, kind: StorageFull }` at `support/stdlib.rs:34` — **not a
+regression**: `ProviderModes::fresh()` builds an isolated sysroot under
+`%TEMP%` and never removes it, so repeated runs had left 3467 abandoned
+`%TEMP%\luna*` directories (21.3 GB). After deleting them the run was clean.
+This is direct evidence for the R5-HARNESS-01 root cause (unbounded temp
+growth + shared-sysroot concurrency, not per-test isolation).
+
+### R5-HARNESS-01 — deterministic test infrastructure (FIXED)
+
+Two distinct problems, kept separate:
+
+1. **Temp sysroot never cleaned up** — 3467 abandoned `%TEMP%\luna*` dirs / 21.3 GB
+   caused `StorageFull` aborts. Root cause: suite-local helpers created unique
+   temp sysroots with no owner (~90 driver suites built paths from
+   `std::env::temp_dir()`; `ProviderModes` had only a heuristic `Drop`).
+2. **Shared mutable output under parallel execution** — **reproduced**: a full
+   workspace run failed `compiler_gap_c_gap_12_safe_loan_effect_tests` with
+   `build fresh canonical sysroot for artifact parity: "Build lock already
+   exists"` while the same binary passed in isolation (4/4, and 1/1 alone).
+   Root cause: suite helpers made paths unique with `pid` + `SystemTime::now()`
+   only, and Windows `SystemTime` granularity is coarse (~15 ms), so two tests
+   running in parallel inside one binary produced the **same** directory — hence
+   the same `.build.lock` and the same artifacts.
+
+Fix: new crate `luna-test-support` with `TempWorkspace` (RAII; guarded removal by
+name prefix + temp-dir containment + marker file), `owned_temp_root()` (one owned
+process root, **a unique child per call** so clock collisions cannot alias two
+tests), and a once-per-process orphan sweep for workspaces whose pid is gone.
+`ProviderModes` owns a `TempWorkspace`; 108 files / 123 call sites route through
+the owned root. No `ignore NotFound` band-aid; no compiler semantics, provider
+protocol or cache-invalidation change.
+
+```
+R5-HARNESS-01
+status: CLOSED / FIXED IN TESTED SCOPE
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+gate: 3 consecutive full workspace runs, parallel mode (no --test-threads=1), temp measured before/after
+run A: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 0 dirs / 0 GB -> 1 dir / 0 GB
+run B: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 1 dir / 0 GB -> 1 dir / 0 GB
+run C: 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 1 dir / 0 GB -> 1 dir / 0 GB
+residual: bounded residual cleanup — one 0-byte directory owned by the last test process; the next process's orphan sweep reclaims it. This is a known infrastructure limitation for 0.1-alpha.1; it is NOT a claim that every temp directory is removed the moment a process exits.
+sweep guard: only directories named `luna_test_ws_*`, directly under the process temp dir, carrying our marker file, AND owned by a pid that is no longer alive are removed — a running process's workspace is never touched.
+release: still BLOCKED (next: regression workspace → E-wave)
+regression (candidate 98b55952, post-defer): 224 binaries, 1383 passed / 0 failed / 1 ignored (exit 0) — temp 0 dirs / 0 GB -> 1 dir / 0 GB
+```
+
+### Formal defer decisions (0.1-alpha.1)
+
+Decisions recorded only — **no implementation change** in this pass.
+
+**C4-FU1 — branch-sensitive comptime dependency selection → DEFERRED to 0.2**
+- Decision: not a 0.1-alpha.1 release blocker. The behaviour is **sound but
+  imprecise**: the static call-graph over-approximation can record a provider that
+  is only reachable through an untaken branch. It never drops a real (executed)
+  dependency, so it cannot produce a stale-artifact false negative.
+- Tested scope: C4 freeze matrix C4-1/C4-2/C4-3/C4-5/C4-6/C4-7 with no
+  counterexample; `comptime_dependency_precision_cli` PASS (source + artifact).
+- Reopen when: a case is found where an untaken branch's provider materially
+  affects a release claim, or before claiming exact dependency selection.
+- Target: 0.2 (precision), not a correctness fix.
+
+**D1-FU1 — E3001 renders internal `%v5.0` → DEFERRED, non-blocking presentation**
+- Decision: presentation-only. Diagnostic code, span and phase ownership are all
+  correct; only the rendered message leaks an internal type-id placeholder.
+- Tested scope: D1 matrix DIAG-1..DIAG-10; `diagnostic_conformance_cli` PASS.
+- Reopen when: a user-visible message-quality pass is scheduled, or if a spec/UX
+  requirement forbids internal placeholders in rendered diagnostics.
+- Target: 0.2 (presentation), not a correctness fix.
+
+With C4-FU1 and D1-FU1 deferred, the known release blockers in the A/C/D groups
+and in test infrastructure are closed. This does **not** replace the E-wave (spec
+debt) or the R5 release qualification.
+
+### E2 — Grammar / spec reconciliation (FIXED)
+
+Reconciled the four grammar/diagnostic rows to the current implementation:
+
+- **V01-GRAMMAR-01** — semicolon field delimiters reject with typed `E0002` and a
+  primary span in both modes.
+- **V01-GRAMMAR-02** — `for (pattern in expression)` is the canonical 0.1 head.
+  The unparenthesized head is kept only as LEGACY / CHARACTERIZATION, is not
+  standardized, and must not be used by stdlib or official docs; C-style `for` is
+  unaffected.
+- **V01-GRAMMAR-03** — `&self`, `&rw self` and bare `self` build and run.
+- **V01-DIAG-01** — evidence-backed parts closed (parser failures render typed
+  codes with spans); the remaining structural invariants stay **R5 preconditions**,
+  not deferred.
+
+Evidence was regenerated by re-running the CLI recorder on the candidate — never
+hand-edited — for the spec_v01 and integration targets; the pre-fix record is
+preserved under `historical-2026-10-04/`, and the validator asserts both the
+reconciled current evidence and that history still shows the gaps.
+
+```
+E2
+status: CLOSED / FIXED IN TESTED SCOPE
+protocol: compiler22 / metadata9 / MVIR5 / format2 (no bump)
+focused: v01_grammar_acceptance_tests 7 + registry_parity 2 + diagnostic_conformance_cli 4 + docs validator 0 errors
+workspace: 224 binaries, 1384 passed / 0 failed / 1 ignored (exit 0)
+release: still BLOCKED
+```
+
+### E1 — Checked integer arithmetic (CLOSED — 2026-10-13)
+
+Current qualification, 2026-10-13: four 59-row matrices and diagnostic
+acquisition PASS on `939d53e0ad7719c7c4a3eb4b915173fedeb1a129`. Full workspace
+stops at 138 binaries / 877 PASS / 1 FAIL / 1 ignored / exit101:
+RangeInclusive computes a successor after MAX solely to replace its owned
+terminal slot. The checked overflow trap is correct. The maintainer approved
+Option slot representation; canonical-provider qualification passes four modes.
+A wider i128 non-Copy test exposed generic enum alignment, now repaired under
+separate approval with compiler25. See the [alignment record](evidence/REPORT-E1-ENUM-ALIGNMENT-2026-10-13.md).
+The historical [blocker report](evidence/REPORT-E1-RANGE-BLOCKER-2026-10-13.md)
+links concrete four-mode/non-Copy feasibility evidence. No three-pass gate or
+candidate advancement is claimed. Compiler25/metadata9/MVIR5/format2 is now
+the adopted boundary; E2 stays CLOSED.
+
+Contract: ordinary integer arithmetic is checked; debug and release share the
+same semantics; comptime failures stay `E4005` with a primary source span; float
+and pointer behavior unchanged; MVIR opcodes unchanged. The initial compiler
+22 → 23 boundary was subsequently amended to **25**, rejecting real22/23/24
+(metadata9 / MVIR5 / format2 unchanged) so incompatible native artifacts cannot be reused.
+
+**Stage 1 — freeze baseline: DONE.** 34 reducers in
+`tests/luna/language/checked_arithmetic/`, recorded by
+`docs/tools/record_checked_arithmetic.py` into `e1-stage1-baseline.json`:
+0 traps, 30 reducers complete with silent wrapping (including division by zero,
+`MIN / -1` and out-of-range shifts), 4 comptime reducers report `E4005`.
+Classification: no signedness/promotion surprises, so checked lowering only adds
+traps; the one pre-existing defect observed is a duplicated `E4005` per comptime
+root, which Stage 3 must decide (fix or record).
+
+**Stage 2A — wrapping contract + stdlib audit: DONE.** Option A approved:
+explicit `std::wrapping_add/sub/mul` recognised by compiler-owned language-item
+identity (never by library-name string matching), lowered to unchecked modular
+ops, with comptime parity. The `.llib` writer already carries the kind in the
+compiler-owned `__luna_intrinsic_{kind}` name, so artifact identity can be
+reconstructed without a wire change; if that proves insufficient the task stops
+for a wire-contract review. Stdlib audit: `core/hash.ln` `mix_u64`,
+`alloc/raw_table.ln` `mix_hash` and `alloc/string.ln` FNV are intentional modular
+math → migrate to `wrapping_*`; capacity/allocation-size math stays checked;
+`core/num.ln` `checked_*`/`saturating_*` are already overflow-safe. 12 wrapping
+reducers added; baseline = COMPILE_ERROR (`std::wrapping_*` not yet defined).
+
+Current closure, 2026-10-13: source `e4f9fb530d72628c81dfa29d117afeb99cc7664c` passes four 59-row
+matrices and three consecutive default-parallel workspace runs. Compiler25
+rejects real22/23/24; source/fresh-artifact/relocation and diagnostic ownership
+gates pass. [E-wave closure](evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md)
+is the current qualification boundary; older entries below remain history.
+E2 remains CLOSED. Next is R4 preparation; Ubuntu GNU/ASan and broader release
+audit remain R5 obligations. Standalone comptime statement execution is a
+separate unsupported surface with typed E4005 admission.
+
+Current revision, 2026-10-12: diagnostic ownership repair and its supplemental
+E1010/E4005/E6001 mappings are adopted; ordinary integer DCE effects are fixed.
+Compiler24 is approved after real compiler23 unchecked-object reproduction;
+metadata9/MVIR5/format2 are retained. Alias identity, expanded-provider AST,
+hygienic access and generated metadata ownership are repaired. See the
+[repair report](evidence/REPORT-E1-REPAIR-2026-10-12.md). Final qualification is
+in progress; candidate remains `6017ba8d`. The checkpoint below is historical
+and does not override the adopted amendments or establish current closure.
+
+```
+E1
+status: STAGES 1 / 2A / 2B / 2C / 3 implemented; Stage 4 versioning implemented, diagnostic precondition BLOCKED (2026-10-12); final qualification not started in the blocked checkpoint
+base: 6017ba8d
+protocol: compiler23 / metadata9 / MVIR5 / format2
+stage1: 34 reducers, 0 traps / 30 silent-wrap / 4 comptime E4005 (duplicated)
+stage2a: contract frozen (Option A), stdlib audit done, 12 wrapping reducers (baseline COMPILE_ERROR)
+stage2b: 3 wrapping lang items (16->19 hooks), identity-based CallIntrinsic, modular LLVM + comptime, stdlib hash/FNV migrated; wrappers 42 no-trap / 4 comptime; hashmap 14 + storage 11 + hashset 8 + string 16 PASS; wrapping_arithmetic_cli 6 PASS (source/artifact/relocation/comptime + forged-name and #[link] guards); workspace 225 binaries / 1390 passed / 0 failed / 1 ignored (exit 0)
+stage2c: checked LLVM lowering for + - * (overflow intrinsics), / % (zero and signed MIN/-1 guards), << >> (count guard + left-shift round-trip value check), unary -MIN; guards dominate the dangerous op; no nsw/nuw; float/pointer unchanged; compiler-generated arithmetic audited (no wrapping exemption needed)
+stage3: comptime shift value-overflow parity; single E4005 ownership (Pass 1.5 no longer duplicates the main declaration pass); D1-FU2 guard unchanged
+stage4: compiler 22 -> 23 with a real compiler22 artifact rejected as VersionMismatch(component="compiler") before payload decode; fresh compiler23 artifacts accepted; relocation accepted
+matrix: 52 rows -> 28 TRAP / 20 NO_TRAP / 4 COMPILE_ERROR / 0 UNEXPECTED_EXIT (one diagnostic per comptime row)
+release: still BLOCKED pending R4/R5
+```
+
+E1-FU-DIAG-01 is a **confirmed release blocker**, not an attribution nuance.
+DIAG-8 forbids a phase from emitting another phase's code; the registry assigns
+E0005 only to Parser. At `2fcce5a4`, reserved intrinsic declarations/renames emit
+it in the semantic attribute processor, and `#[link]` on entry `main` emits it
+in TypeChecker. Resolver also constructs it for contextual language-item
+validation. Three CLI negatives reproduce exactly one E0005 in each check/build
+invocation. Moving ownership or changing semantic diagnostic identities needs
+an explicit maintainer decision; do not reinterpret the attribute description
+as an exception to DIAG-8. The dated Stage 4 record is preserved as historical
+evidence, but its DONE verdict is superseded for current readiness by the
+[2026-10-12 blocker report](evidence/REPORT-E1-DIAGNOSTIC-BLOCKER-2026-10-12.md).
+Current fixtures total 55; the original 46-row historical subset records
+22 TRAP / 20 NO_TRAP / 4 COMPILE_ERROR. Four comptime rows are rechecked here;
+the remaining 42 runtime rows and final qualification are NOT VERIFIED at this
+checkpoint. Candidate remains `6017ba8d`; E2 implementation is unchanged.
+
+Note (artifact identity): the serialized MVIR stream is not executed — artifact
+execution reconstructs provider bodies from the portable AST, so intrinsic
+identity is re-established through the same resolved language-item path as source
+mode and no unrecognised `__luna_intrinsic_*` `CallDirect` can reach the native
+linker. A name in the wire does not prove authenticity of a forged artifact; the
+guarantee recorded is artifact/namespace consistency, not anti-forgery.
+Reconstruction with strict validation becomes a precondition only if that stream
+is ever executed. `__luna_intrinsic_*` declarations and `#[link]` renames claiming
+it are rejected with a typed `E0005`.
 
 ### A3 — Partial aggregate cleanup
 

@@ -1,0 +1,22 @@
+{
+  "gate": "cli-release",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "cargo",
+    "build",
+    "--locked",
+    "--manifest-path",
+    "/home/runner/work/_temp/r5-normal/checkout/luna-rs/Cargo.toml",
+    "-p",
+    "luna-cli",
+    "--release"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T18:01:05Z",
+  "exit": 0,
+  "seconds": 63.83951792200003,
+  "log_sha256": "702844f10934e6d8ce955bc91cb7b135b44b436f3f90f63d7a5da066f0011d21",
+  "status": "PASS",
+  "log": "cli-release.log.gz",
+  "compressed_sha256": "1720d51464c913309c710af5d3866fa390b2f630f4569450c2cda5d5a900f87e"
+}

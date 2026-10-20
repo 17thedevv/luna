@@ -1,0 +1,82 @@
+name: R5 exact-pin Ubuntu workspace qualification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/r5-missing-return]
+    paths:
+      - .github/workflows/r5-exact-workspace-qualification.yml
+      - docs/audits/r5-missing-return-2026-10-17/qualify_ubuntu_workspace.py
+
+permissions:
+  contents: read
+
+env:
+  R5_TESTED_COMMIT: d3d0ffe8d6495aee1f56257a1db817ce4107e992
+  R5_REPOSITORY_URL: https://github.com/17thedevv/luna.git
+  CARGO_TERM_COLOR: never
+  LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
+  LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
+  LLVM_HOME: /usr/lib/llvm-18
+
+jobs:
+  ubuntu-workspace-triage:
+    name: Ubuntu GNU complete workspace triage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install native GNU and LLVM18 dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build clang-18 llvm-18-dev libclang-18-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire full triage at immutable implementation pin
+        run: >-
+          python3 docs/audits/r5-missing-return-2026-10-17/qualify_ubuntu_workspace.py
+          --pass triage --out "$RUNNER_TEMP/r5-workspace-triage"
+      - name: Preserve triage evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-ubuntu-workspace-triage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/r5-workspace-triage/evidence/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+
+  ubuntu-workspace-final:
+    name: Ubuntu GNU complete workspace final with default parallelism
+    needs: ubuntu-workspace-triage
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install native GNU and LLVM18 dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build clang-18 llvm-18-dev libclang-18-dev
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          cache: false
+          rustflags: ""
+      - name: Acquire full final pass at immutable implementation pin
+        run: >-
+          python3 docs/audits/r5-missing-return-2026-10-17/qualify_ubuntu_workspace.py
+          --pass final --out "$RUNNER_TEMP/r5-workspace-final"
+      - name: Preserve final evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: r5-ubuntu-workspace-final-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/r5-workspace-final/evidence/
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true

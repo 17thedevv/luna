@@ -1,0 +1,9 @@
+{
+  "tested_commit": "52ef3711813ac0e2ded272f5ebe71897752766bc",
+  "harness_commit": "23ff7e8aea176fe4ff44d0104fe2e84ffd083a2c",
+  "workflow_run": "39032926577",
+  "status": "PASS_IN_EXECUTED_SCOPE",
+  "failure": null,
+  "scope": "Windows GNU native build/runtime/sysroot/focused/diagnostics/docs/quickstart/comptime; complete workspace acquired separately at the same pin",
+  "release": "BLOCKED PENDING COMPLETE R5 RECONCILIATION"
+}

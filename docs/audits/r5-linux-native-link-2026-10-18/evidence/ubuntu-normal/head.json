@@ -1,0 +1,17 @@
+{
+  "gate": "head",
+  "tested_commit": "3a72f9464fa921410b63551f7eac03414cf51e2b",
+  "command": [
+    "git",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "/home/runner/work/_temp/r5-normal/checkout",
+  "started_utc": "2026-10-17T18:00:39Z",
+  "exit": 0,
+  "seconds": 0.0038356780000299295,
+  "log_sha256": "0396c4e6c96ba40520d0f75e614f5baf6961f4cfbd8cf0d6c8f65fd989ab4c58",
+  "status": "PASS",
+  "log": "head.log.gz",
+  "compressed_sha256": "51f12fe5e8434c5fb6fde6b8643ade31c28f621046552491296501b328e5a5c4"
+}

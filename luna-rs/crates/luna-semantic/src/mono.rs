@@ -71,11 +71,12 @@ impl CanonicalInstanceIdentity {
                 return format!("{base}$defaults${}", omitted.iter().map(u32::to_string).collect::<Vec<_>>().join("_"));
             }
             CanonicalInstanceKind::Decl(decl_id) => {
-                if nominal_name == "main" || nominal_name.starts_with("__luna_") {
-                    return nominal_name.to_string();
-                }
                 let found_sym = tables.decl_symbols.get(&decl_id)
                     .map(|&symbol| symbol_table.get_symbol(symbol));
+                if found_sym.is_some_and(|symbol| symbol_table.is_program_entry(symbol.id))
+                    || nominal_name.starts_with("__luna_") {
+                    return nominal_name.to_string();
+                }
                 let mut method_substs = Vec::new();
                 let mut gp_idx = 0;
                 while let Some(&gp_sym) = tables.generic_param_symbols.get(&(decl_id, gp_idx)) {
@@ -141,7 +142,9 @@ impl CanonicalInstanceIdentity {
                 format!("{base}$defaults${}", omitted.iter().map(u32::to_string).collect::<Vec<_>>().join("_"))
             }
             CanonicalInstanceKind::Decl(decl_id) => {
-                if nominal_name == "main" || nominal_name.starts_with("__luna_") {
+                let found_sym = symbol_table.symbols.iter().find(|symbol| symbol.decl_id == Some(decl_id));
+                if found_sym.is_some_and(|symbol| symbol_table.is_program_entry(symbol.id))
+                    || nominal_name.starts_with("__luna_") {
                     return nominal_name.to_string();
                 }
                 let mut full_path = Vec::new();
@@ -1566,11 +1569,11 @@ impl<'a> MonoCollector<'a> {
             if let Some(message) = op.error_for_type(&self.ctx.types, ty) {
                 let span = self.get_expr_span_for_diag(operand)
                     .unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
-                self.ctx.diagnostics.push(
-                    luna_common::Diagnostic::error(message)
-                        .with_code(luna_common::DiagnosticCode::TypeMismatch)
-                        .with_span(span)
-                );
+                // DIAG-8: E2001 is owned by the TypeChecker phase; the mono pass
+                // routes through the owner-provided constructor.
+                self.ctx
+                    .diagnostics
+                    .push(crate::typechecker::type_mismatch_diagnostic(message, span));
             }
         }
     }

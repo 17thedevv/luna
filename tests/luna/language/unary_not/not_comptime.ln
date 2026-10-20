@@ -1,0 +1,5 @@
+const NEG: bool = comptime { !false };
+fn main() -> i32 {
+    if NEG { return 0; }
+    return 1;
+}

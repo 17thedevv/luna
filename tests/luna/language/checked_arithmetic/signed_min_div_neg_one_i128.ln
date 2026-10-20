@@ -1,0 +1,7 @@
+fn main() -> i32 {
+    dec min: i128 = -((1 as i128) << (126 as i128)) - ((1 as i128) << (126 as i128));
+    dec neg: i128 = 0 - 1;
+    dec r: i128 = min / neg;
+    if r == min { return 0; }
+    return 7;
+}
