@@ -1,0 +1,1447 @@
+{
+  "schema": 1,
+  "status": "PLANNED_NOT_IMPLEMENTED_NOT_FULL_API_MAP",
+  "source_commit": "41416737de0819c8174787035634b94084d4ec1e",
+  "stdlib_tree": "f5022851a7960564a3ac1bc886cd1667b13ba76b",
+  "snapshot_raw_sha256": "ee52bc0da8c42f914407e01dfdaf492a36bfa50e78310759af53e2b010d118bd",
+  "snapshot_archive_sha256": "cfc1fb83bcddf76a1d5a78e26ebb80e00fa497e2b15f4b8fb70af0eb52025516",
+  "snapshot_providers": 50,
+  "snapshot_declarations": 2375,
+  "repeat_byte_identical": true,
+  "all_source_digests_match": true,
+  "limitations": [
+    "Pre-expansion parser declarations; no derived/generated semantic items.",
+    "Declared visibility is not effective export visibility.",
+    "Dependency edges are explicit imports, excluding implicit bootstrap contracts.",
+    "Artifact paths are expected output locations, not evidence of valid bundles.",
+    "Signatures are descriptive; original source is authoritative for defaults, associated bindings and lifetime clauses.",
+    "Parameters/locals are nested implementation data, not separately migrated API units.",
+    "Fixture references are textual import matches, not semantic coverage or executed test results.",
+    "Enum payload type positions are not serialized in the source inventory; inspect original AST/source separately.",
+    "Wave 1 only; no automatic rewrite or complete stable surface claim."
+  ],
+  "candidate_declarations": 66,
+  "candidate_type_positions": 97,
+  "records": [
+    {
+      "declaration_id": "ptr#9",
+      "provider": "ptr",
+      "source": "luna-rs/libs/external/core/ptr.ln",
+      "line": 14,
+      "namespace": "std::ptr",
+      "owner": null,
+      "name": "add",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "count",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "ptr#12",
+      "provider": "ptr",
+      "source": "luna-rs/libs/external/core/ptr.ln",
+      "line": 18,
+      "namespace": "std::ptr",
+      "owner": null,
+      "name": "add_mut",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "count",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "ptr#31",
+      "provider": "ptr",
+      "source": "luna-rs/libs/external/core/ptr.ln",
+      "line": 34,
+      "namespace": "std::ptr",
+      "owner": null,
+      "name": "copy",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "count",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#10",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 11,
+      "namespace": "",
+      "owner": null,
+      "name": "floor_log2",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "n",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#46",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 140,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "slice_len",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#50",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 144,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "slice_get",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#54",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 154,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "slice_get_mut",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#62",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 164,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "split_at",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "mid",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#70",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 178,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "split_at_mut",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "mid",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#93",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 227,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "slice_binary_search_i32",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "std::Option<u64>",
+          "proposed_type": "std::Option<usize>"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#106",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 257,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "insertion_sort_by",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "hi",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#117",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 288,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "heapsort_by",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "hi",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#137",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 315,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "sift_down_by",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "base",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "start",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "heap_size",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#172",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 363,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "partition_by",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "hi",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#181",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 445,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "introsort_by_rec",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "hi",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "depth_limit",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#202",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 492,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "insertion_sort_ord",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "hi",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#215",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 520,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "sift_down_ord",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "root",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "end",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#225",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 547,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "heapsort_ord",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "hi",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#236",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 571,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "median3_ord",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "a",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "b",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "c",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#255",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 593,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "partition_ord",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "hi",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#263",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 636,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "introsort_ord_rec",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "lo",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "hi",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "depth_limit",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "slice#280",
+      "provider": "slice",
+      "source": "luna-rs/libs/external/core/slice.ln",
+      "line": 678,
+      "namespace": "std::slice",
+      "owner": null,
+      "name": "slice_binary_search",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "std::Option<u64>",
+          "proposed_type": "std::Option<usize>"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#3",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 9,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "slice_from_raw_parts",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "len",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#6",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 11,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "slice_from_raw_parts_mut",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "len",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#13",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 13,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "copy",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "bytes",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#19",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 23,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "set",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "bytes",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#22",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 32,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "zero",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "bytes",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#23",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 36,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "size_of",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#24",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 40,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "align_of",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#32",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 63,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "Layout",
+      "kind": "Struct",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "field",
+          "name": "size_",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "field",
+          "name": "align_",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#36",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 75,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "layout_from_size_align_unchecked",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "size",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "align",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#38",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 82,
+      "namespace": "std::mem",
+      "owner": null,
+      "name": "layout_is_valid_align",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "align",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#40",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 90,
+      "namespace": "std::mem",
+      "owner": "Layout",
+      "name": "size",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "mem#42",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 94,
+      "namespace": "std::mem",
+      "owner": "Layout",
+      "name": "align",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#13",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 17,
+      "namespace": "std",
+      "owner": null,
+      "name": "Vec",
+      "kind": "Struct",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "field",
+          "name": "len",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "field",
+          "name": "cap",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#22",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 37,
+      "namespace": "std",
+      "owner": null,
+      "name": "vec_with_capacity",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "capacity",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#35",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 94,
+      "namespace": "std",
+      "owner": null,
+      "name": "VecIntoIter",
+      "kind": "Struct",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "field",
+          "name": "len",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "field",
+          "name": "cap",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "field",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#89",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 286,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "len",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#91",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 290,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "capacity",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#103",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 318,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "truncate",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "new_len",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#107",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 332,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "get",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#111",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 342,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "get_mut",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#132",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 399,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "reserve",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "additional",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#144",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 457,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "swap_remove",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#171",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 537,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "resize_with",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "new_len",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#189",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 569,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "insert",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#199",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 603,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "remove",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#211",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 645,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "swap",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "i",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "j",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#222",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 675,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "split_off",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "at",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#238",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 727,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "binary_search",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "std::Option<u64>",
+          "proposed_type": "std::Option<usize>"
+        }
+      ]
+    },
+    {
+      "declaration_id": "vec#262",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "line": 777,
+      "namespace": "std",
+      "owner": "Vec<T>",
+      "name": "resize",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "new_len",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#31",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 93,
+      "namespace": "utf8",
+      "owner": null,
+      "name": "is_char_boundary",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "index",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#40",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 129,
+      "namespace": "",
+      "owner": null,
+      "name": "str_len",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#48",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 162,
+      "namespace": "std",
+      "owner": null,
+      "name": "string_with_capacity",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "capacity",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#70",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 222,
+      "namespace": "std",
+      "owner": "String",
+      "name": "len",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#72",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 226,
+      "namespace": "std",
+      "owner": "String",
+      "name": "capacity",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#99",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 279,
+      "namespace": "std",
+      "owner": "String",
+      "name": "truncate",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "new_len",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#186",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 528,
+      "namespace": "std",
+      "owner": null,
+      "name": "StringIntoIter",
+      "kind": "Struct",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "field",
+          "name": "pos",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#215",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 596,
+      "namespace": "std",
+      "owner": "String",
+      "name": "char_count",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#280",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 731,
+      "namespace": "std",
+      "owner": "String",
+      "name": "find_str",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "std::Option<u64>",
+          "proposed_type": "std::Option<usize>"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#291",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 758,
+      "namespace": "std",
+      "owner": "String",
+      "name": "find",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "return",
+          "old_type": "std::Option<u64>",
+          "proposed_type": "std::Option<usize>"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#301",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 785,
+      "namespace": "std",
+      "owner": "String",
+      "name": "substr",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "start",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "end_pos",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "string#384",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "line": 1037,
+      "namespace": "std",
+      "owner": null,
+      "name": "CStr",
+      "kind": "Struct",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "field",
+          "name": "len_with_nul",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "__alloc_global#2",
+      "provider": "__alloc_global",
+      "source": "luna-rs/libs/external/alloc/global.ln",
+      "line": 4,
+      "namespace": "",
+      "owner": null,
+      "name": "__luna_alloc",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "size",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "align",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "__alloc_global#7",
+      "provider": "__alloc_global",
+      "source": "luna-rs/libs/external/alloc/global.ln",
+      "line": 5,
+      "namespace": "",
+      "owner": null,
+      "name": "__luna_dealloc",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "size",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "align",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    },
+    {
+      "declaration_id": "__alloc_global#13",
+      "provider": "__alloc_global",
+      "source": "luna-rs/libs/external/alloc/global.ln",
+      "line": 6,
+      "namespace": "",
+      "owner": null,
+      "name": "__luna_realloc",
+      "kind": "Function",
+      "status": "PLANNED_REVIEW_SOURCE_AND_ALL_CONSUMERS",
+      "positions": [
+        {
+          "position": "parameter",
+          "name": "old_size",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "old_align",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        },
+        {
+          "position": "parameter",
+          "name": "new_size",
+          "old_type": "u64",
+          "proposed_type": "usize"
+        }
+      ]
+    }
+  ]
+}

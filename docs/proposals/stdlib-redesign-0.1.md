@@ -30,6 +30,10 @@ thêm primitive cấp phát fallible; ABI cụ thể cần amendment và kiểm 
 [Decision ledger dạng JSON](stdlib-redesign-0.1/decisions.json) ghi riêng các
 direction đã được chọn và đề xuất chưa xác nhận.
 
+[Bản đồ size/index](stdlib-redesign-0.1/size-index.md) tách các vị trí bộ nhớ
+cần đổi sang usize khỏi hash, file offset và số liệu domain có độ rộng bit cố
+định. Đây là kế hoạch migration tiếp theo, chưa phải API đã triển khai.
+
 ## Audit trước kế hoạch migration
 
 [Inventory bằng parser Luna](../audits/stdlib-redesign-2026-10-21/README.md)

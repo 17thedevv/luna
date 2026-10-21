@@ -40,6 +40,7 @@ CURRENT = {
     'docs/runtime/abi-v2-allocation.md',
     'docs/proposals/stdlib-redesign-0.1.md',
     'docs/proposals/stdlib-redesign-0.1/allocator.md',
+    'docs/proposals/stdlib-redesign-0.1/size-index.md',
     'docs/licensing.md',
     'docs/stable/0.1.0/README.md',
     'docs/plans/0.1.0-stable.md',

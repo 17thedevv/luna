@@ -179,6 +179,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/proposals/entry-argv-policy.md](proposals/entry-argv-policy.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/stdlib-redesign-0.1.md](proposals/stdlib-redesign-0.1.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/stdlib-redesign-0.1/allocator.md](proposals/stdlib-redesign-0.1/allocator.md) | guidance | [runtime](spec/0.1/runtime.md) |
+| [docs/proposals/stdlib-redesign-0.1/size-index.md](proposals/stdlib-redesign-0.1/size-index.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/v01-design-01-method-collision.md](proposals/v01-design-01-method-collision.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/v01-filter-step-dedup-api.md](proposals/v01-filter-step-dedup-api.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/runtime/MELLIS_RUNTIME_SPEC.md](runtime/MELLIS_RUNTIME_SPEC.md) | historical | [runtime](spec/0.1/runtime.md) |

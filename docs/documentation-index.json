@@ -855,6 +855,11 @@
     "owner": "runtime"
   },
   {
+    "path": "docs/proposals/stdlib-redesign-0.1/size-index.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/proposals/v01-design-01-method-collision.md",
     "role": "historical",
     "owner": "conformance"
