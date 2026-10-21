@@ -25,11 +25,12 @@ permissions:
 jobs:
   ubuntu:
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 120
     env:
       CARGO_TERM_COLOR: never
       CARGO_PROFILE_DEV_DEBUG: "0"
       CARGO_INCREMENTAL: "0"
+      RUST_TEST_THREADS: "2"
       LLVM_HOME: /usr/lib/llvm-18
       LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
       LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
@@ -45,6 +46,7 @@ jobs:
           echo "LUNA_RUNTIME_LIB=$RUNNER_TEMP/runtime/libluna-runtime.a" >> "$GITHUB_ENV"
           echo "LUNA_ALLOC_TEST_RUNTIME_LIB=$RUNNER_TEMP/runtime/libluna-runtime-alloc-test.a" >> "$GITHUB_ENV"
           echo "CARGO_TARGET_DIR=$RUNNER_TEMP/cargo" >> "$GITHUB_ENV"
+          echo "LUNA_SYSROOT=$GITHUB_WORKSPACE/luna-rs" >> "$GITHUB_ENV"
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: 1.98.0
@@ -65,6 +67,12 @@ jobs:
           --test associated_owner_generic_cli --test imported_ffi_output_cli
           --test fallible_allocation_cli --test stable_io_cli
           2>&1 | tee "$RUNNER_TEMP/fallible-cli.log"
+      - name: Fresh canonical sysroot for workspace readers
+        run: '"$CARGO_TARGET_DIR/debug/luna" build-sysroot --quiet'
+      - name: Complete workspace regression including documentation tests
+        run: >-
+          cargo test --manifest-path luna-rs/Cargo.toml --locked --workspace --no-fail-fast
+          2>&1 | tee "$RUNNER_TEMP/fallible-workspace.log"
       - name: C runtime AddressSanitizer and leak checks
         env:
           ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
@@ -83,5 +91,6 @@ jobs:
             ${{ runner.temp }}/runtime/Testing/Temporary/LastTest.log
             ${{ runner.temp }}/runtime-asan/Testing/Temporary/LastTest.log
             ${{ runner.temp }}/fallible-cli.log
+            ${{ runner.temp }}/fallible-workspace.log
             ${{ runner.temp }}/production-runtime-symbols.txt
           if-no-files-found: warn

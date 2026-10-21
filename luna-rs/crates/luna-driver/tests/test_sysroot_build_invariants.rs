@@ -17,6 +17,8 @@ use std::path::PathBuf;
 #[path = "support/provider_parity.rs"]
 mod provider_parity;
 
+const CANONICAL_PROVIDER_COUNT: usize = 50;
+
 /// ======================================================================
 /// SECTION 4D.1: CANONICAL DEPENDENCY GRAPH VALIDATION (READ-ONLY)
 /// ======================================================================
@@ -37,8 +39,8 @@ fn test_canonical_dag_integrity() {
 
     let provider_count = canonical_providers.len();
     assert_eq!(
-        provider_count, 49,
-        "Expected exactly 49 canonical providers, got {}",
+        provider_count, CANONICAL_PROVIDER_COUNT,
+        "Expected exactly 50 canonical providers, got {}",
         provider_count
     );
 
@@ -89,7 +91,8 @@ fn test_canonical_dag_integrity() {
         }
     }
 
-    assert_eq!(graph.len(), 49, "Expected 49 graph nodes");
+    assert_eq!(graph.len(), CANONICAL_PROVIDER_COUNT, "Canonical graph node count");
+    assert!(graph.contains_key("alloc_error"), "Fallible allocation error provider is canonical");
 
     for (provider, deps) in &graph {
         let unique: BTreeSet<_> = deps.iter().collect();
@@ -190,7 +193,7 @@ fn test_canonical_persistent_obj_and_llib_sidecars() {
         );
     }
 
-    assert_eq!(canonical_count, 49, "Expected 49 canonical providers");
+    assert_eq!(canonical_count, CANONICAL_PROVIDER_COUNT, "Canonical provider count");
 
     // Obsolete monolithic artifacts must NOT exist
     let legacy_monolithic = [
@@ -244,8 +247,8 @@ fn test_no_orphan_obj_sidecars() {
     }
 
     assert_eq!(
-        found_obj_files.len(), 49,
-        "Expected exactly 49 canonical .obj files in sysroot"
+        found_obj_files.len(), CANONICAL_PROVIDER_COUNT,
+        "Expected exactly 50 canonical .obj files in sysroot"
     );
 }
 

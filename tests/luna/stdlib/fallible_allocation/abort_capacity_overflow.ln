@@ -1,0 +1,5 @@
+import <vec>;
+fn main() -> i32 {
+    dec values = std::Vec<i64>::with_capacity(18446744073709551615usize);
+    return 0;
+}

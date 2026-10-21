@@ -17,12 +17,18 @@ fn failure_runtime(work: &TempWorkspace) -> PathBuf {
         return path;
     }
     let build = work.join("runtime");
-    let configured = Command::new("cmake")
+    let mut configure = Command::new("cmake");
+    if cfg!(windows) {
+        // The supported Windows runtime is GNU. CC may name Luna's linker
+        // wrapper; that executable is not a CMake compiler driver.
+        configure.args(["-DCMAKE_C_COMPILER=gcc", "-DCMAKE_CXX_COMPILER=g++"]);
+    }
+    let configured = configure
         .arg("-S")
         .arg(workspace_root().parent().unwrap().join("runtime"))
         .arg("-B")
         .arg(&build)
-        .args(["-G", "Ninja", "-DCMAKE_BUILD_TYPE=Debug"])
+        .args(["-G", "Ninja", "-DCMAKE_BUILD_TYPE=Release"])
         .output()
         .expect("CMake is required for deterministic runtime failure tests");
     assert!(configured.status.success(), "{}", render(&configured));
@@ -60,29 +66,37 @@ fn allocation_success_and_failure_preserve_ownership_in_both_provider_modes() {
         assert!(build.status.success(), "{mode}: {}", render(&build));
         let run = Command::new(exe).output().unwrap();
         assert!(run.status.success(), "{mode}: {}", render(&run));
-        let source = fixtures.join("failure_ownership.ln");
-        let check = modes.check(root, &source);
-        assert!(check.status.success(), "{mode}/failure: {}", render(&check));
-        let (exe, build) =
-            modes.build_with_runtime(root, &source, &format!("failure_{mode}"), Some(&runtime));
-        assert!(build.status.success(), "{mode}/failure: {}", render(&build));
-        let run = Command::new(exe).output().unwrap();
-        assert!(run.status.success(), "{mode}/failure: {}", render(&run));
-        let source = fixtures.join("abort_ordinary.ln");
-        let (exe, build) =
-            modes.build_with_runtime(root, &source, &format!("abort_{mode}"), Some(&runtime));
-        assert!(build.status.success(), "{mode}/abort: {}", render(&build));
-        let run = Command::new(exe).output().unwrap();
-        assert!(!run.status.success());
-        assert!(
-            String::from_utf8_lossy(&run.stderr).contains("PANIC [L001]"),
-            "{}",
-            render(&run)
-        );
+        for name in ["failure_ownership", "borrowed_values"] {
+            let source = fixtures.join(format!("{name}.ln"));
+            let check = modes.check(root, &source);
+            assert!(check.status.success(), "{mode}/failure: {}", render(&check));
+            let (exe, build) =
+                modes.build_with_runtime(root, &source, &format!("{name}_{mode}"), Some(&runtime));
+            assert!(build.status.success(), "{mode}/failure: {}", render(&build));
+            let run = Command::new(exe).output().unwrap();
+            assert!(run.status.success(), "{mode}/failure: {}", render(&run));
+        }
+        for (name, code) in [
+            ("abort_ordinary", "PANIC [L001]"),
+            ("abort_capacity_overflow", "PANIC [L005]"),
+        ] {
+            let source = fixtures.join(format!("{name}.ln"));
+            let (exe, build) =
+                modes.build_with_runtime(root, &source, &format!("{name}_{mode}"), Some(&runtime));
+            assert!(build.status.success(), "{mode}/abort: {}", render(&build));
+            let run = Command::new(exe).output().unwrap();
+            assert!(!run.status.success());
+            assert!(
+                String::from_utf8_lossy(&run.stderr).contains(code),
+                "{}",
+                render(&run)
+            );
+        }
         for (name, code) in [
             ("reject_borrowed_mutation", "error[E3003]"),
             ("reject_moved_input", "error[E3001]"),
             ("reject_local_escape", "error[E3005]"),
+            ("reject_error_borrow_mutation", "error[E3003]"),
         ] {
             let source = fixtures.join(format!("{name}.ln"));
             let check = modes.check(root, &source);
