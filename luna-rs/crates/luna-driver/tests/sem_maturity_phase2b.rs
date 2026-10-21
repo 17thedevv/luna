@@ -183,15 +183,9 @@ mod mutable_references {
         assert_compile_success("sem_mutref_05", src, "SEM-MUTREF-05: Sequential mutable borrows valid");
     }
 
-    // SEM-MUTREF-06: INVALID-TEST - fixture error (val is i32, not &i32)
-    // NOTE: This test had an invalid fixture. `*val = 20` on `i32` is a type error.
-    // The actual gap is SEM-MUTREF-03 (mutation through shared reference).
-    #[test]
-    #[ignore] // IGNORED - INVALID fixture
-    fn sem_mutref_06_invalid_fixture() {
-        // This test is ignored because the fixture was invalid.
-        // val: i32 cannot be dereferenced with *val
-    }
+    // Retired SEM-MUTREF-06: its i32-dereference fixture was invalid and the
+    // ignored body tested nothing. SEM-MUTREF-03 above checks rejection of a
+    // real shared-reference write; SEM-MUTREF-05/07 keep valid borrow controls.
 
     // SEM-MUTREF-07: COMPILER-GAP - shared borrow lifetime after function call
     #[test]

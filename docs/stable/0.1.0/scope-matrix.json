@@ -1,0 +1,993 @@
+{
+  "schema": 1,
+  "status": "REQUALIFICATION_REQUIRED",
+  "records": [
+    {
+      "id": "SCOPE-A1",
+      "requirement": "Closure environment destruction and consume-on-call",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "060aabb3897319e5f400da405470973c601a0871",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A1-CLOSURE-ENV-2026-10-06.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a1-closure-env-2026-10-06.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "generic_drop_cli",
+        "closure_drop_glue_identity"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-A2",
+      "requirement": "Async suspended cleanup",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "f1e53f39602d7fc9e55229b386e7c3ec54b4c90f",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-ASYNC-SUSPENSION-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-async-suspension-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "async_cleanup_cli",
+        "a2_suspension_cleanup_tests"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-A2-FU1",
+      "requirement": "Shared DropFlagPlan / DropFlagTransition",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "d4d980fb300ab9871674eefe36c038db4574e21b",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU1-DROP-FLAG-PLAN-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-fu1-drop-flag-plan-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "async_cleanup_cli",
+        "a2_suspension_cleanup_tests"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-A2-FU2",
+      "requirement": "CLI async source/fresh-artifact cleanup matrix",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "47f402ea7057eb25740ebe7350e56a4e7d7e4d03",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A2-FU2-CLI-MATRIX-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a2-fu2-cli-matrix-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "async_cleanup_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-A3",
+      "requirement": "Remaining constant-index array elements after partial move",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "c3e55f4f06631eac52187bd49e709d57bfe3308f",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A3-PARTIAL-AGGREGATE-CLEANUP-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a3-partial-aggregate-cleanup-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "generic_drop_cli",
+        "p0b_drop_subplace_tests"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-A4",
+      "requirement": "Cast rejection and poison containment",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "7aee152852e10f5d25286c114d384a2e297e3083",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A4-CAST-POISON-CONTAINMENT-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a4-cast-poison-containment-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "cast_poison_cli",
+        "cast_contract_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-A5",
+      "requirement": "Raw slice/view loan transport",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "54df3f4300d19f6a7e9921879342df062abafe50",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A5-RAW-SLICE-VIEW-CONTRACT-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a5-raw-slice-view-contract-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "raw_slice_view_a5_cli",
+        "raw_slice_provenance_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-A6",
+      "requirement": "Unary logical NOT on bool",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "5939105d31434aee419b7dc36a15bd1f44c19d1f",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-A6-UNARY-LOGICAL-NOT-2026-10-07.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/a6-unary-logical-not-2026-10-07.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "unary_not_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-C1",
+      "requirement": "Named/default calls and comptime admission reconciliation",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "52c96ed705b156752c7918682f138442283205ef",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C1-RECONCILE-2026-10-06.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c1-reconcile-candidate-final-2026-10-06.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [
+        "Historical report c5c35c1e records a comparable failing workspace, not release PASS; A1 failure was closed separately; use canonical closure graph and final6 evidence"
+      ],
+      "suites": [
+        "named_arguments_cli",
+        "default_arguments_cli",
+        "default_omission_cli",
+        "comptime_loans_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-C2",
+      "requirement": "Per-impl-header metadata and interface identity",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "22c33366a11f1d0b1331057a884b37e69bad42ed",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C2-PER-IMPL-HEADER-METADATA-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c2-per-impl-header-metadata-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "impl_header_metadata_cli",
+        "interface_constraints_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-C3",
+      "requirement": "Projection fallback and proof depth",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "bf265798ef161f5ec340ec797f88f2cf085d4f75",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C3-PROJECTION-FALLBACK-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c3-projection-fallback-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "projection_fallback_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-C4",
+      "requirement": "Comptime execution dependencies, bounded static precision",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "5994f5a3f90d753dd79c9c139fe2689e543d3710",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C4-COMPTIME-DEPENDENCY-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c4-comptime-dependency-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [
+        "C4-FU1 precision deferred; withdrawn if-expression probe is not acceptance evidence"
+      ],
+      "suites": [
+        "comptime_dependency_precision_cli",
+        "artifact_execution_dependencies_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-C5",
+      "requirement": "Artifact freshness classification",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "7b3c51855eb83b3b7bfff1d8f6d3c1a5f7b0f2e8",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-C5-ARTIFACT-FRESHNESS-CLASSIFICATION-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/c5-artifact-freshness-classification-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "fresh_artifact_classification_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-D1",
+      "requirement": "Diagnostic registry and selected conformance reducers",
+      "historical_status": "PARTIAL_STRUCTURAL_AUDIT",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "39004d69de418a81d74a2748a95a41d093ebc3bb",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-DIAGNOSTIC-CONFORMANCE-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d1-diagnostic-conformance-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [
+        "R5-DIAG-STRUCTURAL: DIAG-1..10 complete construction/emission/coverage audit remains mandatory; original report misnumbers several invariants"
+      ],
+      "suites": [
+        "diagnostic_conformance_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-D2",
+      "requirement": "Expression span precision",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "35260b6bc299703d51c5242ffaadc220c1563211",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D2-EXPRESSION-SPANS-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d2-expression-spans-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "expression_span_precision_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-D3",
+      "requirement": "Tier-2/3 provider graph and rejection matrix",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "70002d84b641b94c3aa0755983fff618e0bb6121",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D3-PROVIDER-TIER23-MATRIX-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d3-provider-tier23-matrix-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [
+        "Provider graph suite is bounded; building 49 providers is not full public API/domain certification; async finding closed separately"
+      ],
+      "suites": [
+        "provider_tiers_cli",
+        "alpha_modules_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-D4",
+      "requirement": "Retained language contracts",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "4024abc6beede7b4bb0fb83f2d12a83ea14df39d",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-RETAINED-CONTRACTS-2026-10-08.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d4-retained-contracts-2026-10-08.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "retained_contracts_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-FIND-ASYNC-PROVIDER-01",
+      "requirement": "Real async provider HeapFree wire decoding",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "f4b7c0de177cb24155777f7dfe9b2727a34827b7",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-FIND-ASYNC-PROVIDER-01-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/find-async-provider-01-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "async_provider_export_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-D4-FU1",
+      "requirement": "Reject link on program entry; original leading-item observation retracted",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "5122d3ce73268eb2e6021e79005be9f70c316b76",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D4-FU1-LINK-ENTRY-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d4-fu1-link-entry-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "retained_contracts_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-D1-FU2",
+      "requirement": "Suppress comptime cascade only with visible root",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "d7129cd14beac6a9906ecd29d1704f8f91004e97",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-D1-FU2-COMPTIME-DIAGNOSTIC-CASCADE-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/d1-fu2-comptime-diagnostic-cascade-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [],
+      "suites": [
+        "comptime_diagnostic_cascade_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-R5-HARNESS-01",
+      "requirement": "Owned temporary state, isolation, bounded residual cleanup",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "ccc52c723ed799f17350d7e110fab72505b147c0",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-R5-HARNESS-01-TEMP-SYSROOT-ISOLATION-2026-10-09.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/r5-harness-01-temp-sysroot-isolation-2026-10-09.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [
+        "One empty last-process directory can remain until the next orphan sweep; no claim of immediate cleanup of every directory"
+      ],
+      "suites": [
+        "test_temp_workspace_lifecycle_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-E2",
+      "requirement": "Grammar/spec reconciliation without grammar expansion",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "6017ba8d8db40cf0bc16498f639e5d830c0e827c",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E2-GRAMMAR-SPEC-RECONCILIATION-2026-10-11.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e2-grammar-spec-reconciliation-2026-10-11.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json"
+      ],
+      "historical_limits": [
+        "V01-DIAG-01 structural remainder is a non-deferred R5 precondition",
+        "Complete formal grammar beyond adopted productions remains debt; legacy parser acceptance is not adoption"
+      ],
+      "suites": [
+        "v01_grammar_acceptance_tests"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-E1",
+      "requirement": "Checked arithmetic, provider admission/parity, terminal extraction and generic alignment",
+      "historical_status": "CONFORMANT_IN_TESTED_SCOPE",
+      "historical_tested_commit": "e4f9fb530d72628c81dfa29d117afeb99cc7664c",
+      "historical_closure_commit": "3f8646c654b99b67bae57ee290b7a7e23d717b40",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-EWAVE-CLOSURE-2026-10-13.md",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-workspace-final6-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-46-row-reconciliation-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-sysroot-provenance-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-current-native-target-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-compiler25-focused-summary-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final-acquisition-ledger-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-generated-arithmetic-audit-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-diagnostic-debug-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-diagnostic-release-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-source-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-source-2026-10-13.meta.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-artifact-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-debug-artifact-2026-10-13.meta.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-source-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-source-2026-10-13.meta.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-artifact-2026-10-13.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-release-artifact-2026-10-13.meta.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat22/num-compiler22.llib",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-compiler23.llib",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-compiler23.obj",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/discarded-arithmetic-source.ln",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat23/provenance.json",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.ll",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.llib",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.ln",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/enum-alignment-compiler24.obj",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/producer-build.txt.gz",
+        "docs/audits/0.1-alpha-completion-2026-10-04/evidence/compat24/provenance.json"
+      ],
+      "historical_limits": [
+        "Ubuntu GNU normal/ASan unverified",
+        "Standalone comptime statements unsupported",
+        "VM layout verified only in 64-bit GNU scope",
+        "R5 complete diagnostic audit outstanding"
+      ],
+      "suites": [
+        "checked_arithmetic_qualification_cli",
+        "wrapping_arithmetic_cli"
+      ],
+      "stable_status": "REQUALIFICATION_REQUIRED",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-C4-FU1",
+      "requirement": "Branch-sensitive comptime dependency precision",
+      "historical_status": "DEFERRED_NON_BLOCKING",
+      "historical_tested_commit": null,
+      "historical_closure_commit": "98b55952b5f51188318e8f447ab9d204355fc722",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md"
+      ],
+      "historical_limits": [
+        "Branch-sensitive comptime dependency precision remains unimplemented; reopen under conditions in known-limitations.md"
+      ],
+      "suites": [],
+      "stable_status": "ACCEPTED_DEFERRAL",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "SCOPE-D1-FU1",
+      "requirement": "E3001 presentation exposes internal value name",
+      "historical_status": "DEFERRED_NON_BLOCKING",
+      "historical_tested_commit": null,
+      "historical_closure_commit": "98b55952b5f51188318e8f447ab9d204355fc722",
+      "historical_evidence": [
+        "docs/audits/0.1-alpha-completion-2026-10-04/MICRO-BACKLOG-2026-10-06.md"
+      ],
+      "historical_limits": [
+        "E3001 presentation exposes internal value name remains unimplemented; reopen under conditions in known-limitations.md"
+      ],
+      "suites": [],
+      "stable_status": "ACCEPTED_DEFERRAL",
+      "current_execution_evidence": [],
+      "targets": [
+        "x86_64-pc-windows-gnu",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    {
+      "id": "LEGACY-W1-POSIX-BUILD",
+      "requirement": "Runtime C11 portability and complete headers for POSIX/Darwin",
+      "historical_status": "PARTIAL",
+      "historical_record": {
+        "id": "W1-POSIX-BUILD",
+        "contract": "Runtime C11 portability and complete headers for POSIX/Darwin",
+        "status": "PARTIAL",
+        "first_failing_stage": "runtime_c_compile",
+        "repro": "runtime/src/io/io.c (kill/SIGKILL without signal.h), runtime/src/platform/posix/net.c (addrinfo without netdb.h)",
+        "fix_commit": "a4c83d5",
+        "evidence": "Headers restored in io.c/net.c; RuntimeAbiTests passed on Windows GNU; pending native Ubuntu/macOS CI verification"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-A1-P0",
+      "requirement": "Backend fail-closed without silent dummy value fallback for unhandled instructions",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "A1-P0",
+        "contract": "Backend fail-closed without silent dummy value fallback for unhandled instructions",
+        "status": "PASS",
+        "first_failing_stage": "luna-backend/src/llvm_codegen.rs",
+        "repro": "llvm_codegen.rs:1836 wildcard returns Ok(i32 zero) instead of Err(BackendError)",
+        "fix_commit": null,
+        "evidence": "llvm_codegen.rs wildcard fallback removed, fails closed with BackendError::InvariantViolation; crates/luna-driver/tests/backend_fail_closed_tests.rs passes"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-C-GAP-04",
+      "requirement": "Import metadata bound identity deduplication without exponential copies",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "C-GAP-04",
+        "contract": "Import metadata bound identity deduplication without exponential copies",
+        "status": "PASS",
+        "first_failing_stage": "luna-driver::registry import resolution",
+        "repro": "tests/luna/language/audit_2026_10_02/provider_bounds/",
+        "fix_commit": "19ba384",
+        "evidence": "tests/luna/language/audit_2026_10_02/provider_bounds/ (12 levels dedup verified); crates/luna-driver/tests/compiler_gap_c_gap_04_provider_chain_bounds_tests.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-C-GAP-01",
+      "requirement": "Deterministic inherent/trait method resolution without infinite recursion",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "C-GAP-01",
+        "contract": "Deterministic inherent/trait method resolution without infinite recursion",
+        "status": "PASS",
+        "first_failing_stage": "luna-semantic method resolver",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/compiler_inherent_trait_dispatch.ln",
+        "fix_commit": "d950f7f",
+        "evidence": "docs/proposals/v01-design-01-method-collision.md; tests/luna/stdlib/audit_2026_10_02/compiler_inherent_trait_dispatch.ln (source/artifact pass)"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-C-GAP-03",
+      "requirement": "Entry argument bridge passing valid argv slices to main(args: [str])",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "C-GAP-03",
+        "contract": "Entry argument bridge passing valid argv slices to main(args: [str])",
+        "status": "PASS",
+        "first_failing_stage": "luna-backend entrypoint lowering and runtime argv ABI",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/compiler_main_args.ln",
+        "fix_commit": "d950f7f",
+        "evidence": "docs/proposals/entry-argv-policy.md; tests/luna/stdlib/audit_2026_10_02/compiler_main_args.ln (source/artifact pass); crates/luna-driver/tests/main_entrypoint_tests.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-C-GAP-02",
+      "requirement": "Source-aware unsigned integer widening casts without sign extension",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "C-GAP-02",
+        "contract": "Source-aware unsigned integer widening casts without sign extension",
+        "status": "PASS",
+        "first_failing_stage": "luna-mvir / backend cast lowering",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/compiler_unsigned_cast.ln",
+        "fix_commit": "eb72083",
+        "evidence": "tests/luna/stdlib/audit_2026_10_02/compiler_unsigned_cast.ln; crates/luna-driver/tests/integer_cast_signedness_tests.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-COMPOUND-ASSIGN",
+      "requirement": "Compound assignment lowering preserving LHS operation and lvalue evaluation",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "COMPOUND-ASSIGN",
+        "contract": "Compound assignment lowering preserving LHS operation and lvalue evaluation",
+        "status": "PASS",
+        "first_failing_stage": "luna-mvir generator Expr::Assign",
+        "repro": "luna-rs/tests/luna/compiler/numeric_compound_assignment_diagnostic.ln",
+        "fix_commit": "eb72083",
+        "evidence": "luna-rs/tests/luna/compiler/numeric_compound_assignment_diagnostic.ln; crates/luna-driver/tests/compound_assignment_tests.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-S-04",
+      "requirement": "Unicode scalar char enforcement and safe UTF-8 String invariants",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "S-04",
+        "contract": "Unicode scalar char enforcement and safe UTF-8 String invariants",
+        "status": "PASS",
+        "first_failing_stage": "luna-semantic / alloc/string.ln",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/string_invalid_char.ln",
+        "fix_commit": "41484c2",
+        "evidence": "crates/luna-cli/tests/char_scalar_cli_parity.rs; tests/luna/stdlib/audit_2026_10_02/string_invalid_char.ln"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-LITERAL-TYPING-01",
+      "requirement": "Literal typing conformance across integer suffix, context, and byte arrays",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "LITERAL-TYPING-01",
+        "contract": "Literal typing conformance across integer suffix, context, and byte arrays",
+        "status": "PASS",
+        "first_failing_stage": "luna-semantic typechecker",
+        "repro": "luna-rs/tests/literal_typing_cli_parity.rs",
+        "fix_commit": "6e8d278",
+        "evidence": "crates/luna-cli/tests/literal_typing_cli_parity.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-S-01",
+      "requirement": "Vec checked allocation and reserve arithmetic without overflow",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "S-01",
+        "contract": "Vec checked allocation and reserve arithmetic without overflow",
+        "status": "PASS",
+        "first_failing_stage": "alloc/vec.ln",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/vec_capacity_overflow.ln",
+        "fix_commit": "1ba8518",
+        "evidence": "tests/luna/stdlib/audit_2026_10_02/vec_capacity_overflow.ln; vec_reserve_overflow.ln (safe panic)"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-S-02",
+      "requirement": "RawTable capacity round-up and growth without wrap to zero or infinite loop",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "S-02",
+        "contract": "RawTable capacity round-up and growth without wrap to zero or infinite loop",
+        "status": "PASS",
+        "first_failing_stage": "alloc/raw_table.ln",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/hashmap_capacity_overflow.ln",
+        "fix_commit": "1ba8518",
+        "evidence": "tests/luna/stdlib/audit_2026_10_02/hashmap_capacity_overflow.ln (safe panic)"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-S-06",
+      "requirement": "Generic Vec.dedup without reinterpreting arbitrary T as i32",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "S-06",
+        "contract": "Generic Vec.dedup without reinterpreting arbitrary T as i32",
+        "status": "PASS",
+        "first_failing_stage": "alloc/vec.ln dedup_i32",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/vec_dedup_i32_generic.ln",
+        "fix_commit": null,
+        "evidence": "alloc/vec.ln dedup_i32 delegates safely to self.dedup() using Eq without pointer reinterpret or size_of==4 assumption; verified with vec_dedup_4byte_nominal.ln and vec_dedup_i32_generic.ln"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-V01-ARCH-02",
+      "requirement": "Removal of hardcoded stdlib macro names, callee mappings, and fallback in MacroEngine",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "V01-ARCH-02",
+        "contract": "Removal of hardcoded stdlib macro names, callee mappings, and fallback in MacroEngine",
+        "status": "PASS",
+        "first_failing_stage": "luna-semantic/src/macro_engine.rs",
+        "repro": "luna-semantic macro expansion inspection",
+        "fix_commit": "d950f7f",
+        "evidence": "crates/luna-cli/tests/v01_arch_02_macro_decoupling_tests.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-A-01",
+      "requirement": "Removal of compiler hardcoded SliceIter/SliceIterMut layout and type knowledge",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "A-01",
+        "contract": "Removal of compiler hardcoded SliceIter/SliceIterMut layout and type knowledge",
+        "status": "PASS",
+        "first_failing_stage": "luna-semantic typechecker.rs",
+        "repro": "luna-semantic typechecker slice iterator lowering",
+        "fix_commit": "6aa260d",
+        "evidence": "SliceIter compiler synthesis removed; SemanticContext.is_slice_authorized capability securely restricts slice inherent impls to authorized sysroot build context; rejects impersonation attempts (e.g. user provider slice.ln); crates/luna-semantic/tests/p1a_tests.rs Cases 19, 20 & 21 pass; crates/luna-cli/tests/v01_grammar_acceptance_tests.rs Case 7 verifies CLI rejection with error[E2006]; 2026-10-03 follow-up: canonical file containment/authentication gates provenance for both .ln and .llib, including -I candidates. Permanent CLI and provider_authority_tests controls; see compiler-integrity-repair-2026-10-03.md."
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-S-03",
+      "requirement": "Zero-Sized Type (ZST) slice iteration returning correct element count",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "S-03",
+        "contract": "Zero-Sized Type (ZST) slice iteration returning correct element count",
+        "status": "PASS",
+        "first_failing_stage": "core/slice.ln",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/slice_zst.ln",
+        "fix_commit": "1ba8518",
+        "evidence": "tests/luna/stdlib/audit_2026_10_02/slice_zst.ln; slice_zst_mut.ln"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-S-05",
+      "requirement": "Filter/find borrow-checker compliant non-Copy item consumption",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "S-05",
+        "contract": "Filter/find borrow-checker compliant non-Copy item consumption",
+        "status": "PASS",
+        "first_failing_stage": "core/iter_adapters.ln, core/iter_consumers.ln",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/filter_owned.ln",
+        "fix_commit": "6aa260d",
+        "evidence": "docs/proposals/v01-filter-step-dedup-api.md adopted; borrowed predicate fn(&Item) -> bool implemented; tests/luna/stdlib/audit_2026_10_02/filter_owned.ln and find_owned.ln pass"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-S-07",
+      "requirement": "Range<T: Step> advancing without moving non-Copy current value prematurely",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "S-07",
+        "contract": "Range<T: Step> advancing without moving non-Copy current value prematurely",
+        "status": "PASS",
+        "first_failing_stage": "core/iter_adapters.ln",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/range_owned_step.ln",
+        "fix_commit": "1ba8518",
+        "evidence": "tests/luna/stdlib/audit_2026_10_02/range_owned_step.ln (source/artifact pass)"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-V01-GRAMMAR-01",
+      "requirement": "Comma-separated struct fields; semicolon delimiters strictly rejected",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "V01-GRAMMAR-01",
+        "contract": "Comma-separated struct fields; semicolon delimiters strictly rejected",
+        "status": "PASS",
+        "first_failing_stage": "luna-parser struct field parsing",
+        "repro": "tests/luna/language/spec_v01/reject_semicolon_fields.ln",
+        "fix_commit": "41484c2",
+        "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-V01-GRAMMAR-02",
+      "requirement": "Parenthesized foreach head support per Rule K.4",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "V01-GRAMMAR-02",
+        "contract": "Parenthesized foreach head support per Rule K.4",
+        "status": "PASS",
+        "first_failing_stage": "luna-parser foreach head parsing",
+        "repro": "tests/luna/language/spec_v01/foreach_parenthesized_contract.ln",
+        "fix_commit": "41484c2",
+        "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-V01-GRAMMAR-03",
+      "requirement": "Receiver shorthand &self, &rw self, self equivalent to canonical form per Rule K.5",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "V01-GRAMMAR-03",
+        "contract": "Receiver shorthand &self, &rw self, self equivalent to canonical form per Rule K.5",
+        "status": "PASS",
+        "first_failing_stage": "luna-parser method receiver parsing",
+        "repro": "tests/luna/language/spec_v01/receiver_shorthand_contract.ln",
+        "fix_commit": "41484c2",
+        "evidence": "crates/luna-cli/tests/v01_grammar_acceptance_tests.rs"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-V01-DIAG-01",
+      "requirement": "Typed diagnostic codes across compiler phases conforming to DIAG-1..10",
+      "historical_status": "PARTIAL",
+      "historical_record": {
+        "id": "V01-DIAG-01",
+        "contract": "Typed diagnostic codes across compiler phases conforming to DIAG-1..10",
+        "status": "PARTIAL",
+        "first_failing_stage": "luna-parser and diagnostic emission",
+        "repro": "tests/luna/language/spec_v01 parser error rendering",
+        "fix_commit": "41484c2",
+        "evidence": "Typed diagnostic codes E0001..E0003 (parser), E1001 (unresolved symbol/method), E2001 (type mismatch in local/global var decl, call args, binary ops, returns), E2006 (coherence orphan & slice impersonation), E2026 (typechecker invalid cast) verified in crates/luna-cli/tests/v01_grammar_acceptance_tests.rs; 2026-10-03 follow-up repairs previously uncoded production constructors, typed escape identity and Unicode/tab caret rendering. Full DIAG-1..10 remains PARTIAL: optional code/span fields, structural related labels, constructor enforcement and complete registry coverage are not implemented by this repair. See compiler-integrity-repair-2026-10-03.md."
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-W7-COMPTIME",
+      "requirement": "Portable comptime artifact without host session leakage across process boundaries",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "W7-COMPTIME",
+        "contract": "Portable comptime artifact without host session leakage across process boundaries",
+        "status": "PASS",
+        "first_failing_stage": "luna-llib and comptime preparation",
+        "repro": "tests/luna/language/literal_comptime_provider_gap.ln",
+        "fix_commit": "6e8d278",
+        "evidence": "crates/luna-cli/tests/literal_typing_cli_parity.rs (comptime_provider_gap)"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-W8-ALL-PROVIDERS",
+      "requirement": "Verification matrix for all 49 providers and adopted language contracts",
+      "historical_status": "PARTIAL",
+      "historical_record": {
+        "id": "W8-ALL-PROVIDERS",
+        "contract": "Verification matrix for all 49 providers and adopted language contracts",
+        "status": "PARTIAL",
+        "first_failing_stage": "provider test coverage",
+        "repro": "luna-rs/libs/external/sysroot.toml",
+        "fix_commit": "8fa8429",
+        "evidence": "Inventory & build infrastructure: 49/49 providers build successfully under sysroot DAG and pass test_sysroot_build_invariants (6/6). Tier-1 Core/Alloc containers (Box, Vec, String, RawTable, HashMap, HashSet, Slice, Iterators) achieve CERTIFIED status with positive/negative/ownership/CLI parity. Full API-level fixture matrix for remaining Tier-2/3 providers is mapped in docs/audits/repair-0.1/provider_matrix.md and remains in progress."
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    },
+    {
+      "id": "LEGACY-W9-PERF",
+      "requirement": "Evidence-backed optimizations for HashMap clustering, allocations, and clear/overwrite",
+      "historical_status": "PASS",
+      "historical_record": {
+        "id": "W9-PERF",
+        "contract": "Evidence-backed optimizations for HashMap clustering, allocations, and clear/overwrite",
+        "status": "PASS",
+        "first_failing_stage": "benchmarks",
+        "repro": "tests/luna/stdlib/audit_2026_10_02/hashmap_collision_pattern.ln",
+        "fix_commit": null,
+        "evidence": "SplitMix64 bit mixer in core/hash.ln and alloc/raw_table.ln; raw_table insert/insert_if_absent/get_or_insert probe first before grow, eliminating redundant rehash/growth on overwrite and hits (verified by test_hashmap_overwrite_no_growth_stress with 10k overwrites); clear() retains capacity; benchmark in docs/audits/repair-0.1/evidence/hashmap-benchmark.json shows 132x speedup on low_bits_collision n=12000 (0.0259s vs 3.4264s)"
+      },
+      "stable_status": "RECONCILE_WITH_CURRENT_REGRESSION",
+      "current_execution_evidence": []
+    }
+  ]
+}

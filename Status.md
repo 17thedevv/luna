@@ -2,7 +2,15 @@
 
 > **Luna 0.1 — guidance.** The [versioned specification](docs/spec/0.1/README.md) and adopted contracts govern; implementation evidence does not create semantic authority.
 
-# Luna 0.1 status — 2026-10-20
+# Luna 0.1 status — 2026-10-21
+
+**Current: alpha published; stable execution IN PROGRESS / NOT QUALIFIED.**
+The [stable ledger](docs/stable/0.1.0/README.md) records the integrated Luna/Lunar
+baseline, 49 historical scope records and outstanding work. The alpha tag now
+points to `a3080712` after metadata-only history cleanup; original package/log
+SHAs below are retained as historical build identities, not silently rewritten.
+
+## Published alpha snapshot — original build identities, 2026-10-20
 
 **Luna 0.1.0-alpha.1 is published as a prerelease.**
 The eight lanes at `8525067f` remain historical qualification evidence, but that

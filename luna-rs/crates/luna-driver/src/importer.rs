@@ -41,7 +41,6 @@ pub fn resolve_collected_imports(
 
     for (name, span, kind) in imports {
         if kind == ImportKind::External {
-            eprintln!("DEBUG loading package: {}", name);
             // External package import: import <pkg>; -> delegates to session.load_package
             if session.registry.is_loading(&name) {
                 diagnostics.push(Diagnostic::error(format!("Cyclic module dependency detected involving '{}'", name)).with_code(luna_common::DiagnosticCode::CyclicModuleDependency).with_span(span));
@@ -123,7 +122,6 @@ pub fn resolve_collected_imports(
     if !diagnostics.is_empty() {
         return Err(diagnostics);
     }
-    eprintln!("DEBUG: resolve_collected_imports finished successfully");
     Ok(())
 }
 
@@ -135,7 +133,6 @@ pub fn resolve_imports(
 ) -> Result<(), Vec<Diagnostic>> {
     let imports = get_imports(items, arena, session);
     let res = resolve_collected_imports(imports, arena, session, context);
-    eprintln!("DEBUG: resolve_imports returning {:?}", res.is_ok());
     res
 }
 /// Keep a provider's original primary location; import sites are context.

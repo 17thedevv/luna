@@ -1,6 +1,7 @@
 [package]
+license.workspace = true
 name = "lunar"
-version = "0.1.0-dev.1"
+version = "0.1.0-rc.1"
 edition = "2021"
 rust-version = "1.89"
 description = "Offline project and build tool for the Luna compiler"

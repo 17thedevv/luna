@@ -4,12 +4,12 @@ Contract status and implementation status are separate. An adopted rule remains
 a requirement while its implementation can be partial, broken or unverified.
 This specification refresh is not a compiler repair or a release certification.
 
-Current qualification — 2026-10-20: **RELEASE BLOCKED by package CPU identity drift**.
-The eight completed lanes at `8525067f` are preserved, but clean Windows package
-smoke fails on a different CPU. [Finding and baseline repair](../../audits/r5-cpu-baseline-2026-10-20/README.md).
-A new implementation pin must reacquire all eight lanes and clean package smoke
-on both hosts. Candidate remains `8525067f`; no merge/tag/publication occurred.
-Strict target identity validation and the adopted language contracts remain mandatory.
+Current status — 2026-10-21: **v0.1.0-alpha.1 is published; stable is not yet qualified**.
+The CPU-baseline repair completed eight alpha lanes and both clean package smokes;
+see its [release closure](../../audits/r5-cpu-baseline-2026-10-20/release-closure.json).
+The [stable execution ledger](../../stable/0.1.0/README.md) defines the new
+integration baseline and remaining work. No alpha PASS is transferred to a new
+candidate. Strict target identity and adopted language contracts remain mandatory.
 Earlier qualification snapshots below retain their dated scopes.
 
 Prior evidence reconciliation — 2026-10-14: see the
@@ -91,8 +91,11 @@ changes; regenerate sysroot artifacts through the official path; run required
 focused and relevant workspace regressions; verify diagnostics and parity; and
 publish the exact supported target matrix and any accepted deferrals.
 
-Current readiness is **BLOCKED** by [gaps.md](gaps.md) and the
-[R5 checklist](../../audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md).
+Stable readiness is **NOT YET QUALIFIED**; see the
+[current stable backlog](../../stable/0.1.0/backlog.json). The historical
+[R5 checklist](../../audits/0.1-alpha-completion-2026-10-04/r4/r5-checklist.md)
+was completed for the published alpha in the later release closure. Its required
+acceptance boundaries remain applicable when requalifying a new candidate.
 E-wave completed three Windows workspace regressions and 236/236 arithmetic
 acquisitions; this does not complete Ubuntu/ASan, the structural diagnostic
 inventory, every generic/data domain, broader sanitizers or fuzzing. Historical

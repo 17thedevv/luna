@@ -96,10 +96,10 @@ for (pattern in expression) { ... }
 for (dec rw i = 0; i < limit; i = i + 1) { ... }
 ```
 
-**Known parser gap:** current accepted fixtures use `for pattern in expression`
-without the surrounding parentheses; the previously defined parenthesized
-foreach form is not implemented correctly. The baseline retains that contract
-pending reconciliation rather than claiming both forms are supported.
+The canonical parenthesized foreach form was implemented and verified by
+[E2 source/artifact acceptance](../../audits/0.1-alpha-completion-2026-10-04/evidence/REPORT-E2-GRAMMAR-SPEC-RECONCILIATION-2026-10-11.md).
+The unparenthesized parser form is legacy characterization, not standardized
+0.1 syntax. New source and official examples use the parenthesized form.
 
 Calls, member/index access, qualified paths, arithmetic, comparisons, boolean
 operations, assignments, pointer/reference operators, casts, aggregate

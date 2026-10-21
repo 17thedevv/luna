@@ -42,12 +42,16 @@ and [document inventory](docs/documentation-index.md).
 The baseline retains defined contracts even where implementation is incomplete.
 **Luna 0.1.0-alpha.1 is published.** The [CPU baseline repair](docs/audits/r5-cpu-baseline-2026-10-20/README.md)
 at `b5cb77c3` passed all eight Windows/Ubuntu qualification lanes, with all eight
-CI ZIPs independently verified. Both clean package smokes passed. The annotated
-tag points to exact packaged source `cd9cd188`, whose implementation trees match
-the qualified pin. Candidate is `b5cb77c3`; PR #7 and the release closure PR #8
-are merged. [Release closure](docs/audits/r5-cpu-baseline-2026-10-20/release-closure.json)
-records the immutable SHAs and published asset digests. Protocol versions remain
+CI ZIPs independently verified. Both clean package smokes passed. The original
+package source is `cd9cd188`; after the metadata-only history cleanup the alpha
+tag points to equivalent-tree commit `a3080712`. PR #7 and closure PR #8 are
+merged. [Release closure](docs/audits/r5-cpu-baseline-2026-10-20/release-closure.json)
+preserves original build SHAs and asset digests; [stable provenance](docs/stable/0.1.0/baseline.json)
+records the history mappings. Protocol versions remain
 **25/9/5/2**. Qualification applies to the declared tested scope and limitations.
+
+[Stable execution](docs/stable/0.1.0/README.md) is now in progress on an integrated
+Luna/Lunar baseline. Stable 0.1.0 has not been qualified or released.
 
 The [previous qualification report](docs/audits/r5-move-origin-2026-10-18/REPORT-R5-QUALIFICATION-8525067f.md)
 and original archives remain historical evidence. [Release authorization and scope](docs/audits/r5-move-origin-2026-10-18/RELEASE-HANDOFF.md)

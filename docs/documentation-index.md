@@ -150,6 +150,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/installation.md](installation.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/integration/2026-10-03-all-worktrees.md](integration/2026-10-03-all-worktrees.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/lang-item-roadmap-catalog.md](lang-item-roadmap-catalog.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/licensing.md](licensing.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/luna_artifact_identity_refactoring.md](luna_artifact_identity_refactoring.md) | historical | [modules](spec/0.1/modules.md) |
 | [docs/lunar.md](lunar.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/mellis-language-semantic-audit.md](mellis-language-semantic-audit.md) | historical | [semantics](spec/0.1/semantics.md) |
@@ -198,6 +199,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/spec/0.1/stdlib-inventory.md](spec/0.1/stdlib-inventory.md) | canonical | [stdlib](spec/0.1/stdlib.md) |
 | [docs/spec/0.1/stdlib.md](spec/0.1/stdlib.md) | canonical | [stdlib](spec/0.1/stdlib.md) |
 | [docs/spec/0.1/syntax.md](spec/0.1/syntax.md) | canonical | [conformance](spec/0.1/conformance.md) |
+| [docs/stable/0.1.0/README.md](stable/0.1.0/README.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/std-arch-01-compatibility-matrix.md](std-arch-01-compatibility-matrix.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/std-arch-01-final-acceptance.md](std-arch-01-final-acceptance.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/walkthrough.md](walkthrough.md) | historical | [conformance](spec/0.1/conformance.md) |
