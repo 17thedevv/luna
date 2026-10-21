@@ -21,6 +21,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: lunar-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 jobs:
   public-cli:
     strategy:
