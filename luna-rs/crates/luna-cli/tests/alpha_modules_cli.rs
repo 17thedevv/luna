@@ -226,6 +226,13 @@ fn alpha_modules_source_and_fresh_artifact_contracts() {
                 fs::remove_file(shared.join(format!("{name}.ln"))).unwrap();
             }
         }
+        let shared_project_config = format!("{config_text}\n[package]\nname = 'configured-app'\n[dependencies]\ngeo = {{ path = '../not-built-by-compiler' }}\n[[bin]]\nname = 'app'\npath = 'app/configured.ln'\n");
+        write(&config, &shared_project_config);
+        accepted(
+            &cli(root, &work, "check", &app.join("configured.ln"), &[]),
+            "shared project tables preserve provider bindings without building dependencies",
+        );
+        write(&config, config_text);
         for name in ["configured", "transitive", "dedup", "old_local"] {
             let input = app.join(format!("{name}.ln"));
             accepted(

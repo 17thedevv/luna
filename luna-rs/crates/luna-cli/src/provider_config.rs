@@ -8,6 +8,47 @@ struct Configuration {
     schema: Option<toml::Spanned<u32>>,
     #[serde(default)]
     providers: std::collections::BTreeMap<String, toml::Spanned<String>>,
+    // Recognized application-owned sections of the shared luna.toml. The
+    // compiler neither interprets project policy nor resolves dependencies.
+    #[serde(default, rename = "package")]
+    _package: Option<toml::Table>,
+    #[serde(default, rename = "dependencies")]
+    _dependencies: Option<toml::Table>,
+    #[serde(default, rename = "lib")]
+    _lib: Option<toml::Table>,
+    #[serde(default, rename = "bin")]
+    _bin: Vec<toml::Table>,
+    #[serde(default, rename = "test")]
+    _test: Vec<toml::Table>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Configuration;
+
+    #[test]
+    fn shared_project_sections_are_opaque_to_compiler() {
+        let config: Configuration = toml::from_str(r#"
+schema = 1
+[providers]
+geo = "../geometry/src/geometry"
+[package]
+name = "app"
+[dependencies]
+geo = { path = "../geometry" }
+[lib]
+path = "src/helper.ln"
+[[bin]]
+name = "app"
+path = "src/main.ln"
+[[test]]
+name = "smoke"
+path = "tests/smoke.ln"
+"#).unwrap();
+        assert_eq!(config.providers["geo"].get_ref(), "../geometry/src/geometry");
+        assert!(toml::from_str::<Configuration>("unknown = 1").is_err());
+        assert!(toml::from_str::<Configuration>("package = 1").is_err());
+    }
 }
 
 fn error(

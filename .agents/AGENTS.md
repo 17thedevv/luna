@@ -20,11 +20,11 @@ Use [the versioned specification](../docs/spec/0.1/README.md). Adopted contracts
 
 6. Luna Artifact Identity Principle ("Luna trusts identity, never existence"):
    - **Existence is not validity**: The presence of a `.llib` artifact does not imply it is valid for the current compilation context. The compiler must validate its identity before loading it. If invalid, the compiler rejects it (it does not silently recompile).
-   - **Discovery vs. Validation**: Discovery merely locates a provider candidate. Validation determines if its identity matches the current context. Package management (`mpm`) handles rebuilding if invalid.
+   - **Discovery vs. Validation**: Discovery merely locates a provider candidate. Validation determines if its identity matches the current context. Project tooling (`lunar`) handles rebuilding if invalid.
    - **Identity is a Tuple**: Artifact identity is not just a source hash. It encompasses Source Identity, Dependency Interface Identity, Compiler Identity, Target Identity, Feature Identity, and Artifact Kind.
    - **Source Identity ≠ Interface Identity**: Private implementation changes affect source identity but not interface identity (canonical public contract). The compiler must use a deterministic serialization of the public interface for the `interface_hash`.
    - **Dependency Interface Fingerprinting**: Artifacts must record the interface identities of their dependencies. Precise incremental invalidation relies on whether a dependency's interface has changed, not just its implementation.
-   - **Compiler Boundary**: The compiler validates and either loads or rejects an artifact. It never auto-rebuilds stale artifacts. `mpm` wraps this process to resolve and rebuild when the compiler rejects a candidate.
+   - **Compiler Boundary**: The compiler validates and either loads or rejects an artifact. It never auto-rebuilds stale artifacts. `lunar` orchestrates source builds without bypassing compiler validation.
    - **The compiler validates; the application orchestrates**: The Luna compiler is unaware of package-management policy. Artifact validation is a compiler capability; rebuilding, caching, acquisition, versioning, and invalidation policy belong to application-layer tooling.
 
 7. Compiler vs Package Manager Boundary & Module Architecture:
@@ -35,7 +35,7 @@ Use [the versioned specification](../docs/spec/0.1/README.md). Adopted contracts
      - Symbol usage: Symbols are accessed via their namespace (`std::Vec<i32>`), not their provider. `import` does NOT bring symbols into scope.
      - Multiple providers can contribute to the same public namespace (e.g., `alloc.ln` -> `std::`, `core.ln` -> `std::`).
    - **Compiler Boundary:** `luna` is fully standalone. It resolves `import <foo>` using search paths and understands module semantics. It does not know about projects, versions, or caching.
-   - **Project Boundary (MPM):** `mpm` manages packages, dependency graphs, versions, incremental rebuilds, and artifacts. It determines *which* providers/artifacts to feed to the compiler.
+   - **Project Boundary (Lunar):** `lunar` manages projects, local dependency graphs and builds. It determines *which* providers/artifacts to feed to the compiler. `mpm` is a historical design name; registry/version solving and incremental caching remain deferred. Both tools share `luna.toml`; the compiler reads provider bindings, while Lunar owns project tables and generates an explicit compiler configuration.
    - **Artifact Boundary:** `.llib` is a compiler-defined artifact containing Manifest, ImplTable, GenericMVIR, ObjectCode, etc. It is functionally identical to a `.ln` source file from the language's perspective.
 
 8. Grammar Authority Rule (mellis-grammar):
