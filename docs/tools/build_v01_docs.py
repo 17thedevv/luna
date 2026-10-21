@@ -46,6 +46,7 @@ CURRENT = {
     'docs/documentation-index.md',
     'distribution/windows/README.md',
     'docs/installation.md',
+    'docs/lunar.md',
 }
 
 
