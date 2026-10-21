@@ -24,7 +24,6 @@ impl<'a> TypeChecker<'a> {
         expression: ExprId,
         subst: &mut Substitution,
     ) {
-        if subst.map.is_empty() { return; }
         let Some(header) = self.ctx.tables.method_sym_to_impl_decl.get(&method)
             .and_then(|implementation| self.ctx.tables.checked_impl_headers.get(implementation))
             .cloned() else { return; };
@@ -35,6 +34,16 @@ impl<'a> TypeChecker<'a> {
         let Some(&owner) = self.ctx.tables.symbol_types.get(&nominal) else { return; };
         let Some(declaration) = self.ctx.symbol_table.get_symbol(nominal).decl_id else { return; };
         let bindings = self.ctx.tables.path_generic_bindings.get(&expression).cloned().unwrap_or_default();
+        let has_owner_arguments = self.ctx.tables.generic_param_symbols.get(&(declaration, 0))
+            .is_some_and(|binder| bindings.iter().any(|(parameter, _)| parameter == binder));
+        if !has_owner_arguments {
+            // Infer the selected implementation's independent binders. Its
+            // checked self pattern retains any fixed specialized arguments.
+            for binder in header.generic_params {
+                subst.insert(binder, self.ctx.types.new_inference_var());
+            }
+            return;
+        }
         let mut arguments = Vec::new();
         while let Some(binder) = self.ctx.tables.generic_param_symbols.get(&(declaration, arguments.len())) {
             let Some((_, argument)) = bindings.iter().find(|(parameter, _)| parameter == binder) else { return; };
@@ -353,6 +362,7 @@ impl<'a> TypeChecker<'a> {
             current_trait_impl: self.current_trait_impl,
             normalization_stack: self.normalization_stack.clone(),
             associated_type_obligations: Vec::<AssociatedTypeEqObligation>::new(),
+            callable_bound_obligations: std::collections::HashMap::new(),
         };
         checker.apply_concrete_method(
             candidate,
@@ -365,6 +375,7 @@ impl<'a> TypeChecker<'a> {
             true,
         );
         checker.solve_associated_type_obligations();
+        checker.solve_callable_bound_obligations();
         checker.ctx.diagnostics[diagnostic_start..]
             .iter()
             .filter(|diagnostic| {

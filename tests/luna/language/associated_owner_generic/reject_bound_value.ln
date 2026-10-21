@@ -1,0 +1,5 @@
+import "provider";
+fn main() -> i32 {
+    dec factory: fn(u8) -> model::Restricted<u8> = model::Restricted<u8>::create;
+    return 0;
+}

@@ -1,0 +1,6 @@
+import "provider";
+fn missing<T>(value: T) -> model::Restricted<T> {
+    dec factory = model::Restricted<T>::create;
+    return factory(value);
+}
+fn main() -> i32 { return 0; }

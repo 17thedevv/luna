@@ -15,6 +15,12 @@ export module model {
             return Pair<i32, Value> { first: 9, second: value };
         }
     }
+    export struct Optional<T> { value: Outcome<T, i32> };
+    impl<Element> Optional<Element> {
+        export fn empty() -> Self {
+            return Optional<Element> { value: Outcome::Failure(0) };
+        }
+    }
     export trait Ready {}
     impl Ready for i32 {}
     export struct Restricted<T> { value: T };

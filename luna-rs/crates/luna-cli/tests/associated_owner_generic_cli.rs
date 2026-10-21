@@ -14,7 +14,17 @@ fn associated_owner_arguments_instantiate_impl_binders_and_bounds() {
     for (mode, root) in [("source", &modes.source), ("artifact", &modes.artifact)] {
         let project = root.join("project");
         fs::create_dir(&project).unwrap();
-        for name in ["local", "consumer", "reject_bound", "reject_owner"] {
+        for name in [
+            "local",
+            "consumer",
+            "inferred",
+            "reject_bound",
+            "reject_owner",
+            "reject_bound_value",
+            "reject_inferred_bound_value",
+            "reject_later_bound_value",
+            "reject_caller_bound_value",
+        ] {
             fs::copy(
                 fixtures.join(format!("{name}.ln")),
                 project.join(format!("{name}.ln")),
@@ -37,7 +47,7 @@ fn associated_owner_arguments_instantiate_impl_binders_and_bounds() {
             assert!(built.status.success(), "{}", render(&built));
             assert!(!project.join("provider.ln").exists());
         }
-        for name in ["local", "consumer"] {
+        for name in ["local", "consumer", "inferred"] {
             let source = project.join(format!("{name}.ln"));
             let check = modes.check(root, &source);
             assert!(check.status.success(), "{mode}/{name}: {}", render(&check));
@@ -49,6 +59,10 @@ fn associated_owner_arguments_instantiate_impl_binders_and_bounds() {
         for (name, message) in [
             ("reject_bound", "error[E2021]"),
             ("reject_owner", "error[E2001]"),
+            ("reject_bound_value", "error[E2021]"),
+            ("reject_inferred_bound_value", "error[E2021]"),
+            ("reject_later_bound_value", "error[E2021]"),
+            ("reject_caller_bound_value", "error[E2021]"),
         ] {
             let source = project.join(format!("{name}.ln"));
             let check = modes.check(root, &source);
