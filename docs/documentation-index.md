@@ -166,6 +166,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/phase16-comptime-plan.md](phase16-comptime-plan.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/phase17-semantic-hardening-plan.md](phase17-semantic-hardening-plan.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/phase17_audit_report.md](phase17_audit_report.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/plans/0.1.0-stable.md](plans/0.1.0-stable.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/project/rename-luna-v1.md](project/rename-luna-v1.md) | adopted-contract | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/e1-range-inclusive-terminal-slot-2026-10-13.md](proposals/e1-range-inclusive-terminal-slot-2026-10-13.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/entry-argv-policy.md](proposals/entry-argv-policy.md) | historical | [conformance](spec/0.1/conformance.md) |
