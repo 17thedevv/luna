@@ -37,6 +37,9 @@ ADOPTED = {
     '.agents/skills/luna-semantic-compliance/references/visibility-02-public-field-default-rfc.md',
 }
 CURRENT = {
+    'docs/licensing.md',
+    'docs/stable/0.1.0/README.md',
+    'docs/plans/0.1.0-stable.md',
     'README.md', 'ROADMAP.md', 'Status.md', 'INCOMPLETE_FEATURES_PLAN.md',
     '.agents/AGENTS.md', 'docs/LanguageReference.md',
     'docs/grammar.md', 'docs/core-language-contract.md', 'docs/architecture.md',
@@ -45,6 +48,7 @@ CURRENT = {
     'docs/documentation-index.md',
     'distribution/windows/README.md',
     'docs/installation.md',
+    'docs/lunar.md',
 }
 
 

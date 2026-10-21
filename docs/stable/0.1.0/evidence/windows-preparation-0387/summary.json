@@ -1,0 +1,151 @@
+{
+  "status": "FAIL",
+  "source_commit": "0387a15db366d15086da73dc9d9b85d79dfbb169",
+  "phase": "prepare",
+  "records": [
+    {
+      "label": "runtime-config",
+      "command": [
+        "cmake",
+        "-S",
+        "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang\\runtime",
+        "-B",
+        "D:\\luna-stable-build\\runtime",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release",
+        "-DCMAKE_C_COMPILER=gcc",
+        "-DCMAKE_CXX_COMPILER=g++"
+      ],
+      "exit": 0,
+      "seconds": 2.853,
+      "log": "runtime-config.log",
+      "sha256": "2e5b8279ef33d46c4f1a62ebb356b54837b8fbc67cfd7467fe7fbb5d85cbbec5"
+    },
+    {
+      "label": "runtime-build",
+      "command": [
+        "cmake",
+        "--build",
+        "D:\\luna-stable-build\\runtime",
+        "--parallel"
+      ],
+      "exit": 0,
+      "seconds": 3.112,
+      "log": "runtime-build.log",
+      "sha256": "c05b4b46696fe7920c7ed9059ff4cc4aee08ec2054bafa0467d568d27b0bc333"
+    },
+    {
+      "label": "runtime-abi",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "D:\\luna-stable-build\\runtime",
+        "-R",
+        "^RuntimeAbiTests$",
+        "--output-on-failure",
+        "--no-tests=error"
+      ],
+      "exit": 0,
+      "seconds": 24.427,
+      "log": "runtime-abi.log",
+      "sha256": "5f6715f12a76a8892d2a464656fa32b903def8c8e21b4dc901a93ecb89726810"
+    },
+    {
+      "label": "cli-build",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "luna-cli",
+        "-p",
+        "lunar"
+      ],
+      "exit": 0,
+      "seconds": 27.22,
+      "log": "cli-build.log",
+      "sha256": "34d4fc2c437c5280d8fbaf792730989acb13a3939d689b9f93f94b64f2ca6f46"
+    },
+    {
+      "label": "sysroot",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "build-sysroot",
+        "--quiet"
+      ],
+      "exit": 0,
+      "seconds": 76.059,
+      "log": "sysroot.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "quiet-cli",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "luna-cli",
+        "--test",
+        "quiet_cli"
+      ],
+      "exit": 0,
+      "seconds": 5.527,
+      "log": "quiet-cli.log",
+      "sha256": "0af2884c109444b5c8f448f399bde644874094ef864d547cf2da374e624ead9a"
+    },
+    {
+      "label": "borrow-maturity",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "luna-driver",
+        "--test",
+        "sem_maturity_phase2b"
+      ],
+      "exit": 0,
+      "seconds": 28.683,
+      "log": "borrow-maturity.log",
+      "sha256": "4074473fa9ca7814d458f40dd7d2962979c07d4015c4f2ee9c8c0c6796be0dd5"
+    },
+    {
+      "label": "lunar-unit",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "lunar"
+      ],
+      "exit": 0,
+      "seconds": 0.746,
+      "log": "lunar-unit.log",
+      "sha256": "6550fbb0261042d6fcfcc41c73e8493cc27b1f75c550998fca399a2e5f401e90"
+    },
+    {
+      "label": "lunar-candidate-smoke",
+      "command": [
+        "python",
+        "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang\\docs\\tools\\smoke_lunar.py",
+        "--lunar",
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--luna",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--out",
+        "D:\\luna-stable-build\\lunar-candidate-smoke"
+      ],
+      "exit": 1,
+      "seconds": 3.551,
+      "log": "lunar-candidate-smoke.log",
+      "sha256": "0649fa6500e33c78633eb5e97a28e83b6de4d389610c33acaa0aa7b86477bcdf"
+    }
+  ],
+  "failure": "lunar-candidate-smoke failed"
+}

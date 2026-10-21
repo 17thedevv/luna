@@ -1,0 +1,12 @@
+
+STDERR
+Checking library leaf
+Checking library middle
+Checking bin hello
+error[E1001]: Symbol 'missing_name' not found
+  --> \\?\D:\luna-stable-build\lunar-candidate-smoke-llvm18\dự án space\hello\src\main.ln:1:27
+   |
+1  | fn main() -> i32 { return missing_name; }
+   |                           ^^^^^^^^^^^^
+
+lunar: Luna compilation failed (exit code: 1)

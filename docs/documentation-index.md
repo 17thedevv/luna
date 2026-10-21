@@ -150,7 +150,9 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/installation.md](installation.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/integration/2026-10-03-all-worktrees.md](integration/2026-10-03-all-worktrees.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/lang-item-roadmap-catalog.md](lang-item-roadmap-catalog.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/licensing.md](licensing.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/luna_artifact_identity_refactoring.md](luna_artifact_identity_refactoring.md) | historical | [modules](spec/0.1/modules.md) |
+| [docs/lunar.md](lunar.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/mellis-language-semantic-audit.md](mellis-language-semantic-audit.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/mellis_constitution.md](mellis_constitution.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/memory/allocator-contract-rfc.md](memory/allocator-contract-rfc.md) | historical | [runtime](spec/0.1/runtime.md) |
@@ -166,6 +168,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/phase16-comptime-plan.md](phase16-comptime-plan.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/phase17-semantic-hardening-plan.md](phase17-semantic-hardening-plan.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/phase17_audit_report.md](phase17_audit_report.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/plans/0.1.0-stable.md](plans/0.1.0-stable.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/project/rename-luna-v1.md](project/rename-luna-v1.md) | adopted-contract | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/e1-range-inclusive-terminal-slot-2026-10-13.md](proposals/e1-range-inclusive-terminal-slot-2026-10-13.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/entry-argv-policy.md](proposals/entry-argv-policy.md) | historical | [conformance](spec/0.1/conformance.md) |
@@ -196,6 +199,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/spec/0.1/stdlib-inventory.md](spec/0.1/stdlib-inventory.md) | canonical | [stdlib](spec/0.1/stdlib.md) |
 | [docs/spec/0.1/stdlib.md](spec/0.1/stdlib.md) | canonical | [stdlib](spec/0.1/stdlib.md) |
 | [docs/spec/0.1/syntax.md](spec/0.1/syntax.md) | canonical | [conformance](spec/0.1/conformance.md) |
+| [docs/stable/0.1.0/README.md](stable/0.1.0/README.md) | guidance | [conformance](spec/0.1/conformance.md) |
 | [docs/std-arch-01-compatibility-matrix.md](std-arch-01-compatibility-matrix.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/std-arch-01-final-acceptance.md](std-arch-01-final-acceptance.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/walkthrough.md](walkthrough.md) | historical | [conformance](spec/0.1/conformance.md) |

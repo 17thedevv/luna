@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "date": "2026-10-21",
+  "status": "INTEGRATED_NOT_QUALIFIED",
+  "source_commit": "c13a9852279666a56526968d4b61622bf7310bb8",
+  "parents": [
+    "017cbc563307366e7a386d08bac798a80c30d7e3",
+    "483b03d30474da1f9a672a85781a9fb72c47a537"
+  ],
+  "source_trees": {
+    "luna-rs": "13283fb5b2780f5eff439eb8c2c5d80a08e8bb14",
+    "runtime": "60cb194d21d570965980c092f4911db66e57827e",
+    "tests": "30ed79cd973a64a3e66f8f18b6c86a0094b54ca4"
+  },
+  "versions": {
+    "compiler": 25,
+    "metadata": 9,
+    "mvir": 5,
+    "format": 2
+  },
+  "provider_count": 49,
+  "alpha": {
+    "status": "PUBLISHED_PRERELEASE",
+    "source_record": "docs/audits/r5-cpu-baseline-2026-10-20/release-closure.json",
+    "record_sha256": "1758dd45757e628cf35d5bc1e723e5a07cac31f58a8f38d36e22456225639cec",
+    "historical_packaged_source": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+    "historical_qualified_pin": "b5cb77c3286f583c43c41d0e56f4136903ebb842"
+  },
+  "history_mapping": [
+    {
+      "old": "b5cb77c3286f583c43c41d0e56f4136903ebb842",
+      "current": "297d6e1a0b208baa748c461d59fa8ed4d0533b2e",
+      "current_tree": "1e2dcd64c512dec6042b131ff638af76e0a4c192"
+    },
+    {
+      "old": "cd9cd1884d2e49c0f03979597ca73e92043b7fe7",
+      "current": "a3080712a458fc581c13c2b1ac5313c759c05f1c",
+      "current_tree": "809ddd2a1512314810c2ed3914d7664936ca6882"
+    }
+  ],
+  "license_decision": {
+    "spdx": "GPL-3.0-only",
+    "authority": "Human maintainer reply 2026-10-21"
+  },
+  "qualified_lanes": 0,
+  "stable_tag": null
+}

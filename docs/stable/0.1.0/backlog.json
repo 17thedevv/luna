@@ -1,0 +1,273 @@
+{
+  "schema": 1,
+  "owner": "17thedevv",
+  "status": "IN_PROGRESS_NOT_QUALIFIED",
+  "evidence_policy": "Historical scoped PASS is input evidence only, never a stable candidate PASS.",
+  "items": [
+    {
+      "id": "STABLE-001",
+      "milestone": "S0",
+      "priority": "P1",
+      "requirement": "Reconcile current publication/status pages and immutable SHA provenance",
+      "status": "OPEN",
+      "owner": "17thedevv",
+      "source_paths": [
+        "docs/spec/0.1/README.md",
+        "docs/spec/0.1/gaps.md",
+        "docs/spec/0.1/conformance.md"
+      ],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-002",
+      "milestone": "S0",
+      "priority": "P1",
+      "requirement": "Reconcile retained grammar coverage and V01-DESIGN-04 without adopting parser-only syntax",
+      "status": "AUDIT_REQUIRED",
+      "owner": "17thedevv",
+      "source_paths": [
+        "docs/grammar.ebnf",
+        "docs/spec/0.1/syntax.md"
+      ],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-003",
+      "milestone": "S1",
+      "priority": "P2",
+      "requirement": "Remove unconditional importer DEBUG stderr while preserving source diagnostics",
+      "status": "FIXED_WINDOWS_FOCUSED_PASS",
+      "owner": "17thedevv",
+      "source_paths": [
+        "luna-rs/crates/luna-driver/src/importer.rs"
+      ],
+      "fix_commit": "0387a15db366d15086da73dc9d9b85d79dfbb169",
+      "evidence": [
+        "evidence/windows-preparation-0387/summary.json",
+        "evidence/windows-io-0b09/summary.json"
+      ],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-004",
+      "milestone": "S1",
+      "priority": "P2",
+      "requirement": "Retire invalid empty ignored fixture with explicit replacement coverage",
+      "status": "FIXED_WINDOWS_FOCUSED_PASS",
+      "owner": "17thedevv",
+      "source_paths": [
+        "luna-rs/crates/luna-driver/tests/sem_maturity_phase2b.rs"
+      ],
+      "fix_commit": "0387a15db366d15086da73dc9d9b85d79dfbb169",
+      "evidence": [
+        "evidence/windows-preparation-0387/summary.json"
+      ],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-005",
+      "milestone": "S2",
+      "priority": "P1",
+      "requirement": "Qualify Lunar with the current candidate compiler and fresh stdlib",
+      "status": "WINDOWS_CANDIDATE_PASS_UBUNTU_PENDING",
+      "owner": "17thedevv",
+      "source_paths": [
+        "docs/tools/smoke_lunar.py"
+      ],
+      "fix_commit": "0b09ed8b65a46593e6b28eb168366c211b4bd0e5",
+      "evidence": [
+        "evidence/windows-preparation-0387/summary.json",
+        "evidence/windows-io-0b09/summary.json",
+        "evidence/windows-io-0b09/lunar/summary.json"
+      ],
+      "blocks": [
+        "STABLE_RELEASE"
+      ],
+      "notes": "20 public CLI steps PASS with freshly built candidate compiler/runtime/sysroot and the installed LLVM18/GNU wrapper, including Unicode paths, local diamond providers, artifact-only execution, changed source, failure without stale execution and owned clean. Ubuntu and clean candidate distribution consumers remain pending. Raw-GCC failure is retained separately."
+    },
+    {
+      "id": "STABLE-006",
+      "milestone": "S3",
+      "priority": "P1",
+      "requirement": "Adopt maintainer-selected GPL-3.0-only; preserve third-party notices and corresponding source provenance",
+      "status": "FIRST_PARTY_LICENSE_APPLIED_PACKAGING_PENDING",
+      "owner": "17thedevv",
+      "source_paths": [
+        "LICENSE",
+        "NOTICE",
+        "docs/licensing.md",
+        "luna-rs/Cargo.toml"
+      ],
+      "fix_commit": "0387a15db366d15086da73dc9d9b85d79dfbb169",
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-007",
+      "milestone": "S3",
+      "priority": "P1",
+      "requirement": "Make CLI/distribution versions agree and bundle Lunar in both native packages",
+      "status": "OPEN",
+      "owner": "17thedevv",
+      "source_paths": [
+        "docs/tools/package_luna_release.py",
+        "luna-rs/crates/luna-cli/Cargo.toml"
+      ],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-008",
+      "milestone": "S3",
+      "priority": "P1",
+      "requirement": "Build versioned Windows installer with candidate Luna and Lunar; upgrade/uninstall and hash controls",
+      "status": "OPEN",
+      "owner": "17thedevv",
+      "source_paths": [
+        "distribution/windows/build_installer.py",
+        "distribution/windows/luna.iss"
+      ],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-009",
+      "milestone": "S3",
+      "priority": "P1",
+      "requirement": "Publish consistent install/reference/download docs and verify live website",
+      "status": "OPEN",
+      "owner": "17thedevv",
+      "source_paths": [
+        "docs/installation.md",
+        "luna-web"
+      ],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ],
+      "notes": "I/O EN/VI pages repaired under STABLE-015. Other tour/stdlib/home pages still contain unsupported format-string calls and require an executable-example audit before stable."
+    },
+    {
+      "id": "STABLE-010",
+      "milestone": "S4",
+      "priority": "P1",
+      "requirement": "Reacquire eight exact-pin qualification lanes and verify all archives",
+      "status": "NOT_STARTED",
+      "owner": "17thedevv",
+      "source_paths": [],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-011",
+      "milestone": "S4",
+      "priority": "P1",
+      "requirement": "Clean Windows/Ubuntu package + installer consumers using shipped compiler/Lunar",
+      "status": "NOT_STARTED",
+      "owner": "17thedevv",
+      "source_paths": [],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-012",
+      "milestone": "S5",
+      "priority": "P1",
+      "requirement": "Exercise three external RC projects, reconcile defects and maintainer release review",
+      "status": "NOT_STARTED",
+      "owner": "17thedevv",
+      "source_paths": [],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-013",
+      "milestone": "S0",
+      "priority": "P1",
+      "requirement": "Document source/API/ABI/artifact compatibility policy for maintainer review",
+      "status": "OPEN",
+      "owner": "17thedevv",
+      "source_paths": [],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-014",
+      "milestone": "S1",
+      "priority": "P1",
+      "requirement": "Run bounded malformed parser/import/LLIB corpus; retain budgets and failures",
+      "status": "NOT_STARTED",
+      "owner": "17thedevv",
+      "source_paths": [],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ]
+    },
+    {
+      "id": "STABLE-015",
+      "milestone": "S1/S3",
+      "priority": "P1",
+      "requirement": "Correct the reported Hello World I/O example, remove importer debug noise, and render mismatch types without session IDs; validate source/artifact behavior",
+      "status": "FIXED_WINDOWS_SOURCE_ARTIFACT_PASS",
+      "owner": "17thedevv",
+      "source_paths": [
+        "luna-web/src/content/docs/stdlib/io.mdx",
+        "luna-web/src/content/docs/vi/stdlib/io.mdx",
+        "luna-rs/crates/luna-semantic/src/diagnostic_types.rs",
+        "luna-rs/crates/luna-cli/tests/stable_io_cli.rs",
+        "tests/luna/stdlib/stable_io"
+      ],
+      "fix_commit": "0b09ed8b65a46593e6b28eb168366c211b4bd0e5",
+      "evidence": [
+        "evidence/windows-io-0b09/summary.json",
+        "evidence/windows-io-0b09/documentation.json",
+        "evidence/windows-macros-5b47/cli/summary.json",
+        "evidence/windows-macros-5b47/site/summary.json",
+        "evidence/windows-macros-5b47/installed/summary.json",
+        "evidence/windows-macros-5b47/project/summary.json"
+      ],
+      "blocks": [
+        "STABLE_RELEASE"
+      ],
+      "notes": "The existing println contract is &[u8]; str literals use println_str. Retain the rejected literal call as E2001, without a stdlib-name special case or new coercion. User installation still has the alpha compiler. Positive/negative CLI check/build and executable output passed in both isolated provider modes; 3 type-display invariant tests, quiet CLI and 4 diagnostic conformance tests passed. Local EN/VI website build passed (33 pages); wider site audit and live deployment remain STABLE-009. This is not final-pin or cross-platform stable qualification. Follow-up: document the existing std::println!/println! macros; 3 positive I/O examples now pass source/artifact CLI parity. Installed-alpha probes and default installed lunar run also pass. Console macros concatenate values and leave braces literal; no new formatting syntax, compiler mapping, or stdlib implementation was introduced.",
+      "followup_commits": [
+        "5b470fa7861fcfe3243c654abdc3560905498df4"
+      ]
+    }
+  ]
+}

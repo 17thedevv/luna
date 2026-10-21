@@ -1,14 +1,16 @@
 # Luna 0.1 specification
 
-Contract baseline: **0.1**. Release conformance: **BLOCKED / NOT VERIFIED**.
+Contract baseline: **0.1**. Stable 0.1.0 conformance: **NOT YET QUALIFIED**.
 Consolidated 2026-10-03 at compiler revision `3dac3ac`.
 
-Current qualification — 2026-10-20: **RELEASE BLOCKED by package CPU identity drift**.
-The eight completed lanes at `8525067f` are preserved, but clean Windows package
-smoke fails on a different CPU. [Finding and baseline repair](../../audits/r5-cpu-baseline-2026-10-20/README.md).
-A new implementation pin must reacquire all eight lanes and clean package smoke
-on both hosts. Candidate remains `8525067f`; no merge/tag/publication occurred.
-Strict target identity validation and the adopted language contracts remain mandatory.
+Current status — 2026-10-21: **v0.1.0-alpha.1 is published as a prerelease**.
+The package CPU-baseline defect at `8525067f` was superseded by the
+[qualified repair and release closure](../../audits/r5-cpu-baseline-2026-10-20/README.md):
+eight lanes and both clean package smokes passed in the recorded alpha scope.
+[Stable execution](../../stable/0.1.0/README.md) now tracks a new integrated
+baseline containing Lunar. Its stable qualification has not run; alpha evidence
+does not certify that new candidate. Historical source SHAs remain in their
+original logs, with metadata-only history mappings recorded separately.
 Earlier qualification snapshots below retain their dated scopes.
 
 Prior implementation status reconciliation — 2026-10-14: the

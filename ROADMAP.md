@@ -4,6 +4,11 @@
 
 # Luna 0.1 roadmap
 
+The [0.1.0 stable plan](docs/plans/0.1.0-stable.md), drafted 2026-10-21,
+sequences baseline reconciliation, correctness, Lunar integration, packaging,
+exact-candidate qualification and RC review. It proposes release scope for
+maintainer review; it does not amend adopted language contracts or certify stable.
+
 Authority: [0.1 specification](docs/spec/0.1/README.md). This roadmap sequences
 work; it does not add language contracts or promise completion dates.
 

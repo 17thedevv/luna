@@ -61,14 +61,15 @@ pointer_type = "*", [ "rw" ], type ;
 array_type = "[", type, ";", expression, "]" ;
 slice_type = "[", type, "]" ;
 (* CALL-ARGUMENTS-v1: labels affect binding, never source evaluation order.
-   Default parameter expressions are an adopted, still pending capability. *)
+   Declaration/omission acceptance is recorded by C1 and later qualification;
+   see the stable ledger for current candidate requalification. *)
 call_arguments = call_argument, { ",", call_argument } ;
 call_argument = [ identifier, ( "=" | ":" ) ], expression ;
 
 function_type = [ "unsafe" ], "fn", "(", [ type, { ",", type } ], ")",
                 [ "->", type ] ;
 
-(* Retained Rule K.4; current unparenthesized foreach parsing is a gap. *)
+(* Retained Rule K.4; unparenthesized parsing is legacy characterization only. *)
 foreach_statement = "for", "(", pattern, "in", expression, ")", block ;
 cstyle_for_statement = "for", "(", ( binding | ";" ), [ expression ], ";",
                        [ expression ], ")", block ;

@@ -392,9 +392,8 @@ impl<'a> TypeChecker<'a> {
                 self.unify(o1, o2)
             }
             _ => {
-                let exp_sem = self.ctx.types.get(expected);
-                let act_sem = self.ctx.types.get(actual);
-                Err(format!("type mismatch: expected {:?}, got {:?}", exp_sem, act_sem))
+                Err(format!("type mismatch: expected {}, got {}",
+                    self.ctx.diagnostic_type(expected), self.ctx.diagnostic_type(actual)))
             }
         }
     }

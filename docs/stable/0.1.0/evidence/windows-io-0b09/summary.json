@@ -1,0 +1,122 @@
+{
+  "status": "PASS",
+  "source_commit": "0b09ed8b65a46593e6b28eb168366c211b4bd0e5",
+  "worktree_status": "",
+  "native_linker": "C:/Users/84387/AppData/Local/Programs/Luna/bin/luna-cc.exe",
+  "records": [
+    {
+      "label": "type-display",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "luna-semantic",
+        "--lib",
+        "diagnostic_types::tests"
+      ],
+      "exit": 0,
+      "seconds": 9.979,
+      "log": "type-display.log",
+      "sha256": "35d474ded312243aa0d7571167e14e260cb54577e6077ed0c398b28781701658"
+    },
+    {
+      "label": "cli-build",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "build",
+        "--offline",
+        "--locked",
+        "-p",
+        "luna-cli",
+        "-p",
+        "lunar"
+      ],
+      "exit": 0,
+      "seconds": 14.562,
+      "log": "cli-build.log",
+      "sha256": "2356dc7a715348e982dd11b856eafb7608c5f74498cd086624fd2ecf1a996300"
+    },
+    {
+      "label": "sysroot",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "build-sysroot",
+        "--quiet"
+      ],
+      "exit": 0,
+      "seconds": 70.932,
+      "log": "sysroot.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "stable_io_cli",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "luna-cli",
+        "--test",
+        "stable_io_cli"
+      ],
+      "exit": 0,
+      "seconds": 108.461,
+      "log": "stable_io_cli.log",
+      "sha256": "f58ce6e58c7b5ba50db968bb0706b809b05559143a9cb3bb5b098dfb8ba075ee"
+    },
+    {
+      "label": "quiet_cli",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "luna-cli",
+        "--test",
+        "quiet_cli"
+      ],
+      "exit": 0,
+      "seconds": 5.926,
+      "log": "quiet_cli.log",
+      "sha256": "7f45c203e5a200c4f24e2409989484541ccb62817e052c505588d47d451e7e15"
+    },
+    {
+      "label": "diagnostic_conformance_cli",
+      "command": [
+        "C:/Users/84387/.cargo/bin/cargo.exe",
+        "test",
+        "--offline",
+        "--locked",
+        "-p",
+        "luna-cli",
+        "--test",
+        "diagnostic_conformance_cli"
+      ],
+      "exit": 0,
+      "seconds": 87.682,
+      "log": "diagnostic_conformance_cli.log",
+      "sha256": "4c252a4036d38ae6933ce79cadc6a12a8f6eb1124b3e5d655646598014b2aada"
+    },
+    {
+      "label": "lunar-candidate-smoke",
+      "command": [
+        "python",
+        "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang\\docs\\tools\\smoke_lunar.py",
+        "--lunar",
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--luna",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--out",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18"
+      ],
+      "exit": 0,
+      "seconds": 61.165,
+      "log": "lunar-candidate-smoke.log",
+      "sha256": "f1cf64934727e64b3b1568ad3022d628af05fc0205c266f0ef6a5abf65eff3fb"
+    }
+  ]
+}

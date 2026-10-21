@@ -1,0 +1,4 @@
+# Preserve acquired bytes, including line endings and diagnostic whitespace.
+*.log -text -whitespace
+*.stdout -text -whitespace
+*.stderr -text -whitespace

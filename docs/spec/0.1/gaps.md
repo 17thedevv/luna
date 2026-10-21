@@ -11,15 +11,17 @@ otherwise. Some fixes may now be present; each original finding requires a
 fresh check before being marked closed. The merged manifest has 49 providers.
 V01-ARCH-02 is newly observed in the imported source, not the old audit.
 
-## Current qualification — 2026-10-20
+## Current qualification — 2026-10-21
 
-Current qualification — 2026-10-20: **RELEASE BLOCKED by package CPU identity drift**.
-The eight completed lanes at `8525067f` are preserved, but clean Windows package
-smoke fails on a different CPU. [Finding and baseline repair](../../audits/r5-cpu-baseline-2026-10-20/README.md).
-A new implementation pin must reacquire all eight lanes and clean package smoke
-on both hosts. Candidate remains `8525067f`; no merge/tag/publication occurred.
-Strict target identity validation and the adopted language contracts remain mandatory.
-Earlier qualification snapshots below retain their dated scopes.
+**v0.1.0-alpha.1 is published as a prerelease. Stable 0.1.0 is not yet qualified.**
+The CPU-baseline blocker at `8525067f` has a
+[replacement qualification and release closure](../../audits/r5-cpu-baseline-2026-10-20/README.md).
+Alpha passed its eight lanes and two clean package smokes in their recorded scope.
+The [stable ledger](../../stable/0.1.0/README.md) separates current work from
+49 historical wave/repair records. Their original findings and scoped closures
+below remain dated evidence, not unconditionally open defects or a new stable PASS.
+Stable qualification must use its own final source pin, with retained contracts
+and accepted deferrals preserved.
 
 ## Prior reconciliation — 2026-10-14
 

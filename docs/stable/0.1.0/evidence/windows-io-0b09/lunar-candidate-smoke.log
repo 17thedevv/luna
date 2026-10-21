@@ -1,0 +1,21 @@
+new-hello: PASS
+fresh-check: PASS
+fresh-build: PASS
+fresh-run-native-args: PASS
+nearest-manifest-discovery: PASS
+new-combined: PASS
+library-and-selected-bin: PASS
+all-bin-targets: PASS
+vendored-source-provider: PASS
+new-leaf: PASS
+new-middle: PASS
+local-diamond-check: PASS
+local-diamond-artifact-run: PASS
+published-artifact-only-run: PASS
+changed-dependency-rebuild: PASS
+test-pass: PASS
+test-failure-exit: PASS
+compile-error-check: PASS
+compile-error-run-no-stale-execution: PASS
+clean-owned-output: PASS
+20 public CLI steps PASS: D:\luna-stable-build\lunar-candidate-smoke-llvm18\evidence

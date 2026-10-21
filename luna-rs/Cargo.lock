@@ -407,7 +407,7 @@ dependencies = [
 
 [[package]]
 name = "luna-cli"
-version = "0.1.0"
+version = "0.1.0-rc.1"
 dependencies = [
  "bincode",
  "clap",
@@ -516,6 +516,15 @@ dependencies = [
 [[package]]
 name = "luna-test-support"
 version = "0.1.0"
+
+[[package]]
+name = "lunar"
+version = "0.1.0-rc.1"
+dependencies = [
+ "clap",
+ "serde",
+ "toml",
+]
 
 [[package]]
 name = "memchr"

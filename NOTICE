@@ -1,0 +1,16 @@
+Luna compiler, runtime, standard library and Lunar
+Copyright (C) 2026 17thedevv
+
+First-party project source is licensed under the GNU General Public License,
+version 3 only (SPDX-License-Identifier: GPL-3.0-only).
+See LICENSE for the full license. No later-version election is granted.
+No additional Luna runtime or linking exception is granted.
+
+Third-party components retain their own copyright notices, license terms and
+any component-specific exceptions. This project notice does not relicense them.
+See docs/licensing.md and distribution/windows/installer-notices.txt.
+
+The GPL-3.0-only decision was made by the maintainer on 2026-10-21. Existing
+published alpha archives and their historical no-license-declared notices have
+not been modified. New distributions must carry the applicable license, notices,
+exact-source provenance and corresponding-source access for their components.

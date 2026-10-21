@@ -1,0 +1,8 @@
+import <io>;
+import <string>;
+
+fn main() -> i32 {
+    dec text = std::string_from_str("hello world");
+    std::io::println(text.as_bytes());
+    return 0;
+}

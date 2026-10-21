@@ -710,9 +710,19 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/licensing.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/luna_artifact_identity_refactoring.md",
     "role": "historical",
     "owner": "modules"
+  },
+  {
+    "path": "docs/lunar.md",
+    "role": "guidance",
+    "owner": "conformance"
   },
   {
     "path": "docs/mellis-language-semantic-audit.md",
@@ -787,6 +797,11 @@
   {
     "path": "docs/phase17_audit_report.md",
     "role": "historical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/plans/0.1.0-stable.md",
+    "role": "guidance",
     "owner": "conformance"
   },
   {
@@ -937,6 +952,11 @@
   {
     "path": "docs/spec/0.1/syntax.md",
     "role": "canonical",
+    "owner": "conformance"
+  },
+  {
+    "path": "docs/stable/0.1.0/README.md",
+    "role": "guidance",
     "owner": "conformance"
   },
   {

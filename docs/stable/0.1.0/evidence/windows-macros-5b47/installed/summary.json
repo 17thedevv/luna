@@ -1,0 +1,41 @@
+{
+  "compiler": "C:\\Users\\84387\\AppData\\Local\\Programs\\Luna\\bin\\luna.exe",
+  "records": [
+    {
+      "name": "qualified_literal",
+      "statement": "std::println!(\"hello world\");",
+      "exit": 0,
+      "stdout": "hello world\r\n",
+      "errors": [],
+      "stdout_sha256": "572a95fee9c0f320030789e4883707affe12482fbb1ea04b3ea8267c87a890fb",
+      "stderr_sha256": "0d9a4a7cc953f6d036d485bb04d1c6cdd57df2e9a5dd3e2623fb7b0cd04729ed"
+    },
+    {
+      "name": "unqualified_literal",
+      "statement": "println!(\"hello world\");",
+      "exit": 0,
+      "stdout": "hello world\r\n",
+      "errors": [],
+      "stdout_sha256": "572a95fee9c0f320030789e4883707affe12482fbb1ea04b3ea8267c87a890fb",
+      "stderr_sha256": "0d9a4a7cc953f6d036d485bb04d1c6cdd57df2e9a5dd3e2623fb7b0cd04729ed"
+    },
+    {
+      "name": "sequential_values",
+      "statement": "std::println!(\"value: \", 42);",
+      "exit": 0,
+      "stdout": "value: 42\r\n",
+      "errors": [],
+      "stdout_sha256": "53c8226b44fa3aa2bb335c75f05964cfb51cb1f3060c9c5b9e80e35e2d882839",
+      "stderr_sha256": "0d9a4a7cc953f6d036d485bb04d1c6cdd57df2e9a5dd3e2623fb7b0cd04729ed"
+    },
+    {
+      "name": "placeholder_control",
+      "statement": "std::println!(\"value: {}\", 42);",
+      "exit": 0,
+      "stdout": "value: {}42\r\n",
+      "errors": [],
+      "stdout_sha256": "4005d0cc1632a438ca22c4b72206b31f34d5313505416fb3f4e922fef109bb7c",
+      "stderr_sha256": "0d9a4a7cc953f6d036d485bb04d1c6cdd57df2e9a5dd3e2623fb7b0cd04729ed"
+    }
+  ]
+}

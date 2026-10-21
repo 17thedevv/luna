@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "source_commit": "5b470fa7861fcfe3243c654abdc3560905498df4",
+  "phase": "site",
+  "exact_example_matches": [
+    {
+      "page": "luna-web/src/content/docs/stdlib/io.mdx",
+      "fixture": "tests/luna/stdlib/stable_io/literal_text.ln"
+    },
+    {
+      "page": "luna-web/src/content/docs/stdlib/io.mdx",
+      "fixture": "tests/luna/stdlib/stable_io/macro_text.ln"
+    },
+    {
+      "page": "luna-web/src/content/docs/stdlib/io.mdx",
+      "fixture": "tests/luna/stdlib/stable_io/owned_text_bytes.ln"
+    },
+    {
+      "page": "luna-web/src/content/docs/vi/stdlib/io.mdx",
+      "fixture": "tests/luna/stdlib/stable_io/literal_text.ln"
+    },
+    {
+      "page": "luna-web/src/content/docs/vi/stdlib/io.mdx",
+      "fixture": "tests/luna/stdlib/stable_io/macro_text.ln"
+    },
+    {
+      "page": "luna-web/src/content/docs/vi/stdlib/io.mdx",
+      "fixture": "tests/luna/stdlib/stable_io/owned_text_bytes.ln"
+    }
+  ],
+  "command": [
+    "C:\\Users\\84387\\AppData\\Roaming\\npm\\pnpm.cmd",
+    "build"
+  ],
+  "exit": 0,
+  "log": "site.log",
+  "sha256": "0c4ea95b9fb7d2856e68c7014beb6978e7e17ef5616da06211c93a8662137265"
+}
