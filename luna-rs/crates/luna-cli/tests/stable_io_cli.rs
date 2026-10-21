@@ -2,7 +2,7 @@
 mod support;
 
 use std::process::Command;
-use support::{ProviderModes, render, workspace_root};
+use support::{render, workspace_root, ProviderModes};
 
 #[test]
 fn documented_text_and_byte_printing_have_source_artifact_parity() {
@@ -12,7 +12,11 @@ fn documented_text_and_byte_printing_have_source_artifact_parity() {
         .unwrap()
         .join("tests/luna/stdlib/stable_io");
     for (mode, root) in [("source", &modes.source), ("artifact", &modes.artifact)] {
-        for name in ["literal_text", "owned_text_bytes"] {
+        for (name, expected) in [
+            ("literal_text", "hello world\n"),
+            ("owned_text_bytes", "hello world\n"),
+            ("macro_text", "hello world\nvalue: 42\n"),
+        ] {
             let source = fixtures.join(format!("{name}.ln"));
             let check = modes.check(root, &source);
             assert!(check.status.success(), "{mode}/{name}: {}", render(&check));
@@ -27,7 +31,7 @@ fn documented_text_and_byte_printing_have_source_artifact_parity() {
             assert!(run.status.success(), "{mode}/{name}: {}", render(&run));
             assert_eq!(
                 String::from_utf8(run.stdout).unwrap().replace("\r\n", "\n"),
-                "hello world\n"
+                expected
             );
             assert!(run.stderr.is_empty());
         }

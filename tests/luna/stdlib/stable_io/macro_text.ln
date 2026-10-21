@@ -1,0 +1,7 @@
+import <io>;
+
+fn main() -> i32 {
+    std::println!("hello world");
+    std::println!("value: ", 42);
+    return 0;
+}

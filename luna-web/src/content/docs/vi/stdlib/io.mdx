@@ -19,6 +19,27 @@ fn main() -> i32 {
 Trong project Lunar, lưu vào `src/main.ln` rồi chạy `lunar run`.
 Với file độc lập, dùng `luna run hello.ln`.
 
+## Macro console đã có sẵn
+
+Provider `io` cũng export `std::print!`, `std::println!`, `std::eprint!` và
+`std::eprintln!`, cùng các tên tương ứng không có tiền tố `std::`.
+Chúng in giá trị qua trait `Display` thông thường. Dấu `!` chọn macro;
+hàm nhận byte slice `std::io::println(...)` là API riêng.
+
+```luna
+import <io>;
+
+fn main() -> i32 {
+    std::println!("hello world");
+    std::println!("value: ", 42);
+    return 0;
+}
+```
+
+Ví dụ in `hello world` và `value: 42` trên hai dòng. Các rule macro hiện nhận
+từ một đến bốn giá trị, in liên tiếp và không tự thêm dấu phân cách.
+Macro xuống dòng còn nhận lời gọi không có đối số để in một dòng trống.
+
 ## Phân biệt văn bản và byte
 
 | Hàm | Đầu vào | Đầu ra |
@@ -53,7 +74,9 @@ Dùng `println_str` hoặc truyền một giá trị `&[u8]` thực sự.
 
 Các hàm trên không xử lý format string. Lời gọi
 `std::io::println("giá trị: {}", value)` và các format specifier kiểu printf
-chưa được API này hỗ trợ. Formatting foundation dùng trait thông thường
+chưa được API này hỗ trợ. Macro console hiện cũng coi dấu ngoặc nhọn là ký tự
+thường: `std::println!("value: {}", 42)` in `value: {}42`. Dùng
+`std::println!("value: ", 42)` để in liên tiếp. Formatting foundation dùng trait thông thường
 `std::fmt::Display` và `std::fmt::Writer`; nó không bao gồm interpolation hay
 compiler tự chọn hàm in dựa trên tên.
 

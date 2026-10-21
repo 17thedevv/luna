@@ -19,6 +19,27 @@ fn main() -> i32 {
 In a Lunar project, save this as `src/main.ln` and run `lunar run`.
 For a standalone file, use `luna run hello.ln`.
 
+## Existing console macros
+
+The `io` provider also exports `std::print!`, `std::println!`, `std::eprint!`
+and `std::eprintln!`, with corresponding unqualified names. They format values
+through the ordinary `Display` trait. The `!` selects a macro; the byte-slice
+function `std::io::println(...)` is a separate API.
+
+```luna
+import <io>;
+
+fn main() -> i32 {
+    std::println!("hello world");
+    std::println!("value: ", 42);
+    return 0;
+}
+```
+
+This prints `hello world` and `value: 42` on separate lines. Current macro rules
+accept one to four values, written consecutively without an automatic separator.
+The newline macros also accept no arguments to print an empty line.
+
 ## Text and bytes are different APIs
 
 | Function | Input | Output |
@@ -53,7 +74,9 @@ Use `println_str` or pass an actual `&[u8]`.
 
 These functions do not parse format strings. Calls such as
 `std::io::println("value: {}", value)` and printf-style format specifiers are
-not supported by this API. The formatting foundation uses ordinary
+not supported by this API. Existing console macros also treat braces literally:
+`std::println!("value: {}", 42)` prints `value: {}42`. Use
+`std::println!("value: ", 42)` for sequential output. The formatting foundation uses ordinary
 `std::fmt::Display` and `std::fmt::Writer` traits; compiler-selected print
 callees and format-string interpolation are not part of that contract.
 
