@@ -61,8 +61,11 @@ The runtime tree is unchanged from the allocator implementation pin.
 The [older workspace attempts](evidence/windows-workspace-attempts/receipt.json)
 are incomplete/superseded, not workspace PASS. Their original raw summaries and
 streams are archived with hashes, including setup failures and interruptions.
-Final workspace regression is being acquired at 5e1c7356 in
+The subsequent workspace run at 5e1c7356 was cancelled before completion in
 [Ubuntu run 39634996889](https://github.com/17thedevv/luna/actions/runs/39634996889).
+Its runtime and four focused CLI suites passed; workspace is incomplete and
+ASan was skipped. The [hashed raw artifact receipt](evidence/ubuntu-5e1c7356/receipt.json)
+preserves this result without promoting it to workspace PASS.
 
 Ubuntu [run 39567793256](https://github.com/17thedevv/luna/actions/runs/39567793256)
 passes runtime ABI/deterministic failure (2 C suites), all four public CLI suites
