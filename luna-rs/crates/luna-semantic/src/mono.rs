@@ -1201,6 +1201,9 @@ impl<'a> MonoCollector<'a> {
         impl_decl_id: Option<DeclId>,
         subst: Vec<(SymbolId, SemanticTypeId)>,
     ) -> Vec<(SymbolId, SemanticTypeId)> {
+        // Qualified direct calls and callable values carry a selected method
+        // declaration too; they need its impl binders just like receiver calls.
+        let impl_decl_id = impl_decl_id.or_else(|| self.ctx.tables.method_to_impl_decl.get(&decl_id).copied());
         let mut ordered = Vec::new();
 
         let mut expected_symbols = Vec::new();

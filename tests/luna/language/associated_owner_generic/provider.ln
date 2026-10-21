@@ -1,0 +1,26 @@
+export module model {
+    export enum Outcome<T, E> { Success(T), Failure(E) }
+    export struct Storage<T> { value: T };
+    impl<Element> Storage<Element> {
+        export fn create(value: Element) -> Outcome<Self, i32> {
+            return Outcome::Success(Storage<Element> { value: value });
+        }
+        export fn pair<Other>(value: Element, other: Other) -> (Self, Other) {
+            return (Storage<Element> { value: value }, other);
+        }
+    }
+    export struct Pair<A, B> { first: A, second: B };
+    impl<Value> Pair<i32, Value> {
+        export fn create(value: Value) -> Self {
+            return Pair<i32, Value> { first: 9, second: value };
+        }
+    }
+    export trait Ready {}
+    impl Ready for i32 {}
+    export struct Restricted<T> { value: T };
+    impl<Value: Ready> Restricted<Value> {
+        export fn create(value: Value) -> Self {
+            return Restricted<Value> { value: value };
+        }
+    }
+}

@@ -2543,6 +2543,9 @@ impl<'a> TypeChecker<'a> {
         if let Some(&decl_id) = self.ctx.tables.symbol_decls.get(&func_sym) {
             self.check_bounds_for_decl(decl_id, subst, span);
         }
+        if let Some(&implementation) = self.ctx.tables.method_sym_to_impl_decl.get(&func_sym) {
+            self.check_bounds_for_decl(implementation, subst, span);
+        }
     }
 
     fn check_bounds_for_decl(&mut self, decl_id: luna_ast::DeclId, subst: &crate::ty::Substitution, span: luna_common::Span) {
@@ -4309,6 +4312,7 @@ impl<'a> TypeChecker<'a> {
                             let concrete = self.lower_type(argument);
                             owner_subst.insert(binder, concrete);
                         }
+                        self.bind_associated_owner_generics(sym_id, *expr_id, &mut owner_subst);
                         let ty = self.ctx.types.subst(ty, &owner_subst);
                         if !owner_subst.map.is_empty() { self.ctx.tables.expr_substs.insert(*expr_id, owner_subst); }
                         if generic_args.is_empty() {
@@ -4598,7 +4602,7 @@ impl<'a> TypeChecker<'a> {
                         } else {
                             if (callee_decl_id.0 as usize) < self.arena.decls.len() {
                                 if let Decl::Function { generic_params: m_gps, .. } = &self.arena.decls[callee_decl_id.0 as usize] {
-                                    has_generics = !m_gps.is_empty();
+                                    has_generics |= !m_gps.is_empty();
                                     for (gp_idx, _) in m_gps.iter().enumerate() {
                                         if let Some(gp_sym) = self.ctx.tables.generic_param_symbols.get(&(callee_decl_id, gp_idx)) {
                                             subst.insert(*gp_sym, self.ctx.types.new_inference_var());

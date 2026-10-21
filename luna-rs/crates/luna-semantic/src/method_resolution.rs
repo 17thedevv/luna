@@ -15,6 +15,42 @@ struct Candidate {
 }
 
 impl<'a> TypeChecker<'a> {
+    // Qualified owners use nominal binders; method signatures use independent
+    // impl binders. Match the checked self pattern, never binder spellings or
+    // zipped declaration ordinals (impl<T> Pair<i32, T> is not Pair<T, i32>).
+    pub(super) fn bind_associated_owner_generics(
+        &mut self,
+        method: SymbolId,
+        expression: ExprId,
+        subst: &mut Substitution,
+    ) {
+        if subst.map.is_empty() { return; }
+        let Some(header) = self.ctx.tables.method_sym_to_impl_decl.get(&method)
+            .and_then(|implementation| self.ctx.tables.checked_impl_headers.get(implementation))
+            .cloned() else { return; };
+        let nominal = match self.ctx.types.get(header.self_type) {
+            SemanticType::Struct(symbol, ..) | SemanticType::Enum(symbol, ..) => *symbol,
+            _ => return,
+        };
+        let Some(&owner) = self.ctx.tables.symbol_types.get(&nominal) else { return; };
+        let Some(declaration) = self.ctx.symbol_table.get_symbol(nominal).decl_id else { return; };
+        let bindings = self.ctx.tables.path_generic_bindings.get(&expression).cloned().unwrap_or_default();
+        let mut arguments = Vec::new();
+        while let Some(binder) = self.ctx.tables.generic_param_symbols.get(&(declaration, arguments.len())) {
+            let Some((_, argument)) = bindings.iter().find(|(parameter, _)| parameter == binder) else { return; };
+            arguments.push(*argument);
+        }
+        let owner = self.instantiate_generic_named_type(nominal, owner, &arguments);
+        let mut implementation = Substitution::new();
+        if self.ctx.matches_impl_pattern(header.self_type, owner, &header.generic_params, &mut implementation) {
+            subst.map.extend(implementation.map);
+        } else {
+            self.ctx.diagnostics.push(Diagnostic::error("Associated implementation does not apply to this owner type")
+                .with_code(DiagnosticCode::TypeMismatch)
+                .with_span(self.get_expr_span_for_diag(&expression).unwrap_or_default()));
+        }
+    }
+
     fn concrete_method_candidates(&self, head: ImplSelfTypeKey, name: &str) -> Vec<Candidate> {
         let mut candidates = Vec::new();
         for (key, declarations) in &self.ctx.tables.trait_impls {

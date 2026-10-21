@@ -1,0 +1,5 @@
+import "provider";
+fn main() -> i32 {
+    dec value = model::Restricted<u8>::create(1 as u8);
+    return 0;
+}
