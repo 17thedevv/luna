@@ -1,0 +1,8 @@
+test smoke ... FAIL
+0 passed; 1 failed
+
+STDERR
+Building library leaf
+Building library middle
+Building bin hello
+Building test smoke

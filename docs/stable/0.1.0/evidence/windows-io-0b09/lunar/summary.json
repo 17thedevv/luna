@@ -1,0 +1,322 @@
+{
+  "status": "PASS",
+  "lunar_sha256": "11947e19d2f1fe09d6cf506d6416c9bb4298022d06f1dc1cdc373bd0757be483",
+  "compiler": "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+  "compiler_sha256": "38cc8e7aabd783d5993d003afe4e3899d98323054ef44c842f0aac84dd55f060",
+  "records": [
+    {
+      "label": "new-hello",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "new",
+        "hello"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.029,
+      "log": "01-new-hello.log",
+      "sha256": "f1349b6dc73ff864669df1bce6e269fa33a1258033ed503184a36d916b1b9570"
+    },
+    {
+      "label": "fresh-check",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "check"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 2.023,
+      "log": "02-fresh-check.log",
+      "sha256": "97713e53345975098cd618e942a830948f0e8f38f42dc94356582f93c2a092c9"
+    },
+    {
+      "label": "fresh-build",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "build"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 2.25,
+      "log": "03-fresh-build.log",
+      "sha256": "fe9d2232ad9230188114924c415e093448c0804433e73127ac48efef0e5b6e7b"
+    },
+    {
+      "label": "fresh-run-native-args",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "run",
+        "--",
+        "space argument",
+        "ti\u1ebfng Vi\u1ec7t"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 2.422,
+      "log": "04-fresh-run-native-args.log",
+      "sha256": "b75d2aed549f7127608e1bba49a36585aca86e02a364395b42aeb518b554d844"
+    },
+    {
+      "label": "nearest-manifest-discovery",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "check"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.473,
+      "log": "05-nearest-manifest-discovery.log",
+      "sha256": "97713e53345975098cd618e942a830948f0e8f38f42dc94356582f93c2a092c9"
+    },
+    {
+      "label": "new-combined",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "new",
+        "combined",
+        "--lib"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.011,
+      "log": "06-new-combined.log",
+      "sha256": "9588e6c98322a07ec84a5ea223f571dd1acfc18d4d94245d7082fb227c7f13e5"
+    },
+    {
+      "label": "library-and-selected-bin",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\combined\\luna.toml",
+        "run",
+        "--bin",
+        "second"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 4.265,
+      "log": "07-library-and-selected-bin.log",
+      "sha256": "e177ffa3749cf2ee1137b8d20354708bb802baca875046a1cb79a0ab8fa2f11d"
+    },
+    {
+      "label": "all-bin-targets",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\combined\\luna.toml",
+        "build"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 4.619,
+      "log": "08-all-bin-targets.log",
+      "sha256": "1a06d5bab71c530772cf0241df9c13466a0fff1bac66d558afa8c323a9d13b3d"
+    },
+    {
+      "label": "vendored-source-provider",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "run"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 2.487,
+      "log": "09-vendored-source-provider.log",
+      "sha256": "b75d2aed549f7127608e1bba49a36585aca86e02a364395b42aeb518b554d844"
+    },
+    {
+      "label": "new-leaf",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "new",
+        "leaf",
+        "--lib"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.011,
+      "log": "10-new-leaf.log",
+      "sha256": "757d0028a85ec84157841a5d31d6d2ecf4f1bbd5cccc1b0e49fc9905000f4754"
+    },
+    {
+      "label": "new-middle",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "new",
+        "middle",
+        "--lib"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.011,
+      "log": "11-new-middle.log",
+      "sha256": "3cd5264f4abcb2c5f87e6c49a4520cdd9c7540d5ec3fcbfe40f61c0a8ce1afe8"
+    },
+    {
+      "label": "local-diamond-check",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "check"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 5.401,
+      "log": "12-local-diamond-check.log",
+      "sha256": "e6a961e14cb25991d7c3db83980ab73e7b2bf083b0cff7a5fec43565e9e6a22a"
+    },
+    {
+      "label": "local-diamond-artifact-run",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "run"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 6.272,
+      "log": "13-local-diamond-artifact-run.log",
+      "sha256": "a6df5e4f8625e94514c120e3f2c0255a2dd43ef0a071219f74c76bf7190e3b9d"
+    },
+    {
+      "label": "published-artifact-only-run",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "run",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\src\\main.ln",
+        "--config",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\target\\lunar\\build\\luna.toml",
+        "--quiet"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 1.019,
+      "log": "14-published-artifact-only-run.log",
+      "sha256": "a3680b6601c39b586ea892ad2bbaa58a7f72b62a64f73917b09aa8c5f188110e"
+    },
+    {
+      "label": "changed-dependency-rebuild",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "run"
+      ],
+      "exit": 2,
+      "expected": 2,
+      "seconds": 6.742,
+      "log": "15-changed-dependency-rebuild.log",
+      "sha256": "a6df5e4f8625e94514c120e3f2c0255a2dd43ef0a071219f74c76bf7190e3b9d"
+    },
+    {
+      "label": "test-pass",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "test"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 7.948,
+      "log": "16-test-pass.log",
+      "sha256": "1feaafdb05d9d3a9695d68058917878a75edd7c6535d0738befc7d969a129f9d"
+    },
+    {
+      "label": "test-failure-exit",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "test"
+      ],
+      "exit": 1,
+      "expected": 1,
+      "seconds": 5.708,
+      "log": "17-test-failure-exit.log",
+      "sha256": "5110d408df1a07a71d01cc58055e53fdd59ef8eb728f15fc0928546c2e2624ae"
+    },
+    {
+      "label": "compile-error-check",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "check"
+      ],
+      "exit": 1,
+      "expected": 1,
+      "seconds": 4.639,
+      "log": "18-compile-error-check.log",
+      "sha256": "346610e226edb7b3b408bd692c07791a9195587dac7a1cf1a16b5a245c253764"
+    },
+    {
+      "label": "compile-error-run-no-stale-execution",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "run"
+      ],
+      "exit": 1,
+      "expected": 1,
+      "seconds": 3.633,
+      "log": "19-compile-error-run-no-stale-execution.log",
+      "sha256": "5c9e1261bd0a9361704086388ff49b56f246eb89ddc7141ba3788f98ea7ae193"
+    },
+    {
+      "label": "clean-owned-output",
+      "command": [
+        "D:\\luna-stable-build\\cargo\\debug\\lunar.exe",
+        "--compiler",
+        "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+        "--manifest-path",
+        "D:\\luna-stable-build\\lunar-candidate-smoke-llvm18\\d\u1ef1 \u00e1n space\\hello\\luna.toml",
+        "clean"
+      ],
+      "exit": 0,
+      "expected": 0,
+      "seconds": 0.016,
+      "log": "20-clean-owned-output.log",
+      "sha256": "c6ccc519d8bdf239c66992f7a1d24902164de8627bc72caa9a6df87d9d18fbed"
+    }
+  ]
+}

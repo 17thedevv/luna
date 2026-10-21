@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "source_commit": "0b09ed8b65a46593e6b28eb168366c211b4bd0e5",
+  "example_matches": [
+    {
+      "page": "luna-web\\src\\content\\docs\\stdlib\\io.mdx",
+      "fixture": "tests\\luna\\stdlib\\stable_io\\literal_text.ln",
+      "sha256": "3ef290beebef5523183a506b2fceed02a19695fa6bbd983b5180dac8d67de7e2",
+      "exact_example_match": true
+    },
+    {
+      "page": "luna-web\\src\\content\\docs\\stdlib\\io.mdx",
+      "fixture": "tests\\luna\\stdlib\\stable_io\\owned_text_bytes.ln",
+      "sha256": "a80c8ad6bce69beb707a3bba4d82b9ec6ac236e2530aaec190a03545bd406acd",
+      "exact_example_match": true
+    },
+    {
+      "page": "luna-web\\src\\content\\docs\\vi\\stdlib\\io.mdx",
+      "fixture": "tests\\luna\\stdlib\\stable_io\\literal_text.ln",
+      "sha256": "3ef290beebef5523183a506b2fceed02a19695fa6bbd983b5180dac8d67de7e2",
+      "exact_example_match": true
+    },
+    {
+      "page": "luna-web\\src\\content\\docs\\vi\\stdlib\\io.mdx",
+      "fixture": "tests\\luna\\stdlib\\stable_io\\owned_text_bytes.ln",
+      "sha256": "a80c8ad6bce69beb707a3bba4d82b9ec6ac236e2530aaec190a03545bd406acd",
+      "exact_example_match": true
+    }
+  ],
+  "documentation_validation": {
+    "documents": 243,
+    "site_pages": 30,
+    "checked_local_links": 1956,
+    "errors": []
+  },
+  "website_build": {
+    "command": "pnpm build",
+    "exit": 0,
+    "pages": 33,
+    "observation": "Observed tool session 5697; build completed in 8.50s. Existing directive, 404-content and missing site/sitemap warnings remain. This is a local build, not a deployment."
+  },
+  "skill_impact": "none; existing semantic/stdlib/compiler boundary rules already cover this correction"
+}

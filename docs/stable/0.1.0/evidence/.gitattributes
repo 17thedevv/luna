@@ -1,0 +1,2 @@
+# Preserve acquired bytes, including line endings and diagnostic whitespace.
+*.log -text -whitespace

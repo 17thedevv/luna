@@ -16,8 +16,8 @@ It is not a stable qualification result.
 | Milestone | State |
 | --- | --- |
 | S0 baseline/backlog | Integrated baseline recorded; publication-state contradictions repaired; grammar/compatibility reconciliation in progress |
-| S1 correctness | DEBUG removal, quiet diagnostics and borrow maturity passed locally at `0387a15d`; reported I/O example/diagnostic repair under validation |
-| S2 Lunar | Integrated; first candidate smoke failed with raw GCC on a Unicode path; retry uses the pinned LLVM/GNU wrapper and retains the failed evidence |
+| S1 correctness | DEBUG removal and borrow maturity passed locally; I/O source/artifact, quiet CLI and diagnostic conformance passed at `0b09ed8b`; broader S1 audit remains open |
+| S2 Lunar | 20 Windows candidate CLI smoke steps PASS with LLVM/GNU wrapper; raw-GCC Unicode-path failure retained; Ubuntu/package consumers pending |
 | S3 packaging/license/docs | GPL-3.0-only applied to first-party source; notices/package source inventory and the wider website example audit remain open |
 | S4 exact-pin qualification | Not started; no prior-pin result transferred |
 | S5 RC/use/release review | Not started; no stable tag or publication |
@@ -31,9 +31,32 @@ The [first local preparation record](evidence/windows-preparation-0387/summary.j
 includes the successful runtime ABI, CLI/sysroot, quiet CLI, borrow and Lunar
 unit checks, and the failed candidate smoke. It is **not** an eight-lane result.
 The reported `println("hello world")` example conflicts with the existing
-`&[u8]` API: literal `str` uses `println_str`. STABLE-015 tracks the EN/VI I/O
-repair and source/artifact regression; remaining incorrect website examples
-stay open under STABLE-009. The user's installed alpha compiler is unchanged.
+`&[u8]` API: literal `str` uses `println_str`. STABLE-015's EN/VI I/O repair and
+source/artifact regression passed locally at `0b09ed8b`:
+
+- Both complete examples check/build/run with fresh source-only and
+  artifact-only providers; stdout is `hello world` plus newline.
+- The original literal-to-byte call rejects with E2001 and a source span;
+  its type message is now `expected &[u8], got str`, without interner IDs.
+- Three internal type-display tests cover source spelling, nominal generic
+  names, inference resolution and bounded recursive/large type rendering.
+- Quiet CLI and all four diagnostic-conformance tests pass; importer DEBUG
+  noise is absent while original typed failures remain observable.
+- The two EN/VI code blocks exactly match the executable fixtures. Local
+  website build passes (33 pages, existing warnings); 243 maintained docs /
+  1,956 links validate with no errors.
+- Lunar's 20-step candidate smoke passes with freshly built compiler,
+  runtime and 49-provider sysroot using the LLVM18/GNU wrapper.
+
+[Command/log evidence](evidence/windows-io-0b09/summary.json),
+[Lunar steps](evidence/windows-io-0b09/lunar/summary.json) and
+[documentation checks](evidence/windows-io-0b09/documentation.json) record the
+tested pin. These focused Windows results do not qualify an RC or stable
+release. Remaining incorrect website examples and live deployment stay open
+under STABLE-009. The user's installed alpha compiler and project are unchanged.
+
+SKILL IMPACT: none. Existing Luna semantic, compiler/stdlib boundary and public
+CLI testing guidance already cover this correction; no language rule changed.
 
 The alpha [release closure](../../audits/r5-cpu-baseline-2026-10-20/release-closure.json)
 supersedes the old `8525067f` CPU-package blocker for alpha only. Its eight
