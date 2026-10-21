@@ -268,6 +268,27 @@
       "followup_commits": [
         "5b470fa7861fcfe3243c654abdc3560905498df4"
       ]
+    },
+    {
+      "id": "STABLE-016",
+      "milestone": "S0/S1/S3",
+      "priority": "P1",
+      "requirement": "Jointly redesign the complete stdlib API/layout, map old-to-new contracts and requalify migrated consumers",
+      "status": "CO_DESIGN_IN_PROGRESS",
+      "owner": "17thedevv",
+      "source_paths": [
+        "docs/proposals/stdlib-redesign-0.1.md",
+        "docs/audits/stdlib-redesign-2026-10-21/source-inventory.json",
+        "luna-rs/libs/external/sysroot.toml"
+      ],
+      "fix_commit": null,
+      "evidence": [
+        "docs/audits/stdlib-redesign-2026-10-21/verification.json"
+      ],
+      "blocks": [
+        "STABLE_RELEASE"
+      ],
+      "notes": "Maintainer explicitly chose whole-API/layout redesign, compact std namespace, constructors on types, the current source root, and usize memory size/index. The parser inventory is not semantic/export or release evidence. Per-domain contracts, old-to-new ownership map, implementation and fresh source/artifact/package qualification remain open."
     }
   ]
 }

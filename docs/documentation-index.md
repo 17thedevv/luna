@@ -123,6 +123,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/repair-0.1/provider_matrix.md](audits/repair-0.1/provider_matrix.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/stdlib-2026-10-02-d-worktree/README.md](audits/stdlib-2026-10-02-d-worktree/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-2026-10-02/README.md](audits/stdlib-2026-10-02/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-redesign-2026-10-21/README.md](audits/stdlib-redesign-2026-10-21/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/borrowck/NLL_spec.md](borrowck/NLL_spec.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/borrowck/call_effect_model.md](borrowck/call_effect_model.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/core-language-contract.md](core-language-contract.md) | guidance | [modules](spec/0.1/modules.md) |
@@ -172,6 +173,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/project/rename-luna-v1.md](project/rename-luna-v1.md) | adopted-contract | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/e1-range-inclusive-terminal-slot-2026-10-13.md](proposals/e1-range-inclusive-terminal-slot-2026-10-13.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/entry-argv-policy.md](proposals/entry-argv-policy.md) | historical | [conformance](spec/0.1/conformance.md) |
+| [docs/proposals/stdlib-redesign-0.1.md](proposals/stdlib-redesign-0.1.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/v01-design-01-method-collision.md](proposals/v01-design-01-method-collision.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/v01-filter-step-dedup-api.md](proposals/v01-filter-step-dedup-api.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/runtime/MELLIS_RUNTIME_SPEC.md](runtime/MELLIS_RUNTIME_SPEC.md) | historical | [runtime](spec/0.1/runtime.md) |

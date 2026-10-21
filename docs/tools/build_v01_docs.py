@@ -37,6 +37,7 @@ ADOPTED = {
     '.agents/skills/luna-semantic-compliance/references/visibility-02-public-field-default-rfc.md',
 }
 CURRENT = {
+    'docs/proposals/stdlib-redesign-0.1.md',
     'docs/licensing.md',
     'docs/stable/0.1.0/README.md',
     'docs/plans/0.1.0-stable.md',

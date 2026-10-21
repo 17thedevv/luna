@@ -575,6 +575,11 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/audits/stdlib-redesign-2026-10-21/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/borrowck/NLL_spec.md",
     "role": "historical",
     "owner": "semantics"
@@ -818,6 +823,11 @@
     "path": "docs/proposals/entry-argv-policy.md",
     "role": "historical",
     "owner": "conformance"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1.md",
+    "role": "guidance",
+    "owner": "stdlib"
   },
   {
     "path": "docs/proposals/v01-design-01-method-collision.md",

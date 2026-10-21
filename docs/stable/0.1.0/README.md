@@ -15,7 +15,7 @@ It is not a stable qualification result.
 
 | Milestone | State |
 | --- | --- |
-| S0 baseline/backlog | Integrated baseline recorded; publication-state contradictions repaired; grammar/compatibility reconciliation in progress |
+| S0 baseline/backlog | Integrated baseline recorded; publication-state contradictions repaired; grammar/compatibility and maintainer-requested stdlib redesign in progress |
 | S1 correctness | DEBUG removal and borrow maturity passed locally; I/O source/artifact, quiet CLI and diagnostic conformance passed at `0b09ed8b`; broader S1 audit remains open |
 | S2 Lunar | 20 Windows candidate CLI smoke steps PASS with LLVM/GNU wrapper; raw-GCC Unicode-path failure retained; Ubuntu/package consumers pending |
 | S3 packaging/license/docs | GPL-3.0-only applied to first-party source; notices/package source inventory and the wider website example audit remain open |
@@ -80,6 +80,17 @@ lanes and two clean package smokes are complete in that recorded scope.
 Historical raw logs, archives, package SHAs and typed failure records remain
 unchanged. Metadata-only Git history mappings are separate provenance; stable
 must build and test a new immutable final pin.
+
+## Stdlib API/layout redesign
+
+At the maintainer's request, [joint API/layout design](../../proposals/stdlib-redesign-0.1.md)
+now precedes stable qualification. The confirmed direction is compact std names,
+type-associated constructors and the existing luna-rs/libs/external source root.
+Internal grouping, per-domain contracts and migration/compatibility remain open.
+The [parser inventory](../../audits/stdlib-redesign-2026-10-21/README.md) maps 49
+providers / 2,358 declaration records / 213 explicit imports at 264390da; it is
+not resolved API or conformance evidence. STABLE-016 tracks design and migration.
+Existing alpha and focused I/O results remain historical results for their pins.
 
 ## Release boundaries
 
