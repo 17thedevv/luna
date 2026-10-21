@@ -55,6 +55,22 @@ tested pin. These focused Windows results do not qualify an RC or stable
 release. Remaining incorrect website examples and live deployment stay open
 under STABLE-009. The user's installed alpha compiler and project are unchanged.
 
+Console-macro clarification at `5b470fa7`: `io` already exports `println!`
+and `std::println!` (plus print/stderr counterparts). The guide now includes
+`std::println!("hello world")` and `std::println!("value: ", 42)`, alongside
+the ordinary functions. The expanded three-example CLI matrix passes with
+fresh source-only and artifact-only providers, and the EN/VI pages build with
+exact fixture matches. [CLI evidence](evidence/windows-macros-5b47/cli/summary.json)
+and [website evidence](evidence/windows-macros-5b47/site/summary.json) retain
+this separate tested pin. No compiler or stdlib implementation was added.
+
+Independent [installed-compiler probes](evidence/windows-macros-5b47/installed/summary.json)
+and [installed Lunar project smoke](evidence/windows-macros-5b47/project/summary.json)
+also pass: these macros are available in the user's alpha installation now.
+Current console macros concatenate Display values; braces remain literal,
+so `std::println!("value: {}", 42)` prints `value: {}42`. Format-string parsing
+remains outside the retained formatting scope.
+
 SKILL IMPACT: none. Existing Luna semantic, compiler/stdlib boundary and public
 CLI testing guidance already cover this correction; no language rule changed.
 

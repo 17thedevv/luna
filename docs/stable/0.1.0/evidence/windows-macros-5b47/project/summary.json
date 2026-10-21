@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "installed_lunar": "C:\\Users\\84387\\AppData\\Local\\Programs\\Luna\\bin\\lunar.exe",
+  "compiler_selection": "default sibling; no --compiler override",
+  "command": [
+    "lunar",
+    "run"
+  ],
+  "exit": 0,
+  "stdout": "hello world\r\n",
+  "stdout_sha256": "572a95fee9c0f320030789e4883707affe12482fbb1ea04b3ea8267c87a890fb",
+  "stderr_sha256": "2c4c05e282c149a9bb46eaa5493139b97b6cf3e4077e6d77a49f38543e492297",
+  "note": "Installed alpha compiler retains DEBUG stderr; this probe verifies macro availability, not the pending debug-output repair."
+}
