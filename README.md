@@ -73,6 +73,11 @@ macro names, stream prefixes and newline suffixes must not select stdlib callees
 
 ## Build and verify
 
+For local Luna projects, [Lunar](docs/lunar.md) provides `new`, `build`, `run`,
+`check`, `test` and `clean` using a shared `luna.toml` and local/vendored
+dependencies. It is new source tooling and is not bundled in the current alpha
+downloads.
+
 The release targets are Windows x86_64 GNU and Ubuntu 24.04 x86_64 GNU with
 LLVM 18 and a Release C runtime. Source development requires Rust/Cargo.
 Set `LLVM_SYS_180_PREFIX` to the LLVM 18 installation and configure the target C

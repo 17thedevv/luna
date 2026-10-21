@@ -44,6 +44,16 @@ package format. Omitted `schema` means 1. Unknown schema, unknown fields,
 duplicate keys, invalid names, empty paths and paths with provider extensions
 are configuration errors with file/key locations.
 
+Maintainer amendment, **2026-10-21**: [Lunar](../../lunar.md) shares `luna.toml`.
+The CLI recognizes optional application-owned `[package]`, `[dependencies]`,
+`[lib]`, `[[bin]]` and `[[test]]` tables. It ignores their contents and continues
+to validate only the schema and provider bindings. Lunar validates and
+orchestrates project policy separately; the compiler does not acquire package
+resolution, rebuilding or network behavior. Other unknown root keys still
+reject. This forward-compatible CLI amendment does not change artifact or
+language semantics. The originally published alpha compiler predates it;
+Lunar passes that compiler a generated provider-only config.
+
 For a provider that declares `export module geometry { ... }`:
 
 ```luna

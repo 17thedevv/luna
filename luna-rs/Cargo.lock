@@ -518,6 +518,15 @@ name = "luna-test-support"
 version = "0.1.0"
 
 [[package]]
+name = "lunar"
+version = "0.1.0-dev.1"
+dependencies = [
+ "clap",
+ "serde",
+ "toml",
+]
+
+[[package]]
 name = "memchr"
 version = "2.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -715,6 +715,11 @@
     "owner": "modules"
   },
   {
+    "path": "docs/lunar.md",
+    "role": "guidance",
+    "owner": "conformance"
+  },
+  {
     "path": "docs/mellis-language-semantic-audit.md",
     "role": "historical",
     "owner": "semantics"

@@ -1,0 +1,95 @@
+name: Lunar local build tool
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [lunar, main]
+    paths:
+      - luna-rs/crates/lunar/**
+      - luna-rs/crates/luna-cli/src/provider_config.rs
+      - luna-rs/Cargo.lock
+      - luna-rs/Cargo.toml
+      - docs/tools/*lunar*.py
+      - .github/workflows/lunar.yml
+  pull_request:
+    paths:
+      - luna-rs/crates/lunar/**
+      - luna-rs/crates/luna-cli/src/provider_config.rs
+      - docs/tools/*lunar*.py
+      - .github/workflows/lunar.yml
+
+permissions:
+  contents: read
+
+jobs:
+  public-cli:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            binary: lunar.exe
+            platform: windows-x86_64
+          - os: ubuntu-24.04
+            binary: lunar
+            platform: linux-x86_64
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    env:
+      CARGO_TERM_COLOR: never
+      CARGO_TARGET_DIR: ${{ github.workspace }}/lunar-target
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Rust
+        shell: pwsh
+        run: |
+          rustup toolchain install 1.98.0 --profile minimal --component clippy,rustfmt
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          rustup default 1.98.0
+      - name: Check formatting
+        run: cargo fmt --manifest-path luna-rs/Cargo.toml -p lunar --check
+      - name: Check Lunar code
+        run: cargo clippy --manifest-path luna-rs/Cargo.toml --locked -p lunar --all-targets -- -D warnings
+      - name: Test manifest, graph and filesystem boundaries
+        run: cargo test --manifest-path luna-rs/Cargo.toml --locked -p lunar
+      - name: Build native Lunar
+        run: cargo build --manifest-path luna-rs/Cargo.toml --locked -p lunar --release
+      - name: Install Linux compiler prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential llvm-18 llvm-18-dev
+          echo '/usr/lib/llvm-18/bin' >> "$GITHUB_PATH"
+          echo 'LLVM_HOME=/usr/lib/llvm-18' >> "$GITHUB_ENV"
+          echo 'LLVM_SYS_180_PREFIX=/usr/lib/llvm-18' >> "$GITHUB_ENV"
+      - name: Test shared config compiler parser
+        if: runner.os == 'Linux'
+        run: cargo test --manifest-path luna-rs/Cargo.toml --locked -p luna-cli --bin luna provider_config::tests
+      - name: Provision verified published Luna alpha compiler
+        shell: pwsh
+        run: python docs/tools/provision_lunar_smoke.py --out "$env:RUNNER_TEMP/lunar-compiler"
+      - name: Regress compiler provider config in source and artifact modes
+        if: runner.os == 'Linux'
+        run: cargo test --manifest-path luna-rs/Cargo.toml --locked -p luna-cli --test alpha_modules_cli
+      - name: Real public compiler, artifact and native execution smoke
+        shell: pwsh
+        run: >-
+          python docs/tools/smoke_lunar.py
+          --lunar "$env:CARGO_TARGET_DIR/release/${{ matrix.binary }}"
+          --luna "$env:LUNAR_SMOKE_COMPILER"
+          --out "$env:RUNNER_TEMP/lunar-smoke"
+      - name: Preserve smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lunar-smoke-${{ matrix.platform }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/lunar-smoke/evidence/
+          if-no-files-found: warn
+      - name: Preserve runnable Lunar
+        uses: actions/upload-artifact@v4
+        with:
+          name: lunar-dev-${{ matrix.platform }}-${{ github.sha }}
+          path: ${{ env.CARGO_TARGET_DIR }}/release/${{ matrix.binary }}
+          if-no-files-found: error
