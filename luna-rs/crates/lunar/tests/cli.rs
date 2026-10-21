@@ -232,6 +232,23 @@ fn clean_rejects_symlinked_target() {
     assert!(outside.join("keep").exists());
 }
 
+#[cfg(unix)]
+#[test]
+fn init_rejects_dangling_manifest_and_external_source_directory() {
+    use std::os::unix::fs::symlink;
+    let t = Temp::new();
+    symlink("missing", t.0.join("luna.toml")).unwrap();
+    let output = t.cli(&["init", ".", "--name", "app"]);
+    assert!(!output.status.success());
+    assert!(!t.0.join("missing").exists());
+    fs::remove_file(t.0.join("luna.toml")).unwrap();
+    let outside = Temp::new();
+    symlink(&outside.0, t.0.join("src")).unwrap();
+    let output = t.cli(&["init", ".", "--name", "app"]);
+    assert!(!output.status.success());
+    assert!(!outside.0.join("main.ln").exists());
+}
+
 #[cfg(windows)]
 #[test]
 fn clean_rejects_junction_target() {

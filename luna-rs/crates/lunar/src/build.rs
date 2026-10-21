@@ -11,12 +11,12 @@ const MARKER: &str = "Lunar disposable build directory, schema 1\n";
 
 fn no_link(path: &Path) -> Result<()> {
     if let Ok(meta) = fs::symlink_metadata(path) {
-        let mut linked = meta.file_type().is_symlink();
+        let linked = meta.file_type().is_symlink();
         #[cfg(windows)]
-        {
+        let linked = {
             use std::os::windows::fs::MetadataExt;
-            linked |= meta.file_attributes() & 0x400 != 0;
-        }
+            linked || meta.file_attributes() & 0x400 != 0
+        };
         if linked {
             return Err(format!(
                 "refusing linked/reparse build path {}",

@@ -85,7 +85,7 @@ fn create(path: &Path, name: Option<String>, library: bool, new: bool) -> Result
         "src/main.ln".into()
     };
     for file in ["luna.toml", &source] {
-        if path.join(file).exists() {
+        if fs::symlink_metadata(path.join(file)).is_ok() {
             return Err(format!(
                 "refusing to overwrite {}",
                 path.join(file).display()
@@ -103,6 +103,13 @@ fn create(path: &Path, name: Option<String>, library: bool, new: bool) -> Result
     } else {
         "fn main() -> i32 {\n    return 0;\n}\n".into()
     };
+    if path.join("src").exists() {
+        let root = fs::canonicalize(path).map_err(|e| e.to_string())?;
+        let source_dir = fs::canonicalize(path.join("src")).map_err(|e| e.to_string())?;
+        if !source_dir.starts_with(root) {
+            return Err("refusing to initialize a source directory outside the package".into());
+        }
+    }
     fs::create_dir_all(path.join("src")).map_err(|e| e.to_string())?;
     fs::write(path.join(&source), code).map_err(|e| e.to_string())?;
     fs::write(path.join("luna.toml"), project).map_err(|e| e.to_string())?;
