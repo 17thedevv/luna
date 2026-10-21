@@ -44,13 +44,15 @@
       "milestone": "S1",
       "priority": "P2",
       "requirement": "Remove unconditional importer DEBUG stderr while preserving source diagnostics",
-      "status": "CONFIRMED",
+      "status": "FIXED_WINDOWS_FOCUSED_PASS",
       "owner": "17thedevv",
       "source_paths": [
         "luna-rs/crates/luna-driver/src/importer.rs"
       ],
-      "fix_commit": null,
-      "evidence": [],
+      "fix_commit": "0387a15db366d15086da73dc9d9b85d79dfbb169",
+      "evidence": [
+        "evidence/windows-preparation-0387/summary.json"
+      ],
       "blocks": [
         "STABLE_RELEASE"
       ]
@@ -60,13 +62,15 @@
       "milestone": "S1",
       "priority": "P2",
       "requirement": "Retire invalid empty ignored fixture with explicit replacement coverage",
-      "status": "CONFIRMED",
+      "status": "FIXED_WINDOWS_FOCUSED_PASS",
       "owner": "17thedevv",
       "source_paths": [
         "luna-rs/crates/luna-driver/tests/sem_maturity_phase2b.rs"
       ],
-      "fix_commit": null,
-      "evidence": [],
+      "fix_commit": "0387a15db366d15086da73dc9d9b85d79dfbb169",
+      "evidence": [
+        "evidence/windows-preparation-0387/summary.json"
+      ],
       "blocks": [
         "STABLE_RELEASE"
       ]
@@ -76,26 +80,34 @@
       "milestone": "S2",
       "priority": "P1",
       "requirement": "Qualify Lunar with the current candidate compiler and fresh stdlib",
-      "status": "OPEN",
+      "status": "WINDOWS_SMOKE_FAILED_RETRY_WITH_PINNED_LINKER",
       "owner": "17thedevv",
       "source_paths": [
         "docs/tools/smoke_lunar.py"
       ],
       "fix_commit": null,
-      "evidence": [],
+      "evidence": [
+        "evidence/windows-preparation-0387/summary.json"
+      ],
       "blocks": [
         "STABLE_RELEASE"
-      ]
+      ],
+      "notes": "Raw development GCC rejected Unicode output path. Preserve failure; rerun with the installed LLVM18/GNU linker wrapper, fresh compiler/runtime/sysroot, and a distinct evidence directory."
     },
     {
       "id": "STABLE-006",
       "milestone": "S3",
       "priority": "P1",
       "requirement": "Adopt maintainer-selected GPL-3.0-only; preserve third-party notices and corresponding source provenance",
-      "status": "AUTHORIZED",
+      "status": "FIRST_PARTY_LICENSE_APPLIED_PACKAGING_PENDING",
       "owner": "17thedevv",
-      "source_paths": [],
-      "fix_commit": null,
+      "source_paths": [
+        "LICENSE",
+        "NOTICE",
+        "docs/licensing.md",
+        "luna-rs/Cargo.toml"
+      ],
+      "fix_commit": "0387a15db366d15086da73dc9d9b85d79dfbb169",
       "evidence": [],
       "blocks": [
         "STABLE_RELEASE"
@@ -150,7 +162,8 @@
       "evidence": [],
       "blocks": [
         "STABLE_RELEASE"
-      ]
+      ],
+      "notes": "I/O EN/VI pages repaired under STABLE-015. Other tour/stdlib/home pages still contain unsupported format-string calls and require an executable-example audit before stable."
     },
     {
       "id": "STABLE-010",
@@ -221,6 +234,27 @@
       "blocks": [
         "STABLE_RELEASE"
       ]
+    },
+    {
+      "id": "STABLE-015",
+      "milestone": "S1/S3",
+      "priority": "P1",
+      "requirement": "Correct the reported Hello World I/O example, remove importer debug noise, and render mismatch types without session IDs; validate source/artifact behavior",
+      "status": "IMPLEMENTED_VALIDATION_PENDING",
+      "owner": "17thedevv",
+      "source_paths": [
+        "luna-web/src/content/docs/stdlib/io.mdx",
+        "luna-web/src/content/docs/vi/stdlib/io.mdx",
+        "luna-rs/crates/luna-semantic/src/diagnostic_types.rs",
+        "luna-rs/crates/luna-cli/tests/stable_io_cli.rs",
+        "tests/luna/stdlib/stable_io"
+      ],
+      "fix_commit": null,
+      "evidence": [],
+      "blocks": [
+        "STABLE_RELEASE"
+      ],
+      "notes": "The existing println contract is &[u8]; str literals use println_str. Retain the rejected literal call as E2001, without a stdlib-name special case or new coercion. User installation still has the alpha compiler."
     }
   ]
 }

@@ -16,9 +16,9 @@ It is not a stable qualification result.
 | Milestone | State |
 | --- | --- |
 | S0 baseline/backlog | Integrated baseline recorded; publication-state contradictions repaired; grammar/compatibility reconciliation in progress |
-| S1 correctness | Importer DEBUG stderr and invalid ignored fixture confirmed; focused repair/qualification next |
-| S2 Lunar | Implementation integrated on this branch; candidate-compiler smoke pending |
-| S3 packaging/license/docs | Maintainer selected GPL-3.0-only; applying license and preparing candidate packaging |
+| S1 correctness | DEBUG removal, quiet diagnostics and borrow maturity passed locally at `0387a15d`; reported I/O example/diagnostic repair under validation |
+| S2 Lunar | Integrated; first candidate smoke failed with raw GCC on a Unicode path; retry uses the pinned LLVM/GNU wrapper and retains the failed evidence |
+| S3 packaging/license/docs | GPL-3.0-only applied to first-party source; notices/package source inventory and the wider website example audit remain open |
 | S4 exact-pin qualification | Not started; no prior-pin result transferred |
 | S5 RC/use/release review | Not started; no stable tag or publication |
 
@@ -26,6 +26,14 @@ It is not a stable qualification result.
 gate, state and evidence. [Scope matrix](scope-matrix.json) preserves all 25 R4
 wave/deferral records and 24 legacy repair records without replacing their
 historical identities or treating a historical PASS as a current execution.
+
+The [first local preparation record](evidence/windows-preparation-0387/summary.json)
+includes the successful runtime ABI, CLI/sysroot, quiet CLI, borrow and Lunar
+unit checks, and the failed candidate smoke. It is **not** an eight-lane result.
+The reported `println("hello world")` example conflicts with the existing
+`&[u8]` API: literal `str` uses `println_str`. STABLE-015 tracks the EN/VI I/O
+repair and source/artifact regression; remaining incorrect website examples
+stay open under STABLE-009. The user's installed alpha compiler is unchanged.
 
 The alpha [release closure](../../audits/r5-cpu-baseline-2026-10-20/release-closure.json)
 supersedes the old `8525067f` CPU-package blocker for alpha only. Its eight

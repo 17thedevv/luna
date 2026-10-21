@@ -1,86 +1,65 @@
 ---
 title: I/O (Nhập / Xuất)
-description: Các thao tác vào ra dữ liệu terminal và hệ thống tập tin trong Luna.
+description: In văn bản và byte slice bằng các API I/O hiện có của Luna.
 ---
 
-## Xuất dữ liệu (In ra màn hình)
+## Hello world
 
-```luna
-import std::io;
-
-// In có xuống dòng
-std::io::println("Xin chào, Luna!");
-
-// In không xuống dòng
-std::io::print("Nhập tên của bạn: ");
-
-// In có định dạng nhiều giá trị
-std::io::println("Các giá trị: {}, {}", 1, 2, 3);
-
-dec name = "Luna";
-dec age = 2024;
-std::io::println("{} được {} tuổi", name, age);
-```
-
-## Chỉ định định dạng (Format Specifiers)
-
-```luna
-// Số nguyên
-std::io::println("{:d}", 42);           // 42
-std::io::println("{:x}", 255);          // ff
-std::io::println("{:b}", 10);           // 1010
-std::io::println("{:o}", 8);            // 10
-
-// Số thực
-std::io::println("{:.2f}", 3.14159);     // 3.14
-
-// Chuỗi
-std::io::println("{:s}", "hello");       // hello
-std::io::println("{:>10}", "hi");        //         hi
-std::io::println("{:.<10}", "hi");       // hi........
-```
-
-## Đọc dữ liệu từ bàn phím
+Import provider `io`, rồi dùng `println_str` khi in string literal:
 
 ```luna
 import <io>;
 
-// Đọc một dòng ký tự
-dec line = std::io::read_line();
-match line {
-    Option::Some(input) -> {
-        std::io::println("Bạn vừa nhập: {}", input);
-    },
-    Option::None -> {
-        std::io::println("Dữ liệu nhập rỗng");
-    }
+fn main() -> i32 {
+    std::io::println_str("hello world");
+    return 0;
 }
 ```
 
-## Đọc và Ghi tập tin
+Trong project Lunar, lưu vào `src/main.ln` rồi chạy `lunar run`.
+Với file độc lập, dùng `luna run hello.ln`.
+
+## Phân biệt văn bản và byte
+
+| Hàm | Đầu vào | Đầu ra |
+| --- | --- | --- |
+| `std::io::print_str(text)` | `str`, gồm cả string literal | stdout, không xuống dòng |
+| `std::io::println_str(text)` | `str` | stdout, có xuống dòng |
+| `std::io::eprint_str(text)` | `str` | stderr, không xuống dòng |
+| `std::io::eprintln_str(text)` | `str` | stderr, có xuống dòng |
+| `std::io::print(bytes)` | `&[u8]` | stdout, đúng số byte của slice |
+| `std::io::println(bytes)` | `&[u8]` | byte ra stdout rồi xuống dòng |
+
+`str` của Luna là biểu diễn văn bản tĩnh kết thúc bằng NUL. Các hàm `_str`
+dừng ở ký tự NUL kết thúc. `std::String` sở hữu dữ liệu và cung cấp
+`as_bytes()` để truyền cho nhóm hàm nhận byte slice:
 
 ```luna
 import <io>;
+import <string>;
 
-// Đọc toàn bộ nội dung tệp
-dec content = std::io::read_file("data.txt");
-match content {
-    Result::Ok(text) -> {
-        std::io::println("{}", text);
-    },
-    Result::Err(e) -> {
-        std::io::println("Lỗi: {}", e);
-    }
-}
-
-// Ghi dữ liệu vào tệp
-dec result = std::io::write_file("output.txt", "Xin chào!");
-match result {
-    Result::Ok(()) -> {
-        std::io::println("Ghi tệp thành công");
-    },
-    Result::Err(e) -> {
-        std::io::println("Lỗi: {}", e);
-    }
+fn main() -> i32 {
+    dec text = std::string_from_str("hello world");
+    std::io::println(text.as_bytes());
+    return 0;
 }
 ```
+
+`std::io::println("hello world")` sai kiểu vì literal `str` không phải byte
+slice được mượn. Thêm `&` vào literal cũng không biến nó thành byte slice.
+Dùng `println_str` hoặc truyền một giá trị `&[u8]` thực sự.
+
+## Phạm vi formatting
+
+Các hàm trên không xử lý format string. Lời gọi
+`std::io::println("giá trị: {}", value)` và các format specifier kiểu printf
+chưa được API này hỗ trợ. Formatting foundation dùng trait thông thường
+`std::fmt::Display` và `std::fmt::Writer`; nó không bao gồm interpolation hay
+compiler tự chọn hàm in dựa trên tên.
+
+## Đọc input và file
+
+`std::io::read_line` nhận buffer `std::Vec<u8>` có thể sửa và trả về
+`std::Result<usize, std::io::IoError>`; hàm không có dạng gọi không đối số.
+Provider `file` cung cấp nhóm API whole-file riêng. Cần theo chữ ký đã khai báo,
+không dùng các ví dụ kiểu Rust trước đây trên trang này.

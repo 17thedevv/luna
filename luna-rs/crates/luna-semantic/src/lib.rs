@@ -16,6 +16,7 @@ pub mod const_eval;
 pub mod coercion;
 pub mod cast;
 mod operators;
+mod diagnostic_types;
 
 pub mod mangler;
 pub mod region;

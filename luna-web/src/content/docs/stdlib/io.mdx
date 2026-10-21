@@ -1,86 +1,65 @@
 ---
 title: I/O
-description: Input and output operations.
+description: Print text and byte slices using Luna's existing I/O APIs.
 ---
 
-## Printing
+## Hello world
 
-```luna
-import std::io;
-
-// Print with newline
-std::io::println("Hello, Luna!");
-
-// Print without newline
-std::io::print("Enter your name: ");
-
-// Formatted printing
-std::io::println("Values: {}, {}", 1, 2, 3);
-
-dec name = "Luna";
-dec age = 2024;
-std::io::println("{} is {} years old", name, age);
-```
-
-## Format Specifiers
-
-```luna
-// Integers
-std::io::println("{:d}", 42);           // 42
-std::io::println("{:x}", 255);          // ff
-std::io::println("{:b}", 10);           // 1010
-std::io::println("{:o}", 8);            // 10
-
-// Floats
-std::io::println("{:.2f}", 3.14159);     // 3.14
-
-// Strings
-std::io::println("{:s}", "hello");       // hello
-std::io::println("{:>10}", "hi");        //         hi
-std::io::println("{:.<10}", "hi");       // hi........
-```
-
-## Reading Input
+Import the `io` provider and call `println_str` for a string literal:
 
 ```luna
 import <io>;
 
-// Read a line
-dec line = std::io::read_line();
-match line {
-    Option::Some(input) -> {
-        std::io::println("You entered: {}", input);
-    },
-    Option::None -> {
-        std::io::println("Empty input");
-    }
+fn main() -> i32 {
+    std::io::println_str("hello world");
+    return 0;
 }
 ```
 
-## File I/O
+In a Lunar project, save this as `src/main.ln` and run `lunar run`.
+For a standalone file, use `luna run hello.ln`.
+
+## Text and bytes are different APIs
+
+| Function | Input | Output |
+| --- | --- | --- |
+| `std::io::print_str(text)` | `str`, including a string literal | stdout, without a newline |
+| `std::io::println_str(text)` | `str` | stdout, with a newline |
+| `std::io::eprint_str(text)` | `str` | stderr, without a newline |
+| `std::io::eprintln_str(text)` | `str` | stderr, with a newline |
+| `std::io::print(bytes)` | `&[u8]` | stdout, exactly the byte-slice length |
+| `std::io::println(bytes)` | `&[u8]` | stdout bytes followed by a newline |
+
+Luna's `str` is the static NUL-terminated text representation. The `_str`
+functions stop at its NUL terminator. An owned `std::String` provides
+`as_bytes()` for the byte-slice functions:
 
 ```luna
 import <io>;
+import <string>;
 
-// Read entire file
-dec content = std::io::read_file("data.txt");
-match content {
-    Result::Ok(text) -> {
-        std::io::println("{}", text);
-    },
-    Result::Err(e) -> {
-        std::io::println("Error: {}", e);
-    }
-}
-
-// Write to file
-dec result = std::io::write_file("output.txt", "Hello!");
-match result {
-    Result::Ok(()) -> {
-        std::io::println("Written successfully");
-    },
-    Result::Err(e) -> {
-        std::io::println("Error: {}", e);
-    }
+fn main() -> i32 {
+    dec text = std::string_from_str("hello world");
+    std::io::println(text.as_bytes());
+    return 0;
 }
 ```
+
+`std::io::println("hello world")` is a type error: a `str` literal is not a
+borrowed byte slice. Adding `&` to the literal does not convert it into bytes.
+Use `println_str` or pass an actual `&[u8]`.
+
+## Formatting boundary
+
+These functions do not parse format strings. Calls such as
+`std::io::println("value: {}", value)` and printf-style format specifiers are
+not supported by this API. The formatting foundation uses ordinary
+`std::fmt::Display` and `std::fmt::Writer` traits; compiler-selected print
+callees and format-string interpolation are not part of that contract.
+
+## Input and files
+
+`std::io::read_line` takes a mutable `std::Vec<u8>` buffer and returns
+`std::Result<usize, std::io::IoError>`; it is not a zero-argument function.
+The `file` provider supplies the separate whole-file APIs. Consult their
+declared signatures rather than the superseded Rust-style examples.

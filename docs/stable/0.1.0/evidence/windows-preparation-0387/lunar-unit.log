@@ -1,0 +1,29 @@
+warning: virtual workspace defaulting to `resolver = "1"` despite one or more workspace members being on edition 2024 which implies `resolver = "3"`
+  |
+  = note: to keep the current resolver, specify `workspace.resolver = "1"` in the workspace root's manifest
+  = note: to use the edition 2024 resolver, specify `workspace.resolver = "3"` in the workspace root's manifest
+  = note: for more details see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
+   Compiling lunar v0.1.0-rc.1 (C:\Users\84387\.codex\worktrees\stable-release-plan\fdlang\luna-rs\crates\lunar)
+    Finished `test` profile [unoptimized] target(s) in 0.42s
+     Running unittests src\main.rs (D:\luna-stable-build\cargo\debug\deps\lunar-b2093f186e20f816.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\cli.rs (D:\luna-stable-build\cargo\debug\deps\cli-a08e2fc76b2de5d0.exe)
+
+running 10 tests
+test init_existing_directory_and_preserves_gitignore ... ok
+test creates_shared_manifest_and_does_not_overwrite ... ok
+test lock_prevents_clean_during_build ... ok
+test clean_requires_ownership_and_preserves_other_targets ... ok
+test no_tests_and_ambiguous_run_reject_without_compiler ... ok
+test rejects_cycle_before_executing_compiler ... ok
+test clean_rejects_junction_target ... ok
+test rejects_schema_typos_and_sources_outside_package ... ok
+test rejects_alias_collision_and_binary_only_dependencies ... ok
+test rejects_network_dependency_declarations ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+

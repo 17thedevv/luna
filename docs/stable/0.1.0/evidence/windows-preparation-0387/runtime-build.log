@@ -1,0 +1,12 @@
+[1/12] Building C object CMakeFiles/luna-runtime.dir/src/memory/memory.c.obj
+[2/12] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/threading.c.obj
+[3/12] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/time.c.obj
+[4/12] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/random.c.obj
+[5/12] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/sync.c.obj
+[6/12] Building C object CMakeFiles/luna-runtime.dir/src/startup/startup.c.obj
+[7/12] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/net.c.obj
+[8/12] Building C object CMakeFiles/luna-runtime.dir/src/io/io.c.obj
+[9/12] Building C object CMakeFiles/luna-runtime.dir/src/panic/panic.c.obj
+[10/12] Linking C static library libluna-runtime.a
+[11/12] Building C object CMakeFiles/abi_tests.dir/tests/abi_tests.c.obj
+[12/12] Linking C executable abi_tests.exe

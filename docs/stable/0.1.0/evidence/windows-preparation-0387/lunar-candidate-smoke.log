@@ -1,0 +1,24 @@
+new-hello: PASS
+fresh-check: PASS
+Traceback (most recent call last):
+  File "C:\Users\84387\.codex\worktrees\stable-release-plan\fdlang\docs\tools\smoke_lunar.py", line 110, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\84387\.codex\worktrees\stable-release-plan\fdlang\docs\tools\smoke_lunar.py", line 52, in main
+    invoke('fresh-build', app, 'build')
+    ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\84387\.codex\worktrees\stable-release-plan\fdlang\docs\tools\smoke_lunar.py", line 44, in invoke
+    return run(label, [lunar, '--compiler', luna, '--manifest-path', project / 'luna.toml', command, *extra], cwd, expected)
+  File "C:\Users\84387\.codex\worktrees\stable-release-plan\fdlang\docs\tools\smoke_lunar.py", line 35, in run
+    assert result.returncode == expected, f'{label}: exit {result.returncode}, expected {expected}\n{content.decode("utf-8", errors="replace")}'
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: fresh-build: exit 1, expected 0
+
+STDERR
+Building bin hello
+error[E6003]: Link Error: native linker exited with status exit code: 1: c:/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/12.1.0/../../../../x86_64-w64-mingw32/bin/ld.exe: cannot open output file \\?\D:\luna-stable-build\lunar-candidate-smoke\d? \ufffdn space\hello\target\lunar\stage\bin\hello.exe: Invalid argument
+collect2.exe: error: ld returned 1 exit status
+
+
+lunar: Luna compilation failed (exit code: 1)
+
