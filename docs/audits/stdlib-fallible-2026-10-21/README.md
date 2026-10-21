@@ -54,6 +54,10 @@ controls cover borrowed inputs carried by allocation failures, mutation after
 those owners die, ordinary overflow aborts and constructor inference. The
 Windows runtime test archive fallback was exercised without a prebuilt override.
 
+Both C suites also pass a clean GNU
+[Windows Debug build with assertions active](evidence/windows-runtime-asserts-1548f1b6/receipt.json).
+The runtime tree is unchanged from the allocator implementation pin.
+
 The [older workspace attempts](evidence/windows-workspace-attempts/receipt.json)
 are incomplete/superseded, not workspace PASS. Their original raw summaries and
 streams are archived with hashes, including setup failures and interruptions.
