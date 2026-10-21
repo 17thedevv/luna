@@ -278,6 +278,7 @@
       "owner": "17thedevv",
       "source_paths": [
         "docs/proposals/stdlib-redesign-0.1.md",
+        "docs/proposals/stdlib-redesign-0.1/allocator.md",
         "docs/audits/stdlib-redesign-2026-10-21/source-inventory.json",
         "luna-rs/libs/external/sysroot.toml"
       ],
@@ -288,7 +289,7 @@
       "blocks": [
         "STABLE_RELEASE"
       ],
-      "notes": "Maintainer explicitly chose whole-API/layout redesign, compact std namespace, constructors on types, the current source root, and usize memory size/index. The parser inventory is not semantic/export or release evidence. Per-domain contracts, old-to-new ownership map, implementation and fresh source/artifact/package qualification remain open."
+      "notes": "Maintainer explicitly chose whole-API/layout redesign, compact std namespace, constructors on types, the current source root, usize memory size/index and supplemental fallible allocation (STD-D06): ordinary APIs abort on OOM; try_* returns errors while preserving existing storage/data. The allocator design proposes ABI/status/versioning, ownership-return errors for consumed inputs, concrete public API types, deterministic failure tests and source/artifact/package acceptance; these details are not adopted or implemented. The parser inventory is not semantic/export or release evidence. Per-domain contracts, old-to-new ownership map, implementation and fresh source/artifact/package qualification remain open."
     }
   ]
 }

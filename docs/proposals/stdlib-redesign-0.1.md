@@ -18,11 +18,12 @@ API mới chưa có trong alpha, chưa thay đặc tả hay thiết lập qualif
 | STD-D03 | Constructor thuộc type | Type::new(...), Type::with_capacity(...); thay factory có tiền tố type khi làm cùng việc |
 | STD-D04 | Giữ vị trí source hiện tại | Gốc vẫn là luna-rs/libs/external; tổ chức lại bên trong |
 | STD-D05 | usize cho size/index bộ nhớ | Độ dài/capacity/index của container và bộ nhớ dùng usize; fixed-width dành cho domain/format yêu cầu số bit |
+| STD-D06 | Cấp phát hai tầng theo phương án B | API thường abort khi OOM; API try_* trả lỗi để caller xử lý, bảo toàn allocation/dữ liệu cũ khi thất bại |
 
 Thẩm quyền: các câu trả lời của maintainer ngày 2026-10-21. Đây là hướng thiết
 kế, chưa chứng nhận mọi API có thể triển khai. Thay API không tự đổi ownership,
-lifetime, builtin str, cú pháp macro, lang-item hoặc runtime ABI; yêu cầu thay
-các cơ chế đó phải được ghi thành quyết định riêng.
+lifetime, builtin str, cú pháp macro hoặc lang-item. STD-D06 cho phép thiết kế
+thêm primitive cấp phát fallible; ABI cụ thể cần amendment và kiểm chứng riêng.
 
 [Decision ledger dạng JSON](stdlib-redesign-0.1/decisions.json) ghi riêng các
 direction đã được chọn và đề xuất chưa xác nhận.
@@ -92,11 +93,18 @@ và rebuild dependent, không patch llib bằng tay.
 | Text | String sở hữu UTF-8; byte slice/Vec chứa byte bất kỳ; str giữ nghĩa hiện hành | Byte → text validation, Unicode/NUL, lifetime |
 | Raw/runtime | Bridge nội bộ, safe wrapper có invariant và unsafe proof | Effective visibility, FFI/layout, source/artifact parity |
 
-Conversion naming, fallibility từng constructor, error taxonomy và compatibility
-alias chưa chốt. Thiết kế xuất phát từ semantics Luna, không sao chép catalog
-API của ngôn ngữ khác. Theo [ABI v1](../runtime/abi-v1.md), overflow/OOM abort,
-không trả NULL: trả OOM qua Result cần contract/primitive fallible allocation
-riêng, gồm giữ block cũ và ownership khi lỗi. Tên try_* không tự tạo khả năng đó.
+STD-D06 đã chốt bổ sung fallible allocation: constructor/thao tác thường giữ
+hành vi abort khi OOM, còn biến thể try_* trả Result. Không ép mọi constructor
+trả Result: Vec::new hiện tạo vector rỗng mà không cấp phát. Khi try_reserve
+thất bại, vector cũ vẫn hợp lệ; API nhận ownership một giá trị cần có đường trả
+lại giá trị đó khi không thể đưa nó vào container.
+
+[Bản thiết kế allocator](stdlib-redesign-0.1/allocator.md) ghi primitive,
+ownership, versioning và acceptance đề xuất. [ABI v1](../runtime/abi-v1.md)
+hiện vẫn abort khi allocation overflow/OOM và không trả NULL; primitive mới
+chưa triển khai. Conversion naming, error taxonomy cụ thể, danh sách try_*
+và compatibility alias còn mở. Thiết kế xuất phát từ semantics Luna, không
+sao chép catalog API của ngôn ngữ khác.
 
 ## Catalog cần thiết kế lần lượt
 
@@ -123,8 +131,9 @@ stream/newline/callee theo tên macro; interpolation cần generic contract riê
 
 ## Đường thực hiện sau thiết kế
 
-1. Chốt nền API: namespace/constructor/root/size-index đã quyết định;
-   error/allocator, conversion naming và compatibility còn mở.
+1. Chốt nền API: namespace/constructor/root/size-index và chính sách allocator
+   hai tầng đã quyết định; ABI fallible, error type, conversion naming và
+   compatibility còn mở.
 2. Spec domain: signature, owner, dependency, invariant, unsafe proof, error;
    phân loại IMPLEMENT / SAFE-API-VIA-AUDITED-UNSAFE / LANGUAGE-BLOCKED /
    COMPILER-GAP / DEFERRED trước khi hứa API.

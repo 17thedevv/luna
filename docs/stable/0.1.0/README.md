@@ -85,7 +85,11 @@ must build and test a new immutable final pin.
 
 At the maintainer's request, [joint API/layout design](../../proposals/stdlib-redesign-0.1.md)
 now precedes stable qualification. The confirmed direction is compact std names,
-type-associated constructors and the existing luna-rs/libs/external source root.
+type-associated constructors, usize memory sizes/indices and the existing
+luna-rs/libs/external source root. STD-D06 supplements aborting allocation with
+fallible try_* APIs; the [allocator design](../../proposals/stdlib-redesign-0.1/allocator.md)
+proposes runtime primitives, ownership on failure and acceptance. Those ABI/API
+details are not adopted or implemented yet.
 Internal grouping, per-domain contracts and migration/compatibility remain open.
 The [parser inventory](../../audits/stdlib-redesign-2026-10-21/README.md) maps 49
 providers / 2,358 declaration records / 213 explicit imports at 264390da; it is

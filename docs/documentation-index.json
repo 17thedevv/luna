@@ -830,6 +830,11 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/proposals/stdlib-redesign-0.1/allocator.md",
+    "role": "guidance",
+    "owner": "runtime"
+  },
+  {
     "path": "docs/proposals/v01-design-01-method-collision.md",
     "role": "historical",
     "owner": "conformance"

@@ -23,11 +23,18 @@
     {
       "id": "STD-D05",
       "decision": "Use usize for memory/container length, capacity and index; fixed-width integers for domains/formats requiring them"
+    },
+    {
+      "id": "STD-D06",
+      "decision": "Supplement aborting allocation with fallible try_* APIs returning Result; allocation failure preserves existing storage/data",
+      "design": "allocator.md",
+      "implementation_status": "NOT_IMPLEMENTED_ABI_AND_API_DETAILS_PROPOSED"
     }
   ],
   "proposed_not_confirmed": [
     "lang/core/alloc/host internal grouping",
-    "conversion/error/allocator policies",
+    "conversion naming and per-domain error policies",
+    "fallible allocation ABI signatures/status/version and concrete public try_* APIs",
     "compatibility aliases and migration details",
     "generated artifact output/install layout"
   ]
