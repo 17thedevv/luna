@@ -1,6 +1,7 @@
 import <num>;
 
 import <vec>;
+import <alloc_error>;
 import <default>;
 import <core/panic>;
 import <ptr>;
@@ -200,6 +201,24 @@ module std {
     }
 
     impl String {
+        export fn new() -> Self { return string_new(); }
+
+        export fn with_capacity(capacity: usize) -> Self {
+            return string_with_capacity(capacity as u64);
+        }
+
+        export fn try_with_capacity(capacity: usize) -> std::Result<Self, std::AllocError> {
+            return match std::Vec<u8>::try_with_capacity(capacity) {
+                std::Result::Ok(vec) -> std::Result::Ok(String { vec: vec }),
+                std::Result::Err(cause) -> std::Result::Err(cause),
+            };
+        }
+
+        // Reserving storage does not change initialized bytes or UTF-8 validity.
+        export fn try_reserve(self: &rw Self, additional_bytes: usize) -> std::Result<void, std::AllocError> {
+            return self.vec.try_reserve(additional_bytes);
+        }
+
         export fn len(self: &Self) -> u64 {
             return self.vec.len();
         }

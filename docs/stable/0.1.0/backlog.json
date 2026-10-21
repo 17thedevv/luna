@@ -289,7 +289,28 @@
       "blocks": [
         "STABLE_RELEASE"
       ],
-      "notes": "Maintainer explicitly chose whole-API/layout redesign, compact std namespace, constructors on types, the current source root, usize memory size/index and supplemental fallible allocation (STD-D06): ordinary APIs abort on OOM; try_* returns errors while preserving existing storage/data. The allocator design proposes ABI/status/versioning, ownership-return errors for consumed inputs, concrete public API types, deterministic failure tests and source/artifact/package acceptance; these details are not adopted or implemented. The parser inventory is not semantic/export or release evidence. Per-domain contracts, old-to-new ownership map, implementation and fresh source/artifact/package qualification remain open."
+      "notes": "Maintainer explicitly chose whole-API/layout redesign, compact std namespace, constructors on types, the current source root, usize memory size/index and supplemental fallible allocation (STD-D06), then authorized implementation. STABLE-017 tracks the first ABI 2 / Vec / Box / String allocation slice. The parser inventory remains the immutable pre-redesign snapshot; the added alloc_error provider makes 50 current providers. Per-domain contracts, the remaining old-to-new ownership and size/index map, implementation and fresh source/artifact/package qualification remain open."
+    },
+    {
+      "id": "STABLE-017",
+      "milestone": "S1/S3/S4",
+      "priority": "P1",
+      "requirement": "Implement STD-D06 fallible allocation, preserve input/storage ownership, validate source/artifact and native runtime/package compatibility",
+      "status": "IMPLEMENTED_VALIDATION_IN_PROGRESS",
+      "owner": "17thedevv",
+      "source_paths": [
+        "runtime/src/memory/memory.c",
+        "runtime/include/luna/runtime/memory.h",
+        "luna-rs/libs/external/alloc/error.ln",
+        "luna-rs/libs/external/alloc/vec.ln",
+        "luna-rs/libs/external/alloc/box.ln",
+        "luna-rs/libs/external/alloc/string.ln",
+        "tests/luna/stdlib/fallible_allocation"
+      ],
+      "fix_commit": null,
+      "evidence": ["docs/audits/stdlib-fallible-2026-10-21/README.md"],
+      "blocks": ["STABLE_RELEASE"],
+      "notes": "Runtime ABI 2 supplements legacy terminal allocation; new try_* APIs use usize and return allocation errors, including an owned input on failed insertion/boxing. C-GAP-13 repairs qualified owner/impl substitutions; C-GAP-14 preserves imported extern identity. Existing factories and u64 size/index APIs remain migration bridges. Focused Windows results are not final stable or package qualification. Broad regression, Ubuntu/ASan and package/runtime compatibility remain gates."
     }
   ]
 }

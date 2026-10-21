@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "CO_DESIGN_IN_PROGRESS_NOT_IMPLEMENTED",
+  "status": "CO_DESIGN_IN_PROGRESS_ALLOCATOR_IMPLEMENTATION_VALIDATING",
   "date": "2026-10-21",
   "authority": "Direct maintainer responses in the current conversation",
   "confirmed": [
@@ -28,13 +28,13 @@
       "id": "STD-D06",
       "decision": "Supplement aborting allocation with fallible try_* APIs returning Result; allocation failure preserves existing storage/data",
       "design": "allocator.md",
-      "implementation_status": "NOT_IMPLEMENTED_ABI_AND_API_DETAILS_PROPOSED"
+      "implementation_status": "IMPLEMENTED_ON_BRANCH_VALIDATION_IN_PROGRESS"
     }
   ],
   "proposed_not_confirmed": [
     "lang/core/alloc/host internal grouping",
     "conversion naming and per-domain error policies",
-    "fallible allocation ABI signatures/status/version and concrete public try_* APIs",
+    "final adoption and release compatibility of the ABI 2 / try_* implementation contract",
     "compatibility aliases and migration details",
     "generated artifact output/install layout"
   ]

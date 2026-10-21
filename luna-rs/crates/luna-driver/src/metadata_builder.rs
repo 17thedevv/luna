@@ -630,7 +630,12 @@ impl<'a> MetadataBuilder<'a> {
             }
         }
 
+        // Extern-ness affects raw-pointer call effects and is part of the
+        // canonical interface, independently of function safety.
         let kind_str = match sym.sym.kind {
+            luna_semantic::symbol::SymbolKind::Function
+                if self.provider.extern_functions.contains(&sid)
+                    || sym.merged_ids.iter().any(|(_, symbol)| self.provider.extern_functions.contains(symbol)) => "ExternFunction",
             luna_semantic::symbol::SymbolKind::Function => "Function",
             luna_semantic::symbol::SymbolKind::ExternFunction => "ExternFunction",
             luna_semantic::symbol::SymbolKind::Variable => "Variable",

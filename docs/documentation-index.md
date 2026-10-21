@@ -123,6 +123,9 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/repair-0.1/provider_matrix.md](audits/repair-0.1/provider_matrix.md) | evidence | [conformance](spec/0.1/conformance.md) |
 | [docs/audits/stdlib-2026-10-02-d-worktree/README.md](audits/stdlib-2026-10-02-d-worktree/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-2026-10-02/README.md](audits/stdlib-2026-10-02/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-fallible-2026-10-21/README.md](audits/stdlib-fallible-2026-10-21/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-fallible-2026-10-21/compiler-gap-13.md](audits/stdlib-fallible-2026-10-21/compiler-gap-13.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-fallible-2026-10-21/compiler-gap-14.md](audits/stdlib-fallible-2026-10-21/compiler-gap-14.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-redesign-2026-10-21/README.md](audits/stdlib-redesign-2026-10-21/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/borrowck/NLL_spec.md](borrowck/NLL_spec.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/borrowck/call_effect_model.md](borrowck/call_effect_model.md) | historical | [semantics](spec/0.1/semantics.md) |
@@ -179,6 +182,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/proposals/v01-filter-step-dedup-api.md](proposals/v01-filter-step-dedup-api.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/runtime/MELLIS_RUNTIME_SPEC.md](runtime/MELLIS_RUNTIME_SPEC.md) | historical | [runtime](spec/0.1/runtime.md) |
 | [docs/runtime/abi-v1.md](runtime/abi-v1.md) | adopted-contract | [runtime](spec/0.1/runtime.md) |
+| [docs/runtime/abi-v2-allocation.md](runtime/abi-v2-allocation.md) | guidance | [runtime](spec/0.1/runtime.md) |
 | [docs/runtime/architecture.md](runtime/architecture.md) | historical | [runtime](spec/0.1/runtime.md) |
 | [docs/runtime/boundary-audit.md](runtime/boundary-audit.md) | historical | [runtime](spec/0.1/runtime.md) |
 | [docs/runtime/invariants.md](runtime/invariants.md) | historical | [runtime](spec/0.1/runtime.md) |

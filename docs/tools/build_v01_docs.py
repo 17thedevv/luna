@@ -37,6 +37,7 @@ ADOPTED = {
     '.agents/skills/luna-semantic-compliance/references/visibility-02-public-field-default-rfc.md',
 }
 CURRENT = {
+    'docs/runtime/abi-v2-allocation.md',
     'docs/proposals/stdlib-redesign-0.1.md',
     'docs/proposals/stdlib-redesign-0.1/allocator.md',
     'docs/licensing.md',

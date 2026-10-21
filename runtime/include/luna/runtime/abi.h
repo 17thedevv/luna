@@ -1,7 +1,7 @@
 // =============================================================================
 // luna/runtime/abi.h
 //
-// Luna Runtime ABI v1 — Master Header (FROZEN)
+// Luna Runtime ABI v2 — v1 core plus fallible allocation
 // =============================================================================
 
 #pragma once
@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-#define LUNA_RUNTIME_ABI_VERSION 1
+#define LUNA_RUNTIME_ABI_VERSION 2
 #define LUNA_MAX_ALIGN 4096
 
 #if defined(__GNUC__) || defined(__clang__)

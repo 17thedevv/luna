@@ -2,7 +2,7 @@
 
 # Cấp phát hai tầng cho stdlib Luna 0.1.0
 
-Ngày **2026-10-21**, Asia/Bangkok. **BẢN THIẾT KẾ, CHƯA TRIỂN KHAI**.
+Ngày **2026-10-21**, Asia/Bangkok. **ĐANG TRIỂN KHAI / KIỂM CHỨNG**.
 Thuộc [RFC stdlib](../stdlib-redesign-0.1.md), quyết định **STD-D06**.
 
 ## Chính sách đã được maintainer chọn
@@ -15,15 +15,17 @@ Phương án B bổ sung khả năng xử lý lỗi cấp phát vào stdlib:
 - Allocation thất bại không làm mất dữ liệu/container đang có.
 - Không bắt constructor không cần cấp phát, như Vec::new rỗng, trả Result.
 
-Đây là hướng đã được chọn. Signature, tên error/status, số revision ABI và
-danh sách API dưới đây là **đề xuất để review**, chưa phải adopted contract.
+Đây là hướng đã được chọn và maintainer đã yêu cầu triển khai. Bản implementation
+đầu dùng ABI 2 và các tên API/error dưới đây; vẫn cần review/qualification trước
+stable. [Hồ sơ thực hiện](../../audits/stdlib-fallible-2026-10-21/README.md)
+phân biệt code đã có, bằng chứng và công việc còn lại.
 Result chỉ phản ánh lỗi allocator đã trả về; không bảo đảm mọi tình huống
 thiếu tài nguyên đều cho phép chương trình tiếp tục.
 
 ## Điểm xuất phát và ranh giới
 
-[ABI v1](../../runtime/abi-v1.md) và
-[memory.c](../../../runtime/src/memory/memory.c) hiện chỉ có allocation/reallocation
+Điểm xuất phát trước STD-D06: [ABI v1](../../runtime/abi-v1.md) và
+[memory.c](../../../runtime/src/memory/memory.c) chỉ có allocation/reallocation
 abort khi OOM; __luna_alloc không trả NULL. Không thể triển khai try_* bằng
 cách gọi primitive đó rồi kiểm tra NULL hoặc bắt panic sau khi đã abort.
 
@@ -33,9 +35,10 @@ lỗi theo API. Compiler không có nhánh đặc biệt cho container hay tên 
 Việc thêm primitive cấp phát fallible là thay đổi runtime generic riêng.
 Gốc source vẫn là luna-rs/libs/external theo STD-D04.
 
-## Primitive runtime đề xuất
+## Primitive runtime đang triển khai
 
-Giữ các entry point v1 và bổ sung hai entry point C:
+Giữ các entry point v1 và bổ sung hai entry point C theo
+[contract implementation ABI 2](../../runtime/abi-v2-allocation.md):
 
 ```c
 int32_t __luna_try_alloc(size_t size, size_t align, void **out_ptr);
@@ -43,7 +46,7 @@ int32_t __luna_try_realloc(void *ptr, size_t old_size, size_t align,
                            size_t new_size, void **out_ptr);
 ```
 
-| Status đề xuất | Nghĩa | Output |
+| Status implementation | Nghĩa | Output |
 | --- | --- | --- |
 | 0 | Thành công | Pointer khác NULL, kể cả zero-size sentinel |
 | 1 | Allocator không cấp được block yêu cầu | NULL |
@@ -97,8 +100,9 @@ không đổi __luna_alloc thành hàm có thể trả NULL.
 | Box<T>::try_new(value) | Box sở hữu value | Lỗi sở hữu lại value cùng nguyên nhân |
 | String::try_reserve(additional_bytes) | Đủ byte trống, text không đổi | AllocError; giữ nguyên text và UTF-8 invariant |
 
-Tên và dạng generic của lỗi mang lại value cần chốt trong public API. Hướng
-đề xuất là một aggregate sở hữu nguyên nhân và T, không cấp phát thêm; caller
+Implementation dùng std::AllocFailure<T> với hai field cause và value; error
+std::AllocError gồm OutOfMemory, CapacityOverflow và UnsupportedLayout. Aggregate
+sở hữu nguyên nhân và T, không cấp phát thêm; caller
 có thể lấy lại T hoặc drop lỗi, khiến T được drop đúng một lần. Không âm thầm
 drop hoặc clone input để làm cho try_push/try_new có vẻ thành công.
 
@@ -119,9 +123,9 @@ UTF-8; B không thay semantics của str hay cho phép text chứa byte tùy ý.
 
 ## Versioning và migration
 
-Đề xuất phát hành extension này cùng runtime ABI revision mới, rebuild runtime,
-stdlib và consumer từ cùng pin. Số revision và amendment phải được chốt trước
-implementation; không sửa tài liệu adopted ABI v1 để giả định symbol đã tồn tại.
+Implementation dùng runtime ABI revision 2; phát hành phải rebuild runtime,
+stdlib và consumer từ cùng pin. ABI v1 vẫn là contract của các symbol cũ;
+extension được ghi riêng, không coi nó đã có trong gói alpha.
 Provider/interface fingerprint và package manifest phải ghi dependency mới.
 Không tăng metadata protocol chỉ vì thêm symbol nếu format không thay đổi.
 
@@ -150,9 +154,13 @@ runtime production. Dùng budget/counter không cần heap; kiểm tra cả allo
 đầu tiên và các lần growth, cùng trường hợp không allocation thì không tiêu
 budget. Cơ chế injection cụ thể là implementation test, không public API.
 
-Chưa có primitive, public API, test PASS hoặc claim completion từ tài liệu này.
+Primitive và các API trong bảng đã có trên nhánh, cộng String::try_with_capacity
+và constructor trên type. Factory cũ tạm giữ làm cầu nối có chủ đích cho migration;
+không nhân thêm alias mới. API mới nhận usize; field/size-index API cũ còn u64
+trên hai target 64-bit hiện hành và sẽ được chuyển trong đợt STD-D05 riêng.
+Hồ sơ thực hiện mới là nơi ghi kết quả chạy; tài liệu này không tự claim completion.
 Nếu gặp thiếu machinery ownership/FFI chung, tách reproducer user-defined và
 compiler gap trước khi tiếp tục; không đặc cách stdlib.
 
 SKILL IMPACT: không đổi skill. Chính sách đã được chọn được lưu trong RFC;
-ABI/API chi tiết còn là đề xuất, chưa tạo một quy tắc ngôn ngữ đã được duyệt.
+ABI/API chi tiết đang kiểm chứng; không tự tạo language rule hay stable freeze.

@@ -27,6 +27,12 @@ nonzero elements. Deallocation and reallocation require valid metadata and
 ownership. Runtime round-up checks cannot detect a multiplication that already
 wrapped in the caller; safe container arithmetic must be checked beforehand.
 
+STD-D06 authorizes supplemental fallible allocation. The
+[ABI 2 implementation contract](../../runtime/abi-v2-allocation.md) adds status
+and output-pointer primitives while preserving the v1 terminal entry points.
+It is being validated on the stdlib redesign branch and is not part of the
+published alpha runtime or a stable qualification claim.
+
 ## Entry and process arguments
 
 Startup receives argc/argv. The already defined language entry contract permits

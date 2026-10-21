@@ -1,7 +1,7 @@
 // =============================================================================
 // runtime/tests/abi_tests.c
 //
-// Luna Runtime ABI v1.0 — Conformance & Invariant Verification Suite
+// Luna Runtime — Retained Core ABI Conformance & Invariant Verification Suite
 // =============================================================================
 
 #include "luna/runtime/abi.h"
@@ -649,7 +649,7 @@ int main(int argc, char** argv) {
     }
 
     printf("=================================================================\n");
-    printf("   Luna Runtime ABI v1.0 Conformance Test Suite\n");
+    printf("   Luna Runtime ABI %d Retained Core Test Suite\n", LUNA_RUNTIME_ABI_VERSION);
     printf("=================================================================\n");
 
     int failures = 0;

@@ -1,0 +1,5 @@
+import "bridge";
+fn main() -> i32 {
+    dec rw raw: *rw u8 = 0 as usize as *rw u8;
+    return __luna_try_alloc(4 as usize, 4 as usize, &rw raw as *rw *rw u8);
+}

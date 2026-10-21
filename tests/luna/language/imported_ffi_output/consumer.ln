@@ -1,0 +1,18 @@
+import <result>;
+import "bridge";
+// C-GAP-14: imported extern identity must keep the same raw output effects.
+struct Buffer<T> { ptr: *rw T } requires anchor(ptr) = self;
+impl<T> Buffer<T> {
+    fn create() -> std::Result<Self, i32> {
+        dec rw raw: *rw u8 = 0 as usize as *rw u8;
+        dec rw status: i32 = 0;
+        unsafe { status = __luna_try_alloc(sizeof(T) as usize, alignof(T) as usize, &rw raw as *rw *rw u8); }
+        if status != 0 { return std::Result::Err(status); }
+        unsafe { return std::Result::Ok(Buffer<T> { ptr: raw as *rw T }); }
+    }
+}
+fn main() -> i32 {
+    dec value = Buffer<i32>::create().unwrap();
+    __luna_dealloc(value.ptr as *rw u8, 4 as u64, 4 as u64);
+    return 0;
+}

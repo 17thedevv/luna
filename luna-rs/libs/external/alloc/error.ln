@@ -1,0 +1,19 @@
+import <copy>;
+
+module std {
+    // Value-only error: reporting allocation failure never needs allocation.
+    export enum AllocError {
+        OutOfMemory,
+        CapacityOverflow,
+        UnsupportedLayout,
+    }
+
+    impl std::Copy for AllocError {}
+
+    // Owns the input that could not be inserted/boxed. Dropping the error drops
+    // the input once; moving value out transfers that obligation to the caller.
+    export struct AllocFailure<T> {
+        cause: AllocError,
+        value: T,
+    };
+}

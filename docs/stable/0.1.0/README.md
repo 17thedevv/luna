@@ -88,8 +88,10 @@ now precedes stable qualification. The confirmed direction is compact std names,
 type-associated constructors, usize memory sizes/indices and the existing
 luna-rs/libs/external source root. STD-D06 supplements aborting allocation with
 fallible try_* APIs; the [allocator design](../../proposals/stdlib-redesign-0.1/allocator.md)
-proposes runtime primitives, ownership on failure and acceptance. Those ABI/API
-details are not adopted or implemented yet.
+records runtime primitives, ownership on failure and acceptance. The maintainer
+then requested implementation: [STD-D06 execution](../../audits/stdlib-fallible-2026-10-21/README.md)
+now has ABI 2 primitives and the first Vec/Box/String try_* APIs under validation.
+This adds alloc_error (50 current providers); full redesign remains in progress.
 Internal grouping, per-domain contracts and migration/compatibility remain open.
 The [parser inventory](../../audits/stdlib-redesign-2026-10-21/README.md) maps 49
 providers / 2,358 declaration records / 213 explicit imports at 264390da; it is

@@ -1,0 +1,11 @@
+import <box>;
+import <result>;
+import <alloc_error>;
+fn escape() -> std::Result<std::Box<&i32>, std::AllocFailure<&i32>> {
+    dec local = 7;
+    return std::Box<&i32>::try_new(&local);
+}
+fn main() -> i32 {
+    dec result = escape();
+    return 0;
+}

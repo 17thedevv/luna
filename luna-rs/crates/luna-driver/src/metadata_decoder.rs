@@ -30,6 +30,7 @@ pub struct InterfaceDecoder {
         HashMap<luna_common::ids::SymbolId, luna_semantic::CanonicalRawStorageAnchorContract>,
     callable_signatures: HashMap<luna_common::ids::SymbolId, luna_semantic::CallableSignature>,
     unsafe_functions: std::collections::HashSet<luna_common::ids::SymbolId>,
+    extern_functions: std::collections::HashSet<luna_common::ids::SymbolId>,
     trait_bounds: HashMap<CanonicalSymbolId, Vec<crate::registry::ExternalTraitBound>>,
     assoc_type_bounds: HashMap<CanonicalSymbolId, Vec<crate::registry::ExternalAssocTypeBound>>,
     known_providers: HashMap<String, ProviderId>,
@@ -62,6 +63,7 @@ impl InterfaceDecoder {
             symbol_raw_storage_anchor_contracts: HashMap::new(),
             callable_signatures: HashMap::new(),
             unsafe_functions: std::collections::HashSet::new(),
+            extern_functions: std::collections::HashSet::new(),
             trait_bounds: HashMap::new(),
             assoc_type_bounds: HashMap::new(),
             known_providers,
@@ -296,6 +298,7 @@ impl InterfaceDecoder {
             symbol_ffi_sync_noescape: HashMap::new(),
             trait_methods,
             unsafe_functions: self.unsafe_functions,
+            extern_functions: self.extern_functions,
             trait_bounds: self.trait_bounds,
             assoc_type_bounds: self.assoc_type_bounds,
             method_to_impl_decl,
@@ -365,7 +368,10 @@ impl InterfaceDecoder {
         }
         let kind = match exported.kind.as_str() {
             "Function" => luna_semantic::symbol::SymbolKind::Function,
-            "ExternFunction" => luna_semantic::symbol::SymbolKind::ExternFunction,
+            "ExternFunction" => {
+                self.extern_functions.insert(sym_id);
+                luna_semantic::symbol::SymbolKind::Function
+            },
             "Variable" => luna_semantic::symbol::SymbolKind::Variable,
             "Constant" => luna_semantic::symbol::SymbolKind::Constant,
             "Struct" => luna_semantic::symbol::SymbolKind::Struct,

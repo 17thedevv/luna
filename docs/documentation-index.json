@@ -575,6 +575,21 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/audits/stdlib-fallible-2026-10-21/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-fallible-2026-10-21/compiler-gap-13.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-fallible-2026-10-21/compiler-gap-14.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/audits/stdlib-redesign-2026-10-21/README.md",
     "role": "evidence",
     "owner": "stdlib"
@@ -852,6 +867,11 @@
   {
     "path": "docs/runtime/abi-v1.md",
     "role": "adopted-contract",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/runtime/abi-v2-allocation.md",
+    "role": "guidance",
     "owner": "runtime"
   },
   {

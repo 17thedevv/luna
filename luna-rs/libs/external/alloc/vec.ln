@@ -1,4 +1,6 @@
 import <__alloc_global>;
+import <alloc_error>;
+import <result>;
 import <slice>;
 import <ptr>;
 import <mem>;
@@ -39,7 +41,7 @@ export fn vec_with_capacity<T>(capacity: u64) -> Vec<T> {
     dec elem_size = std::mem::size_of<T>() as u64;
     if elem_size > (0 as u64) {
         if capacity > (18446744073709551615u64 / elem_size) {
-            return vec_new<T>();
+            __luna_panic_default();
         }
     }
     dec size = capacity * elem_size;
@@ -153,6 +155,101 @@ impl<T> std::IntoIterator<T, VecIntoIter<T>> for Vec<T> {
 }
 
 impl<T> Vec<T> {
+    export fn new() -> Self {
+        return vec_new<T>();
+    }
+
+    export fn with_capacity(capacity: usize) -> Self {
+        return vec_with_capacity<T>(capacity as u64);
+    }
+
+    export fn try_with_capacity(capacity: usize) -> std::Result<Self, std::AllocError> {
+        dec elem_size = sizeof(T) as usize;
+        dec max_size = 18446744073709551615u64 as usize;
+        dec align = alignof(T) as usize;
+        if align == (0 as usize) || align > (4096 as usize) {
+            return std::Result::Err(std::AllocError::UnsupportedLayout);
+        }
+        if elem_size > (0 as usize) {
+            if capacity > ((max_size - (align - (1 as usize))) / elem_size) {
+                return std::Result::Err(std::AllocError::CapacityOverflow);
+            }
+        }
+        if capacity == (0 as usize) {
+            return std::Result::Ok(vec_new<T>());
+        }
+        dec rw raw: *rw u8 = 0 as usize as *rw u8;
+        dec rw status: i32 = 0;
+        unsafe {
+            status = __luna_try_alloc(capacity * elem_size, alignof(T) as usize, &rw raw as *rw *rw u8);
+        }
+        if status == 1 { return std::Result::Err(std::AllocError::OutOfMemory); }
+        if status == 2 { return std::Result::Err(std::AllocError::CapacityOverflow); }
+        if status != 0 { return std::Result::Err(std::AllocError::UnsupportedLayout); }
+        unsafe {
+            return std::Result::Ok(Vec<T> { ptr: raw as *rw T, len: 0 as u64, cap: capacity as u64 });
+        }
+    }
+
+    // Strong failure guarantee: no fields or initialized values change until
+    // allocation succeeds. Only initialized bytes are moved; old storage is
+    // then freed without dropping its relocated elements.
+    export fn try_reserve(self: &rw Self, additional: usize) -> std::Result<void, std::AllocError> {
+        dec max_size = 18446744073709551615u64 as usize;
+        dec len = self.len as usize;
+        if additional > (max_size - len) {
+            return std::Result::Err(std::AllocError::CapacityOverflow);
+        }
+        dec needed = len + additional;
+        if needed <= (self.cap as usize) { return std::Result::Ok; }
+        dec elem_size = sizeof(T) as usize;
+        dec align = alignof(T) as usize;
+        if align == (0 as usize) || align > (4096 as usize) {
+            return std::Result::Err(std::AllocError::UnsupportedLayout);
+        }
+        dec rw limit = max_size;
+        if elem_size > (0 as usize) { limit = (max_size - (align - (1 as usize))) / elem_size; }
+        if needed > limit { return std::Result::Err(std::AllocError::CapacityOverflow); }
+        dec rw capacity = needed;
+        if (self.cap as usize) <= (limit / (2 as usize)) {
+            dec doubled = (self.cap as usize) * (2 as usize);
+            if capacity < doubled { capacity = doubled; }
+        }
+        if capacity < (4 as usize) && limit >= (4 as usize) { capacity = 4 as usize; }
+        dec rw raw: *rw u8 = 0 as usize as *rw u8;
+        dec rw status: i32 = 0;
+        unsafe {
+            status = __luna_try_alloc(capacity * elem_size, alignof(T) as usize, &rw raw as *rw *rw u8);
+        }
+        if status == 1 { return std::Result::Err(std::AllocError::OutOfMemory); }
+        if status == 2 { return std::Result::Err(std::AllocError::CapacityOverflow); }
+        if status != 0 { return std::Result::Err(std::AllocError::UnsupportedLayout); }
+        unsafe {
+            dec new_ptr = raw as *rw T;
+            if self.cap > (0 as u64) {
+                std::ptr::copy<T>(self.ptr as *T, new_ptr, self.len);
+                __luna_dealloc(self.ptr as *rw u8, self.cap * (elem_size as u64), alignof(T) as u64);
+            }
+            self.ptr = new_ptr;
+        }
+        self.cap = capacity as u64;
+        return std::Result::Ok;
+    }
+
+    export fn try_push(self: &rw Self, item: T) -> std::Result<void, std::AllocFailure<T>> {
+        match self.try_reserve(1 as usize) {
+            std::Result::Err(cause) -> {
+                return std::Result::Err(std::AllocFailure<T> { cause: cause, value: item });
+            },
+            std::Result::Ok -> {},
+        }
+        unsafe {
+            std::ptr::write<T>(std::ptr::add_mut<T>(self.ptr, self.len), item);
+        }
+        self.len = self.len + (1 as u64);
+        return std::Result::Ok;
+    }
+
     export fn push(self: &rw Self, item: T) {
         if self.len == self.cap {
             self.grow();

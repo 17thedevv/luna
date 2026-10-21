@@ -1,0 +1,7 @@
+import <box>;
+extern fn __luna_test_alloc_fail_after(budget: i64);
+fn main() -> i32 {
+    __luna_test_alloc_fail_after(0);
+    dec value = std::Box<i32>::new(73);
+    return 0;
+}

@@ -2,12 +2,14 @@
 
 # Đồng thiết kế lại stdlib cho Luna 0.1.0
 
-Ngày **2026-10-21**, Asia/Bangkok. **ĐANG THIẾT KẾ**, chưa triển khai API mới.
+Ngày **2026-10-21**, Asia/Bangkok. **ĐANG THIẾT KẾ / TRIỂN KHAI PHẦN NỀN**.
 Nhánh `stdlib-redesign`, dựa trên `264390da` của `stable-baseline`.
 
 Maintainer yêu cầu thiết kế lại toàn bộ API và layout, thay cho phương án chỉ
 sắp xếp mã và giữ API. Tài liệu ghi riêng quyết định đã chốt và phần đề xuất;
-API mới chưa có trong alpha, chưa thay đặc tả hay thiết lập qualification.
+API mới chưa có trong alpha, chưa thiết lập stable qualification. Sau STD-D06,
+maintainer yêu cầu bắt đầu triển khai: allocator hai tầng là phần đầu tiên,
+được theo dõi trong [hồ sơ thực hiện](../audits/stdlib-fallible-2026-10-21/README.md).
 
 ## Quyết định đã chốt trực tiếp với maintainer
 
@@ -101,8 +103,9 @@ lại giá trị đó khi không thể đưa nó vào container.
 
 [Bản thiết kế allocator](stdlib-redesign-0.1/allocator.md) ghi primitive,
 ownership, versioning và acceptance đề xuất. [ABI v1](../runtime/abi-v1.md)
-hiện vẫn abort khi allocation overflow/OOM và không trả NULL; primitive mới
-chưa triển khai. Conversion naming, error taxonomy cụ thể, danh sách try_*
+hiện vẫn abort khi allocation overflow/OOM và không trả NULL; extension
+[runtime ABI 2](../runtime/abi-v2-allocation.md) được triển khai trên nhánh và
+đang kiểm chứng. Conversion naming, error taxonomy các domain còn lại, danh sách try_*
 và compatibility alias còn mở. Thiết kế xuất phát từ semantics Luna, không
 sao chép catalog API của ngôn ngữ khác.
 
@@ -148,4 +151,4 @@ stream/newline/callee theo tên macro; interpolation cần generic contract riê
 
 49/2.358/213 là snapshot, không phải số đích của layout mới. Alpha và focused PASS
 trước redesign giữ giá trị lịch sử, không chứng nhận stdlib mới. Nhánh thiết kế
-chưa đổi source stdlib, compiler semantics hay runtime ABI.
+đã bắt đầu triển khai allocator; toàn bộ API/layout và qualification vẫn còn mở.
