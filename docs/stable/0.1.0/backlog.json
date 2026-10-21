@@ -308,9 +308,13 @@
         "tests/luna/stdlib/fallible_allocation"
       ],
       "fix_commit": null,
-      "evidence": ["docs/audits/stdlib-fallible-2026-10-21/README.md"],
+      "evidence": [
+        "docs/audits/stdlib-fallible-2026-10-21/README.md",
+        "docs/audits/stdlib-fallible-2026-10-21/evidence/windows-5e1c7356/receipt.json",
+        "docs/audits/stdlib-fallible-2026-10-21/evidence/ubuntu-b9878c70/receipt.json"
+      ],
       "blocks": ["STABLE_RELEASE"],
-      "notes": "Runtime ABI 2 supplements legacy terminal allocation; new try_* APIs use usize and return allocation errors, including an owned input on failed insertion/boxing. C-GAP-13 repairs qualified owner/impl substitutions; C-GAP-14 preserves imported extern identity. Existing factories and u64 size/index APIs remain migration bridges. Focused Windows results are not final stable or package qualification. Broad regression, Ubuntu/ASan and package/runtime compatibility remain gates."
+      "notes": "Runtime ABI 2 supplements legacy terminal allocation; new try_* APIs use usize and return allocation errors, including an owned input on failed insertion/boxing. C-GAP-13 repairs qualified owner/impl substitutions; C-GAP-14 preserves imported extern identity; C-GAP-15 fixes owner inference and native callable bounds. At 5e1c7356 Windows passes five CLI suites, 209 semantic tests and six sysroot invariant tests. Ubuntu/ASan passed the earlier b9878c70 slice and is being reacquired with full workspace regression at 5e1c7356. Older Windows workspace attempts are incomplete/superseded with raw evidence preserved. Existing factories and u64 size/index APIs remain migration bridges. Generic callable materialization in comptime still rejects E4005 and is not covered by native PASS. Package/runtime compatibility, updated distribution tooling and final stable qualification remain gates."
     }
   ]
 }

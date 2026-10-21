@@ -590,6 +590,11 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/audits/stdlib-fallible-2026-10-21/compiler-gap-15.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/audits/stdlib-redesign-2026-10-21/README.md",
     "role": "evidence",
     "owner": "stdlib"

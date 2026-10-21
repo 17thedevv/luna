@@ -29,6 +29,13 @@ callable types, later indirect calls and bounded generic forwarding. Missing
 explicit/inferred/caller bounds reject E2021 in both check and build. Broad
 workspace regression and Ubuntu reacquisition are tracked separately.
 
+This evidence covers native execution. A separate source-provider probe taking
+the same valid constructor as a callable value inside `comptime` rejects E4005
+(missing function in the VM context) with both the previous and repaired
+compilers. The [raw probe receipt](evidence/comptime-callable-gap/receipt.json)
+preserves that unresolved limitation; artifact-mode comptime parity is unknown.
+This repair does not establish complete comptime callable support.
+
 Compiler Change
 - Capability: ordinary associated-owner inference and bounds on callable values.
 - Why stdlib exposed it: `Box::new(value)` and `Vec::new()` with contextual types.

@@ -1,0 +1,74 @@
+{
+  "status": "FOCUSED_PASS_NOT_STABLE_QUALIFIED",
+  "source_commit": "5e1c735605b054319d1f5011a510ba9890dc651c",
+  "code_trees": {
+    "luna-rs": "a77017e8c329b2e7035001e993f51a22be9baecb",
+    "runtime": "b2702099bc5780d5806e508a77466bfd89541323",
+    "tests": "8ebb08e4b9b13e35c5a16684151e4f2ce24ead62"
+  },
+  "target": "x86_64-pc-windows-gnu",
+  "notes": [
+    "Associated-owner matrix was acquired before the recording commit with identical compiler and fixture content.",
+    "Allocation runtime fallback was exercised without LUNA_ALLOC_TEST_RUNTIME_LIB.",
+    "The phase0 read-only sysroot contains all 50 b9878c70 stdlib sources unchanged at 5e1c7356.",
+    "Complete older workspace attempts remain incomplete/superseded; they are not workspace PASS."
+  ],
+  "commands": [
+    {
+      "command": "cargo test -p luna-cli --test associated_owner_generic_cli -- --nocapture",
+      "cwd": "D:/luna-stable-build/constructor-fix/luna-rs",
+      "exit": 0,
+      "binaries": 1,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "constructor-focused.log",
+        "sha256": "faa8ab20e26ad8aa40c600cedb90fba9409a0c71c59abe5ce5fb6228c05692e6"
+      }
+    },
+    {
+      "command": "cargo test -p luna-cli --test fallible_allocation_cli --test imported_ffi_output_cli --test stable_io_cli --test semantic_maturity_phase0 --no-fail-fast -- --nocapture",
+      "cwd": "D:/luna-stable-build/constructor-fix/luna-rs",
+      "exit": 0,
+      "binaries": 4,
+      "passed": 25,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "constructor-allocation.log",
+        "sha256": "7dd8c05e3b4a4b7deb6362e7f1fd3dcd7345f865a1b8df4b0fab6735542f0f84"
+      }
+    },
+    {
+      "command": "cargo test -p luna-semantic --tests --no-fail-fast",
+      "cwd": "D:/luna-stable-build/constructor-fix/luna-rs",
+      "exit": 0,
+      "binaries": 25,
+      "passed": 209,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "constructor-semantic.log",
+        "sha256": "0a18fc09eb0797009de5918e3bef029fb62277b38869f8e950265bdca290958f"
+      }
+    },
+    {
+      "command": "cargo test -p luna-driver --test test_sysroot_build_invariants --no-fail-fast",
+      "cwd": "D:/luna-stable-build/constructor-fix/luna-rs",
+      "exit": 0,
+      "binaries": 1,
+      "passed": 6,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "constructor-sysroot.log",
+        "sha256": "d06cbc9eba843c5881c83f717a4b123c7ea4ba66165b4d810415c2b19f6f1054"
+      }
+    }
+  ],
+  "compiler": {
+    "path": "D:/luna-stable-build/constructor-cargo/debug/luna.exe",
+    "sha256": "ce85af6c47f2779852cb95fbe6327fc0433da156c8e644a1153fd7de2a694374"
+  }
+}

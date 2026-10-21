@@ -126,6 +126,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/stdlib-fallible-2026-10-21/README.md](audits/stdlib-fallible-2026-10-21/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-fallible-2026-10-21/compiler-gap-13.md](audits/stdlib-fallible-2026-10-21/compiler-gap-13.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-fallible-2026-10-21/compiler-gap-14.md](audits/stdlib-fallible-2026-10-21/compiler-gap-14.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-fallible-2026-10-21/compiler-gap-15.md](audits/stdlib-fallible-2026-10-21/compiler-gap-15.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-redesign-2026-10-21/README.md](audits/stdlib-redesign-2026-10-21/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/borrowck/NLL_spec.md](borrowck/NLL_spec.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/borrowck/call_effect_model.md](borrowck/call_effect_model.md) | historical | [semantics](spec/0.1/semantics.md) |

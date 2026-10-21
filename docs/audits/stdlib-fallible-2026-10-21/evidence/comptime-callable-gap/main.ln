@@ -1,0 +1,7 @@
+import "provider";
+const VALUE: i32 = comptime {
+    dec factory = model::Restricted<i32>::create;
+    dec value = factory(19);
+    value.value
+};
+fn main() -> i32 { return VALUE - 19; }

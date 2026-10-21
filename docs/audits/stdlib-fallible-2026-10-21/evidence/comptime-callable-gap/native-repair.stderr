@@ -1,0 +1,6 @@
+error[E4005]: cannot evaluate comptime block: symbol '_MMTN5model10RestrictedEGlEE6create' not found in comptime context
+  --> C:\Users\84387\.codex\worktrees\stable-release-plan\fdlang\docs\audits\stdlib-fallible-2026-10-21\evidence\comptime-callable-gap\main.ln:3:9
+   |
+3  |     dec factory = model::Restricted<i32>::create;
+   |         ^^^^^^^
+

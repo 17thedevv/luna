@@ -1,0 +1,9 @@
+Test project D:/luna-stable-build/runtime
+    Start 1: RuntimeAbiTests
+1/2 Test #1: RuntimeAbiTests ..................   Passed   26.29 sec
+    Start 2: RuntimeFallibleAllocation
+2/2 Test #2: RuntimeFallibleAllocation ........   Passed    0.02 sec
+
+100% tests passed out of 2
+
+Total Test time (real) =  26.32 sec
