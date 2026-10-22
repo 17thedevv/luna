@@ -177,6 +177,10 @@ export module std {
     }
 
     impl Sha256 {
+        export fn new() -> Self {
+            return sha256_new();
+        }
+
         // v1 borrows the owner as one domain. Work on independent scalar
         // state, then commit it after the borrowed block is no longer live.
         fn process_pending_block(self: &rw Self) {
@@ -376,6 +380,10 @@ export module std {
     }
 
     impl HmacSha256 {
+        export fn new(key: &[u8]) -> Self {
+            return hmac_sha256_new(key);
+        }
+
         export fn update(self: &rw Self, data: &[u8]) {
             self.inner_hasher.update(data);
         }
@@ -543,6 +551,10 @@ export module std {
     }
 
     impl ChaCha20 {
+        export fn new(key: &[u8], nonce: &[u8], counter: u32) -> Self {
+            return chacha20_new(key, nonce, counter);
+        }
+
         export fn apply_keystream(self: &rw Self, data: &rw [u8]) {
             dec len = data.len;
             dec rw pos: usize = 0 as usize;

@@ -297,6 +297,10 @@ export module std {
         }
 
         impl<T> Cursor<T> {
+            export fn new(inner: T) -> Self {
+                return cursor_new<T>(inner);
+            }
+
             export fn position(self: &Self) -> u64 {
                 return self.pos;
             }
@@ -399,6 +403,16 @@ export module std {
             return buf_reader_with_capacity<R>(inner, 512 as usize);
         }
 
+        impl<R> BufReader<R> {
+            export fn new(inner: R) -> Self {
+                return buf_reader_new<R>(inner);
+            }
+
+            export fn with_capacity(inner: R, cap: usize) -> Self {
+                return buf_reader_with_capacity<R>(inner, cap);
+            }
+        }
+
         export fn buf_reader_with_capacity<R>(inner: R, cap: usize) -> BufReader<R> {
             dec rw b = std::vec_with_capacity<u8>(cap);
             dec rw i: usize = 0 as usize;
@@ -494,6 +508,16 @@ export module std {
 
         export fn buf_writer_new<W>(inner: W) -> BufWriter<W> {
             return buf_writer_with_capacity<W>(inner, 512 as usize);
+        }
+
+        impl<W> BufWriter<W> {
+            export fn new(inner: W) -> Self {
+                return buf_writer_new<W>(inner);
+            }
+
+            export fn with_capacity(inner: W, cap: usize) -> Self {
+                return buf_writer_with_capacity<W>(inner, cap);
+            }
         }
 
         export fn buf_writer_with_capacity<W>(inner: W, cap: usize) -> BufWriter<W> {

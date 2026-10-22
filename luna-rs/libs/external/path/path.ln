@@ -266,6 +266,10 @@ export module std {
     }
 
     impl PathBuf {
+        export fn new() -> Self {
+            return path_buf_new();
+        }
+
         export fn as_string(self: &Self) -> &std::String life_from(self) {
             return &self.inner;
         }

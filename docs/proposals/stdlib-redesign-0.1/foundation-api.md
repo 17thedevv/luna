@@ -76,19 +76,35 @@ all-integer-width coverage is promised by this slice.
 ## Constructor migration slice — 2026-10-23
 
 The confirmed STD-D03 convention now has type-owned constructors for the
-shared-ownership and interior-cell wrappers:
+shared-ownership, interior-cell, time, random, path, crypto and existing I/O
+buffer/cursor types:
 
 ```luna
 std::Rc<T>::new(value)
 std::Arc<T>::new(value)
 std::Cell<T>::new(value)
 std::RefCell<T>::new(value)
+std::Duration::new(secs, nanos)
+std::Rng::new(seed)
+std::PathBuf::new()
+std::Sha256::new()
+std::HmacSha256::new(key)
+std::ChaCha20::new(key, nonce, counter)
+std::io::Cursor<T>::new(inner)
+std::io::BufReader<R>::new(inner)
+std::io::BufReader<R>::with_capacity(inner, capacity)
+std::io::BufWriter<W>::new(inner)
+std::io::BufWriter<W>::with_capacity(inner, capacity)
 ```
 
-Each method forwards its owned value once to the provider's existing factory;
-allocation, initialization, representation and borrow behavior are unchanged.
+Each method forwards its arguments once to the provider's existing factory;
+owned inputs move once, while borrowed crypto inputs keep their existing copy
+behavior. Allocation, initialization, representation and borrow behavior are
+unchanged.
+The I/O wrappers preserve the current default capacity and zero-capacity
+behavior; the separate I/O policies remain proposals.
 The older `std::rc_new`, `std::arc_new`, `std::cell_new` and
-`std::ref_cell_new` entry points remain migration bridges. Removing or
-deprecating those aliases requires the remaining compatibility and migration
-decision. No fallible `Rc`/`Arc` constructor or new allocation contract is
-introduced by this slice.
+other `*_new`/`*_with_capacity` entry points remain migration bridges. Removing
+or deprecating those aliases requires the remaining compatibility and migration
+decision. No fallible constructor or new allocation contract is introduced by
+this slice.

@@ -32,8 +32,9 @@ implemented support. Existing concatenation macros retain their current behavior
 The [lang-item design](docs/proposals/stdlib-redesign-0.1/lang-items.md) covers
 the 26-role core target and optional protocol profiles, with a source inventory
 of 22 production / 2 test registry keys. New hook identities and protocols remain
-proposals. The first subsequent D03 stdlib slice adds type-owned constructors for
-Rc, Arc, Cell and RefCell; its source/artifact qualification remains open.
+proposals. The first D03 stdlib slice adds type-owned constructors for shared
+ownership/cell, time, random, path, crypto and I/O buffer/cursor types; its
+source/artifact qualification remains open.
 
 ## Published alpha snapshot — original build identities, 2026-10-20
 
