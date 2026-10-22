@@ -1,0 +1,15 @@
+error[E6004]: Failed to build Luna sysroot: Failed to build thread:
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 637, end: 638, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 647, end: 648, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 971, end: 973, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 982, end: 983, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 2636, end: 2637, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 2646, end: 2647, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3015, end: 3016, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3025, end: 3026, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3361, end: 3363, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3372, end: 3373, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3806, end: 3808, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3817, end: 3818, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+
+

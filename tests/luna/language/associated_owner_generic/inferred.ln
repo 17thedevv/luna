@@ -1,0 +1,29 @@
+// C-GAP-15: owner inference and callable materialization preserve impl bounds.
+import "provider";
+fn forwarding<T: model::Ready>(value: T) -> model::Restricted<T> {
+    dec factory = model::Restricted<T>::create;
+    return factory(value);
+}
+fn main() -> i32 {
+    match model::Storage::create(17 as u8) {
+        model::Outcome::Success(value) -> { if value.value != (17 as u8) { return 1; } },
+        model::Outcome::Failure(_) -> { return 2; },
+    }
+    dec empty: model::Optional<i64> = model::Optional::empty();
+    match empty.value {
+        model::Outcome::Failure(value) -> { if value != 0 { return 3; } },
+        model::Outcome::Success(_) -> { return 4; },
+    }
+    dec pair = model::Storage::pair(6 as u8, 44 as i64);
+    if pair.0.value != (6 as u8) || pair.1 != (44 as i64) { return 5; }
+    dec specialized = model::Pair::create(8 as u8);
+    if specialized.first != 9 || specialized.second != (8 as u8) { return 6; }
+    dec factory: fn(i32) -> model::Restricted<i32> = model::Restricted::create;
+    if factory(11).value != 11 { return 7; }
+    dec later = model::Restricted::create;
+    if later(12).value != 12 { return 8; }
+    dec independent: fn(u8, i64) -> (model::Storage<u8>, i64) = model::Storage<u8>::pair<i64>;
+    dec produced = independent(13 as u8, 14 as i64);
+    if produced.0.value != (13 as u8) || produced.1 != (14 as i64) { return 9; }
+    return forwarding(15).value - 15;
+}

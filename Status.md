@@ -2,13 +2,39 @@
 
 > **Luna 0.1 — guidance.** The [versioned specification](docs/spec/0.1/README.md) and adopted contracts govern; implementation evidence does not create semantic authority.
 
-# Luna 0.1 status — 2026-10-21
+# Luna 0.1 status — 2026-10-23
 
 **Current: alpha published; stable execution IN PROGRESS / NOT QUALIFIED.**
 The [stable ledger](docs/stable/0.1.0/README.md) records the integrated Luna/Lunar
 baseline, 49 historical scope records and outstanding work. The alpha tag now
 points to `a3080712` after metadata-only history cleanup; original package/log
 SHAs below are retained as historical build identities, not silently rewritten.
+
+The 2026-10-22 [stdlib API expansion](docs/audits/stdlib-usize-2026-10-22/README.md)
+passes focused Windows validation at `28802f12` on stdlib-redesign: usize memory counts, additional type
+constructors, ordered-set algebra and fixed-width bit utilities. Compiler
+protocol 26 / runtime ABI 2 / 50 providers form a new bundle requiring fresh
+qualification. The [C++23 comparison](docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md)
+tracks missing functional families; graph and basic CPU matrix/tensor remain
+planned. Eight CLI suites (29 tests), 40 existing ptr/mem/collection tests and
+all 50 canonical artifact/object checks PASS. Ubuntu
+[run 39724850945](https://github.com/17thedevv/luna/actions/runs/39724850945)
+now reports SUCCESS, including public CLI, fresh sysroot, C-runtime ASan and
+complete workspace/doctests at 28802f12. Artifact archive digest acquisition,
+full Windows and final package/installer gates remain open.
+These changes are not installed or included in the published alpha.
+
+The [I/O redesign](docs/proposals/stdlib-redesign-0.1/io-api.md) now precedes
+further expansion. The maintainer selected `$name` interpolation; API/error/
+buffer policies and generic macro machinery are documented proposals, not
+implemented support. Existing concatenation macros retain their current behavior.
+
+The [lang-item design](docs/proposals/stdlib-redesign-0.1/lang-items.md) covers
+the 26-role core target and optional protocol profiles, with a source inventory
+of 22 production / 2 test registry keys. New hook identities and protocols remain
+proposals. The first D03 stdlib slice adds type-owned constructors for shared
+ownership/cell, time, random, path, crypto and I/O buffer/cursor types; its
+source/artifact qualification remains open.
 
 ## Published alpha snapshot — original build identities, 2026-10-20
 

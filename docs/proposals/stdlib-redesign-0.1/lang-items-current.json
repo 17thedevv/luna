@@ -1,0 +1,975 @@
+{
+  "schema": 1,
+  "status": "SOURCE_INVENTORY_NOT_CONFORMANCE_OR_ADOPTION",
+  "source_commit": "25c9e26d39f61239dd62cc23c7ddd67f2874fa57",
+  "compiler_tree": "b176a88ec6b1ef394dc041c800d3e2cd9f397854",
+  "stdlib_tree": "d261ad73d74d6f2c46eb2c2f019dff060440d025",
+  "counts": {
+    "registry": 24,
+    "production": 22,
+    "test_only": 2,
+    "source_attributes": 22,
+    "bootstrap_entries": 8,
+    "compiler_contract_entries": 7,
+    "bootstrap_bindings": 19,
+    "intrinsic_enum_variants": 11
+  },
+  "registry": [
+    {
+      "variant": "TestTrait",
+      "key": "test_trait",
+      "target": "Trait",
+      "test_only": true
+    },
+    {
+      "variant": "TestStruct",
+      "key": "test_struct",
+      "target": "Struct",
+      "test_only": true
+    },
+    {
+      "variant": "Drop",
+      "key": "drop",
+      "target": "Trait",
+      "test_only": false
+    },
+    {
+      "variant": "Copy",
+      "key": "copy",
+      "target": "Trait",
+      "test_only": false
+    },
+    {
+      "variant": "DropFn",
+      "key": "drop_fn",
+      "target": "Method",
+      "test_only": false
+    },
+    {
+      "variant": "Try",
+      "key": "try",
+      "target": "Trait",
+      "test_only": false
+    },
+    {
+      "variant": "TryFromOutput",
+      "key": "try_from_output",
+      "target": "Method",
+      "test_only": false
+    },
+    {
+      "variant": "TryBranch",
+      "key": "try_branch",
+      "target": "Method",
+      "test_only": false
+    },
+    {
+      "variant": "FromResidual",
+      "key": "from_residual",
+      "target": "Trait",
+      "test_only": false
+    },
+    {
+      "variant": "FromResidualFn",
+      "key": "from_residual_fn",
+      "target": "Method",
+      "test_only": false
+    },
+    {
+      "variant": "ControlFlow",
+      "key": "control_flow",
+      "target": "Enum",
+      "test_only": false
+    },
+    {
+      "variant": "ControlFlowContinue",
+      "key": "continue",
+      "target": "EnumVariant",
+      "test_only": false
+    },
+    {
+      "variant": "ControlFlowBreak",
+      "key": "break",
+      "target": "EnumVariant",
+      "test_only": false
+    },
+    {
+      "variant": "Option",
+      "key": "option",
+      "target": "Enum",
+      "test_only": false
+    },
+    {
+      "variant": "OptionSome",
+      "key": "some",
+      "target": "EnumVariant",
+      "test_only": false
+    },
+    {
+      "variant": "OptionNone",
+      "key": "none",
+      "target": "EnumVariant",
+      "test_only": false
+    },
+    {
+      "variant": "Iterator",
+      "key": "iterator",
+      "target": "Trait",
+      "test_only": false
+    },
+    {
+      "variant": "IntoIterator",
+      "key": "into_iterator",
+      "target": "Trait",
+      "test_only": false
+    },
+    {
+      "variant": "DropInPlace",
+      "key": "drop_in_place",
+      "target": "Function",
+      "test_only": false
+    },
+    {
+      "variant": "SliceFromRawParts",
+      "key": "slice_from_raw_parts",
+      "target": "Function",
+      "test_only": false
+    },
+    {
+      "variant": "SliceFromRawPartsMut",
+      "key": "slice_from_raw_parts_mut",
+      "target": "Function",
+      "test_only": false
+    },
+    {
+      "variant": "WrappingAdd",
+      "key": "wrapping_add",
+      "target": "Function",
+      "test_only": false
+    },
+    {
+      "variant": "WrappingSub",
+      "key": "wrapping_sub",
+      "target": "Function",
+      "test_only": false
+    },
+    {
+      "variant": "WrappingMul",
+      "key": "wrapping_mul",
+      "target": "Function",
+      "test_only": false
+    }
+  ],
+  "source_attributes": [
+    {
+      "key": "drop_in_place",
+      "provider": "ptr",
+      "source": "luna-rs/libs/external/core/ptr.ln",
+      "line": 11,
+      "expected_artifact": "core/ptr.llib"
+    },
+    {
+      "key": "slice_from_raw_parts",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 8,
+      "expected_artifact": "core/mem.llib"
+    },
+    {
+      "key": "slice_from_raw_parts_mut",
+      "provider": "mem",
+      "source": "luna-rs/libs/external/core/mem.ln",
+      "line": 10,
+      "expected_artifact": "core/mem.llib"
+    },
+    {
+      "key": "copy",
+      "provider": "copy",
+      "source": "luna-rs/libs/external/core/copy.ln",
+      "line": 2,
+      "expected_artifact": "core/copy.llib"
+    },
+    {
+      "key": "from_residual",
+      "provider": "try",
+      "source": "luna-rs/libs/external/core/try.ln",
+      "line": 6,
+      "expected_artifact": "core/try.llib"
+    },
+    {
+      "key": "from_residual_fn",
+      "provider": "try",
+      "source": "luna-rs/libs/external/core/try.ln",
+      "line": 8,
+      "expected_artifact": "core/try.llib"
+    },
+    {
+      "key": "try",
+      "provider": "try",
+      "source": "luna-rs/libs/external/core/try.ln",
+      "line": 12,
+      "expected_artifact": "core/try.llib"
+    },
+    {
+      "key": "try_from_output",
+      "provider": "try",
+      "source": "luna-rs/libs/external/core/try.ln",
+      "line": 17,
+      "expected_artifact": "core/try.llib"
+    },
+    {
+      "key": "try_branch",
+      "provider": "try",
+      "source": "luna-rs/libs/external/core/try.ln",
+      "line": 20,
+      "expected_artifact": "core/try.llib"
+    },
+    {
+      "key": "control_flow",
+      "provider": "try",
+      "source": "luna-rs/libs/external/core/try.ln",
+      "line": 24,
+      "expected_artifact": "core/try.llib"
+    },
+    {
+      "key": "continue",
+      "provider": "try",
+      "source": "luna-rs/libs/external/core/try.ln",
+      "line": 26,
+      "expected_artifact": "core/try.llib"
+    },
+    {
+      "key": "break",
+      "provider": "try",
+      "source": "luna-rs/libs/external/core/try.ln",
+      "line": 28,
+      "expected_artifact": "core/try.llib"
+    },
+    {
+      "key": "wrapping_add",
+      "provider": "num",
+      "source": "luna-rs/libs/external/core/num.ln",
+      "line": 96,
+      "expected_artifact": "core/num.llib"
+    },
+    {
+      "key": "wrapping_sub",
+      "provider": "num",
+      "source": "luna-rs/libs/external/core/num.ln",
+      "line": 98,
+      "expected_artifact": "core/num.llib"
+    },
+    {
+      "key": "wrapping_mul",
+      "provider": "num",
+      "source": "luna-rs/libs/external/core/num.ln",
+      "line": 100,
+      "expected_artifact": "core/num.llib"
+    },
+    {
+      "key": "drop",
+      "provider": "__lang_drop",
+      "source": "luna-rs/libs/external/lang/drop.ln",
+      "line": 2,
+      "expected_artifact": "lang/drop.llib"
+    },
+    {
+      "key": "drop_fn",
+      "provider": "__lang_drop",
+      "source": "luna-rs/libs/external/lang/drop.ln",
+      "line": 4,
+      "expected_artifact": "lang/drop.llib"
+    },
+    {
+      "key": "option",
+      "provider": "__lang_option",
+      "source": "luna-rs/libs/external/lang/option.ln",
+      "line": 4,
+      "expected_artifact": "lang/option.llib"
+    },
+    {
+      "key": "some",
+      "provider": "__lang_option",
+      "source": "luna-rs/libs/external/lang/option.ln",
+      "line": 6,
+      "expected_artifact": "lang/option.llib"
+    },
+    {
+      "key": "none",
+      "provider": "__lang_option",
+      "source": "luna-rs/libs/external/lang/option.ln",
+      "line": 8,
+      "expected_artifact": "lang/option.llib"
+    },
+    {
+      "key": "iterator",
+      "provider": "__lang_iterator",
+      "source": "luna-rs/libs/external/lang/iterator.ln",
+      "line": 4,
+      "expected_artifact": "lang/iterator.llib"
+    },
+    {
+      "key": "into_iterator",
+      "provider": "__lang_into_iterator",
+      "source": "luna-rs/libs/external/lang/into_iterator.ln",
+      "line": 2,
+      "expected_artifact": "lang/into_iterator.llib"
+    }
+  ],
+  "bootstrap_manifest": [
+    {
+      "contract": "drop",
+      "provider": "__lang_drop",
+      "visibility_kind": "CompilerContract",
+      "auto_visible_paths": [
+        "std::Drop"
+      ],
+      "language_items": [
+        {
+          "key": "drop",
+          "path": "std::Drop"
+        },
+        {
+          "key": "drop_fn",
+          "path": "std::Drop::drop"
+        }
+      ]
+    },
+    {
+      "contract": "option",
+      "provider": "__lang_option",
+      "visibility_kind": "CompilerContract",
+      "auto_visible_paths": [
+        "std::Option",
+        "std::option_flatten"
+      ],
+      "language_items": [
+        {
+          "key": "option",
+          "path": "std::Option"
+        },
+        {
+          "key": "some",
+          "path": "std::Option::Some"
+        },
+        {
+          "key": "none",
+          "path": "std::Option::None"
+        }
+      ]
+    },
+    {
+      "contract": "iterator",
+      "provider": "__lang_iterator",
+      "visibility_kind": "CompilerContract",
+      "auto_visible_paths": [
+        "std::Iterator"
+      ],
+      "language_items": [
+        {
+          "key": "iterator",
+          "path": "std::Iterator"
+        }
+      ]
+    },
+    {
+      "contract": "into_iterator",
+      "provider": "__lang_into_iterator",
+      "visibility_kind": "CompilerContract",
+      "auto_visible_paths": [
+        "std::IntoIterator"
+      ],
+      "language_items": [
+        {
+          "key": "into_iterator",
+          "path": "std::IntoIterator"
+        }
+      ]
+    },
+    {
+      "contract": "copy",
+      "provider": "copy",
+      "visibility_kind": "CompilerContract",
+      "auto_visible_paths": [
+        "std::Copy"
+      ],
+      "language_items": [
+        {
+          "key": "copy",
+          "path": "std::Copy"
+        }
+      ]
+    },
+    {
+      "contract": "try",
+      "provider": "try",
+      "visibility_kind": "CompilerContract",
+      "auto_visible_paths": [
+        "std::Try",
+        "std::FromResidual",
+        "std::ControlFlow"
+      ],
+      "language_items": [
+        {
+          "key": "try",
+          "path": "std::Try"
+        },
+        {
+          "key": "try_from_output",
+          "path": "std::Try::from_output"
+        },
+        {
+          "key": "try_branch",
+          "path": "std::Try::branch"
+        },
+        {
+          "key": "from_residual",
+          "path": "std::FromResidual"
+        },
+        {
+          "key": "from_residual_fn",
+          "path": "std::FromResidual::from_residual"
+        },
+        {
+          "key": "control_flow",
+          "path": "std::ControlFlow"
+        },
+        {
+          "key": "continue",
+          "path": "std::ControlFlow::Continue"
+        },
+        {
+          "key": "break",
+          "path": "std::ControlFlow::Break"
+        }
+      ]
+    },
+    {
+      "contract": "result",
+      "provider": "result",
+      "visibility_kind": "StandardPrelude",
+      "auto_visible_paths": [
+        "std::OptionExt"
+      ],
+      "language_items": []
+    },
+    {
+      "contract": "wrapping_arithmetic",
+      "provider": "num",
+      "visibility_kind": "CompilerContract",
+      "auto_visible_paths": [
+        "std::wrapping_add",
+        "std::wrapping_sub",
+        "std::wrapping_mul"
+      ],
+      "language_items": [
+        {
+          "key": "wrapping_add",
+          "path": "std::wrapping_add"
+        },
+        {
+          "key": "wrapping_sub",
+          "path": "std::wrapping_sub"
+        },
+        {
+          "key": "wrapping_mul",
+          "path": "std::wrapping_mul"
+        }
+      ]
+    }
+  ],
+  "intrinsic_enum_variants": [
+    "Null",
+    "Cast",
+    "PtrOffset",
+    "PtrWrite",
+    "SizeOf",
+    "AlignOf",
+    "TypeOf",
+    "TypeInfo",
+    "WrappingAdd",
+    "WrappingSub",
+    "WrappingMul"
+  ],
+  "static_lang_item_references": [
+    {
+      "key": "slice_from_raw_parts",
+      "source": "luna-rs/crates/luna-borrowck/src/memory_intrinsic_body.rs",
+      "line": 12,
+      "text": "LangItem::SliceFromRawParts => Mutability::Immutable,"
+    },
+    {
+      "key": "slice_from_raw_parts_mut",
+      "source": "luna-rs/crates/luna-borrowck/src/memory_intrinsic_body.rs",
+      "line": 13,
+      "text": "LangItem::SliceFromRawPartsMut => Mutability::Mutable,"
+    },
+    {
+      "key": "slice_from_raw_parts_mut",
+      "source": "luna-rs/crates/luna-borrowck/src/memory_intrinsic_body.rs",
+      "line": 97,
+      "text": "LangItem::SliceFromRawPartsMut"
+    },
+    {
+      "key": "slice_from_raw_parts",
+      "source": "luna-rs/crates/luna-borrowck/src/memory_intrinsic_body.rs",
+      "line": 99,
+      "text": "LangItem::SliceFromRawParts"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-driver/src/registry.rs",
+      "line": 689,
+      "text": "Some(ts) == ctx.lang_items.get(luna_semantic::lang_item::LangItem::Drop)"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 567,
+      "text": "let drop_sym = self.ctx.lang_items.get(luna_semantic::lang_item::LangItem::Drop).or_else(|| {"
+    },
+    {
+      "key": "drop_in_place",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 1883,
+      "text": "LangItem::DropInPlace if operands.len() == 1 => {"
+    },
+    {
+      "key": "slice_from_raw_parts",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 1894,
+      "text": "LangItem::SliceFromRawParts | LangItem::SliceFromRawPartsMut if operands.len() == 2 => {"
+    },
+    {
+      "key": "slice_from_raw_parts_mut",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 1894,
+      "text": "LangItem::SliceFromRawParts | LangItem::SliceFromRawPartsMut if operands.len() == 2 => {"
+    },
+    {
+      "key": "some",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2322,
+      "text": ".get(luna_semantic::lang_item::LangItem::OptionSome)"
+    },
+    {
+      "key": "slice_from_raw_parts",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2836,
+      "text": "Some(LangItem::SliceFromRawParts | LangItem::SliceFromRawPartsMut) if arg_ops.len() == 2 => {"
+    },
+    {
+      "key": "slice_from_raw_parts_mut",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2836,
+      "text": "Some(LangItem::SliceFromRawParts | LangItem::SliceFromRawPartsMut) if arg_ops.len() == 2 => {"
+    },
+    {
+      "key": "drop_in_place",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2842,
+      "text": "Some(LangItem::DropInPlace) if arg_ops.len() == 1 => {"
+    },
+    {
+      "key": "wrapping_add",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2861,
+      "text": "LangItem::WrappingAdd => luna_semantic::semantic_tables::IntrinsicKind::WrappingAdd,"
+    },
+    {
+      "key": "wrapping_sub",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2862,
+      "text": "LangItem::WrappingSub => luna_semantic::semantic_tables::IntrinsicKind::WrappingSub,"
+    },
+    {
+      "key": "wrapping_mul",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 2863,
+      "text": "LangItem::WrappingMul => luna_semantic::semantic_tables::IntrinsicKind::WrappingMul,"
+    },
+    {
+      "key": "break",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 3497,
+      "text": "let break_sym = self.ctx.lang_items.get(luna_semantic::lang_item::LangItem::ControlFlowBreak).unwrap();"
+    },
+    {
+      "key": "continue",
+      "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+      "line": 3498,
+      "text": "let continue_sym = self.ctx.lang_items.get(luna_semantic::lang_item::LangItem::ControlFlowContinue).unwrap();"
+    },
+    {
+      "key": "copy",
+      "source": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+      "line": 225,
+      "text": "registry.register(LangItem::Copy, SymbolId(1), LangItemTarget::Trait, first, &mut diagnostics);"
+    },
+    {
+      "key": "copy",
+      "source": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+      "line": 227,
+      "text": "for item in [LangItem::Copy, LangItem::Drop] {"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+      "line": 227,
+      "text": "for item in [LangItem::Copy, LangItem::Drop] {"
+    },
+    {
+      "key": "copy",
+      "source": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+      "line": 228,
+      "text": "let symbol = if item == LangItem::Copy { SymbolId(2) } else { SymbolId(1) };"
+    },
+    {
+      "key": "copy",
+      "source": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+      "line": 237,
+      "text": "injected.register(LangItem::Copy, SymbolId(8), LangItemTarget::Trait, second, &mut diagnostics);"
+    },
+    {
+      "key": "copy",
+      "source": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+      "line": 240,
+      "text": "canonical.inject_raw_with_span(LangItem::Copy, SymbolId(9), first);"
+    },
+    {
+      "key": "copy",
+      "source": "luna-rs/crates/luna-semantic/src/lang_item.rs",
+      "line": 241,
+      "text": "canonical.register(LangItem::Copy, SymbolId(10), LangItemTarget::Trait, second, &mut diagnostics);"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/lib.rs",
+      "line": 202,
+      "text": "|| self.lang_items.get(crate::lang_item::LangItem::Drop).map_or(false, |drop_sym| {"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/lib.rs",
+      "line": 216,
+      "text": "|| self.lang_items.get(crate::lang_item::LangItem::Drop).map_or(false, |drop_sym| {"
+    },
+    {
+      "key": "drop_fn",
+      "source": "luna-rs/crates/luna-semantic/src/method_resolution.rs",
+      "line": 712,
+      "text": "== self.ctx.lang_items.get(crate::lang_item::LangItem::DropFn)"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/mono.rs",
+      "line": 299,
+      "text": "let drop_sym_opt = self.ctx.lang_items.get(crate::lang_item::LangItem::Drop);"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/mono.rs",
+      "line": 349,
+      "text": "let drop_sym_opt = self.ctx.lang_items.get(crate::lang_item::LangItem::Drop);"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/mono.rs",
+      "line": 516,
+      "text": "if let Some(drop_sym) = self.ctx.lang_items.get(crate::lang_item::LangItem::Drop) {"
+    },
+    {
+      "key": "drop_in_place",
+      "source": "luna-rs/crates/luna-semantic/src/mono.rs",
+      "line": 679,
+      "text": "== Some(crate::lang_item::LangItem::DropInPlace);"
+    },
+    {
+      "key": "copy",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 1125,
+      "text": "let copy_trait = match self.ctx.lang_items.get(crate::lang_item::LangItem::Copy) {"
+    },
+    {
+      "key": "slice_from_raw_parts",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 2192,
+      "text": "let expected = if item == LangItem::SliceFromRawParts {"
+    },
+    {
+      "key": "drop_in_place",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 2201,
+      "text": "valid = if item == LangItem::DropInPlace {"
+    },
+    {
+      "key": "slice_from_raw_parts",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 2204,
+      "text": "let expected = if item == LangItem::SliceFromRawParts {"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 2397,
+      "text": "if Some(trait_sym) == self.ctx.lang_items.get(crate::lang_item::LangItem::Drop) {"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 2649,
+      "text": "if Some(trait_sym) == self.ctx.lang_items.get(crate::lang_item::LangItem::Drop) {"
+    },
+    {
+      "key": "into_iterator",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 3871,
+      "text": "let Some(into_iterator_trait) = self.ctx.lang_items.get(LangItem::IntoIterator) else {"
+    },
+    {
+      "key": "iterator",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 3879,
+      "text": "let Some(iterator_trait) = self.ctx.lang_items.get(LangItem::Iterator) else {"
+    },
+    {
+      "key": "option",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 3887,
+      "text": "let Some(option_sym) = self.ctx.lang_items.get(LangItem::Option) else {"
+    },
+    {
+      "key": "drop_fn",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 4574,
+      "text": "if Some(callee_sym) == self.ctx.lang_items.get(crate::lang_item::LangItem::DropFn) {"
+    },
+    {
+      "key": "drop",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 5491,
+      "text": "if Some(trait_sym) == self.ctx.lang_items.get(crate::lang_item::LangItem::Drop)"
+    },
+    {
+      "key": "drop_fn",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 5492,
+      "text": "|| Some(m_sym) == self.ctx.lang_items.get(crate::lang_item::LangItem::DropFn)"
+    },
+    {
+      "key": "try",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 5949,
+      "text": "let try_sym = self.ctx.lang_items.get(crate::lang_item::LangItem::Try);"
+    },
+    {
+      "key": "from_residual",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 5950,
+      "text": "let from_residual_sym = self.ctx.lang_items.get(crate::lang_item::LangItem::FromResidual);"
+    },
+    {
+      "key": "try_branch",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 5993,
+      "text": "let try_branch_name = self.ctx.lang_items.get(crate::lang_item::LangItem::TryBranch)"
+    },
+    {
+      "key": "from_residual_fn",
+      "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+      "line": 6066,
+      "text": "let from_residual_name = self.ctx.lang_items.get(crate::lang_item::LangItem::FromResidualFn)"
+    }
+  ],
+  "observations": [
+    {
+      "kind": "drop_short_name_fallback",
+      "status": "STATIC_REVIEW_FINDING_NOT_REPRODUCED_DEFECT",
+      "sites": [
+        {
+          "source": "luna-rs/crates/luna-mvir/src/generator.rs",
+          "line": 568,
+          "text": "self.ctx.symbol_table.symbols.iter().position(|s| s.name == \"Drop\").map(|idx| luna_common::ids::SymbolId(idx as u32))"
+        }
+      ]
+    },
+    {
+      "kind": "copy_short_name_in_vm",
+      "status": "STATIC_REVIEW_FINDING_NOT_REPRODUCED_DEFECT",
+      "sites": [
+        {
+          "source": "luna-rs/crates/luna-mvir/src/interp.rs",
+          "line": 287,
+          "text": "trait_sym.name == \"Copy\""
+        }
+      ]
+    },
+    {
+      "kind": "future_short_type_name",
+      "status": "STATIC_REVIEW_FINDING_NOT_REPRODUCED_DEFECT",
+      "sites": [
+        {
+          "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 2863,
+          "text": "if let Some(\"Future\") = name {"
+        }
+      ]
+    },
+    {
+      "kind": "try_output_name",
+      "status": "STATIC_REVIEW_FINDING_NOT_REPRODUCED_DEFECT",
+      "sites": [
+        {
+          "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6033,
+          "text": "let output_assoc_sym = self.ctx.tables.assoc_type_names.get(&(try_sym, \"Output\".to_string())).copied();"
+        }
+      ]
+    },
+    {
+      "kind": "try_residual_name",
+      "status": "STATIC_REVIEW_FINDING_NOT_REPRODUCED_DEFECT",
+      "sites": [
+        {
+          "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 6034,
+          "text": "let residual_assoc_sym = self.ctx.tables.assoc_type_names.get(&(try_sym, \"Residual\".to_string())).copied();"
+        }
+      ]
+    },
+    {
+      "kind": "iterator_single_method_guard",
+      "status": "STATIC_REVIEW_FINDING_NOT_REPRODUCED_DEFECT",
+      "sites": [
+        {
+          "source": "luna-rs/crates/luna-semantic/src/typechecker.rs",
+          "line": 3801,
+          "text": "if required_methods.len() != 1 {"
+        }
+      ]
+    },
+    {
+      "kind": "bootstrap_raw_injection",
+      "status": "STATIC_REVIEW_FINDING_NOT_REPRODUCED_DEFECT",
+      "sites": [
+        {
+          "source": "luna-rs/crates/luna-driver/src/registry.rs",
+          "line": 994,
+          "text": "ctx.lang_items.inject_raw_with_span(item, symbol_id, span);"
+        }
+      ]
+    },
+    {
+      "kind": "semantic_metadata_lang_map_stub",
+      "status": "STATIC_REVIEW_FINDING_NOT_REPRODUCED_DEFECT",
+      "sites": [
+        {
+          "source": "luna-rs/crates/luna-driver/src/metadata_decoder.rs",
+          "line": 260,
+          "text": "lang_items: HashMap::new(), // Not implemented in v1 SemanticMetadata"
+        }
+      ]
+    }
+  ],
+  "source_digests": {
+    "luna-rs/crates/luna-borrowck/src/memory_intrinsic_body.rs": {
+      "raw_sha256": "83fce31a6b72b50c7608b77c39ce54c8b29aa4ac0e776a543502553d7ac103e3",
+      "git_blob_sha256": "83fce31a6b72b50c7608b77c39ce54c8b29aa4ac0e776a543502553d7ac103e3"
+    },
+    "luna-rs/crates/luna-driver/src/lang_contracts.rs": {
+      "raw_sha256": "cb1859e64f34f6070d73bbda60e8d5b42d2058abe2167d1f23666695224b4bd8",
+      "git_blob_sha256": "db9810392b5667ab6386588ed8900a8707ea567745a48dbdb8a9c67f1b0b4981"
+    },
+    "luna-rs/crates/luna-driver/src/metadata_decoder.rs": {
+      "raw_sha256": "4a383cc41a96110c9fe2db618b12c825c3d80fc6be74aef2b03de19a7112a2bf",
+      "git_blob_sha256": "4a383cc41a96110c9fe2db618b12c825c3d80fc6be74aef2b03de19a7112a2bf"
+    },
+    "luna-rs/crates/luna-driver/src/registry.rs": {
+      "raw_sha256": "db5e93a4c514e15e99ef1746eae6ef3c2385dc674a09a47dd15563c8f5db2c7a",
+      "git_blob_sha256": "db5e93a4c514e15e99ef1746eae6ef3c2385dc674a09a47dd15563c8f5db2c7a"
+    },
+    "luna-rs/crates/luna-mvir/src/generator.rs": {
+      "raw_sha256": "bcf5bf0b24c186d7ecd31ec65084b60d1886fcda4c2348027e4fc4852137b2ef",
+      "git_blob_sha256": "bcf5bf0b24c186d7ecd31ec65084b60d1886fcda4c2348027e4fc4852137b2ef"
+    },
+    "luna-rs/crates/luna-mvir/src/interp.rs": {
+      "raw_sha256": "b3700848e8c318f79d22ddaf350a443a76d6a69bc1b36d9486cffd7bfd89584a",
+      "git_blob_sha256": "e9b9af20103ef32d6aa456fb73a17d3d5dea2911dde3f5bfc603a1683f2ca8e3"
+    },
+    "luna-rs/crates/luna-semantic/src/lang_item.rs": {
+      "raw_sha256": "d08ce69260d5dc826df9099f189561b7e6e8ec5d84a4db149025c984d1b3e26a",
+      "git_blob_sha256": "23e405283f620dcfe1f32284e17fc4cac2c56f49bf8a9b3c1326978c75ed1abf"
+    },
+    "luna-rs/crates/luna-semantic/src/lib.rs": {
+      "raw_sha256": "0980e1988079f4df03462f0aad632cffdcac4dc59d125b6272abd04ab6d73b98",
+      "git_blob_sha256": "b9a39eb7be5e702932a56bb5b8ba591a6386fc3fec56bc619adb21964450ddd6"
+    },
+    "luna-rs/crates/luna-semantic/src/method_resolution.rs": {
+      "raw_sha256": "43dbc59d2dd44867a0a16766e9f2aef058025673ece47a4c2813a9c4cf211fb6",
+      "git_blob_sha256": "fc13650017f0215b0a54f874cda0ba6d32d4a620bcb420b6619d8edd5b5de38c"
+    },
+    "luna-rs/crates/luna-semantic/src/mono.rs": {
+      "raw_sha256": "75b937882f7a62f03773931111aa513b974c08d19912fc8bd5ca268193ea4d31",
+      "git_blob_sha256": "694441176230403b4302ee4775b79493f0417f828dca9878dd20ed075eb2317a"
+    },
+    "luna-rs/crates/luna-semantic/src/resolver.rs": {
+      "raw_sha256": "35bf9c9f486a77237ff33ea98cd5f4686055e978a82f2e320d99913ff64dac46",
+      "git_blob_sha256": "387da22d6a43ed181c12c45ed9bb1ba6d3b2fe1fc7893eb24de6ebd30ccb90da"
+    },
+    "luna-rs/crates/luna-semantic/src/semantic_tables.rs": {
+      "raw_sha256": "a9a4584d0d4b3796caa4a321e3f58574629404c7c5f25e172affa8958aa5ae2f",
+      "git_blob_sha256": "3296def268b800848b5830b96a58d8d3d57ce0ea9066cd4ac6f84b9a6e841d76"
+    },
+    "luna-rs/crates/luna-semantic/src/typechecker.rs": {
+      "raw_sha256": "4ee98ae1e921ecd2fecace985a1a01ed1d1331111ffc3eb9a7db0d8f55313593",
+      "git_blob_sha256": "c0d386bd0054a57bd0d3dd3e719d6a42007d6d00e2c4f91a0c96085f768b3b55"
+    },
+    "luna-rs/libs/external/core/copy.ln": {
+      "raw_sha256": "5bb12cb033b0ef453e51bad45ceb4f47b0a483c0affabd0c055b69c160dd679e",
+      "git_blob_sha256": "f57b7ca80c749bc4c9908847d005765877d9f6b3637bd2eebc22bdc53210577b"
+    },
+    "luna-rs/libs/external/core/mem.ln": {
+      "raw_sha256": "3a9d7d951d796f644dd4ef2acd133c6f1d7f686c66936c7e2ea88bda06bb4115",
+      "git_blob_sha256": "3a9d7d951d796f644dd4ef2acd133c6f1d7f686c66936c7e2ea88bda06bb4115"
+    },
+    "luna-rs/libs/external/core/num.ln": {
+      "raw_sha256": "aa9e87e4ea539da0a73c9fc42102bb2c076aff80a577c299bb7d47c56a56612f",
+      "git_blob_sha256": "537675c2e3b5591c93b29be98625c39fe8c12bcbac6ccaaa80163b244f27c9f3"
+    },
+    "luna-rs/libs/external/core/ptr.ln": {
+      "raw_sha256": "adb23951860e5abe4e3d23afd44bedc988b89edb2b143e6b05a94141c3673eff",
+      "git_blob_sha256": "adb23951860e5abe4e3d23afd44bedc988b89edb2b143e6b05a94141c3673eff"
+    },
+    "luna-rs/libs/external/core/try.ln": {
+      "raw_sha256": "80ea78e10f4f3a33ee1eec8a242952322101fd5ea63eea64975869c66c10df89",
+      "git_blob_sha256": "13a320414e218d71c6be53f406399f9f695a31ecefec3b84d6315b5acb862690"
+    },
+    "luna-rs/libs/external/lang/drop.ln": {
+      "raw_sha256": "b9358bcc04e2c9bdb1966524fb2dbbcec12d76fece26494c79e95ea11e2ac923",
+      "git_blob_sha256": "d2442f6c9b478fc89bfadc9af41927ca34794007811880bb62f9e5fcbfd341ea"
+    },
+    "luna-rs/libs/external/lang/into_iterator.ln": {
+      "raw_sha256": "2e61d4f690c7cb17cef7ffa1b0f10e1ca211ed7f37b48b60c02cd12451a91a4e",
+      "git_blob_sha256": "a06573f7738f54f7713cf37a4a5e52dd68730922ae01f2b0ef77fe1cda8feba3"
+    },
+    "luna-rs/libs/external/lang/iterator.ln": {
+      "raw_sha256": "8b90e3ec65f64eaea86af67c381465b75816b8992db5e39842e0a41ebc12e8a6",
+      "git_blob_sha256": "9717d3a6c13a6f7098c2f14cb8cc6a59fbbb32e87576d8b58a4c00bc97fb70c9"
+    },
+    "luna-rs/libs/external/lang/option.ln": {
+      "raw_sha256": "45f32a97118a95b9646445b3de82a4994d5cc8377313542e9138d436510757d5",
+      "git_blob_sha256": "7b058125f772902e5f988c662af890749243ef24d036db6b9a7027e1c6fa8120"
+    },
+    "luna-rs/libs/external/sysroot.toml": {
+      "raw_sha256": "b547e9d56463040221c473bfc4ec61250b762cd6b43ddda959c9642fe4442c22",
+      "git_blob_sha256": "c47cd0bcf7cee45c877491542b72268ee5973fecc282a276498986f5a12393a7"
+    }
+  },
+  "limitations": [
+    "Literal source inspection, not a Rust/Luna semantic export query.",
+    "Static references can include tests inside source modules; they do not prove executed support.",
+    "Intrinsic enum variants alone do not establish an implemented or public primitive.",
+    "Canonical source annotations are counted; transitive or derived declarations are not inferred.",
+    "Review findings require isolated reproducers before defect/qualification claims."
+  ]
+}

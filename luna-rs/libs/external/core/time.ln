@@ -71,6 +71,10 @@ export fn duration_from_nanos(nanos: u64) -> Duration {
 }
 
 impl Duration {
+    export fn new(secs: u64, nanos: u32) -> Self {
+        return duration_new(secs, nanos);
+    }
+
     export fn as_secs(self: &Self) -> u64 {
         return self.secs;
     }

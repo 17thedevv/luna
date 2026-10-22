@@ -147,6 +147,7 @@ pub struct ProviderInterface {
     pub symbol_ffi_sync_noescape: HashMap<luna_common::ids::SymbolId, Vec<bool>>,
     pub trait_methods: HashMap<CanonicalSymbolId, Vec<CanonicalSymbolId>>,
     pub unsafe_functions: HashSet<luna_common::ids::SymbolId>,
+    pub extern_functions: HashSet<luna_common::ids::SymbolId>,
     pub trait_bounds: HashMap<CanonicalSymbolId, Vec<ExternalTraitBound>>,
     pub assoc_type_bounds: HashMap<CanonicalSymbolId, Vec<ExternalAssocTypeBound>>,
     pub method_to_impl_decl: HashMap<luna_ast::DeclId, luna_ast::DeclId>,
@@ -517,7 +518,10 @@ impl ModuleRegistry {
                 ctx.tables.ffi_sync_noescape.insert(new_sym_id, noescapes.clone());
             }
 
-            // Inject unsafe functions
+            // Extern identity and callable safety are independent facts.
+            for &old_sym_id in &interface.extern_functions {
+                ctx.tables.extern_functions.insert(lookup_sym(old_sym_id));
+            }
             for &old_sym_id in &interface.unsafe_functions {
                 let new_sym_id = lookup_sym(old_sym_id);
                 ctx.tables.unsafe_functions.insert(new_sym_id);
@@ -1609,6 +1613,9 @@ impl ModuleRegistry {
             symbol_ffi_sync_noescape: ctx.tables.ffi_sync_noescape.clone(),
             trait_methods,
             unsafe_functions: ctx.tables.unsafe_functions.clone(),
+            extern_functions: ctx.tables.extern_functions.iter().copied().filter(|symbol|
+                ctx.tables.symbol_decls.get(symbol).is_some_and(|declaration| owns_decl(declaration.0))
+            ).collect(),
             trait_bounds,
             assoc_type_bounds,
             method_to_impl_decl,

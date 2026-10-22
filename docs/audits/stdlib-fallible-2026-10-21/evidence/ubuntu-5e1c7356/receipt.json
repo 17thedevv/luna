@@ -1,0 +1,34 @@
+{
+  "implementation": "5e1c735605b054319d1f5011a510ba9890dc651c",
+  "run": 39634996889,
+  "artifact": 12370138571,
+  "zip_sha256": "6bc91a3d2c9778bcd7888fb866114bb429d9937de82acba1fc0f44d20a2c9ddc",
+  "api_digest": "sha256:6bc91a3d2c9778bcd7888fb866114bb429d9937de82acba1fc0f44d20a2c9ddc",
+  "status": "INCOMPLETE_CANCELLED",
+  "runtime": "PASS",
+  "focused_cli": "PASS",
+  "workspace": "CANCELLED",
+  "asan": "SKIPPED",
+  "files": [
+    {
+      "path": "fallible-cli.log",
+      "sha256": "b2fd2be3045565cfb11805940a98a1b3ad7381075a6e4eb33b8ecc85c47d73e9",
+      "bytes": 32513
+    },
+    {
+      "path": "fallible-workspace.log",
+      "sha256": "8f96fbf17d8bcba91e8b7f0be75f769af2d7dcbfbd1fe68c4680da055870b57c",
+      "bytes": 84380
+    },
+    {
+      "path": "production-runtime-symbols.txt",
+      "sha256": "c95627a16cd6a27e2f4ea45644ff850da8ace83b1c9520234d77bbb6aafe6f15",
+      "bytes": 4936
+    },
+    {
+      "path": "runtime/Testing/Temporary/LastTest.log",
+      "sha256": "9ba6e853c572d84610c14b7362e5fa8fc3b39ae51ccd3314b5b5d950f648c18b",
+      "bytes": 4097
+    }
+  ]
+}

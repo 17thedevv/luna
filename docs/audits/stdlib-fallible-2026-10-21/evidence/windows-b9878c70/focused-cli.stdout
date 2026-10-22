@@ -1,0 +1,47 @@
+
+running 1 test
+test associated_owner_arguments_instantiate_impl_binders_and_bounds has been running for over 60 seconds
+test associated_owner_arguments_instantiate_impl_binders_and_bounds ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 107.69s
+
+
+running 4 tests
+test diagnostics_are_coded_spanned_and_phase_consistent has been running for over 60 seconds
+test diagnostics_are_deterministic_and_deduplicated has been running for over 60 seconds
+test diagnostics_are_coded_spanned_and_phase_consistent ... ok
+test diagnostics_are_deterministic_and_deduplicated ... ok
+test origin_traceability_and_source_artifact_identity has been running for over 60 seconds
+test related_spans_and_poison_containment_hold has been running for over 60 seconds
+test related_spans_and_poison_containment_hold ... ok
+test origin_traceability_and_source_artifact_identity ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 173.85s
+
+
+running 1 test
+test allocation_success_and_failure_preserve_ownership_in_both_provider_modes has been running for over 60 seconds
+test allocation_success_and_failure_preserve_ownership_in_both_provider_modes ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 137.71s
+
+
+running 1 test
+test imported_extern_outputs_preserve_ffi_identity_and_borrow_checks has been running for over 60 seconds
+test imported_extern_outputs_preserve_ffi_identity_and_borrow_checks ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 102.28s
+
+
+running 1 test
+test quiet_commands_have_clean_streams_and_keep_typed_failures ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 4.56s
+
+
+running 1 test
+test documented_text_and_byte_printing_have_source_artifact_parity has been running for over 60 seconds
+test documented_text_and_byte_printing_have_source_artifact_parity ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 156.09s
+

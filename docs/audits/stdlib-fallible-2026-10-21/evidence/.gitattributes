@@ -1,0 +1,2 @@
+# Preserve the acquired bytes covered by receipt/command SHA-256 values.
+* -text -whitespace

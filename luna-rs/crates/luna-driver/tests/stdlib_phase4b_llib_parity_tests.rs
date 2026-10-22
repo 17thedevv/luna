@@ -184,9 +184,9 @@ fn test_parity_vec_and_slices() {
             v.push(50);
 
             // 1. swap_remove
-            dec rem = v.swap_remove(0 as u64);
+            dec rem = v.swap_remove(0 as usize);
             if rem != 40 { return 1; }
-            if v.len() != (4 as u64) { return 2; }
+            if v.len() != (4 as usize) { return 2; }
 
             // 2. slice_sort
             std::slice::slice_sort<i32>(v.as_mut_slice());
@@ -197,7 +197,7 @@ fn test_parity_vec_and_slices() {
             if s[3 as u64] != 50 { return 6; }
 
             // 3. split_at
-            dec (left, right) = std::slice::split_at<i32>(s, 2 as u64);
+            dec (left, right) = std::slice::split_at<i32>(s, 2 as usize);
             if (left.len as u64) != (2 as u64) { return 7; }
             if (right.len as u64) != (2 as u64) { return 8; }
             if left[0 as u64] != 10 || left[1 as u64] != 20 { return 9; }
@@ -205,9 +205,9 @@ fn test_parity_vec_and_slices() {
 
             // 4. clone and resize
             dec rw v2 = v.clone();
-            if v2.len() != (4 as u64) { return 11; }
+            if v2.len() != (4 as usize) { return 11; }
             v2.resize(2 as u64, 0);
-            if v2.len() != (2 as u64) { return 12; }
+            if v2.len() != (2 as usize) { return 12; }
 
             return 0;
         }
@@ -242,7 +242,7 @@ fn test_parity_hashmap_and_hashset() {
             dec r2 = map.get_or_insert(4, 400);
             if *r2 != 400 { return 4; }
 
-            if map.len() != (4 as u64) { return 5; }
+            if map.len() != (4 as usize) { return 5; }
 
             // 2. HashSet operations
             dec rw set = std::hashset_new<i32>();
@@ -252,12 +252,12 @@ fn test_parity_hashmap_and_hashset() {
 
             if set.contains(&10) == false { return 6; }
             if set.contains(&99) == true { return 7; }
-            if set.len() != (3 as u64) { return 8; }
+            if set.len() != (3 as usize) { return 8; }
 
             dec removed = set.remove(&20);
             if removed == false { return 9; }
             if set.contains(&20) == true { return 10; }
-            if set.len() != (2 as u64) { return 11; }
+            if set.len() != (2 as usize) { return 11; }
 
             return 0;
         }

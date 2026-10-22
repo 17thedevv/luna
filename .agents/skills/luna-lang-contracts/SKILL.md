@@ -21,8 +21,9 @@ Current contracts:
 - IntoIterator
 - Copy
 - Try / FromResidual / ControlFlow
+- Explicit wrapping arithmetic (wrapping_add / wrapping_sub / wrapping_mul)
 
-The result provider additionally contributes controlled qualified std::OptionExt visibility; it is not a seventh compiler-contract family.
+The result provider additionally contributes controlled qualified std::OptionExt visibility; it is not a compiler-contract family. The explicit-import ptr/mem providers carry checked memory-hook identities without becoming broad auto-visible prelude providers.
 
 These contracts are represented by normal Luna source/artifacts but participate in language semantics.
 
@@ -45,11 +46,11 @@ Instead it recognizes explicit language-level contracts.
 For example:
 
 ```text
-#[lang("iterator")]
-#[lang("iterator_next")]
+#[lang("drop")]
+#[lang("drop_fn")]
 ```
 
-identify the required Iterator protocol.
+identify the existing Drop protocol. Proposed future role markers are not examples of currently supported attributes.
 
 The actual implementation remains Luna code.
 
@@ -72,7 +73,7 @@ dec x: std::Option<i32>;
 or implement:
 
 ```text
-impl std::Iterator for MyIterator {
+impl std::Iterator<i32> for MyIterator {
     ...
 }
 ```
@@ -95,6 +96,7 @@ iterator = "lang/iterator"
 into_iterator = "lang/into_iterator"
 copy = "core/copy"
 try = "core/try"
+wrapping_arithmetic = "core/num"
 ```
 
 The compiler MUST NOT scan arbitrary files for `#[lang(...)]` and automatically load them.
@@ -168,7 +170,7 @@ IntoIterator
 
 Defines the conversion from an iterable value into an iterator.
 
-Copy and Try/FromResidual/ControlFlow are also current families, represented by core/copy and core/try. Controlled std::OptionExt visibility is supplied by result. Exact hook and qualified path lists live in luna-driver/src/lang_contracts.rs.
+Copy, Try/FromResidual/ControlFlow and explicit wrapping arithmetic are also current families, represented by core/copy, core/try and core/num. Controlled std::OptionExt visibility is supplied by result. Exact bootstrap hook and qualified path lists live in luna-driver/src/lang_contracts.rs; the complete registered key table is in luna-semantic/src/lang_item.rs. Memory intrinsic identities are additionally carried by explicit ptr/mem imports. A key in a registry or a design proposal does not establish end-to-end support.
 
 Do NOT add Clone to lang/ as part of this migration.
 

@@ -48,6 +48,8 @@ pub struct TypeChecker<'a> {
     pub current_trait_impl: Option<luna_ast::DeclId>,
     pub normalization_stack: Vec<(SemanticTypeId, luna_common::ids::SymbolId, luna_common::ids::SymbolId)>,
     pub associated_type_obligations: Vec<AssociatedTypeEqObligation>,
+    callable_bound_obligations: std::collections::HashMap<luna_ast::ExprId,
+        (luna_common::ids::SymbolId, crate::ty::Substitution, luna_common::Span)>,
 }
 
 impl<'a> TypeChecker<'a> {
@@ -102,6 +104,7 @@ impl<'a> TypeChecker<'a> {
             current_trait_impl: None,
             normalization_stack: Vec::new(),
             associated_type_obligations: Vec::new(),
+            callable_bound_obligations: std::collections::HashMap::new(),
         }
     }
 
@@ -127,6 +130,7 @@ impl<'a> TypeChecker<'a> {
             current_trait_impl: None,
             normalization_stack: Vec::new(),
             associated_type_obligations: Vec::new(),
+            callable_bound_obligations: std::collections::HashMap::new(),
         }
     }
 
@@ -1093,6 +1097,7 @@ impl<'a> TypeChecker<'a> {
             self.typecheck_item(item);
         }
         self.solve_associated_type_obligations();
+        self.solve_callable_bound_obligations();
         self.check_copy_drop_invariants();
 
         let expr_keys: Vec<_> = self.ctx.tables.expr_types.keys().copied().collect();
@@ -2200,7 +2205,7 @@ impl<'a> TypeChecker<'a> {
                                         Mutability::Immutable
                                     } else { Mutability::Mutable };
                                     params.len() == 2
-                                        && matches!(self.ctx.types.get(params[1]), SemanticType::Primitive(BuiltinType::U64))
+                                        && matches!(self.ctx.types.get(params[1]), SemanticType::Primitive(BuiltinType::Usize))
                                         && matches!(self.ctx.types.get(*return_type),
                                             SemanticType::Reference(_, mutable, slice) if *mutable == expected
                                                 && matches!(self.ctx.types.get(*slice), SemanticType::Slice(inner) if *inner == element))
@@ -2539,9 +2544,22 @@ impl<'a> TypeChecker<'a> {
     }
 
 
+    fn solve_callable_bound_obligations(&mut self) {
+        // A function value's owner may be inferred by its expected callable
+        // type, or by a later indirect call. Check after those constraints.
+        let mut obligations: Vec<_> = std::mem::take(&mut self.callable_bound_obligations).into_iter().collect();
+        obligations.sort_by_key(|(expression, _)| expression.0);
+        for (_, (function, subst, span)) in obligations {
+            self.check_bounds_for_call(function, &subst, span);
+        }
+    }
+
     fn check_bounds_for_call(&mut self, func_sym: luna_common::ids::SymbolId, subst: &crate::ty::Substitution, span: luna_common::Span) {
         if let Some(&decl_id) = self.ctx.tables.symbol_decls.get(&func_sym) {
             self.check_bounds_for_decl(decl_id, subst, span);
+        }
+        if let Some(&implementation) = self.ctx.tables.method_sym_to_impl_decl.get(&func_sym) {
+            self.check_bounds_for_decl(implementation, subst, span);
         }
     }
 
@@ -4309,8 +4327,18 @@ impl<'a> TypeChecker<'a> {
                             let concrete = self.lower_type(argument);
                             owner_subst.insert(binder, concrete);
                         }
+                        self.bind_associated_owner_generics(sym_id, *expr_id, &mut owner_subst);
+                        if generic_args.is_empty() && self.ctx.tables.method_sym_to_impl_decl.contains_key(&sym_id) {
+                            if let Some(&declaration) = self.ctx.tables.symbol_decls.get(&sym_id) {
+                                let mut index = 0;
+                                while let Some(&binder) = self.ctx.tables.generic_param_symbols.get(&(declaration, index)) {
+                                    owner_subst.insert(binder, self.ctx.types.new_inference_var());
+                                    index += 1;
+                                }
+                            }
+                        }
                         let ty = self.ctx.types.subst(ty, &owner_subst);
-                        if !owner_subst.map.is_empty() { self.ctx.tables.expr_substs.insert(*expr_id, owner_subst); }
+                        if !owner_subst.map.is_empty() { self.ctx.tables.expr_substs.insert(*expr_id, owner_subst.clone()); }
                         if generic_args.is_empty() {
                             let sym_kind = self.ctx.symbol_table.get_symbol(sym_id).kind.clone();
                             if matches!(sym_kind, crate::SymbolKind::EnumVariant(_) | crate::SymbolKind::Enum) {
@@ -4361,7 +4389,7 @@ impl<'a> TypeChecker<'a> {
                                 for arg in generic_args {
                                     concrete_args.push(self.lower_type(*arg));
                                 }
-                                let mut subst = crate::ty::Substitution::new();
+                                let mut subst = owner_subst.clone();
                                 for (idx, _) in generic_args.iter().enumerate() {
                                     if let Some(gp_sym) = self.ctx.tables.generic_param_symbols.get(&(decl_id, idx)) {
                                         subst.insert(*gp_sym, concrete_args[idx]);
@@ -4598,10 +4626,12 @@ impl<'a> TypeChecker<'a> {
                         } else {
                             if (callee_decl_id.0 as usize) < self.arena.decls.len() {
                                 if let Decl::Function { generic_params: m_gps, .. } = &self.arena.decls[callee_decl_id.0 as usize] {
-                                    has_generics = !m_gps.is_empty();
+                                    has_generics |= !m_gps.is_empty();
                                     for (gp_idx, _) in m_gps.iter().enumerate() {
                                         if let Some(gp_sym) = self.ctx.tables.generic_param_symbols.get(&(callee_decl_id, gp_idx)) {
-                                            subst.insert(*gp_sym, self.ctx.types.new_inference_var());
+                                            if !subst.map.contains_key(gp_sym) {
+                                                subst.insert(*gp_sym, self.ctx.types.new_inference_var());
+                                            }
                                         }
                                     }
                                 }
@@ -4609,7 +4639,9 @@ impl<'a> TypeChecker<'a> {
                                 let mut gp_idx = 0;
                                 while let Some(gp_sym) = self.ctx.tables.generic_param_symbols.get(&(callee_decl_id, gp_idx)) {
                                     has_generics = true;
-                                    subst.insert(*gp_sym, self.ctx.types.new_inference_var());
+                                    if !subst.map.contains_key(gp_sym) {
+                                        subst.insert(*gp_sym, self.ctx.types.new_inference_var());
+                                    }
                                     gp_idx += 1;
                                 }
                             }
@@ -4693,7 +4725,12 @@ impl<'a> TypeChecker<'a> {
                     if has_generics {
                         let span = self.get_expr_span_for_diag(expr_id).unwrap_or(luna_common::Span::new(luna_common::ids::FileId(0), 0, 0));
                         if let Some(func_sym) = func_sym_opt {
-                            self.check_bounds_for_call(func_sym, &subst, span);
+                            if let Some(obligation) = self.callable_bound_obligations.get_mut(callee) {
+                                obligation.1 = subst.clone();
+                                obligation.2 = span;
+                            } else {
+                                self.check_bounds_for_call(func_sym, &subst, span);
+                            }
                             let owner = self.ctx.tables.trait_methods.iter()
                                 .find(|(_, methods)| methods.contains(&func_sym)).map(|(&owner, _)| owner);
                             if let Some(owner) = owner {
@@ -6227,6 +6264,15 @@ impl<'a> TypeChecker<'a> {
             }
         };
         
+        if matches!(expr, Expr::Identifier { .. }) {
+            if let Some(&function) = self.ctx.tables.expr_symbols.get(expr_id) {
+                if self.ctx.tables.method_sym_to_impl_decl.contains_key(&function) {
+                    let subst = self.ctx.tables.expr_substs.get(expr_id).cloned().unwrap_or_default();
+                    let span = self.get_expr_span_for_diag(expr_id).unwrap_or_default();
+                    self.callable_bound_obligations.insert(*expr_id, (function, subst, span));
+                }
+            }
+        }
         self.ctx.tables.expr_types.insert(*expr_id, ty_id);
         ty_id
     }

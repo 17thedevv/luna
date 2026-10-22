@@ -8,12 +8,12 @@ import <copy>;
 
 // Provider-private helper used by the nested public std::slice sorting API.
 // Keeping this implementation at provider scope preserves its internal linkage.
-fn floor_log2(n: u64) -> u64 {
-    dec rw result: u64 = 0 as u64;
+fn floor_log2(n: usize) -> usize {
+    dec rw result: usize = 0 as usize;
     dec rw val = n;
-    while val > (1 as u64) {
-        val = val / (2 as u64);
-        result = result + (1 as u64);
+    while val > (1 as usize) {
+        val = val / (2 as usize);
+        result = result + (1 as usize);
     }
     return result;
 }
@@ -34,16 +34,16 @@ export module std {
     impl<T> SliceIter<T> {
         // Shared borrow iteration - returns reference to backing element
         export fn next_ref(self: &rw Self) -> std::Option<&T> life_from(self) {
-            if (self.ptr as u64) >= (self.end as u64) {
+            if (self.ptr as usize) >= (self.end as usize) {
                 return std::Option::None;
             }
-            dec rw step: u64 = sizeof(T) as u64;
-            if step == (0 as u64) {
-                step = 1 as u64;
+            dec rw step: usize = sizeof(T) as usize;
+            if step == (0 as usize) {
+                step = 1 as usize;
             }
             unsafe {
-                self.ptr = (self.ptr as u64 + step) as *T;
-                dec item_ptr = (self.ptr as u64 - step) as *T;
+                self.ptr = (self.ptr as usize + step) as *T;
+                dec item_ptr = (self.ptr as usize - step) as *T;
                 return std::Option::Some(&*item_ptr);
             }
         }
@@ -75,16 +75,16 @@ export module std {
     
     impl<T> SliceIterMut<T> {
         export fn next_mut(self: &rw Self) -> std::Option<&rw T> life_from(self) {
-            if (self.ptr as u64) >= (self.end as u64) {
+            if (self.ptr as usize) >= (self.end as usize) {
                 return std::Option::None;
             }
-            dec rw step: u64 = sizeof(T) as u64;
-            if step == (0 as u64) {
-                step = 1 as u64;
+            dec rw step: usize = sizeof(T) as usize;
+            if step == (0 as usize) {
+                step = 1 as usize;
             }
             unsafe {
-                self.ptr = (self.ptr as u64 + step) as *rw T;
-                dec item_ptr = (self.ptr as u64 - step) as *rw T;
+                self.ptr = (self.ptr as usize + step) as *rw T;
+                dec item_ptr = (self.ptr as usize - step) as *rw T;
                 return std::Option::Some(&rw *item_ptr);
             }
         }
@@ -97,11 +97,11 @@ export module std {
     }
     
     export fn slice_iter<T>(s: &[T]) -> SliceIter<T> life_from(s) {
-        dec rw step: u64 = sizeof(T) as u64;
-        if step == (0 as u64) {
-            step = 1 as u64;
+        dec rw step: usize = sizeof(T) as usize;
+        if step == (0 as usize) {
+            step = 1 as usize;
         }
-        dec end_ptr = (s.data as u64 + (s.len as u64 * step)) as *T;
+        dec end_ptr = (s.data as usize + (s.len as usize * step)) as *T;
         unsafe {
             return SliceIter<T> {
                 ptr: s.data as *T,
@@ -111,11 +111,11 @@ export module std {
     }
     
     export fn slice_iter_mut<T>(s: &rw [T]) -> SliceIterMut<T> life_from(s) {
-        dec rw step: u64 = sizeof(T) as u64;
-        if step == (0 as u64) {
-            step = 1 as u64;
+        dec rw step: usize = sizeof(T) as usize;
+        if step == (0 as usize) {
+            step = 1 as usize;
         }
-        dec end_ptr = (s.data as u64 + (s.len as u64 * step)) as *rw T;
+        dec end_ptr = (s.data as usize + (s.len as usize * step)) as *rw T;
         unsafe {
             return SliceIterMut<T> {
                 ptr: s.data as *rw T,
@@ -137,12 +137,12 @@ export module std {
 // Slice utility functions
 // =========================================================================
 
-export fn slice_len<T>(s: &[T]) -> u64 {
-    return s.len as u64;
+export fn slice_len<T>(s: &[T]) -> usize {
+    return s.len as usize;
 }
 
-export fn slice_get<T>(s: &[T], index: u64) -> std::Option<&T> life_from(s) {
-    if index >= (s.len as u64) {
+export fn slice_get<T>(s: &[T], index: usize) -> std::Option<&T> life_from(s) {
+    if index >= (s.len as usize) {
         return std::Option::None;
     }
     unsafe {
@@ -151,8 +151,8 @@ export fn slice_get<T>(s: &[T], index: u64) -> std::Option<&T> life_from(s) {
     }
 }
 
-export fn slice_get_mut<T>(s: &rw [T], index: u64) -> std::Option<&rw T> life_from(s) {
-    if index >= (s.len as u64) {
+export fn slice_get_mut<T>(s: &rw [T], index: usize) -> std::Option<&rw T> life_from(s) {
+    if index >= (s.len as usize) {
         return std::Option::None;
     }
     unsafe {
@@ -161,8 +161,8 @@ export fn slice_get_mut<T>(s: &rw [T], index: u64) -> std::Option<&rw T> life_fr
     }
 }
 
-export fn split_at<T>(s: &[T], mid: u64) -> (&[T], &[T]) life_from(s) {
-    dec slen = s.len as u64;
+export fn split_at<T>(s: &[T], mid: usize) -> (&[T], &[T]) life_from(s) {
+    dec slen = s.len as usize;
     if mid > slen {
         __luna_panic_default();
     }
@@ -175,8 +175,8 @@ export fn split_at<T>(s: &[T], mid: u64) -> (&[T], &[T]) life_from(s) {
     }
 }
 
-export fn split_at_mut<T>(s: &rw [T], mid: u64) -> (&rw [T], &rw [T]) life_from(s) {
-    dec slen = s.len as u64;
+export fn split_at_mut<T>(s: &rw [T], mid: usize) -> (&rw [T], &rw [T]) life_from(s) {
+    dec slen = s.len as usize;
     if mid > slen {
         __luna_panic_default();
     }
@@ -190,28 +190,28 @@ export fn split_at_mut<T>(s: &rw [T], mid: u64) -> (&rw [T], &rw [T]) life_from(
 }
 
 export fn slice_reverse<T>(s: &rw [T]) {
-    dec slen = s.len as u64;
-    if slen <= (1 as u64) {
+    dec slen = s.len as usize;
+    if slen <= (1 as usize) {
         return;
     }
-    dec rw lo: u64 = 0 as u64;
-    dec rw hi: u64 = slen - (1 as u64);
+    dec rw lo: usize = 0 as usize;
+    dec rw hi: usize = slen - (1 as usize);
     while lo < hi {
         unsafe {
             dec p_lo = std::ptr::add_mut<T>(s.data as *rw T, lo);
             dec p_hi = std::ptr::add_mut<T>(s.data as *rw T, hi);
             dec tmp = std::ptr::read<T>(p_lo as *T);
-            std::ptr::copy<T>(p_hi as *T, p_lo, 1 as u64);
+            std::ptr::copy<T>(p_hi as *T, p_lo, 1 as usize);
             std::ptr::write<T>(p_hi, tmp);
         }
-        lo = lo + (1 as u64);
-        hi = hi - (1 as u64);
+        lo = lo + (1 as usize);
+        hi = hi - (1 as usize);
     }
 }
 
 export fn slice_contains_i32(s: &[i32], value: i32) -> bool {
-    dec rw i: u64 = 0 as u64;
-    dec slen = s.len as u64;
+    dec rw i: usize = 0 as usize;
+    dec slen = s.len as usize;
     while i < slen {
         unsafe {
             dec p = std::ptr::add<i32>(s.data as *i32, i);
@@ -219,20 +219,20 @@ export fn slice_contains_i32(s: &[i32], value: i32) -> bool {
                 return true;
             }
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
     return false;
 }
 
-export fn slice_binary_search_i32(s: &[i32], value: i32) -> std::Option<u64> {
-    dec slen = s.len as u64;
-    if slen == (0 as u64) {
+export fn slice_binary_search_i32(s: &[i32], value: i32) -> std::Option<usize> {
+    dec slen = s.len as usize;
+    if slen == (0 as usize) {
         return std::Option::None;
     }
-    dec rw lo: u64 = 0 as u64;
-    dec rw hi: u64 = slen;
+    dec rw lo: usize = 0 as usize;
+    dec rw hi: usize = slen;
     while lo < hi {
-        dec mid = lo + ((hi - lo) / (2 as u64));
+        dec mid = lo + ((hi - lo) / (2 as usize));
         unsafe {
             dec p = std::ptr::add<i32>(s.data as *i32, mid);
             dec v = *p;
@@ -240,7 +240,7 @@ export fn slice_binary_search_i32(s: &[i32], value: i32) -> std::Option<u64> {
                 return std::Option::Some(mid);
             }
             if v < value {
-                lo = mid + (1 as u64);
+                lo = mid + (1 as usize);
             } else {
                 hi = mid;
             }
@@ -254,8 +254,8 @@ export fn slice_binary_search_i32(s: &[i32], value: i32) -> std::Option<u64> {
 // =========================================================================
 
 // Insertion sort for small subarrays (n <= 16)
-fn insertion_sort_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) {
-    dec rw i = lo + (1 as u64);
+fn insertion_sort_by<T>(data: *rw T, lo: usize, hi: usize, compare: fn(&T, &T) -> i32) {
+    dec rw i = lo + (1 as usize);
     while i < hi {
         unsafe {
             dec rw j = i;
@@ -265,14 +265,14 @@ fn insertion_sort_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i3
                 if j <= lo {
                     cont = false;
                 } else {
-                    dec prev = std::ptr::add<T>(data as *T, j - (1 as u64));
+                    dec prev = std::ptr::add<T>(data as *T, j - (1 as usize));
                     dec cmp_fn = compare;
                     dec c = cmp_fn(&*prev, &tmp);
                     if c > 0 {
                         // Shift element right
                         dec dest = std::ptr::add_mut<T>(data, j);
-                        std::ptr::copy<T>(prev, dest, 1 as u64);
-                        j = j - (1 as u64);
+                        std::ptr::copy<T>(prev, dest, 1 as usize);
+                        j = j - (1 as usize);
                     } else {
                         cont = false;
                     }
@@ -280,43 +280,43 @@ fn insertion_sort_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i3
             }
             std::ptr::write<T>(std::ptr::add_mut<T>(data, j), tmp);
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
 }
 
 // Heapsort fallback when recursion depth exceeded
-fn heapsort_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) {
+fn heapsort_by<T>(data: *rw T, lo: usize, hi: usize, compare: fn(&T, &T) -> i32) {
     dec n = hi - lo;
-    if n <= (1 as u64) { return; }
+    if n <= (1 as usize) { return; }
 
     // Build max-heap (sift down from last parent to root)
-    dec rw start_idx = n / (2 as u64);
-    while start_idx > (0 as u64) {
-        start_idx = start_idx - (1 as u64);
+    dec rw start_idx = n / (2 as usize);
+    while start_idx > (0 as usize) {
+        start_idx = start_idx - (1 as usize);
         sift_down_by<T>(data, lo, start_idx, n, compare);
     }
 
     // Extract max elements
-    dec rw end_idx = n - (1 as u64);
-    while end_idx > (0 as u64) {
+    dec rw end_idx = n - (1 as usize);
+    while end_idx > (0 as usize) {
         // Swap root (lo) with end
         unsafe {
             dec p_root = std::ptr::add_mut<T>(data, lo);
             dec p_end = std::ptr::add_mut<T>(data, lo + end_idx);
             dec tmp = std::ptr::read<T>(p_root as *T);
-            std::ptr::copy<T>(p_end as *T, p_root, 1 as u64);
+            std::ptr::copy<T>(p_end as *T, p_root, 1 as usize);
             std::ptr::write<T>(p_end, tmp);
         }
-        sift_down_by<T>(data, lo, 0 as u64, end_idx, compare);
-        end_idx = end_idx - (1 as u64);
+        sift_down_by<T>(data, lo, 0 as usize, end_idx, compare);
+        end_idx = end_idx - (1 as usize);
     }
 }
 
-fn sift_down_by<T>(data: *rw T, base: u64, start: u64, heap_size: u64, compare: fn(&T, &T) -> i32) {
+fn sift_down_by<T>(data: *rw T, base: usize, start: usize, heap_size: usize, compare: fn(&T, &T) -> i32) {
     dec rw root = start;
     dec rw running = true;
     while running {
-        dec left = (2 as u64) * root + (1 as u64);
+        dec left = (2 as usize) * root + (1 as usize);
         if left >= heap_size {
             running = false;
         } else {
@@ -331,7 +331,7 @@ fn sift_down_by<T>(data: *rw T, base: u64, start: u64, heap_size: u64, compare: 
                 }
             }
             // Compare right child if exists
-            dec right = left + (1 as u64);
+            dec right = left + (1 as usize);
             if right < heap_size {
                 unsafe {
                     dec p_largest2 = std::ptr::add<T>(data as *T, base + largest);
@@ -350,7 +350,7 @@ fn sift_down_by<T>(data: *rw T, base: u64, start: u64, heap_size: u64, compare: 
                     dec p_r = std::ptr::add_mut<T>(data, base + root);
                     dec p_l = std::ptr::add_mut<T>(data, base + largest);
                     dec tmp = std::ptr::read<T>(p_r as *T);
-                    std::ptr::copy<T>(p_l as *T, p_r, 1 as u64);
+                    std::ptr::copy<T>(p_l as *T, p_r, 1 as usize);
                     std::ptr::write<T>(p_l, tmp);
                 }
                 root = largest;
@@ -360,10 +360,10 @@ fn sift_down_by<T>(data: *rw T, base: u64, start: u64, heap_size: u64, compare: 
 }
 
 // Partition using median-of-three pivot
-fn partition_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) -> u64 {
+fn partition_by<T>(data: *rw T, lo: usize, hi: usize, compare: fn(&T, &T) -> i32) -> usize {
     // hi is exclusive, so last element is at hi - 1
-    dec last = hi - (1 as u64);
-    dec mid = lo + ((last - lo) / (2 as u64));
+    dec last = hi - (1 as usize);
+    dec mid = lo + ((last - lo) / (2 as usize));
 
     // Sort lo, mid, last (median-of-three)
     unsafe {
@@ -374,7 +374,7 @@ fn partition_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) ->
         dec cmp1 = compare;
         if cmp1(&*(p_lo as *T), &*(p_mid as *T)) > 0 {
             dec tmp = std::ptr::read<T>(p_lo as *T);
-            std::ptr::copy<T>(p_mid as *T, p_lo, 1 as u64);
+            std::ptr::copy<T>(p_mid as *T, p_lo, 1 as usize);
             std::ptr::write<T>(p_mid, tmp);
         }
         dec cmp2 = compare;
@@ -383,7 +383,7 @@ fn partition_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) ->
             dec p_lo2 = std::ptr::add_mut<T>(data, lo);
             dec p_last2 = std::ptr::add_mut<T>(data, last);
             dec tmp2 = std::ptr::read<T>(p_lo2 as *T);
-            std::ptr::copy<T>(p_last2 as *T, p_lo2, 1 as u64);
+            std::ptr::copy<T>(p_last2 as *T, p_lo2, 1 as usize);
             std::ptr::write<T>(p_last2, tmp2);
         }
         dec cmp3 = compare;
@@ -391,7 +391,7 @@ fn partition_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) ->
         dec p_last3 = std::ptr::add_mut<T>(data, last);
         if cmp3(&*(p_mid3 as *T), &*(p_last3 as *T)) > 0 {
             dec tmp3 = std::ptr::read<T>(p_mid3 as *T);
-            std::ptr::copy<T>(p_last3 as *T, p_mid3, 1 as u64);
+            std::ptr::copy<T>(p_last3 as *T, p_mid3, 1 as usize);
             std::ptr::write<T>(p_last3, tmp3);
         }
     }
@@ -401,13 +401,13 @@ fn partition_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) ->
         dec p_lo_swap = std::ptr::add_mut<T>(data, lo);
         dec p_mid_swap = std::ptr::add_mut<T>(data, mid);
         dec tmp_swap = std::ptr::read<T>(p_lo_swap as *T);
-        std::ptr::copy<T>(p_mid_swap as *T, p_lo_swap, 1 as u64);
+        std::ptr::copy<T>(p_mid_swap as *T, p_lo_swap, 1 as usize);
         std::ptr::write<T>(p_mid_swap, tmp_swap);
     }
 
     // Lomuto partition scheme
-    dec rw i = lo + (1 as u64);
-    dec rw store = lo + (1 as u64);
+    dec rw i = lo + (1 as usize);
+    dec rw store = lo + (1 as usize);
     while i < hi {
         unsafe {
             dec p_i = std::ptr::add<T>(data as *T, i);
@@ -418,23 +418,23 @@ fn partition_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) ->
                     dec p_store = std::ptr::add_mut<T>(data, store);
                     dec p_i_mut = std::ptr::add_mut<T>(data, i);
                     dec tmp = std::ptr::read<T>(p_store as *T);
-                    std::ptr::copy<T>(p_i_mut as *T, p_store, 1 as u64);
+                    std::ptr::copy<T>(p_i_mut as *T, p_store, 1 as usize);
                     std::ptr::write<T>(p_i_mut, tmp);
                 }
-                store = store + (1 as u64);
+                store = store + (1 as usize);
             }
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
 
     // Move pivot into final position
-    dec pivot_final = store - (1 as u64);
+    dec pivot_final = store - (1 as usize);
     if lo != pivot_final {
         unsafe {
             dec p_lo_final = std::ptr::add_mut<T>(data, lo);
             dec p_pivot_final = std::ptr::add_mut<T>(data, pivot_final);
             dec tmp_final = std::ptr::read<T>(p_lo_final as *T);
-            std::ptr::copy<T>(p_pivot_final as *T, p_lo_final, 1 as u64);
+            std::ptr::copy<T>(p_pivot_final as *T, p_lo_final, 1 as usize);
             std::ptr::write<T>(p_pivot_final, tmp_final);
         }
     }
@@ -442,35 +442,35 @@ fn partition_by<T>(data: *rw T, lo: u64, hi: u64, compare: fn(&T, &T) -> i32) ->
 }
 
 // Introsort recursive core
-fn introsort_by_rec<T>(data: *rw T, lo: u64, hi: u64, depth_limit: u64, compare: fn(&T, &T) -> i32) {
+fn introsort_by_rec<T>(data: *rw T, lo: usize, hi: usize, depth_limit: usize, compare: fn(&T, &T) -> i32) {
     dec n = hi - lo;
-    if n <= (1 as u64) { return; }
+    if n <= (1 as usize) { return; }
 
     // Small subarrays: insertion sort
-    if n <= (16 as u64) {
+    if n <= (16 as usize) {
         insertion_sort_by<T>(data, lo, hi, compare);
         return;
     }
 
     // Depth limit exceeded: heapsort fallback
-    if depth_limit == (0 as u64) {
+    if depth_limit == (0 as usize) {
         heapsort_by<T>(data, lo, hi, compare);
         return;
     }
 
     // Partition and recurse
     dec pivot = partition_by<T>(data, lo, hi, compare);
-    dec new_depth = depth_limit - (1 as u64);
+    dec new_depth = depth_limit - (1 as usize);
     introsort_by_rec<T>(data, lo, pivot, new_depth, compare);
-    introsort_by_rec<T>(data, pivot + (1 as u64), hi, new_depth, compare);
+    introsort_by_rec<T>(data, pivot + (1 as usize), hi, new_depth, compare);
 }
 
 // Public sort_by: in-place introsort with O(n log n) worst-case guarantee
 export fn slice_sort_by<T>(s: &rw [T], compare: fn(&T, &T) -> i32) {
-    dec slen = s.len as u64;
-    if slen <= (1 as u64) { return; }
-    dec depth_limit = (2 as u64) * floor_log2(slen);
-    introsort_by_rec<T>(s.data as *rw T, 0 as u64, slen, depth_limit, compare);
+    dec slen = s.len as usize;
+    if slen <= (1 as usize) { return; }
+    dec depth_limit = (2 as usize) * floor_log2(slen);
+    introsort_by_rec<T>(s.data as *rw T, 0 as usize, slen, depth_limit, compare);
 }
 
 // Helper: comparison function for i32 using Ord
@@ -489,8 +489,8 @@ export fn slice_sort_i32(s: &rw [i32]) {
 // Generic Slice Sorting: Introsort for T: Ord
 // =========================================================================
 
-fn insertion_sort_ord<T: std::Ord>(data: *rw T, lo: u64, hi: u64) {
-    dec rw i = lo + (1 as u64);
+fn insertion_sort_ord<T: std::Ord>(data: *rw T, lo: usize, hi: usize) {
+    dec rw i = lo + (1 as usize);
     while i < hi {
         unsafe {
             dec rw j = i;
@@ -500,12 +500,12 @@ fn insertion_sort_ord<T: std::Ord>(data: *rw T, lo: u64, hi: u64) {
                 if j <= lo {
                     cont = false;
                 } else {
-                    dec prev = std::ptr::add<T>(data as *T, j - (1 as u64));
+                    dec prev = std::ptr::add<T>(data as *T, j - (1 as usize));
                     dec c = (*prev).cmp(&tmp);
                     if c > 0 {
                         dec dest = std::ptr::add_mut<T>(data, j);
-                        std::ptr::copy<T>(prev, dest, 1 as u64);
-                        j = j - (1 as u64);
+                        std::ptr::copy<T>(prev, dest, 1 as usize);
+                        j = j - (1 as usize);
                     } else {
                         cont = false;
                     }
@@ -513,15 +513,15 @@ fn insertion_sort_ord<T: std::Ord>(data: *rw T, lo: u64, hi: u64) {
             }
             std::ptr::write<T>(std::ptr::add_mut<T>(data, j), tmp);
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
 }
 
-fn sift_down_ord<T: std::Ord>(data: *rw T, lo: u64, root: u64, end: u64) {
+fn sift_down_ord<T: std::Ord>(data: *rw T, lo: usize, root: usize, end: usize) {
     dec rw cur = root;
-    while ((2 as u64) * cur + (1 as u64)) < end {
-        dec rw child = (2 as u64) * cur + (1 as u64);
-        dec right = child + (1 as u64);
+    while ((2 as usize) * cur + (1 as usize)) < end {
+        dec rw child = (2 as usize) * cur + (1 as usize);
+        dec right = child + (1 as usize);
         unsafe {
             if right < end {
                 dec p_child = std::ptr::add<T>(data as *T, lo + child);
@@ -534,7 +534,7 @@ fn sift_down_ord<T: std::Ord>(data: *rw T, lo: u64, root: u64, end: u64) {
             dec p_ch = std::ptr::add_mut<T>(data, lo + child);
             if (*p_cur).cmp(&*p_ch) < 0 {
                 dec tmp = std::ptr::read<T>(p_cur as *T);
-                std::ptr::copy<T>(p_ch as *T, p_cur, 1 as u64);
+                std::ptr::copy<T>(p_ch as *T, p_cur, 1 as usize);
                 std::ptr::write<T>(p_ch, tmp);
                 cur = child;
             } else {
@@ -544,31 +544,31 @@ fn sift_down_ord<T: std::Ord>(data: *rw T, lo: u64, root: u64, end: u64) {
     }
 }
 
-fn heapsort_ord<T: std::Ord>(data: *rw T, lo: u64, hi: u64) {
+fn heapsort_ord<T: std::Ord>(data: *rw T, lo: usize, hi: usize) {
     dec n = hi - lo;
-    if n <= (1 as u64) { return; }
+    if n <= (1 as usize) { return; }
 
-    dec rw start_idx = n / (2 as u64);
-    while start_idx > (0 as u64) {
-        start_idx = start_idx - (1 as u64);
+    dec rw start_idx = n / (2 as usize);
+    while start_idx > (0 as usize) {
+        start_idx = start_idx - (1 as usize);
         sift_down_ord<T>(data, lo, start_idx, n);
     }
 
-    dec rw end_idx = n - (1 as u64);
-    while end_idx > (0 as u64) {
+    dec rw end_idx = n - (1 as usize);
+    while end_idx > (0 as usize) {
         unsafe {
             dec p_root = std::ptr::add_mut<T>(data, lo);
             dec p_end = std::ptr::add_mut<T>(data, lo + end_idx);
             dec tmp = std::ptr::read<T>(p_root as *T);
-            std::ptr::copy<T>(p_end as *T, p_root, 1 as u64);
+            std::ptr::copy<T>(p_end as *T, p_root, 1 as usize);
             std::ptr::write<T>(p_end, tmp);
         }
-        sift_down_ord<T>(data, lo, 0 as u64, end_idx);
-        end_idx = end_idx - (1 as u64);
+        sift_down_ord<T>(data, lo, 0 as usize, end_idx);
+        end_idx = end_idx - (1 as usize);
     }
 }
 
-fn median3_ord<T: std::Ord>(data: *rw T, a: u64, b: u64, c: u64) -> u64 {
+fn median3_ord<T: std::Ord>(data: *rw T, a: usize, b: usize, c: usize) -> usize {
     unsafe {
         dec pa = std::ptr::add<T>(data as *T, a);
         dec pb = std::ptr::add<T>(data as *T, b);
@@ -590,18 +590,18 @@ fn median3_ord<T: std::Ord>(data: *rw T, a: u64, b: u64, c: u64) -> u64 {
     }
 }
 
-fn partition_ord<T: std::Ord>(data: *rw T, lo: u64, hi: u64) -> u64 {
-    dec mid = median3_ord<T>(data, lo, lo + ((hi - lo) / (2 as u64)), hi - (1 as u64));
+fn partition_ord<T: std::Ord>(data: *rw T, lo: usize, hi: usize) -> usize {
+    dec mid = median3_ord<T>(data, lo, lo + ((hi - lo) / (2 as usize)), hi - (1 as usize));
     unsafe {
         dec p_lo_swap = std::ptr::add_mut<T>(data, lo);
         dec p_mid_swap = std::ptr::add_mut<T>(data, mid);
         dec tmp_swap = std::ptr::read<T>(p_lo_swap as *T);
-        std::ptr::copy<T>(p_mid_swap as *T, p_lo_swap, 1 as u64);
+        std::ptr::copy<T>(p_mid_swap as *T, p_lo_swap, 1 as usize);
         std::ptr::write<T>(p_mid_swap, tmp_swap);
     }
 
-    dec rw store = lo + (1 as u64);
-    dec rw i = lo + (1 as u64);
+    dec rw store = lo + (1 as usize);
+    dec rw i = lo + (1 as usize);
     while i < hi {
         unsafe {
             dec p_i = std::ptr::add<T>(data as *T, i);
@@ -611,84 +611,84 @@ fn partition_ord<T: std::Ord>(data: *rw T, lo: u64, hi: u64) -> u64 {
                     dec p_store = std::ptr::add_mut<T>(data, store);
                     dec p_i_mut = std::ptr::add_mut<T>(data, i);
                     dec tmp = std::ptr::read<T>(p_store as *T);
-                    std::ptr::copy<T>(p_i_mut as *T, p_store, 1 as u64);
+                    std::ptr::copy<T>(p_i_mut as *T, p_store, 1 as usize);
                     std::ptr::write<T>(p_i_mut, tmp);
                 }
-                store = store + (1 as u64);
+                store = store + (1 as usize);
             }
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
 
-    dec pivot_final = store - (1 as u64);
+    dec pivot_final = store - (1 as usize);
     if lo != pivot_final {
         unsafe {
             dec p_lo_final = std::ptr::add_mut<T>(data, lo);
             dec p_pivot_final = std::ptr::add_mut<T>(data, pivot_final);
             dec tmp_final = std::ptr::read<T>(p_lo_final as *T);
-            std::ptr::copy<T>(p_pivot_final as *T, p_lo_final, 1 as u64);
+            std::ptr::copy<T>(p_pivot_final as *T, p_lo_final, 1 as usize);
             std::ptr::write<T>(p_pivot_final, tmp_final);
         }
     }
     return pivot_final;
 }
 
-fn introsort_ord_rec<T: std::Ord>(data: *rw T, lo: u64, hi: u64, depth_limit: u64) {
+fn introsort_ord_rec<T: std::Ord>(data: *rw T, lo: usize, hi: usize, depth_limit: usize) {
     dec n = hi - lo;
-    if n <= (1 as u64) { return; }
+    if n <= (1 as usize) { return; }
 
-    if n <= (16 as u64) {
+    if n <= (16 as usize) {
         insertion_sort_ord<T>(data, lo, hi);
         return;
     }
 
-    if depth_limit == (0 as u64) {
+    if depth_limit == (0 as usize) {
         heapsort_ord<T>(data, lo, hi);
         return;
     }
 
     dec pivot = partition_ord<T>(data, lo, hi);
-    dec new_depth = depth_limit - (1 as u64);
+    dec new_depth = depth_limit - (1 as usize);
     introsort_ord_rec<T>(data, lo, pivot, new_depth);
-    introsort_ord_rec<T>(data, pivot + (1 as u64), hi, new_depth);
+    introsort_ord_rec<T>(data, pivot + (1 as usize), hi, new_depth);
 }
 
 // Public generic sort for slices whose elements implement Ord
 export fn slice_sort<T: std::Ord>(s: &rw [T]) {
-    dec slen = s.len as u64;
-    if slen <= (1 as u64) { return; }
-    dec depth_limit = (2 as u64) * floor_log2(slen);
-    introsort_ord_rec<T>(s.data as *rw T, 0 as u64, slen, depth_limit);
+    dec slen = s.len as usize;
+    if slen <= (1 as usize) { return; }
+    dec depth_limit = (2 as usize) * floor_log2(slen);
+    introsort_ord_rec<T>(s.data as *rw T, 0 as usize, slen, depth_limit);
 }
 
 // Linear search for an element in a slice
 export fn slice_contains<T: std::Eq>(s: &[T], value: &T) -> bool {
-    dec slen = s.len as u64;
-    dec rw i: u64 = 0 as u64;
+    dec slen = s.len as usize;
+    dec rw i: usize = 0 as usize;
     while i < slen {
         if s[i].eq(value) {
             return true;
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
     return false;
 }
 
 // Binary search on a sorted slice
-export fn slice_binary_search<T: std::Ord>(s: &[T], value: &T) -> std::Option<u64> {
-    dec slen = s.len as u64;
-    if slen == (0 as u64) {
+export fn slice_binary_search<T: std::Ord>(s: &[T], value: &T) -> std::Option<usize> {
+    dec slen = s.len as usize;
+    if slen == (0 as usize) {
         return std::Option::None;
     }
-    dec rw lo: u64 = 0 as u64;
-    dec rw hi: u64 = slen;
+    dec rw lo: usize = 0 as usize;
+    dec rw hi: usize = slen;
     while lo < hi {
-        dec mid = lo + ((hi - lo) / (2 as u64));
+        dec mid = lo + ((hi - lo) / (2 as usize));
         dec cmp_res = s[mid].cmp(value);
         if cmp_res == 0 {
             return std::Option::Some(mid);
         } else if cmp_res < 0 {
-            lo = mid + (1 as u64);
+            lo = mid + (1 as usize);
         } else {
             hi = mid;
         }
@@ -698,31 +698,31 @@ export fn slice_binary_search<T: std::Ord>(s: &[T], value: &T) -> std::Option<u6
 
 // Check if slice starts with the given prefix
 export fn slice_starts_with<T: std::Eq>(s: &[T], prefix: &[T]) -> bool {
-    dec s_len = s.len as u64;
-    dec p_len = prefix.len as u64;
+    dec s_len = s.len as usize;
+    dec p_len = prefix.len as usize;
     if p_len > s_len { return false; }
-    dec rw i: u64 = 0 as u64;
+    dec rw i: usize = 0 as usize;
     while i < p_len {
         if s[i].eq(&prefix[i]) == false {
             return false;
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
     return true;
 }
 
 // Check if slice ends with the given suffix
 export fn slice_ends_with<T: std::Eq>(s: &[T], suffix: &[T]) -> bool {
-    dec s_len = s.len as u64;
-    dec suf_len = suffix.len as u64;
+    dec s_len = s.len as usize;
+    dec suf_len = suffix.len as usize;
     if suf_len > s_len { return false; }
     dec offset = s_len - suf_len;
-    dec rw i: u64 = 0 as u64;
+    dec rw i: usize = 0 as usize;
     while i < suf_len {
         if s[offset + i].eq(&suffix[i]) == false {
             return false;
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
     return true;
 }
@@ -730,15 +730,15 @@ export fn slice_ends_with<T: std::Eq>(s: &[T], suffix: &[T]) -> bool {
 
 // Generic slice copy for std::Copy types
 export fn slice_copy_from_slice<T: std::Copy>(dst: &rw [T], src: &[T]) {
-    dec dst_len = dst.len as u64;
-    dec src_len = src.len as u64;
+    dec dst_len = dst.len as usize;
+    dec src_len = src.len as usize;
     if dst_len != src_len {
         __luna_panic_default();
     }
-    dec rw i: u64 = 0 as u64;
+    dec rw i: usize = 0 as usize;
     while i < dst_len {
         dst[i] = src[i];
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
 }
 
@@ -746,16 +746,16 @@ export fn slice_copy_from_slice<T: std::Copy>(dst: &rw [T], src: &[T]) {
 // - Clones value for the first slen - 1 slots
 // - Moves original value into the final slot (or drops if empty)
 export fn slice_fill<T: std::Clone>(s: &rw [T], value: T) {
-    dec slen = s.len as u64;
-    if slen == (0 as u64) {
+    dec slen = s.len as usize;
+    if slen == (0 as usize) {
         return;
     }
-    dec rw i: u64 = 0 as u64;
-    while i < slen - (1 as u64) {
+    dec rw i: usize = 0 as usize;
+    while i < slen - (1 as usize) {
         s[i] = value.clone();
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
-    s[slen - (1 as u64)] = value;
+    s[slen - (1 as usize)] = value;
 }
 
 // std::Copy elements between equal-length slices (i32 specialization)

@@ -61,30 +61,30 @@ fn test_slice_len_and_get() {
             v.push(30);
 
             // 1. slice_len
-            if std::slice::slice_len<i32>(v.as_slice()) != (3 as u64) { return 1; }
+            if std::slice::slice_len<i32>(v.as_slice()) != (3 as usize) { return 1; }
 
             // 2. slice_get within bounds
-            match std::slice::slice_get<i32>(v.as_slice(), 0 as u64) {
+            match std::slice::slice_get<i32>(v.as_slice(), 0 as usize) {
                 std::Option::Some(x) -> { if *x != 10 { return 2; } },
                 std::Option::None -> { return 3; },
             }
-            match std::slice::slice_get<i32>(v.as_slice(), 2 as u64) {
+            match std::slice::slice_get<i32>(v.as_slice(), 2 as usize) {
                 std::Option::Some(x) -> { if *x != 30 { return 4; } },
                 std::Option::None -> { return 5; },
             }
 
             // 3. slice_get out of bounds
-            match std::slice::slice_get<i32>(v.as_slice(), 3 as u64) {
+            match std::slice::slice_get<i32>(v.as_slice(), 3 as usize) {
                 std::Option::Some(_) -> { return 6; },
                 std::Option::None -> {},
             }
 
             // 4. slice_get_mut and mutate in-place
-            match std::slice::slice_get_mut<i32>(v.as_mut_slice(), 1 as u64) {
+            match std::slice::slice_get_mut<i32>(v.as_mut_slice(), 1 as usize) {
                 std::Option::Some(x) -> { *x = 99; },
                 std::Option::None -> { return 7; },
             }
-            match std::slice::slice_get<i32>(v.as_slice(), 1 as u64) {
+            match std::slice::slice_get<i32>(v.as_slice(), 1 as usize) {
                 std::Option::Some(x) -> { if *x != 99 { return 8; } },
                 std::Option::None -> { return 9; },
             }
@@ -119,23 +119,23 @@ fn test_slice_reverse() {
             v1.push(5);
 
             std::slice::slice_reverse<i32>(v1.as_mut_slice());
-            match std::slice::slice_get<i32>(v1.as_slice(), 0 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 0 as usize) {
                 std::Option::Some(x) -> { if *x != 5 { return 1; } },
                 std::Option::None -> { return 2; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 1 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 1 as usize) {
                 std::Option::Some(x) -> { if *x != 4 { return 3; } },
                 std::Option::None -> { return 4; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 2 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 2 as usize) {
                 std::Option::Some(x) -> { if *x != 3 { return 5; } },
                 std::Option::None -> { return 6; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 3 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 3 as usize) {
                 std::Option::Some(x) -> { if *x != 2 { return 7; } },
                 std::Option::None -> { return 8; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 4 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 4 as usize) {
                 std::Option::Some(x) -> { if *x != 1 { return 9; } },
                 std::Option::None -> { return 10; },
             }
@@ -146,11 +146,11 @@ fn test_slice_reverse() {
             v2.push(20);
 
             std::slice::slice_reverse<i32>(v2.as_mut_slice());
-            match std::slice::slice_get<i32>(v2.as_slice(), 0 as u64) {
+            match std::slice::slice_get<i32>(v2.as_slice(), 0 as usize) {
                 std::Option::Some(x) -> { if *x != 20 { return 11; } },
                 std::Option::None -> { return 12; },
             }
-            match std::slice::slice_get<i32>(v2.as_slice(), 1 as u64) {
+            match std::slice::slice_get<i32>(v2.as_slice(), 1 as usize) {
                 std::Option::Some(x) -> { if *x != 10 { return 13; } },
                 std::Option::None -> { return 14; },
             }
@@ -159,7 +159,7 @@ fn test_slice_reverse() {
             dec rw v3 = std::vec_new<i32>();
             v3.push(42);
             std::slice::slice_reverse<i32>(v3.as_mut_slice());
-            match std::slice::slice_get<i32>(v3.as_slice(), 0 as u64) {
+            match std::slice::slice_get<i32>(v3.as_slice(), 0 as usize) {
                 std::Option::Some(x) -> { if *x != 42 { return 15; } },
                 std::Option::None -> { return 16; },
             }
@@ -200,15 +200,15 @@ fn test_slice_contains_and_binary_search() {
 
             // 2. slice_binary_search_i32
             match std::slice::slice_binary_search_i32(v.as_slice(), 10) {
-                std::Option::Some(idx) -> { if idx != (0 as u64) { return 5; } },
+                std::Option::Some(idx) -> { if idx != (0 as usize) { return 5; } },
                 std::Option::None -> { return 6; },
             }
             match std::slice::slice_binary_search_i32(v.as_slice(), 30) {
-                std::Option::Some(idx) -> { if idx != (2 as u64) { return 7; } },
+                std::Option::Some(idx) -> { if idx != (2 as usize) { return 7; } },
                 std::Option::None -> { return 8; },
             }
             match std::slice::slice_binary_search_i32(v.as_slice(), 50) {
-                std::Option::Some(idx) -> { if idx != (4 as u64) { return 9; } },
+                std::Option::Some(idx) -> { if idx != (4 as usize) { return 9; } },
                 std::Option::None -> { return 10; },
             }
             match std::slice::slice_binary_search_i32(v.as_slice(), 25) {
@@ -260,27 +260,27 @@ fn test_slice_sort() {
             v1.push(3);
 
             std::slice::slice_sort_i32(v1.as_mut_slice());
-            match std::slice::slice_get<i32>(v1.as_slice(), 0 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 0 as usize) {
                 std::Option::Some(x) -> { if *x != 1 { return 1; } },
                 std::Option::None -> { return 2; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 1 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 1 as usize) {
                 std::Option::Some(x) -> { if *x != 2 { return 3; } },
                 std::Option::None -> { return 4; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 2 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 2 as usize) {
                 std::Option::Some(x) -> { if *x != 3 { return 5; } },
                 std::Option::None -> { return 6; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 3 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 3 as usize) {
                 std::Option::Some(x) -> { if *x != 5 { return 7; } },
                 std::Option::None -> { return 8; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 4 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 4 as usize) {
                 std::Option::Some(x) -> { if *x != 8 { return 9; } },
                 std::Option::None -> { return 10; },
             }
-            match std::slice::slice_get<i32>(v1.as_slice(), 5 as u64) {
+            match std::slice::slice_get<i32>(v1.as_slice(), 5 as usize) {
                 std::Option::Some(x) -> { if *x != 9 { return 11; } },
                 std::Option::None -> { return 12; },
             }
@@ -294,16 +294,16 @@ fn test_slice_sort() {
             }
             // v2 is [20, 19, 18, ..., 1] of len 20
             std::slice::slice_sort_i32(v2.as_mut_slice());
-            dec rw check_idx: u64 = 0 as u64;
-            while check_idx < (20 as u64) {
+            dec rw check_idx: usize = 0 as usize;
+            while check_idx < (20 as usize) {
                 match std::slice::slice_get<i32>(v2.as_slice(), check_idx) {
                     std::Option::Some(x) -> {
-                        dec expected = (check_idx + (1 as u64)) as i32;
+                        dec expected = (check_idx + (1 as usize)) as i32;
                         if *x != expected { return 13; }
                     },
                     std::Option::None -> { return 14; },
                 }
-                check_idx = check_idx + (1 as u64);
+                check_idx = check_idx + (1 as usize);
             }
 
             // 3. Custom descending sort with slice_sort_by
@@ -312,15 +312,15 @@ fn test_slice_sort() {
             v3.push(50);
             v3.push(30);
             std::slice::slice_sort_by<i32>(v3.as_mut_slice(), cmp_desc);
-            match std::slice::slice_get<i32>(v3.as_slice(), 0 as u64) {
+            match std::slice::slice_get<i32>(v3.as_slice(), 0 as usize) {
                 std::Option::Some(x) -> { if *x != 50 { return 15; } },
                 std::Option::None -> { return 16; },
             }
-            match std::slice::slice_get<i32>(v3.as_slice(), 1 as u64) {
+            match std::slice::slice_get<i32>(v3.as_slice(), 1 as usize) {
                 std::Option::Some(x) -> { if *x != 30 { return 17; } },
                 std::Option::None -> { return 18; },
             }
-            match std::slice::slice_get<i32>(v3.as_slice(), 2 as u64) {
+            match std::slice::slice_get<i32>(v3.as_slice(), 2 as usize) {
                 std::Option::Some(x) -> { if *x != 10 { return 19; } },
                 std::Option::None -> { return 20; },
             }
@@ -353,15 +353,15 @@ fn test_slice_copy_and_fill() {
             v.push(3);
 
             std::slice::slice_fill_i32(v.as_mut_slice(), 77);
-            match std::slice::slice_get<i32>(v.as_slice(), 0 as u64) {
+            match std::slice::slice_get<i32>(v.as_slice(), 0 as usize) {
                 std::Option::Some(x) -> { if *x != 77 { return 1; } },
                 std::Option::None -> { return 2; },
             }
-            match std::slice::slice_get<i32>(v.as_slice(), 1 as u64) {
+            match std::slice::slice_get<i32>(v.as_slice(), 1 as usize) {
                 std::Option::Some(x) -> { if *x != 77 { return 3; } },
                 std::Option::None -> { return 4; },
             }
-            match std::slice::slice_get<i32>(v.as_slice(), 2 as u64) {
+            match std::slice::slice_get<i32>(v.as_slice(), 2 as usize) {
                 std::Option::Some(x) -> { if *x != 77 { return 5; } },
                 std::Option::None -> { return 6; },
             }
@@ -378,15 +378,15 @@ fn test_slice_copy_and_fill() {
             dst_vec.push(0);
 
             std::slice::slice_copy_i32(dst_vec.as_mut_slice(), src_vec.as_slice());
-            match std::slice::slice_get<i32>(dst_vec.as_slice(), 0 as u64) {
+            match std::slice::slice_get<i32>(dst_vec.as_slice(), 0 as usize) {
                 std::Option::Some(x) -> { if *x != 100 { return 7; } },
                 std::Option::None -> { return 8; },
             }
-            match std::slice::slice_get<i32>(dst_vec.as_slice(), 1 as u64) {
+            match std::slice::slice_get<i32>(dst_vec.as_slice(), 1 as usize) {
                 std::Option::Some(x) -> { if *x != 200 { return 9; } },
                 std::Option::None -> { return 10; },
             }
-            match std::slice::slice_get<i32>(dst_vec.as_slice(), 2 as u64) {
+            match std::slice::slice_get<i32>(dst_vec.as_slice(), 2 as usize) {
                 std::Option::Some(x) -> { if *x != 300 { return 11; } },
                 std::Option::None -> { return 12; },
             }
@@ -419,7 +419,7 @@ fn test_slice_split_at_and_split_at_mut() {
             v.push(40);
 
             // 1. Immutable split_at at mid = 2
-            dec tuple_imm = std::slice::split_at<i32>(v.as_slice(), 2 as u64);
+            dec tuple_imm = std::slice::split_at<i32>(v.as_slice(), 2 as usize);
             dec left_imm = tuple_imm.0;
             dec right_imm = tuple_imm.1;
             if left_imm.len != (2 as usize) { return 1; }
@@ -430,7 +430,7 @@ fn test_slice_split_at_and_split_at_mut() {
             if right_imm[1] != 40 { return 6; }
 
             // 2. Mutable split_at_mut at mid = 2
-            dec tuple_mut = std::slice::split_at_mut<i32>(v.as_mut_slice(), 2 as u64);
+            dec tuple_mut = std::slice::split_at_mut<i32>(v.as_mut_slice(), 2 as usize);
             dec left_mut = tuple_mut.0;
             dec right_mut = tuple_mut.1;
             left_mut[0] = 100;
@@ -442,11 +442,11 @@ fn test_slice_split_at_and_split_at_mut() {
             if v.as_slice()[3] != 400 { return 10; }
 
             // 3. Boundary split at 0 and at len
-            dec tuple_zero = std::slice::split_at<i32>(v.as_slice(), 0 as u64);
+            dec tuple_zero = std::slice::split_at<i32>(v.as_slice(), 0 as usize);
             if tuple_zero.0.len != (0 as usize) { return 11; }
             if tuple_zero.1.len != (4 as usize) { return 12; }
 
-            dec tuple_full = std::slice::split_at<i32>(v.as_slice(), 4 as u64);
+            dec tuple_full = std::slice::split_at<i32>(v.as_slice(), 4 as usize);
             if tuple_full.0.len != (4 as usize) { return 13; }
             if tuple_full.1.len != (0 as usize) { return 14; }
 

@@ -155,6 +155,11 @@ visibility = "public"
 
 # --- Canonical public providers with alloc-backed implementations ---
 [[provider]]
+name = "alloc_error"
+path = "alloc/error"
+visibility = "public"
+
+[[provider]]
 name = "box"
 path = "alloc/box"
 visibility = "public"

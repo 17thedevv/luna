@@ -1,0 +1,652 @@
+[
+  {
+    "provider": "result",
+    "artifact": "luna-rs/libs/external/core/result.llib",
+    "artifact_sha256": "7d401853a443580265f50237f5712eabbf285567f3bf33f2a7bce01ec08648a6",
+    "object_sha256": "9b35246c5c0a78407d16640a2712673495e36e0f65ad4f41dd974993532b258b",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "ptr",
+    "artifact": "luna-rs/libs/external/core/ptr.llib",
+    "artifact_sha256": "08fd0e83bcd9483e740e291dd491cf10dbc5c213908fac93cb1de5b0e83d2805",
+    "object_sha256": "fe4babcd5078a986e9b1acc1c6f9847d0383d682a218137da777dc5dabfb90d1",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "slice",
+    "artifact": "luna-rs/libs/external/core/slice.llib",
+    "artifact_sha256": "d943e08c8d014feb23c70e0857ff3d53752d4245b4a6406cd4fce01a0894cabc",
+    "object_sha256": "0c3dbdd421de23c8c8aa467cb322f9ee2bd03164afe8195535670bdcd8aecce3",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "mem",
+    "artifact": "luna-rs/libs/external/core/mem.llib",
+    "artifact_sha256": "02732fb52418bdda8645c3461d53b7d57897b21f27c8999e91bf1cae07d896ed",
+    "object_sha256": "e7ee941f91a6fbaf60363065d2e00ad72a06d787dc9531754bdae6ac0aafbb38",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "cell",
+    "artifact": "luna-rs/libs/external/core/cell.llib",
+    "artifact_sha256": "e379a727514dff1fa60623ade0560650ce0a850de771bf571a5b8daf672fad95",
+    "object_sha256": "2c527e48ed41bfa220f86d495845061afb1008594fb74cd142d7492733ffceb5",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "atomic",
+    "artifact": "luna-rs/libs/external/core/atomic.llib",
+    "artifact_sha256": "da8b1c782f8d949b9fac0bf770400dd0d2ba3cac0130a889715357b6ba2b3883",
+    "object_sha256": "0a703704432e6e2a3298d9f0c87e89bd12640006563ffe20f98716d56b517413",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "sync",
+    "artifact": "luna-rs/libs/external/core/sync.llib",
+    "artifact_sha256": "aea60e5066c2817b3faf8f2aa5a68083ef16709eef1946745173daa4ef38d32e",
+    "object_sha256": "1494e5cfbb78b7416f2086473bbbed4854608d6664fde7d1b111592627bbe9d9",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "cmp",
+    "artifact": "luna-rs/libs/external/core/cmp.llib",
+    "artifact_sha256": "79fbc83de04c43fd616a1a57bf1e76776b5b00bf5e35bf77cc0287149c622b48",
+    "object_sha256": "21f7cf39e88ef2d7d24df32e7fde3c67e2390c003c69034931d86e91116ad06f",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "hash",
+    "artifact": "luna-rs/libs/external/core/hash.llib",
+    "artifact_sha256": "80b10252e041a3286bb159c62b69444571d170b299821fc71995c38d77766448",
+    "object_sha256": "2a7a0fa4e82fda76ed304ade7bf309015361fe4c8ac99379556de814326c0a22",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "clone",
+    "artifact": "luna-rs/libs/external/core/clone.llib",
+    "artifact_sha256": "7684476af226901cc5b9a752f5e8f5ed32cc046039c8bf1b9b447615944eab51",
+    "object_sha256": "47e1323938754f79f1b7ba9ef6e3fec1fd798a54fc3c506efafa9ed5f1206f5a",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "copy",
+    "artifact": "luna-rs/libs/external/core/copy.llib",
+    "artifact_sha256": "8b372025f04acb84a8f673992009bd799111dcf0d7bfc9f00bc629e1de4a9657",
+    "object_sha256": "84a40161d15b775ec4948ac18c4ef4200335305e446258534800b9a25b95d33f",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "iter_adapters",
+    "artifact": "luna-rs/libs/external/core/iter_adapters.llib",
+    "artifact_sha256": "7cdd2bfd7884cf7ad10f15884279aaee81be9b4f7455931e5dcd8cba4494aeef",
+    "object_sha256": "04ffbbc7cd3473c34385c55cc804a0878fc57a36dad99881b0496178df9736b4",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "iter_consumers",
+    "artifact": "luna-rs/libs/external/core/iter_consumers.llib",
+    "artifact_sha256": "fe40c7bd10ede94648aadc69b239d642177c48dfc6eca617372cb98a6d9b9d07",
+    "object_sha256": "63844c72553760887a3d2955501b3eb865f9821d9be013a02f23e838f4ae51d6",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "algo",
+    "artifact": "luna-rs/libs/external/core/algo.llib",
+    "artifact_sha256": "70c27d0dbf414bdc46be1ef905652f32b35ad8b47210288a91f822f93d18243b",
+    "object_sha256": "d6cbc829b83012c084fee2341faf32953c21ad4333903cc2389346235b59bdfb",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "time",
+    "artifact": "luna-rs/libs/external/core/time.llib",
+    "artifact_sha256": "43f76e63fdd7d7b05827c6c73c3b05c1f8bad238d77b61c5b66bc394ca0abc97",
+    "object_sha256": "3515011578ee40df08588bae1d0747402c636cd80edfc3bced2b872c3f7d935b",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "try",
+    "artifact": "luna-rs/libs/external/core/try.llib",
+    "artifact_sha256": "683842b81fb22f99f39cf50d208b93e1a75ad919e2ed50e95cb9383bb6fc47e2",
+    "object_sha256": "da480234743e746294ce379828608cf2cf46d97b8b5718a51edd8d18fc388382",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "io",
+    "artifact": "luna-rs/libs/external/io/io.llib",
+    "artifact_sha256": "7ba2535507effc1dfb7213061036a48ec984414a6407f9ca8141efc5505e6c38",
+    "object_sha256": "6c626ac0c5c76cc7e06d80da71949f6fc91da62d677182cb114d2915559ffa03",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "file",
+    "artifact": "luna-rs/libs/external/file/file.llib",
+    "artifact_sha256": "704baa68420d457b105bcb27e7b07fb8a805e9c71caed85506e7aca75c6eed27",
+    "object_sha256": "62c6a37b1171a505a691d24cb0dfdcefd9dc01d1115034f93953d730bc4c495d",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "path",
+    "artifact": "luna-rs/libs/external/path/path.llib",
+    "artifact_sha256": "c1b941dbe04cf50dd851f0fef302674236c7eff92cd2cd0ad5f8016d794b9456",
+    "object_sha256": "4bbe2f426795f7fac0bf8794b496bde43775b1ad6ba8f7b01dc268551d51491a",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "net",
+    "artifact": "luna-rs/libs/external/net/net.llib",
+    "artifact_sha256": "3209339d41d8ac0a8ccd699b5e3edc27c8490e70c0bc653bc607841429071523",
+    "object_sha256": "7fa492c9c75021815c4d2700d7cdb57e767ffeb533bef059507c5516e9cae1a1",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "random",
+    "artifact": "luna-rs/libs/external/core/random.llib",
+    "artifact_sha256": "0705c5c3d0349a9a4b8a81139a8a8e8a013dbaf4681f433283cd1c6a633a1397",
+    "object_sha256": "850a3b229d31519c6e2c528ada7b9aca6c3a6ad1bfdec4e6c3eeb880cc7316ef",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "encoding",
+    "artifact": "luna-rs/libs/external/encoding/encoding.llib",
+    "artifact_sha256": "21893ce030761c33f858d5039774def36e19cf05f39fba936e5918d4f98d1d6d",
+    "object_sha256": "86959a5affab84f3d3cffe31642a5c8b2bc5ee0528b4d8b842f3e7f87b8efdb3",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "crypto",
+    "artifact": "luna-rs/libs/external/crypto/crypto.llib",
+    "artifact_sha256": "56351e9aa4a8d8e4ccb956b5b428a81f8699d771eb688a2e5e639a287bbbd762",
+    "object_sha256": "3cc298f06e6f4f898fcbe42be562d3be6e0d29c3085b4c5deec1f50f8ac3f8df",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "json",
+    "artifact": "luna-rs/libs/external/json/json.llib",
+    "artifact_sha256": "4f8c16bdbdb82385665440f0717b49f05a4026ab1543ed3ed585aa325b817da6",
+    "object_sha256": "05079b0d5bf4cc4655f648002bb35ef72a9d5ae73b439c4daa7e67dfc379d4ec",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "num",
+    "artifact": "luna-rs/libs/external/core/num.llib",
+    "artifact_sha256": "df62877d1ea27b0800635b4376e7c6e7cb85efa5147899a9565339080a0a2d9b",
+    "object_sha256": "99e2ffd5ad95d51694ca4ceab5a81daa96230b79a261dce6e657db218d8acb35",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "default",
+    "artifact": "luna-rs/libs/external/core/default.llib",
+    "artifact_sha256": "81a50026b362227630d27fd6381c2ce28e12cf7b9e088670404cc547060d04f9",
+    "object_sha256": "e83834a1d71716089b4f40d0a7f57213aa648b08ea53b1c1060d45fadf06c7a2",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "convert",
+    "artifact": "luna-rs/libs/external/core/convert.llib",
+    "artifact_sha256": "e33749cb8125ff942f3946190bed247390689237bec7b3cc5d4230dc48ba4a99",
+    "object_sha256": "4af4efedea5e3ae7dd6374787a5f598a5ba7d703fe3a6d2ce187e501e0144574",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "float",
+    "artifact": "luna-rs/libs/external/core/float.llib",
+    "artifact_sha256": "402f7f17a28fd26d90becd5856101fae00d0b551bf133c8dcc03f1d9b6a05a89",
+    "object_sha256": "9485f357ee71398a11688bc7f53bf7124eb701e541755713989c9d9eff5bb936",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "fmt",
+    "artifact": "luna-rs/libs/external/core/fmt.llib",
+    "artifact_sha256": "39ab9c53165ec136cdb64e15f400bfbf8fba0f1e9561cb508e6a5b42df3654f2",
+    "object_sha256": "2880427bc9f10b3adf3cde9ed202911f74001ae5d033c805290465ce86b37af4",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "alloc_error",
+    "artifact": "luna-rs/libs/external/alloc/error.llib",
+    "artifact_sha256": "8b1f4dacf359f4fdab4ae1cf7413c3fd0efcb027001f1e7495c1441462681658",
+    "object_sha256": "5c9389ddff4d5651756d30a412572594808aa9a1e0b604393596a1c789710c24",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "box",
+    "artifact": "luna-rs/libs/external/alloc/box.llib",
+    "artifact_sha256": "69c44b6776859bd6d2eda01ba0796c869bf13cc1d7acf509df8244382e2e5cc4",
+    "object_sha256": "926e8f50dc388f990ac04d594459a467c6e8051b62adfc5219c9a3d73991eafe",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "vec",
+    "artifact": "luna-rs/libs/external/alloc/vec.llib",
+    "artifact_sha256": "a7c137bbb4bda26fd9f1d08fc08b67889b689e2948cc43ad64aed8d56839f02e",
+    "object_sha256": "64eb494789e7117079eca540e81e0fd6f67c2f5910e130b5595bb415cc2e18bd",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "string",
+    "artifact": "luna-rs/libs/external/alloc/string.llib",
+    "artifact_sha256": "8424824e8786e7816ce7fd050713fbba5bf74480343dc00f221cb28f1e3a3c91",
+    "object_sha256": "4843d64dd1f6179c6f89dbb4fc09fcff72a6982470486743d297b9ce029f3eb8",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "hashmap",
+    "artifact": "luna-rs/libs/external/alloc/hashmap.llib",
+    "artifact_sha256": "b3e501f7a1cfabf837d260278960050ee846e5e01842d0660436fe10040cb13e",
+    "object_sha256": "d98b5dc989bc03d54984fbf4cb8b7a0d97b49ea9725d8ee8bcb58fbeb82a3bd5",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "hashset",
+    "artifact": "luna-rs/libs/external/alloc/hashset.llib",
+    "artifact_sha256": "59523426c76960348d27cef5be7ac63bd968ac345f6d1f212bc45303925926d8",
+    "object_sha256": "c3e38ab4974deb7065fb87ee69e57fa5c6ec3ff1e23a2ed28d5d0e2176665ac1",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "iter_collect",
+    "artifact": "luna-rs/libs/external/alloc/iter_collect.llib",
+    "artifact_sha256": "63022c65c1f6452a6243b5a33788e0c7c37062ec23c2e3f8a04ac9f5a7d245e4",
+    "object_sha256": "8dcf26c881617aa52fab61c89c91f41be6dfe186fc635cc707d4ad9bfdcaf409",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "rc",
+    "artifact": "luna-rs/libs/external/alloc/rc.llib",
+    "artifact_sha256": "a0f95fd97a6722b1628a9336ffbfed7eb759c6f57d060ebe137f7510b3360cda",
+    "object_sha256": "8559f011b0b46b4f6179a79e7fe1337f005c19922c7d676ded5e1ff291e876d2",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "arc",
+    "artifact": "luna-rs/libs/external/alloc/arc.llib",
+    "artifact_sha256": "84875ba5abe9ba437273ea1b85eb6660ac2f86a7eb686070ae7fefdb0b750e7c",
+    "object_sha256": "7710ca64f7e25f5e4649146021948a68c582861ed0384190352aea1600f4eb3f",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "vecdeque",
+    "artifact": "luna-rs/libs/external/alloc/vecdeque.llib",
+    "artifact_sha256": "ef9a73836749a57959864d0f0868cae3fdc2a011f4428c645fd5be36aaa83863",
+    "object_sha256": "3039edd9db79a253430b170254ce0710df5bd14f9239296a595a1c1360da3ee0",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "binaryheap",
+    "artifact": "luna-rs/libs/external/alloc/binaryheap.llib",
+    "artifact_sha256": "a5be44996b8ceaaab70e1b710fbce3eb42ceeceb2206c13669735b28db5b288c",
+    "object_sha256": "ab0e6ac692636e41f3042e53f0cc24532d44d1e94be749ef55f9c7e7ce56b395",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "btreemap",
+    "artifact": "luna-rs/libs/external/alloc/btreemap.llib",
+    "artifact_sha256": "f2df522ab36fbdf342943ab105f31040964a5a5e08b3dbfcddf4261fc0b2c4ec",
+    "object_sha256": "05237211ea40134a10ab9e7e5342f254de9b5d70fe5bdd11d7d221432f57cfaf",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "btreeset",
+    "artifact": "luna-rs/libs/external/alloc/btreeset.llib",
+    "artifact_sha256": "1fa86015e30a0a69fa519b5bcc30294f2e3f53a017e9f441e352b5fb5497c32d",
+    "object_sha256": "a8d0fd37e8e1f4f3f503e09224e9a41927671839a82439175fd0eea7fcd38422",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "thread",
+    "artifact": "luna-rs/libs/external/alloc/thread.llib",
+    "artifact_sha256": "e740c8f2d2f477080b2236c486f574cec10680ce5b4a8f167ead73a37f265356",
+    "object_sha256": "1865a863349147a9c4628d5658d3de02f18d4d952e9651895517bb7d7fb2503e",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "panic",
+    "artifact": "luna-rs/libs/external/core/panic.llib",
+    "artifact_sha256": "9763e977101082521136faf0a8cc6e85b757f8b0c91084a5d4080a8630c8d32b",
+    "object_sha256": "008a53375da2844e542f49349f9d55a44c3d473018091b0a934025038acae30d",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "__alloc_global",
+    "artifact": "luna-rs/libs/external/alloc/global.llib",
+    "artifact_sha256": "88112937ee3576f2e35f21bb8c102466b8d19d4c267ea149c0e3e72d2ae25a23",
+    "object_sha256": "a305b83ca889cf4f7db7a1bc9c4ad259675146966d69f97e56d48516e896d3b5",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "__raw_table",
+    "artifact": "luna-rs/libs/external/alloc/raw_table.llib",
+    "artifact_sha256": "7aeba8a01f7c7b8ad15c33eb60f333e611c4108437eef9fcba7205245b29a187",
+    "object_sha256": "432bda045d222a4b4ba8cfb4e990352ea60fef3aa982e5ee2907a6b4fbdd3f3c",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "__lang_drop",
+    "artifact": "luna-rs/libs/external/lang/drop.llib",
+    "artifact_sha256": "79f206f64e0edfb6693d983645646839ec9b0033ef7058e9e0e5d1331034f33b",
+    "object_sha256": "42f32a165786ca315e14278fb47fdce68d1abb05608d2fcba06697e35c18fb99",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "__lang_option",
+    "artifact": "luna-rs/libs/external/lang/option.llib",
+    "artifact_sha256": "e56ac7cf909327ae153507c319f955d92c6e0ec79ab789fa34a1fa7804ddc6a7",
+    "object_sha256": "e570a63d3e3580f8dfd662c7a4d3fc8215d009a751c48c1b0cfd1200be8eab6b",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "__lang_iterator",
+    "artifact": "luna-rs/libs/external/lang/iterator.llib",
+    "artifact_sha256": "79a69f09654d19306d02923117426a9aeaca54c629d00554642c2b25066b7638",
+    "object_sha256": "797ce00b26a0c805e7dd40f04e91d9d63d94b5d6cbc46dea8bb2d266eae8f5bf",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  },
+  {
+    "provider": "__lang_into_iterator",
+    "artifact": "luna-rs/libs/external/lang/into_iterator.llib",
+    "artifact_sha256": "e3d4b933f51839589aa1bc3ae9b8d468a2f794013f0571d0fa6b8026af9bb189",
+    "object_sha256": "d7d020e2a8c468f13ba85351c28527462539ee3029d7c34b7c089308d94e0026",
+    "format_compiler_mvir": [
+      2,
+      26,
+      5
+    ],
+    "target": "x86_64-pc-windows-gnu",
+    "coff_machine": "0x8664"
+  }
+]

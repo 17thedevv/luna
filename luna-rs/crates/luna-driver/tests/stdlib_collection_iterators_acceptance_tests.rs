@@ -179,7 +179,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(1, 10);
             map.insert(2, 20);
             map.insert(3, 30);
@@ -252,7 +252,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(16 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(16 as usize);
             dec rw i: i32 = 1;
             while i <= 8 {
                 map.insert(i, i * 10);
@@ -336,7 +336,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(10, 100);
             map.insert(20, 200);
             map.insert(30, 300);
@@ -421,7 +421,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as usize);
             set.insert(10);
             set.insert(20);
             set.insert(30);
@@ -487,7 +487,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as usize);
             set.insert(1);
             set.insert(2);
             set.insert(3);
@@ -556,7 +556,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(1, 10);
 
             dec rw it = map.iter(); // Borrows map
@@ -597,7 +597,7 @@ fn test_iter_source_vs_llib_parity() {
         import <iter_collect>;
         
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(100, 1000);
             map.insert(200, 2000);
 

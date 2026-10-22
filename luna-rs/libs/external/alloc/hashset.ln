@@ -54,7 +54,16 @@ module std {
         private map: std::HashMap<T, ()>,
     };
 
-    export fn hashset_new<T>() -> HashSet<T> {
+    // Type-owned constructors; free factories remain migration entry points.
+impl<T> HashSet<T> {
+    export fn new() -> Self { return hashset_new<T>(); }
+    export fn with_capacity(capacity: usize) -> Self {
+        return hashset_with_capacity<T>(capacity);
+    }
+}
+
+
+export fn hashset_new<T>() -> HashSet<T> {
         return HashSet {
             map: std::hashmap_new<T, ()>(),
         };
@@ -66,18 +75,18 @@ module std {
         }
     }
 
-    export fn hashset_with_capacity<T>(capacity: u64) -> HashSet<T> {
+    export fn hashset_with_capacity<T>(capacity: usize) -> HashSet<T> {
         return HashSet {
             map: std::hashmap_with_capacity<T, ()>(capacity),
         };
     }
 
     impl<T: std::Hash + std::Eq> HashSet<T> {
-        export fn len(self: &Self) -> u64 {
+        export fn len(self: &Self) -> usize {
             return self.map.len();
         }
 
-        export fn capacity(self: &Self) -> u64 {
+        export fn capacity(self: &Self) -> usize {
             return self.map.capacity();
         }
 
@@ -127,6 +136,17 @@ module std {
             }
             return true;
         }
+
+    export fn is_disjoint(self: &Self, other: &Self) -> bool {
+        dec rw it = self.iter();
+        while true {
+            match it.next() {
+                std::Option::Some(value) -> { if other.contains(value) { return false; } },
+                std::Option::None -> { return true; },
+            }
+        }
+        return true;
+    }
 
         export fn is_superset(self: &Self, other: &Self) -> bool {
             return other.is_subset(self);
@@ -268,6 +288,8 @@ impl<T> std::IntoIterator<T, std::SetIntoIter<T>> for std::HashSet<T> {
     fn into_iter(self: Self) -> std::SetIntoIter<T> {
         return self.into_iter();
     }
+
+
 }
 
 

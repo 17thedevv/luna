@@ -575,6 +575,51 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/audits/stdlib-fallible-2026-10-21/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-fallible-2026-10-21/compiler-gap-13.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-fallible-2026-10-21/compiler-gap-14.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-fallible-2026-10-21/compiler-gap-15.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-redesign-2026-10-21/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-usize-2026-10-22/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-usize-2026-10-22/compiler-gap-16.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-usize-2026-10-22/compiler-gap-17.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-usize-2026-10-22/evidence/windows-28802f12/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/borrowck/NLL_spec.md",
     "role": "historical",
     "owner": "semantics"
@@ -820,6 +865,46 @@
     "owner": "conformance"
   },
   {
+    "path": "docs/proposals/stdlib-redesign-0.1.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/allocator.md",
+    "role": "guidance",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/foundation-api.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/io-api.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/io-interpolation.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/lang-items.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/size-index.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/proposals/v01-design-01-method-collision.md",
     "role": "historical",
     "owner": "conformance"
@@ -837,6 +922,11 @@
   {
     "path": "docs/runtime/abi-v1.md",
     "role": "adopted-contract",
+    "owner": "runtime"
+  },
+  {
+    "path": "docs/runtime/abi-v2-allocation.md",
+    "role": "guidance",
     "owner": "runtime"
   },
   {
@@ -941,6 +1031,11 @@
   },
   {
     "path": "docs/spec/0.1/stdlib-inventory.md",
+    "role": "canonical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/spec/0.1/stdlib-memory-size-v1.md",
     "role": "canonical",
     "owner": "stdlib"
   },

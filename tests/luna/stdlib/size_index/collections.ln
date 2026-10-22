@@ -1,0 +1,71 @@
+import <vec>;
+import <vecdeque>;
+import <binaryheap>;
+import <hashmap>;
+import <hashset>;
+import <btreemap>;
+import <btreeset>;
+import <string>;
+
+struct Token { id: i32, drops: *rw usize };
+impl std::Drop for Token {
+    fn drop(self: &rw Self) { unsafe { *self.drops = *self.drops + (1 as usize); } }
+}
+fn exercise(drops: *rw usize) -> i32 {
+    dec rw values = std::Vec<Token>::with_capacity(0 as usize);
+    dec rw deque = std::VecDeque<Token>::with_capacity(1 as usize);
+    dec rw map = std::HashMap<i32, Token>::new();
+    dec rw tree = std::BTreeMap<i32, Token>::new();
+    dec rw i = 0;
+    while i < 40 {
+        values.push(Token { id: i, drops: drops });
+        deque.push_back(Token { id: i, drops: drops });
+        map.insert(i, Token { id: i, drops: drops });
+        tree.insert(i, Token { id: i, drops: drops });
+        i = i + 1;
+    }
+    dec n: usize = values.len();
+    dec cap: usize = values.capacity();
+    dec d: usize = deque.len();
+    dec m: usize = map.len();
+    dec t: usize = tree.len();
+    if n != 40 as usize || cap < n || d != n || m != n || t != n { return 10; }
+    if deque.get(n).is_some() { return 11; }
+    if deque.pop_front().unwrap().id != 0 || deque.pop_back().unwrap().id != 39 { return 12; }
+    if map.get(&17).unwrap().id != 17 || tree.get(&23).unwrap().id != 23 { return 13; }
+    if *tree.first_key().unwrap() != 0 || *tree.last_key().unwrap() != 39 { return 14; }
+    values.clear();
+    deque.clear();
+    map.clear();
+    tree.clear();
+    return 0;
+}
+fn main() -> i32 {
+    dec rw drops = 0 as usize;
+    dec result = exercise(&rw drops as *rw usize);
+    if result != 0 { return result; }
+    if drops != 160 as usize { return 15; }
+    dec rw heap = std::BinaryHeap<i32>::with_capacity(2 as usize);
+    heap.push(3); heap.push(8); heap.push(1);
+    dec h: usize = heap.len();
+    if h != 3 as usize || heap.pop().unwrap() != 8 { return 16; }
+    dec rw set = std::HashSet<i32>::with_capacity(1 as usize);
+    set.insert(9); set.insert(9);
+    dec s: usize = set.len();
+    if s != 1 as usize { return 17; }
+    dec rw sorted = std::BTreeSet<i32>::new();
+    sorted.insert(4); sorted.insert(2);
+    dec b: usize = sorted.len();
+    if b != 2 as usize { return 18; }
+    dec rw text = std::String::with_capacity(0 as usize);
+    text.push_str("a🌙z");
+    dec len: usize = text.len();
+    dec chars: usize = text.char_count();
+    dec index: usize = text.find_str("z").unwrap();
+    dec hash: u64 = text.hash();
+    if len != 6 as usize || chars != 3 as usize || index != 5 as usize { return 19; }
+    if hash != std::string_from_str("a🌙z").hash() { return 20; }
+    text.truncate(5 as usize);
+    if text.len() != 5 as usize { return 21; }
+    return 0;
+}

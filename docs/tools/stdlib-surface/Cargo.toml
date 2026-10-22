@@ -1,0 +1,15 @@
+[package]
+name = "luna-stdlib-surface"
+version = "0.0.0"
+edition = "2021"
+license = "GPL-3.0-only"
+publish = false
+
+[workspace]
+
+[dependencies]
+luna-ast = { path = "../../../luna-rs/crates/luna-ast" }
+luna-common = { path = "../../../luna-rs/crates/luna-common" }
+luna-lexer = { path = "../../../luna-rs/crates/luna-lexer" }
+luna-parser = { path = "../../../luna-rs/crates/luna-parser" }
+serde_json = "1.0.151"

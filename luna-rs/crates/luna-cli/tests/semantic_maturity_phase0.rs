@@ -31,7 +31,7 @@ fn check(relative: &str) -> Output {
         .arg("-I")
         .arg(fixture_dir)
         .arg("-I")
-        .arg(workspace_root())
+        .arg(std::env::var_os("LUNA_SYSROOT").map(PathBuf::from).unwrap_or_else(workspace_root))
         .output()
         .expect("luna check must start")
 }

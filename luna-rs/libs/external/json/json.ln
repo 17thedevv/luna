@@ -104,7 +104,7 @@ export module std {
             export fn as_string(self: &Self) -> std::Option<&std::String> life_from(self) {
                 if self.is_string() {
                     unsafe {
-                        return std::Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *std::String));
+                        return std::Option::Some(&*(((self as *Self as usize) + (8 as usize)) as *std::String));
                     }
                 }
                 return std::Option::None;
@@ -113,7 +113,7 @@ export module std {
             export fn as_array(self: &Self) -> std::Option<&std::Vec<JsonValue>> life_from(self) {
                 if self.is_array() {
                     unsafe {
-                        return std::Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *std::Vec<JsonValue>));
+                        return std::Option::Some(&*(((self as *Self as usize) + (8 as usize)) as *std::Vec<JsonValue>));
                     }
                 }
                 return std::Option::None;
@@ -122,7 +122,7 @@ export module std {
             export fn as_array_mut(self: &rw Self) -> std::Option<&rw std::Vec<JsonValue>> life_from(self) {
                 if self.is_array() {
                     unsafe {
-                        return std::Option::Some(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw std::Vec<JsonValue>));
+                        return std::Option::Some(&rw *(((self as *rw Self as usize) + (8 as usize)) as *rw std::Vec<JsonValue>));
                     }
                 }
                 return std::Option::None;
@@ -131,7 +131,7 @@ export module std {
             export fn as_object(self: &Self) -> std::Option<&std::Vec<JsonKeyValue>> life_from(self) {
                 if self.is_object() {
                     unsafe {
-                        return std::Option::Some(&*(((self as *Self as u64) + (8 as u64)) as *std::Vec<JsonKeyValue>));
+                        return std::Option::Some(&*(((self as *Self as usize) + (8 as usize)) as *std::Vec<JsonKeyValue>));
                     }
                 }
                 return std::Option::None;
@@ -140,7 +140,7 @@ export module std {
             export fn as_object_mut(self: &rw Self) -> std::Option<&rw std::Vec<JsonKeyValue>> life_from(self) {
                 if self.is_object() {
                     unsafe {
-                        return std::Option::Some(&rw *(((self as *rw Self as u64) + (8 as u64)) as *rw std::Vec<JsonKeyValue>));
+                        return std::Option::Some(&rw *(((self as *rw Self as usize) + (8 as usize)) as *rw std::Vec<JsonKeyValue>));
                     }
                 }
                 return std::Option::None;
@@ -161,7 +161,7 @@ export module std {
                 match obj_opt {
                     std::Option::Some(entries) -> {
                         dec len = entries.len();
-                        dec rw i: u64 = 0 as u64;
+                        dec rw i: usize = 0 as usize;
                         while i < len {
                             dec opt_entry = entries.get(i);
                             match opt_entry {
@@ -184,7 +184,7 @@ export module std {
                                 },
                                 std::Option::None -> {},
                             }
-                            i = i + (1 as u64);
+                            i = i + (1 as usize);
                         }
                     },
                     std::Option::None -> {},
@@ -195,8 +195,8 @@ export module std {
             export fn get_index(self: &Self, index: usize) -> std::Option<&JsonValue> life_from(self) {
                 if self.is_array() {
                     unsafe {
-                        dec arr = &*(((self as *Self as u64) + (8 as u64)) as *std::Vec<JsonValue>);
-                        return arr.get(index as u64);
+                        dec arr = &*(((self as *Self as usize) + (8 as usize)) as *std::Vec<JsonValue>);
+                        return arr.get(index as usize);
                     }
                 }
                 return std::Option::None;

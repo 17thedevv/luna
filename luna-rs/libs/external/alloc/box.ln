@@ -1,4 +1,6 @@
 import <__alloc_global>;
+import <alloc_error>;
+import <result>;
 import <ptr>;
 import <mem>;
 import <__lang_drop>;
@@ -26,7 +28,7 @@ module std {
         dec rw boxed = b;
         dec raw = boxed.ptr;
         unsafe {
-            boxed.ptr = 0 as u64 as *rw T;
+            boxed.ptr = 0 as usize as *rw T;
             dec val = std::ptr::read<T>(raw as *T);
             __luna_dealloc(raw as *rw u8, std::mem::size_of<T>(), std::mem::align_of<T>());
             return val;
@@ -34,6 +36,29 @@ module std {
     }
 
     impl<T> Box<T> {
+        export fn new(value: T) -> Self {
+            return box_new<T>(value);
+        }
+
+        export fn try_new(value: T) -> std::Result<Self, std::AllocFailure<T>> {
+            dec rw raw: *rw u8 = 0 as usize as *rw u8;
+            dec rw status: i32 = 0;
+            unsafe {
+                status = __luna_try_alloc(sizeof(T) as usize, alignof(T) as usize, &rw raw as *rw *rw u8);
+            }
+            if status != 0 {
+                dec rw cause = std::AllocError::OutOfMemory;
+                if status == 2 { cause = std::AllocError::CapacityOverflow; }
+                if status == 3 { cause = std::AllocError::UnsupportedLayout; }
+                return std::Result::Err(std::AllocFailure<T> { cause: cause, value: value });
+            }
+            unsafe {
+                dec ptr = raw as *rw T;
+                std::ptr::write<T>(ptr, value);
+                return std::Result::Ok(Box<T> { ptr: ptr });
+            }
+        }
+
         export fn as_ref(self: &Self) -> &T life_from(self) {
             unsafe {
                 return &*(self.ptr as *T);
@@ -49,11 +74,11 @@ module std {
 
     impl<T> std::Drop for Box<T> {
         fn drop(self: &rw Self) {
-            if (self.ptr as u64) != (0 as u64) {
+            if (self.ptr as usize) != (0 as usize) {
                 unsafe {
                     std::ptr::drop_in_place<T>(self.ptr);
                     __luna_dealloc(self.ptr as *rw u8, std::mem::size_of<T>(), std::mem::align_of<T>());
-                    self.ptr = 0 as u64 as *rw T;
+                    self.ptr = 0 as usize as *rw T;
                 }
             }
         }

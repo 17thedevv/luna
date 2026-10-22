@@ -1,0 +1,5 @@
+import <mem>;
+fn main() {
+    dec data = [1, 2];
+    unsafe { dec view = std::mem::slice_from_raw_parts<i32>(data.data as *i32, 2 as u64); }
+}

@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "source_commit": "1548f1b6cbe26ae5cf76b2466f0fad3c58fc9101",
+  "runtime_tree": "b2702099bc5780d5806e508a77466bfd89541323",
+  "target": "x86_64-pc-windows-gnu",
+  "build_type": "Debug",
+  "assertions": "enabled; no NDEBUG definition in abi_tests.c or Debug CMake compiler flags",
+  "commands": [
+    {
+      "command": [
+        "cmake",
+        "-S",
+        "runtime",
+        "-B",
+        "D:/luna-stable-build/runtime-asserts",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Debug",
+        "-DCMAKE_C_COMPILER=C:/mingw64/bin/gcc.exe",
+        "-DCMAKE_CXX_COMPILER=C:/mingw64/bin/g++.exe"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "cmake",
+        "--build",
+        "D:/luna-stable-build/runtime-asserts",
+        "--parallel",
+        "2"
+      ],
+      "exit": 0
+    },
+    {
+      "command": [
+        "ctest",
+        "--test-dir",
+        "D:/luna-stable-build/runtime-asserts",
+        "--output-on-failure"
+      ],
+      "exit": 0
+    }
+  ],
+  "suites": [
+    "RuntimeAbiTests",
+    "RuntimeFallibleAllocation"
+  ],
+  "files": {
+    "runtime-asserts-config.log": "876959fadbc0a4b7abf16f3f7b6ae6a876bf370e24bff7786b6834888dd213c1",
+    "runtime-asserts-build.log": "0ed5d6aefefb3cd04da2b6fd212e821c41b94383555cbc6b2055399335f68551",
+    "runtime-asserts-tests.log": "e73fbe65ca619bb9ec35272bcc52c8de8646a58b0a813c7a02e1c46f4eec1722",
+    "LastTest.log": "fc72852d74bc5c5ea423e14102b222464a2949a84f55934fa513fc9593aa9995"
+  },
+  "abi_test_compile_flags": "-g -std=gnu11"
+}

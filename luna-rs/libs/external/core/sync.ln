@@ -21,8 +21,8 @@ export extern fn __luna_atomic_load_u32(ptr: *u32) -> u32;
 export extern fn __luna_atomic_store_u32(ptr: *rw u32, val: u32);
 export extern fn __luna_atomic_cas_u32(ptr: *rw u32, expected: u32, desired: u32) -> u32;
 
-extern fn __luna_alloc(size: u64, align: u64) -> *rw u8;
-extern fn __luna_dealloc(ptr: *rw u8, size: u64, align: u64);
+extern fn __luna_alloc(size: usize, align: usize) -> *rw u8;
+extern fn __luna_dealloc(ptr: *rw u8, size: usize, align: usize);
 
 export module std {
     // =========================================================================

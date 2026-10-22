@@ -1,0 +1,13 @@
+import <vec>;
+import <result>;
+import <alloc_error>;
+fn main() -> i32 {
+    dec rw source = 7;
+    dec rw values = std::Vec<&i32>::new();
+    dec result = values.try_push(&source);
+    source = 8;
+    return match result {
+        std::Result::Err(failure) -> *failure.value,
+        std::Result::Ok -> 0,
+    };
+}

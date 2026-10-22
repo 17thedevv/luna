@@ -7,9 +7,9 @@ fn main() -> i32 {
     v.push(4);
     v.push(9);
     if v.pop().unwrap() != 9 { return 1; }
-    if *v.get(0 as u64).unwrap() != 4 { return 2; }
+    if *v.get(0 as usize).unwrap() != 4 { return 2; }
     dec s = std::string_from_str("Luna");
-    if s.len() != (4 as u64) { return 3; }
+    if s.len() != (4 as usize) { return 3; }
     dec rw m = std::hashmap_new<i32, i32>();
     m.insert(1, 17);
     if *m.get(&1).unwrap() != 17 { return 4; }

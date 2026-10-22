@@ -2,7 +2,7 @@ import <mem>;
 unsafe fn read(pointer: *i32) -> i32 { return *pointer; }
 fn inspect(pointer: *rw i32, callback: unsafe fn(*i32) -> i32) -> i32 {
     unsafe {
-        dec slice = std::mem::slice_from_raw_parts<i32>(pointer as *i32, 1 as u64);
+        dec slice = std::mem::slice_from_raw_parts<i32>(pointer as *i32, 1 as usize);
         dec value = callback(pointer as *i32);
         return value + slice[0];
     }

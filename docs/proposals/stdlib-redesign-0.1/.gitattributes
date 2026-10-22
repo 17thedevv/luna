@@ -1,0 +1,2 @@
+# Preserve the acquired inventory bytes referenced by source_inventory_sha256.
+lang-items-current.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

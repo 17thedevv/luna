@@ -86,6 +86,7 @@ about past test runs or implementation completion remain dated evidence.
 | Lifetime elision | [LLE-v1](../../../.agents/skills/luna-semantic-compliance/references/lle_v1_rfc.md) |
 | Independent type/field visibility | [Approved Visibility-02 amendment](../../../.agents/skills/luna-semantic-compliance/references/visibility-02-public-field-default-rfc.md) |
 | Logical standard namespace | [STD-NAMESPACE-01](../../../luna-rs/docs/std_namespace_01_canonical_namespace.md) |
+| Target-sized memory counts | [STD-D05](stdlib-memory-size-v1.md) |
 | Whole-file APIs | [Whole-file I/O v1](../../../luna-rs/docs/whole_file_io_v1.md) |
 | Formatting foundation | [Formatting v1](../../../luna-rs/docs/phase6_core_formatting_v1.md) |
 | Canonical identity and legacy reads | [Rename compatibility contract](../../project/rename-luna-v1.md) |

@@ -185,9 +185,9 @@ fn phase4c_fresh_session_source_vs_llib_parity() {
             dec maybe: std::Option<i32> = std::Default::default();
             if maybe.is_some() { return 9; }
             dec values: std::Vec<i32> = std::Default::default();
-            if values.len() != (0 as u64) { return 10; }
+            if values.len() != (0 as usize) { return 10; }
             dec map: std::HashMap<i32, i32> = std::Default::default();
-            if map.len() != (0 as u64) { return 11; }
+            if map.len() != (0 as usize) { return 11; }
 
             // Ordinary FloatOps dispatch and bit-preserving factories.
             if ((0.0 as f32) - (2.0 as f32)).abs() != (2.0 as f32) { return 12; }

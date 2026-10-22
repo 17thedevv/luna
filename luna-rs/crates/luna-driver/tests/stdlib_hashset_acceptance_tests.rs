@@ -120,18 +120,18 @@ import <iter_collect>;
 
         fn main() -> i32 {
             dec rw set = std::hashset_new<i32>();
-            if set.len() != (0 as u64) {
+            if set.len() != (0 as usize) {
                 return 1;
             }
             if set.is_empty() == false {
                 return 2;
             }
 
-            dec rw set_cap = std::hashset_with_capacity<i32>(16 as u64);
-            if set_cap.capacity() != (16 as u64) {
+            dec rw set_cap = std::hashset_with_capacity<i32>(16 as usize);
+            if set_cap.capacity() != (16 as usize) {
                 return 3;
             }
-            if set_cap.len() != (0 as u64) {
+            if set_cap.len() != (0 as usize) {
                 return 4;
             }
             if set_cap.is_empty() == false {
@@ -174,7 +174,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as usize);
 
             dec ins10 = set.insert(10);
             dec ins20 = set.insert(20);
@@ -183,7 +183,7 @@ import <iter_collect>;
             if ins10 == false || ins20 == false || ins30 == false {
                 return 1;
             }
-            if set.len() != (3 as u64) {
+            if set.len() != (3 as usize) {
                 return 2;
             }
             if set.is_empty() == true {
@@ -244,13 +244,13 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as usize);
 
             dec first_ins = set.insert(42);
             if first_ins == false {
                 return 1;
             }
-            if set.len() != (1 as u64) {
+            if set.len() != (1 as usize) {
                 return 2;
             }
 
@@ -258,7 +258,7 @@ import <iter_collect>;
             if second_ins == true {
                 return 3;
             }
-            if set.len() != (1 as u64) {
+            if set.len() != (1 as usize) {
                 return 4;
             }
 
@@ -266,7 +266,7 @@ import <iter_collect>;
             if third_ins == true {
                 return 5;
             }
-            if set.len() != (1 as u64) {
+            if set.len() != (1 as usize) {
                 return 6;
             }
 
@@ -311,7 +311,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as usize);
             set.insert(100);
             set.insert(200);
             set.insert(300);
@@ -326,7 +326,7 @@ import <iter_collect>;
             if rem_absent == true {
                 return 1;
             }
-            if set.len() != (3 as u64) {
+            if set.len() != (3 as usize) {
                 return 2;
             }
 
@@ -335,7 +335,7 @@ import <iter_collect>;
             if rem_200 == false {
                 return 3;
             }
-            if set.len() != (2 as u64) {
+            if set.len() != (2 as usize) {
                 return 4;
             }
             if set.contains(&k200) == true {
@@ -390,24 +390,24 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as usize);
             set.insert(1);
             set.insert(2);
             set.insert(3);
 
-            if set.len() != (3 as u64) {
+            if set.len() != (3 as usize) {
                 return 1;
             }
 
             set.clear();
 
-            if set.len() != (0 as u64) {
+            if set.len() != (0 as usize) {
                 return 2;
             }
             if set.is_empty() == false {
                 return 3;
             }
-            if set.capacity() != (8 as u64) {
+            if set.capacity() != (8 as usize) {
                 return 4;
             }
 
@@ -425,7 +425,7 @@ import <iter_collect>;
             if set.contains(&k99) == false {
                 return 6;
             }
-            if set.len() != (1 as u64) {
+            if set.len() != (1 as usize) {
                 return 7;
             }
 
@@ -484,7 +484,7 @@ import <iter_collect>;
         }
 
         fn main() -> i32 {
-            dec rw set = std::hashset_with_capacity<CollidingKey>(8 as u64);
+            dec rw set = std::hashset_with_capacity<CollidingKey>(8 as usize);
 
             // Three distinct keys that all produce hash = 3
             dec k1 = CollidingKey { id: 10, fixed_hash: 3 as u64 };
@@ -495,7 +495,7 @@ import <iter_collect>;
             set.insert(k2);
             set.insert(k3);
 
-            if set.len() != (3 as u64) {
+            if set.len() != (3 as usize) {
                 return 1;
             }
 
@@ -513,7 +513,7 @@ import <iter_collect>;
 
             // Remove middle key in collision probe chain
             set.remove(&q2);
-            if set.len() != (2 as u64) {
+            if set.len() != (2 as usize) {
                 return 4;
             }
             if set.contains(&q2) == true {
@@ -560,7 +560,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw set = std::hashset_with_capacity<i32>(8 as u64);
+            dec rw set = std::hashset_with_capacity<i32>(8 as usize);
 
             // Insert 25 elements, forcing multiple resizes (8 -> 16 -> 32 -> 64)
             dec rw i: i32 = 1;
@@ -569,10 +569,10 @@ import <iter_collect>;
                 i = i + 1;
             }
 
-            if set.len() != (25 as u64) {
+            if set.len() != (25 as usize) {
                 return 1;
             }
-            if set.capacity() < (32 as u64) {
+            if set.capacity() < (32 as usize) {
                 return 2;
             }
 
@@ -655,7 +655,7 @@ import <iter_collect>;
         }
 
         fn run_set_lifecycle(drop_count_ptr: *rw i32) -> i32 {
-            dec rw set = std::hashset_with_capacity<TrackedElement>(8 as u64);
+            dec rw set = std::hashset_with_capacity<TrackedElement>(8 as usize);
 
             // Insert 6 elements (6 tracked elements created)
             dec rw i: i32 = 1;

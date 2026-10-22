@@ -83,7 +83,16 @@ module std {
         private table: RawTable<K, V>,
     };
 
-    export fn hashmap_new<K, V>() -> HashMap<K, V> {
+    // Type-owned constructors; free factories remain migration entry points.
+impl<K, V> HashMap<K, V> {
+    export fn new() -> Self { return hashmap_new<K, V>(); }
+    export fn with_capacity(capacity: usize) -> Self {
+        return hashmap_with_capacity<K, V>(capacity);
+    }
+}
+
+
+export fn hashmap_new<K, V>() -> HashMap<K, V> {
         return HashMap<K, V> {
             table: raw_table_new<K, V>(),
         };
@@ -95,18 +104,18 @@ module std {
         }
     }
 
-    export fn hashmap_with_capacity<K, V>(capacity: u64) -> HashMap<K, V> {
+    export fn hashmap_with_capacity<K, V>(capacity: usize) -> HashMap<K, V> {
         return HashMap<K, V> {
             table: raw_table_with_capacity<K, V>(capacity),
         };
     }
 
     impl<K: std::Hash + std::Eq, V> HashMap<K, V> {
-        export fn len(self: &Self) -> u64 {
+        export fn len(self: &Self) -> usize {
             return self.table.len();
         }
 
-        export fn capacity(self: &Self) -> u64 {
+        export fn capacity(self: &Self) -> usize {
             return self.table.capacity();
         }
 
@@ -220,6 +229,8 @@ impl<K, V> std::IntoIterator<(K, V), std::MapIntoIter<K, V>> for std::HashMap<K,
     fn into_iter(self: Self) -> std::MapIntoIter<K, V> {
         return self.into_iter();
     }
+
+
 }
 
 extern fn __luna_panic_default();

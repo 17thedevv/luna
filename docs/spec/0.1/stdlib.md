@@ -16,6 +16,15 @@ E1 arithmetic/range evidence are listed in the
 This supersedes a blanket description of every later addition as unverified,
 while retaining the distinction between building providers and certifying all APIs.
 
+## Memory size/index amendment (2026-10-22)
+
+The maintainer-approved [STD-D05 amendment](stdlib-memory-size-v1.md) uses
+usize for in-memory counts and indices, including canonical raw-slice hooks.
+Compiler protocol 26 rejects pre-amendment bundles. Hash widths, stream/file
+coordinates and fixed C ABI domains are reviewed separately. The current branch
+has 50 providers after alloc_error; historical 49-provider evidence below keeps
+its original pin and does not qualify this migration.
+
 ## Required invariants
 
 | Capability | Contract |

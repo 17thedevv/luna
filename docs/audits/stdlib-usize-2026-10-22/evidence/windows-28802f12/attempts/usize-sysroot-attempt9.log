@@ -1,0 +1,6 @@
+error[E6004]: Failed to build Luna sysroot: Failed to build encoding:
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 1585, end: 1588, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 2161, end: 2164, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 2874, end: 2877, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+
+

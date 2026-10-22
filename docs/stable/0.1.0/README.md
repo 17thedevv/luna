@@ -15,7 +15,7 @@ It is not a stable qualification result.
 
 | Milestone | State |
 | --- | --- |
-| S0 baseline/backlog | Integrated baseline recorded; publication-state contradictions repaired; grammar/compatibility reconciliation in progress |
+| S0 baseline/backlog | Integrated baseline recorded; publication-state contradictions repaired; grammar/compatibility and maintainer-requested stdlib redesign in progress |
 | S1 correctness | DEBUG removal and borrow maturity passed locally; I/O source/artifact, quiet CLI and diagnostic conformance passed at `0b09ed8b`; broader S1 audit remains open |
 | S2 Lunar | 20 Windows candidate CLI smoke steps PASS with LLVM/GNU wrapper; raw-GCC Unicode-path failure retained; Ubuntu/package consumers pending |
 | S3 packaging/license/docs | GPL-3.0-only applied to first-party source; notices/package source inventory and the wider website example audit remain open |
@@ -80,6 +80,47 @@ lanes and two clean package smokes are complete in that recorded scope.
 Historical raw logs, archives, package SHAs and typed failure records remain
 unchanged. Metadata-only Git history mappings are separate provenance; stable
 must build and test a new immutable final pin.
+
+## Stdlib API/layout redesign
+
+At the maintainer's request, [joint API/layout design](../../proposals/stdlib-redesign-0.1.md)
+now precedes stable qualification. The confirmed direction is compact std names,
+type-associated constructors, usize memory sizes/indices and the existing
+luna-rs/libs/external source root. STD-D06 supplements aborting allocation with
+fallible try_* APIs; the [allocator design](../../proposals/stdlib-redesign-0.1/allocator.md)
+records runtime primitives, ownership on failure and acceptance. The maintainer
+then requested implementation: [STD-D06 execution](../../audits/stdlib-fallible-2026-10-21/README.md)
+now has ABI 2 primitives and the first Vec/Box/String try_* APIs under validation.
+This adds alloc_error (50 current providers); full redesign remains in progress.
+Internal grouping, per-domain contracts and migration/compatibility remain open.
+The [parser inventory](../../audits/stdlib-redesign-2026-10-21/README.md) maps 49
+providers / 2,358 declaration records / 213 explicit imports at 264390da; it is
+not resolved API or conformance evidence. STABLE-016 tracks design and migration.
+Existing alpha and focused I/O results remain historical results for their pins.
+
+The next [API foundation slice](../../audits/stdlib-usize-2026-10-22/README.md)
+implements STD-D05 through containers and consumers, constructor expansion,
+ordered-set algebra and u64 bit utilities. It requires compiler protocol 26 and
+new bundles. The [C++23 functional map](../../proposals/stdlib-redesign-0.1/cpp-library-gap-map.md)
+adds a prioritized backlog, with graph/basic CPU matrix/tensor as maintainer-
+authorized extensions. Focused validation and final qualification are separate;
+the foundation pin 28802f12 passes eight Windows CLI suites (29 tests) and 40
+existing acceptance tests, with 50 fresh canonical artifact/object pairs.
+The refreshed parser snapshot maps 2,411 declaration records / 219 explicit
+imports. Ubuntu/workspace and final package qualification remain pending;
+STABLE-016 remains open.
+
+On 2026-10-23 the maintainer prioritized the [I/O API design](../../proposals/stdlib-redesign-0.1/io-api.md)
+before further numerical/graph expansion and selected `$name` interpolation.
+The proposal records byte/text/formatting boundaries, errors/progress, buffer
+recovery and a separate generic macro prerequisite. No new I/O implementation,
+runtime ABI or dollar interpolation support is claimed by that design work.
+
+The next [lang-item design](../../proposals/stdlib-redesign-0.1/lang-items.md)
+separates 22 current production registrations from a 26-role core target and
+disabled optional profiles. It defines owner/shape/trust, artifact/VM parity and
+acceptance; neither the four new core roles nor optional protocols are implemented
+by the design-only follow-up.
 
 ## Release boundaries
 

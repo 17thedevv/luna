@@ -145,16 +145,16 @@ fn test_default_protocol() {
 
             // Containers
             dec v: std::Vec<i32> = std::Default::default();
-            if v.len() != (0 as u64) { return 14; }
+            if v.len() != (0 as usize) { return 14; }
 
             dec s: std::String = std::Default::default();
-            if s.len() != (0 as u64) { return 15; }
+            if s.len() != (0 as usize) { return 15; }
 
             dec m: std::HashMap<i32, i32> = std::Default::default();
-            if m.len() != (0 as u64) { return 16; }
+            if m.len() != (0 as usize) { return 16; }
 
             dec set: std::HashSet<i32> = std::Default::default();
-            if set.len() != (0 as u64) { return 17; }
+            if set.len() != (0 as usize) { return 17; }
 
             // Creating empty containers must not require Hash or Eq impls.
             dec non_hash_map: std::HashMap<EmptyKey, EmptyValue> = std::Default::default();

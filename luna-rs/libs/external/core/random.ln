@@ -52,6 +52,10 @@ export module std {
     }
 
     impl Rng {
+        export fn new(seed: u64) -> Self {
+            return rng_new(seed);
+        }
+
         export fn next_u64(self: &rw Self) -> u64 {
             dec result = rotl(self.s1 * (5 as u64), 7 as u64) * (9 as u64);
             dec t = self.s1 << (17 as u64);
@@ -141,8 +145,8 @@ export module std {
                 if i != j {
                     dec base_ptr = &rw slice[0] as *rw T;
                     unsafe {
-                        dec p_i = std::ptr::add_mut<T>(base_ptr, i as u64);
-                        dec p_j = std::ptr::add_mut<T>(base_ptr, j as u64);
+                        dec p_i = std::ptr::add_mut<T>(base_ptr, i);
+                        dec p_j = std::ptr::add_mut<T>(base_ptr, j);
                         dec tmp = std::ptr::read<T>(p_i as *T);
                         std::ptr::write<T>(p_i, std::ptr::read<T>(p_j as *T));
                         std::ptr::write<T>(p_j, tmp);

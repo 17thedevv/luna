@@ -330,7 +330,7 @@ import <iter_consumers>;
 
 fn escape_raw(p: *i32) -> &[i32] life_from(p) {
     unsafe {
-        return std::mem::slice_from_raw_parts(p, 1 as u64);
+        return std::mem::slice_from_raw_parts(p, 1 as usize);
     }
 }
 "#;

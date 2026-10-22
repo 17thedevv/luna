@@ -2,7 +2,7 @@
 
 Generated from [sysroot.toml](../../../luna-rs/libs/external/sysroot.toml). Provider identity is not a namespace or a completeness claim.
 
-Current manifest: **49 providers**. The [original audit manifest](evidence/sysroot-audit-baseline.toml) has 32; later additions are implementation inventory, not automatic spec adoption or conformance. Public/internal visibility controls import access, separately from exported declarations.
+Current manifest: **50 providers**. The [original audit manifest](evidence/sysroot-audit-baseline.toml) has 32; later additions are implementation inventory, not automatic spec adoption or conformance. Public/internal visibility controls import access, separately from exported declarations.
 
 Current evidence: all 49 fresh bundle/object hashes and target headers are preserved by [E1 provenance](../../audits/0.1-alpha-completion-2026-10-04/evidence/e1-final5-sysroot-provenance-2026-10-13.json). [R4 provider reconciliation](../../audits/0.1-alpha-completion-2026-10-04/r4/README.md) records bounded D3 graph/API evidence; builds do not certify every public API or advertised target.
 
@@ -37,6 +37,7 @@ Current evidence: all 49 fresh bundle/object hashes and target headers are prese
 | `convert` | [core/convert.ln](../../../luna-rs/libs/external/core/convert.ln) | public | ordinary provider | original 32-provider audit | E1 fresh bundle verified; API scope per R4 |
 | `float` | [core/float.ln](../../../luna-rs/libs/external/core/float.ln) | public | ordinary provider | original 32-provider audit | E1 fresh bundle verified; API scope per R4 |
 | `fmt` | [core/fmt.ln](../../../luna-rs/libs/external/core/fmt.ln) | public | ordinary provider | original 32-provider audit | E1 fresh bundle verified; API scope per R4 |
+| `alloc_error` | [alloc/error.ln](../../../luna-rs/libs/external/alloc/error.ln) | public | ordinary provider | later addition; outside original audit | E1 fresh bundle verified; API scope per R4 |
 | `box` | [alloc/box.ln](../../../luna-rs/libs/external/alloc/box.ln) | public | ordinary provider | original 32-provider audit | E1 fresh bundle verified; API scope per R4 |
 | `vec` | [alloc/vec.ln](../../../luna-rs/libs/external/alloc/vec.ln) | public | ordinary provider | original 32-provider audit | E1 fresh bundle verified; API scope per R4 |
 | `string` | [alloc/string.ln](../../../luna-rs/libs/external/alloc/string.ln) | public | ordinary provider | original 32-provider audit | E1 fresh bundle verified; API scope per R4 |

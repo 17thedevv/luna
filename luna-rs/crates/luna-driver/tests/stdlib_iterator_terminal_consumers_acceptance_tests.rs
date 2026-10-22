@@ -482,7 +482,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v = std::vec_with_capacity<TrackedItem>(5 as u64);
+                dec rw v = std::vec_with_capacity<TrackedItem>(5 as usize);
                 dec rw i: i32 = 1;
                 while i <= 5 {
                     unsafe {
@@ -572,7 +572,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v = std::vec_with_capacity<TrackedItem>(4 as u64);
+                dec rw v = std::vec_with_capacity<TrackedItem>(4 as usize);
                 dec rw i: i32 = 1;
                 while i <= 4 {
                     unsafe {
@@ -663,7 +663,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v = std::vec_with_capacity<TrackedItem>(5 as u64);
+                dec rw v = std::vec_with_capacity<TrackedItem>(5 as usize);
                 dec rw i: i32 = 1;
                 while i <= 5 {
                     unsafe {
@@ -892,9 +892,9 @@ fn test_iter_find_owned_droptracker() {
             dec size = 3 as u64 * (sizeof(i32) as u64);
             dec raw_buf = __luna_alloc(size, 4 as u64) as *rw i32;
             unsafe {
-                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 0 as u64), 10);
-                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 1 as u64), 20);
-                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 2 as u64), 30);
+                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 0 as usize), 10);
+                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 1 as usize), 20);
+                std::ptr::write<i32>(std::ptr::add_mut<i32>(raw_buf, 2 as usize), 30);
             }
             dec it = OwnedCopyIter {
                 buf: raw_buf,
@@ -1010,9 +1010,9 @@ fn test_iter_any_owned_droptracker() {
                 dec size = 3 as u64 * (sizeof(TrackedItem) as u64);
                 dec raw_buf = __luna_alloc(size, 8 as u64) as *rw TrackedItem;
                 unsafe {
-                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 0 as u64), TrackedItem { val: 10, counter: c_ptr });
-                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 1 as u64), TrackedItem { val: 20, counter: c_ptr });
-                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 2 as u64), TrackedItem { val: 30, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 0 as usize), TrackedItem { val: 10, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 1 as usize), TrackedItem { val: 20, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 2 as usize), TrackedItem { val: 30, counter: c_ptr });
                 }
                 dec it = OwnedTripleIter {
                     buf: raw_buf,
@@ -1136,9 +1136,9 @@ fn test_iter_all_owned_droptracker() {
                 dec size = 3 as u64 * (sizeof(TrackedItem) as u64);
                 dec raw_buf = __luna_alloc(size, 8 as u64) as *rw TrackedItem;
                 unsafe {
-                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 0 as u64), TrackedItem { val: 11, counter: c_ptr });
-                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 1 as u64), TrackedItem { val: 20, counter: c_ptr });
-                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 2 as u64), TrackedItem { val: 30, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 0 as usize), TrackedItem { val: 11, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 1 as usize), TrackedItem { val: 20, counter: c_ptr });
+                    std::ptr::write<TrackedItem>(std::ptr::add_mut<TrackedItem>(raw_buf, 2 as usize), TrackedItem { val: 30, counter: c_ptr });
                 }
                 dec it = OwnedTripleIter {
                     buf: raw_buf,

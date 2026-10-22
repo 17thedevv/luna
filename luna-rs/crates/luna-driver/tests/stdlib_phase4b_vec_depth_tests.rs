@@ -53,7 +53,7 @@ fn test_vec_swap_remove() {
     let src = r#"
         import <vec>;
 
-        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: usize) -> i32 {
             match v.get(idx) {
                 std::Option::Some(x) -> *x,
                 std::Option::None -> 0 - 1,
@@ -68,12 +68,12 @@ fn test_vec_swap_remove() {
             v.push(40);
 
             // swap_remove(1) removes 20, moves 40 into index 1
-            dec removed = v.swap_remove(1 as u64);
+            dec removed = v.swap_remove(1 as usize);
             if removed != 20 { return 1; }
-            if v.len() != (3 as u64) { return 2; }
-            if get_val(&v, 0 as u64) != 10 { return 3; }
-            if get_val(&v, 1 as u64) != 40 { return 4; }
-            if get_val(&v, 2 as u64) != 30 { return 5; }
+            if v.len() != (3 as usize) { return 2; }
+            if get_val(&v, 0 as usize) != 10 { return 3; }
+            if get_val(&v, 1 as usize) != 40 { return 4; }
+            if get_val(&v, 2 as usize) != 30 { return 5; }
 
             return 0;
         }
@@ -94,7 +94,7 @@ fn test_vec_retain() {
     let src = r#"
         import <vec>;
 
-        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: usize) -> i32 {
             match v.get(idx) {
                 std::Option::Some(x) -> *x,
                 std::Option::None -> 0 - 1,
@@ -115,10 +115,10 @@ fn test_vec_retain() {
             v.push(6);
 
             v.retain(is_even);
-            if v.len() != (3 as u64) { return 1; }
-            if get_val(&v, 0 as u64) != 2 { return 2; }
-            if get_val(&v, 1 as u64) != 4 { return 3; }
-            if get_val(&v, 2 as u64) != 6 { return 4; }
+            if v.len() != (3 as usize) { return 1; }
+            if get_val(&v, 0 as usize) != 2 { return 2; }
+            if get_val(&v, 1 as usize) != 4 { return 3; }
+            if get_val(&v, 2 as usize) != 6 { return 4; }
 
             return 0;
         }
@@ -139,7 +139,7 @@ fn test_vec_dedup() {
     let src = r#"
         import <vec>;
 
-        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: usize) -> i32 {
             match v.get(idx) {
                 std::Option::Some(x) -> *x,
                 std::Option::None -> 0 - 1,
@@ -157,11 +157,11 @@ fn test_vec_dedup() {
             v.push(4);
 
             v.dedup_i32();
-            if v.len() != (4 as u64) { return 1; }
-            if get_val(&v, 0 as u64) != 1 { return 2; }
-            if get_val(&v, 1 as u64) != 2 { return 3; }
-            if get_val(&v, 2 as u64) != 3 { return 4; }
-            if get_val(&v, 3 as u64) != 4 { return 5; }
+            if v.len() != (4 as usize) { return 1; }
+            if get_val(&v, 0 as usize) != 1 { return 2; }
+            if get_val(&v, 1 as usize) != 2 { return 3; }
+            if get_val(&v, 2 as usize) != 3 { return 4; }
+            if get_val(&v, 3 as usize) != 4 { return 5; }
 
             return 0;
         }
@@ -182,7 +182,7 @@ fn test_vec_insert_and_remove() {
     let src = r#"
         import <vec>;
 
-        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: usize) -> i32 {
             match v.get(idx) {
                 std::Option::Some(x) -> *x,
                 std::Option::None -> 0 - 1,
@@ -195,16 +195,16 @@ fn test_vec_insert_and_remove() {
             v.push(30);
 
             // insert 20 at index 1 -> [10, 20, 30]
-            v.insert(1 as u64, 20);
-            if v.len() != (3 as u64) { return 1; }
-            if get_val(&v, 1 as u64) != 20 { return 2; }
+            v.insert(1 as usize, 20);
+            if v.len() != (3 as usize) { return 1; }
+            if get_val(&v, 1 as usize) != 20 { return 2; }
 
             // remove at index 1 -> removes 20 -> [10, 30]
-            dec rem = v.remove(1 as u64);
+            dec rem = v.remove(1 as usize);
             if rem != 20 { return 3; }
-            if v.len() != (2 as u64) { return 4; }
-            if get_val(&v, 0 as u64) != 10 { return 5; }
-            if get_val(&v, 1 as u64) != 30 { return 6; }
+            if v.len() != (2 as usize) { return 4; }
+            if get_val(&v, 0 as usize) != 10 { return 5; }
+            if get_val(&v, 1 as usize) != 30 { return 6; }
 
             return 0;
         }
@@ -226,7 +226,7 @@ fn test_vec_resize_and_extend() {
         import <vec>;
         import <slice>;
 
-        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: usize) -> i32 {
             match v.get(idx) {
                 std::Option::Some(x) -> *x,
                 std::Option::None -> 0 - 1,
@@ -243,15 +243,15 @@ fn test_vec_resize_and_extend() {
             v.push(2);
 
             // resize_with up to 4 elements
-            v.resize_with(4 as u64, default_val);
-            if v.len() != (4 as u64) { return 1; }
-            if get_val(&v, 2 as u64) != 99 { return 2; }
-            if get_val(&v, 3 as u64) != 99 { return 3; }
+            v.resize_with(4 as usize, default_val);
+            if v.len() != (4 as usize) { return 1; }
+            if get_val(&v, 2 as usize) != 99 { return 2; }
+            if get_val(&v, 3 as usize) != 99 { return 3; }
 
             // resize_with down to 1 element
-            v.resize_with(1 as u64, default_val);
-            if v.len() != (1 as u64) { return 4; }
-            if get_val(&v, 0 as u64) != 1 { return 5; }
+            v.resize_with(1 as usize, default_val);
+            if v.len() != (1 as usize) { return 4; }
+            if get_val(&v, 0 as usize) != 1 { return 5; }
 
             // extend_from_iter with owned elements from another Vec
             dec rw v2 = std::vec_new<i32>();
@@ -259,10 +259,10 @@ fn test_vec_resize_and_extend() {
             v2.push(20);
             v2.push(30);
             v.extend_from_iter(v2.into_iter());
-            if v.len() != (4 as u64) { return 6; }
-            if get_val(&v, 1 as u64) != 10 { return 7; }
-            if get_val(&v, 2 as u64) != 20 { return 8; }
-            if get_val(&v, 3 as u64) != 30 { return 9; }
+            if v.len() != (4 as usize) { return 6; }
+            if get_val(&v, 1 as usize) != 10 { return 7; }
+            if get_val(&v, 2 as usize) != 20 { return 8; }
+            if get_val(&v, 3 as usize) != 30 { return 9; }
 
             return 0;
         }
@@ -326,7 +326,7 @@ fn test_vec_extend_from_slice() {
         import <vec>;
         import <clone>;
 
-        fn get_val(v: &std::Vec<i32>, idx: u64) -> i32 {
+        fn get_val(v: &std::Vec<i32>, idx: usize) -> i32 {
             match v.get(idx) {
                 std::Option::Some(x) -> *x,
                 std::Option::None -> 0 - 1,
@@ -344,12 +344,12 @@ fn test_vec_extend_from_slice() {
             v2.push(5);
 
             v1.extend_from_slice(v2.as_slice());
-            if v1.len() != (5 as u64) { return 1; }
-            if get_val(&v1, 0 as u64) != 1 { return 2; }
-            if get_val(&v1, 1 as u64) != 2 { return 3; }
-            if get_val(&v1, 2 as u64) != 3 { return 4; }
-            if get_val(&v1, 3 as u64) != 4 { return 5; }
-            if get_val(&v1, 4 as u64) != 5 { return 6; }
+            if v1.len() != (5 as usize) { return 1; }
+            if get_val(&v1, 0 as usize) != 1 { return 2; }
+            if get_val(&v1, 1 as usize) != 2 { return 3; }
+            if get_val(&v1, 2 as usize) != 3 { return 4; }
+            if get_val(&v1, 3 as usize) != 4 { return 5; }
+            if get_val(&v1, 4 as usize) != 5 { return 6; }
 
             return 0;
         }

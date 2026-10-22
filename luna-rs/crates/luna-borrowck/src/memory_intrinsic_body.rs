@@ -34,7 +34,7 @@ pub(super) fn validate(func: &Function, ctx: &SemanticContext) -> Option<Result<
             || !matches!(ctx.types.get(*slice), SemanticType::Slice(inner) if inner == element)
             || !matches!(
                 ctx.types.get(func.param_types[1]),
-                SemanticType::Primitive(BuiltinType::U64)
+                SemanticType::Primitive(BuiltinType::Usize)
             )
         {
             return false;
@@ -83,7 +83,7 @@ mod tests {
     fn thunk(mutable: Mutability) -> (Function, SemanticContext) {
         let mut ctx = SemanticContext::new();
         let element = ctx.types.intern(SemanticType::Primitive(BuiltinType::I32));
-        let length = ctx.types.intern(SemanticType::Primitive(BuiltinType::U64));
+        let length = ctx.types.intern(SemanticType::Primitive(BuiltinType::Usize));
         let pointer = ctx
             .types
             .intern(SemanticType::Pointer(mutable.clone(), element));
@@ -155,12 +155,13 @@ mod tests {
     #[test]
     fn only_exact_typed_primitive_recipes_receive_the_declared_unsafe_boundary() {
         for mutable in [Mutability::Immutable, Mutability::Mutable] {
-            let (func, ctx) = thunk(mutable);
+            let (func, mut ctx) = thunk(mutable);
+            let old_length = ctx.types.intern(SemanticType::Primitive(BuiltinType::U64));
             assert!(validate(&func, &ctx).unwrap().is_ok());
             let mut other = func.clone();
             other.name.symbol_id = Some(SymbolId(78));
             assert!(validate(&other, &ctx).is_none());
-            for alteration in 0..7 {
+            for alteration in 0..8 {
                 let mut changed = func.clone();
                 match alteration {
                     0 => changed.values[0].origin = ValueOrigin::Local,
@@ -169,11 +170,16 @@ mod tests {
                     3 => changed.blocks[0].insts.swap(2, 3),
                     4 => changed.param_types.swap(0, 1),
                     5 => changed.ret_ty = changed.param_types[0],
-                    _ => {
+                    6 => {
                         changed.values[4].inst = Instruction::MakeSlice {
                             data_ptr: Operand::Value(ValueId(3)),
                             len: Operand::Value(ValueId(2)),
                         }
+                    }
+                    _ => {
+                        changed.param_types[1] = old_length;
+                        changed.values[1].ty = old_length;
+                        changed.values[3].ty = old_length;
                     }
                 }
                 assert!(

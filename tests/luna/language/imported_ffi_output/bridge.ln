@@ -1,0 +1,2 @@
+export extern unsafe fn __luna_try_alloc(size: usize, align: usize, out: *rw *rw u8) -> i32;
+export extern fn __luna_dealloc(ptr: *rw u8, size: u64, align: u64);

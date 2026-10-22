@@ -1,0 +1,5 @@
+error[E6004]: Failed to build Luna sysroot: Failed to build random:
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 4987, end: 4988, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 5064, end: 5065, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+
+

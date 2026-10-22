@@ -1,0 +1,8 @@
+import <box>;
+struct Token { id: i32 };
+impl std::Drop for Token { fn drop(self: &rw Self) {} }
+fn main() -> i32 {
+    dec token = Token { id: 7 };
+    dec result = std::Box<Token>::try_new(token);
+    return token.id;
+}

@@ -110,14 +110,14 @@ import <iter_collect>;
 import <__raw_table>;
 
         fn main() -> i32 {
-            dec rw table = raw_table_with_capacity<i32, i32>(8 as u64);
-            if table.len() != (0 as u64) {
+            dec rw table = raw_table_with_capacity<i32, i32>(8 as usize);
+            if table.len() != (0 as usize) {
                 return 1;
             }
-            if table.capacity() != (8 as u64) {
+            if table.capacity() != (8 as usize) {
                 return 2;
             }
-            if table.tombstones() != (0 as u64) {
+            if table.tombstones() != (0 as usize) {
                 return 3;
             }
             if table.is_empty() == false {
@@ -162,7 +162,7 @@ import <iter_collect>;
 import <__raw_table>;
 
         fn main() -> i32 {
-            dec rw table = raw_table_with_capacity<i32, i32>(8 as u64);
+            dec rw table = raw_table_with_capacity<i32, i32>(8 as usize);
             dec ins1 = table.insert(10, 100);
             dec ins2 = table.insert(20, 200);
             dec ins3 = table.insert(30, 300);
@@ -170,7 +170,7 @@ import <__raw_table>;
             if ins1 == false || ins2 == false || ins3 == false {
                 return 1;
             }
-            if table.len() != (3 as u64) {
+            if table.len() != (3 as usize) {
                 return 2;
             }
 
@@ -248,7 +248,7 @@ import <iter_collect>;
 import <__raw_table>;
 
         fn main() -> i32 {
-            dec rw table = raw_table_with_capacity<i32, i32>(8 as u64);
+            dec rw table = raw_table_with_capacity<i32, i32>(8 as usize);
             table.insert(5, 50);
 
             dec mut_opt = table.get_mut(&5);
@@ -310,12 +310,12 @@ import <iter_collect>;
 import <__raw_table>;
 
         fn main() -> i32 {
-            dec rw table = raw_table_with_capacity<i32, i32>(8 as u64);
+            dec rw table = raw_table_with_capacity<i32, i32>(8 as usize);
             dec first_ins = table.insert(7, 70);
             if first_ins == false {
                 return 1;
             }
-            if table.len() != (1 as u64) {
+            if table.len() != (1 as usize) {
                 return 2;
             }
 
@@ -323,7 +323,7 @@ import <__raw_table>;
             if second_ins == true {
                 return 3; // Must return false indicating overwrite
             }
-            if table.len() != (1 as u64) {
+            if table.len() != (1 as usize) {
                 return 4; // Length must remain 1
             }
 
@@ -398,7 +398,7 @@ import <__raw_table>;
         }
 
         fn main() -> i32 {
-            dec rw table = raw_table_with_capacity<CollidingKey, i32>(8 as u64);
+            dec rw table = raw_table_with_capacity<CollidingKey, i32>(8 as usize);
             
             // 3 keys with the exact same forced hash
             dec k1 = CollidingKey { id: 1 as u64, forced_hash: 42 as u64 };
@@ -409,7 +409,7 @@ import <__raw_table>;
             table.insert(k2, 200);
             table.insert(k3, 300);
 
-            if table.len() != (3 as u64) {
+            if table.len() != (3 as usize) {
                 return 1;
             }
 
@@ -419,10 +419,10 @@ import <__raw_table>;
             if rem1 == false {
                 return 2;
             }
-            if table.len() != (2 as u64) {
+            if table.len() != (2 as usize) {
                 return 3;
             }
-            if table.tombstones() != (1 as u64) {
+            if table.tombstones() != (1 as usize) {
                 return 4;
             }
 
@@ -465,10 +465,10 @@ import <__raw_table>;
                 return 8;
             }
             // Tombstone was reused: tombstones count decrements from 1 to 0
-            if table.tombstones() != (0 as u64) {
+            if table.tombstones() != (0 as usize) {
                 return 9;
             }
-            if table.len() != (3 as u64) {
+            if table.len() != (3 as usize) {
                 return 10;
             }
 
@@ -529,8 +529,8 @@ import <iter_collect>;
 import <__raw_table>;
 
         fn main() -> i32 {
-            dec rw table = raw_table_with_capacity<i32, i32>(8 as u64);
-            if table.capacity() != (8 as u64) {
+            dec rw table = raw_table_with_capacity<i32, i32>(8 as usize);
+            if table.capacity() != (8 as usize) {
                 return 1;
             }
 
@@ -541,10 +541,10 @@ import <__raw_table>;
                 i = i + 1;
             }
 
-            if table.len() != (20 as u64) {
+            if table.len() != (20 as usize) {
                 return 2;
             }
-            if table.capacity() < (32 as u64) {
+            if table.capacity() < (32 as usize) {
                 return 3;
             }
 
@@ -562,7 +562,7 @@ import <__raw_table>;
             }
 
             // Tombstones must be 0 after resize
-            if table.tombstones() != (0 as u64) {
+            if table.tombstones() != (0 as usize) {
                 return 5;
             }
 
@@ -632,7 +632,7 @@ import <__raw_table>;
         }
 
         fn run_stress_lifecycle(drop_count_ptr: *rw i32) -> i32 {
-            dec rw table = raw_table_with_capacity<TrackedItem, TrackedItem>(8 as u64);
+            dec rw table = raw_table_with_capacity<TrackedItem, TrackedItem>(8 as usize);
             
             // Insert 6 key-value pairs (12 tracked items)
             dec rw i: i32 = 1;
@@ -753,7 +753,7 @@ import <iter_collect>;
 import <__raw_table>;
 
         fn main() -> i32 {
-            dec rw table = raw_table_with_capacity<i32, i32>(8 as u64);
+            dec rw table = raw_table_with_capacity<i32, i32>(8 as usize);
             table.insert(100, 1000);
             table.insert(200, 2000);
 

@@ -1,0 +1,147 @@
+import <vec>;
+import <box>;
+import <string>;
+import <alloc_error>;
+import <result>;
+
+extern fn __luna_test_alloc_fail_after(budget: i64);
+extern fn __luna_test_alloc_attempts() -> i64;
+extern fn __luna_test_alloc_live_blocks() -> i64;
+extern fn __luna_test_record_event();
+extern fn __luna_test_event_count() -> i64;
+
+struct Token { id: i32, drops: *rw usize };
+impl std::Drop for Token {
+    fn drop(self: &rw Self) {
+        unsafe { *self.drops = *self.drops + (1 as usize); }
+    }
+}
+struct Empty {};
+impl std::Drop for Empty {
+    fn drop(self: &rw Self) { __luna_test_record_event(); }
+}
+
+fn vector_case(drops: *rw usize) -> i32 {
+    __luna_test_alloc_fail_after(0);
+    match std::Vec<i32>::try_with_capacity(18446744073709551615u64 as usize) {
+        std::Result::Err(std::AllocError::CapacityOverflow) -> {},
+        _ -> { return 26; },
+    }
+    match std::Vec<Token>::try_with_capacity(1 as usize) {
+        std::Result::Err(std::AllocError::OutOfMemory) -> {},
+        _ -> { return 10; },
+    }
+    __luna_test_alloc_fail_after(1);
+    dec rw values = std::Vec<Token>::try_with_capacity(1 as usize).unwrap();
+    dec attempts = __luna_test_alloc_attempts();
+    if values.try_push(Token { id: 1, drops: drops }).is_err() { return 11; }
+    if __luna_test_alloc_attempts() != attempts { return 12; }
+    dec old_capacity = values.capacity();
+    match values.try_push(Token { id: 2, drops: drops }) {
+        std::Result::Err(failure) -> {
+            match failure.cause {
+                std::AllocError::OutOfMemory -> {},
+                _ -> { return 13; },
+            }
+            if failure.value.id != 2 { return 14; }
+            unsafe { if *drops != (0 as usize) { return 15; } }
+            if values.capacity() != old_capacity || values.len() != (1 as usize) { return 16; }
+            if values.as_slice()[0].id != 1 { return 17; }
+            __luna_test_alloc_fail_after(-1);
+            if values.try_push(failure.value).is_err() { return 18; }
+        },
+        std::Result::Ok -> { return 19; },
+    }
+    __luna_test_alloc_fail_after(0);
+    dec current_capacity = values.capacity();
+    if values.try_reserve(16 as usize).is_ok() { return 20; }
+    if values.capacity() != current_capacity || values.len() != (2 as usize) { return 21; }
+    if values.as_slice()[0].id != 1 || values.as_slice()[1].id != 2 { return 22; }
+    dec before_overflow = __luna_test_alloc_attempts();
+    match values.try_reserve(18446744073709551615u64 as usize) {
+        std::Result::Err(std::AllocError::CapacityOverflow) -> {},
+        _ -> { return 23; },
+    }
+    if __luna_test_alloc_attempts() != before_overflow { return 24; }
+    __luna_test_alloc_fail_after(-1);
+    if values.try_reserve(16 as usize).is_err() { return 25; }
+    return 0;
+}
+
+fn box_case(drops: *rw usize) -> i32 {
+    __luna_test_alloc_fail_after(0);
+    match std::Box<Token>::try_new(Token { id: 3, drops: drops }) {
+        std::Result::Err(failure) -> {
+            if failure.value.id != 3 { return 30; }
+            __luna_test_alloc_fail_after(-1);
+            dec boxed = std::Box<Token>::try_new(failure.value).unwrap();
+            if boxed.as_ref().id != 3 { return 31; }
+        },
+        std::Result::Ok(_) -> { return 32; },
+    }
+    __luna_test_alloc_fail_after(0);
+    {
+        dec failed = std::Box<Token>::try_new(Token { id: 4, drops: drops });
+        if failed.is_ok() { return 33; }
+    }
+    return 0;
+}
+
+fn text_case() -> i32 {
+    __luna_test_alloc_fail_after(-1);
+    dec rw text = std::String::try_with_capacity(8 as usize).unwrap();
+    text.push_str("Luna 🌙");
+    dec old_capacity = text.capacity();
+    __luna_test_alloc_fail_after(0);
+    if text.try_reserve(128 as usize).is_ok() { return 40; }
+    if text.capacity() != old_capacity || text.len() != (9 as usize) { return 41; }
+    dec expected = std::string_from_str(""); // Empty construction must not allocate.
+    if expected.len() != (0 as usize) { return 44; }
+    dec bytes = text.as_bytes();
+    if bytes[0] != (76 as u8) || bytes[5] != (240 as u8) || bytes[8] != (153 as u8) { return 42; }
+    __luna_test_alloc_fail_after(-1);
+    if text.try_reserve(128 as usize).is_err() { return 43; }
+    return 0;
+}
+
+fn zero_size_case() -> i32 {
+    __luna_test_alloc_fail_after(0);
+    dec attempts = __luna_test_alloc_attempts();
+    dec events = __luna_test_event_count();
+    {
+        dec zero_capacity = std::Vec<i32>::try_with_capacity(0 as usize).unwrap();
+        if zero_capacity.capacity() != (0 as usize) { return 55; }
+        dec rw empty = std::Vec<Empty>::new();
+        if empty.try_push(Empty {}).is_err() { return 50; }
+        if empty.try_push(Empty {}).is_err() { return 51; }
+        if empty.try_reserve(10 as usize).is_err() { return 52; }
+        dec boxed = std::Box<Empty>::try_new(Empty {}).unwrap();
+    }
+    if __luna_test_event_count() != events + 3 { return 53; }
+    if __luna_test_alloc_attempts() != attempts { return 54; }
+    return 0;
+}
+
+fn main() -> i32 {
+    dec baseline = __luna_test_alloc_live_blocks();
+    dec rw drops = 0 as usize;
+    dec vector = vector_case(&rw drops as *rw usize);
+    if vector != 0 { return vector; }
+    if drops != (2 as usize) { return 60; }
+    dec box = box_case(&rw drops as *rw usize);
+    if box != 0 { return box; }
+    if drops != (4 as usize) { return 61; }
+    __luna_test_alloc_fail_after(0);
+    {
+        dec rw empty = std::Vec<Token>::new();
+        dec failed = empty.try_push(Token { id: 5, drops: &rw drops as *rw usize });
+        if failed.is_ok() { return 63; }
+    }
+    if drops != (5 as usize) { return 64; }
+    dec text = text_case();
+    if text != 0 { return text; }
+    dec zero = zero_size_case();
+    if zero != 0 { return zero; }
+    if __luna_test_alloc_live_blocks() != baseline { return 62; }
+    return 0;
+}

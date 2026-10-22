@@ -8,7 +8,7 @@ fn main() -> i32 {
     dec rw owned = std::cstring_new("hello").unwrap();
     { dec view = owned.as_c_str(); if view.to_bytes().len != 5 as usize { return 4; } }
     dec clone = owned.clone();
-    if clone.to_string().len() != 5 as u64 { return 5; }
+    if clone.to_string().len() != 5 as usize { return 5; }
     dec rw text = std::string_from_str("a"); text.push_str("bc");
     return text.len() as i32 - 3;
 }

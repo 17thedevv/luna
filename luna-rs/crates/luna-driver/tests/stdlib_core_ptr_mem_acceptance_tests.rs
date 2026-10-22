@@ -125,9 +125,9 @@ fn test_p4_mem_primitives() {
             dec src_ptr = &src_byte as *u8;
             dec dst_ptr = &rw dst_byte as *rw u8;
             unsafe {
-                std::mem::copy(src_ptr, dst_ptr, 1 as u64);
-                std::mem::set(dst_ptr, 128 as u8, 1 as u64);
-                std::mem::zero(dst_ptr, 1 as u64);
+                std::mem::copy(src_ptr, dst_ptr, 1 as usize);
+                std::mem::set(dst_ptr, 128 as u8, 1 as usize);
+                std::mem::zero(dst_ptr, 1 as usize);
             }
         }
     "#;
@@ -198,7 +198,7 @@ fn test_p6_p7_ptr_arithmetic_and_diff() {
             dec p_a = &a as *i32;
             dec p_b = &b as *i32;
             unsafe {
-                dec p_next = std::ptr::add<i32>(p_a, 1 as u64);
+                dec p_next = std::ptr::add<i32>(p_a, 1 as usize);
                 dec p_back = std::ptr::offset<i32>(p_next, -1 as i64);
                 dec distance = std::ptr::diff<i32>(p_b, p_a);
                 return distance as i32;
@@ -274,7 +274,7 @@ fn test_p11_generic_struct_ptr_copy() {
             dec p1 = Point { x: 10, y: 20 };
             dec rw p2 = Point { x: 0, y: 0 };
             unsafe {
-                std::ptr::copy<Point>(&p1 as *Point, &rw p2 as *rw Point, 1 as u64);
+                std::ptr::copy<Point>(&p1 as *Point, &rw p2 as *rw Point, 1 as usize);
                 dec read_back = std::ptr::read<Point>(&p2 as *Point);
             }
         }

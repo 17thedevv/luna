@@ -1,0 +1,8 @@
+import <vec>;
+fn main() -> i32 {
+    dec rw values = std::Vec<i32>::new();
+    values.push(7);
+    dec borrowed = values.as_slice();
+    dec result = values.try_reserve(64 as usize);
+    return borrowed[0];
+}

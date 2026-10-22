@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "status": "FOCUSED_PASS_NOT_STABLE_QUALIFIED",
+  "source_commit": "b9878c70843572113c6c5e6c96fe998f17f6979a",
+  "code_trees": {
+    "luna-rs": "b8e5af56258677f945e83173fd79ea73a9563687",
+    "runtime": "b2702099bc5780d5806e508a77466bfd89541323",
+    "tests": "dcc9ea8e03d6e47cae46bea266389fc605ffb3d3"
+  },
+  "platform": "Windows x86_64 GNU",
+  "commands": [
+    {
+      "label": "runtime-config",
+      "command": [
+        "cmake",
+        "-S",
+        "runtime",
+        "-B",
+        "D:/luna-stable-build/runtime",
+        "-G",
+        "Ninja",
+        "-DCMAKE_BUILD_TYPE=Release"
+      ],
+      "cwd": "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang",
+      "started": "2026-10-21T08:15:37.051813+00:00",
+      "exit": 0,
+      "seconds": 0.255,
+      "stdout": {
+        "path": "runtime-config.stdout",
+        "sha256": "15895230cdc6b1d32277fad7d540687111ad6b0d2b6b3c552b88038208d6c6dc"
+      },
+      "stderr": {
+        "path": "runtime-config.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "runtime-build",
+      "command": [
+        "cmake",
+        "--build",
+        "D:/luna-stable-build/runtime",
+        "--parallel",
+        "4"
+      ],
+      "cwd": "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang",
+      "started": "2026-10-21T08:15:37.316865+00:00",
+      "exit": 0,
+      "seconds": 3.553,
+      "stdout": {
+        "path": "runtime-build.stdout",
+        "sha256": "a3afa4f581e979fa7d5e30cff94c548e9e4a831bf44434ac7ad54e5b6bdf5333"
+      },
+      "stderr": {
+        "path": "runtime-build.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "runtime-tests",
+      "command": [
+        "ctest",
+        "--test-dir",
+        "D:/luna-stable-build/runtime",
+        "--output-on-failure"
+      ],
+      "cwd": "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang",
+      "started": "2026-10-21T08:15:40.870542+00:00",
+      "exit": 0,
+      "seconds": 26.365,
+      "stdout": {
+        "path": "runtime-tests.stdout",
+        "sha256": "9e2374de8bf88918a0f1c2aa9aa672e834754f5c22c069d122309182d5acd2bb"
+      },
+      "stderr": {
+        "path": "runtime-tests.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "runtime-symbols",
+      "command": [
+        "C:/mingw64/bin/nm.exe",
+        "--defined-only",
+        "D:/luna-stable-build/runtime/libluna-runtime.a"
+      ],
+      "cwd": "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang",
+      "started": "2026-10-21T08:16:07.236555+00:00",
+      "exit": 0,
+      "seconds": 0.024,
+      "stdout": {
+        "path": "runtime-symbols.stdout",
+        "sha256": "121db15075edc441e4a021f4e841600084bc3b21ee49d809311038bb80a0864b"
+      },
+      "stderr": {
+        "path": "runtime-symbols.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "cli-build",
+      "command": [
+        "cargo",
+        "build",
+        "--manifest-path",
+        "luna-rs/Cargo.toml",
+        "--locked",
+        "-p",
+        "luna-cli"
+      ],
+      "cwd": "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang",
+      "started": "2026-10-21T08:16:07.261322+00:00",
+      "exit": 0,
+      "seconds": 4.312,
+      "stdout": {
+        "path": "cli-build.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "cli-build.stderr",
+        "sha256": "1bd02442870e0933198b0c36dcca947ec998a509be9523af7e4586265144b8b5"
+      }
+    },
+    {
+      "label": "fresh-sysroot",
+      "command": [
+        "D:/luna-stable-build/cargo/debug/luna.exe",
+        "build-sysroot",
+        "--quiet"
+      ],
+      "cwd": "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang",
+      "started": "2026-10-21T08:16:11.650725+00:00",
+      "exit": 0,
+      "seconds": 92.225,
+      "stdout": {
+        "path": "fresh-sysroot.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "fresh-sysroot.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "label": "focused-cli",
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "luna-rs/Cargo.toml",
+        "--locked",
+        "-p",
+        "luna-cli",
+        "--test",
+        "associated_owner_generic_cli",
+        "--test",
+        "imported_ffi_output_cli",
+        "--test",
+        "fallible_allocation_cli",
+        "--test",
+        "stable_io_cli",
+        "--test",
+        "quiet_cli",
+        "--test",
+        "diagnostic_conformance_cli"
+      ],
+      "cwd": "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang",
+      "started": "2026-10-21T08:17:43.876261+00:00",
+      "exit": 0,
+      "seconds": 683.036,
+      "stdout": {
+        "path": "focused-cli.stdout",
+        "sha256": "91ee9a968f3549503df4e022593ac650ca27b0aa6f2f2d779ec5d0befc611a60"
+      },
+      "stderr": {
+        "path": "focused-cli.stderr",
+        "sha256": "2af84420da42aec93148f523803d9ea8555c69f3514656f87029ad1928d1a11b"
+      }
+    }
+  ],
+  "workspace_status": "Running separately; focused PASS does not imply workspace PASS",
+  "scope": [
+    "C runtime retained ABI and deterministic failures",
+    "No production test hooks",
+    "Fresh 50-provider sysroot",
+    "Six CLI suites / nine Rust tests with public source/artifact programs"
+  ]
+}

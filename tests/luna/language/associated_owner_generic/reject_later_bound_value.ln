@@ -1,0 +1,6 @@
+import "provider";
+fn main() -> i32 {
+    dec factory = model::Restricted::create;
+    dec value = factory(1 as u8);
+    return value.value as i32;
+}

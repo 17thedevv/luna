@@ -1,0 +1,101 @@
+name: Stdlib API foundation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [stdlib-redesign]
+    paths:
+      - .github/workflows/stdlib-fallible.yml
+      - luna-rs/crates/**
+      - luna-rs/libs/external/**
+      - runtime/**
+      - tests/luna/language/associated_owner_generic/**
+      - tests/luna/language/imported_ffi_output/**
+      - tests/luna/stdlib/fallible_allocation/**
+      - tests/luna/stdlib/size_index/**
+      - tests/luna/stdlib/string_views/**
+      - tests/luna/language/raw_slice_contract/**
+  pull_request:
+    paths:
+      - .github/workflows/stdlib-fallible.yml
+      - luna-rs/**
+      - runtime/**
+      - tests/luna/**
+
+permissions:
+  contents: read
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    env:
+      CARGO_TERM_COLOR: never
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      CARGO_INCREMENTAL: "0"
+      RUST_TEST_THREADS: "2"
+      LLVM_HOME: /usr/lib/llvm-18
+      LLVM_SYS_180_PREFIX: /usr/lib/llvm-18
+      LLVM_CONFIG_PATH: /usr/lib/llvm-18/bin/llvm-config
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install native GNU and LLVM18
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes build-essential cmake ninja-build llvm-18-dev libclang-18-dev
+          echo /usr/lib/llvm-18/bin >> "$GITHUB_PATH"
+          echo "LUNA_RUNTIME_LIB=$RUNNER_TEMP/runtime/libluna-runtime.a" >> "$GITHUB_ENV"
+          echo "LUNA_ALLOC_TEST_RUNTIME_LIB=$RUNNER_TEMP/runtime/libluna-runtime-alloc-test.a" >> "$GITHUB_ENV"
+          echo "CARGO_TARGET_DIR=$RUNNER_TEMP/cargo" >> "$GITHUB_ENV"
+          echo "LUNA_SYSROOT=$GITHUB_WORKSPACE/luna-rs" >> "$GITHUB_ENV"
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: 1.98.0
+          cache: false
+          rustflags: ""
+      - name: Runtime ABI and deterministic allocation failure
+        run: |
+          cmake -S runtime -B "$RUNNER_TEMP/runtime" -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build "$RUNNER_TEMP/runtime" --parallel 2
+          ctest --test-dir "$RUNNER_TEMP/runtime" --output-on-failure
+          nm --defined-only "$LUNA_RUNTIME_LIB" > "$RUNNER_TEMP/production-runtime-symbols.txt"
+          if grep -q __luna_test_ "$RUNNER_TEMP/production-runtime-symbols.txt"; then
+            echo 'Production runtime contains test hooks'; exit 1
+          fi
+      - name: Public source and fresh artifact CLI matrices
+        run: >-
+          cargo test --manifest-path luna-rs/Cargo.toml --locked -p luna-cli
+          --test associated_owner_generic_cli --test imported_ffi_output_cli
+          --test fallible_allocation_cli --test stable_io_cli
+          --test stdlib_size_index_cli --test raw_slice_provenance_cli
+          --test raw_slice_view_a5_cli
+          2>&1 | tee "$RUNNER_TEMP/fallible-cli.log"
+      - name: Fresh canonical sysroot for workspace readers
+        run: '"$CARGO_TARGET_DIR/debug/luna" build-sysroot --quiet'
+      - name: C runtime AddressSanitizer and leak checks
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+        run: |
+          cmake -S runtime -B "$RUNNER_TEMP/runtime-asan" -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_FLAGS='-fsanitize=address -fno-omit-frame-pointer' \
+            -DCMAKE_EXE_LINKER_FLAGS=-fsanitize=address
+          cmake --build "$RUNNER_TEMP/runtime-asan" --parallel 2
+          ctest --test-dir "$RUNNER_TEMP/runtime-asan" --output-on-failure
+      - name: Complete workspace regression including documentation tests
+        run: >-
+          cargo test --manifest-path luna-rs/Cargo.toml --locked --workspace --no-fail-fast
+          2>&1 | tee "$RUNNER_TEMP/fallible-workspace.log"
+      - name: Preserve test output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stdlib-fallible-ubuntu-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/runtime/Testing/Temporary/LastTest.log
+            ${{ runner.temp }}/runtime-asan/Testing/Temporary/LastTest.log
+            ${{ runner.temp }}/fallible-cli.log
+            ${{ runner.temp }}/fallible-workspace.log
+            ${{ runner.temp }}/production-runtime-symbols.txt
+          if-no-files-found: warn

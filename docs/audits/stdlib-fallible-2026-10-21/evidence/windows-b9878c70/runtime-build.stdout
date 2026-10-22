@@ -1,0 +1,24 @@
+[1/24] Building C object CMakeFiles/luna-runtime.dir/src/memory/memory.c.obj
+[2/24] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/threading.c.obj
+[3/24] Building C object CMakeFiles/luna-runtime.dir/src/startup/startup.c.obj
+[4/24] Building C object CMakeFiles/luna-runtime.dir/src/io/io.c.obj
+[5/24] Building C object CMakeFiles/luna-runtime.dir/src/panic/panic.c.obj
+[6/24] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/time.c.obj
+[7/24] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/sync.c.obj
+[8/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/memory/memory.c.obj
+[9/24] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/net.c.obj
+[10/24] Building C object CMakeFiles/luna-runtime.dir/src/platform/windows/random.c.obj
+[11/24] Linking C static library libluna-runtime.a
+[12/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/io/io.c.obj
+[13/24] Building C object CMakeFiles/abi_tests.dir/tests/abi_tests.c.obj
+[14/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/panic/panic.c.obj
+[15/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/startup/startup.c.obj
+[16/24] Linking C executable abi_tests.exe
+[17/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/platform/windows/threading.c.obj
+[18/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/platform/windows/time.c.obj
+[19/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/platform/windows/sync.c.obj
+[20/24] Building C object CMakeFiles/alloc_tests.dir/tests/alloc_tests.c.obj
+[21/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/platform/windows/net.c.obj
+[22/24] Building C object CMakeFiles/luna-runtime-alloc-test.dir/src/platform/windows/random.c.obj
+[23/24] Linking C static library libluna-runtime-alloc-test.a
+[24/24] Linking C executable alloc_tests.exe

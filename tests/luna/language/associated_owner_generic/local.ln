@@ -1,0 +1,21 @@
+// C-GAP-13: nominal owner binders and impl binders have distinct identities.
+enum Outcome<T, E> { Success(T), Failure(E) }
+struct Storage<T> { value: T };
+impl<T> Storage<T> {
+    fn create(value: T) -> Outcome<Self, i32> {
+        return Outcome::Success(Storage<T> { value: value });
+    }
+}
+struct Wrapper { storage: Storage<u8> };
+fn wrap() -> Outcome<Wrapper, i32> {
+    return match Storage<u8>::create(7 as u8) {
+        Outcome::Success(storage) -> Outcome::Success(Wrapper { storage: storage }),
+        Outcome::Failure(error) -> Outcome::Failure(error),
+    };
+}
+fn main() -> i32 {
+    return match wrap() {
+        Outcome::Success(wrapper) -> (wrapper.storage.value as i32) - 7,
+        Outcome::Failure(error) -> error,
+    };
+}

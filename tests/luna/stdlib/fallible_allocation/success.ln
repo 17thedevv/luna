@@ -1,0 +1,30 @@
+import <vec>;
+import <box>;
+import <string>;
+
+fn main() -> i32 {
+    dec rw values = std::Vec<i32>::try_with_capacity(2 as usize).unwrap();
+    if values.try_push(11).is_err() { return 1; }
+    if values.try_push(22).is_err() { return 2; }
+    if values.try_reserve(8 as usize).is_err() { return 3; }
+    if values.len() != (2 as usize) { return 4; }
+    if values.as_slice()[0] != 11 || values.as_slice()[1] != 22 { return 5; }
+    dec boxed = std::Box<i32>::try_new(73).unwrap();
+    if *boxed.as_ref() != 73 { return 6; }
+    dec rw text = std::String::try_with_capacity(8 as usize).unwrap();
+    text.push_str("hello");
+    if text.try_reserve(32 as usize).is_err() { return 7; }
+    if text.len() != (5 as usize) { return 8; }
+    if text.as_bytes()[0] != (104 as u8) { return 9; }
+    dec rw empty: std::Vec<i32> = std::Vec::new();
+    empty.push(1);
+    dec normal = std::Box::new(2);
+    if *normal.as_ref() != 2 { return 10; }
+    dec rw inferred = std::Vec::new();
+    inferred.push(7 as u8);
+    if inferred.as_slice()[0] != (7 as u8) { return 11; }
+    dec normal_vec = std::Vec<i32>::with_capacity(2 as usize);
+    dec normal_text = std::String::with_capacity(2 as usize);
+    dec empty_text = std::String::new();
+    return 0;
+}

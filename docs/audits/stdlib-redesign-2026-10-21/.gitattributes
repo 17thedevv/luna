@@ -1,0 +1,2 @@
+# Preserve acquired inventory bytes covered by verification.json.
+*.json -text whitespace=cr-at-eol

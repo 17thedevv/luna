@@ -1,0 +1,1841 @@
+{
+  "schema": 1,
+  "status": "DESIGN_ONLY_NOT_COMPILER_CONFIGURATION_OR_FREEZE",
+  "date": "2026-10-23",
+  "authority": "Maintainer requested a complete lang-item design; new roles/profiles remain proposals.",
+  "core_target_count": 26,
+  "optional_candidate_count": 71,
+  "total_candidate_count": 97,
+  "currently_registered_production_count": 22,
+  "test_keys_excluded": [
+    "test_trait",
+    "test_struct"
+  ],
+  "proposed_new_core_keys": [
+    "iterator_next",
+    "into_iter_fn",
+    "try_output",
+    "try_residual"
+  ],
+  "profiles": {
+    "core": {
+      "item_count": 26,
+      "status": "PROPOSED_CORE_COMPLETION",
+      "profile_configuration_implemented": false,
+      "note": "22 keys are already registered today; the proposed profile mechanism and four additional roles are not implemented."
+    },
+    "operators": {
+      "item_count": 56,
+      "status": "OPTIONAL_DISABLED_PROPOSAL",
+      "profile_configuration_implemented": false,
+      "requires_profiles": [
+        "core"
+      ]
+    },
+    "callable": {
+      "item_count": 6,
+      "status": "OPTIONAL_DISABLED_PROPOSAL",
+      "profile_configuration_implemented": false,
+      "requires_profiles": [
+        "core"
+      ]
+    },
+    "async": {
+      "item_count": 5,
+      "status": "OPTIONAL_DISABLED_PROPOSAL",
+      "profile_configuration_implemented": false,
+      "requires_profiles": [
+        "core"
+      ]
+    },
+    "ranges": {
+      "item_count": 2,
+      "status": "OPTIONAL_DISABLED_PROPOSAL",
+      "profile_configuration_implemented": false,
+      "requires_profiles": [
+        "core"
+      ]
+    },
+    "concurrency": {
+      "item_count": 2,
+      "status": "OPTIONAL_DISABLED_PROPOSAL",
+      "profile_configuration_implemented": false,
+      "requires_profiles": [
+        "core"
+      ]
+    }
+  },
+  "contracts": {
+    "drop": {
+      "semantic_contract": "Destroy each remaining initialized unmoved owned value once; forbid explicit manual DropFn call that would double-destroy.",
+      "safety_contract": "Drop/Copy exclusivity, partial-move rules and overwrite cleanup remain enforced.",
+      "generic_applicability": "Any user-defined non-Copy owner, including generic captured or suspended state.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Compiler-generated cleanup needs a checked destructor role, not an arbitrary ordinary method name."
+    },
+    "copy": {
+      "semantic_contract": "Copy eligibility controls implicit value duplication without consuming the source.",
+      "safety_contract": "No owned non-Copy field or Drop conflict; never grants aliasing/exclusive-access permissions.",
+      "generic_applicability": "User-defined aggregates, generics and native/VM move analysis.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Move checking must use canonical trait identity, including generic bounds, not text Copy."
+    },
+    "option": {
+      "semantic_contract": "Iteration return protocol identifies presence/absence by variant identity and payload.",
+      "safety_contract": "No fixed tag ordinal or same-layout substitution; contained ownership/provenance is preserved.",
+      "generic_applicability": "Any Item, including non-Copy values and valid references.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Compiler-driven for needs checked branch roles; arbitrary enum names are insufficient."
+    },
+    "iteration": {
+      "semantic_contract": "IntoIterator consumes once; Iterator::next borrows exclusively and returns Option<Item>.",
+      "safety_contract": "Borrowed Item validity and exact cleanup on early exit; no lending/GAT promise.",
+      "generic_applicability": "Arbitrary user iterable/iterator impls and generic binder identities.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Current one-required-method selection does not identify a member role when a trait evolves."
+    },
+    "try": {
+      "semantic_contract": "Single evaluation; branch chooses Output or Residual; FromResidual constructs the enclosing return value.",
+      "safety_contract": "Preserve owned residual and carried loans; no Error bound or implicit error conversion.",
+      "generic_applicability": "Custom Try/FromResidual impls, not just Result/Option.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Associated Output/Residual projection and branch/residual members require identities, not member-name strings."
+    },
+    "memory": {
+      "semantic_contract": "Drop in place and construct raw-backed slices with usize element counts.",
+      "safety_contract": "Unsafe call admission; alignment, live initialized storage, bounds, exclusive access and raw-origin/lifetime proof.",
+      "generic_applicability": "All sized T admitted by the existing memory primitive contract.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Raw-to-safe construction and generic drop semantics cannot be replaced by arbitrary body/layout recognition."
+    },
+    "wrapping": {
+      "semantic_contract": "Integer-only modular add/sub/mul modulo 2^width, independent of build mode.",
+      "safety_contract": "No implicit unchecked arithmetic or char/float/pointer admission.",
+      "generic_applicability": "Every admitted integer width and signedness after generic substitution.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Ordinary arithmetic is checked; compiler primitive identity selects deliberate modular behavior."
+    },
+    "operators": {
+      "semantic_contract": "Optional ordinary trait calls selected by syntax token and checked lang role.",
+      "safety_contract": "Normal move/borrow; no auto-clone; assignment place evaluated once; primitive arithmetic rules unchanged.",
+      "generic_applicability": "Unrelated user-defined numbers, matrices or values, not one known stdlib type.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Syntax desugaring needs an explicit protocol if nominal operator dispatch is adopted."
+    },
+    "comparison": {
+      "semantic_contract": "Use existing Eq.eq bool and Ord.cmp i32 sign protocols for optional nominal comparisons.",
+      "safety_contract": "Borrow operands; no false total ordering for IEEE NaN and no new implicit numeric conversions.",
+      "generic_applicability": "Existing and user-defined Eq/Ord implementations.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Ordinary cmp calls work today; comparison syntax requires an opted-in hook, not a spelling match."
+    },
+    "index_deref": {
+      "semantic_contract": "Safe index/deref yields receiver-bounded shared or exclusive reference.",
+      "safety_contract": "Invalid index checked failure; mutable capability, lifetime and overwrite/drop preserved; no new coercion via name.",
+      "generic_applicability": "Arbitrary owning/view container types with a sound reference-returning implementation.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Place syntax needs checked return-place/provenance information; not every same-shaped function is equivalent."
+    },
+    "callable": {
+      "semantic_contract": "Fn/FnMut/FnOnce distinguish shared, exclusive and consuming calls with tuple Args/Output roles.",
+      "safety_contract": "No safe erasure of unsafe callable; no lending environment output without separate lifetime design; exact captures drop.",
+      "generic_applicability": "Compiler-generated closures and ordinary user-defined callables.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Explicit source call traits and their syntax routing do not follow merely from native closure representation."
+    },
+    "async": {
+      "semantic_contract": "Future.poll receives context, returns Pending or one Ready output; cancellation uses generic Drop.",
+      "safety_contract": "Self-referential futures remain prohibited; external loans live across suspension; no double poll/drop after completion.",
+      "generic_applicability": "Generated futures and arbitrary user futures under the new opt-in protocol.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable. Native Future type/layout migration also needs source compatibility and MVIR/VM/native validation.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Existing native Future machinery is not an ordinary trait/poll protocol; method/variant roles need an explicit design."
+    },
+    "ranges": {
+      "semantic_contract": "Range syntax calls a checked ordinary range constructor; no hardcoded library struct fields.",
+      "safety_contract": "Endpoints evaluate once, generic ownership and inclusive-MAX terminal rules preserved.",
+      "generic_applicability": "Generic range implementations with ordinary Step/IntoIterator proofs.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Range expression construction needs a callee identity if native Range coupling is removed; range struct identity is unnecessary."
+    },
+    "concurrency": {
+      "semantic_contract": "Reserved marker candidates for cross-thread transfer/shared-access contracts.",
+      "safety_contract": "Disabled until structural propagation, unsafe manual impl, pointer/borrow and scoped-lifetime rules are adopted.",
+      "generic_applicability": "Any type participating in a future fully specified thread safety model.",
+      "abi_implications": "No ABI change from this design document. Enabling roles requires compiler/metadata admission versioning and interface fingerprints as applicable.",
+      "source_artifact_behavior": "Resolve canonical owner/member identity in source and fresh .llib; retain signature, binder substitutions, safety and canonical lifetime; reject stale or conflicting bindings.",
+      "why_existing_primitives_insufficient": "Ordinary marker names cannot establish language-level cross-thread guarantees; this is not current support."
+    }
+  },
+  "items": [
+    {
+      "key": "drop",
+      "target_kind": "Trait",
+      "canonical_path": "std::Drop",
+      "profile": "core",
+      "contract_ref": "drop",
+      "owner_key": null,
+      "generic_roles": [],
+      "signature": "trait Drop",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "drop",
+        "provider": "__lang_drop",
+        "source": "luna-rs/libs/external/lang/drop.ln",
+        "line": 2,
+        "expected_artifact": "lang/drop.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "drop_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::Drop::drop",
+      "profile": "core",
+      "contract_ref": "drop",
+      "owner_key": "drop",
+      "generic_roles": [],
+      "signature": "fn(&rw Self) -> void",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "drop_fn",
+        "provider": "__lang_drop",
+        "source": "luna-rs/libs/external/lang/drop.ln",
+        "line": 4,
+        "expected_artifact": "lang/drop.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "copy",
+      "target_kind": "Trait",
+      "canonical_path": "std::Copy",
+      "profile": "core",
+      "contract_ref": "copy",
+      "owner_key": null,
+      "generic_roles": [],
+      "signature": "marker trait Copy; no members",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "copy",
+        "provider": "copy",
+        "source": "luna-rs/libs/external/core/copy.ln",
+        "line": 2,
+        "expected_artifact": "core/copy.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "option",
+      "target_kind": "Enum",
+      "canonical_path": "std::Option",
+      "profile": "core",
+      "contract_ref": "option",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "enum Option<T>",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "option",
+        "provider": "__lang_option",
+        "source": "luna-rs/libs/external/lang/option.ln",
+        "line": 4,
+        "expected_artifact": "lang/option.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "some",
+      "target_kind": "EnumVariant",
+      "canonical_path": "std::Option::Some",
+      "profile": "core",
+      "contract_ref": "option",
+      "owner_key": "option",
+      "generic_roles": [],
+      "signature": "Some(T)",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "some",
+        "provider": "__lang_option",
+        "source": "luna-rs/libs/external/lang/option.ln",
+        "line": 6,
+        "expected_artifact": "lang/option.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "none",
+      "target_kind": "EnumVariant",
+      "canonical_path": "std::Option::None",
+      "profile": "core",
+      "contract_ref": "option",
+      "owner_key": "option",
+      "generic_roles": [],
+      "signature": "None",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "none",
+        "provider": "__lang_option",
+        "source": "luna-rs/libs/external/lang/option.ln",
+        "line": 8,
+        "expected_artifact": "lang/option.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "iterator",
+      "target_kind": "Trait",
+      "canonical_path": "std::Iterator",
+      "profile": "core",
+      "contract_ref": "iteration",
+      "owner_key": null,
+      "generic_roles": [
+        "Item"
+      ],
+      "signature": "trait Iterator<Item>",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "iterator",
+        "provider": "__lang_iterator",
+        "source": "luna-rs/libs/external/lang/iterator.ln",
+        "line": 4,
+        "expected_artifact": "lang/iterator.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "iterator_next",
+      "target_kind": "Method",
+      "canonical_path": "std::Iterator::next",
+      "profile": "core",
+      "contract_ref": "iteration",
+      "owner_key": "iterator",
+      "generic_roles": [],
+      "signature": "fn(&rw Self) -> Option<Item> life_from(self)",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "into_iterator",
+      "target_kind": "Trait",
+      "canonical_path": "std::IntoIterator",
+      "profile": "core",
+      "contract_ref": "iteration",
+      "owner_key": null,
+      "generic_roles": [
+        "Item",
+        "IntoIter"
+      ],
+      "signature": "trait IntoIterator<Item, IntoIter>",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "into_iterator",
+        "provider": "__lang_into_iterator",
+        "source": "luna-rs/libs/external/lang/into_iterator.ln",
+        "line": 2,
+        "expected_artifact": "lang/into_iterator.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "into_iter_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::IntoIterator::into_iter",
+      "profile": "core",
+      "contract_ref": "iteration",
+      "owner_key": "into_iterator",
+      "generic_roles": [],
+      "signature": "fn(Self) -> IntoIter; IntoIter: Iterator<Item>",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "try",
+      "target_kind": "Trait",
+      "canonical_path": "std::Try",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": null,
+      "generic_roles": [],
+      "signature": "trait Try; associated Output, Residual",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "try",
+        "provider": "try",
+        "source": "luna-rs/libs/external/core/try.ln",
+        "line": 12,
+        "expected_artifact": "core/try.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "try_output",
+      "target_kind": "AssociatedType",
+      "canonical_path": "std::Try::Output",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": "try",
+      "generic_roles": [],
+      "signature": "associated type Output",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "try_residual",
+      "target_kind": "AssociatedType",
+      "canonical_path": "std::Try::Residual",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": "try",
+      "generic_roles": [],
+      "signature": "associated type Residual",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "try_from_output",
+      "target_kind": "Method",
+      "canonical_path": "std::Try::from_output",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": "try",
+      "generic_roles": [],
+      "signature": "fn(Self::Output) -> Self",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "try_from_output",
+        "provider": "try",
+        "source": "luna-rs/libs/external/core/try.ln",
+        "line": 17,
+        "expected_artifact": "core/try.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "try_branch",
+      "target_kind": "Method",
+      "canonical_path": "std::Try::branch",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": "try",
+      "generic_roles": [],
+      "signature": "fn(Self) -> ControlFlow<Self::Residual, Self::Output>",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "try_branch",
+        "provider": "try",
+        "source": "luna-rs/libs/external/core/try.ln",
+        "line": 20,
+        "expected_artifact": "core/try.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "from_residual",
+      "target_kind": "Trait",
+      "canonical_path": "std::FromResidual",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": null,
+      "generic_roles": [
+        "R"
+      ],
+      "signature": "trait FromResidual<R>",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "from_residual",
+        "provider": "try",
+        "source": "luna-rs/libs/external/core/try.ln",
+        "line": 6,
+        "expected_artifact": "core/try.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "from_residual_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::FromResidual::from_residual",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": "from_residual",
+      "generic_roles": [],
+      "signature": "fn(R) -> Self",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "from_residual_fn",
+        "provider": "try",
+        "source": "luna-rs/libs/external/core/try.ln",
+        "line": 8,
+        "expected_artifact": "core/try.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "control_flow",
+      "target_kind": "Enum",
+      "canonical_path": "std::ControlFlow",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": null,
+      "generic_roles": [
+        "B",
+        "C"
+      ],
+      "signature": "enum ControlFlow<B, C>",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "control_flow",
+        "provider": "try",
+        "source": "luna-rs/libs/external/core/try.ln",
+        "line": 24,
+        "expected_artifact": "core/try.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "continue",
+      "target_kind": "EnumVariant",
+      "canonical_path": "std::ControlFlow::Continue",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": "control_flow",
+      "generic_roles": [],
+      "signature": "Continue(C)",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "continue",
+        "provider": "try",
+        "source": "luna-rs/libs/external/core/try.ln",
+        "line": 26,
+        "expected_artifact": "core/try.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "break",
+      "target_kind": "EnumVariant",
+      "canonical_path": "std::ControlFlow::Break",
+      "profile": "core",
+      "contract_ref": "try",
+      "owner_key": "control_flow",
+      "generic_roles": [],
+      "signature": "Break(B)",
+      "required_when": "Core default profile, subject to complete family validation before lowering.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "break",
+        "provider": "try",
+        "source": "luna-rs/libs/external/core/try.ln",
+        "line": 28,
+        "expected_artifact": "core/try.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "drop_in_place",
+      "target_kind": "Function",
+      "canonical_path": "std::ptr::drop_in_place",
+      "profile": "core",
+      "contract_ref": "memory",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "unsafe intrinsic fn<T>(*rw T) -> void",
+      "required_when": "Explicit import of trusted ptr/mem provider; no broad prelude exposure.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "drop_in_place",
+        "provider": "ptr",
+        "source": "luna-rs/libs/external/core/ptr.ln",
+        "line": 11,
+        "expected_artifact": "core/ptr.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "slice_from_raw_parts",
+      "target_kind": "Function",
+      "canonical_path": "std::mem::slice_from_raw_parts",
+      "profile": "core",
+      "contract_ref": "memory",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "unsafe intrinsic fn<T>(*T, usize) -> &[T]",
+      "required_when": "Explicit import of trusted ptr/mem provider; no broad prelude exposure.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "slice_from_raw_parts",
+        "provider": "mem",
+        "source": "luna-rs/libs/external/core/mem.ln",
+        "line": 8,
+        "expected_artifact": "core/mem.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "slice_from_raw_parts_mut",
+      "target_kind": "Function",
+      "canonical_path": "std::mem::slice_from_raw_parts_mut",
+      "profile": "core",
+      "contract_ref": "memory",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "unsafe intrinsic fn<T>(*rw T, usize) -> &rw [T]",
+      "required_when": "Explicit import of trusted ptr/mem provider; no broad prelude exposure.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "slice_from_raw_parts_mut",
+        "provider": "mem",
+        "source": "luna-rs/libs/external/core/mem.ln",
+        "line": 10,
+        "expected_artifact": "core/mem.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "wrapping_add",
+      "target_kind": "Function",
+      "canonical_path": "std::wrapping_add",
+      "profile": "core",
+      "contract_ref": "wrapping",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "intrinsic fn<T: builtin_integer>(T, T) -> T",
+      "required_when": "Core default wrapping binding; integer admission also checked after monomorphization.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "wrapping_add",
+        "provider": "num",
+        "source": "luna-rs/libs/external/core/num.ln",
+        "line": 96,
+        "expected_artifact": "core/num.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "wrapping_sub",
+      "target_kind": "Function",
+      "canonical_path": "std::wrapping_sub",
+      "profile": "core",
+      "contract_ref": "wrapping",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "intrinsic fn<T: builtin_integer>(T, T) -> T",
+      "required_when": "Core default wrapping binding; integer admission also checked after monomorphization.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "wrapping_sub",
+        "provider": "num",
+        "source": "luna-rs/libs/external/core/num.ln",
+        "line": 98,
+        "expected_artifact": "core/num.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "wrapping_mul",
+      "target_kind": "Function",
+      "canonical_path": "std::wrapping_mul",
+      "profile": "core",
+      "contract_ref": "wrapping",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "intrinsic fn<T: builtin_integer>(T, T) -> T",
+      "required_when": "Core default wrapping binding; integer admission also checked after monomorphization.",
+      "current_state": "REGISTERED_PRODUCTION_ID_NOT_A_CONFORMANCE_CLAIM",
+      "current_annotation": {
+        "key": "wrapping_mul",
+        "provider": "num",
+        "source": "luna-rs/libs/external/core/num.ln",
+        "line": 100,
+        "expected_artifact": "core/num.llib"
+      },
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "add",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Add",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait Add<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "add_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Add::add",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "add",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "+"
+    },
+    {
+      "key": "sub",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Sub",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait Sub<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "sub_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Sub::sub",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "sub",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "-"
+    },
+    {
+      "key": "mul",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Mul",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait Mul<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "mul_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Mul::mul",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "mul",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "*"
+    },
+    {
+      "key": "div",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Div",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait Div<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "div_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Div::div",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "div",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "/"
+    },
+    {
+      "key": "rem",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Rem",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait Rem<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "rem_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Rem::rem",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "rem",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "%"
+    },
+    {
+      "key": "bit_and",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::BitAnd",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait BitAnd<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "bit_and_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::BitAnd::bit_and",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "bit_and",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "&"
+    },
+    {
+      "key": "bit_or",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::BitOr",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait BitOr<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "bit_or_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::BitOr::bit_or",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "bit_or",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "|"
+    },
+    {
+      "key": "bit_xor",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::BitXor",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait BitXor<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "bit_xor_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::BitXor::bit_xor",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "bit_xor",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "^"
+    },
+    {
+      "key": "shl",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Shl",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait Shl<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "shl_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Shl::shl",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "shl",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "<<"
+    },
+    {
+      "key": "shr",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Shr",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs",
+        "Output"
+      ],
+      "signature": "trait Shr<Rhs, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "shr_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Shr::shr",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "shr",
+      "generic_roles": [],
+      "signature": "fn(Self, Rhs) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": ">>"
+    },
+    {
+      "key": "neg",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Neg",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Output"
+      ],
+      "signature": "trait Neg<Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "neg_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Neg::neg",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "neg",
+      "generic_roles": [],
+      "signature": "fn(Self) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "-"
+    },
+    {
+      "key": "bit_not",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::BitNot",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Output"
+      ],
+      "signature": "trait BitNot<Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "bit_not_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::BitNot::bit_not",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "bit_not",
+      "generic_roles": [],
+      "signature": "fn(Self) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "~"
+    },
+    {
+      "key": "add_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::AddAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait AddAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "add_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::AddAssign::add_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "add_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "+="
+    },
+    {
+      "key": "sub_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::SubAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait SubAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "sub_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::SubAssign::sub_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "sub_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "-="
+    },
+    {
+      "key": "mul_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::MulAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait MulAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "mul_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::MulAssign::mul_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "mul_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "*="
+    },
+    {
+      "key": "div_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::DivAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait DivAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "div_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::DivAssign::div_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "div_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "/="
+    },
+    {
+      "key": "rem_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::RemAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait RemAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "rem_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::RemAssign::rem_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "rem_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "%="
+    },
+    {
+      "key": "bit_and_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::BitAndAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait BitAndAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "bit_and_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::BitAndAssign::bit_and_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "bit_and_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "&="
+    },
+    {
+      "key": "bit_or_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::BitOrAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait BitOrAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "bit_or_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::BitOrAssign::bit_or_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "bit_or_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "|="
+    },
+    {
+      "key": "bit_xor_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::BitXorAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait BitXorAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "bit_xor_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::BitXorAssign::bit_xor_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "bit_xor_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "^="
+    },
+    {
+      "key": "shl_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::ShlAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait ShlAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "shl_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::ShlAssign::shl_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "shl_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": "<<="
+    },
+    {
+      "key": "shr_assign",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::ShrAssign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": null,
+      "generic_roles": [
+        "Rhs"
+      ],
+      "signature": "trait ShrAssign<Rhs>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "shr_assign_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::ShrAssign::shr_assign",
+      "profile": "operators",
+      "contract_ref": "operators",
+      "owner_key": "shr_assign",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Rhs) -> void",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "syntax_token": ">>="
+    },
+    {
+      "key": "eq",
+      "target_kind": "Trait",
+      "canonical_path": "std::Eq",
+      "profile": "operators",
+      "contract_ref": "comparison",
+      "owner_key": null,
+      "generic_roles": [],
+      "signature": "existing trait Eq",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "eq_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::Eq::eq",
+      "profile": "operators",
+      "contract_ref": "comparison",
+      "owner_key": "eq",
+      "generic_roles": [],
+      "signature": "fn(&Self, &Self) -> bool",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "ord",
+      "target_kind": "Trait",
+      "canonical_path": "std::Ord",
+      "profile": "operators",
+      "contract_ref": "comparison",
+      "owner_key": null,
+      "generic_roles": [],
+      "signature": "existing trait Ord",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "ord_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::Ord::cmp",
+      "profile": "operators",
+      "contract_ref": "comparison",
+      "owner_key": "ord",
+      "generic_roles": [],
+      "signature": "fn(&Self, &Self) -> i32",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "index",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Index",
+      "profile": "operators",
+      "contract_ref": "index_deref",
+      "owner_key": null,
+      "generic_roles": [
+        "Idx",
+        "Elem"
+      ],
+      "signature": "trait Index<Idx, Elem>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "index_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Index::index",
+      "profile": "operators",
+      "contract_ref": "index_deref",
+      "owner_key": "index",
+      "generic_roles": [],
+      "signature": "fn(&Self, Idx) -> &Elem life_from(self)",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "index_mut",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::IndexMut",
+      "profile": "operators",
+      "contract_ref": "index_deref",
+      "owner_key": null,
+      "generic_roles": [
+        "Idx",
+        "Elem"
+      ],
+      "signature": "trait IndexMut<Idx, Elem>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "supertrait_key": "index"
+    },
+    {
+      "key": "index_mut_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::IndexMut::index_mut",
+      "profile": "operators",
+      "contract_ref": "index_deref",
+      "owner_key": "index_mut",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Idx) -> &rw Elem life_from(self)",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "deref",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::Deref",
+      "profile": "operators",
+      "contract_ref": "index_deref",
+      "owner_key": null,
+      "generic_roles": [
+        "Target"
+      ],
+      "signature": "trait Deref<Target>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "deref_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::Deref::deref",
+      "profile": "operators",
+      "contract_ref": "index_deref",
+      "owner_key": "deref",
+      "generic_roles": [],
+      "signature": "fn(&Self) -> &Target life_from(self)",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "deref_mut",
+      "target_kind": "Trait",
+      "canonical_path": "std::ops::DerefMut",
+      "profile": "operators",
+      "contract_ref": "index_deref",
+      "owner_key": null,
+      "generic_roles": [
+        "Target"
+      ],
+      "signature": "trait DerefMut<Target>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "supertrait_key": "deref"
+    },
+    {
+      "key": "deref_mut_fn",
+      "target_kind": "Method",
+      "canonical_path": "std::ops::DerefMut::deref_mut",
+      "profile": "operators",
+      "contract_ref": "index_deref",
+      "owner_key": "deref_mut",
+      "generic_roles": [],
+      "signature": "fn(&rw Self) -> &rw Target life_from(self)",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "fn_once",
+      "target_kind": "Trait",
+      "canonical_path": "std::FnOnce",
+      "profile": "callable",
+      "contract_ref": "callable",
+      "owner_key": null,
+      "generic_roles": [
+        "Args",
+        "Output"
+      ],
+      "signature": "trait FnOnce<Args, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "fn_once_call",
+      "target_kind": "Method",
+      "canonical_path": "std::FnOnce::call_once",
+      "profile": "callable",
+      "contract_ref": "callable",
+      "owner_key": "fn_once",
+      "generic_roles": [],
+      "signature": "fn(Self, Args) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "fn_mut",
+      "target_kind": "Trait",
+      "canonical_path": "std::FnMut",
+      "profile": "callable",
+      "contract_ref": "callable",
+      "owner_key": null,
+      "generic_roles": [
+        "Args",
+        "Output"
+      ],
+      "signature": "trait FnMut<Args, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "supertrait_key": "fn_once"
+    },
+    {
+      "key": "fn_mut_call",
+      "target_kind": "Method",
+      "canonical_path": "std::FnMut::call_mut",
+      "profile": "callable",
+      "contract_ref": "callable",
+      "owner_key": "fn_mut",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, Args) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "fn",
+      "target_kind": "Trait",
+      "canonical_path": "std::Fn",
+      "profile": "callable",
+      "contract_ref": "callable",
+      "owner_key": null,
+      "generic_roles": [
+        "Args",
+        "Output"
+      ],
+      "signature": "trait Fn<Args, Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false,
+      "supertrait_key": "fn_mut"
+    },
+    {
+      "key": "fn_call",
+      "target_kind": "Method",
+      "canonical_path": "std::Fn::call",
+      "profile": "callable",
+      "contract_ref": "callable",
+      "owner_key": "fn",
+      "generic_roles": [],
+      "signature": "fn(&Self, Args) -> Output",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "future",
+      "target_kind": "Trait",
+      "canonical_path": "std::Future",
+      "profile": "async",
+      "contract_ref": "async",
+      "owner_key": null,
+      "generic_roles": [
+        "Output"
+      ],
+      "signature": "trait Future<Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "future_poll",
+      "target_kind": "Method",
+      "canonical_path": "std::Future::poll",
+      "profile": "async",
+      "contract_ref": "async",
+      "owner_key": "future",
+      "generic_roles": [],
+      "signature": "fn(&rw Self, &std::task::Context) -> std::Poll<Output>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "poll",
+      "target_kind": "Enum",
+      "canonical_path": "std::Poll",
+      "profile": "async",
+      "contract_ref": "async",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "enum Poll<T>",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "poll_ready",
+      "target_kind": "EnumVariant",
+      "canonical_path": "std::Poll::Ready",
+      "profile": "async",
+      "contract_ref": "async",
+      "owner_key": "poll",
+      "generic_roles": [],
+      "signature": "Ready(T)",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "poll_pending",
+      "target_kind": "EnumVariant",
+      "canonical_path": "std::Poll::Pending",
+      "profile": "async",
+      "contract_ref": "async",
+      "owner_key": "poll",
+      "generic_roles": [],
+      "signature": "Pending",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "range_new",
+      "target_kind": "Function",
+      "canonical_path": "std::iter::range",
+      "profile": "ranges",
+      "contract_ref": "ranges",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "fn<T>(T, T) -> library range value implementing IntoIterator",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "range_inclusive_new",
+      "target_kind": "Function",
+      "canonical_path": "std::iter::range_inclusive",
+      "profile": "ranges",
+      "contract_ref": "ranges",
+      "owner_key": null,
+      "generic_roles": [
+        "T"
+      ],
+      "signature": "fn<T>(T, T) -> library range value implementing IntoIterator",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "send",
+      "target_kind": "Trait",
+      "canonical_path": "std::Send",
+      "profile": "concurrency",
+      "contract_ref": "concurrency",
+      "owner_key": null,
+      "generic_roles": [],
+      "signature": "marker trait Send; structural/manual safety rules require separate RFC",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    },
+    {
+      "key": "sync",
+      "target_kind": "Trait",
+      "canonical_path": "std::Sync",
+      "profile": "concurrency",
+      "contract_ref": "concurrency",
+      "owner_key": null,
+      "generic_roles": [],
+      "signature": "marker trait Sync; structural/manual safety rules require separate RFC",
+      "required_when": "Only when this optional profile is explicitly enabled.",
+      "current_state": "PROPOSED_NOT_REGISTERED",
+      "current_annotation": null,
+      "implementation_in_this_task": false
+    }
+  ],
+  "native_or_library_exclusions": [
+    "Display",
+    "Writer",
+    "Read",
+    "Write",
+    "Seek",
+    "Clone",
+    "Default",
+    "Hash",
+    "Convert",
+    "TryConvert",
+    "Error",
+    "Result",
+    "Infallible",
+    "Box",
+    "Vec",
+    "String",
+    "SliceIter",
+    "Matrix",
+    "Tensor",
+    "Graph",
+    "sizeof",
+    "alignof",
+    "cast",
+    "borrow",
+    "control_flow_syntax",
+    "dollar_interpolation",
+    "allocator_runtime_abi",
+    "panic_runtime_abi",
+    "entry_startup_abi",
+    "Sized",
+    "Unpin",
+    "Unsize",
+    "CoerceUnsized"
+  ],
+  "source_inventory_sha256": "fc978cc621a2f95db3251d7bf16684a179024e3a3a06753d293537f74c08f27a"
+}

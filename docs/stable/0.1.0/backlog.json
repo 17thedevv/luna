@@ -268,6 +268,74 @@
       "followup_commits": [
         "5b470fa7861fcfe3243c654abdc3560905498df4"
       ]
+    },
+    {
+      "id": "STABLE-016",
+      "milestone": "S0/S1/S3",
+      "priority": "P1",
+      "requirement": "Jointly redesign the complete stdlib API/layout, map old-to-new contracts and requalify migrated consumers",
+      "status": "IMPLEMENTATION_IN_PROGRESS",
+      "owner": "17thedevv",
+      "source_paths": [
+        "docs/proposals/stdlib-redesign-0.1.md",
+        "docs/proposals/stdlib-redesign-0.1/allocator.md",
+        "docs/audits/stdlib-redesign-2026-10-21/source-inventory.json",
+        "luna-rs/libs/external/sysroot.toml",
+        "luna-rs/libs/external/core/cell.ln",
+        "luna-rs/libs/external/core/time.ln",
+        "luna-rs/libs/external/core/random.ln",
+        "luna-rs/libs/external/alloc/rc.ln",
+        "luna-rs/libs/external/alloc/arc.ln",
+        "luna-rs/libs/external/path/path.ln",
+        "luna-rs/libs/external/crypto/crypto.ln",
+        "luna-rs/libs/external/io/io.ln",
+        "docs/proposals/stdlib-redesign-0.1/size-index.md",
+        "docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md",
+        "docs/proposals/stdlib-redesign-0.1/foundation-api.md",
+        "docs/proposals/stdlib-redesign-0.1/io-api.md",
+        "docs/proposals/stdlib-redesign-0.1/io-interpolation.md",
+        "docs/proposals/stdlib-redesign-0.1/io-current-surface.json",
+        "docs/proposals/stdlib-redesign-0.1/lang-items.md",
+        "docs/proposals/stdlib-redesign-0.1/lang-items-catalog.json",
+        "docs/proposals/stdlib-redesign-0.1/lang-items-current.json"
+      ],
+      "fix_commit": null,
+      "evidence": [
+        "docs/audits/stdlib-redesign-2026-10-21/verification.json",
+        "docs/audits/stdlib-usize-2026-10-22/evidence/windows-28802f12/receipt.json",
+        "docs/audits/stdlib-usize-2026-10-22/evidence/windows-28802f12/source-surface-receipt.json"
+      ],
+      "blocks": [
+        "STABLE_RELEASE"
+      ],
+      "notes": "Maintainer explicitly chose whole-API/layout redesign, compact std namespace, constructors on types, the current source root, usize memory size/index and supplemental fallible allocation (STD-D06), then authorized implementation. STABLE-017 tracks the first ABI 2 / Vec / Box / String allocation slice. The parser inventory remains the immutable pre-redesign snapshot; the added alloc_error provider makes 50 current providers. Per-domain contracts, the remaining old-to-new ownership and size/index map, implementation and fresh source/artifact/package qualification remain open. On 2026-10-22 the maintainer requested a functional comparison against C++ and basic CPU math/graph/matrix/tensor in stdlib, with advanced functionality in local/vendored libraries. The foundation slice migrates usize memory APIs and adds type constructors, ordered-set algebra and u64 bit utilities; broader families and final qualification remain open. Implementation pin 28802f12 passes focused Windows eight CLI suites (29 tests), 40 existing acceptance tests and all 50 canonical LLIB/object inspections. The fresh parser snapshot has 2,411 declarations and 219 explicit imports, not a resolved API catalog. Full platform/workspace/package gates remain open; no release completion is claimed. On 2026-10-23 the maintainer prioritized clear I/O design before numerical/graph expansion and selected $variable interpolation instead of {} placeholders. The I/O and generic interpolation proposals define target API/semantics only; detailed policies and macro capability remain unimplemented and are not release qualification. The maintainer then requested a complete lang-item design: 22 current production keys are distinguished from a 26-role core target and disabled optional profiles. This is design-only; optional roadmap identities are not automatically stable 0.1.0 requirements or supported features. Initial D03 implementation at this task's pin adds type-owned constructors for Rc, Arc, Cell, RefCell, Duration, Rng, PathBuf, SHA-256/HMAC/ChaCha20 and std::io cursor/buffers, with existing factory aliases retained. Build/source-artifact qualification and the remaining API migrations remain open."
+    },
+    {
+      "id": "STABLE-017",
+      "milestone": "S1/S3/S4",
+      "priority": "P1",
+      "requirement": "Implement STD-D06 fallible allocation, preserve input/storage ownership, validate source/artifact and native runtime/package compatibility",
+      "status": "IMPLEMENTED_VALIDATION_IN_PROGRESS",
+      "owner": "17thedevv",
+      "source_paths": [
+        "runtime/src/memory/memory.c",
+        "runtime/include/luna/runtime/memory.h",
+        "luna-rs/libs/external/alloc/error.ln",
+        "luna-rs/libs/external/alloc/vec.ln",
+        "luna-rs/libs/external/alloc/box.ln",
+        "luna-rs/libs/external/alloc/string.ln",
+        "tests/luna/stdlib/fallible_allocation"
+      ],
+      "fix_commit": null,
+      "evidence": [
+        "docs/audits/stdlib-fallible-2026-10-21/README.md",
+        "docs/audits/stdlib-fallible-2026-10-21/evidence/windows-5e1c7356/receipt.json",
+        "docs/audits/stdlib-fallible-2026-10-21/evidence/ubuntu-b9878c70/receipt.json"
+      ],
+      "blocks": [
+        "STABLE_RELEASE"
+      ],
+      "notes": "Runtime ABI 2 supplements legacy terminal allocation; new try_* APIs use usize and return allocation errors, including an owned input on failed insertion/boxing. C-GAP-13 repairs qualified owner/impl substitutions; C-GAP-14 preserves imported extern identity; C-GAP-15 fixes owner inference and native callable bounds. At 5e1c7356 Windows passes five CLI suites, 209 semantic tests and six sysroot invariant tests. Ubuntu/ASan passed the earlier b9878c70 slice and is being reacquired with full workspace regression at 5e1c7356. Older Windows workspace attempts are incomplete/superseded with raw evidence preserved. Existing factories and u64 size/index APIs remain migration bridges. Generic callable materialization in comptime still rejects E4005 and is not covered by native PASS. Package/runtime compatibility, updated distribution tooling and final stable qualification remain gates."
     }
   ]
 }

@@ -1,0 +1,36 @@
+{
+  "status": "OPEN_BASELINE_AND_REPAIRED_NATIVE_COMPILER_REJECT_COMPTIME_CALLABLE_VALUE",
+  "covered_mode": "source provider only; artifact mode not established",
+  "commands": [
+    {
+      "label": "baseline-b9878c70",
+      "executable": "D:/luna-stable-build/cargo/debug/luna.exe",
+      "executable_sha256": "32449f1adc57e6ff991fe97e1715739c9bdf06bef5227661541625d6e0ca3273",
+      "command": [
+        "check",
+        "main.ln",
+        "--quiet"
+      ],
+      "exit": 1
+    },
+    {
+      "label": "native-repair",
+      "executable": "D:/luna-stable-build/constructor-cargo/debug/luna.exe",
+      "executable_sha256": "ce85af6c47f2779852cb95fbe6327fc0433da156c8e644a1153fd7de2a694374",
+      "command": [
+        "check",
+        "main.ln",
+        "--quiet"
+      ],
+      "exit": 1
+    }
+  ],
+  "files": {
+    "baseline-b9878c70.stderr": "bba81444e19462a06abdc6c437e437b86993760e0f37118dbed1eeaaea4407d1",
+    "baseline-b9878c70.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "main.ln": "497caab502562a6cdaf57b0ef25e3605efc204d3324c3c2c64fda3995747ea92",
+    "native-repair.stderr": "bba81444e19462a06abdc6c437e437b86993760e0f37118dbed1eeaaea4407d1",
+    "native-repair.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "provider.ln": "b29e020861482c43e2b778f65a57ca07d479502d50eacd6f73f99e3f27d1eaed"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "source_commit": "28802f1258de156015c4ffec8a607e1dcfd6df4d",
+  "stdlib_tree": "d261ad73d74d6f2c46eb2c2f019dff060440d025",
+  "parser_source_tree": "87156549c98aaaaf8c7dd7db49ec3925ca1f9cac",
+  "parser_binary_sha256": "7e02d2c0201705fba5554dd6c93c3b5c2ea2dbb9666faca779c00dcc1e7f9fd4",
+  "raw_sha256": "829727342ada119c3b72e4189ac950e3fd7182f0cd2de2828408f98ed645680f",
+  "gzip_sha256": "e18a206653afbab32d6c91a5e5ebeb294ffa0d3b66481171433ddffce1306d47",
+  "raw_bytes": 1640908,
+  "gzip_bytes": 72580,
+  "byte_identical_repeat": true,
+  "provider_source_digests_checked": 50,
+  "provider_count": 50,
+  "declaration_count": 2411,
+  "explicit_import_edges": 219,
+  "command": [
+    "python",
+    "docs/tools/inventory_stdlib.py",
+    "--parser",
+    "D:/luna-stable-build/surface-cargo/debug/luna-stdlib-surface.exe",
+    "--out",
+    "D:\\luna-stable-build\\surface-28802f12.json"
+  ],
+  "status": "PARSER_SOURCE_INVENTORY_NOT_RESOLVED_API_OR_CONFORMANCE",
+  "limitations": [
+    "Pre-expansion parser declarations; no derived/generated semantic items.",
+    "Declared visibility is not effective export visibility.",
+    "Dependency edges are explicit imports, excluding implicit bootstrap contracts.",
+    "Artifact paths are expected output locations, not evidence of valid bundles.",
+    "Signatures are descriptive; original source is authoritative for defaults, associated bindings and lifetime clauses.",
+    "Parameters/locals are nested implementation data, not separately migrated API units.",
+    "Fixture references are textual import matches, not semantic coverage or executed test results.",
+    "Enum payload type details are not expanded by this source mapper."
+  ]
+}

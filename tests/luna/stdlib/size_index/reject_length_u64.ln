@@ -1,0 +1,2 @@
+import <string>;
+fn main() { dec text = std::String::new(); dec n: u64 = text.len(); }

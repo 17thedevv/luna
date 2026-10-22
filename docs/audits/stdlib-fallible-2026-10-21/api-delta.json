@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "scope": "First allocator slice only; not the complete stdlib migration map",
+  "baseline_source_commit": "264390dacfd8f35ea53d4e5639ca4018cfc64f4d",
+  "implementation_source_commit": "b9878c70843572113c6c5e6c96fe998f17f6979a",
+  "status": "IMPLEMENTED_NOT_STABLE_QUALIFIED",
+  "existing_api_map": [
+    {
+      "baseline_record": "vec#12",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "old_api": "std::vec_new",
+      "preferred_api": "std::Vec<T>::new()",
+      "disposition": "RETAIN_AS_TRANSITION_ENTRY_POINT",
+      "old_signature_kept": true
+    },
+    {
+      "baseline_record": "vec#20",
+      "provider": "vec",
+      "source": "luna-rs/libs/external/alloc/vec.ln",
+      "old_api": "std::vec_with_capacity",
+      "preferred_api": "std::Vec<T>::with_capacity(usize)",
+      "disposition": "RETAIN_AS_TRANSITION_ENTRY_POINT",
+      "old_signature_kept": true
+    },
+    {
+      "baseline_record": "box#9",
+      "provider": "box",
+      "source": "luna-rs/libs/external/alloc/box.ln",
+      "old_api": "std::box_new",
+      "preferred_api": "std::Box<T>::new(T)",
+      "disposition": "RETAIN_AS_TRANSITION_ENTRY_POINT",
+      "old_signature_kept": true
+    },
+    {
+      "baseline_record": "string#43",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "old_api": "std::string_new",
+      "preferred_api": "std::String::new()",
+      "disposition": "RETAIN_AS_TRANSITION_ENTRY_POINT",
+      "old_signature_kept": true
+    },
+    {
+      "baseline_record": "string#47",
+      "provider": "string",
+      "source": "luna-rs/libs/external/alloc/string.ln",
+      "old_api": "std::string_with_capacity",
+      "preferred_api": "std::String::with_capacity(usize)",
+      "disposition": "RETAIN_AS_TRANSITION_ENTRY_POINT",
+      "old_signature_kept": true
+    }
+  ],
+  "new_provider": {
+    "id": "alloc_error",
+    "source": "luna-rs/libs/external/alloc/error.ln",
+    "public_types": [
+      "std::AllocError",
+      "std::AllocFailure<T>"
+    ],
+    "allocation_required": false
+  },
+  "new_fallible_api": [
+    "std::Vec<T>::try_with_capacity(usize)",
+    "std::Vec<T>::try_reserve(&rw Self, usize)",
+    "std::Vec<T>::try_push(&rw Self, T)",
+    "std::Box<T>::try_new(T)",
+    "std::String::try_with_capacity(usize)",
+    "std::String::try_reserve(&rw Self, usize)"
+  ],
+  "changed_existing_behavior": [
+    {
+      "baseline_record": "vec#20",
+      "change": "Element-count multiplication overflow aborts rather than returning an empty vector as success"
+    }
+  ],
+  "size_index_scope": {
+    "new_memory_count_inputs": "usize",
+    "existing_u64_fields_and_size_index_apis": "Unchanged; remaining STD-D05 migration is open"
+  },
+  "runtime": {
+    "abi_revision": 2,
+    "new_symbols": [
+      "__luna_try_alloc",
+      "__luna_try_realloc"
+    ],
+    "retained_nonnullable_terminal_symbols": [
+      "__luna_alloc",
+      "__luna_realloc"
+    ],
+    "deallocator": "__luna_dealloc unchanged"
+  },
+  "compiler_repairs": [
+    "C-GAP-13",
+    "C-GAP-14"
+  ]
+}

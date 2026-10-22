@@ -114,13 +114,27 @@ impl ProviderModes {
     }
 
     pub fn build(&self, root: &Path, fixture: &Path, tag: &str) -> (PathBuf, Output) {
+        self.build_with_runtime(root, fixture, tag, None)
+    }
+
+    pub fn build_with_runtime(
+        &self,
+        root: &Path,
+        fixture: &Path,
+        tag: &str,
+        runtime: Option<&Path>,
+    ) -> (PathBuf, Output) {
         assert!(!tag.contains('/') && !tag.contains('\\'));
         let executable = self
             .work
             .join("executables")
             .join(tag)
             .with_extension(std::env::consts::EXE_EXTENSION);
-        let output = Command::new(env!("CARGO_BIN_EXE_luna"))
+        let mut command = Command::new(env!("CARGO_BIN_EXE_luna"));
+        if let Some(runtime) = runtime {
+            command.env("LUNA_RUNTIME_LIB", runtime);
+        }
+        let output = command
             .arg("build")
             .arg(fixture)
             .arg("-o")

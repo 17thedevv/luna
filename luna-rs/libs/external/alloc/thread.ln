@@ -19,7 +19,7 @@ fn __luna_thread_void_worker(arg: *rw void) {
     unsafe {
         dec f = (*pkt).func;
         f();
-        __luna_dealloc(arg as *rw u8, 8 as u64, 8 as u64);
+        __luna_dealloc(arg as *rw u8, std::mem::size_of<ThreadVoidPacket>(), std::mem::align_of<ThreadVoidPacket>());
     }
 }
 
@@ -34,7 +34,7 @@ fn __luna_thread_arg_worker(raw: *rw void) {
         dec f = (*pkt).func;
         dec a = (*pkt).arg;
         f(a);
-        __luna_dealloc(raw as *rw u8, 16 as u64, 8 as u64);
+        __luna_dealloc(raw as *rw u8, std::mem::size_of<ThreadArgPacket>(), std::mem::align_of<ThreadArgPacket>());
     }
 }
 
@@ -103,14 +103,14 @@ export module std {
 
     export fn spawn(f: fn() -> void) -> std::Result<JoinHandle, ThreadError> {
         unsafe {
-            dec mem = __luna_alloc(8 as u64, 8 as u64) as *rw ThreadVoidPacket;
+            dec mem = __luna_alloc(std::mem::size_of<ThreadVoidPacket>(), std::mem::align_of<ThreadVoidPacket>()) as *rw ThreadVoidPacket;
             if (mem as u64) == (0 as u64) {
                 return std::Result::Err(ThreadError::SpawnFailed);
             }
             (*mem).func = f;
             dec h = __luna_thread_spawn(__luna_thread_void_worker, mem as *rw void);
             if (h as u64) == (0 as u64) {
-                __luna_dealloc(mem as *rw u8, 8 as u64, 8 as u64);
+                __luna_dealloc(mem as *rw u8, std::mem::size_of<ThreadVoidPacket>(), std::mem::align_of<ThreadVoidPacket>());
                 return std::Result::Err(ThreadError::SpawnFailed);
             }
             return std::Result::Ok(JoinHandle { handle: h });
@@ -119,7 +119,7 @@ export module std {
 
     export fn spawn_with<T>(f: fn(*rw T) -> void, arg: *rw T) -> std::Result<JoinHandle, ThreadError> {
         unsafe {
-            dec mem = __luna_alloc(16 as u64, 8 as u64) as *rw ThreadArgPacket;
+            dec mem = __luna_alloc(std::mem::size_of<ThreadArgPacket>(), std::mem::align_of<ThreadArgPacket>()) as *rw ThreadArgPacket;
             if (mem as u64) == (0 as u64) {
                 return std::Result::Err(ThreadError::SpawnFailed);
             }
@@ -127,7 +127,7 @@ export module std {
             (*mem).arg = arg as *rw void;
             dec h = __luna_thread_spawn(__luna_thread_arg_worker, mem as *rw void);
             if (h as u64) == (0 as u64) {
-                __luna_dealloc(mem as *rw u8, 16 as u64, 8 as u64);
+                __luna_dealloc(mem as *rw u8, std::mem::size_of<ThreadArgPacket>(), std::mem::align_of<ThreadArgPacket>());
                 return std::Result::Err(ThreadError::SpawnFailed);
             }
             return std::Result::Ok(JoinHandle { handle: h });

@@ -1,0 +1,75 @@
+{
+  "status": "PASS",
+  "source_commit": "b9878c70843572113c6c5e6c96fe998f17f6979a",
+  "target": "x86_64-unknown-linux-gnu",
+  "run_id": 39567793256,
+  "run_url": "https://github.com/17thedevv/luna/actions/runs/39567793256",
+  "job_id": 119114190636,
+  "artifact_id": 12330858234,
+  "artifact_name": "stdlib-fallible-ubuntu-b9878c70843572113c6c5e6c96fe998f17f6979a",
+  "archive_sha256": "1018c40c54db0fd7b1f832f0628d37ef1dea81404611b661ff5af6da549c71e4",
+  "archive_digest_matches_github_api": true,
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Install native GNU and LLVM18",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions-rust-lang/setup-rust-toolchain@v1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Runtime ABI and deterministic allocation failure",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Public source and fresh artifact CLI matrices",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "C runtime AddressSanitizer and leak checks",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Preserve test output",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions-rust-lang/setup-rust-toolchain@v1",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Post Run actions/checkout@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "files": {
+    "fallible-cli.log": "9375c621143170b1569fb5ed8738ebd14df7f76dfcf641f7dcae83cf4bea0761",
+    "production-runtime-symbols.txt": "c95627a16cd6a27e2f4ea45644ff850da8ace83b1c9520234d77bbb6aafe6f15",
+    "runtime/Testing/Temporary/LastTest.log": "0412bbb8291884b7c1f383f0aa4622900b4031f2f42a66ef264830b60b14ca3a",
+    "runtime-asan/Testing/Temporary/LastTest.log": "1677e7d0bc98f5b8c6e031db721f33d7733f302c4762e52f3c542f98cfb4d093"
+  }
+}

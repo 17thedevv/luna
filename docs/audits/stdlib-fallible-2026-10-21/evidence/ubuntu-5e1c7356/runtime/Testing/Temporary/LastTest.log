@@ -1,0 +1,108 @@
+Start testing: Oct 21 16:28 UTC
+----------------------------------------------------------
+1/2 Testing: RuntimeAbiTests
+1/2 Test: RuntimeAbiTests
+Command: "/home/runner/work/_temp/runtime/abi_tests"
+Directory: /home/runner/work/_temp/runtime
+"RuntimeAbiTests" start time: Oct 21 16:28 UTC
+Output:
+----------------------------------------------------------
+=================================================================
+   Luna Runtime ABI 2 Retained Core Test Suite
+=================================================================
+[RUN] test_abi_marker
+[PASS] test_abi_marker
+[RUN] test_sentinel_identity
+[PASS] test_sentinel_identity
+[RUN] test_realloc_transitions
+[PASS] test_realloc_transitions
+[RUN] test_align_boundary_4096
+[PASS] test_align_boundary_4096
+[RUN] test_minimum_nonzero_alignment
+[PASS] test_minimum_nonzero_alignment
+[RUN] test_stdio_exact_bytes
+Luna [verified]
+Luna Runtime ABI v1.0
+Luna Runtime ABI v1.0
+[PASS] test_stdio_exact_bytes
+[RUN] test_process_args
+[PASS] test_process_args
+[RUN] test_file_io_roundtrip
+[PASS] test_file_io_roundtrip
+[RUN] test_internal_read_all_growth_and_error
+[PASS] test_internal_read_all_growth_and_error
+[RUN] test_file_one_byte_and_large_binary
+[PASS] test_file_one_byte_and_large_binary
+[RUN] test_file_nul_defense
+[PASS] test_file_nul_defense
+[RUN] test_file_not_found
+[PASS] test_file_not_found
+[RUN] test_empty_file_io
+[PASS] test_empty_file_io
+[RUN] test_file_partial_read_capacity_invariant
+[PASS] test_file_partial_read_capacity_invariant
+[RUN] test_long_path_fallback
+[PASS] test_long_path_fallback (dynamic fallback handled path length 594 without arbitrary cap)
+[RUN] term_align_0 (expecting terminal abort/exit)...
+
+luna: PANIC [L005] Invalid alignment in __luna_alloc
+    at <unknown>:0:0
+[PASS] term_align_0 successfully aborted deterministically
+[RUN] term_align_3 (expecting terminal abort/exit)...
+
+luna: PANIC [L005] Invalid alignment in __luna_alloc
+    at <unknown>:0:0
+[PASS] term_align_3 successfully aborted deterministically
+[RUN] term_align_8192 (expecting terminal abort/exit)...
+
+luna: PANIC [L005] Invalid alignment in __luna_alloc
+    at <unknown>:0:0
+[PASS] term_align_8192 successfully aborted deterministically
+[RUN] term_overflow (expecting terminal abort/exit)...
+
+luna: PANIC [L001] Allocation size overflow in __luna_alloc
+    at <unknown>:0:0
+[PASS] term_overflow successfully aborted deterministically
+[RUN] term_panic (expecting terminal abort/exit)...
+
+luna: PANIC [L005] test explicit panic
+    at test_source.ln:42:10
+[PASS] term_panic successfully aborted deterministically
+[RUN] term_panic_default (expecting terminal abort/exit)...
+
+luna: PANIC [L005] explicit panic
+    at <unknown>:0:0
+[PASS] term_panic_default successfully aborted deterministically
+[RUN] term_bounds_fail (expecting terminal abort/exit)...
+
+luna: PANIC [L002] index out of bounds: index 15, length 10
+    at test_bounds.ln:99:4
+[PASS] term_bounds_fail successfully aborted deterministically
+=================================================================
+   ALL RUNTIME ABI INVARIANT TESTS PASSED (0 FAILURES)
+=================================================================
+<end of output>
+Test time =   0.69 sec
+----------------------------------------------------------
+Test Passed.
+"RuntimeAbiTests" end time: Oct 21 16:28 UTC
+"RuntimeAbiTests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: RuntimeFallibleAllocation
+2/2 Test: RuntimeFallibleAllocation
+Command: "/home/runner/work/_temp/runtime/alloc_tests"
+Directory: /home/runner/work/_temp/runtime
+"RuntimeFallibleAllocation" start time: Oct 21 16:28 UTC
+Output:
+----------------------------------------------------------
+fallible allocation: alignment, sentinel, overflow, failure, retry and ownership PASS
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"RuntimeFallibleAllocation" end time: Oct 21 16:28 UTC
+"RuntimeFallibleAllocation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 21 16:28 UTC

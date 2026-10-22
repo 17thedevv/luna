@@ -1,0 +1,26 @@
+[
+  {
+    "id": 39724856381,
+    "name": "Stdlib API foundation",
+    "event": "pull_request",
+    "prior_status": "in_progress",
+    "prior_conclusion": null,
+    "reason": "duplicate PR preview; preserve push qualification on identical source head"
+  },
+  {
+    "id": 39724856535,
+    "name": "Phase 5 platform verification",
+    "event": "pull_request",
+    "prior_status": "in_progress",
+    "prior_conclusion": null,
+    "reason": "duplicate PR preview; preserve push qualification on identical source head"
+  },
+  {
+    "id": 39724856016,
+    "name": "Phase 6 formatting verification",
+    "event": "pull_request",
+    "prior_status": "in_progress",
+    "prior_conclusion": null,
+    "reason": "duplicate PR preview; preserve push qualification on identical source head"
+  }
+]

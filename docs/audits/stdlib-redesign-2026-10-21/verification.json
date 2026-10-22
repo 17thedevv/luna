@@ -1,0 +1,50 @@
+{
+  "status": "PASS_FOR_SOURCE_INVENTORY_ONLY",
+  "source_commit": "264390dacfd8f35ea53d4e5639ca4018cfc64f4d",
+  "source_inventory_sha256": "d6bbad03b8e1ea8be78110b9afae784ffb07e6b92cdc2858739414d3b0f437c7",
+  "provider_count": 49,
+  "declaration_records": 2358,
+  "explicit_import_declarations": 213,
+  "fixture_files_indexed": 957,
+  "physical_layers": {
+    "core": 23,
+    "io": 1,
+    "file": 1,
+    "path": 1,
+    "net": 1,
+    "encoding": 1,
+    "crypto": 1,
+    "json": 1,
+    "alloc": 15,
+    "lang": 4
+  },
+  "declaration_kinds": {
+    "Enum": 23,
+    "Function": 1637,
+    "Impl": 436,
+    "Module": 58,
+    "Trait": 26,
+    "Struct": 130,
+    "Macro": 39,
+    "TypeAlias": 9
+  },
+  "extern_declaration_occurrences": 137,
+  "spelled_public_extern_occurrences": 55,
+  "checks": {
+    "all_manifest_sources_parsed": true,
+    "no_unmapped_source": true,
+    "source_sha256_rechecked": 49,
+    "unique_record_ids": true,
+    "explicit_import_topology": true,
+    "repeat_output_byte_identical": true,
+    "malformed_source_rejected": {
+      "fixture": "tests/luna/language/diagnostic_conformance/parser_missing_semi.ln",
+      "exit": 1,
+      "stdout_empty": true
+    },
+    "no_unassigned_nonlocal_library_items": true
+  },
+  "artifact_validation": false,
+  "resolved_export_validation": false,
+  "stdlib_behavior_tests_run": false
+}

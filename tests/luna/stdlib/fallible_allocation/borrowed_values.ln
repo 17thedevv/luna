@@ -1,0 +1,29 @@
+import <box>;
+import <vec>;
+import <result>;
+import <alloc_error>;
+extern fn __luna_test_alloc_fail_after(budget: i64);
+fn main() -> i32 {
+    dec rw source = 7;
+    {
+        dec rw values = std::Vec<&i32>::new();
+        __luna_test_alloc_fail_after(0);
+        match values.try_push(&source) {
+            std::Result::Err(failure) -> {
+                __luna_test_alloc_fail_after(-1);
+                if values.try_reserve(1 as usize).is_err() { return 1; }
+                if *failure.value != 7 { return 2; }
+                if values.try_push(failure.value).is_err() { return 3; }
+            },
+            std::Result::Ok -> { return 4; },
+        }
+        if *values.as_slice()[0] != 7 { return 5; }
+    }
+    source = 8;
+    {
+        dec value = std::Box<&i32>::try_new(&source).unwrap();
+        if **value.as_ref() != 8 { return 6; }
+    }
+    source = 9;
+    return source - 9;
+}
