@@ -1,0 +1,18 @@
+{
+  "build_command": [
+    "python",
+    "docs/tools/build_v01_docs.py"
+  ],
+  "validate_command": [
+    "python",
+    "docs/tools/validate_v01_docs.py"
+  ],
+  "build_exit_code": 0,
+  "validate_exit_code": 0,
+  "result": {
+    "documents": 259,
+    "site_pages": 31,
+    "checked_local_links": 2126,
+    "errors": []
+  }
+}

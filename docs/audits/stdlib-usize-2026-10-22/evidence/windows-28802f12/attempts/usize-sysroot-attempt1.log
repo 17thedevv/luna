@@ -1,0 +1,25 @@
+error[E6004]: Failed to build Luna sysroot: Failed to build __raw_table:
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 9937, end: 9939, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 10344, end: 10345, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 10475, end: 10476, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 11046, end: 11048, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 11405, end: 11406, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 11512, end: 11513, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 11608, end: 11609, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 12744, end: 12746, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 13159, end: 13160, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 13455, end: 13456, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 14026, end: 14028, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 14393, end: 14394, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 14641, end: 14642, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 14861, end: 14862, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 20710, end: 20712, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 21362, end: 21364, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 21616, end: 21617, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 21698, end: 21699, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 22384, end: 22385, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 22584, end: 22585, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 22668, end: 22669, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(InvalidSyntax), span: Some(Span { file_id: FileId(0), start: 23069, end: 23070, ctxt: SyntaxContext(0) }), message: "Expected expression.", related: [], contract_diagnostic: false }
+
+

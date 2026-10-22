@@ -1,0 +1,15 @@
+{
+  "source_root_commit": "8a01f8ee9e79bffb6e6d7813f1a609900f585c07",
+  "compiler_sha256": "32449f1adc57e6ff991fe97e1715739c9bdf06bef5227661541625d6e0ca3273",
+  "fixture_sha256": "a42684b08432d24009a0dcc7393bd229e6ae4e4ab9239d77f7e07090b468a7e1",
+  "command": [
+    "D:\\luna-stable-build\\cargo\\debug\\luna.exe",
+    "build",
+    "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang\\tests\\luna\\stdlib\\size_index\\projected_temporary.ln",
+    "--quiet",
+    "-o",
+    "D:\\luna-stable-build\\projected-old.exe"
+  ],
+  "build_exit": 0,
+  "native_exit": 1
+}

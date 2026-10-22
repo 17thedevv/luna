@@ -2,7 +2,8 @@
 
 # Stdlib API expansion — 2026-10-22
 
-Status: implementation on stdlib-redesign; validation in progress. This record
+Status: focused Windows PASS at implementation pin
+`28802f1258de156015c4ffec8a607e1dcfd6df4d` on stdlib-redesign. This record
 does not qualify stable, a package, an installer or 32-bit native execution.
 
 The maintainer selected usize memory counts, type constructors and continued
@@ -33,16 +34,40 @@ runtime ABI 2, with 50 providers.
 
 ## Verification boundaries
 
-Fresh sysroot builds and focused CLI/native tests are being acquired with
-LLVM18/GNU on Windows. Source-only and artifact-only roots are isolated; prior
-bundles are never copied into a fresh build. The acceptance matrix includes
-positive and negative type/bound checks, exact non-Copy cleanup, borrowed views,
-overflow/allocation controls, interface identity and old-protocol rejection.
+The [Windows receipt](evidence/windows-28802f12/receipt.json) and
+[acquisition notes](evidence/windows-28802f12/README.md) preserve raw logs,
+commands, binary identities and SHA-256 values. LLVM18/GNU results:
+
+| Scope | Result |
+| --- | --- |
+| Eight CLI suites, including the new size/index matrix | 29 Rust tests PASS, zero failed |
+| Existing ptr/mem, RawTable, Vec and String acceptance | 40 PASS, zero failed |
+| Semantic/llib tests | 231 PASS, zero failed |
+| Borrowck/semantic/llib unit run | 59 PASS, overlapping the semantic run |
+| Final backend/MVIR unit replay | 9 PASS, zero failed |
+| Fresh canonical sysroot | 50 LLIB headers: format 2 / compiler 26 / MVIR 5; 50 COFF objects 0x8664 |
+
+Source-only and artifact-only roots are isolated; prior bundles are never
+copied into a fresh build. The new matrix passes positive and negative
+type/bound checks, exact non-Copy cleanup, borrowed views, overflow/allocation
+controls, interface identity and old-protocol rejection. The generic projected
+temporary fixture returns failure with the pre-repair compiler and success with
+the repaired compiler. Failed intermediate attempts remain explicitly superseded.
+
+The [parser source snapshot](evidence/windows-28802f12/source-surface-receipt.json)
+records 50 providers, 2,411 declaration records and 219 explicit import edges.
+Two acquisitions were byte-identical and all 50 raw source digests were checked.
+These records include implementation declarations: they are not a resolved
+export catalog, semantic coverage count or conformance percentage.
 
 Earlier allocator results remain pinned to their recorded commits. In particular,
 Ubuntu run 39634996889 completed focused tests but was cancelled during workspace
 regression and skipped ASan; it is not workspace PASS for this implementation.
-Full Windows/Ubuntu regression and final package/installer gates remain open.
+Fresh Ubuntu [run 39724850945](https://github.com/17thedevv/luna/actions/runs/39724850945)
+targets the same implementation pin. Its runtime step passed; public CLI,
+canonical sysroot, C-runtime ASan and complete workspace results are not yet
+closed by this record. Full Windows/Ubuntu regression and final
+package/installer gates remain open.
 
 ## API and release follow-up
 

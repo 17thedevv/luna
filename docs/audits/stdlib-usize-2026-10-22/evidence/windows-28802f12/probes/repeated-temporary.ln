@@ -1,0 +1,15 @@
+struct Owner { value: i32, drops: *rw usize };
+impl std::Drop for Owner {
+    fn drop(self: &rw Self) { unsafe { *self.drops = *self.drops + (1 as usize); } }
+}
+fn make(drops: *rw usize) -> Owner { return Owner { value: 7, drops: drops }; }
+fn consume(value: Owner) -> i32 { return value.value; }
+fn repeated(drops: *rw usize) {
+    dec rw i = 0;
+    while i < 3 && make(drops).value == 7 { i = i + 1; }
+}
+fn main() -> i32 {
+    dec rw drops = 0 as usize;
+    repeated(&rw drops as *rw usize);
+    return drops as i32;
+}

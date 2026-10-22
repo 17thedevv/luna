@@ -1,0 +1,466 @@
+{
+  "status": "FOCUSED_WINDOWS_PASS_NOT_STABLE_QUALIFIED",
+  "recorded_at_utc": "2026-10-22T04:59:08.148933+00:00",
+  "source_commit": "28802f1258de156015c4ffec8a607e1dcfd6df4d",
+  "code_trees": {
+    "luna-rs": "c73d5f080dac36936830209824a6ae6317c8bad9",
+    "runtime": "b2702099bc5780d5806e508a77466bfd89541323",
+    "tests": "65ca679b7ace2d9555b9e7b7ee8a298a40913fcd"
+  },
+  "target": "x86_64-pc-windows-gnu",
+  "compiler_sha256": "7cdbd50e70fbacaf77748522d7781b3f0fb225232e9ed749a5aec65bb98c59ab",
+  "production_runtime_sha256": "9df62c256c69148623a9f83ddccce975e4e5ee521bb0b133dc9d039777ba8c98",
+  "tooling": {
+    "LLVM_SYS_180_PREFIX": "D:/Programs/LLVM-DEV",
+    "CARGO_TARGET_DIR": "D:/luna-stable-build/constructor-cargo",
+    "CC": "C:/Users/84387/AppData/Local/Programs/Luna/bin/luna-cc.exe"
+  },
+  "protocol": {
+    "format": 2,
+    "compiler": 26,
+    "metadata": 9,
+    "mvir": 5,
+    "runtime_abi": 2
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "luna-rs/Cargo.toml",
+        "-p",
+        "luna-cli",
+        "--test",
+        "fallible_allocation_cli",
+        "--test",
+        "semantic_maturity_phase0",
+        "--test",
+        "stdlib_size_index_cli",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "scope": "Final compiler and permanent fixtures; native source/artifact matrices plus phase0 controls.",
+      "test_binaries": 3,
+      "passed": 24,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-final-control.log",
+        "sha256": "116db65bd028819d086347f8e9f99a23c16d7117c067378f7095027ccef1c445",
+        "bytes": 29992
+      }
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "luna-rs/Cargo.toml",
+        "-p",
+        "luna-driver",
+        "--test",
+        "stdlib_core_ptr_mem_acceptance_tests",
+        "--test",
+        "stdlib_hashmap_storage_acceptance_tests",
+        "--test",
+        "stdlib_phase4b_vec_depth_tests",
+        "--test",
+        "stdlib_string_acceptance_tests",
+        "--",
+        "--nocapture"
+      ],
+      "exit_code": 0,
+      "scope": "Final canonical sysroot; existing ptr/mem, RawTable, Vec and String acceptance suites.",
+      "test_binaries": 4,
+      "passed": 40,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-driver-final.log",
+        "sha256": "350a694895a34ac5317e1a0800770a38fe579d2190561ab0d096eccdd8a1c494",
+        "bytes": 29848
+      }
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "luna-rs/Cargo.toml",
+        "-p",
+        "luna-semantic",
+        "-p",
+        "luna-llib",
+        "-p",
+        "luna-borrowck",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "scope": "Acquired before final predicate cleanup; these crate sources are unchanged by that follow-up. Overlaps the semantic run.",
+      "test_binaries": 3,
+      "passed": 59,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-units.log",
+        "sha256": "3a1b0242fc7bfdb0f03f88f78a7a28422b4e5106d6fb94ff167c2f4cbac0780f",
+        "bytes": 27734
+      }
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "luna-rs/Cargo.toml",
+        "-p",
+        "luna-semantic",
+        "--tests",
+        "-p",
+        "luna-llib",
+        "--test",
+        "compiler_version_compat_tests"
+      ],
+      "exit_code": 0,
+      "scope": "Acquired before final predicate cleanup; semantic/llib sources unchanged by that follow-up. Includes configured 32/64-bit semantic tests, not 32-bit native execution.",
+      "test_binaries": 28,
+      "passed": 231,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-semantic.log",
+        "sha256": "f22f6797fde5f4d7d2decc0825318792951d31504025d937c84ab25ec05c37a6",
+        "bytes": 45968
+      }
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--manifest-path",
+        "luna-rs/Cargo.toml",
+        "-p",
+        "luna-backend",
+        "-p",
+        "luna-mvir",
+        "--lib"
+      ],
+      "exit_code": 0,
+      "scope": "Replayed after final generic predicate cleanup. CLI/native regressions carry behavioral coverage.",
+      "test_binaries": 2,
+      "passed": 9,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-codegen-final.log",
+        "sha256": "3b02de0be526ff31cbeebafc451827c7d16b0b2e8f0547e4687013b0b0eee0ed",
+        "bytes": 21733
+      }
+    },
+    {
+      "command": [
+        "D:/luna-stable-build/constructor-cargo\\debug\\deps\\associated_owner_generic_cli-97f8257dad76331b.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "scope": "Final implementation; built together through Cargo then invoked with at most two concurrent test processes.",
+      "executable_sha256": "3eebd45fb44a44a801f94cb81ab0e03c6c0ee7d38b9911bd822ce436d6763f43",
+      "test_binaries": 1,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-final-associated_owner_generic_cli.log",
+        "sha256": "4c9673f384a2a66243d38a925f673cf920c21a6364a25b97d32c17a77f68d8ef",
+        "bytes": 189
+      }
+    },
+    {
+      "command": [
+        "D:/luna-stable-build/constructor-cargo\\debug\\deps\\imported_ffi_output_cli-2fb5c99222a2b1c6.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "scope": "Final implementation; built together through Cargo then invoked with at most two concurrent test processes.",
+      "executable_sha256": "70defac5dd4555b88aa3dde103df5471d369dc13f8dcfb38f6cac04c6ee53edd",
+      "test_binaries": 1,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-final-imported_ffi_output_cli.log",
+        "sha256": "22cb4ddd08711aee2f5537627b65a67fe8eb1509196aa1d59b120ee01ca2fdb6",
+        "bytes": 190
+      }
+    },
+    {
+      "command": [
+        "D:/luna-stable-build/constructor-cargo\\debug\\deps\\raw_slice_provenance_cli-8dd47fa2d81802bf.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "scope": "Final implementation; built together through Cargo then invoked with at most two concurrent test processes.",
+      "executable_sha256": "b5ad0ab0f97730eadb5c35a648dcb00bb0ebe574e1a0a142d545d6f567c79d0e",
+      "test_binaries": 1,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-final-raw_slice_provenance_cli.log",
+        "sha256": "537e7d9d0ca5eea313c1ee1d673fc355cee121cb0d0d41a524495ebb84564114",
+        "bytes": 4597
+      }
+    },
+    {
+      "command": [
+        "D:/luna-stable-build/constructor-cargo\\debug\\deps\\raw_slice_view_a5_cli-4d846cffc16d20aa.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "scope": "Final implementation; built together through Cargo then invoked with at most two concurrent test processes.",
+      "executable_sha256": "ad68945ecb293aa963975c9322da8da97717979658f5b14eebf5c345f253c926",
+      "test_binaries": 1,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-final-raw_slice_view_a5_cli.log",
+        "sha256": "794409b2ca30555fdcf084c4e03e2761b7a5d5c08e5210c6b8e78906359747e6",
+        "bytes": 177
+      }
+    },
+    {
+      "command": [
+        "D:/luna-stable-build/constructor-cargo\\debug\\deps\\stable_io_cli-58211bcf8a4bcfcb.exe",
+        "--nocapture",
+        "--test-threads=1"
+      ],
+      "exit_code": 0,
+      "scope": "Final implementation; built together through Cargo then invoked with at most two concurrent test processes.",
+      "executable_sha256": "125e1dc316d0aa5daa2841be34534280d2f9fc7516217565f951b091c4e97dad",
+      "test_binaries": 1,
+      "passed": 1,
+      "failed": 0,
+      "ignored": 0,
+      "log": {
+        "path": "stdlib-expansion-final-stable_io_cli.log",
+        "sha256": "262870c489328796776b8ff79fa1e031f1ffe3adf10a95efe26e12a3055ccbed",
+        "bytes": 188
+      }
+    }
+  ],
+  "final_cli_suites": 8,
+  "final_cli_rust_tests": 29,
+  "driver_acceptance_tests": 40,
+  "sysroot": {
+    "command": [
+      "D:\\luna-stable-build\\constructor-cargo\\debug\\luna.exe",
+      "build-sysroot",
+      "--quiet"
+    ],
+    "exit_code": 0,
+    "canonical_root": "C:\\Users\\84387\\.codex\\worktrees\\stable-release-plan\\fdlang\\luna-rs",
+    "providers": 50,
+    "objects": 50,
+    "header_inventory": "sysroot-headers.json"
+  },
+  "native_probe_replays": [
+    {
+      "executable": "D:\\luna-stable-build\\projected-old.exe",
+      "sha256": "7f17f4a2b84b50e45900c8cb1137f0089d9ad5f46adef29ab229d7f694411015",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "D:\\luna-stable-build\\projected-final.exe",
+      "sha256": "d404ba8c8e74c56c4d1cf40fe04e3ee27d372c7d3aa70d100d7825c18ff78c20",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "D:\\luna-stable-build\\repeated-temporary.exe",
+      "sha256": "172ee483fe2da227afa21ee1ae7280c739ec2801c731fd6636a1f2871f582efc",
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "executable": "D:\\luna-stable-build\\repeated-temporary-after.exe",
+      "sha256": "bcf07423e0a4b206dd8d04150b46febabea5b98b2a7a915fc062345eb7952be0",
+      "exit_code": 3,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "superseded_attempts": [
+    {
+      "status": "FAILED_SUPERSEDED",
+      "reason": "FAIL: 158 of 160 owned values dropped; C-GAP-17.",
+      "log": {
+        "path": "attempts/usize-cli-attempt1.log",
+        "sha256": "4bbe524c7461f295ad89117f6956d82fe7e321eaa1d49c0f67155baca7ea769b",
+        "bytes": 26750
+      }
+    },
+    {
+      "status": "FAILED_SUPERSEDED",
+      "reason": "FAIL: conditional temporary stack address dominance; C-GAP-17.",
+      "log": {
+        "path": "attempts/usize-cli-attempt2.log",
+        "sha256": "d6a537e00ee365ec6c3ce32d228ef12e7302b4b0b398803cb88e941a920af2c9",
+        "bytes": 27802
+      }
+    },
+    {
+      "status": "FAILED_SUPERSEDED",
+      "reason": "FAIL: fixture missing explicit trait/provider imports; fixture corrected.",
+      "log": {
+        "path": "attempts/usize-cli-attempt3.log",
+        "sha256": "181a9fb68ead93acc475a66bdec21417077349d999a08e3e3e09a4bda51b485c",
+        "bytes": 31496
+      }
+    },
+    {
+      "status": "FAILED_SUPERSEDED",
+      "reason": "FAIL: first seven suites passed but new bit fixture trapped L005 on checked shift; rotations corrected with masks. Superseded by final eight-suite replay.",
+      "log": {
+        "path": "attempts/stdlib-expansion-cli.log",
+        "sha256": "cc95951475b7fd172b2374aabcee1c9fe5461fc22306d4b3b3e8088490d9ca09",
+        "bytes": 35820
+      }
+    },
+    {
+      "status": "FAILED_SUPERSEDED",
+      "reason": "FAIL: old canonical u64 thunk count; C-GAP-16.",
+      "log": {
+        "path": "attempts/usize-thunk-before.log",
+        "sha256": "7932abb3639a073eae933210c4c96608b842ec0b779db7e95e2ec1f4c4109f05",
+        "bytes": 21766
+      }
+    },
+    {
+      "status": "FAILED_SUPERSEDED",
+      "reason": "FAIL: canonical usize hooks rejected; C-GAP-16.",
+      "log": {
+        "path": "attempts/usize-intrinsic-before.log",
+        "sha256": "5cc612d9d2e9d3657b1de7a4308205c3aa06c89b9e5ba4619576c8728ff5ba5d",
+        "bytes": 17143
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt1.log",
+        "sha256": "0da34770e4bdbf377aa1947e849ec4342e93351d669e226dfb89c82542c5d0f2",
+        "bytes": 4982
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt10.log",
+        "sha256": "6ea279572670fe4c5095517e4c7c520bc2b7c1b6da7bc60df808b80af51ed39f",
+        "bytes": 1779
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt11.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt2.log",
+        "sha256": "8af58d296dbb19c7e4477b116c4b58e36096ceb6f7c8c6bc7b9a3241a880c73b",
+        "bytes": 549
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt3.log",
+        "sha256": "bb634dc8fc253747b2de69bbbdc47f4a6a99c4a2ccb1a1380cbc94f2c7bc777c",
+        "bytes": 4391
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt4.log",
+        "sha256": "34542a429309b03aa411dfe2c9433797885f3a4cf2d9c7260b4666bcda17ec5c",
+        "bytes": 2921
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt5.log",
+        "sha256": "a95b2e7f8c91f966a9899ca9d9ebed65d1d30e5d420205d31547aa7350ccd3ab",
+        "bytes": 2923
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt6.log",
+        "sha256": "0b5155f3d949e884b0d75dc7a40985ed021960a9b950b38682992d1737258322",
+        "bytes": 5327
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt7.log",
+        "sha256": "6d92d64ffd4b642fd7a59a25568412d87191ce4359036a04d089225fa9475155",
+        "bytes": 549
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt8.log",
+        "sha256": "8d6edba046bb9bb766576f31b76158f6243b5699e62939a9d3c93c6b733bea51",
+        "bytes": 445
+      }
+    },
+    {
+      "status": "SUPERSEDED_NOT_QUALIFICATION",
+      "reason": "Intermediate migration acquisition; not final sysroot PASS.",
+      "log": {
+        "path": "attempts/usize-sysroot-attempt9.log",
+        "sha256": "fe56673480986b1ec8f20c08ad64740180cc0e643d380e698cfafe3040336c81",
+        "bytes": 789
+      }
+    }
+  ],
+  "notes": [
+    "The final code and fixtures were acquired before/around the recording commit with unchanged implementation content.",
+    "Internal unit/semantic counts overlap; do not sum them into unique coverage.",
+    "Zero-byte quiet sysroot/probe logs are accompanied by explicit exit/status and artifact or native checks.",
+    "Repeated-temporary executables report the number of drops as their exit code; 3 is the successful post-repair oracle.",
+    "C runtime assertion/ASan evidence from earlier pins is historical; this Windows record does not claim new C-runtime or full-workspace qualification.",
+    "Full Windows/Ubuntu qualification, native 32-bit, final package/installer, general comptime callable gap and broader stdlib redesign remain open."
+  ]
+}

@@ -1,0 +1,5 @@
+error[E6004]: Failed to build Luna sysroot: Failed to build io:
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 19644, end: 19647, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 21834, end: 21835, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+
+

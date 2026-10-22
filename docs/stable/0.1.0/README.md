@@ -104,6 +104,10 @@ ordered-set algebra and u64 bit utilities. It requires compiler protocol 26 and
 new bundles. The [C++23 functional map](../../proposals/stdlib-redesign-0.1/cpp-library-gap-map.md)
 adds a prioritized backlog, with graph/basic CPU matrix/tensor as maintainer-
 authorized extensions. Focused validation and final qualification are separate;
+the foundation pin 28802f12 passes eight Windows CLI suites (29 tests) and 40
+existing acceptance tests, with 50 fresh canonical artifact/object pairs.
+The refreshed parser snapshot maps 2,411 declaration records / 219 explicit
+imports. Ubuntu/workspace and final package qualification remain pending;
 STABLE-016 remains open.
 
 ## Release boundaries

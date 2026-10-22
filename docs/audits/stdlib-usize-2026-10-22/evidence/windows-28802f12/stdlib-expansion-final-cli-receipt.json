@@ -1,0 +1,52 @@
+[
+  {
+    "suite": "associated_owner_generic_cli",
+    "command": [
+      "D:/luna-stable-build/constructor-cargo\\debug\\deps\\associated_owner_generic_cli-97f8257dad76331b.exe",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit_code": 0,
+    "log": "D:\\luna-stable-build\\stdlib-expansion-final-associated_owner_generic_cli.log"
+  },
+  {
+    "suite": "imported_ffi_output_cli",
+    "command": [
+      "D:/luna-stable-build/constructor-cargo\\debug\\deps\\imported_ffi_output_cli-2fb5c99222a2b1c6.exe",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit_code": 0,
+    "log": "D:\\luna-stable-build\\stdlib-expansion-final-imported_ffi_output_cli.log"
+  },
+  {
+    "suite": "raw_slice_provenance_cli",
+    "command": [
+      "D:/luna-stable-build/constructor-cargo\\debug\\deps\\raw_slice_provenance_cli-8dd47fa2d81802bf.exe",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit_code": 0,
+    "log": "D:\\luna-stable-build\\stdlib-expansion-final-raw_slice_provenance_cli.log"
+  },
+  {
+    "suite": "raw_slice_view_a5_cli",
+    "command": [
+      "D:/luna-stable-build/constructor-cargo\\debug\\deps\\raw_slice_view_a5_cli-4d846cffc16d20aa.exe",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit_code": 0,
+    "log": "D:\\luna-stable-build\\stdlib-expansion-final-raw_slice_view_a5_cli.log"
+  },
+  {
+    "suite": "stable_io_cli",
+    "command": [
+      "D:/luna-stable-build/constructor-cargo\\debug\\deps\\stable_io_cli-58211bcf8a4bcfcb.exe",
+      "--nocapture",
+      "--test-threads=1"
+    ],
+    "exit_code": 0,
+    "log": "D:\\luna-stable-build\\stdlib-expansion-final-stable_io_cli.log"
+  }
+]

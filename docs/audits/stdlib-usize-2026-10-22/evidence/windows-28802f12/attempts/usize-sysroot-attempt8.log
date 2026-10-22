@@ -1,0 +1,5 @@
+error[E6004]: Failed to build Luna sysroot: Failed to build io:
+  Diagnostic { level: Error, code: Some(BackendInvariantViolation), span: None, message: "invalid compiler-generated raw-slice intrinsic thunk", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(BackendInvariantViolation), span: None, message: "invalid compiler-generated raw-slice intrinsic thunk", related: [], contract_diagnostic: false }
+
+

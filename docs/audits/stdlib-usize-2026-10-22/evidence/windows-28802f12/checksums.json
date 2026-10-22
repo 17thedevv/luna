@@ -1,0 +1,256 @@
+{
+  "recorded_at_utc": "2026-10-22T05:00:48.771495+00:00",
+  "scope": "All files in this evidence directory except checksums.json itself.",
+  "files": [
+    {
+      "path": "attempts/stdlib-expansion-cli.log",
+      "bytes": 35820,
+      "sha256": "cc95951475b7fd172b2374aabcee1c9fe5461fc22306d4b3b3e8088490d9ca09"
+    },
+    {
+      "path": "attempts/usize-cli-attempt1.log",
+      "bytes": 26750,
+      "sha256": "4bbe524c7461f295ad89117f6956d82fe7e321eaa1d49c0f67155baca7ea769b"
+    },
+    {
+      "path": "attempts/usize-cli-attempt2.log",
+      "bytes": 27802,
+      "sha256": "d6a537e00ee365ec6c3ce32d228ef12e7302b4b0b398803cb88e941a920af2c9"
+    },
+    {
+      "path": "attempts/usize-cli-attempt3.log",
+      "bytes": 31496,
+      "sha256": "181a9fb68ead93acc475a66bdec21417077349d999a08e3e3e09a4bda51b485c"
+    },
+    {
+      "path": "attempts/usize-intrinsic-before.log",
+      "bytes": 17143,
+      "sha256": "5cc612d9d2e9d3657b1de7a4308205c3aa06c89b9e5ba4619576c8728ff5ba5d"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt1.log",
+      "bytes": 4982,
+      "sha256": "0da34770e4bdbf377aa1947e849ec4342e93351d669e226dfb89c82542c5d0f2"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt10.log",
+      "bytes": 1779,
+      "sha256": "6ea279572670fe4c5095517e4c7c520bc2b7c1b6da7bc60df808b80af51ed39f"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt11.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt2.log",
+      "bytes": 549,
+      "sha256": "8af58d296dbb19c7e4477b116c4b58e36096ceb6f7c8c6bc7b9a3241a880c73b"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt3.log",
+      "bytes": 4391,
+      "sha256": "bb634dc8fc253747b2de69bbbdc47f4a6a99c4a2ccb1a1380cbc94f2c7bc777c"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt4.log",
+      "bytes": 2921,
+      "sha256": "34542a429309b03aa411dfe2c9433797885f3a4cf2d9c7260b4666bcda17ec5c"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt5.log",
+      "bytes": 2923,
+      "sha256": "a95b2e7f8c91f966a9899ca9d9ebed65d1d30e5d420205d31547aa7350ccd3ab"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt6.log",
+      "bytes": 5327,
+      "sha256": "0b5155f3d949e884b0d75dc7a40985ed021960a9b950b38682992d1737258322"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt7.log",
+      "bytes": 549,
+      "sha256": "6d92d64ffd4b642fd7a59a25568412d87191ce4359036a04d089225fa9475155"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt8.log",
+      "bytes": 445,
+      "sha256": "8d6edba046bb9bb766576f31b76158f6243b5699e62939a9d3c93c6b733bea51"
+    },
+    {
+      "path": "attempts/usize-sysroot-attempt9.log",
+      "bytes": 789,
+      "sha256": "fe56673480986b1ec8f20c08ad64740180cc0e643d380e698cfafe3040336c81"
+    },
+    {
+      "path": "attempts/usize-thunk-before.log",
+      "bytes": 21766,
+      "sha256": "7932abb3639a073eae933210c4c96608b842ec0b779db7e95e2ec1f4c4109f05"
+    },
+    {
+      "path": "documentation.json",
+      "bytes": 341,
+      "sha256": "3a48b78761ccb54462ade0804ae122cdb733a5bf8d3f00e09ae8e2f83bb4ef97"
+    },
+    {
+      "path": "probes/projected-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "probes/projected-old-build.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "probes/projected-old-build.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "probes/projected-old-run.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "probes/projected-old-run.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "probes/repeated-temporary-after.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "probes/repeated-temporary-before.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "probes/repeated-temporary.ln",
+      "bytes": 536,
+      "sha256": "cabdfd30805bc788da52faeaaac9e4ec02b7ce8f7c88487297a69ad59a2af49e"
+    },
+    {
+      "path": "projected-old-receipt.json",
+      "bytes": 589,
+      "sha256": "78039a9587e9cc01d7b57dbf3507ca397c2b3cc82c337a9832f43f1372b6f8aa"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3022,
+      "sha256": "3aaada0569017e771e61221c9dadf80d3996bbb2262581db20d5e031e7e51c44"
+    },
+    {
+      "path": "receipt.json",
+      "bytes": 16440,
+      "sha256": "09f39777024392f27958ec3042567dd1188e5894edd586e489040d3246e4d105"
+    },
+    {
+      "path": "source-surface-receipt.json",
+      "bytes": 1719,
+      "sha256": "1c43fb09d1548361790e09cef628a4251b007e18077f59f8e31b13e111b3ed52"
+    },
+    {
+      "path": "source-surface.json.gz",
+      "bytes": 72580,
+      "sha256": "e18a206653afbab32d6c91a5e5ebeb294ffa0d3b66481171433ddffce1306d47"
+    },
+    {
+      "path": "stdlib-expansion-canonical-sysroot-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "stdlib-expansion-ci-duplicates.json",
+      "bytes": 809,
+      "sha256": "af833908e18a2699dd06c00f6a3a8ebc194df1933d6839d6dc1c240ae3596319"
+    },
+    {
+      "path": "stdlib-expansion-ci-jobs-final.json",
+      "bytes": 4187,
+      "sha256": "7fbd4b907b6136b5c2d858e84a5e6f67f0ca58749c9db6e852494e7f47412385"
+    },
+    {
+      "path": "stdlib-expansion-codegen-final.log",
+      "bytes": 21733,
+      "sha256": "3b02de0be526ff31cbeebafc451827c7d16b0b2e8f0547e4687013b0b0eee0ed"
+    },
+    {
+      "path": "stdlib-expansion-docs-final-build.log",
+      "bytes": 192,
+      "sha256": "528a83ef3cba8d911bf7f671c9128bdcb6db75cb40f38b006e501c2fa2da50d1"
+    },
+    {
+      "path": "stdlib-expansion-docs-final-validate.log",
+      "bytes": 96,
+      "sha256": "89cb56261b291168f4068c853b423f0e7d2f04978b1e2952ac75ed1d93d2d441"
+    },
+    {
+      "path": "stdlib-expansion-driver-final.log",
+      "bytes": 29848,
+      "sha256": "350a694895a34ac5317e1a0800770a38fe579d2190561ab0d096eccdd8a1c494"
+    },
+    {
+      "path": "stdlib-expansion-final-associated_owner_generic_cli.log",
+      "bytes": 189,
+      "sha256": "4c9673f384a2a66243d38a925f673cf920c21a6364a25b97d32c17a77f68d8ef"
+    },
+    {
+      "path": "stdlib-expansion-final-cli-build.stderr",
+      "bytes": 658,
+      "sha256": "2df0e06990c666f9c844ca869f6301160e0646d4cc81dc78c17c1518ab1b4c72"
+    },
+    {
+      "path": "stdlib-expansion-final-cli-build.stdout",
+      "bytes": 252819,
+      "sha256": "6dceea60945e63699be48d57bf97a7ff6d6e34d258e1cd1ccc3252683c95527c"
+    },
+    {
+      "path": "stdlib-expansion-final-cli-receipt.json",
+      "bytes": 1702,
+      "sha256": "188c78838586c884b556e7ef1852732fc092e722a20a4fc3cfa793e2355456d8"
+    },
+    {
+      "path": "stdlib-expansion-final-control.log",
+      "bytes": 29992,
+      "sha256": "116db65bd028819d086347f8e9f99a23c16d7117c067378f7095027ccef1c445"
+    },
+    {
+      "path": "stdlib-expansion-final-imported_ffi_output_cli.log",
+      "bytes": 190,
+      "sha256": "22cb4ddd08711aee2f5537627b65a67fe8eb1509196aa1d59b120ee01ca2fdb6"
+    },
+    {
+      "path": "stdlib-expansion-final-raw_slice_provenance_cli.log",
+      "bytes": 4597,
+      "sha256": "537e7d9d0ca5eea313c1ee1d673fc355cee121cb0d0d41a524495ebb84564114"
+    },
+    {
+      "path": "stdlib-expansion-final-raw_slice_view_a5_cli.log",
+      "bytes": 177,
+      "sha256": "794409b2ca30555fdcf084c4e03e2761b7a5d5c08e5210c6b8e78906359747e6"
+    },
+    {
+      "path": "stdlib-expansion-final-stable_io_cli.log",
+      "bytes": 188,
+      "sha256": "262870c489328796776b8ff79fa1e031f1ffe3adf10a95efe26e12a3055ccbed"
+    },
+    {
+      "path": "stdlib-expansion-semantic.log",
+      "bytes": 45968,
+      "sha256": "f22f6797fde5f4d7d2decc0825318792951d31504025d937c84ab25ec05c37a6"
+    },
+    {
+      "path": "stdlib-expansion-units.log",
+      "bytes": 27734,
+      "sha256": "3a1b0242fc7bfdb0f03f88f78a7a28422b4e5106d6fb94ff167c2f4cbac0780f"
+    },
+    {
+      "path": "sysroot-headers.json",
+      "bytes": 20940,
+      "sha256": "cc9ef3cc0edd232408a1bea66f5615a10a23bbee05a715adc55689b464c1f2bc"
+    }
+  ]
+}

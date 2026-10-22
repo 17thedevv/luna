@@ -7,6 +7,10 @@ the maintainer's 2026-10-22 request. It does not freeze all stdlib APIs or adopt
 C++ semantics. The [functional gap map](cpp-library-gap-map.md) records the larger
 backlog; verification lives in the [audit](../../audits/stdlib-usize-2026-10-22/README.md).
 
+The implementation at 28802f12 passes focused Windows check/build/native
+source/artifact matrices, including negative bounds and old-artifact rejection.
+Full platform/workspace and final distribution qualification remain open.
+
 ## Set operations
 
 All types remain directly in std. BTreeSet<T> adds:

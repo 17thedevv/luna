@@ -1,0 +1,10 @@
+error[E6004]: Failed to build Luna sysroot: Failed to build json:
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 5935, end: 5936, ctxt: SyntaxContext(0) }), message: "type mismatch: expected u64, got usize", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 6002, end: 6003, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 6086, end: 6089, ctxt: SyntaxContext(0) }), message: "Enum variant expects 0 fields, but 1 were provided", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 6173, end: 6176, ctxt: SyntaxContext(0) }), message: "Member access requires a struct or trait object", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(UnresolvedSymbol), span: Some(Span { file_id: FileId(0), start: 6177, end: 6185, ctxt: SyntaxContext(0) }), message: "Method `as_bytes` not found for type `InferenceVar(45)`", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 6933, end: 6934, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 7685, end: 7690, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got u64", related: [], contract_diagnostic: false }
+
+

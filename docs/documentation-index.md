@@ -131,6 +131,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/stdlib-usize-2026-10-22/README.md](audits/stdlib-usize-2026-10-22/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-usize-2026-10-22/compiler-gap-16.md](audits/stdlib-usize-2026-10-22/compiler-gap-16.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-usize-2026-10-22/compiler-gap-17.md](audits/stdlib-usize-2026-10-22/compiler-gap-17.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-usize-2026-10-22/evidence/windows-28802f12/README.md](audits/stdlib-usize-2026-10-22/evidence/windows-28802f12/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/borrowck/NLL_spec.md](borrowck/NLL_spec.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/borrowck/call_effect_model.md](borrowck/call_effect_model.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/core-language-contract.md](core-language-contract.md) | guidance | [modules](spec/0.1/modules.md) |

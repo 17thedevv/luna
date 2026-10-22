@@ -615,6 +615,11 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/audits/stdlib-usize-2026-10-22/evidence/windows-28802f12/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/borrowck/NLL_spec.md",
     "role": "historical",
     "owner": "semantics"

@@ -1,0 +1,15 @@
+error[E6004]: Failed to build Luna sysroot: Failed to build thread:
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 623, end: 639, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 650, end: 666, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 975, end: 990, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 1001, end: 1016, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 2601, end: 2617, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 2628, end: 2644, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3006, end: 3022, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3033, end: 3049, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3376, end: 3391, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3402, end: 3417, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3843, end: 3858, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+  Diagnostic { level: Error, code: Some(TypeMismatch), span: Some(Span { file_id: FileId(0), start: 3869, end: 3884, ctxt: SyntaxContext(0) }), message: "type mismatch: expected usize, got i32", related: [], contract_diagnostic: false }
+
+

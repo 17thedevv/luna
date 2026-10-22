@@ -11,12 +11,15 @@ points to `a3080712` after metadata-only history cleanup; original package/log
 SHAs below are retained as historical build identities, not silently rewritten.
 
 The 2026-10-22 [stdlib API expansion](docs/audits/stdlib-usize-2026-10-22/README.md)
-is under validation on stdlib-redesign: usize memory counts, additional type
+passes focused Windows validation at `28802f12` on stdlib-redesign: usize memory counts, additional type
 constructors, ordered-set algebra and fixed-width bit utilities. Compiler
 protocol 26 / runtime ABI 2 / 50 providers form a new bundle requiring fresh
 qualification. The [C++23 comparison](docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md)
 tracks missing functional families; graph and basic CPU matrix/tensor remain
-planned. These changes are not installed or included in the published alpha.
+planned. Eight CLI suites (29 tests), 40 existing ptr/mem/collection tests and
+all 50 canonical artifact/object checks PASS. Fresh Ubuntu run 39724850945 is
+still acquiring results; full workspace/package gates remain open.
+These changes are not installed or included in the published alpha.
 
 ## Published alpha snapshot — original build identities, 2026-10-20
 

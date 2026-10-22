@@ -1,0 +1,6 @@
+
+running 1 test
+test imported_extern_outputs_preserve_ffi_identity_and_borrow_checks ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 213.31s
+

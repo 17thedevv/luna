@@ -1,0 +1,6 @@
+
+running 1 test
+test associated_owner_arguments_instantiate_impl_binders_and_bounds ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 233.56s
+
