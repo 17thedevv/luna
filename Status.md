@@ -29,10 +29,11 @@ further expansion. The maintainer selected `$name` interpolation; API/error/
 buffer policies and generic macro machinery are documented proposals, not
 implemented support. Existing concatenation macros retain their current behavior.
 
-The [lang-item design](docs/proposals/stdlib-redesign-0.1/lang-items.md) now covers
+The [lang-item design](docs/proposals/stdlib-redesign-0.1/lang-items.md) covers
 the 26-role core target and optional protocol profiles, with a source inventory
 of 22 production / 2 test registry keys. New hook identities and protocols remain
-proposals; the compiler/stdlib/runtime implementation pin is unchanged.
+proposals. The first subsequent D03 stdlib slice adds type-owned constructors for
+Rc, Arc, Cell and RefCell; its source/artifact qualification remains open.
 
 ## Published alpha snapshot — original build identities, 2026-10-20
 

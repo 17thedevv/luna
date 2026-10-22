@@ -36,6 +36,10 @@ export module std {
     }
 
     impl<T> Rc<T> {
+        export fn new(val: T) -> Self {
+            return rc_new<T>(val);
+        }
+
         export fn clone(self: &Self) -> Rc<T> {
             unsafe {
                 dec box = &*self.ptr;

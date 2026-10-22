@@ -14,7 +14,8 @@
     },
     {
       "id": "STD-D03",
-      "decision": "Constructors on the type: Type::new / Type::with_capacity"
+      "decision": "Constructors on the type: Type::new / Type::with_capacity",
+      "implementation_status": "PARTIAL_TYPE_OWNED_CONSTRUCTORS_ADDED_FOR_RC_ARC_CELL_REFCELL; LEGACY_FACTORIES_RETAINED_PENDING_MIGRATION_POLICY"
     },
     {
       "id": "STD-D04",

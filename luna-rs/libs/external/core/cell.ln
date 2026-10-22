@@ -13,6 +13,10 @@ export module std {
     }
 
     impl<T> Cell<T> {
+        export fn new(val: T) -> Self {
+            return cell_new<T>(val);
+        }
+
         export fn set(self: &Self, val: T) {
             dec p_imm = &self.value as *T;
             dec p_mut = p_imm as *rw T;
@@ -49,6 +53,12 @@ export module std {
             value: val,
             borrow: cell_new<i64>(0 as i64),
         };
+    }
+
+    impl<T> RefCell<T> {
+        export fn new(val: T) -> Self {
+            return ref_cell_new<T>(val);
+        }
     }
 
     export struct Ref<T> {

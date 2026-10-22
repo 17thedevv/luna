@@ -72,3 +72,23 @@ These are total, allocation-free scalar operations using existing integer
 machinery. u32 describes bounded properties/rotation counts of a fixed u64,
 not memory length/index. No implicit u64/usize conversion, new intrinsic or
 all-integer-width coverage is promised by this slice.
+
+## Constructor migration slice — 2026-10-23
+
+The confirmed STD-D03 convention now has type-owned constructors for the
+shared-ownership and interior-cell wrappers:
+
+```luna
+std::Rc<T>::new(value)
+std::Arc<T>::new(value)
+std::Cell<T>::new(value)
+std::RefCell<T>::new(value)
+```
+
+Each method forwards its owned value once to the provider's existing factory;
+allocation, initialization, representation and borrow behavior are unchanged.
+The older `std::rc_new`, `std::arc_new`, `std::cell_new` and
+`std::ref_cell_new` entry points remain migration bridges. Removing or
+deprecating those aliases requires the remaining compatibility and migration
+decision. No fallible `Rc`/`Arc` constructor or new allocation contract is
+introduced by this slice.
