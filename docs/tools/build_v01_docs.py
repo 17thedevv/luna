@@ -45,6 +45,7 @@ CURRENT = {
     'docs/proposals/stdlib-redesign-0.1/foundation-api.md',
     'docs/proposals/stdlib-redesign-0.1/io-api.md',
     'docs/proposals/stdlib-redesign-0.1/io-interpolation.md',
+    'docs/proposals/stdlib-redesign-0.1/lang-items.md',
     'docs/licensing.md',
     'docs/stable/0.1.0/README.md',
     'docs/plans/0.1.0-stable.md',

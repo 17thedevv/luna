@@ -42,6 +42,14 @@
       "design": "io-api.md",
       "interpolation_design": "io-interpolation.md",
       "implementation_status": "DESIGN_ONLY_GENERIC_LITERAL_SEGMENT_CAPABILITY_NOT_IMPLEMENTED"
+    },
+    {
+      "id": "STD-D09",
+      "decision": "Design the complete Luna lang-item/compiler-contract set after the I/O API design",
+      "design": "lang-items.md",
+      "catalog": "lang-items-catalog.json",
+      "inventory": "lang-items-current.json",
+      "implementation_status": "DESIGN_ONLY_NEW_CORE_ROLES_AND_OPTIONAL_PROFILES_NOT_ADOPTED_OR_IMPLEMENTED"
     }
   ],
   "proposed_not_confirmed": [
@@ -51,6 +59,7 @@
     "compatibility aliases and migration details",
     "generated artifact output/install layout",
     "I/O Result/error-progress, console flush/staging, buffered Drop/extraction and migration policies in io-api.md",
-    "Dollar interpolation escaping, grammar, scope/hygiene and generic macro opt-in mechanism in io-interpolation.md"
+    "Dollar interpolation escaping, grammar, scope/hygiene and generic macro opt-in mechanism in io-interpolation.md",
+    "The 26-role core target, four new role markers/AssociatedType target and optional operator/callable/async/range/concurrency profiles in lang-items.md"
   ]
 }

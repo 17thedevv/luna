@@ -171,3 +171,11 @@ Maintainer yêu cầu đối chiếu nhóm chức năng thư viện chuẩn C++ 
 cao dùng thư viện riêng local/vendored. [Bảng đối chiếu và thứ tự triển khai](stdlib-redesign-0.1/cpp-library-gap-map.md)
 phân biệt phần có nền, thiếu thao tác, chưa có và khác biệt semantics.
 Đây không phải quyết định sao chép exception/RTTI/API deprecated của C++.
+
+## Thiết kế lang item — 2026-10-23
+
+Theo yêu cầu tiếp theo của maintainer, [bộ compiler contract](stdlib-redesign-0.1/lang-items.md)
+ghi inventory 22 production key hiện có, target core 26 role và các profile
+operator/callable/async/range/concurrency tách riêng. Catalog là thiết kế,
+không phải compiler configuration hoặc support claim. Display/I/O/Clone và
+allocator/runtime ABI không bị biến thành lang item theo tên thư viện.

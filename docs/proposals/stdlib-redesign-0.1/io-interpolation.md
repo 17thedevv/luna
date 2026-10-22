@@ -97,6 +97,10 @@ reproducer trước implementation; không tự thêm một keyword, intrinsic,
 `#[format_macro]` hay hardcoded library callee vào grammar/skill hiện hành.
 Đây là feature mới (LANGUAGE-BLOCKED), không mặc định là C-GAP sửa bug.
 
+[Bản thiết kế lang item](lang-items.md) giữ literal segmentation ở nhóm generic
+compiler capability, không tạo lang item cho Display/println hay chọn sink trong
+compiler. Tên macro và namespace không cấp implicit compiler semantics.
+
 Source .ln và macro từ .llib phải giữ nguyên segments, literal origin, visibility,
 trait bounds và borrow semantics. Nếu representation/metadata đổi, bump version
 đúng phần và từ chối artifact cũ; không dùng file tồn tại để quyết định hợp lệ.

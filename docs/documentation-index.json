@@ -895,6 +895,11 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/proposals/stdlib-redesign-0.1/lang-items.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/proposals/stdlib-redesign-0.1/size-index.md",
     "role": "guidance",
     "owner": "stdlib"

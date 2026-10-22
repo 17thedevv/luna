@@ -116,6 +116,12 @@ The proposal records byte/text/formatting boundaries, errors/progress, buffer
 recovery and a separate generic macro prerequisite. No new I/O implementation,
 runtime ABI or dollar interpolation support is claimed by that design work.
 
+The next [lang-item design](../../proposals/stdlib-redesign-0.1/lang-items.md)
+separates 22 current production registrations from a 26-role core target and
+disabled optional profiles. It defines owner/shape/trust, artifact/VM parity and
+acceptance; neither the four new core roles nor optional protocols are implemented
+by the design-only follow-up.
+
 ## Release boundaries
 
 Supported native release scope remains Windows x86_64 GNU and Ubuntu 24.04

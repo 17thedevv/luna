@@ -187,6 +187,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/proposals/stdlib-redesign-0.1/foundation-api.md](proposals/stdlib-redesign-0.1/foundation-api.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/stdlib-redesign-0.1/io-api.md](proposals/stdlib-redesign-0.1/io-api.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/stdlib-redesign-0.1/io-interpolation.md](proposals/stdlib-redesign-0.1/io-interpolation.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
+| [docs/proposals/stdlib-redesign-0.1/lang-items.md](proposals/stdlib-redesign-0.1/lang-items.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/stdlib-redesign-0.1/size-index.md](proposals/stdlib-redesign-0.1/size-index.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/v01-design-01-method-collision.md](proposals/v01-design-01-method-collision.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/v01-filter-step-dedup-api.md](proposals/v01-filter-step-dedup-api.md) | historical | [conformance](spec/0.1/conformance.md) |
