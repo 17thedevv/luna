@@ -885,6 +885,16 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/proposals/stdlib-redesign-0.1/io-api.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/io-interpolation.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/proposals/stdlib-redesign-0.1/size-index.md",
     "role": "guidance",
     "owner": "stdlib"

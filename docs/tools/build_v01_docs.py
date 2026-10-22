@@ -15,7 +15,7 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / 'docs/spec/0.1'
 SITE = ROOT / 'docs/site'
-STATUS_DATE = '2026-10-22'
+STATUS_DATE = '2026-10-23'
 QUALIFICATION_ROOT = ROOT / 'docs/audits/r5-cpu-baseline-2026-10-20'
 QUALIFICATION = json.loads((QUALIFICATION_ROOT / 'qualification-state.json').read_text(encoding='utf-8'))
 PUBLISHED = QUALIFICATION['status'] == 'PUBLISHED_PRERELEASE'
@@ -43,6 +43,8 @@ CURRENT = {
     'docs/proposals/stdlib-redesign-0.1/size-index.md',
     'docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md',
     'docs/proposals/stdlib-redesign-0.1/foundation-api.md',
+    'docs/proposals/stdlib-redesign-0.1/io-api.md',
+    'docs/proposals/stdlib-redesign-0.1/io-interpolation.md',
     'docs/licensing.md',
     'docs/stable/0.1.0/README.md',
     'docs/plans/0.1.0-stable.md',

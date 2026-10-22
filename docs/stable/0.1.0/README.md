@@ -110,6 +110,12 @@ The refreshed parser snapshot maps 2,411 declaration records / 219 explicit
 imports. Ubuntu/workspace and final package qualification remain pending;
 STABLE-016 remains open.
 
+On 2026-10-23 the maintainer prioritized the [I/O API design](../../proposals/stdlib-redesign-0.1/io-api.md)
+before further numerical/graph expansion and selected `$name` interpolation.
+The proposal records byte/text/formatting boundaries, errors/progress, buffer
+recovery and a separate generic macro prerequisite. No new I/O implementation,
+runtime ABI or dollar interpolation support is claimed by that design work.
+
 ## Release boundaries
 
 Supported native release scope remains Windows x86_64 GNU and Ubuntu 24.04

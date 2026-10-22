@@ -136,6 +136,13 @@ bằng code thư viện, in nối tiếp giá trị, không parse {}. std::io::p
 stdout/stderr error, partial write/flush, arity/repetition. Compiler không chọn
 stream/newline/callee theo tên macro; interpolation cần generic contract riêng.
 
+Ngày 2026-10-23 maintainer ưu tiên thiết kế I/O trước math/matrix/graph và chọn
+`$tenbien` thay cho `{}`. [Bản API I/O](stdlib-redesign-0.1/io-api.md) định nghĩa
+target signatures, byte/text/formatting, EOF/partial/error, buffer recovery và
+migration. [Contract nội suy](stdlib-redesign-0.1/io-interpolation.md) tách scope,
+escaping, borrow và generic macro capability. Các policy chi tiết là proposal;
+không đổi compiler, source stdlib, runtime ABI hay macro behavior trong đợt này.
+
 ## Đường thực hiện sau thiết kế
 
 1. Chốt nền API: namespace/constructor/root/size-index và chính sách allocator

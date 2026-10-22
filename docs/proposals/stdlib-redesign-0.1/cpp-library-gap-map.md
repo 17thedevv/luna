@@ -58,15 +58,19 @@ header/provider: provider, namespace và năng lực ngôn ngữ là các đơn 
    triển khai, không phải đóng toàn bộ nhóm container/bit của C++.
    [Kết quả tại 28802f12](../../audits/stdlib-usize-2026-10-22/README.md)
    tách rõ kiểm thử thành công và các gate còn mở.
-2. **Toán và mảng CPU:** thiết kế Complex, numeric folds/scans và constants;
+2. **I/O trước khi mở rộng tiếp (ưu tiên maintainer ngày 2026-10-23):** review
+   [API byte/text/formatting](io-api.md), error/EOF/partial I/O, buffer recovery,
+   File/TCP traits và [nội suy $tenbien](io-interpolation.md). Đây là thiết kế,
+   chưa phải capability đã triển khai.
+3. **Toán và mảng CPU:** thiết kế Complex, numeric folds/scans và constants;
    Matrix/Tensor sở hữu bộ nhớ liên tục, shape/index usize, kiểm tra overflow,
    indexing/reshape, rồi elementwise và matmul CPU. Chốt kiểu số, storage order,
    shape errors, borrow/view, allocation failure và IEEE behavior trước từng API.
-3. **Graph:** chốt directed/undirected, node/edge identity, duplicate/removal,
+4. **Graph:** chốt directed/undirected, node/edge identity, duplicate/removal,
    weight và invalidation; sau đó adjacency, traversal và path algorithms.
-4. **Text và host:** conversion/formatting, regex/Unicode, filesystem, calendar
+5. **Text và host:** conversion/formatting bổ sung, regex/Unicode, filesystem, calendar
    và concurrency theo các contract riêng, với cùng qualification hai platform.
-5. **Collection chuyên biệt và tối ưu:** BitSet, flat/multi/node containers,
+6. **Collection chuyên biệt và tối ưu:** BitSet, flat/multi/node containers,
    arena/pool, parallel/vectorized execution sau khi API nền ổn định.
 
 Graph và owning Matrix/Tensor là phần mở rộng maintainer đã chọn, không phải

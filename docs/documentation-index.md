@@ -1,6 +1,6 @@
 # Luna 0.1 documentation inventory
 
-Updated 2026-10-22. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
+Updated 2026-10-23. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
 
 All repository-authored tracked Markdown and new versioned/archived/audit documents are classified below. Agent guidance is included. Vendor documentation, generated build logs and test-failure dumps are excluded. Website pages are generated from the same baseline.
 
@@ -185,6 +185,8 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/proposals/stdlib-redesign-0.1/allocator.md](proposals/stdlib-redesign-0.1/allocator.md) | guidance | [runtime](spec/0.1/runtime.md) |
 | [docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md](proposals/stdlib-redesign-0.1/cpp-library-gap-map.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/stdlib-redesign-0.1/foundation-api.md](proposals/stdlib-redesign-0.1/foundation-api.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
+| [docs/proposals/stdlib-redesign-0.1/io-api.md](proposals/stdlib-redesign-0.1/io-api.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
+| [docs/proposals/stdlib-redesign-0.1/io-interpolation.md](proposals/stdlib-redesign-0.1/io-interpolation.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/stdlib-redesign-0.1/size-index.md](proposals/stdlib-redesign-0.1/size-index.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/v01-design-01-method-collision.md](proposals/v01-design-01-method-collision.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/v01-filter-step-dedup-api.md](proposals/v01-filter-step-dedup-api.md) | historical | [conformance](spec/0.1/conformance.md) |
