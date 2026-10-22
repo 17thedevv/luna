@@ -27,10 +27,10 @@ fn main() -> i32 {
     dec rw values = [2, 3, 5];
     dec pointer = &rw values[0] as *rw i32;
     unsafe {
-        dec xs = std::mem::slice_from_raw_parts<i32>(pointer as *i32, 3 as u64);
+        dec xs = std::mem::slice_from_raw_parts<i32>(pointer as *i32, 3 as usize);
         if xs.len != 3 as usize { return 4; }
         if xs[2] != 5 { return 5; }
-        dec rw ys = std::mem::slice_from_raw_parts_mut<i32>(pointer, 3 as u64);
+        dec rw ys = std::mem::slice_from_raw_parts_mut<i32>(pointer, 3 as usize);
         ys[1] = 11;
         dec view = std::mem::slice_from_raw_parts<i32>;
         dec zs = view(pointer as *i32, 3 as u64);

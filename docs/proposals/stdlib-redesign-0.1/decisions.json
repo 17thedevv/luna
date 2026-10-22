@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "status": "CO_DESIGN_IN_PROGRESS_ALLOCATOR_IMPLEMENTATION_VALIDATING",
-  "date": "2026-10-21",
+  "status": "CO_DESIGN_IN_PROGRESS_API_EXPANSION_VALIDATING",
+  "date": "2026-10-22",
   "authority": "Direct maintainer responses in the current conversation",
   "confirmed": [
     {
@@ -29,6 +29,12 @@
       "decision": "Supplement aborting allocation with fallible try_* APIs returning Result; allocation failure preserves existing storage/data",
       "design": "allocator.md",
       "implementation_status": "IMPLEMENTED_ON_BRANCH_VALIDATION_IN_PROGRESS"
+    },
+    {
+      "id": "STD-D07",
+      "decision": "Compare functionality against C++23 standard-library families and fill useful gaps with Luna-native APIs; math/graph/basic CPU matrix/tensor in stdlib, advanced numerical/GPU/AI libraries separate with local/vendored dependencies",
+      "design": "cpp-library-gap-map.md",
+      "implementation_status": "FOUNDATION_SLICE_IN_PROGRESS_NOT_FULL_CPP_PARITY"
     }
   ],
   "proposed_not_confirmed": [

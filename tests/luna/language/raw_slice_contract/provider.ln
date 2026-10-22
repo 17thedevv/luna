@@ -1,8 +1,8 @@
 import <mem>;
 export module views {
-    export struct View { private pointer: *u8, private length: u64, } requires anchor(pointer) = self;
+    export struct View { private pointer: *u8, private length: usize, } requires anchor(pointer) = self;
     export fn make(bytes: &[u8]) -> View life_from(bytes) {
-        unsafe { return View { pointer: bytes.data as *u8, length: bytes.len as u64 }; }
+        unsafe { return View { pointer: bytes.data as *u8, length: bytes.len as usize }; }
     }
     export fn forward<T>(value: T) -> T { return value; }
     export enum Wrapped<T> { Value(T), Empty }

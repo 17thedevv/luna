@@ -1,0 +1,65 @@
+import <cmp>;
+import <clone>;
+import <btreeset>;
+import <hashset>;
+struct OrdOnly { id: i32 };
+impl std::Ord for OrdOnly {
+    fn cmp(self: &Self, other: &Self) -> i32 { return self.id - other.id; }
+}
+fn relations_without_clone() -> bool {
+    dec a = std::BTreeSet<OrdOnly>::new();
+    dec b = std::BTreeSet<OrdOnly>::new();
+    return a.is_subset(&b) && a.is_superset(&b) && a.is_disjoint(&b);
+}
+struct Key { id: i32, drops: *rw usize };
+impl std::Ord for Key {
+    fn cmp(self: &Self, other: &Self) -> i32 {
+        if self.id < other.id { return -1; }
+        if self.id > other.id { return 1; }
+        return 0;
+    }
+}
+impl std::Clone for Key {
+    fn clone(self: &Self) -> Self { return Key { id: self.id, drops: self.drops }; }
+}
+impl std::Drop for Key {
+    fn drop(self: &rw Self) { unsafe { *self.drops = *self.drops + (1 as usize); } }
+}
+fn owned(drops: *rw usize) -> i32 {
+    dec rw a = std::BTreeSet<Key>::new();
+    dec rw b = std::BTreeSet<Key>::new();
+    a.insert(Key { id: 1, drops: drops }); a.insert(Key { id: 2, drops: drops });
+    b.insert(Key { id: 2, drops: drops }); b.insert(Key { id: 3, drops: drops });
+    dec union = a.union_owned(&b);
+    dec intersection = a.intersection_owned(&b);
+    dec difference = a.difference_owned(&b);
+    dec symmetric = a.symmetric_difference_owned(&b);
+    if union.len() != 3 as usize || intersection.len() != 1 as usize { return 1; }
+    if difference.len() != 1 as usize || symmetric.len() != 2 as usize { return 2; }
+    if a.len() != 2 as usize || b.len() != 2 as usize { return 3; }
+    if a.is_subset(&union) == false || union.is_superset(&b) == false { return 4; }
+    if a.is_disjoint(&b) || difference.is_disjoint(&intersection) == false { return 5; }
+    dec rw it = union.iter();
+    if it.next().unwrap().id != 1 || it.next().unwrap().id != 2 || it.next().unwrap().id != 3 { return 6; }
+    if it.next().is_some() { return 7; }
+    return 0;
+}
+fn main() -> i32 {
+    if relations_without_clone() == false { return 13; }
+    dec rw drops = 0 as usize;
+    dec result = owned(&rw drops as *rw usize);
+    if result != 0 { return result; }
+    // Four inputs plus eight clones, including the duplicate union key.
+    if drops != 12 as usize { return 8; }
+    dec a = std::BTreeSet<i32>::new();
+    dec b = std::BTreeSet<i32>::new();
+    if a.is_subset(&b) == false || a.is_disjoint(&b) == false { return 9; }
+    if a.union_owned(&b).is_empty() == false { return 10; }
+    dec rw h = std::HashSet<i32>::new();
+    dec rw other = std::HashSet<i32>::new();
+    h.insert(1); other.insert(2);
+    if h.is_disjoint(&other) == false { return 11; }
+    other.insert(1);
+    if h.is_disjoint(&other) { return 12; }
+    return 0;
+}

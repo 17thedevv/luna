@@ -617,7 +617,20 @@ impl<'a, 'ctx> LLVMBackend<'a, 'ctx> {
             Instruction::StaticAddress(static_data) => self.static_address(static_data, data.ty),
             Instruction::Alloca => {
                 let ty = self.map_type(data.ty)?;
-                let alloca = self.builder.build_alloca(ty, &format!("v{}", id.0)).unwrap();
+                // Storage can be cleaned up after a conditional initialization.
+                // Its address must dominate every guarded cleanup path; drop
+                // flags still decide whether an initialized value is live.
+                let entry = self.builder.get_insert_block()
+                    .and_then(|block| block.get_parent())
+                    .and_then(|function| function.get_first_basic_block())
+                    .ok_or_else(|| BackendError::InvariantViolation("alloca outside function".into()))?;
+                let storage_builder = self.context.create_builder();
+                if let Some(first) = entry.get_first_instruction() {
+                    storage_builder.position_before(&first);
+                } else {
+                    storage_builder.position_at_end(entry);
+                }
+                let alloca = storage_builder.build_alloca(ty, &format!("v{}", id.0)).unwrap();
                 Ok(alloca.into())
             }
             Instruction::HeapAlloc => {

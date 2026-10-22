@@ -1,0 +1,43 @@
+struct Owner { value: i32, drops: *rw usize };
+impl std::Drop for Owner {
+    fn drop(self: &rw Self) { unsafe { *self.drops = *self.drops + (1 as usize); } }
+}
+fn make(drops: *rw usize) -> Owner { return Owner { value: 7, drops: drops }; }
+fn consume(value: Owner) -> i32 { return value.value; }
+fn repeated(drops: *rw usize) {
+    dec rw i = 0;
+    while i < 3 && make(drops).value == 7 { i = i + 1; }
+}
+fn breaking(drops: *rw usize) {
+    dec rw i = 0;
+    while make(drops).value == 7 {
+        i = i + 1;
+        if i == 3 { break; }
+    }
+}
+fn early(drops: *rw usize) -> i32 {
+    if make(drops).value == 7 { return 7; }
+    return 0;
+}
+fn main() -> i32 {
+    dec rw drops = 0 as usize;
+    { dec value = make(&rw drops as *rw usize).value; if value != 7 { return 10; } }
+    if drops != 1 as usize { return 1; }
+    { dec pair = (make(&rw drops as *rw usize), 3); dec moved = pair.0; if moved.value != 7 { return 11; } }
+    if drops != 2 as usize { return 2; }
+    { dec value = consume(make(&rw drops as *rw usize)); if value != 7 { return 12; } }
+    if drops != 3 as usize { return 3; }
+    { dec value = (make(&rw drops as *rw usize), 3).1; if value != 3 { return 13; } }
+    if drops != 4 as usize { return 4; }
+    { dec skipped = true || make(&rw drops as *rw usize).value == 7; }
+    if drops != 4 as usize { return 5; }
+    { dec visited = false || make(&rw drops as *rw usize).value == 7; }
+    if drops != 5 as usize { return 6; }
+    repeated(&rw drops as *rw usize);
+    if drops != 8 as usize { return 7; }
+    breaking(&rw drops as *rw usize);
+    if drops != 11 as usize { return 8; }
+    if early(&rw drops as *rw usize) != 7 { return 9; }
+    if drops != 12 as usize { return 10; }
+    return 0;
+}

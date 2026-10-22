@@ -46,7 +46,7 @@ export module std {
             unsafe {
                 dec p = s as *u8;
                 dec rw len: usize = 0 as usize;
-                while (*std::ptr::add<u8>(p, len as u64)) != (0 as u8) {
+                while (*std::ptr::add<u8>(p, len)) != (0 as u8) {
                     len = len + (1 as usize);
                 }
                 __luna_print(p, len);
@@ -57,7 +57,7 @@ export module std {
             unsafe {
                 dec p = s as *u8;
                 dec rw len: usize = 0 as usize;
-                while (*std::ptr::add<u8>(p, len as u64)) != (0 as u8) {
+                while (*std::ptr::add<u8>(p, len)) != (0 as u8) {
                     len = len + (1 as usize);
                 }
                 __luna_println(p, len);
@@ -68,7 +68,7 @@ export module std {
             unsafe {
                 dec p = s as *u8;
                 dec rw len: usize = 0 as usize;
-                while (*std::ptr::add<u8>(p, len as u64)) != (0 as u8) {
+                while (*std::ptr::add<u8>(p, len)) != (0 as u8) {
                     len = len + (1 as usize);
                 }
                 __luna_stderr_write(p, len);
@@ -80,7 +80,7 @@ export module std {
             unsafe {
                 dec p = s as *u8;
                 dec rw len: usize = 0 as usize;
-                while (*std::ptr::add<u8>(p, len as u64)) != (0 as u8) {
+                while (*std::ptr::add<u8>(p, len)) != (0 as u8) {
                     len = len + (1 as usize);
                 }
                 __luna_eprintln(p, len);
@@ -149,7 +149,7 @@ export module std {
 
         export fn read_to_end<R: Read>(reader: &rw R, buf: &rw std::Vec<u8>) -> std::Result<usize, std::io::IoError> {
             dec rw total: usize = 0 as usize;
-            dec rw chunk = std::vec_with_capacity<u8>(512 as u64);
+            dec rw chunk = std::vec_with_capacity<u8>(512 as usize);
             dec rw ci: usize = 0 as usize;
             while ci < (512 as usize) {
                 chunk.push(0 as u8);
@@ -186,8 +186,8 @@ export module std {
                 dec rw has_err = false;
                 dec rw err = IoError::Other;
                 unsafe {
-                    dec p = std::ptr::add_mut<u8>(buf.data as *rw u8, offset as u64);
-                    dec rem = std::mem::slice_from_raw_parts_mut<u8>(p, (target - offset) as u64);
+                    dec p = std::ptr::add_mut<u8>(buf.data as *rw u8, offset);
+                    dec rem = std::mem::slice_from_raw_parts_mut<u8>(p, target - offset);
                     dec res = reader.read(rem);
                     match res {
                         std::Result::Ok(n) -> {
@@ -218,8 +218,8 @@ export module std {
                 dec rw has_err = false;
                 dec rw err = IoError::Other;
                 unsafe {
-                    dec p = std::ptr::add<u8>(buf.data as *u8, offset as u64);
-                    dec rem = std::mem::slice_from_raw_parts<u8>(p, (target - offset) as u64);
+                    dec p = std::ptr::add<u8>(buf.data as *u8, offset);
+                    dec rem = std::mem::slice_from_raw_parts<u8>(p, target - offset);
                     dec res = writer.write(rem);
                     match res {
                         std::Result::Ok(n) -> {
@@ -244,7 +244,7 @@ export module std {
 
         export fn copy<R: Read, W: Write>(reader: &rw R, writer: &rw W) -> std::Result<u64, std::io::IoError> {
             dec rw total: u64 = 0 as u64;
-            dec rw chunk = std::vec_with_capacity<u8>(512 as u64);
+            dec rw chunk = std::vec_with_capacity<u8>(512 as usize);
             dec rw ci: usize = 0 as usize;
             while ci < (512 as usize) {
                 chunk.push(0 as u8);
@@ -261,7 +261,7 @@ export module std {
                         dec rw w_err = IoError::Other;
                         unsafe {
                             dec p = chunk.as_slice().data as *u8;
-                            dec sub = std::mem::slice_from_raw_parts<u8>(p, n as u64);
+                            dec sub = std::mem::slice_from_raw_parts<u8>(p, n);
                             dec w_res = write_all<W>(writer, sub);
                             match w_res {
                                 std::Result::Ok -> {},
@@ -320,7 +320,7 @@ export module std {
 
         impl Read for Cursor<std::Vec<u8>> {
             fn read(self: &rw Self, buf: &rw [u8]) -> std::Result<usize, std::io::IoError> {
-                dec total_len = self.inner.len();
+                dec total_len = self.inner.len() as u64;
                 if self.pos >= total_len {
                     return std::Result::Ok(0 as usize);
                 }
@@ -345,11 +345,11 @@ export module std {
                 dec count = buf.len;
                 dec rw i: usize = 0 as usize;
                 while i < count {
-                    dec cur_idx = self.pos as u64;
-                    if cur_idx < self.inner.len() {
+                    dec cur_idx = self.pos;
+                    if cur_idx < (self.inner.len() as u64) {
                         unsafe {
                             dec data_ptr = self.inner.as_mut_slice().data;
-                            *std::ptr::add_mut<u8>(data_ptr, cur_idx) = buf[i];
+                            *std::ptr::add_mut<u8>(data_ptr, cur_idx as usize) = buf[i];
                         }
                     } else {
                         self.inner.push(buf[i]);
@@ -400,7 +400,7 @@ export module std {
         }
 
         export fn buf_reader_with_capacity<R>(inner: R, cap: usize) -> BufReader<R> {
-            dec rw b = std::vec_with_capacity<u8>(cap as u64);
+            dec rw b = std::vec_with_capacity<u8>(cap);
             dec rw i: usize = 0 as usize;
             while i < cap {
                 b.push(0 as u8);
@@ -430,12 +430,12 @@ export module std {
             export fn buffer(self: &Self) -> &[u8] life_from(self) {
                 if self.pos >= self.cap {
                     unsafe {
-                        return std::mem::slice_from_raw_parts<u8>(self.buf.as_slice().data as *u8, 0 as u64);
+                        return std::mem::slice_from_raw_parts<u8>(self.buf.as_slice().data as *u8, 0 as usize);
                     }
                 }
                 unsafe {
-                    dec p = std::ptr::add<u8>(self.buf.as_slice().data as *u8, self.pos as u64);
-                    return std::mem::slice_from_raw_parts<u8>(p, (self.cap - self.pos) as u64);
+                    dec p = std::ptr::add<u8>(self.buf.as_slice().data as *u8, self.pos);
+                    return std::mem::slice_from_raw_parts<u8>(p, self.cap - self.pos);
                 }
             }
         }
@@ -499,7 +499,7 @@ export module std {
         export fn buf_writer_with_capacity<W>(inner: W, cap: usize) -> BufWriter<W> {
             return BufWriter<W> {
                 inner: inner,
-                buf: std::vec_with_capacity<u8>(cap as u64),
+                buf: std::vec_with_capacity<u8>(cap),
                 capacity: cap,
             };
         }
@@ -543,7 +543,7 @@ export module std {
             }
 
             fn flush(self: &rw Self) -> std::Result<void, std::io::IoError> {
-                if self.buf.len() > (0 as u64) {
+                if self.buf.len() > (0 as usize) {
                     dec rw w_ok = true;
                     dec rw w_err = IoError::Other;
                     unsafe {
@@ -598,7 +598,7 @@ export module std {
                     }
                     dec rw i: usize = 0 as usize;
                     while i < out_len {
-                        dec b = std::ptr::read<u8>(std::ptr::add<u8>(out_ptr as *u8, i as u64));
+                        dec b = std::ptr::read<u8>(std::ptr::add<u8>(out_ptr as *u8, i));
                         buf.push(b);
                         i = i + (1 as usize);
                     }

@@ -372,15 +372,6 @@ impl<'a> MvirGenerator<'a> {
         luna_semantic::SemanticTypeId(0)
     }
 
-    fn find_u64_type(&self) -> luna_semantic::SemanticTypeId {
-        for id in self.ctx.types.get_all_types() {
-            if let luna_semantic::SemanticType::Primitive(luna_semantic::ty::BuiltinType::U64) = self.ctx.types.get(id) {
-                return id;
-            }
-        }
-        self.ctx.types.usize_id()
-    }
-
     pub fn generate_all_known_functions(&mut self) {
         for instance in &self.ctx.instantiated_functions {
             self.generate_mono_instance(instance);
@@ -871,6 +862,22 @@ impl<'a> MvirGenerator<'a> {
         self.temporary_drop_scopes.push(Vec::new());
     }
 
+    fn generate_condition(&mut self, expression: &luna_ast::ExprId) -> Operand {
+        // A loop evaluates its predicate repeatedly. Owners materialized by
+        // one evaluation must be cleaned up before that storage is reused.
+        self.push_scope();
+        let value = self.generate_expr(expression);
+        if self.current_block.is_none() {
+            // A return inside the expression already emitted active cleanups.
+            self.temporary_drop_scopes.pop();
+            self.lexical_scopes.pop();
+            return value;
+        }
+        let snapshot = self.push_inst(Instruction::Assign(value), self.ctx.types.bool_id());
+        self.pop_scope_and_drop(None);
+        Operand::Value(snapshot)
+    }
+
     fn pop_scope_and_drop(&mut self, keep: Option<luna_common::ids::SymbolId>) {
         if let Some(temporaries) = self.temporary_drop_scopes.pop() {
             self.emit_temporary_drops(&temporaries);
@@ -1347,15 +1354,15 @@ impl<'a> MvirGenerator<'a> {
                             ptr: Operand::Value(ptr_field),
                         }, ptr_ptr_ty);
 
-                        let u64_ty = self.find_u64_type();
+                        let length_ty = self.ctx.types.usize_id();
                         let len_field = self.push_inst(Instruction::FieldPtr {
                             base: base_ptr,
                             field_idx: 1,
                             field_name: None,
-                        }, u64_ty);
+                        }, length_ty);
                         let len_val = self.push_inst(Instruction::Load {
                             ptr: Operand::Value(len_field),
-                        }, u64_ty);
+                        }, length_ty);
 
                         self.push_inst(Instruction::BoundsCheck {
                             index: index_op.clone(),
@@ -1423,6 +1430,14 @@ impl<'a> MvirGenerator<'a> {
                     ptr: Operand::Value(alloca),
                     value: val_op,
                 }, ty_id);
+                // A projected rvalue still owns its unconsumed fields. Keep
+                // its storage in the lexical cleanup scope; ordinary move
+                // tracking suppresses cleanup for fields transferred out.
+                if self.ctx.needs_drop(ty_id) {
+                    self.temporary_drop_scopes.last_mut()
+                        .expect("ICE: projected temporary has no cleanup scope")
+                        .push((alloca, ty_id));
+                }
                 Operand::Value(alloca)
             }
         }
@@ -2092,7 +2107,7 @@ impl<'a> MvirGenerator<'a> {
                 self.terminate_block(Terminator::Br { target: cond_label.clone() });
                 self.start_block(cond_label.clone());
 
-                let cond_op = self.generate_expr(condition);
+                let cond_op = self.generate_condition(condition);
                 self.terminate_block(Terminator::CondBr {
                     condition: cond_op,
                     true_target: body_label.clone(),
@@ -2131,7 +2146,7 @@ impl<'a> MvirGenerator<'a> {
                 let else_label = self.new_label("if_else");
                 let end_label = self.new_label("if_end");
 
-                let cond_op = self.generate_expr(condition);
+                let cond_op = self.generate_condition(condition);
                 self.terminate_block(Terminator::CondBr {
                     condition: cond_op,
                     true_target: then_label.clone(),

@@ -156,3 +156,11 @@ stream/newline/callee theo tên macro; interpolation cần generic contract riê
 49/2.358/213 là snapshot, không phải số đích của layout mới. Alpha và focused PASS
 trước redesign giữ giá trị lịch sử, không chứng nhận stdlib mới. Nhánh thiết kế
 đã bắt đầu triển khai allocator; toàn bộ API/layout và qualification vẫn còn mở.
+
+## Mở rộng theo đối chiếu C++23 — 2026-10-22
+
+Maintainer yêu cầu đối chiếu nhóm chức năng thư viện chuẩn C++ để bổ sung gap,
+đồng thời chọn math/graph/matrix/tensor CPU cơ bản trong stdlib; tính năng nâng
+cao dùng thư viện riêng local/vendored. [Bảng đối chiếu và thứ tự triển khai](stdlib-redesign-0.1/cpp-library-gap-map.md)
+phân biệt phần có nền, thiếu thao tác, chưa có và khác biệt semantics.
+Đây không phải quyết định sao chép exception/RTTI/API deprecated của C++.

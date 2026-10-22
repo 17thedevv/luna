@@ -78,12 +78,12 @@ fn test_sorting_adversarial_and_inconsistent() {
 
             // Verify monotonic non-decreasing order
             dec s = v.as_slice();
-            dec rw j: u64 = 0 as u64;
-            while j < (v.len() - (1 as u64)) {
-                if s[j] > s[j + (1 as u64)] {
+            dec rw j: usize = 0 as usize;
+            while j < (v.len() - (1 as usize)) {
+                if s[j] > s[j + (1 as usize)] {
                     return 1;
                 }
-                j = j + (1 as u64);
+                j = j + (1 as usize);
             }
 
             // 2. Inconsistent comparator: MUST terminate without infinite loop
@@ -98,7 +98,7 @@ fn test_sorting_adversarial_and_inconsistent() {
             std::slice::slice_sort_by<i32>(v_incon.as_mut_slice(), inconsistent_cmp);
 
             // Multiset check: length unchanged, sum unchanged
-            if v_incon.len() != (5 as u64) {
+            if v_incon.len() != (5 as usize) {
                 return 2;
             }
             dec s2 = v_incon.as_slice();

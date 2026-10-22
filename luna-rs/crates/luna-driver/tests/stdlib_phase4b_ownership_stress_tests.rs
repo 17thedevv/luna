@@ -121,7 +121,7 @@ fn test_ownership_stress_vec_swap_remove() {
             // swap_remove element at index 1 (id: 20)
             // It moves the last element (40) into index 1
             {{
-                dec removed = v.swap_remove(1 as u64);
+                dec removed = v.swap_remove(1 as usize);
                 if removed.id != 20 {{ return 2; }}
                 unsafe {{
                     // No drops during swap_remove!
@@ -133,7 +133,7 @@ fn test_ownership_stress_vec_swap_remove() {
                 if *drops != 1 {{ return 4; }}
             }}
 
-            if v.len() != (3 as u64) {{ return 5; }}
+            if v.len() != (3 as usize) {{ return 5; }}
             dec s = v.as_slice();
             if s[0 as u64].id != 10 {{ return 6; }}
             if s[1 as u64].id != 40 {{ return 7; }}
@@ -190,7 +190,7 @@ fn test_ownership_stress_vec_retain() {
                 if *drops != 3 {{ return 2; }}
             }}
 
-            if v.len() != (3 as u64) {{ return 3; }}
+            if v.len() != (3 as usize) {{ return 3; }}
             dec s = v.as_slice();
             if s[0 as u64].id != 2 {{ return 4; }}
             if s[1 as u64].id != 4 {{ return 5; }}
@@ -245,7 +245,7 @@ fn test_ownership_stress_vec_dedup() {
                 if *drops != 4 {{ return 2; }}
             }}
 
-            if v.len() != (4 as u64) {{ return 3; }}
+            if v.len() != (4 as usize) {{ return 3; }}
             dec s = v.as_slice();
             if s[0 as u64].id != 1 {{ return 4; }}
             if s[1 as u64].id != 2 {{ return 5; }}
@@ -293,7 +293,7 @@ fn test_ownership_stress_vec_resize_and_clone() {
             unsafe {{
                 if *drops != 4 {{ return 1; }}
             }}
-            if v.len() != (2 as u64) {{ return 2; }}
+            if v.len() != (2 as usize) {{ return 2; }}
             dec s = v.as_slice();
             if s[0 as u64].id != 10 {{ return 3; }}
             if s[1 as u64].id != 20 {{ return 4; }}
@@ -312,12 +312,12 @@ fn test_ownership_stress_vec_resize_and_clone() {
                 // Only the template argument dropped so far
                 if *drops != 1 {{ return 5; }}
             }}
-            if v.len() != (4 as u64) {{ return 6; }}
+            if v.len() != (4 as usize) {{ return 6; }}
 
             // Clone vector: 4 elements cloned into v_clone
             {{
                 dec v_clone = v.clone();
-                if v_clone.len() != (4 as u64) {{ return 7; }}
+                if v_clone.len() != (4 as usize) {{ return 7; }}
                 unsafe {{
                     // Still 1 drop! Clones are alive
                     if *drops != 1 {{ return 8; }}
@@ -388,7 +388,7 @@ fn test_ownership_stress_hashmap_insert_if_absent_and_get_or_insert() {
                 if *drops != 2 {{ return 4; }}
             }}
 
-            if map.len() != (1 as u64) {{ return 5; }}
+            if map.len() != (1 as usize) {{ return 5; }}
 
             return 0;
         }}
@@ -420,7 +420,7 @@ fn test_ownership_stress_hashmap_insert_if_absent_and_get_or_insert() {
                 if *drops != 2 {{ return 9; }}
             }}
 
-            if map.len() != (1 as u64) {{ return 10; }}
+            if map.len() != (1 as usize) {{ return 10; }}
 
             return 0;
         }}

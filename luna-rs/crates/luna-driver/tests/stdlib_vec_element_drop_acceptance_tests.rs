@@ -185,7 +185,7 @@ fn main() -> i32 {
     v.clear();
 
     // After clear, all 4 elements must be dropped and len is 0
-    if count == 4 && v.len() == (0 as u64) {
+    if count == 4 && v.len() == (0 as usize) {
         return 0;
     }
     return 2;
@@ -250,14 +250,14 @@ fn main() -> i32 {
     v.push(DropTracker { id: 5, counter: &rw count as *rw i32 });
 
     // Truncate to 2: elements 5, 4, 3 are dropped (3 drops)
-    v.truncate(2 as u64);
-    if count != 3 || v.len() != (2 as u64) {
+    v.truncate(2 as usize);
+    if count != 3 || v.len() != (2 as usize) {
         return 1;
     }
 
     // Truncate to larger than current len does nothing
-    v.truncate(10 as u64);
-    if count != 3 || v.len() != (2 as u64) {
+    v.truncate(10 as usize);
+    if count != 3 || v.len() != (2 as usize) {
         return 2;
     }
 
@@ -640,7 +640,7 @@ fn main() -> i32 {
         dec rw v = std::vec_new<Tracker>();
         v.push(Tracker { counter: &rw count as *rw i32 });
         v.push(Tracker { counter: &rw count as *rw i32 });
-        v.truncate(1 as u64);
+        v.truncate(1 as usize);
         v.clear();
     }
     // 1 dropped on truncate, remaining 1 dropped on clear

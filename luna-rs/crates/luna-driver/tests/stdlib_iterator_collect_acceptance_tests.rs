@@ -115,10 +115,10 @@ import <iter_collect>;
             dec m_it = std::iter::iter_map(it, deref_i32);
             dec v = std::iter_collect_vec(m_it);
 
-            if v.len() != (5 as u64) {
+            if v.len() != (5 as usize) {
                 return 1;
             }
-            match v.get(0 as u64) {
+            match v.get(0 as usize) {
                 std::Option::Some(r) -> {
                     if *r != 10 {
                         return 2;
@@ -128,7 +128,7 @@ import <iter_collect>;
                     return 20;
                 },
             }
-            match v.get(2 as u64) {
+            match v.get(2 as usize) {
                 std::Option::Some(r) -> {
                     if *r != 30 {
                         return 3;
@@ -138,7 +138,7 @@ import <iter_collect>;
                     return 30;
                 },
             }
-            match v.get(4 as u64) {
+            match v.get(4 as usize) {
                 std::Option::Some(r) -> {
                     if *r != 50 {
                         return 4;
@@ -193,7 +193,7 @@ import <iter_collect>;
             dec m_it = std::iter::iter_map(it, deref_i32);
             dec v = std::iter_collect_vec(m_it);
 
-            if v.len() != (0 as u64) {
+            if v.len() != (0 as usize) {
                 return 1;
             }
             if v.is_empty() == false {
@@ -259,10 +259,10 @@ import <iter_collect>;
             dec gen = PointGenerator { count: 0, max: 3 };
             dec v = std::iter_collect_vec(gen);
 
-            if v.len() != (3 as u64) {
+            if v.len() != (3 as usize) {
                 return 1;
             }
-            match v.get(0 as u64) {
+            match v.get(0 as usize) {
                 std::Option::Some(p) -> {
                     if (*p).x != 0 || (*p).y != 0 {
                         return 2;
@@ -272,7 +272,7 @@ import <iter_collect>;
                     return 20;
                 },
             }
-            match v.get(1 as u64) {
+            match v.get(1 as usize) {
                 std::Option::Some(p) -> {
                     if (*p).x != 10 || (*p).y != 100 {
                         return 3;
@@ -282,7 +282,7 @@ import <iter_collect>;
                     return 30;
                 },
             }
-            match v.get(2 as u64) {
+            match v.get(2 as usize) {
                 std::Option::Some(p) -> {
                     if (*p).x != 20 || (*p).y != 200 {
                         return 4;
@@ -373,7 +373,7 @@ import <iter_collect>;
                 dec gen = TrackedGenerator { cur: 1, max: 6, counter: c_ptr };
                 dec v = std::iter_collect_vec(gen);
 
-                if v.len() != (5 as u64) {
+                if v.len() != (5 as usize) {
                     return 1;
                 }
 
@@ -435,7 +435,7 @@ import <iter_collect>;
             dec m_it = std::iter::iter_map(it, deref_i32);
             dec s = std::iter_collect_hashset(m_it);
 
-            if s.len() != (3 as u64) {
+            if s.len() != (3 as usize) {
                 return 1;
             }
             dec k10 = 10;
@@ -500,7 +500,7 @@ import <iter_collect>;
             dec s = std::iter_collect_hashset(m_it);
 
             // 7 items in stream, 4 unique: 1, 2, 3, 4
-            if s.len() != (4 as u64) {
+            if s.len() != (4 as usize) {
                 return 1;
             }
             dec k1 = 1;
@@ -622,7 +622,7 @@ fn test_c7_collect_hashset_droptracker() {
                 dec gen = DedupGenerator { step: 0, counter: c_ptr };
                 dec s = std::iter_collect_hashset(gen);
 
-                if s.len() != (3 as u64) {
+                if s.len() != (3 as usize) {
                     return 1;
                 }
 
@@ -697,7 +697,7 @@ import <iter_collect>;
             dec gen = PairGenerator { cur: 1, max: 4 };
             dec m = std::iter_collect_hashmap(gen);
 
-            if m.len() != (3 as u64) {
+            if m.len() != (3 as usize) {
                 return 1;
             }
 
@@ -788,7 +788,7 @@ import <iter_collect>;
             dec gen = DupPairGenerator { step: 0 };
             dec m = std::iter_collect_hashmap(gen);
 
-            if m.len() != (2 as u64) {
+            if m.len() != (2 as usize) {
                 return 1;
             }
 
@@ -941,7 +941,7 @@ fn test_c10_collect_hashmap_droptracker_identity() {
                 dec gen = PairGenerator { step: 0, k_counter: k_ptr, v_counter: v_ptr };
                 dec m = std::iter_collect_hashmap(gen);
 
-                if m.len() != (1 as u64) {
+                if m.len() != (1 as usize) {
                     return 1;
                 }
 
@@ -1043,19 +1043,19 @@ import <iter_collect>;
             // Evens: 2, 4, 6, 8, 10
             // Squares: 4, 16, 36, 64, 100
             // Take 3: 4, 16, 36
-            if v.len() != (3 as u64) {
+            if v.len() != (3 as usize) {
                 return 1;
             }
 
-            match v.get(0 as u64) {
+            match v.get(0 as usize) {
                 std::Option::Some(r) -> { if *r != 4 { return 2; } },
                 std::Option::None -> { return 20; },
             }
-            match v.get(1 as u64) {
+            match v.get(1 as usize) {
                 std::Option::Some(r) -> { if *r != 16 { return 3; } },
                 std::Option::None -> { return 30; },
             }
-            match v.get(2 as u64) {
+            match v.get(2 as usize) {
                 std::Option::Some(r) -> { if *r != 36 { return 4; } },
                 std::Option::None -> { return 40; },
             }
@@ -1124,14 +1124,14 @@ fn test_c12_collect_source_vs_llib_parity() {
             dec m_it = std::iter::iter_map(it, deref_i32);
             dec v = std::iter_collect_vec(m_it);
 
-            if v.len() != (4 as u64) {
+            if v.len() != (4 as usize) {
                 return 1;
             }
 
             dec gen = PairGenerator { cur: 1, max: 3 };
             dec m = std::iter_collect_hashmap(gen);
 
-            if m.len() != (2 as u64) {
+            if m.len() != (2 as usize) {
                 return 2;
             }
 
@@ -1197,11 +1197,11 @@ import <iter_collect>;
             dec m_it = std::iter::iter_map(it, to_boxed_i32);
             dec v = std::iter_collect_vec(m_it);
 
-            if v.len() != (3 as u64) {
+            if v.len() != (3 as usize) {
                 return 1;
             }
 
-            match v.get(0 as u64) {
+            match v.get(0 as usize) {
                 std::Option::Some(b) -> {
                     if *((*b).as_ref()) != 111 {
                         return 2;
@@ -1211,7 +1211,7 @@ import <iter_collect>;
                     return 20;
                 },
             }
-            match v.get(1 as u64) {
+            match v.get(1 as usize) {
                 std::Option::Some(b) -> {
                     if *((*b).as_ref()) != 222 {
                         return 3;
@@ -1221,7 +1221,7 @@ import <iter_collect>;
                     return 30;
                 },
             }
-            match v.get(2 as u64) {
+            match v.get(2 as usize) {
                 std::Option::Some(b) -> {
                     if *((*b).as_ref()) != 333 {
                         return 4;
@@ -1271,11 +1271,11 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw src = std::vec_with_capacity<i32>(4 as u64);
+            dec rw src = std::vec_with_capacity<i32>(4 as usize);
             src.push(10);
             src.push(20);
 
-            dec r = src.get(0 as u64);
+            dec r = src.get(0 as usize);
 
             // MUTATION WHILE BORROW IS LIVE: Must be rejected by Borrowck!
             src.push(30);
@@ -1336,7 +1336,7 @@ import <iter_collect>;
         }
 
         fn main() -> i32 {
-            dec rw src = std::vec_with_capacity<i32>(4 as u64);
+            dec rw src = std::vec_with_capacity<i32>(4 as usize);
             src.push(10);
             src.push(20);
 
@@ -1345,7 +1345,7 @@ import <iter_collect>;
                 dec it = std::slice::slice_iter<i32>(src.as_slice());
                 dec m_it = std::iter::iter_map(it, deref_i32);
                 dec collected = std::iter_collect_vec(m_it);
-                if collected.len() != (2 as u64) {
+                if collected.len() != (2 as usize) {
                     return 1;
                 }
             }
@@ -1353,7 +1353,7 @@ import <iter_collect>;
             // Mutation after borrow ends: completely valid!
             src.push(30);
 
-            if src.len() != (3 as u64) {
+            if src.len() != (3 as usize) {
                 return 2;
             }
             return 0;
@@ -1429,7 +1429,7 @@ fn test_c15_collect_hashset_duplicate_representative_semantics() {
             dec gen = IdentityGenerator { step: 0 };
             dec s = std::iter_collect_hashset(gen);
 
-            if s.len() != (1 as u64) {
+            if s.len() != (1 as usize) {
                 return 1;
             }
 

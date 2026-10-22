@@ -15,7 +15,7 @@ import tomllib
 ROOT = Path(__file__).resolve().parents[2]
 SPEC = ROOT / 'docs/spec/0.1'
 SITE = ROOT / 'docs/site'
-STATUS_DATE = '2026-10-21'
+STATUS_DATE = '2026-10-22'
 QUALIFICATION_ROOT = ROOT / 'docs/audits/r5-cpu-baseline-2026-10-20'
 QUALIFICATION = json.loads((QUALIFICATION_ROOT / 'qualification-state.json').read_text(encoding='utf-8'))
 PUBLISHED = QUALIFICATION['status'] == 'PUBLISHED_PRERELEASE'
@@ -41,6 +41,8 @@ CURRENT = {
     'docs/proposals/stdlib-redesign-0.1.md',
     'docs/proposals/stdlib-redesign-0.1/allocator.md',
     'docs/proposals/stdlib-redesign-0.1/size-index.md',
+    'docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md',
+    'docs/proposals/stdlib-redesign-0.1/foundation-api.md',
     'docs/licensing.md',
     'docs/stable/0.1.0/README.md',
     'docs/plans/0.1.0-stable.md',
@@ -258,7 +260,8 @@ def page(target, body, language='en', title='Luna 0.1'):
 def site_pages():
     for source in SPEC.glob('*.md'):
         target = SITE / 'spec' / ('index.html' if source.stem == 'README' else source.stem + '.html')
-        page(target, render_markdown(source, target), title=source.read_text(encoding='utf-8').splitlines()[0].lstrip('# '))
+        heading = re.search(r'^#\s+(.+)$', source.read_text(encoding='utf-8'), re.MULTILINE)
+        page(target, render_markdown(source, target), title=heading.group(1) if heading else source.stem)
     originals = [p for p in SITE.rglob('*.html') if 'spec' not in p.relative_to(SITE).parts]
     for target in originals:
         name = target.relative_to(SITE).as_posix()

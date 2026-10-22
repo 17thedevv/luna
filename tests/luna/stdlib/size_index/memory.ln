@@ -1,0 +1,31 @@
+import <mem>;
+import <ptr>;
+import <slice>;
+import <algo>;
+
+fn below_three(x: &i32) -> bool { return *x < 3; }
+fn main() -> i32 {
+    dec query: fn() -> usize = std::mem::size_of<i32>;
+    dec align: usize = std::mem::align_of<i32>();
+    if query() != 4 as usize || align != 4 as usize { return 1; }
+    dec layout = std::mem::layout_from_size_align_unchecked(12 as usize, align);
+    dec bytes: usize = layout.size();
+    if bytes != 12 as usize || layout.align() != align || layout.is_valid() == false { return 2; }
+    dec source = [1, 2, 3];
+    dec rw target = [0, 0, 0];
+    unsafe {
+        std::ptr::copy<i32>(&source[0] as *i32, &rw target[0] as *rw i32, 3 as usize);
+        dec view = std::mem::slice_from_raw_parts<i32>(&target[0] as *i32, 3 as usize);
+        dec n: usize = std::slice::slice_len<i32>(view);
+        dec found: usize = std::slice::slice_binary_search_i32(view, 3).unwrap();
+        if n != 3 as usize || found != 2 as usize { return 3; }
+        if std::slice::slice_get<i32>(view, n).is_some() { return 4; }
+        dec parts = std::slice::split_at<i32>(view, 0 as usize);
+        if parts.0.len != 0 as usize || parts.1.len != n { return 5; }
+        dec point: usize = std::algo::partition_point<i32>(view, below_three);
+        if point != 2 as usize { return 6; }
+    }
+    unsafe { std::mem::zero(&rw target[0] as *rw i32 as *rw u8, bytes); }
+    if target[0] != 0 || target[1] != 0 || target[2] != 0 { return 7; }
+    return 0;
+}

@@ -1,0 +1,2 @@
+import <vec>;
+fn main() { dec values = std::Vec<i32>::with_capacity(3 as u64); }

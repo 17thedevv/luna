@@ -2,7 +2,7 @@
 
 # STD-D05: memory size/index migration
 
-2026-10-21, Asia/Bangkok. **PLANNED, NOT IMPLEMENTED.** The maintainer selected
+2026-10-22, Asia/Bangkok. **IMPLEMENTED ON BRANCH; QUALIFICATION IN PROGRESS.** The maintainer selected
 `usize` for memory/container lengths, capacities and indices. This map applies
 that decision; it does not adopt new numeric, iterator or operating-system APIs.
 
@@ -34,10 +34,10 @@ The first-wave JSON identifies positions from parser declarations, not every
 implementation expression. Review original source and implicit compiler
 contracts before editing; textual replacement is not the migration algorithm.
 
-## Later passes and exclusions
+## Expanded implementation and exclusions
 
-Container follow-up includes RawTable, map/set, deque, heap and tree storage.
-The RawTable `ProbeResult::Found(u64)` / `Vacant(u64)` payloads are memory indices,
+The branch now includes RawTable, map/set, deque, heap and tree storage.
+The RawTable `ProbeResult::Found(usize)` / `Vacant(usize)` payloads are memory indices,
 while its hash parameters and hash array remain u64. Enum payload types are not
 serialized in the inventory's declaration records, so source/AST review is
 required. B-tree child indices/stacks and sentinel arithmetic need equivalent
@@ -70,3 +70,31 @@ intrinsic size/align results and raw slice length representation consistent with
 their language contracts. Rebuild coherent compiler/provider/runtime bundles;
 the earlier allocator or alpha qualification does not qualify this migration.
 The current native scope is Windows/Ubuntu x86_64 GNU, not untested 32-bit support.
+
+## Implementation slice — 2026-10-22
+
+The [memory-count amendment](../../spec/0.1/stdlib-memory-size-v1.md) and
+[C-GAP-16](../../audits/stdlib-usize-2026-10-22/compiler-gap-16.md) cover canonical
+raw-slice validation and target-sized MVIR lengths. Compiler protocol is now 26;
+format 2, metadata 9, MVIR 5 and runtime ABI 2 are unchanged.
+
+The migration includes ptr/mem/slice/algo, allocator ABI declarations, Vec,
+String/CStr/CString and all map/set/deque/heap/tree storage. Thread/sync scratch
+allocations now use size_t-compatible signatures; B-tree child storage uses
+size/align_of<usize> rather than hardcoded eight-byte index slots. File/I/O,
+encoding, crypto buffering, JSON and lexical path consumers were updated.
+
+Hash arrays/parameters and SHA bit lengths remain u64; file/stream coordinates,
+general iterator counters and Rc/Arc counts retain their domains. Network C
+buffer-length parameters remain the existing uint64_t ABI with explicit bridges;
+this does not silently change runtime ABI 2. Signed ptr offset/diff remain i64.
+The retained source inventory above is a historical planning snapshot, not the
+new surface or an automatic migration result.
+
+Added type constructors: HashMap/HashSet/VecDeque/BinaryHeap new/with_capacity,
+BTreeMap/BTreeSet new. Existing factory names remain migration entry points.
+New public CLI fixtures in tests/luna/stdlib/size_index exercise typed returns,
+byte/element units, UTF-8 byte offsets, growth, non-Copy cleanup, old u64 rejection,
+interface fingerprint changes, stale dependents, coherent rebuild and old
+protocol rejection. The [implementation audit](../../audits/stdlib-usize-2026-10-22/README.md)
+tracks actual test outcomes and remaining release gates.

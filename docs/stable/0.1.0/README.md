@@ -98,6 +98,14 @@ providers / 2,358 declaration records / 213 explicit imports at 264390da; it is
 not resolved API or conformance evidence. STABLE-016 tracks design and migration.
 Existing alpha and focused I/O results remain historical results for their pins.
 
+The next [API foundation slice](../../audits/stdlib-usize-2026-10-22/README.md)
+implements STD-D05 through containers and consumers, constructor expansion,
+ordered-set algebra and u64 bit utilities. It requires compiler protocol 26 and
+new bundles. The [C++23 functional map](../../proposals/stdlib-redesign-0.1/cpp-library-gap-map.md)
+adds a prioritized backlog, with graph/basic CPU matrix/tensor as maintainer-
+authorized extensions. Focused validation and final qualification are separate;
+STABLE-016 remains open.
+
 ## Release boundaries
 
 Supported native release scope remains Windows x86_64 GNU and Ubuntu 24.04

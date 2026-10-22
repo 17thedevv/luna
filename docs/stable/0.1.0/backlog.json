@@ -274,13 +274,16 @@
       "milestone": "S0/S1/S3",
       "priority": "P1",
       "requirement": "Jointly redesign the complete stdlib API/layout, map old-to-new contracts and requalify migrated consumers",
-      "status": "CO_DESIGN_IN_PROGRESS",
+      "status": "IMPLEMENTATION_IN_PROGRESS",
       "owner": "17thedevv",
       "source_paths": [
         "docs/proposals/stdlib-redesign-0.1.md",
         "docs/proposals/stdlib-redesign-0.1/allocator.md",
         "docs/audits/stdlib-redesign-2026-10-21/source-inventory.json",
-        "luna-rs/libs/external/sysroot.toml"
+        "luna-rs/libs/external/sysroot.toml",
+        "docs/proposals/stdlib-redesign-0.1/size-index.md",
+        "docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md",
+        "docs/proposals/stdlib-redesign-0.1/foundation-api.md"
       ],
       "fix_commit": null,
       "evidence": [
@@ -289,7 +292,7 @@
       "blocks": [
         "STABLE_RELEASE"
       ],
-      "notes": "Maintainer explicitly chose whole-API/layout redesign, compact std namespace, constructors on types, the current source root, usize memory size/index and supplemental fallible allocation (STD-D06), then authorized implementation. STABLE-017 tracks the first ABI 2 / Vec / Box / String allocation slice. The parser inventory remains the immutable pre-redesign snapshot; the added alloc_error provider makes 50 current providers. Per-domain contracts, the remaining old-to-new ownership and size/index map, implementation and fresh source/artifact/package qualification remain open."
+      "notes": "Maintainer explicitly chose whole-API/layout redesign, compact std namespace, constructors on types, the current source root, usize memory size/index and supplemental fallible allocation (STD-D06), then authorized implementation. STABLE-017 tracks the first ABI 2 / Vec / Box / String allocation slice. The parser inventory remains the immutable pre-redesign snapshot; the added alloc_error provider makes 50 current providers. Per-domain contracts, the remaining old-to-new ownership and size/index map, implementation and fresh source/artifact/package qualification remain open. On 2026-10-22 the maintainer requested a functional comparison against C++ and basic CPU math/graph/matrix/tensor in stdlib, with advanced functionality in local/vendored libraries. The foundation slice migrates usize memory APIs and adds type constructors, ordered-set algebra and u64 bit utilities; broader families and final qualification remain open."
     },
     {
       "id": "STABLE-017",
@@ -313,7 +316,9 @@
         "docs/audits/stdlib-fallible-2026-10-21/evidence/windows-5e1c7356/receipt.json",
         "docs/audits/stdlib-fallible-2026-10-21/evidence/ubuntu-b9878c70/receipt.json"
       ],
-      "blocks": ["STABLE_RELEASE"],
+      "blocks": [
+        "STABLE_RELEASE"
+      ],
       "notes": "Runtime ABI 2 supplements legacy terminal allocation; new try_* APIs use usize and return allocation errors, including an owned input on failed insertion/boxing. C-GAP-13 repairs qualified owner/impl substitutions; C-GAP-14 preserves imported extern identity; C-GAP-15 fixes owner inference and native callable bounds. At 5e1c7356 Windows passes five CLI suites, 209 semantic tests and six sysroot invariant tests. Ubuntu/ASan passed the earlier b9878c70 slice and is being reacquired with full workspace regression at 5e1c7356. Older Windows workspace attempts are incomplete/superseded with raw evidence preserved. Existing factories and u64 size/index APIs remain migration bridges. Generic callable materialization in comptime still rejects E4005 and is not covered by native PASS. Package/runtime compatibility, updated distribution tooling and final stable qualification remain gates."
     }
   ]

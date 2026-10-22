@@ -620,7 +620,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v = std::vec_with_capacity<TrackedItem>(5 as u64);
+                dec rw v = std::vec_with_capacity<TrackedItem>(5 as usize);
                 dec rw i: i32 = 1;
                 while i <= 5 {
                     unsafe {
@@ -728,7 +728,7 @@ import <iter_collect>;
             dec c_ptr = &rw counter as *rw DropCounter;
 
             {
-                dec rw v_a = std::vec_with_capacity<TrackedItem>(3 as u64);
+                dec rw v_a = std::vec_with_capacity<TrackedItem>(3 as usize);
                 dec rw i: i32 = 1;
                 while i <= 3 {
                     unsafe {
@@ -826,7 +826,7 @@ import <iter_collect>;
         }
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(1, 10);
             map.insert(2, 20);
 

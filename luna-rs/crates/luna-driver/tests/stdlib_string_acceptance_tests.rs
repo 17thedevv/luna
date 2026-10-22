@@ -99,7 +99,7 @@ import <iter_collect>;
 
 fn main() -> i32 {
     dec s = std::string_from_str("Hello to Luna!");
-    if s.len() != (14 as u64) {
+    if s.len() != (14 as usize) {
         return 1;
     }
     if s.is_empty() {
@@ -157,7 +157,7 @@ fn main() -> i32 {
         return 1;
     }
     dec s = opt.unwrap();
-    if s.len() != (2 as u64) {
+    if s.len() != (2 as usize) {
         return 2;
     }
     dec bytes = s.as_bytes();
@@ -214,7 +214,7 @@ fn main() -> i32 {
         return 1;
     }
     dec s = opt.unwrap();
-    if s.len() != (6 as u64) {
+    if s.len() != (6 as usize) {
         return 2;
     }
     return 0;
@@ -264,7 +264,7 @@ fn main() -> i32 {
         return 1;
     }
     dec s = opt.unwrap();
-    if s.len() != (4 as u64) {
+    if s.len() != (4 as usize) {
         return 2;
     }
     return 0;
@@ -449,8 +449,8 @@ fn main() -> i32 {
 
     dec rw s = std::string_from_bytes(v.as_slice()).unwrap();
     // Truncate after 'Vi' (index 2 is a valid scalar boundary)
-    s.truncate(2 as u64);
-    if s.len() != (2 as u64) {
+    s.truncate(2 as usize);
+    if s.len() != (2 as usize) {
         return 1;
     }
     dec bytes = s.as_bytes();
@@ -504,7 +504,7 @@ fn main() -> i32 {
 
     dec rw s = std::string_from_bytes(v.as_slice()).unwrap();
     // Index 3 is in the middle of 'ệ' -> MUST PANIC!
-    s.truncate(3 as u64);
+    s.truncate(3 as usize);
     return 0;
 }
 "#;
@@ -545,7 +545,7 @@ fn main() -> i32 {
     s.push_str("Hello");
     s.push_str(" ");
     s.push_str("World");
-    if s.len() != (11 as u64) {
+    if s.len() != (11 as usize) {
         return 1;
     }
     dec b = s.as_bytes();
@@ -590,11 +590,11 @@ import <iter_collect>;
 fn main() -> i32 {
     dec rw s = std::string_new();
     s.push_char('A'); // 1-byte
-    if s.len() != (1 as u64) {
+    if s.len() != (1 as usize) {
         return 1;
     }
     s.push_char('Z'); // 1-byte
-    if s.len() != (2 as u64) {
+    if s.len() != (2 as usize) {
         return 2;
     }
     return 0;
@@ -632,14 +632,14 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-fn consume_string(s: std::String) -> u64 {
+fn consume_string(s: std::String) -> usize {
     return s.len();
 }
 
 fn main() -> i32 {
     dec s = std::string_from_str("Temporary string that gets moved and dropped");
     dec len = consume_string(s);
-    if len != (44 as u64) {
+    if len != (44 as usize) {
         return 1;
     }
     return 0;
@@ -756,7 +756,7 @@ fn main() -> i32 {
     s.push_str(" ");
     s.push_str("Language");
     
-    if s.len() != (13 as u64) {
+    if s.len() != (13 as usize) {
         return 1;
     }
     
@@ -858,7 +858,7 @@ fn main() -> i32 {
     if s1.eq(&s2) {
         return 2;
     }
-    if s1.len() != (5 as u64) || s2.len() != (6 as u64) {
+    if s1.len() != (5 as usize) || s2.len() != (6 as usize) {
         return 3;
     }
     return 0;

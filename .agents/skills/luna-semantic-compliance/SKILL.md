@@ -229,8 +229,9 @@ The 5 semantic contracts are strictly frozen:
 - **PTR-MEM-4 (Explicit Count Units)**:
   Units for count parameters are explicitly bifurcated:
   - `std::ptr::*` functions operate strictly on **typed element counts** ($N$ elements of type $T$).
-  - `std::mem::*` block functions operate strictly on **raw byte counts** (`bytes: u64`).
-  - Typed block copy `std::ptr::copy<T>(src: *T, dst: *rw T, count: u64)` operates on **element counts** ($N \times \text{sizeof}(T)$ bytes).
+  - `std::mem::*` block functions operate strictly on **raw byte counts** (`bytes: usize`).
+  - Typed block copy `std::ptr::copy<T>(src: *T, dst: *rw T, count: usize)` operates on **element counts** ($N \times \text{sizeof}(T)$ bytes).
+  - Current unsigned memory count types follow the maintainer-approved [STD-D05 amendment](../../../docs/spec/0.1/stdlib-memory-size-v1.md); byte/element units and provenance obligations are unchanged.
 - **PTR-MEM-5 (Source & .llib Parity)**:
   Module definitions, symbol visibility, and parameter signatures in the `ptr` and `mem` providers and their precompiled artifacts are strictly identical across binary boundaries.
 

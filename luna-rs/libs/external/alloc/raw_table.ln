@@ -10,8 +10,8 @@ import <__lang_option>;
 import <__lang_iterator>;
 
     export enum ProbeResult {
-        Found(u64),
-        Vacant(u64),
+        Found(usize),
+        Vacant(usize),
     }
 
     export struct RawTable<K, V> {
@@ -19,9 +19,9 @@ import <__lang_iterator>;
         private hashes: *rw u64,
         private keys: *rw K,
         private values: *rw V,
-        private cap: u64,
-        private len: u64,
-        private tombstones: u64,
+        private cap: usize,
+        private len: usize,
+        private tombstones: usize,
     } requires anchor(states) = self
       requires anchor(hashes) = self
       requires anchor(keys) = self
@@ -29,49 +29,49 @@ import <__lang_iterator>;
 
     export fn raw_table_new<K, V>() -> RawTable<K, V> {
         return RawTable<K, V> {
-            states: 0 as u64 as *rw u8,
-            hashes: 0 as u64 as *rw u64,
-            keys: 0 as u64 as *rw K,
-            values: 0 as u64 as *rw V,
-            cap: 0 as u64,
-            len: 0 as u64,
-            tombstones: 0 as u64,
+            states: 0 as usize as *rw u8,
+            hashes: 0 as usize as *rw u64,
+            keys: 0 as usize as *rw K,
+            values: 0 as usize as *rw V,
+            cap: 0 as usize,
+            len: 0 as usize,
+            tombstones: 0 as usize,
         };
     }
 
-    export fn raw_table_with_capacity<K, V>(capacity: u64) -> RawTable<K, V> {
-        if capacity == (0 as u64) {
+    export fn raw_table_with_capacity<K, V>(capacity: usize) -> RawTable<K, V> {
+        if capacity == (0 as usize) {
             return raw_table_new<K, V>();
         }
-        if capacity > 4611686018427387904u64 {
+        if capacity > (((18446744073709551615u64 as usize) / (4 as usize)) + (1 as usize)) {
             __luna_panic_default();
         }
-        dec rw cap: u64 = 8 as u64;
+        dec rw cap: usize = 8 as usize;
         while cap < capacity {
-            if cap > 4611686018427387904u64 {
+            if cap > (((18446744073709551615u64 as usize) / (4 as usize)) + (1 as usize)) {
                 __luna_panic_default();
             }
-            cap = cap * (2 as u64);
+            cap = cap * (2 as usize);
         }
-        dec k_elem = std::mem::size_of<K>() as u64;
-        dec v_elem = std::mem::size_of<V>() as u64;
-        if k_elem > (0 as u64) {
-            if cap > (18446744073709551615u64 / k_elem) {
+        dec k_elem = std::mem::size_of<K>() as usize;
+        dec v_elem = std::mem::size_of<V>() as usize;
+        if k_elem > (0 as usize) {
+            if cap > ((18446744073709551615u64 as usize) / k_elem) {
                 __luna_panic_default();
             }
         }
-        if v_elem > (0 as u64) {
-            if cap > (18446744073709551615u64 / v_elem) {
+        if v_elem > (0 as usize) {
+            if cap > ((18446744073709551615u64 as usize) / v_elem) {
                 __luna_panic_default();
             }
         }
         dec k_size = cap * k_elem;
-        dec k_align = std::mem::align_of<K>() as u64;
-        dec v_size = cap * (std::mem::size_of<V>() as u64);
-        dec v_align = std::mem::align_of<V>() as u64;
+        dec k_align = std::mem::align_of<K>() as usize;
+        dec v_size = cap * (std::mem::size_of<V>() as usize);
+        dec v_align = std::mem::align_of<V>() as usize;
 
-        dec states_ptr = __luna_alloc(cap, 1 as u64);
-        dec hashes_ptr = __luna_alloc(cap * (8 as u64), 8 as u64) as *rw u64;
+        dec states_ptr = __luna_alloc(cap, 1 as usize);
+        dec hashes_ptr = __luna_alloc(cap * (8 as usize), 8 as usize) as *rw u64;
         dec keys_ptr = __luna_alloc(k_size, k_align) as *rw K;
         dec values_ptr = __luna_alloc(v_size, v_align) as *rw V;
 
@@ -86,8 +86,8 @@ import <__lang_iterator>;
                 keys: keys_ptr,
                 values: values_ptr,
                 cap: cap,
-                len: 0 as u64,
-                tombstones: 0 as u64,
+                len: 0 as usize,
+                tombstones: 0 as usize,
             };
         }
     }
@@ -99,20 +99,20 @@ import <__lang_iterator>;
     }
 
 impl<K, V> RawTable<K, V> {
-        export fn len(self: &Self) -> u64 {
+        export fn len(self: &Self) -> usize {
             return self.len;
         }
 
-        export fn capacity(self: &Self) -> u64 {
+        export fn capacity(self: &Self) -> usize {
             return self.cap;
         }
 
-        export fn tombstones(self: &Self) -> u64 {
+        export fn tombstones(self: &Self) -> usize {
             return self.tombstones;
         }
 
         export fn is_empty(self: &Self) -> bool {
-            return self.len == (0 as u64);
+            return self.len == (0 as usize);
         }
 
     }
@@ -124,13 +124,13 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         //   - Deleted: continue probing (never terminate search)
         //   - Empty: terminate search
         export fn find(self: &Self, key: &K, hash: u64) -> ProbeResult {
-            if self.cap == (0 as u64) {
-                return ProbeResult::Vacant(0 as u64);
+            if self.cap == (0 as usize) {
+                return ProbeResult::Vacant(0 as usize);
             }
-            dec mask = self.cap - (1 as u64);
-            dec rw idx = mix_hash(hash) & mask;
-            dec rw first_tombstone: u64 = self.cap;
-            dec rw step: u64 = 0 as u64;
+            dec mask = self.cap - (1 as usize);
+            dec rw idx = (mix_hash(hash) as usize) & mask;
+            dec rw first_tombstone: usize = self.cap;
+            dec rw step: usize = 0 as usize;
 
             while step < self.cap {
                 dec rw state_val: u8 = 0 as u8;
@@ -163,8 +163,8 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                         return ProbeResult::Found(idx);
                     }
                 }
-                step = step + (1 as u64);
-                idx = (idx + (1 as u64)) & mask;
+                step = step + (1 as usize);
+                idx = (idx + (1 as usize)) & mask;
             }
 
             if first_tombstone < self.cap {
@@ -175,7 +175,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
 
         export fn insert(self: &rw Self, key: K, val: V) -> bool {
             dec hash = key.hash();
-            if self.cap > (0 as u64) {
+            if self.cap > (0 as usize) {
                 dec probe = self.find(&key, hash);
                 match probe {
                     ProbeResult::Found(idx) -> {
@@ -187,11 +187,11 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                         return false;
                     },
                     ProbeResult::Vacant(idx) -> {
-                        if (self.len + self.tombstones + (1 as u64)) * (4 as u64) < self.cap * (3 as u64) {
+                        if (self.len + self.tombstones + (1 as usize)) * (4 as usize) < self.cap * (3 as usize) {
                             unsafe {
                                 dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
                                 if *state_ptr == (2 as u8) {
-                                    self.tombstones = self.tombstones - (1 as u64);
+                                    self.tombstones = self.tombstones - (1 as usize);
                                 }
                                 *state_ptr = 1 as u8;
                                 dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
@@ -201,7 +201,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                                 dec val_dst = std::ptr::add_mut<V>(self.values, idx);
                                 std::ptr::write<V>(val_dst, val);
                             }
-                            self.len = self.len + (1 as u64);
+                            self.len = self.len + (1 as usize);
                             return true;
                         }
                     },
@@ -214,7 +214,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                     unsafe {
                         dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
                         if *state_ptr == (2 as u8) {
-                            self.tombstones = self.tombstones - (1 as u64);
+                            self.tombstones = self.tombstones - (1 as usize);
                         }
                         *state_ptr = 1 as u8;
                         dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
@@ -224,7 +224,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                         dec val_dst = std::ptr::add_mut<V>(self.values, idx);
                         std::ptr::write<V>(val_dst, val);
                     }
-                    self.len = self.len + (1 as u64);
+                    self.len = self.len + (1 as usize);
                     return true;
                 },
                 ProbeResult::Found(idx) -> {
@@ -240,18 +240,18 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
 
         export fn insert_if_absent(self: &rw Self, key: K, val: V) -> bool {
             dec hash = key.hash();
-            if self.cap > (0 as u64) {
+            if self.cap > (0 as usize) {
                 dec probe = self.find(&key, hash);
                 match probe {
                     ProbeResult::Found(_) -> {
                         return false;
                     },
                     ProbeResult::Vacant(idx) -> {
-                        if (self.len + self.tombstones + (1 as u64)) * (4 as u64) < self.cap * (3 as u64) {
+                        if (self.len + self.tombstones + (1 as usize)) * (4 as usize) < self.cap * (3 as usize) {
                             unsafe {
                                 dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
                                 if *state_ptr == (2 as u8) {
-                                    self.tombstones = self.tombstones - (1 as u64);
+                                    self.tombstones = self.tombstones - (1 as usize);
                                 }
                                 *state_ptr = 1 as u8;
                                 dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
@@ -261,7 +261,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                                 dec val_dst = std::ptr::add_mut<V>(self.values, idx);
                                 std::ptr::write<V>(val_dst, val);
                             }
-                            self.len = self.len + (1 as u64);
+                            self.len = self.len + (1 as usize);
                             return true;
                         }
                     },
@@ -274,7 +274,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                     unsafe {
                         dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
                         if *state_ptr == (2 as u8) {
-                            self.tombstones = self.tombstones - (1 as u64);
+                            self.tombstones = self.tombstones - (1 as usize);
                         }
                         *state_ptr = 1 as u8;
                         dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
@@ -284,7 +284,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                         dec val_dst = std::ptr::add_mut<V>(self.values, idx);
                         std::ptr::write<V>(val_dst, val);
                     }
-                    self.len = self.len + (1 as u64);
+                    self.len = self.len + (1 as usize);
                     return true;
                 },
                 ProbeResult::Found(_) -> {
@@ -295,7 +295,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
 
         export fn get_or_insert(self: &rw Self, key: K, default_val: V) -> &rw V life_from(self) {
             dec hash = key.hash();
-            if self.cap > (0 as u64) {
+            if self.cap > (0 as usize) {
                 dec probe = self.find(&key, hash);
                 match probe {
                     ProbeResult::Found(idx) -> {
@@ -305,11 +305,11 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                         }
                     },
                     ProbeResult::Vacant(idx) -> {
-                        if (self.len + self.tombstones + (1 as u64)) * (4 as u64) < self.cap * (3 as u64) {
+                        if (self.len + self.tombstones + (1 as usize)) * (4 as usize) < self.cap * (3 as usize) {
                             unsafe {
                                 dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
                                 if *state_ptr == (2 as u8) {
-                                    self.tombstones = self.tombstones - (1 as u64);
+                                    self.tombstones = self.tombstones - (1 as usize);
                                 }
                                 *state_ptr = 1 as u8;
                                 dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
@@ -319,7 +319,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                                 dec val_dst = std::ptr::add_mut<V>(self.values, idx);
                                 std::ptr::write<V>(val_dst, default_val);
                             }
-                            self.len = self.len + (1 as u64);
+                            self.len = self.len + (1 as usize);
                             unsafe {
                                 dec val_ptr = std::ptr::add_mut<V>(self.values, idx);
                                 return &rw *val_ptr;
@@ -335,7 +335,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                     unsafe {
                         dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
                         if *state_ptr == (2 as u8) {
-                            self.tombstones = self.tombstones - (1 as u64);
+                            self.tombstones = self.tombstones - (1 as usize);
                         }
                         *state_ptr = 1 as u8;
                         dec hash_ptr = std::ptr::add_mut<u64>(self.hashes, idx);
@@ -345,7 +345,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                         dec val_dst = std::ptr::add_mut<V>(self.values, idx);
                         std::ptr::write<V>(val_dst, default_val);
                     }
-                    self.len = self.len + (1 as u64);
+                    self.len = self.len + (1 as usize);
                     unsafe {
                         dec val_ptr = std::ptr::add_mut<V>(self.values, idx);
                         return &rw *val_ptr;
@@ -361,7 +361,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         }
 
         export fn get(self: &Self, key: &K) -> std::Option<&V> life_from(self) {
-            if self.len == (0 as u64) {
+            if self.len == (0 as usize) {
                 return std::Option::None;
             }
             dec hash = key.hash();
@@ -380,7 +380,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         }
 
         export fn get_mut(self: &rw Self, key: &K) -> std::Option<&rw V> life_from(self) {
-            if self.len == (0 as u64) {
+            if self.len == (0 as usize) {
                 return std::Option::None;
             }
             dec hash = key.hash();
@@ -399,7 +399,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         }
 
         export fn contains_key(self: &Self, key: &K) -> bool {
-            if self.len == (0 as u64) {
+            if self.len == (0 as usize) {
                 return false;
             }
             dec hash = key.hash();
@@ -411,7 +411,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         }
 
         export fn remove(self: &rw Self, key: &K) -> bool {
-            if self.len == (0 as u64) {
+            if self.len == (0 as usize) {
                 return false;
             }
             dec hash = key.hash();
@@ -426,8 +426,8 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                         dec state_ptr = std::ptr::add_mut<u8>(self.states, idx);
                         *state_ptr = 2 as u8;
                     }
-                    self.len = self.len - (1 as u64);
-                    self.tombstones = self.tombstones + (1 as u64);
+                    self.len = self.len - (1 as usize);
+                    self.tombstones = self.tombstones + (1 as usize);
                     return true;
                 },
                 ProbeResult::Vacant(_) -> {
@@ -437,8 +437,8 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         }
 
         export fn clear(self: &rw Self) {
-            if self.cap > (0 as u64) {
-                dec rw i: u64 = 0 as u64;
+            if self.cap > (0 as usize) {
+                dec rw i: usize = 0 as usize;
                 while i < self.cap {
                     dec rw state_val: u8 = 0 as u8;
                     unsafe {
@@ -448,49 +448,49 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                             std::ptr::drop_in_place<V>(std::ptr::add_mut<V>(self.values, i));
                         }
                     }
-                    i = i + (1 as u64);
+                    i = i + (1 as usize);
                 }
                 unsafe {
                     std::mem::zero(self.states, self.cap);
                 }
-                self.len = 0 as u64;
-                self.tombstones = 0 as u64;
+                self.len = 0 as usize;
+                self.tombstones = 0 as usize;
             }
         }
 
         fn grow(self: &rw Self) {
-            dec rw new_cap: u64 = 8 as u64;
-            if self.cap > (0 as u64) {
-                if self.len * (2 as u64) <= self.cap {
+            dec rw new_cap: usize = 8 as usize;
+            if self.cap > (0 as usize) {
+                if self.len * (2 as usize) <= self.cap {
                     new_cap = self.cap;
                 } else {
-                    if self.cap > 4611686018427387904u64 {
+                    if self.cap > (((18446744073709551615u64 as usize) / (4 as usize)) + (1 as usize)) {
                         __luna_panic_default();
                     }
-                    new_cap = self.cap * (2 as u64);
+                    new_cap = self.cap * (2 as usize);
                 }
             }
 
-            dec k_elem = std::mem::size_of<K>() as u64;
-            dec v_elem = std::mem::size_of<V>() as u64;
-            if k_elem > (0 as u64) {
-                if new_cap > (18446744073709551615u64 / k_elem) {
+            dec k_elem = std::mem::size_of<K>() as usize;
+            dec v_elem = std::mem::size_of<V>() as usize;
+            if k_elem > (0 as usize) {
+                if new_cap > ((18446744073709551615u64 as usize) / k_elem) {
                     __luna_panic_default();
                 }
             }
-            if v_elem > (0 as u64) {
-                if new_cap > (18446744073709551615u64 / v_elem) {
+            if v_elem > (0 as usize) {
+                if new_cap > ((18446744073709551615u64 as usize) / v_elem) {
                     __luna_panic_default();
                 }
             }
 
             dec k_size = new_cap * k_elem;
-            dec k_align = std::mem::align_of<K>() as u64;
-            dec v_size = new_cap * (std::mem::size_of<V>() as u64);
-            dec v_align = std::mem::align_of<V>() as u64;
+            dec k_align = std::mem::align_of<K>() as usize;
+            dec v_size = new_cap * (std::mem::size_of<V>() as usize);
+            dec v_align = std::mem::align_of<V>() as usize;
 
-            dec new_states = __luna_alloc(new_cap, 1 as u64);
-            dec new_hashes = __luna_alloc(new_cap * (8 as u64), 8 as u64) as *rw u64;
+            dec new_states = __luna_alloc(new_cap, 1 as usize);
+            dec new_hashes = __luna_alloc(new_cap * (8 as usize), 8 as usize) as *rw u64;
             dec new_keys = __luna_alloc(k_size, k_align) as *rw K;
             dec new_values = __luna_alloc(v_size, v_align) as *rw V;
 
@@ -498,9 +498,9 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                 std::mem::zero(new_states, new_cap);
             }
 
-            if self.cap > (0 as u64) {
-                dec new_mask = new_cap - (1 as u64);
-                dec rw i: u64 = 0 as u64;
+            if self.cap > (0 as usize) {
+                dec new_mask = new_cap - (1 as usize);
+                dec rw i: usize = 0 as usize;
                 while i < self.cap {
                     dec rw state_val: u8 = 0 as u8;
                     unsafe {
@@ -512,9 +512,9 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                             dec k = std::ptr::read<K>(std::ptr::add<K>(self.keys as *K, i));
                             dec v = std::ptr::read<V>(std::ptr::add<V>(self.values as *V, i));
 
-                            dec rw new_idx = mix_hash(cached_hash) & new_mask;
+                            dec rw new_idx = (mix_hash(cached_hash) as usize) & new_mask;
                             while *std::ptr::add<u8>(new_states as *u8, new_idx) != (0 as u8) {
-                                new_idx = (new_idx + (1 as u64)) & new_mask;
+                                new_idx = (new_idx + (1 as usize)) & new_mask;
                             }
 
                             *std::ptr::add_mut<u8>(new_states, new_idx) = 1 as u8;
@@ -523,17 +523,17 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                             std::ptr::write<V>(std::ptr::add_mut<V>(new_values, new_idx), v);
                         }
                     }
-                    i = i + (1 as u64);
+                    i = i + (1 as usize);
                 }
 
-                dec old_k_size = self.cap * (std::mem::size_of<K>() as u64);
-                dec old_k_align = std::mem::align_of<K>() as u64;
-                dec old_v_size = self.cap * (std::mem::size_of<V>() as u64);
-                dec old_v_align = std::mem::align_of<V>() as u64;
+                dec old_k_size = self.cap * (std::mem::size_of<K>() as usize);
+                dec old_k_align = std::mem::align_of<K>() as usize;
+                dec old_v_size = self.cap * (std::mem::size_of<V>() as usize);
+                dec old_v_align = std::mem::align_of<V>() as usize;
 
                 unsafe {
-                    __luna_dealloc(self.states, self.cap, 1 as u64);
-                    __luna_dealloc(self.hashes as *rw u8, self.cap * (8 as u64), 8 as u64);
+                    __luna_dealloc(self.states, self.cap, 1 as usize);
+                    __luna_dealloc(self.hashes as *rw u8, self.cap * (8 as usize), 8 as usize);
                     __luna_dealloc(self.keys as *rw u8, old_k_size, old_k_align);
                     __luna_dealloc(self.values as *rw u8, old_v_size, old_v_align);
                 }
@@ -546,7 +546,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                 self.values = new_values;
             }
             self.cap = new_cap;
-            self.tombstones = 0 as u64;
+            self.tombstones = 0 as usize;
         }
 
         export fn iter(self: &Self) -> RawTableIter<K, V> life_from(self) {
@@ -555,7 +555,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                     states: self.states as *u8,
                     keys: self.keys as *K,
                     values: self.values as *V,
-                    idx: 0 as u64,
+                    idx: 0 as usize,
                     cap: self.cap,
                 };
             }
@@ -564,8 +564,8 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
 
     impl<K, V> std::Drop for RawTable<K, V> {
         fn drop(self: &rw Self) {
-            if (self.states as u64) != (0 as u64) && self.cap > (0 as u64) {
-                dec rw i: u64 = 0 as u64;
+            if (self.states as usize) != (0 as usize) && self.cap > (0 as usize) {
+                dec rw i: usize = 0 as usize;
                 while i < self.cap {
                     dec rw state_val: u8 = 0 as u8;
                     unsafe {
@@ -575,27 +575,27 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
                             std::ptr::drop_in_place<V>(std::ptr::add_mut<V>(self.values, i));
                         }
                     }
-                    i = i + (1 as u64);
+                    i = i + (1 as usize);
                 }
-                dec k_size = self.cap * (std::mem::size_of<K>() as u64);
-                dec k_align = std::mem::align_of<K>() as u64;
-                dec v_size = self.cap * (std::mem::size_of<V>() as u64);
-                dec v_align = std::mem::align_of<V>() as u64;
+                dec k_size = self.cap * (std::mem::size_of<K>() as usize);
+                dec k_align = std::mem::align_of<K>() as usize;
+                dec v_size = self.cap * (std::mem::size_of<V>() as usize);
+                dec v_align = std::mem::align_of<V>() as usize;
 
                 unsafe {
-                    __luna_dealloc(self.states, self.cap, 1 as u64);
-                    __luna_dealloc(self.hashes as *rw u8, self.cap * (8 as u64), 8 as u64);
+                    __luna_dealloc(self.states, self.cap, 1 as usize);
+                    __luna_dealloc(self.hashes as *rw u8, self.cap * (8 as usize), 8 as usize);
                     __luna_dealloc(self.keys as *rw u8, k_size, k_align);
                     __luna_dealloc(self.values as *rw u8, v_size, v_align);
                 }
 
-                self.states = 0 as u64 as *rw u8;
-                self.hashes = 0 as u64 as *rw u64;
-                self.keys = 0 as u64 as *rw K;
-                self.values = 0 as u64 as *rw V;
-                self.cap = 0 as u64;
-                self.len = 0 as u64;
-                self.tombstones = 0 as u64;
+                self.states = 0 as usize as *rw u8;
+                self.hashes = 0 as usize as *rw u64;
+                self.keys = 0 as usize as *rw K;
+                self.values = 0 as usize as *rw V;
+                self.cap = 0 as usize;
+                self.len = 0 as usize;
+                self.tombstones = 0 as usize;
             }
         }
     }
@@ -606,7 +606,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
 
     export struct RawTableIntoIter<K, V> {
         private table: RawTable<K, V>,
-        private idx: u64,
+        private idx: usize,
     };
 
     // Internal component bridge: HashMap owns the public iterator wrapper, while
@@ -614,7 +614,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
     export fn raw_table_into_iter<K, V>(table: RawTable<K, V>) -> RawTableIntoIter<K, V> {
         return RawTableIntoIter<K, V> {
             table: table,
-            idx: 0 as u64,
+            idx: 0 as usize,
         };
     }
 
@@ -622,7 +622,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         export fn next(self: &rw Self) -> std::Option<(K, V)> {
             while self.idx < self.table.capacity() {
                 dec cur = self.idx;
-                self.idx = self.idx + (1 as u64);
+                self.idx = self.idx + (1 as usize);
                 unsafe {
                     dec state_ptr = std::ptr::add_mut<u8>(self.table.states as *rw u8, cur);
                     dec state_val = *state_ptr;
@@ -645,8 +645,8 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         private states: *u8,
         private keys: *K,
         private values: *V,
-        private idx: u64,
-        private cap: u64,
+        private idx: usize,
+        private cap: usize,
     } requires anchor(states) = self
       requires anchor(keys) = self
       requires anchor(values) = self;
@@ -655,7 +655,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         export fn next_entry(self: &rw Self) -> std::Option<(&K, &V)> {
             while self.idx < self.cap {
                 dec cur = self.idx;
-                self.idx = self.idx + (1 as u64);
+                self.idx = self.idx + (1 as usize);
                 unsafe {
                     dec state_val = *std::ptr::add<u8>(self.states, cur);
                     if state_val == (1 as u8) {
@@ -671,7 +671,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         export fn next_key(self: &rw Self) -> std::Option<&K> {
             while self.idx < self.cap {
                 dec cur = self.idx;
-                self.idx = self.idx + (1 as u64);
+                self.idx = self.idx + (1 as usize);
                 unsafe {
                     dec state_val = *std::ptr::add<u8>(self.states, cur);
                     if state_val == (1 as u8) {
@@ -686,7 +686,7 @@ impl<K: std::Hash + std::Eq, V> RawTable<K, V> {
         export fn next_value(self: &rw Self) -> std::Option<&V> {
             while self.idx < self.cap {
                 dec cur = self.idx;
-                self.idx = self.idx + (1 as u64);
+                self.idx = self.idx + (1 as usize);
                 unsafe {
                     dec state_val = *std::ptr::add<u8>(self.states, cur);
                     if state_val == (1 as u8) {

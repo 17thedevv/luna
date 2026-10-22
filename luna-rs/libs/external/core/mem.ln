@@ -6,39 +6,39 @@ export module std {
     // bridging raw pointers to fat-pointer slices. They must NOT be treated as a precedent for safe
     // reference construction without explicit lifetime provenance contracts.
     #[lang("slice_from_raw_parts")]
-    export unsafe intrinsic fn slice_from_raw_parts<T>(ptr: *T, len: u64) -> &[T];
+    export unsafe intrinsic fn slice_from_raw_parts<T>(ptr: *T, len: usize) -> &[T];
     #[lang("slice_from_raw_parts_mut")]
-    export unsafe intrinsic fn slice_from_raw_parts_mut<T>(ptr: *rw T, len: u64) -> &rw [T];
+    export unsafe intrinsic fn slice_from_raw_parts_mut<T>(ptr: *rw T, len: usize) -> &rw [T];
     
-    export unsafe fn copy(src: *u8, dst: *rw u8, bytes: u64) {
-        dec rw i: u64 = 0 as u64;
+    export unsafe fn copy(src: *u8, dst: *rw u8, bytes: usize) {
+        dec rw i: usize = 0 as usize;
         while i < bytes {
-            dec s = (src as u64 + i) as *u8;
-            dec d = (dst as u64 + i) as *rw u8;
+            dec s = (src as usize + i) as *u8;
+            dec d = (dst as usize + i) as *rw u8;
             *d = *s;
-            i = i + (1 as u64);
+            i = i + (1 as usize);
         }
     }
     
-    export unsafe fn set(dst: *rw u8, val: u8, bytes: u64) {
-        dec rw i: u64 = 0 as u64;
+    export unsafe fn set(dst: *rw u8, val: u8, bytes: usize) {
+        dec rw i: usize = 0 as usize;
         while i < bytes {
-            dec d = (dst as u64 + i) as *rw u8;
+            dec d = (dst as usize + i) as *rw u8;
             *d = val;
-            i = i + (1 as u64);
+            i = i + (1 as usize);
         }
     }
     
-    export unsafe fn zero(dst: *rw u8, bytes: u64) {
+    export unsafe fn zero(dst: *rw u8, bytes: usize) {
         set(dst, 0 as u8, bytes);
     }
     
-    export fn size_of<T>() -> u64 {
-        return sizeof(T) as u64;
+    export fn size_of<T>() -> usize {
+        return sizeof(T) as usize;
     }
     
-    export fn align_of<T>() -> u64 {
-        return alignof(T) as u64;
+    export fn align_of<T>() -> usize {
+        return alignof(T) as usize;
     }
 
     /// Swaps the values of two mutable references without invalidating either.
@@ -61,8 +61,8 @@ export module std {
     }
 
     export struct Layout {
-        private size_: u64,
-        private align_: u64,
+        private size_: usize,
+        private align_: usize,
     };
 
     export fn layout_for_type<T>() -> Layout {
@@ -72,34 +72,34 @@ export module std {
         };
     }
 
-    export fn layout_from_size_align_unchecked(size: u64, align: u64) -> Layout {
+    export fn layout_from_size_align_unchecked(size: usize, align: usize) -> Layout {
         return Layout {
             size_: size,
             align_: align,
         };
     }
 
-    export fn layout_is_valid_align(align: u64) -> bool {
-        if align == (0 as u64) {
+    export fn layout_is_valid_align(align: usize) -> bool {
+        if align == (0 as usize) {
             return false;
         }
-        return (align & (align - (1 as u64))) == (0 as u64);
+        return (align & (align - (1 as usize))) == (0 as usize);
     }
 
     impl Layout {
-        export fn size(self: &Self) -> u64 {
+        export fn size(self: &Self) -> usize {
             return self.size_;
         }
 
-        export fn align(self: &Self) -> u64 {
+        export fn align(self: &Self) -> usize {
             return self.align_;
         }
 
         export fn is_valid(self: &Self) -> bool {
-            if self.align_ == (0 as u64) {
+            if self.align_ == (0 as usize) {
                 return false;
             }
-            return (self.align_ & (self.align_ - (1 as u64))) == (0 as u64);
+            return (self.align_ & (self.align_ - (1 as usize))) == (0 as usize);
         }
     }
 }

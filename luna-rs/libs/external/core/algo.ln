@@ -13,41 +13,41 @@ export module std {
 // =========================================================================
 
 export fn is_sorted<T: std::Ord>(s: &[T]) -> bool {
-    dec slen = s.len as u64;
-    if slen <= (1 as u64) { return true; }
-    dec rw i: u64 = 1 as u64;
+    dec slen = s.len as usize;
+    if slen <= (1 as usize) { return true; }
+    dec rw i: usize = 1 as usize;
     while i < slen {
-        if s[i - (1 as u64)].cmp(&s[i]) > 0 {
+        if s[i - (1 as usize)].cmp(&s[i]) > 0 {
             return false;
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
     return true;
 }
 
 export fn is_sorted_by<T>(s: &[T], compare: fn(&T, &T) -> i32) -> bool {
-    dec slen = s.len as u64;
-    if slen <= (1 as u64) { return true; }
-    dec rw i: u64 = 1 as u64;
+    dec slen = s.len as usize;
+    if slen <= (1 as usize) { return true; }
+    dec rw i: usize = 1 as usize;
     while i < slen {
         dec cmp_fn = compare;
-        if cmp_fn(&s[i - (1 as u64)], &s[i]) > 0 {
+        if cmp_fn(&s[i - (1 as usize)], &s[i]) > 0 {
             return false;
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
     return true;
 }
 
-export fn partition_point<T>(s: &[T], pred: fn(&T) -> bool) -> u64 {
-    dec slen = s.len as u64;
-    dec rw lo: u64 = 0 as u64;
-    dec rw hi: u64 = slen;
+export fn partition_point<T>(s: &[T], pred: fn(&T) -> bool) -> usize {
+    dec slen = s.len as usize;
+    dec rw lo: usize = 0 as usize;
+    dec rw hi: usize = slen;
     while lo < hi {
-        dec mid = lo + ((hi - lo) / (2 as u64));
+        dec mid = lo + ((hi - lo) / (2 as usize));
         dec p_fn = pred;
         if p_fn(&s[mid]) {
-            lo = mid + (1 as u64);
+            lo = mid + (1 as usize);
         } else {
             hi = mid;
         }
@@ -55,21 +55,21 @@ export fn partition_point<T>(s: &[T], pred: fn(&T) -> bool) -> u64 {
     return lo;
 }
 
-export fn partition<T>(s: &rw [T], pred: fn(&T) -> bool) -> u64 {
-    dec slen = s.len as u64;
-    if slen == (0 as u64) { return 0 as u64; }
-    dec rw i: u64 = 0 as u64;
-    dec rw j: u64 = slen;
+export fn partition<T>(s: &rw [T], pred: fn(&T) -> bool) -> usize {
+    dec slen = s.len as usize;
+    if slen == (0 as usize) { return 0 as usize; }
+    dec rw i: usize = 0 as usize;
+    dec rw j: usize = slen;
     while true {
         while i < slen {
             dec p_fn = pred;
             if p_fn(&s[i]) == false {
                 break;
             }
-            i = i + (1 as u64);
+            i = i + (1 as usize);
         }
         while j > i {
-            j = j - (1 as u64);
+            j = j - (1 as usize);
             dec p_fn = pred;
             if p_fn(&s[j]) {
                 break;
@@ -85,7 +85,7 @@ export fn partition<T>(s: &rw [T], pred: fn(&T) -> bool) -> u64 {
             std::ptr::write<T>(pi, std::ptr::read<T>(pj as *T));
             std::ptr::write<T>(pj, tmp);
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
     return i;
 }
@@ -94,14 +94,14 @@ export fn partition<T>(s: &rw [T], pred: fn(&T) -> bool) -> u64 {
 // 2. Binary Searching Bounds
 // =========================================================================
 
-export fn lower_bound<T: std::Ord>(s: &[T], val: &T) -> u64 {
-    dec slen = s.len as u64;
-    dec rw lo: u64 = 0 as u64;
-    dec rw hi: u64 = slen;
+export fn lower_bound<T: std::Ord>(s: &[T], val: &T) -> usize {
+    dec slen = s.len as usize;
+    dec rw lo: usize = 0 as usize;
+    dec rw hi: usize = slen;
     while lo < hi {
-        dec mid = lo + ((hi - lo) / (2 as u64));
+        dec mid = lo + ((hi - lo) / (2 as usize));
         if s[mid].cmp(val) < 0 {
-            lo = mid + (1 as u64);
+            lo = mid + (1 as usize);
         } else {
             hi = mid;
         }
@@ -109,14 +109,14 @@ export fn lower_bound<T: std::Ord>(s: &[T], val: &T) -> u64 {
     return lo;
 }
 
-export fn upper_bound<T: std::Ord>(s: &[T], val: &T) -> u64 {
-    dec slen = s.len as u64;
-    dec rw lo: u64 = 0 as u64;
-    dec rw hi: u64 = slen;
+export fn upper_bound<T: std::Ord>(s: &[T], val: &T) -> usize {
+    dec slen = s.len as usize;
+    dec rw lo: usize = 0 as usize;
+    dec rw hi: usize = slen;
     while lo < hi {
-        dec mid = lo + ((hi - lo) / (2 as u64));
+        dec mid = lo + ((hi - lo) / (2 as usize));
         if s[mid].cmp(val) <= 0 {
-            lo = mid + (1 as u64);
+            lo = mid + (1 as usize);
         } else {
             hi = mid;
         }
@@ -124,7 +124,7 @@ export fn upper_bound<T: std::Ord>(s: &[T], val: &T) -> u64 {
     return lo;
 }
 
-export fn equal_range<T: std::Ord>(s: &[T], val: &T) -> (u64, u64) {
+export fn equal_range<T: std::Ord>(s: &[T], val: &T) -> (usize, usize) {
     dec lb = lower_bound<T>(s, val);
     dec ub = upper_bound<T>(s, val);
     return (lb, ub);
@@ -134,10 +134,10 @@ export fn equal_range<T: std::Ord>(s: &[T], val: &T) -> (u64, u64) {
 // 3. In-Place Slice Manipulation
 // =========================================================================
 
-fn reverse_subslice<T>(data: *rw T, lo: u64, hi: u64) {
+fn reverse_subslice<T>(data: *rw T, lo: usize, hi: usize) {
     if hi <= lo { return; }
     dec rw l = lo;
-    dec rw r = hi - (1 as u64);
+    dec rw r = hi - (1 as usize);
     while l < r {
         unsafe {
             dec pl = std::ptr::add_mut<T>(data, l);
@@ -146,48 +146,48 @@ fn reverse_subslice<T>(data: *rw T, lo: u64, hi: u64) {
             std::ptr::write<T>(pl, std::ptr::read<T>(pr as *T));
             std::ptr::write<T>(pr, tmp);
         }
-        l = l + (1 as u64);
-        r = r - (1 as u64);
+        l = l + (1 as usize);
+        r = r - (1 as usize);
     }
 }
 
-export fn rotate_left<T>(s: &rw [T], k: u64) {
-    dec slen = s.len as u64;
-    if slen <= (1 as u64) { return; }
+export fn rotate_left<T>(s: &rw [T], k: usize) {
+    dec slen = s.len as usize;
+    if slen <= (1 as usize) { return; }
     dec step = k % slen;
-    if step == (0 as u64) { return; }
-    reverse_subslice<T>(s.data, 0 as u64, step);
+    if step == (0 as usize) { return; }
+    reverse_subslice<T>(s.data, 0 as usize, step);
     reverse_subslice<T>(s.data, step, slen);
-    reverse_subslice<T>(s.data, 0 as u64, slen);
+    reverse_subslice<T>(s.data, 0 as usize, slen);
 }
 
-export fn rotate_right<T>(s: &rw [T], k: u64) {
-    dec slen = s.len as u64;
-    if slen <= (1 as u64) { return; }
+export fn rotate_right<T>(s: &rw [T], k: usize) {
+    dec slen = s.len as usize;
+    if slen <= (1 as usize) { return; }
     dec step = k % slen;
-    if step == (0 as u64) { return; }
+    if step == (0 as usize) { return; }
     rotate_left<T>(s, slen - step);
 }
 
 export fn fill<T: std::Clone>(s: &rw [T], val: &T) {
-    dec slen = s.len as u64;
-    dec rw i: u64 = 0 as u64;
+    dec slen = s.len as usize;
+    dec rw i: usize = 0 as usize;
     while i < slen {
         unsafe {
             dec p = std::ptr::add_mut<T>(s.data, i);
             std::ptr::drop_in_place<T>(p);
             std::ptr::write<T>(p, (*val).clone());
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
 }
 
 export fn swap_ranges<T>(a: &rw [T], b: &rw [T]) {
-    dec rw n = a.len as u64;
-    if (b.len as u64) < n {
-        n = b.len as u64;
+    dec rw n = a.len as usize;
+    if (b.len as usize) < n {
+        n = b.len as usize;
     }
-    dec rw i: u64 = 0 as u64;
+    dec rw i: usize = 0 as usize;
     while i < n {
         unsafe {
             dec pa = std::ptr::add_mut<T>(a.data, i);
@@ -196,7 +196,7 @@ export fn swap_ranges<T>(a: &rw [T], b: &rw [T]) {
             std::ptr::write<T>(pa, std::ptr::read<T>(pb as *T));
             std::ptr::write<T>(pb, tmp);
         }
-        i = i + (1 as u64);
+        i = i + (1 as usize);
     }
 }
 

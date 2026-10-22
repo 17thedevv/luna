@@ -108,7 +108,7 @@ export module std {
             h5: 2600822924u32, // 0x9b05688c
             h6: 528734635 as u32,  // 0x1f83d9ab
             h7: 1541459225 as u32, // 0x5be0cd19
-            buffer: std::vec_with_capacity<u8>(64 as u64),
+            buffer: std::vec_with_capacity<u8>(64 as usize),
             total_len: 0 as u64,
         };
     }
@@ -118,7 +118,7 @@ export module std {
         h4: &rw u32, h5: &rw u32, h6: &rw u32, h7: &rw u32,
         block: &[u8]
     ) {
-        dec rw w = std::vec_with_capacity<u32>(64 as u64);
+        dec rw w = std::vec_with_capacity<u32>(64 as usize);
         dec rw i: usize = 0 as usize;
         while i < (16 as usize) {
             dec offset = i * (4 as usize);
@@ -210,7 +210,7 @@ export module std {
 
             while i < len {
                 self.buffer.push(data[i]);
-                if self.buffer.len() == (64 as u64) {
+                if self.buffer.len() == (64 as usize) {
                     self.process_pending_block();
                     self.buffer.clear();
                 }
@@ -222,15 +222,15 @@ export module std {
             // Padding
             self.buffer.push(128 as u8); // 0x80
 
-            if self.buffer.len() > (56 as u64) {
-                while self.buffer.len() < (64 as u64) {
+            if self.buffer.len() > (56 as usize) {
+                while self.buffer.len() < (64 as usize) {
                     self.buffer.push(0 as u8);
                 }
                 self.process_pending_block();
                 self.buffer.clear();
             }
 
-            while self.buffer.len() < (56 as u64) {
+            while self.buffer.len() < (56 as usize) {
                 self.buffer.push(0 as u8);
             }
 
@@ -562,7 +562,7 @@ export module std {
     }
 
     export fn chacha20_crypt(key: &[u8], nonce: &[u8], counter: u32, data: &[u8]) -> std::Vec<u8> {
-        dec rw buf = std::vec_with_capacity<u8>(data.len as u64);
+        dec rw buf = std::vec_with_capacity<u8>(data.len);
         dec rw i: usize = 0 as usize;
         while i < data.len {
             buf.push(data[i]);

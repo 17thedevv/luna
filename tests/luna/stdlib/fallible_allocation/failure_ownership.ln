@@ -45,7 +45,7 @@ fn vector_case(drops: *rw usize) -> i32 {
             }
             if failure.value.id != 2 { return 14; }
             unsafe { if *drops != (0 as usize) { return 15; } }
-            if values.capacity() != old_capacity || values.len() != (1 as u64) { return 16; }
+            if values.capacity() != old_capacity || values.len() != (1 as usize) { return 16; }
             if values.as_slice()[0].id != 1 { return 17; }
             __luna_test_alloc_fail_after(-1);
             if values.try_push(failure.value).is_err() { return 18; }
@@ -55,7 +55,7 @@ fn vector_case(drops: *rw usize) -> i32 {
     __luna_test_alloc_fail_after(0);
     dec current_capacity = values.capacity();
     if values.try_reserve(16 as usize).is_ok() { return 20; }
-    if values.capacity() != current_capacity || values.len() != (2 as u64) { return 21; }
+    if values.capacity() != current_capacity || values.len() != (2 as usize) { return 21; }
     if values.as_slice()[0].id != 1 || values.as_slice()[1].id != 2 { return 22; }
     dec before_overflow = __luna_test_alloc_attempts();
     match values.try_reserve(18446744073709551615u64 as usize) {
@@ -94,9 +94,9 @@ fn text_case() -> i32 {
     dec old_capacity = text.capacity();
     __luna_test_alloc_fail_after(0);
     if text.try_reserve(128 as usize).is_ok() { return 40; }
-    if text.capacity() != old_capacity || text.len() != (9 as u64) { return 41; }
+    if text.capacity() != old_capacity || text.len() != (9 as usize) { return 41; }
     dec expected = std::string_from_str(""); // Empty construction must not allocate.
-    if expected.len() != (0 as u64) { return 44; }
+    if expected.len() != (0 as usize) { return 44; }
     dec bytes = text.as_bytes();
     if bytes[0] != (76 as u8) || bytes[5] != (240 as u8) || bytes[8] != (153 as u8) { return 42; }
     __luna_test_alloc_fail_after(-1);
@@ -110,7 +110,7 @@ fn zero_size_case() -> i32 {
     dec events = __luna_test_event_count();
     {
         dec zero_capacity = std::Vec<i32>::try_with_capacity(0 as usize).unwrap();
-        if zero_capacity.capacity() != (0 as u64) { return 55; }
+        if zero_capacity.capacity() != (0 as usize) { return 55; }
         dec rw empty = std::Vec<Empty>::new();
         if empty.try_push(Empty {}).is_err() { return 50; }
         if empty.try_push(Empty {}).is_err() { return 51; }

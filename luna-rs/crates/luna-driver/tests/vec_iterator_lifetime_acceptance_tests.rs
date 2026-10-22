@@ -112,7 +112,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec r = v.get(0 as u64);
     v.push(20); // Conflict: v is mutably borrowed while r holds active borrow of v!
@@ -145,7 +145,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec r = v.get(0 as u64);
     dec _ = r;
@@ -191,7 +191,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec rw it = v.iter();
     v.push(20); // Conflict: v mutated while iterator `it` is active!
@@ -236,7 +236,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec rw it = v.iter();
     v.clear(); // Conflict: v cleared while iterator `it` is active!
@@ -281,7 +281,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec rw it = v.iter();
     v.grow(); // Conflict: realloc/grow while iterator `it` is active!
@@ -326,7 +326,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec rw it = v.iter();
     dec _ = it.next_ref();
@@ -374,7 +374,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec rw it = v.iter_mut();
     v.push(20); // Conflict: exclusive borrow by iter_mut!
@@ -407,7 +407,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec rw it = v.iter_mut();
     dec opt_ref = it.next_mut();
@@ -481,7 +481,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec rw it = v.iter();
     v.push(20);
@@ -505,7 +505,7 @@ import <hashset>;
 import <iter_collect>;
 
 fn main() {
-    dec rw v = std::vec_with_capacity<i32>(4 as u64);
+    dec rw v = std::vec_with_capacity<i32>(4 as usize);
     v.push(10);
     dec rw it = v.iter();
     dec _ = it.next_ref();

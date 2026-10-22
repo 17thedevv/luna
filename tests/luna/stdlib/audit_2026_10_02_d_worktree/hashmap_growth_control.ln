@@ -1,13 +1,13 @@
 import <hashmap>;
 
 fn main() -> i32 {
-    dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+    dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
     dec rw i: i32 = 1;
     while i <= 20 {
         map.insert(i, i * 10);
         i = i + 1;
     }
-    if map.len() != (20 as u64) { return 1; }
+    if map.len() != (20 as usize) { return 1; }
     dec rw j: i32 = 1;
     while j <= 20 {
         dec value = match map.get(&j) {

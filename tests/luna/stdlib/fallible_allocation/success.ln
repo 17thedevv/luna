@@ -7,14 +7,14 @@ fn main() -> i32 {
     if values.try_push(11).is_err() { return 1; }
     if values.try_push(22).is_err() { return 2; }
     if values.try_reserve(8 as usize).is_err() { return 3; }
-    if values.len() != (2 as u64) { return 4; }
+    if values.len() != (2 as usize) { return 4; }
     if values.as_slice()[0] != 11 || values.as_slice()[1] != 22 { return 5; }
     dec boxed = std::Box<i32>::try_new(73).unwrap();
     if *boxed.as_ref() != 73 { return 6; }
     dec rw text = std::String::try_with_capacity(8 as usize).unwrap();
     text.push_str("hello");
     if text.try_reserve(32 as usize).is_err() { return 7; }
-    if text.len() != (5 as u64) { return 8; }
+    if text.len() != (5 as usize) { return 8; }
     if text.as_bytes()[0] != (104 as u8) { return 9; }
     dec rw empty: std::Vec<i32> = std::Vec::new();
     empty.push(1);

@@ -2,13 +2,21 @@
 
 > **Luna 0.1 — guidance.** The [versioned specification](docs/spec/0.1/README.md) and adopted contracts govern; implementation evidence does not create semantic authority.
 
-# Luna 0.1 status — 2026-10-21
+# Luna 0.1 status — 2026-10-22
 
 **Current: alpha published; stable execution IN PROGRESS / NOT QUALIFIED.**
 The [stable ledger](docs/stable/0.1.0/README.md) records the integrated Luna/Lunar
 baseline, 49 historical scope records and outstanding work. The alpha tag now
 points to `a3080712` after metadata-only history cleanup; original package/log
 SHAs below are retained as historical build identities, not silently rewritten.
+
+The 2026-10-22 [stdlib API expansion](docs/audits/stdlib-usize-2026-10-22/README.md)
+is under validation on stdlib-redesign: usize memory counts, additional type
+constructors, ordered-set algebra and fixed-width bit utilities. Compiler
+protocol 26 / runtime ABI 2 / 50 providers form a new bundle requiring fresh
+qualification. The [C++23 comparison](docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md)
+tracks missing functional families; graph and basic CPU matrix/tensor remain
+planned. These changes are not installed or included in the published alpha.
 
 ## Published alpha snapshot — original build identities, 2026-10-20
 

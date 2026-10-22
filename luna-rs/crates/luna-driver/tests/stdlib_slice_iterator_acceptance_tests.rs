@@ -417,7 +417,7 @@ fn main() -> i32 {
     dec c_ptr = &rw counter as *rw DropCounter;
 
     {
-        dec rw v = std::vec_with_capacity<TrackedItem>(4 as u64);
+        dec rw v = std::vec_with_capacity<TrackedItem>(4 as usize);
         dec rw i: i32 = 0;
         while i < 4 {
             unsafe {
@@ -512,7 +512,7 @@ fn main() -> i32 {
     dec c_ptr = &rw counter as *rw DropCounter;
 
     {
-        dec rw v = std::vec_with_capacity<TrackedItem>(3 as u64);
+        dec rw v = std::vec_with_capacity<TrackedItem>(3 as usize);
         dec rw i: i32 = 1;
         while i <= 3 {
             unsafe {
@@ -637,7 +637,7 @@ fn main() -> i32 {
     }
     // r dies here
     xs.push(2); // OK: borrow has ended
-    if xs.len() == (2 as u64) {
+    if xs.len() == (2 as usize) {
         return 0;
     }
     return 1;

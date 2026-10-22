@@ -129,7 +129,7 @@ import <hashmap>;
 import <hashset>;
 import <iter_collect>;
 
-        fn test_access(v: &std::Vec<i32>) -> u64 {
+        fn test_access(v: &std::Vec<i32>) -> usize {
             return v.len;
         }
 
@@ -166,7 +166,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn test_mutate(v: &rw std::Vec<i32>) {
-            v.cap = 100 as u64;
+            v.cap = 100 as usize;
         }
 
         fn main() -> i32 {
@@ -204,8 +204,8 @@ import <iter_collect>;
         fn construct() -> std::Vec<i32> {
             return std::Vec<i32> {
                 ptr: 0 as u64 as *rw i32,
-                len: 0 as u64,
-                cap: 0 as u64,
+                len: 0 as usize,
+                cap: 0 as usize,
             };
         }
 
@@ -658,13 +658,13 @@ import <iter_collect>;
             dec rw v = std::vec_new<i32>();
             v.push(10);
             v.push(20);
-            if v.len() != (2 as u64) {
+            if v.len() != (2 as usize) {
                 return 3;
             }
 
             // 3. std::String public methods
             dec s = std::string_from_str("Hello");
-            if s.len() != (5 as u64) {
+            if s.len() != (5 as usize) {
                 return 4;
             }
 
@@ -676,7 +676,7 @@ import <iter_collect>;
             if t.contains_key(&k1) == false {
                 return 5;
             }
-            if t.len() != (2 as u64) {
+            if t.len() != (2 as usize) {
                 return 6;
             }
 

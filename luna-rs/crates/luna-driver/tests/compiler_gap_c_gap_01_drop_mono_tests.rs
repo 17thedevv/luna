@@ -438,7 +438,7 @@ fn main() -> i32 {
     v.push(10);
     v.push(20);
     v.push(30);
-    if v.len() != (3 as u64) {
+    if v.len() != (3 as usize) {
         return 101;
     }
     return 0;

@@ -32,13 +32,22 @@ export struct BinaryHeap<T> {
     private data: Vec<T>,
 };
 
+// Type-owned constructors; free factories remain migration entry points.
+impl<T> BinaryHeap<T> {
+    export fn new() -> Self { return binaryheap_new<T>(); }
+    export fn with_capacity(capacity: usize) -> Self {
+        return binaryheap_with_capacity<T>(capacity);
+    }
+}
+
+
 export fn binaryheap_new<T>() -> BinaryHeap<T> {
     return BinaryHeap<T> {
         data: std::vec_new<T>(),
     };
 }
 
-export fn binaryheap_with_capacity<T>(capacity: u64) -> BinaryHeap<T> {
+export fn binaryheap_with_capacity<T>(capacity: usize) -> BinaryHeap<T> {
     return BinaryHeap<T> {
         data: std::vec_with_capacity<T>(capacity),
     };
@@ -49,16 +58,16 @@ export fn binaryheap_from_vec<T: std::Ord>(v: Vec<T>) -> BinaryHeap<T> {
         data: v,
     };
     dec len = heap.data.len();
-    if len <= (1 as u64) {
+    if len <= (1 as usize) {
         return heap;
     }
-    dec rw i = len / (2 as u64);
+    dec rw i = len / (2 as usize);
     while true {
         heap.sift_down(i);
-        if i == (0 as u64) {
+        if i == (0 as usize) {
             break;
         }
-        i = i - (1 as u64);
+        i = i - (1 as usize);
     }
     return heap;
 }
@@ -70,7 +79,7 @@ impl<T> std::Default for BinaryHeap<T> {
 }
 
 impl<T> BinaryHeap<T> {
-    export fn len(self: &Self) -> u64 {
+    export fn len(self: &Self) -> usize {
         return self.data.len();
     }
 
@@ -78,7 +87,7 @@ impl<T> BinaryHeap<T> {
         return self.data.is_empty();
     }
 
-    export fn capacity(self: &Self) -> u64 {
+    export fn capacity(self: &Self) -> usize {
         return self.data.capacity();
     }
 
@@ -106,10 +115,10 @@ impl<T> BinaryHeap<T> {
 }
 
 impl<T: std::Ord> BinaryHeap<T> {
-    fn sift_up(self: &rw Self, start_idx: u64) {
+    fn sift_up(self: &rw Self, start_idx: usize) {
         dec rw idx = start_idx;
-        while idx > (0 as u64) {
-            dec parent = (idx - (1 as u64)) / (2 as u64);
+        while idx > (0 as usize) {
+            dec parent = (idx - (1 as usize)) / (2 as usize);
             dec slice = self.data.as_slice();
             if slice[parent].cmp(&slice[idx]) < 0 {
                 self.data.swap(parent, idx);
@@ -120,12 +129,12 @@ impl<T: std::Ord> BinaryHeap<T> {
         }
     }
 
-    fn sift_down(self: &rw Self, start_idx: u64) {
+    fn sift_down(self: &rw Self, start_idx: usize) {
         dec len = self.data.len();
         dec rw idx = start_idx;
         while true {
-            dec left = ((2 as u64) * idx) + (1 as u64);
-            dec right = ((2 as u64) * idx) + (2 as u64);
+            dec left = ((2 as usize) * idx) + (1 as usize);
+            dec right = ((2 as usize) * idx) + (2 as usize);
             dec rw largest = idx;
 
             dec slice = self.data.as_slice();
@@ -151,20 +160,20 @@ impl<T: std::Ord> BinaryHeap<T> {
 
     export fn push(self: &rw Self, item: T) {
         self.data.push(item);
-        dec last_idx = self.data.len() - (1 as u64);
+        dec last_idx = self.data.len() - (1 as usize);
         self.sift_up(last_idx);
     }
 
     export fn pop(self: &rw Self) -> std::Option<T> {
         dec len = self.data.len();
-        if len == (0 as u64) {
+        if len == (0 as usize) {
             return std::Option::None;
         }
-        dec last_idx = len - (1 as u64);
-        self.data.swap(0 as u64, last_idx);
+        dec last_idx = len - (1 as usize);
+        self.data.swap(0 as usize, last_idx);
         dec val = self.data.pop();
-        if self.data.len() > (0 as u64) {
-            self.sift_down(0 as u64);
+        if self.data.len() > (0 as usize) {
+            self.sift_down(0 as usize);
         }
         return val;
     }
@@ -173,7 +182,7 @@ impl<T: std::Ord> BinaryHeap<T> {
     export fn into_sorted_vec(self: &rw Self) -> Vec<T> {
         dec len = self.data.len();
         dec rw result = std::vec_with_capacity<T>(len);
-        while self.data.len() > (0 as u64) {
+        while self.data.len() > (0 as usize) {
             dec opt = self.pop();
             match opt {
                 std::Option::Some(val) -> {
@@ -190,16 +199,16 @@ impl<T: std::Ord> BinaryHeap<T> {
     export fn retain(self: &rw Self, pred: fn(&T) -> bool) {
         self.data.retain(pred);
         dec len = self.data.len();
-        if len <= (1 as u64) {
+        if len <= (1 as usize) {
             return;
         }
-        dec rw i = len / (2 as u64);
+        dec rw i = len / (2 as usize);
         while true {
             self.sift_down(i);
-            if i == (0 as u64) {
+            if i == (0 as usize) {
                 break;
             }
-            i = i - (1 as u64);
+            i = i - (1 as usize);
         }
     }
 }
@@ -218,4 +227,6 @@ impl<T> std::IntoIterator<T, std::BinaryHeapIntoIter<T>> for std::BinaryHeap<T> 
     fn into_iter(self: Self) -> std::BinaryHeapIntoIter<T> {
         return self.into_iter();
     }
+
+
 }

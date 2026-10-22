@@ -152,9 +152,9 @@ fn test_hashset_algebra_borrowed() {
             // Phase 4A contract: union_owned borrows both sets
             dec u = s1.union_owned(&s2);
             // s1 and s2 must still be intact and valid!
-            if s1.len() != (3 as u64) { return 1; }
-            if s2.len() != (3 as u64) { return 2; }
-            if u.len() != (4 as u64) { return 3; }
+            if s1.len() != (3 as usize) { return 1; }
+            if s2.len() != (3 as usize) { return 2; }
+            if u.len() != (4 as usize) { return 3; }
             if u.contains(&1) == false { return 4; }
             if u.contains(&2) == false { return 5; }
             if u.contains(&3) == false { return 6; }
@@ -162,9 +162,9 @@ fn test_hashset_algebra_borrowed() {
 
             // intersection_owned borrows both sets
             dec inter = s1.intersection_owned(&s2);
-            if s1.len() != (3 as u64) { return 8; }
-            if s2.len() != (3 as u64) { return 9; }
-            if inter.len() != (2 as u64) { return 10; }
+            if s1.len() != (3 as usize) { return 8; }
+            if s2.len() != (3 as usize) { return 9; }
+            if inter.len() != (2 as usize) { return 10; }
             if inter.contains(&2) == false { return 11; }
             if inter.contains(&3) == false { return 12; }
             if inter.contains(&1) { return 13; }
@@ -172,15 +172,15 @@ fn test_hashset_algebra_borrowed() {
 
             // difference_owned borrows both sets
             dec diff = s1.difference_owned(&s2);
-            if s1.len() != (3 as u64) { return 15; }
-            if s2.len() != (3 as u64) { return 16; }
-            if diff.len() != (1 as u64) { return 17; }
+            if s1.len() != (3 as usize) { return 15; }
+            if s2.len() != (3 as usize) { return 16; }
+            if diff.len() != (1 as usize) { return 17; }
             if diff.contains(&1) == false { return 18; }
             if diff.contains(&2) { return 19; }
 
             // free-function form: std::union_owned(&s1, &s2)
             dec u2 = std::union_owned(&s1, &s2);
-            if u2.len() != (4 as u64) { return 20; }
+            if u2.len() != (4 as usize) { return 20; }
 
             return 0;
         }

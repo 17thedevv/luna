@@ -50,6 +50,12 @@ export struct BTreeSet<T> {
     private map: BTreeMap<T, bool>,
 };
 
+// Type-owned constructors; free factories remain migration entry points.
+impl<T> BTreeSet<T> {
+    export fn new() -> Self { return btreeset_new<T>(); }
+}
+
+
 export fn btreeset_new<T>() -> BTreeSet<T> {
     return BTreeSet<T> {
         map: std::btreemap_new<T, bool>(),
@@ -63,7 +69,7 @@ impl<T> std::Default for BTreeSet<T> {
 }
 
 impl<T> BTreeSet<T> {
-    export fn len(self: &Self) -> u64 {
+    export fn len(self: &Self) -> usize {
         return self.map.len();
     }
 
@@ -109,9 +115,99 @@ impl<T: std::Ord> BTreeSet<T> {
         return self.map.contains_key(value);
     }
 
+    export fn is_subset(self: &Self, other: &Self) -> bool {
+        if self.len() > other.len() { return false; }
+        dec rw it = self.iter();
+        while true {
+            match it.next() {
+                std::Option::Some(value) -> { if other.contains(value) == false { return false; } },
+                std::Option::None -> { return true; },
+            }
+        }
+        return true;
+    }
+
+    export fn is_superset(self: &Self, other: &Self) -> bool { return other.is_subset(self); }
+
+    export fn is_disjoint(self: &Self, other: &Self) -> bool {
+        dec rw it = self.iter();
+        while true {
+            match it.next() {
+                std::Option::Some(value) -> { if other.contains(value) { return false; } },
+                std::Option::None -> { return true; },
+            }
+        }
+        return true;
+    }
+
     export fn range(self: &Self, min_val: &T, max_val: &T) -> std::Vec<&T> life_from(self) {
         return self.map.range_keys(min_val, max_val);
     }
+}
+
+impl<T: std::Ord + std::Clone> BTreeSet<T> {
+    export fn union_owned(self: &Self, other: &Self) -> Self {
+        dec rw out = BTreeSet<T>::new();
+        dec rw it = self.iter();
+        while true {
+            match it.next() {
+                std::Option::Some(value) -> { if true { out.insert((*value).clone()); } },
+                std::Option::None -> { break; },
+            }
+        }
+        dec rw other_it = other.iter();
+        while true {
+            match other_it.next() {
+                std::Option::Some(value) -> { if true { out.insert((*value).clone()); } },
+                std::Option::None -> { break; },
+            }
+        }
+        return out;
+    }
+
+    export fn intersection_owned(self: &Self, other: &Self) -> Self {
+        dec rw out = BTreeSet<T>::new();
+        dec rw it = self.iter();
+        while true {
+            match it.next() {
+                std::Option::Some(value) -> { if other.contains(value) { out.insert((*value).clone()); } },
+                std::Option::None -> { break; },
+            }
+        }
+        return out;
+    }
+
+    export fn difference_owned(self: &Self, other: &Self) -> Self {
+        dec rw out = BTreeSet<T>::new();
+        dec rw it = self.iter();
+        while true {
+            match it.next() {
+                std::Option::Some(value) -> { if other.contains(value) == false { out.insert((*value).clone()); } },
+                std::Option::None -> { break; },
+            }
+        }
+        return out;
+    }
+
+    export fn symmetric_difference_owned(self: &Self, other: &Self) -> Self {
+        dec rw out = BTreeSet<T>::new();
+        dec rw it = self.iter();
+        while true {
+            match it.next() {
+                std::Option::Some(value) -> { if other.contains(value) == false { out.insert((*value).clone()); } },
+                std::Option::None -> { break; },
+            }
+        }
+        dec rw other_it = other.iter();
+        while true {
+            match other_it.next() {
+                std::Option::Some(value) -> { if self.contains(value) == false { out.insert((*value).clone()); } },
+                std::Option::None -> { break; },
+            }
+        }
+        return out;
+    }
+
 }
 
 impl<T: std::Clone> std::Clone for BTreeSet<T> {
@@ -128,4 +224,6 @@ impl<T> std::IntoIterator<T, std::BTreeSetIntoIter<T>> for std::BTreeSet<T> {
     fn into_iter(self: Self) -> std::BTreeSetIntoIter<T> {
         return self.into_iter();
     }
+
+
 }

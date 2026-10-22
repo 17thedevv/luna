@@ -143,18 +143,18 @@ import <iter_collect>;
 
         fn main() -> i32 {
             dec rw map = std::hashmap_new<i32, i32>();
-            if map.len() != (0 as u64) {
+            if map.len() != (0 as usize) {
                 return 1;
             }
             if map.is_empty() == false {
                 return 2;
             }
 
-            dec rw map_cap = std::hashmap_with_capacity<i32, i32>(16 as u64);
-            if map_cap.capacity() != (16 as u64) {
+            dec rw map_cap = std::hashmap_with_capacity<i32, i32>(16 as usize);
+            if map_cap.capacity() != (16 as usize) {
                 return 3;
             }
-            if map_cap.len() != (0 as u64) {
+            if map_cap.len() != (0 as usize) {
                 return 4;
             }
 
@@ -194,7 +194,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             dec ins1 = map.insert(10, 100);
             dec ins2 = map.insert(20, 200);
             dec ins3 = map.insert(30, 300);
@@ -202,7 +202,7 @@ import <iter_collect>;
             if ins1 == false || ins2 == false || ins3 == false {
                 return 1;
             }
-            if map.len() != (3 as u64) {
+            if map.len() != (3 as usize) {
                 return 2;
             }
 
@@ -269,7 +269,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(1, 10);
             map.insert(2, 20);
 
@@ -323,7 +323,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(5, 50);
 
             dec k5: i32 = 5;
@@ -383,12 +383,12 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             dec ins1 = map.insert(7, 70);
             if ins1 == false {
                 return 1;
             }
-            if map.len() != (1 as u64) {
+            if map.len() != (1 as usize) {
                 return 2;
             }
 
@@ -396,7 +396,7 @@ import <iter_collect>;
             if ins2 == true {
                 return 3; // false indicates an overwrite
             }
-            if map.len() != (1 as u64) {
+            if map.len() != (1 as usize) {
                 return 4; // length remains 1
             }
 
@@ -445,7 +445,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(1, 10);
             map.insert(2, 20);
             map.insert(3, 30);
@@ -455,7 +455,7 @@ import <iter_collect>;
             if rem_res == false {
                 return 1;
             }
-            if map.len() != (2 as u64) {
+            if map.len() != (2 as usize) {
                 return 2;
             }
 
@@ -506,18 +506,18 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(1, 10);
             map.insert(2, 20);
             map.insert(3, 30);
 
-            if map.len() != (3 as u64) {
+            if map.len() != (3 as usize) {
                 return 1;
             }
 
             map.clear();
 
-            if map.len() != (0 as u64) {
+            if map.len() != (0 as usize) {
                 return 2;
             }
             if map.is_empty() == false {
@@ -584,7 +584,7 @@ import <iter_collect>;
         }
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<CollidingKey, i32>(16 as u64);
+            dec rw map = std::hashmap_with_capacity<CollidingKey, i32>(16 as usize);
 
             dec k1 = CollidingKey { id: 1 as u64, forced_hash: 42 as u64 };
             dec k2 = CollidingKey { id: 2 as u64, forced_hash: 42 as u64 };
@@ -596,7 +596,7 @@ import <iter_collect>;
             map.insert(k3, 300);
             map.insert(k4, 400);
 
-            if map.len() != (4 as u64) {
+            if map.len() != (4 as usize) {
                 return 1;
             }
 
@@ -659,7 +659,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
 
             // Insert 25 elements, forcing multiple resizes (8 -> 16 -> 32 -> 64)
             dec rw i: i32 = 1;
@@ -668,10 +668,10 @@ import <iter_collect>;
                 i = i + 1;
             }
 
-            if map.len() != (25 as u64) {
+            if map.len() != (25 as usize) {
                 return 1;
             }
-            if map.capacity() < (32 as u64) {
+            if map.capacity() < (32 as usize) {
                 return 2;
             }
 
@@ -722,7 +722,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(1, 10);
 
             dec k1: i32 = 1;
@@ -763,7 +763,7 @@ import <hashset>;
 import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             map.insert(1, 10);
 
             dec k1: i32 = 1;
@@ -835,7 +835,7 @@ import <iter_collect>;
         }
 
         fn run_map_lifecycle(drop_count_ptr: *rw i32) -> i32 {
-            dec rw map = std::hashmap_with_capacity<TrackedItem, TrackedItem>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<TrackedItem, TrackedItem>(8 as usize);
 
             // Insert 6 key-value pairs (12 tracked items)
             dec rw i: i32 = 1;
@@ -998,7 +998,7 @@ fn test_hashmap_overwrite_no_growth_stress() {
         import <iter_collect>;
 
         fn main() -> i32 {
-            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(8 as usize);
             // Insert 5 elements (load factor: 5/8 < 0.75, so cap remains 8)
             map.insert(1, 10);
             map.insert(2, 20);
@@ -1007,10 +1007,10 @@ fn test_hashmap_overwrite_no_growth_stress() {
             map.insert(5, 50);
 
             dec init_cap = map.capacity();
-            if init_cap != (8 as u64) {
+            if init_cap != (8 as usize) {
                 return 1;
             }
-            if map.len() != (5 as u64) {
+            if map.len() != (5 as usize) {
                 return 2;
             }
 
@@ -1028,7 +1028,7 @@ fn test_hashmap_overwrite_no_growth_stress() {
             if map.capacity() != init_cap {
                 return 4;
             }
-            if map.len() != (5 as u64) {
+            if map.len() != (5 as usize) {
                 return 5;
             }
 
@@ -1045,7 +1045,7 @@ fn test_hashmap_overwrite_no_growth_stress() {
             if map.capacity() != init_cap {
                 return 7;
             }
-            if map.len() != (5 as u64) {
+            if map.len() != (5 as usize) {
                 return 8;
             }
 

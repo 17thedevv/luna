@@ -28,7 +28,7 @@ module std {
         dec rw boxed = b;
         dec raw = boxed.ptr;
         unsafe {
-            boxed.ptr = 0 as u64 as *rw T;
+            boxed.ptr = 0 as usize as *rw T;
             dec val = std::ptr::read<T>(raw as *T);
             __luna_dealloc(raw as *rw u8, std::mem::size_of<T>(), std::mem::align_of<T>());
             return val;
@@ -74,11 +74,11 @@ module std {
 
     impl<T> std::Drop for Box<T> {
         fn drop(self: &rw Self) {
-            if (self.ptr as u64) != (0 as u64) {
+            if (self.ptr as usize) != (0 as usize) {
                 unsafe {
                     std::ptr::drop_in_place<T>(self.ptr);
                     __luna_dealloc(self.ptr as *rw u8, std::mem::size_of<T>(), std::mem::align_of<T>());
-                    self.ptr = 0 as u64 as *rw T;
+                    self.ptr = 0 as usize as *rw T;
                 }
             }
         }

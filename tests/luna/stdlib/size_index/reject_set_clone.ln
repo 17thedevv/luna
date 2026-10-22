@@ -1,0 +1,11 @@
+import <cmp>;
+import <btreeset>;
+struct Key { id: i32 };
+impl std::Ord for Key {
+    fn cmp(self: &Self, other: &Self) -> i32 { return self.id - other.id; }
+}
+fn main() {
+    dec a = std::BTreeSet<Key>::new();
+    dec b = std::BTreeSet<Key>::new();
+    dec result = a.union_owned(&b);
+}

@@ -1,6 +1,6 @@
 # Luna 0.1 documentation inventory
 
-Updated 2026-10-21. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
+Updated 2026-10-22. [Authority](spec/0.1/README.md) · [Gaps](spec/0.1/gaps.md).
 
 All repository-authored tracked Markdown and new versioned/archived/audit documents are classified below. Agent guidance is included. Vendor documentation, generated build logs and test-failure dumps are excluded. Website pages are generated from the same baseline.
 
@@ -128,6 +128,9 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/audits/stdlib-fallible-2026-10-21/compiler-gap-14.md](audits/stdlib-fallible-2026-10-21/compiler-gap-14.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-fallible-2026-10-21/compiler-gap-15.md](audits/stdlib-fallible-2026-10-21/compiler-gap-15.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/audits/stdlib-redesign-2026-10-21/README.md](audits/stdlib-redesign-2026-10-21/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-usize-2026-10-22/README.md](audits/stdlib-usize-2026-10-22/README.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-usize-2026-10-22/compiler-gap-16.md](audits/stdlib-usize-2026-10-22/compiler-gap-16.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
+| [docs/audits/stdlib-usize-2026-10-22/compiler-gap-17.md](audits/stdlib-usize-2026-10-22/compiler-gap-17.md) | evidence | [stdlib](spec/0.1/stdlib.md) |
 | [docs/borrowck/NLL_spec.md](borrowck/NLL_spec.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/borrowck/call_effect_model.md](borrowck/call_effect_model.md) | historical | [semantics](spec/0.1/semantics.md) |
 | [docs/core-language-contract.md](core-language-contract.md) | guidance | [modules](spec/0.1/modules.md) |
@@ -179,6 +182,8 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/proposals/entry-argv-policy.md](proposals/entry-argv-policy.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/stdlib-redesign-0.1.md](proposals/stdlib-redesign-0.1.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/stdlib-redesign-0.1/allocator.md](proposals/stdlib-redesign-0.1/allocator.md) | guidance | [runtime](spec/0.1/runtime.md) |
+| [docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md](proposals/stdlib-redesign-0.1/cpp-library-gap-map.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
+| [docs/proposals/stdlib-redesign-0.1/foundation-api.md](proposals/stdlib-redesign-0.1/foundation-api.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/stdlib-redesign-0.1/size-index.md](proposals/stdlib-redesign-0.1/size-index.md) | guidance | [stdlib](spec/0.1/stdlib.md) |
 | [docs/proposals/v01-design-01-method-collision.md](proposals/v01-design-01-method-collision.md) | historical | [conformance](spec/0.1/conformance.md) |
 | [docs/proposals/v01-filter-step-dedup-api.md](proposals/v01-filter-step-dedup-api.md) | historical | [conformance](spec/0.1/conformance.md) |
@@ -206,6 +211,7 @@ Historical bodies are preserved, with an authority notice. Replaced entry pages 
 | [docs/spec/0.1/runtime.md](spec/0.1/runtime.md) | canonical | [runtime](spec/0.1/runtime.md) |
 | [docs/spec/0.1/semantics.md](spec/0.1/semantics.md) | canonical | [semantics](spec/0.1/semantics.md) |
 | [docs/spec/0.1/stdlib-inventory.md](spec/0.1/stdlib-inventory.md) | canonical | [stdlib](spec/0.1/stdlib.md) |
+| [docs/spec/0.1/stdlib-memory-size-v1.md](spec/0.1/stdlib-memory-size-v1.md) | canonical | [stdlib](spec/0.1/stdlib.md) |
 | [docs/spec/0.1/stdlib.md](spec/0.1/stdlib.md) | canonical | [stdlib](spec/0.1/stdlib.md) |
 | [docs/spec/0.1/syntax.md](spec/0.1/syntax.md) | canonical | [conformance](spec/0.1/conformance.md) |
 | [docs/stable/0.1.0/README.md](stable/0.1.0/README.md) | guidance | [conformance](spec/0.1/conformance.md) |

@@ -175,7 +175,7 @@ fn test_transitive_access_to_internal_providers_succeeds() {
             dec rw v: std::Vec<i32> = std::vec_new<i32>();
             v.push(std::box_into_inner(b));
 
-            dec rw map = std::hashmap_with_capacity<i32, i32>(4 as u64);
+            dec rw map = std::hashmap_with_capacity<i32, i32>(4 as usize);
             map.insert(1, 42);
 
             dec val = map.get(&1);

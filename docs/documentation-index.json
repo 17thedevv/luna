@@ -600,6 +600,21 @@
     "owner": "stdlib"
   },
   {
+    "path": "docs/audits/stdlib-usize-2026-10-22/README.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-usize-2026-10-22/compiler-gap-16.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/audits/stdlib-usize-2026-10-22/compiler-gap-17.md",
+    "role": "evidence",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/borrowck/NLL_spec.md",
     "role": "historical",
     "owner": "semantics"
@@ -855,6 +870,16 @@
     "owner": "runtime"
   },
   {
+    "path": "docs/proposals/stdlib-redesign-0.1/cpp-library-gap-map.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/proposals/stdlib-redesign-0.1/foundation-api.md",
+    "role": "guidance",
+    "owner": "stdlib"
+  },
+  {
     "path": "docs/proposals/stdlib-redesign-0.1/size-index.md",
     "role": "guidance",
     "owner": "stdlib"
@@ -986,6 +1011,11 @@
   },
   {
     "path": "docs/spec/0.1/stdlib-inventory.md",
+    "role": "canonical",
+    "owner": "stdlib"
+  },
+  {
+    "path": "docs/spec/0.1/stdlib-memory-size-v1.md",
     "role": "canonical",
     "owner": "stdlib"
   },

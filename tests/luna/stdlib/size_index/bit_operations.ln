@@ -1,0 +1,26 @@
+import <num>;
+fn main() -> i32 {
+    if std::bit::count_ones_u64(18446744073709551615u64) != 64 as u32 { return 1; }
+    if std::bit::count_ones_u64(0 as u64) != 0 as u32 { return 2; }
+    if std::bit::leading_zeros_u64(0 as u64) != 64 as u32 || std::bit::trailing_zeros_u64(0 as u64) != 64 as u32 { return 3; }
+    if std::bit::leading_zeros_u64(1 as u64) != 63 as u32 || std::bit::trailing_zeros_u64(9223372036854775808u64) != 63 as u32 { return 4; }
+    if std::bit::has_single_bit_u64(0 as u64) || std::bit::has_single_bit_u64(3 as u64) { return 5; }
+    if std::bit::has_single_bit_u64(9223372036854775808u64) == false { return 6; }
+    if std::bit::bit_width_u64(0 as u64) != 0 as u32 || std::bit::bit_width_u64(18446744073709551615u64) != 64 as u32 { return 7; }
+    if std::bit::bit_floor_u64(0 as u64) != 0 as u64 || std::bit::bit_floor_u64(9 as u64) != 8 as u64 { return 8; }
+    if std::bit::bit_ceil_u64(0 as u64).unwrap() != 1 as u64 || std::bit::bit_ceil_u64(9 as u64).unwrap() != 16 as u64 { return 9; }
+    if std::bit::bit_ceil_u64(9223372036854775808u64).unwrap() != 9223372036854775808u64 { return 10; }
+    if std::bit::bit_ceil_u64(9223372036854775809u64).is_some() { return 11; }
+    dec value = 81985529216486895u64;
+    dec rw count = 0 as u32;
+    while count <= 129 as u32 {
+        dec rotated = std::bit::rotate_left_u64(value, count);
+        if std::bit::rotate_right_u64(rotated, count) != value { return 12; }
+        if std::bit::count_ones_u64(rotated) != std::bit::count_ones_u64(value) { return 13; }
+        count = count + (1 as u32);
+    }
+    if std::bit::rotate_left_u64(9223372036854775808u64, 1 as u32) != 1 as u64 { return 14; }
+    if std::bit::swap_bytes_u64(value) != 17279655951921914625u64 { return 15; }
+    if std::bit::swap_bytes_u64(std::bit::swap_bytes_u64(value)) != value { return 16; }
+    return 0;
+}

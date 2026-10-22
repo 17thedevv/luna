@@ -2205,7 +2205,7 @@ impl<'a> TypeChecker<'a> {
                                         Mutability::Immutable
                                     } else { Mutability::Mutable };
                                     params.len() == 2
-                                        && matches!(self.ctx.types.get(params[1]), SemanticType::Primitive(BuiltinType::U64))
+                                        && matches!(self.ctx.types.get(params[1]), SemanticType::Primitive(BuiltinType::Usize))
                                         && matches!(self.ctx.types.get(*return_type),
                                             SemanticType::Reference(_, mutable, slice) if *mutable == expected
                                                 && matches!(self.ctx.types.get(*slice), SemanticType::Slice(inner) if *inner == element))

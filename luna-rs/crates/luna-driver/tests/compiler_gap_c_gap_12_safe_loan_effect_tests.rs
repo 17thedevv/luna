@@ -678,7 +678,7 @@ fn main() {
 import <ptr>;
 struct AnchoredOwner { ptr: *rw i32 } requires anchor(ptr) = self;
 unsafe fn expose(owner: &rw AnchoredOwner) -> &rw i32 life_from(owner) {
-    dec shifted = std::ptr::add_mut<i32>(owner.ptr, 0 as u64);
+    dec shifted = std::ptr::add_mut<i32>(owner.ptr, 0 as usize);
     return &rw *shifted;
 }
 fn main() {

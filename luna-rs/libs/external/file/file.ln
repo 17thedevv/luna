@@ -213,16 +213,16 @@ export module std {
         // output cells in runtime-owned scratch memory and access them only
         // through the raw-pointer unsafe boundary.
         dec buffer_slot = __luna_alloc(
-            std::mem::size_of<*rw u8>() as u64,
-            std::mem::align_of<*rw u8>() as u64
+            std::mem::size_of<*rw u8>(),
+            std::mem::align_of<*rw u8>()
         ) as *rw *rw u8;
         dec length_slot = __luna_alloc(
-            std::mem::size_of<usize>() as u64,
-            std::mem::align_of<usize>() as u64
+            std::mem::size_of<usize>(),
+            std::mem::align_of<usize>()
         ) as *rw usize;
         dec capacity_slot = __luna_alloc(
-            std::mem::size_of<usize>() as u64,
-            std::mem::align_of<usize>() as u64
+            std::mem::size_of<usize>(),
+            std::mem::align_of<usize>()
         ) as *rw usize;
         dec rw buffer: *rw u8 = 0 as u64 as *rw u8;
         dec rw length: usize = 0 as usize;
@@ -245,18 +245,18 @@ export module std {
             capacity = *capacity_slot;
             __luna_dealloc(
                 buffer_slot as *rw u8,
-                std::mem::size_of<*rw u8>() as u64,
-                std::mem::align_of<*rw u8>() as u64
+                std::mem::size_of<*rw u8>(),
+                std::mem::align_of<*rw u8>()
             );
             __luna_dealloc(
                 length_slot as *rw u8,
-                std::mem::size_of<usize>() as u64,
-                std::mem::align_of<usize>() as u64
+                std::mem::size_of<usize>(),
+                std::mem::align_of<usize>()
             );
             __luna_dealloc(
                 capacity_slot as *rw u8,
-                std::mem::size_of<usize>() as u64,
-                std::mem::align_of<usize>() as u64
+                std::mem::size_of<usize>(),
+                std::mem::align_of<usize>()
             );
         }
 
@@ -265,12 +265,12 @@ export module std {
         }
 
         dec rw bytes = std::vec_new<u8>();
-        dec rw i: u64 = 0 as u64;
-        while i < (length as u64) {
+        dec rw i: usize = 0 as usize;
+        while i < (length) {
             unsafe {
                 bytes.push(std::ptr::read<u8>(std::ptr::add<u8>(buffer as *u8, i)));
             }
-            i = i + (1 as u64);
+            i = i + (1 as usize);
         }
 
         // Runtime buffers are not Vec storage. Copy first, then free exactly
@@ -308,12 +308,12 @@ export module std {
         }
         dec lhs_bytes = lhs.as_bytes();
         dec rhs_bytes = rhs.as_bytes();
-        dec rw i = 0 as u64;
+        dec rw i = 0 as usize;
         while i < lhs.len() {
             if lhs_bytes[i] != rhs_bytes[i] {
                 return false;
             }
-            i = i + (1 as u64);
+            i = i + (1 as usize);
         }
         return true;
     }
@@ -326,7 +326,7 @@ export module std {
         match read_file(src) {
             std::Result::Ok(bytes) -> {
                 match write_file(dst, bytes.as_slice()) {
-                    std::Result::Ok -> std::Result::Ok(bytes.len()),
+                    std::Result::Ok -> std::Result::Ok(bytes.len() as u64),
                     std::Result::Err(error) -> std::Result::Err(error),
                 }
             },
@@ -695,7 +695,7 @@ export module std {
             dec rw out_len: usize = 0 as usize;
             dec rw out_is_dir: i32 = 0 as i32;
             unsafe {
-                dec name_buf = __luna_alloc(512 as u64, 1 as u64);
+                dec name_buf = __luna_alloc(512 as usize, 1 as usize);
                 dec res = __luna_fs_readdir(
                     self.handle,
                     name_buf,
@@ -704,25 +704,25 @@ export module std {
                     &rw out_is_dir as *rw i32
                 );
                 if res == (1 as i32) {
-                    __luna_dealloc(name_buf, 512 as u64, 1 as u64);
+                    __luna_dealloc(name_buf, 512 as usize, 1 as usize);
                     return std::Result::Ok(std::Option::None);
                 }
                 if res < (0 as i32) {
-                    __luna_dealloc(name_buf, 512 as u64, 1 as u64);
+                    __luna_dealloc(name_buf, 512 as usize, 1 as usize);
                     return std::Result::Err(error_from_runtime_status(res));
                 }
-                dec name_slice = std::mem::slice_from_raw_parts<u8>(name_buf as *u8, out_len as u64);
+                dec name_slice = std::mem::slice_from_raw_parts<u8>(name_buf as *u8, out_len);
                 dec name_opt = std::string_from_bytes(name_slice);
                 dec name_str = match name_opt {
                     std::Option::Some(s) -> s,
                     std::Option::None -> std::string_new(),
                 };
-                __luna_dealloc(name_buf, 512 as u64, 1 as u64);
+                __luna_dealloc(name_buf, 512 as usize, 1 as usize);
 
                 dec rw full = self.dir_path.clone();
                 dec dlen = full.len();
-                if dlen > (0 as u64) {
-                    dec last_ch = full.as_bytes()[dlen - (1 as u64)];
+                if dlen > (0 as usize) {
+                    dec last_ch = full.as_bytes()[dlen - (1 as usize)];
                     if last_ch != (47 as u8) && last_ch != (92 as u8) {
                         full.push_char('/');
                     }
@@ -762,7 +762,7 @@ export module std {
         dec path_bytes = path.as_bytes();
         dec rw out_len: usize = 0 as usize;
         unsafe {
-            dec out_buf = __luna_alloc(1024 as u64, 1 as u64);
+            dec out_buf = __luna_alloc(1024 as usize, 1 as usize);
             dec res = __luna_fs_canonicalize(
                 path_bytes.data as *u8,
                 path_bytes.len() as usize,
@@ -771,16 +771,16 @@ export module std {
                 &rw out_len as *rw usize
             );
             if res != (0 as i32) {
-                __luna_dealloc(out_buf, 1024 as u64, 1 as u64);
+                __luna_dealloc(out_buf, 1024 as usize, 1 as usize);
                 return std::Result::Err(error_from_runtime_status(res));
             }
-            dec slice = std::mem::slice_from_raw_parts<u8>(out_buf as *u8, out_len as u64);
+            dec slice = std::mem::slice_from_raw_parts<u8>(out_buf as *u8, out_len);
             dec str_opt = std::string_from_bytes(slice);
             dec res_str = match str_opt {
                 std::Option::Some(s) -> s,
                 std::Option::None -> std::string_new(),
             };
-            __luna_dealloc(out_buf, 1024 as u64, 1 as u64);
+            __luna_dealloc(out_buf, 1024 as usize, 1 as usize);
             return std::Result::Ok(res_str);
         }
     }
@@ -999,7 +999,7 @@ export module std {
                 dec rw stdout_vec = std::vec_new<u8>();
                 dec rw i: usize = 0 as usize;
                 while i < out_len {
-                    dec b = std::ptr::read<u8>(std::ptr::add<u8>(out_ptr as *u8, i as u64));
+                    dec b = std::ptr::read<u8>(std::ptr::add<u8>(out_ptr as *u8, i));
                     stdout_vec.push(b);
                     i = i + (1 as usize);
                 }
@@ -1008,7 +1008,7 @@ export module std {
                 dec rw stderr_vec = std::vec_new<u8>();
                 dec rw j: usize = 0 as usize;
                 while j < err_len {
-                    dec b = std::ptr::read<u8>(std::ptr::add<u8>(err_ptr as *u8, j as u64));
+                    dec b = std::ptr::read<u8>(std::ptr::add<u8>(err_ptr as *u8, j));
                     stderr_vec.push(b);
                     j = j + (1 as usize);
                 }

@@ -11,36 +11,36 @@ export module std {
         #[lang("drop_in_place")]
         export unsafe intrinsic fn drop_in_place<T>(p: *rw T);
     
-        export unsafe fn add<T>(p: *T, count: u64) -> *T {
-            return (p as u64 + (count * (sizeof(T) as u64))) as *T;
+        export unsafe fn add<T>(p: *T, count: usize) -> *T {
+            return (p as usize + (count * (sizeof(T) as usize))) as *T;
         }
     
-        export unsafe fn add_mut<T>(p: *rw T, count: u64) -> *rw T {
-            return (p as u64 + (count * (sizeof(T) as u64))) as *rw T;
+        export unsafe fn add_mut<T>(p: *rw T, count: usize) -> *rw T {
+            return (p as usize + (count * (sizeof(T) as usize))) as *rw T;
         }
     
         export unsafe fn offset<T>(p: *T, count: i64) -> *T {
-            return (p as u64 + (count as u64 * (sizeof(T) as u64))) as *T;
+            return (p as usize + (count as usize * (sizeof(T) as usize))) as *T;
         }
     
         export unsafe fn offset_mut<T>(p: *rw T, count: i64) -> *rw T {
-            return (p as u64 + (count as u64 * (sizeof(T) as u64))) as *rw T;
+            return (p as usize + (count as usize * (sizeof(T) as usize))) as *rw T;
         }
     
         export unsafe fn diff<T>(a: *T, b: *T) -> i64 {
             return ((a as i64) - (b as i64)) / (sizeof(T) as i64);
         }
     
-        export unsafe fn copy<T>(src: *T, dst: *rw T, count: u64) {
-            dec bytes = count * (sizeof(T) as u64);
-            dec s_u8 = src as u64 as *u8;
-            dec d_u8 = dst as u64 as *rw u8;
-            dec rw i: u64 = 0 as u64;
+        export unsafe fn copy<T>(src: *T, dst: *rw T, count: usize) {
+            dec bytes = count * (sizeof(T) as usize);
+            dec s_u8 = src as usize as *u8;
+            dec d_u8 = dst as usize as *rw u8;
+            dec rw i: usize = 0 as usize;
             while i < bytes {
-                dec s = (s_u8 as u64 + i) as *u8;
-                dec d = (d_u8 as u64 + i) as *rw u8;
+                dec s = (s_u8 as usize + i) as *u8;
+                dec d = (d_u8 as usize + i) as *rw u8;
                 *d = *s;
-                i = i + (1 as u64);
+                i = i + (1 as usize);
             }
         }
 
@@ -50,20 +50,20 @@ export module std {
         /// - If a != b: both pointers must be valid for T, properly aligned, and non-overlapping.
         /// Pure bitwise move semantics: reads and writes without dropping either location.
         export unsafe fn swap<T>(a: *rw T, b: *rw T) {
-            if (a as u64) == (b as u64) {
+            if (a as usize) == (b as usize) {
                 return;
             }
-            dec bytes = sizeof(T) as u64;
-            dec a_u8 = a as u64 as *rw u8;
-            dec b_u8 = b as u64 as *rw u8;
-            dec rw i: u64 = 0 as u64;
+            dec bytes = sizeof(T) as usize;
+            dec a_u8 = a as usize as *rw u8;
+            dec b_u8 = b as usize as *rw u8;
+            dec rw i: usize = 0 as usize;
             while i < bytes {
-                dec ap = (a_u8 as u64 + i) as *rw u8;
-                dec bp = (b_u8 as u64 + i) as *rw u8;
+                dec ap = (a_u8 as usize + i) as *rw u8;
+                dec bp = (b_u8 as usize + i) as *rw u8;
                 dec tmp = *ap;
                 *ap = *bp;
                 *bp = tmp;
-                i = i + (1 as u64);
+                i = i + (1 as usize);
             }
         }
 
@@ -79,7 +79,7 @@ export module std {
 
         impl<T> NonNull<T> {
             export fn is_null(self: &Self) -> bool {
-                return (self.pointer as u64) == (0 as u64);
+                return (self.pointer as usize) == (0 as usize);
             }
 
             export fn as_ptr(self: &Self) -> *rw T {
